@@ -24,7 +24,7 @@ casper.test.begin('Disable Toolbar', function (test) {
     casper
         .start(globals.editUrl)
         // click on example.com
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         // click on Disable Toolbar

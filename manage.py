@@ -41,6 +41,32 @@ if __name__ == '__main__':
         os.path.join(os.path.dirname(__file__), 'cms', 'test_utils')
     )
 
+    PLUGIN_APPS = [
+        'djangocms_text_ckeditor',
+        'djangocms_column',
+        'djangocms_picture',
+        'djangocms_file',
+        'djangocms_googlemap',
+        'djangocms_inherit',
+        'djangocms_teaser',
+        'djangocms_video',
+        'djangocms_style',
+        'djangocms_link',
+        'cms.test_utils.project.sampleapp',
+        'cms.test_utils.project.placeholderapp',
+        'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
+        'cms.test_utils.project.pluginapp.plugins.extra_context',
+        'cms.test_utils.project.pluginapp.plugins.meta',
+        'cms.test_utils.project.pluginapp.plugins.one_thing',
+        'cms.test_utils.project.pluginapp.plugins.revdesc',
+        'cms.test_utils.project.fakemlng',
+        'cms.test_utils.project.fileapp',
+        'cms.test_utils.project.objectpermissionsapp',
+        'cms.test_utils.project.bunch_of_plugins',
+        'cms.test_utils.project.extensionapp',
+        'cms.test_utils.project.mti_pluginapp',
+    ]
+
     INSTALLED_APPS = [
         'debug_toolbar',
         'django.contrib.auth',
@@ -54,41 +80,19 @@ if __name__ == '__main__':
         'treebeard',
         'cms',
         'menus',
-        'djangocms_text_ckeditor',
-        'djangocms_column',
-        'djangocms_picture',
-        'djangocms_file',
-        'djangocms_googlemap',
-        'djangocms_teaser',
-        'djangocms_video',
-        'djangocms_inherit',
-        'djangocms_style',
-        'djangocms_link',
-        'cms.test_utils.project.sampleapp',
-        'cms.test_utils.project.placeholderapp',
-        'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
-        'cms.test_utils.project.pluginapp.plugins.extra_context',
-        'cms.test_utils.project.pluginapp.plugins.meta',
-        'cms.test_utils.project.pluginapp.plugins.one_thing',
-        'cms.test_utils.project.fakemlng',
-        'cms.test_utils.project.fileapp',
-        'cms.test_utils.project.objectpermissionsapp',
-        'cms.test_utils.project.bunch_of_plugins',
-        'cms.test_utils.project.extensionapp',
-        'cms.test_utils.project.mti_pluginapp',
         'reversion',
         'sekizai',
         'hvad',
         'better_test',
-    ]
+    ] + PLUGIN_APPS
 
     dynamic_configs = {
         'TEMPLATES': [{
             'NAME': 'django',
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
             'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
             'OPTIONS': {
+                'debug': True,
                 'context_processors': [
                     "django.contrib.auth.context_processors.auth",
                     'django.contrib.messages.context_processors.messages',
@@ -101,14 +105,18 @@ if __name__ == '__main__':
                     "sekizai.context_processors.sekizai",
                     "django.template.context_processors.static",
                 ],
-                'debug': True,
+                'loaders': (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                )
             }
-        }],
-    }
+        }
+    ]}
 
-    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture',
-               'djangocms_style', 'djangocms_teaser', 'djangocms_video')
+    plugins = ('djangocms_column', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
+               'djangocms_teaser', 'djangocms_video')
 
     migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
     if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
@@ -128,6 +136,10 @@ if __name__ == '__main__':
                 return 'notmigrations'
 
         dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
+    if 'test' in sys.argv:
+        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    else:
+        SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
     app_manage.main(
         ['cms', 'menus'],
@@ -145,7 +157,7 @@ if __name__ == '__main__':
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             }
         },
-        SESSION_ENGINE="django.contrib.sessions.backends.cache",
+        SESSION_ENGINE=SESSION_ENGINE,
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
@@ -170,6 +182,7 @@ if __name__ == '__main__':
         STATIC_URL='/static/',
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        PLUGIN_APPS=PLUGIN_APPS,
         MIDDLEWARE_CLASSES=[
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
@@ -302,9 +315,9 @@ if __name__ == '__main__':
         CMS_PERMISSION=True,
         CMS_PUBLIC_FOR='all',
         CMS_CACHE_DURATIONS={
-            'menus': 0,
-            'content': 0,
-            'permissions': 0,
+            'menus': 60,
+            'content': 60,
+            'permissions': 60,
         },
         CMS_APPHOOKS=[],
         CMS_PLUGIN_PROCESSORS=(),

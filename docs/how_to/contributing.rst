@@ -84,7 +84,7 @@ integration tests.
 Depending on your contribution, you will write a mix of them.
 
 Let's start with something simple. We'll assume you have set up your environment correctly as
-`described above <start-contributing>`_.
+:ref:`described above <start-contributing>`.
 
 Let's say you want to test the behaviour of the ``CMSPluginBase.render`` method:
 
@@ -114,7 +114,7 @@ Let's try to run it:
 
 .. code-block:: bash
 
-    python manage.py test cms.SimplePluginTestCase
+    python manage.py test cms.tests.test_plugins.SimplePluginTestCase
 
 This will call the new test case class only and it's handy when creating new tests and iterating
 quickly through the steps. A full test run (``python manage.py test``) is required before opening

@@ -2,15 +2,20 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches
 from django.template import Template
+from django.test import RequestFactory
 from django.test.utils import override_settings
+
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page
+from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, CMSPlugin
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT,
                                       URL_CMS_PLUGIN_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
+from cms.toolbar.toolbar import CMSToolbar
+from cms.utils import get_cms_setting
 
 
 @override_settings(
@@ -49,7 +54,29 @@ class TestNoI18N(CMSTestCase):
         super(TestNoI18N, self).setUp()
 
     def tearDown(self):
+        super(TestNoI18N, self).tearDown()
         clear_url_caches()
+
+    def get_page_request(self, page, user, path=None, edit=False, lang_code='en', disable=False):
+        path = path or page and page.get_absolute_url()
+        if edit:
+            path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        request = RequestFactory().get(path)
+        request.session = {}
+        request.user = user
+        request.LANGUAGE_CODE = lang_code
+        if edit:
+            request.GET = {'edit': None}
+        else:
+            request.GET = {'edit_off': None}
+        if disable:
+            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
+        request.current_page = page
+        mid = ToolbarMiddleware()
+        mid.process_request(request)
+        if hasattr(request, 'toolbar'):
+            request.toolbar.populate()
+        return request
 
     def test_language_chooser(self):
         # test simple language chooser with default args
@@ -100,7 +127,7 @@ class TestNoI18N(CMSTestCase):
         ):
             create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
             response = self.client.get('/', follow=False)
-            self.assertEqual(response['Location'], 'http://testserver/foobar/')
+            self.assertTrue(response['Location'].endswith("/foobar/"))
 
     def test_plugin_add_edit(self):
         page_data = {
@@ -151,3 +178,14 @@ class TestNoI18N(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         txt = Text.objects.all()[0]
         self.assertEqual("Hello World", txt.body)
+
+    def test_toolbar_no_locale(self):
+        page = create_page('test', 'nav_playground.html', 'en-us', published=True)
+        sub = create_page('sub', 'nav_playground.html', 'en-us', published=True, parent=page)
+        # loads the urlconf before reverse below
+        sub.get_absolute_url('en-us')
+        request = self.get_page_request(sub, self.get_superuser(), edit=True)
+        del request.LANGUAGE_CODE
+        toolbar = CMSToolbar(request)
+        toolbar.set_object(sub)
+        self.assertEqual(toolbar.get_object_public_url(), '/sub/')

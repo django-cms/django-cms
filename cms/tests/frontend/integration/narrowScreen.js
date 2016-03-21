@@ -25,7 +25,7 @@ casper.test.begin('Toolbar menu is collapsed on narrow screens (320, 240)', func
     casper
         .start(globals.editUrl)
         .viewport(320, 480)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertSelectorHasText(
                 '.cms-toolbar-left > .cms-toolbar-item-navigation > .cms-toolbar-more:only-child',
                 'More',
@@ -51,7 +51,7 @@ casper.test.begin('Toolbar menu is collapsed on narrow screens (768, 1024)', fun
     casper
         .start(globals.editUrl)
         .viewport(768, 1024)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertSelectorHasText(
                 '.cms-toolbar-left > .cms-toolbar-item-navigation > .cms-toolbar-more:only-child',
                 'More',
@@ -65,7 +65,7 @@ casper.test.begin('Toolbar menu is collapsed on narrow screens (768, 1024)', fun
         })
         .waitUntilVisible('.cms-toolbar-item-navigation-hover', function () {
             test.assertEvalEquals(function () {
-                return CMS.$('.cms-toolbar-item-navigation-hover ul a:visible').length;
+                return CMS.$('.cms-toolbar-item-navigation-hover > ul > li > a:visible').length;
             }, 4, 'Only top level menu items are in the More dropdown');
         })
         .run(function () {

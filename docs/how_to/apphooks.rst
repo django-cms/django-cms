@@ -55,12 +55,13 @@ a page and open the advanced settings tab. Select your new apphook under
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a ``urls.py`` that looks like this::
 
-    from django.conf.urls import *
+    from django.conf.urls import url
+    from sampleapp.views import main_view, sample_view
 
-    urlpatterns = patterns('sampleapp.views',
-        url(r'^$', 'main_view', name='app_main'),
-        url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
-    )
+    urlpatterns = [
+        url(r'^$', main_view, name='app_main'),
+        url(r'^sublevel/$', sample_view, name='app_sublevel'),
+    ]
 
 The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the URL ``/hello/world/sublevel/``.
@@ -80,9 +81,9 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
     default :class:`~django.template.Context` instance.
 
 
-**************
+*************
 Apphook menus
-**************
+*************
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -205,10 +206,12 @@ hook like this::
 
 If you use app namespace you will need to give all your view ``context`` a ``current_app``::
 
-  def my_view(request):
-      current_app = resolve(request.path_info).namespace
-      context = RequestContext(request, current_app=current_app)
-      return render_to_response("my_templace.html", context_instance=context)
+    from django.core.urlresolvers import resolve
+    from django.shortcuts import render
+
+    def my_view(request):
+        request.current_app = resolve(request.path_info).namespace
+        return render(request, "my_template.html")
 
 .. note::
     You need to set the current_app explicitly in all your view contexts as Django does not allow
@@ -306,17 +309,15 @@ will look like this::
 
     class OscarApp(CMSApp):
         name = _("Oscar")
-        urls = [
-            patterns('', *application.urls[0])
-        ]
+        urls = application.urls[0]
         exclude_permissions = ['dashboard']
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
 .. __: https://github.com/tangentlabs/django-oscar/blob/0.7.2/oscar/apps/dashboard/nav.py#L57
 
-************************************************
+***********************************************
 Automatically restart server on apphook changes
-************************************************
+***********************************************
 
 As mentioned above, whenever you:
 

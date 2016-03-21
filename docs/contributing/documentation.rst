@@ -49,10 +49,10 @@ This allows you to review your changes in your local browser using ``http://loca
 
     ``make install`` is roughly the equivalent of::
 
-    	virtualenv env
+        virtualenv env
         source env/bin/activate
         pip install -r requirements.txt
-    	cd docs
+        cd docs
         make html
 
     ``make run`` runs ``make html``, and serves the built documentation on port 8001 (that is, at
@@ -102,7 +102,7 @@ Check spelling
 
 Run::
 
-    ``make spelling``
+    make spelling
 
 in the ``docs`` directory to conduct the checks.
 
@@ -271,4 +271,4 @@ run search-and-replaces when items are moved in the structure.
 
 
 .. _restructuredText: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
-.. _Sphinx: http://sphinx.pocoo.org/
+.. _Sphinx: http://sphinx-doc.org//

@@ -48,7 +48,7 @@ var PROJECT_PATTERNS = {
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
-        PROJECT_PATH.sass + '/**/*.{scss,sass}'
+        PROJECT_PATH.sass + '/**/*.{scss,sass}',
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'
@@ -70,11 +70,10 @@ var JS_BUNDLES = {
     'bundle.admin.changeform.min.js': [
         PROJECT_PATH.js + '/modules/cms.changeform.js'
     ],
-    'bundle.admin.changelist.min.js': [
-        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
-        PROJECT_PATH.js + '/modules/cms.changelist.js',
-        PROJECT_PATH.js + '/jstree/_lib/_all.js',
-        PROJECT_PATH.js + '/jstree/tree_component.js'
+    'bundle.admin.pagetree.min.js': [
+        PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
+        PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.js'
     ],
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/polyfills/bind.js',
@@ -203,7 +202,8 @@ gulp.task('tests:integration', function (done) {
         'revertLive',
         'narrowScreen',
         'clipboard',
-        'modal'
+        'modal',
+        'pagetree'
     ];
     var pre = ['setup'];
 
@@ -217,7 +217,7 @@ gulp.task('tests:integration', function (done) {
     });
 
     // npm install -g casper-summoner
-    if (argv && argv.summon) {
+    if (argv && argv.screenshots) {
         child_process.execSync('casper-summoner ' + tests.join(' '));
         tests = tests.map(function (file) {
             return file.replace('.js', '.summoned.js');
@@ -231,7 +231,7 @@ gulp.task('tests:integration', function (done) {
     });
 
     casperChild.on('close', function (code) {
-        if (argv && argv.summon) {
+        if (argv && argv.screenshots) {
             child_process.execSync('rm ' + tests.join(' '));
         }
 

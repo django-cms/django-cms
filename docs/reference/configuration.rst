@@ -771,6 +771,9 @@ performance.
           limit.  Unfortunately, this means that non-superusers won't see any
           benefit from this setting.
 
+.. versionchanged:: 3.2.1: CMS_RAW_ID_USERS also applies to
+                           :class:`cms.model.GlobalPagePermission`` admin.
+
 
 .. setting:: CMS_PUBLIC_FOR
 
@@ -975,14 +978,8 @@ default
     ``False``
 
 If True, the toolbar is hidden in the pages out django CMS.
-To determine the internal url of django cms, you need to assign CMS_APP_NAME to use when you include ``'cms.urls'``
 
-Example::
-
-    urlpatterns += i18n_patterns('',
-        url(r'^admin/', include(admin.site.urls)),
-        url(r'^content/', include('cms.urls', app_name=settings.CMS_APP_NAME)),
-    )
+.. versionchanged:: 3.2.1: CMS_APP_NAME has been removed as it's no longer required.
 
 
 CMS_DEFAULT_X_FRAME_OPTIONS

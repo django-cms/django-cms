@@ -4,6 +4,7 @@ from functools import wraps
 import json
 import sys
 
+
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
@@ -11,17 +12,19 @@ from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.utils import get_deleted_objects
+from django.contrib.admin.utils import get_deleted_objects, quote
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist,
+                                    PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.template.defaultfilters import escape
 from django.utils.encoding import force_text
+from django.utils.formats import localize
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
@@ -29,12 +32,19 @@ from django.views.decorators.http import require_POST
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
-                             PublicationDatesForm)
-from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
+from cms.admin.forms import (
+    PageForm, AdvancedSettingsForm, PagePermissionForm, PublicationDatesForm
+)
+from cms.admin.permissionadmin import (
+    PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
+)
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
-from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
+from cms.constants import (
+    PAGE_TYPES_ID,
+    PUBLISHER_STATE_PENDING,
+    REVISION_INITIAL_COMMENT,
+)
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.plugin_pool import plugin_pool
@@ -51,8 +61,7 @@ from cms.utils.urlutils import add_url_parameters, admin_reverse
 require_POST = method_decorator(require_POST)
 
 if is_installed('reversion'):
-    from reversion.admin import VersionAdmin as ModelAdmin
-    from reversion import create_revision
+    from cms.utils.reversion_hacks import ModelAdmin, create_revision, Version, RollBackRevisionView
 else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
@@ -87,7 +96,6 @@ else:  # pragma: no cover
         return ReversionContext()
 
 PUBLISH_COMMENT = "Publish"
-INITIAL_COMMENT = "Initial version."
 
 
 class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
@@ -121,8 +129,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
+            # Deprecated in 3.2.1, please use ".../change-template/..." instead
             pat(r'^([0-9]+)/change_template/$', self.change_template),
-            pat(r'^([0-9]+)/([a-z\-]+)/descendants/$', self.descendants),  # menu html for page descendants
+            pat(r'^([0-9]+)/change-template/$', self.change_template),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -131,6 +140,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^add-page-type/$', self.add_page_type),
             pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
+            url(r'^get-tree/$', self.get_tree, name="get_tree"),
         ]
 
         if plugin_pool.get_all_plugins():
@@ -171,26 +181,26 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         position = request.GET.get('position', None)
 
         if 'recover' in request.path_info:
-            pk = obj.pk
+            tmp_page = Page(
+                path=None,
+                numchild=0,
+                depth=0,
+                site_id=obj.site_id,
+            )
+
+            # It's necessary to create a temporary page
+            # in order to calculate the tree attributes.
             if obj.parent_id:
-                try:
-                    parent = Page.objects.get(pk=obj.parent_id)
-                except Page.DoesNotExist:
-                    parent = None
+                tmp_page = obj.parent.add_child(instance=tmp_page)
             else:
-                parent = None
-            obj.pk = None
-            obj.path = None
-            obj.numchild = 0
-            obj.depth = 0
-            if parent:
-                saved_obj = parent.add_child(instance=obj)
-            else:
-                saved_obj = obj.add_root(instance=obj)
-            tmp_pk = saved_obj.pk
-            saved_obj.pk = pk
-            Page.objects.get(pk=tmp_pk).delete()
-            saved_obj.save(no_signals=True)
+                tmp_page = obj.add_root(instance=tmp_page)
+
+            obj.path = tmp_page.path
+            obj.numchild = tmp_page.numchild
+            obj.depth = tmp_page.depth
+
+            # Remove temporary page.
+            tmp_page.delete()
         else:
             if 'history' in request.path_info:
                 old_obj = self.model.objects.get(pk=obj.pk)
@@ -386,6 +396,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             uhd_urls = []
         return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
 
+    @create_revision()
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
@@ -420,7 +431,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # to determine whether a given object exists.
             obj = None
         else:
-            #activate(user_lang_set)
             context = {
                 'page': obj,
                 'CMS_PERMISSION': get_cms_setting('PERMISSION'),
@@ -433,7 +443,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context = self.update_language_tab_context(request, obj, context)
 
         tab_language = get_language_from_request(request)
-
         extra_context.update(self.get_unihandecode_context(tab_language))
 
         response = super(PageAdmin, self).change_view(
@@ -441,6 +450,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+        if request.method == "POST" and response.status_code in (200, 302):
+            if 'history' in request.path_info:
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
+            elif 'recover' in request.path_info:
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
@@ -455,7 +469,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
     def _get_site_languages(self, obj=None):
-        site_id = None
         if obj:
             site_id = obj.site_id
         else:
@@ -596,6 +609,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return False
         return True
 
+    @create_revision()
     def post_add_plugin(self, request, placeholder, plugin):
         if is_installed('reversion') and placeholder.page:
             plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
@@ -604,6 +618,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(placeholder.page)
             helpers.make_revision_with_plugins(placeholder.page, request.user, message)
 
+    @create_revision()
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
         page = target_placeholder.page
         if page and is_installed('reversion'):
@@ -611,11 +626,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
 
+    @create_revision()
     def post_edit_plugin(self, request, plugin):
         page = plugin.placeholder.page
-        if page:
-            # if reversion is installed, save version of the page plugins
-            if is_installed('reversion') and page:
+
+        # if reversion is installed, save version of the page plugins
+        if page and is_installed('reversion'):
                 plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
                 message = _(
                     u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
@@ -626,12 +642,20 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, message)
 
+    @create_revision()
     def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
-        page = target_placeholder.page
-        if page and is_installed('reversion'):
-            self.cleanup_history(page)
-            helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
+        # order matters.
+        # We give priority to the target page but fallback to the source.
+        # This comes into play when moving plugins between static placeholders
+        # and non static placeholders.
+        page = target_placeholder.page or source_placeholder.page
 
+        if page and is_installed('reversion'):
+            message = _(u"Moved plugins to %(placeholder)s") % {'placeholder': target_placeholder}
+            self.cleanup_history(page)
+            helpers.make_revision_with_plugins(page, request.user, message)
+
+    @create_revision()
     def post_delete_plugin(self, request, plugin):
         plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
         page = plugin.placeholder.page
@@ -646,6 +670,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
+    @create_revision()
     def post_clear_placeholder(self, request, placeholder):
         page = placeholder.page
         if page:
@@ -739,14 +764,34 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not self.has_recover_permission(request):
             raise PermissionDenied
         extra_context = self.update_language_tab_context(request, None, extra_context)
+        request.original_version_id = version_id
         return super(PageAdmin, self).recover_view(request, version_id, extra_context)
 
     def revision_view(self, request, object_id, version_id, extra_context=None):
+        if not is_installed('reversion'):
+            return HttpResponseBadRequest('django reversion not installed')
+
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
-        extra_context = self.update_language_tab_context(request, None, extra_context)
-        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
-        return response
+
+        page = get_object_or_404(self.model, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
+        try:
+            version = Version.objects.get(pk=version_id)
+            clean = page._apply_revision(version.revision, set_dirty=True)
+            if not clean:
+                messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
+            with create_revision():
+                adapter = self.revision_manager.get_adapter(page.__class__)
+                self.revision_context_manager.add_to_context(self.revision_manager, page, adapter.get_version_data(page))
+                self.revision_context_manager.set_comment(_("Reverted to previous version, saved on %(datetime)s") % {"datetime": localize(version.revision.date_created)})
+        except IndexError as e:
+            return HttpResponseBadRequest(e.message)
+
+        return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
 
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
@@ -754,8 +799,21 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         extra_context = self.update_language_tab_context(request, None, extra_context)
         return super(PageAdmin, self).history_view(request, object_id, extra_context)
 
-    def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
-        # reset parent to null if parent is not found
+    def get_object(self, request, object_id, from_field=None):
+        if from_field:
+            obj = super(PageAdmin, self).get_object(request, object_id, from_field)
+        else:
+            # This is for DJANGO_16
+            obj = super(PageAdmin, self).get_object(request, object_id)
+
+        if is_installed('reversion') and getattr(request, 'original_version_id', None):
+            version = get_object_or_404(Version, pk=getattr(request, 'original_version_id', None))
+            recover = 'recover' in request.path_info
+            revert = 'history' in request.path_info
+            obj, version = self._reset_parent_during_reversion(obj, version, revert, recover)
+        return obj
+
+    def _reset_parent_during_reversion(self, obj, version, revert=False, recover=False):
         if version.field_dict['parent']:
             try:
                 Page.objects.get(pk=version.field_dict['parent'])
@@ -768,7 +826,60 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     version.field_dict['parent'] = None
 
         obj.version = version
+        return obj, version
 
+    # Reversion 1.9+ no longer uses these two methods to save revision, but we still need them
+    # as we do not use signals
+    def log_addition(self, request, object, message=None):
+        """Sets the version meta information."""
+        if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
+            adapter = self.revision_manager.get_adapter(object.__class__)
+            self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
+            self.revision_context_manager.set_comment(REVISION_INITIAL_COMMENT)
+        # Same code as reversion 1.9
+        try:
+            super(PageAdmin, self).log_addition(request, object, REVISION_INITIAL_COMMENT)
+        except TypeError:  # Django < 1.9 pragma: no cover
+            super(PageAdmin, self).log_addition(request, object)
+
+    def log_change(self, request, object, message):
+        """Sets the version meta information."""
+        if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
+            adapter = self.revision_manager.get_adapter(object.__class__)
+            self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
+            self.revision_context_manager.set_comment(message)
+            if isinstance(object, Title):
+                page = object.page
+            if isinstance(object, Page):
+                page = object
+            helpers.make_revision_with_plugins(page, request.user, message)
+        super(PageAdmin, self).log_change(request, object, message)
+
+    # This is just for Django 1.6 / reversion 1.8 compatibility
+    # The handling of recover / revision in 3.3 can be simplified
+    # by using the new reversion semantic and django changeform_view
+    def revisionform_view(self, request, version, template_name, extra_context=None):
+        try:
+            with transaction.atomic():
+                # Revert the revision.
+                version.revision.revert(delete=True)
+                # Run the normal change_view view.
+                with self._create_revision(request):
+                    response = self.change_view(request, version.object_id, request.path, extra_context)
+                    # Decide on whether the keep the changes.
+                    if request.method == "POST" and response.status_code == 302:
+                        self.revision_context_manager.set_comment(_("Reverted to previous version, saved on %(datetime)s") % {"datetime": localize(version.revision.date_created)})
+                    else:
+                        response.template_name = template_name
+                        response.render()
+                        raise RollBackRevisionView
+        except RollBackRevisionView:
+            pass
+        return response
+
+    def render_revision_form(self, request, obj, version, context, revert=False, recover=False):
+        # reset parent to null if parent is not found
+        obj, version = self._reset_parent_during_reversion(obj, version, revert, recover)
         return super(PageAdmin, self).render_revision_form(request, obj, version, context, revert, recover)
 
     @require_POST
@@ -832,31 +943,110 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @transaction.atomic
     def move_page(self, request, page_id, extra_context=None):
         """
-        Move the page to the requested target, at the given position
+        Move the page to the requested target, at the given position.
+
+        NOTE: We have to change from one "coordinate system" to another to
+        adapt JSTree to Django Treebeard.
+
+        If the Tree looks like this:
+
+            <root>
+               ⊢ …
+               ⊢ …
+               ⊢ Page 4
+                   ⊢ Page 5 (position 0)
+                   ⊢ …
+
+        For example,
+            target=4, position=1 => target=5, position="right"
+            target=4, position=0 => target=4, position="first-child"
+
         """
         target = request.POST.get('target', None)
-        position = request.POST.get('position', None)
-        if target is None or position is None:
-            return HttpResponseRedirect('../../')
+        position = request.POST.get('position', 0)
+        site_id = request.POST.get('site', None)
+
+        try:
+            position = int(position)
+        except (TypeError, ValueError):
+            position = 0
 
         try:
             page = self.model.objects.get(pk=page_id)
-            target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
             return jsonify_request(HttpResponseBadRequest("error"))
 
-        # does he haves permissions to do this...?
-        if not page.has_move_page_permission(request) or \
-                not target.has_add_permission(request):
+        try:
+            site = Site.objects.get(id=int(site_id))
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if target is None:
+            # Special case: If «target» is not provided, it means to let the
+            # page become a new root node.
+            try:
+                tb_target = Page.get_root_nodes().filter(
+                    publisher_is_draft=True, site=site)[position]
+                if page.is_sibling_of(tb_target) and page.path < tb_target.path:
+                    tb_position = "right"
+                else:
+                    tb_position = "left"
+            except IndexError:
+                # Move page to become the last root node.
+                tb_target = Page.get_last_root_node()
+                tb_position = "right"
+        else:
+            try:
+                target = tb_target = self.model.objects.get(pk=int(target), site=site)
+            except (TypeError, ValueError, self.model.DoesNotExist):
+                return jsonify_request(HttpResponseBadRequest("error"))
+            if position == 0:
+                tb_position = "first-child"
+            else:
+                try:
+                    tb_target = target.get_children().filter(
+                        publisher_is_draft=True, site=site)[position]
+                    if page.is_sibling_of(tb_target) and page.path < tb_target.path:
+                        tb_position = "right"
+                    else:
+                        tb_position = "left"
+                except IndexError:
+                    tb_position = "last-child"
+
+        # Does the user have permissions to do this...?
+        if not page.has_move_page_permission(request) or (
+                    target and not target.has_add_permission(request)):
             return jsonify_request(
-                HttpResponseForbidden(force_text(_("Error! You don't have permissions to move this page. Please reload the page"))))
-            # move page
-        page.move_page(target, position)
+                HttpResponseForbidden(
+                    force_text(_("Error! You don't have permissions to move "
+                                 "this page. Please reload the page"))))
+
+        page.move_page(tb_target, tb_position)
+
+        # Force an update the published/unpublished state of this page and
+        # its descendants.
+        for language in page.get_languages():
+            published = page.get_title_obj(language).published
+            if page.parent:
+                if page.parent.get_title_obj(language).published and published:
+                    page.publish(language)
+                else:
+                    page.parent.mark_descendants_pending(language)
+
+            else:
+                if published:
+                    page.publish(language)
+                else:
+                    page.mark_descendants_pending(language)
+
         if is_installed('reversion'):
             self.cleanup_history(page)
-            helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
+            helpers.make_revision_with_plugins(
+                page, request.user, _("Page moved"))
 
-        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
+        return jsonify_request(
+            HttpResponse(admin_utils.render_admin_menu_item(request, page)))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(self.model, id=page_id)
@@ -918,37 +1108,75 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @transaction.atomic
     def copy_page(self, request, page_id, extra_context=None):
         """
-        Copy the page and all its plugins and descendants to the requested target, at the given position
-        """
-        context = {}
-        page = Page.objects.get(pk=page_id)
+        Copy the page and all its plugins and descendants to the requested
+        target, at the given position
 
+        NOTE: We have to change from one "coordinate system" to another to
+        adapt JSTree to Django Treebeard. See comments in move_page().
+
+        NOTE: This code handles more cases then are *currently* supported in
+        the UI, specifically, the target should never be None and the position
+        should never be non-zero. These are implemented, however, because we
+        intend to support these cases later.
+        """
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
-        site = request.POST.get('site', None)
-        if target is not None and position is not None and site is not None:
+        site_id = request.POST.get('site', None)
+        copy_permissions = request.POST.get('copy_permissions', False)
+
+        try:
+            page = self.model.objects.get(pk=page_id)
+        except self.model.DoesNotExist:
+            return jsonify_request(HttpResponseBadRequest("Error"))
+
+        try:
+            position = int(position)
+        except (TypeError, ValueError):
+            position = 0
+        try:
+            site = Site.objects.get(id=int(site_id))
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if target is None:
+            # Special case: If «target» is not provided, it means to create the
+            # new page as a root node.
             try:
-                target = self.model.objects.get(pk=target)
-                # does he have permissions to copy this page under target?
-                assert target.has_add_permission(request)
-                site = Site.objects.get(pk=site)
-            except (ObjectDoesNotExist, AssertionError):
-                return HttpResponse("error")
+                tb_target = Page.get_root_nodes().filter(
+                    publisher_is_draft=True, site=site)[position]
+                tb_position = "left"
+            except IndexError:
+                # New page to become the last root node.
+                tb_target = Page.get_last_root_node()
+                tb_position = "right"
+        else:
+            try:
+                tb_target = self.model.objects.get(pk=int(target), site=site)
+                assert tb_target.has_add_permission(request)
+            except (TypeError, ValueError, self.model.DoesNotExist,
+                    AssertionError):
+                return jsonify_request(HttpResponseBadRequest("Error"))
+            if position == 0:
+                # This is really the only possible value for position.
+                tb_position = "first-child"
             else:
+                # But, just in case...
                 try:
-                    permissions = request.GET.get('copy_permissions', False)
-                    if not permissions:
-                        permissions = request.POST.get('copy_permissions', False)
-                    kwargs = {
-                        'copy_permissions': permissions,
-                    }
-                    page.copy_page(target, site, position, **kwargs)
-                    return jsonify_request(HttpResponse("ok"))
-                except ValidationError:
-                    exc = sys.exc_info()[1]
-                    return jsonify_request(HttpResponseBadRequest(exc.messages))
-        context.update(extra_context or {})
-        return HttpResponseRedirect('../../')
+                    tb_target = tb_target.get_children().filter(
+                        publisher_is_draft=True, site=site)[position]
+                    tb_position = "left"
+                except IndexError:
+                    tb_position = "last-child"
+        try:
+            new_page = page.copy_page(tb_target, site, tb_position,
+                                      copy_permissions=copy_permissions)
+            results = {"id": new_page.pk}
+            return HttpResponse(
+                json.dumps(results), content_type='application/json')
+        except ValidationError:
+            exc = sys.exc_info()[1]
+            return jsonify_request(HttpResponseBadRequest(exc.messages))
 
     @require_POST
     @transaction.atomic
@@ -1000,7 +1228,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # create a new publish reversion
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
@@ -1027,20 +1255,20 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def cleanup_history(self, page, publish=False):
         if is_installed('reversion') and page:
             # delete revisions that are not publish revisions
-            from reversion.models import Version
+            from cms.utils.reversion_hacks import Version
 
             content_type = ContentType.objects.get_for_model(Page)
             # reversion 1.8+ removes type field, revision filtering must be based on comments
             versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
             history_limit = get_cms_setting("MAX_PAGE_HISTORY_REVERSIONS")
             deleted = []
-            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)).order_by(
+            for version in versions_qs.exclude(revision__comment__in=(REVISION_INITIAL_COMMENT,  PUBLISH_COMMENT)).order_by(
                         '-revision__pk')[history_limit - 1:]:
                 if not version.revision_id in deleted:
                     revision = version.revision
                     revision.delete()
                     deleted.append(revision.pk)
-                    # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
+            # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
             publish_limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
             if publish_limit and publish:
                 deleted = []
@@ -1101,7 +1329,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         # TODO: This should never fail, but it may be a POF
         path = page.get_absolute_url(language=language)
@@ -1188,8 +1416,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 helpers.make_revision_with_plugins(obj, request.user, message)
 
             if not self.has_change_permission(request, None):
-                return HttpResponseRedirect("../../../../")
-            return HttpResponseRedirect("../../")
+                return HttpResponseRedirect(admin_reverse('index'))
+            return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
 
         context = {
             "title": _("Are you sure?"),
@@ -1232,20 +1460,52 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if page.has_change_permission(request):
             page.toggle_in_navigation()
             language = request.GET.get('language') or get_language_from_request(request)
-            return admin_utils.render_admin_menu_item(request, page, language=language)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page, language=language))
         return HttpResponseForbidden(force_text(_("You do not have permission to change this page's in_navigation status")))
 
-    def descendants(self, request, page_id, language):
+    def get_tree(self, request):
         """
-        Get html for descendants of given page
-        Used for lazy loading pages in cms.changelist.js
+        Get html for the descendants (only) of given page or if no page_id is
+        provided, all the root nodes.
+
+        Used for lazy loading pages in cms.pagetree.js
 
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
-        page = get_object_or_404(self.model, pk=page_id)
-        return admin_utils.render_admin_menu_item(request, page,
-                                                  template="admin/cms/page/tree/lazy_menu.html", language=language)
+        page_id = request.GET.get('pageId', None)
+        site_id = request.GET.get('site', None)
+        language = request.GET.get('language', None)
+        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
+
+        try:
+            site_id = int(site_id)
+            site = Site.objects.get(id=site_id)
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if language is None:
+            language = (request.GET.get('language') or
+                        get_language_from_request(request))
+
+        if page_id:
+            page = get_object_or_404(self.model, pk=int(page_id))
+            pages = list(page.get_children())
+        else:
+            pages = Page.get_root_nodes().filter(site=site,
+                                                 publisher_is_draft=True)
+
+        template = "admin/cms/page/tree/lazy_menu.html"
+        response = u""
+        for page in pages:
+            response += admin_utils.render_admin_menu_item(
+                request, page,
+               template=template,
+               language=language,
+               open_nodes=open_nodes,
+           )
+        return HttpResponse(response)
 
     def add_page_type(self, request):
         site = Site.objects.get_current()
@@ -1299,7 +1559,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     except:
                         obj = None
         if obj:
-            if not request.toolbar or not request.toolbar.edit_mode:
+            if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode', False):
                 if isinstance(obj, Page):
                     if obj.get_public_object():
                         url = obj.get_public_object().get_absolute_url()
@@ -1409,31 +1669,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponse(json.dumps(results), content_type='application/json')
         else:
             return HttpResponseForbidden()
-
-    def add_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).add_plugin(*args, **kwargs)
-
-    def copy_plugins(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).copy_plugins(*args, **kwargs)
-
-    def edit_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).edit_plugin(*args, **kwargs)
-
-    def move_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).move_plugin(*args, **kwargs)
-
-    def delete_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).delete_plugin(*args, **kwargs)
-
-    def clear_placeholder(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).clear_placeholder(*args, **kwargs)
-
 
 
 admin.site.register(Page, PageAdmin)

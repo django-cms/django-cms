@@ -17,6 +17,7 @@ dev
 fallback
 fallbacks
 js
+jsTree
 practices
 rc
 regexps
@@ -25,7 +26,7 @@ url
 
 #### accepted entries ####
 
-
+addon
 addons
 Admin
 admin
@@ -37,10 +38,13 @@ apphooked
 apphooks
 apps
 astagi
+Asus
+attr
 backport
 backported
 backticks
 basilelegal
+Bertschy
 blog
 boilerplates
 cacheable
@@ -97,6 +101,7 @@ ikudryavtsev
 Indices
 inline
 introspected
+iOS
 iPad
 ipsum
 Japanisch
@@ -138,6 +143,7 @@ newsblog
 nikolas
 northben
 nostalgiaz
+Nüesch
 Obrist
 olarcheveque
 online
@@ -155,6 +161,7 @@ programmatically
 queryset
 recurses
 refactor
+refactored
 runserver
 runtime
 Saltvik
@@ -163,10 +170,11 @@ Samsung
 Sass
 Schoen
 searchable
-sekizai
 Sekizai
+sekizai
 sephii
 sideframe
+Sikora
 sitemap
 sitemaps
 slugified
@@ -193,6 +201,7 @@ uncached
 unclosed
 uncomment
 uneditable
+unescaped
 unfussy
 unihandecode
 unimprovable
@@ -207,6 +216,7 @@ upgraders
 urlconf
 username
 vad
+Vadim
 viewable
 Vimeo
 vstoykov
@@ -215,12 +225,11 @@ Wohlwend
 workflows
 writeable
 xframe
+Xperia
 YouTube
 Zürich
 Øyvind
 日本語
-iOS
-Asus
-Xperia
+
 
 

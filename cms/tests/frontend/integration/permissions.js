@@ -33,7 +33,7 @@ casper.test.tearDown(function (done) {
 // for this case LOGIN_URL is '/admin/login/?user-login=test'
 casper.test.begin('Can set / unset "login required" for the page', function (test) {
     casper.start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             test.assertSelectorHasText(
                 '.cms-plugin',
@@ -82,7 +82,7 @@ casper.test.begin('Can set / unset "login required" for the page', function (tes
         // wait till the form submits
         .waitForResource(/admin\/login/)
         // wait till we are redirected
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             // check for body, because we see published page (no .cms-plugin)
             test.assertSelectorHasText(
                 'body',
@@ -94,7 +94,7 @@ casper.test.begin('Can set / unset "login required" for the page', function (tes
             // click on Edit button to edit the page
             this.click('.cms-btn-switch-edit');
         })
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // now backwards
         .then(function () {
             // click on "Page" menu item

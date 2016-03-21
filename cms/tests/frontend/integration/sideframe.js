@@ -70,7 +70,7 @@ casper.test.begin('Sideframe', function (test) {
             this.click('.cms-sideframe .cms-icon-close');
         })
         .thenOpen(globals.baseUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertNotVisible('.cms-sideframe-frame', 'The sideframe has been closed');
         })
         .run(function () {

@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from copy import copy
+
+from classytags.utils import flatten_context
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.utils import six
@@ -10,11 +13,7 @@ from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plug
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
-from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
 
-
-# these are always called before all other plugin context processors
-from sekizai.helpers import Watcher
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
@@ -35,10 +34,8 @@ class PluginContext(Context):
     """
 
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
-        if current_app:
-            super(PluginContext, self).__init__(dict_)
-        else:
-            super(PluginContext, self).__init__(dict_, current_app=current_app)
+        dict_ = flatten_context(dict_)
+        super(PluginContext, self).__init__(dict_)
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
@@ -59,9 +56,9 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     if not processors:
         processors = []
     if isinstance(template, six.string_types):
-        content = render_to_string(template, context)
+        content = render_to_string(template, flatten_context(context))
     elif (isinstance(template, Template) or (hasattr(template, 'template') and
-         hasattr(template, 'render') and isinstance(template.template, Template))):
+          hasattr(template, 'render') and isinstance(template.template, Template))):
         content = template.render(context)
     else:
         content = ''
@@ -104,10 +101,14 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     during rendering. This is primarily used for the "as" variant of the
     render_placeholder tag.
     """
+    from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
+    from cms.utils.plugins import get_plugins
+    # these are always called before all other plugin context processors
+    from sekizai.helpers import Watcher
+
     if not placeholder:
         return
-    from cms.utils.plugins import get_plugins
-    context = context_to_copy.new(context_to_copy)
+    context = copy(context_to_copy)
     context.push()
     request = context['request']
     if not hasattr(request, 'placeholders'):
@@ -139,7 +140,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
             cached_value = get_placeholder_cache(placeholder, lang)
-            if not cached_value is None:
+            if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 return mark_safe(cached_value['content'])
     if page:
@@ -166,20 +167,20 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if edit and editable:
         if not hasattr(request.toolbar, 'placeholder_list'):
             request.toolbar.placeholder_list = []
-        if placeholder.pk not in request.toolbar.placeholder_list:
+        if placeholder not in request.toolbar.placeholder_list:
             request.toolbar.placeholder_list.append(placeholder)
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
     if content:
         content = mark_safe("".join(content))
     elif default:
-        #should be nodelist from a template
+        # should be nodelist from a template
         content = mark_safe(default.render(context_to_copy))
     else:
         content = ''
     context['content'] = content
     context['placeholder'] = toolbar_content
     context['edit'] = edit
-    result = render_to_string("cms/toolbar/content.html", context)
+    result = render_to_string("cms/toolbar/content.html", flatten_context(context))
     changes = watcher.get_changes()
     if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes})
@@ -209,6 +210,6 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
     context['placeholder'] = placeholder
     context['language'] = save_language
     context['page'] = page
-    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
+    toolbar = render_to_string("cms/toolbar/placeholder.html", flatten_context(context))
     context.pop()
     return toolbar

@@ -32,7 +32,7 @@ casper.test.begin('Publishing a page with publish button', function (test) {
 
     // open an unpublished new page
     casper.start(pageUrl + '?edit')
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             pageTitle = this.getTitle();
 
             test.assertSelectorHasText(
@@ -49,7 +49,7 @@ casper.test.begin('Publishing a page with publish button', function (test) {
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
         // clicking on 'Publish page now' button
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             // handles confirm popup
             this.setFilter('page.confirm', function () {
                 return true;
@@ -81,12 +81,12 @@ casper.test.begin('Publishing dates', function (test) {
     casper
         .start(globals.editUrl)
         // opening an unpublished new page
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             this.thenOpen(pageUrl);
         })
         // checking that it isn't published
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             pageTitle = this.getTitle();
 
             test.assertSelectorHasText(
@@ -146,7 +146,7 @@ casper.test.begin('Publishing dates', function (test) {
             this.click('.cms-modal .cms-btn-action');
         })
         // clicking on 'Publish page now' button
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             // handles confirm popup
             this.setFilter('page.confirm', function () {
                 return true;
@@ -154,15 +154,17 @@ casper.test.begin('Publishing dates', function (test) {
 
             this.click('.cms-btn-publish');
         })
+        .waitForResource(/publish/)
         // logging out through toolbar
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
         .waitForResource(/admin/)
+        .wait(1000)
         .waitForSelector('body', function () {
             test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
         })

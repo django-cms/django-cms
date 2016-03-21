@@ -13,6 +13,7 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.dj import is_installed, get_app_paths
 
 
@@ -264,6 +265,7 @@ def check_plugin_instances(output):
         else:
             section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
 
+
 @define_check
 def check_copy_relations(output):
     from cms.plugin_pool import plugin_pool
@@ -292,7 +294,7 @@ def check_copy_relations(output):
                     c_to_s(plugin_class),
                     c_to_s(rel.model),
                 ))
-            for rel in plugin_class._meta.get_all_related_objects():
+            for rel in plugin_class._get_related_objects():
                 if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
@@ -305,11 +307,17 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                    extension,
-                    rel.related,
-                ))
-            for rel in extension._meta.get_all_related_objects():
+                if DJANGO_1_8:
+                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                        c_to_s(extension),
+                        c_to_s(rel.related.model),
+                    ))
+                else:
+                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                        c_to_s(extension),
+                        c_to_s(rel.remote_field.model),
+                    ))
+            for rel in extension._get_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(extension),
@@ -336,7 +344,10 @@ def _load_all_templates(directory):
             elif path.endswith('.html'):
                 with open(path, 'rb') as fobj:
                     source = fobj.read().decode(settings.FILE_CHARSET)
-                    lexer = Lexer(source, path)
+                    if DJANGO_1_8:
+                        lexer = Lexer(source, path)
+                    else:
+                        lexer = Lexer(source)
                     yield lexer.tokenize(), path
 
 @define_check

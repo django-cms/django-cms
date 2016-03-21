@@ -7,13 +7,14 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
                                       RegexURLPattern)
+from django.db import OperationalError, ProgrammingError
 from django.utils import six
-from django.utils.translation import get_language
+from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
-from cms.utils.i18n import force_language, get_language_list
-
+from cms.utils.compat import DJANGO_1_8
+from cms.utils.i18n import get_language_list
 
 APP_RESOLVERS = []
 
@@ -109,16 +110,23 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None, nested=Fals
         path = path.lstrip('^')
         regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
         if isinstance(pattern, RegexURLResolver):
-            # this is an 'include', recurse!
-            resolver = RegexURLResolver(regex, 'cms_appresolver',
-                                        pattern.default_kwargs, pattern.app_name, pattern.namespace)
-            resolver.page_id = page_id
             # include default_args
             args = pattern.default_kwargs
             if default_args:
                 args.update(default_args)
-            # see lines 243 and 236 of urlresolvers.py to understand the next line
-            resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+            if DJANGO_1_8:
+                # this is an 'include', recurse!
+                resolver = RegexURLResolver(regex, 'cms_appresolver',
+                                            pattern.default_kwargs, pattern.app_name, pattern.namespace)
+                # see lines 243 and 236 of urlresolvers.py to understand the next line
+                resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+            else:
+                # see lines 243 and 236 of urlresolvers.py to understand the next line
+                urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+                # this is an 'include', recurse!
+                resolver = RegexURLResolver(regex, urlconf_module,
+                                            pattern.default_kwargs, pattern.app_name, pattern.namespace)
+            resolver.page_id = page_id
         else:
             # Re-do the RegexURLPattern with the new regular expression
             args = pattern.default_args
@@ -170,6 +178,16 @@ def get_patterns_for_title(path, title):
 
 
 def get_app_patterns():
+    try:
+        return _get_app_patterns()
+    except (OperationalError, ProgrammingError):
+        # ignore if DB is not ready
+        # Starting with Django 1.9 this code gets called even when creating
+        # or running migrations. So in many cases the DB will not be ready yet.
+        return []
+
+
+def _get_app_patterns():
     """
     Get a list of patterns for all hooked apps.
 
@@ -214,7 +232,7 @@ def get_app_patterns():
             hooked_applications[title.page_id] = {}
         app = apphook_pool.get_apphook(title.page.application_urls)
         app_ns = app.app_name, title.page.application_namespace
-        with force_language(title.language):
+        with override(title.language):
             hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs

@@ -2,6 +2,7 @@
 """
 Edit Toolbar middleware
 """
+from classytags.utils import flatten_context
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
@@ -41,7 +42,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     original_context.update(data)
     plugin_class = instance.get_plugin_class()
     template = plugin_class.frontend_edit_template
-    output = render_to_string(template, original_context).strip()
+    output = render_to_string(template, flatten_context(original_context)).strip()
     original_context.pop()
     return output
 
@@ -51,11 +52,10 @@ class ToolbarMiddleware(object):
     Middleware to set up CMS Toolbar.
     """
 
-    def is_cms_request(self,request):
-        cms_app_name = get_cms_setting('APP_NAME')
+    def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
 
-        if not toolbar_hide or not cms_app_name:
+        if not toolbar_hide:
             return True
 
         try:
@@ -63,8 +63,7 @@ class ToolbarMiddleware(object):
         except:
             return False
 
-        return match.app_name == cms_app_name
-
+        return match.url_name in ('pages-root', 'pages-details-by-slug')
 
     def process_request(self, request):
         """
@@ -86,7 +85,9 @@ class ToolbarMiddleware(object):
         if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
             request.session['cms_toolbar_disabled'] = False
 
-        if request.user.is_staff or (anonymous_on and request.user.is_anonymous()):
+        if not request.session.get('cms_toolbar_disabled', False) and (
+                request.user.is_staff or (anonymous_on and request.user.is_anonymous())
+        ):
             if edit_on in request.GET and not request.session.get('cms_edit', False):
                 if not request.session.get('cms_edit', False):
                     menu_pool.clear()

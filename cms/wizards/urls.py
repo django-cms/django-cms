@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import WizardCreateView
 
 
-urlpatterns = patterns('',  # NOQA
+urlpatterns = [
     url(r"^create/$",
         WizardCreateView.as_view(), name="cms_wizard_create"),
-)
+]

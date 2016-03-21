@@ -7,12 +7,15 @@
 # Angelo Dini <finalangeljp@hotmail.com>, 2015
 # Arne Schauf <transifex@asmaps.de>, 2014
 # Michael P. Jung <michael.jung@terreon.de>, 2013
+# Chive <kim@smuzey.ch>, 2015
+# death_ashaman <admiral_proton@yahoo.de>, 2014
 # Diana Dünki <diana.duenki@divio.ch>, 2015
 # Hendrik Richter <hendrikr@gnome.org>, 2014
 # Jonas Obrist <me@ojii.ch>, 2011
 # Chive <kim@smuzey.ch>, 2015
 # Martin Koistinen <mkoistinen@gmail.com>, 2015
 # Michael P. Jung <michael.jung@terreon.de>, 2013
+# o.zander <oliver.zander@gmail.com>, 2014
 # o.zander <oliver.zander@gmail.com>, 2014
 # Patrick Lauber <patrick.lauber@divio.ch>, 2012-2015
 # Peter Bittner <django@bittner.it>, 2015
@@ -27,9 +30,9 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-11-11 17:31+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: German (http://www.transifex.com/digi604/django-cms/language/de/)\n"
+"PO-Revision-Date: 2015-12-03 12:14+0000\n"
+"Last-Translator: Diana Dünki <diana.duenki@divio.ch>\n"
+"Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1353,11 +1356,11 @@ msgstr[1] ""
 #: templates/admin/cms/page/tree/base.html:108
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s Total"
 
 #: templates/admin/cms/page/tree/base.html:108
 msgid "Show all"
-msgstr ""
+msgstr "Alle anzeigen"
 
 #: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
@@ -1377,7 +1380,7 @@ msgstr "Filter"
 
 #: templates/admin/cms/page/tree/base_header.html:8
 msgid "View"
-msgstr ""
+msgstr "Ansehen"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
@@ -1570,7 +1573,7 @@ msgstr "Editieren"
 
 #: templates/cms/toolbar/dragitem.html:22
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Dieses Plugin kann nicht ausserhalb des Parents-Plugins verschoben oder editiert werden"
 
 #: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."

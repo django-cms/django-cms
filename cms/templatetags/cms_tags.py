@@ -3,7 +3,9 @@ from collections import OrderedDict
 from copy import copy
 from datetime import datetime
 from itertools import chain
+from platform import python_version
 
+import django
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -26,6 +28,7 @@ from classytags.arguments import (Argument, MultiValueArgument,
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from classytags.utils import flatten_context
 from classytags.values import StringValue
 from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
@@ -47,6 +50,8 @@ from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
 
+DJANGO_VERSION = django.get_version()
+PYTHON_VERSION = python_version()
 
 register = template.Library()
 
@@ -653,13 +658,15 @@ class CMSToolbar(RenderBlock):
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
         context['cms_version'] =  __version__
+        context['django_version'] = DJANGO_VERSION
+        context['python_version'] = PYTHON_VERSION
         context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         context['cms_edit_off'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
                 # needed to populate the context with sekizai content
-                render_to_string('cms/toolbar/toolbar_javascript.html', context)
+                render_to_string('cms/toolbar/toolbar_javascript.html', flatten_context(context))
                 context['addons'] =  mark_safe(toolbar.render_addons(context))
         else:
             language = None
@@ -676,7 +683,7 @@ class CMSToolbar(RenderBlock):
         request.toolbar.post_template_populate()
         with force_language(language):
             addons = mark_safe(toolbar.post_template_render_addons(context))
-            toolbar = render_to_string('cms/toolbar/toolbar.html', context)
+            toolbar = render_to_string('cms/toolbar/toolbar.html', flatten_context(context))
         # return the toolbar content and the content below
         return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
 
@@ -724,7 +731,7 @@ class CMSEditableObject(InclusionTag):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        output = render_to_string(template, data).strip()
+        output = render_to_string(template, flatten_context(data)).strip()
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output
@@ -898,7 +905,6 @@ class CMSEditableObject(InclusionTag):
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
         # would cause a perfomance hit for no reason
-        extra_context.update(context)
         if self._is_editable(context.get('request', None)):
             extra_context.update(self._get_editable_context(
                 extra_context, instance, language, edit_fields, view_method,
@@ -1011,7 +1017,7 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
-        output = render_to_string(template, data)
+        output = render_to_string(template, flatten_context(data))
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output
@@ -1063,7 +1069,7 @@ class CMSEditableObjectBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
-        output = render_to_string(template, data)
+        output = render_to_string(template, flatten_context(data))
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output
@@ -1170,7 +1176,7 @@ class RenderPlaceholder(AsTag):
             request.placeholders = []
         if placeholder.has_change_permission(request):
             request.placeholders.append(placeholder)
-        context = context.new(context)
+        context = copy(context)
         return safe(placeholder.render(context, width, lang=language,
                                        editable=editable, use_cache=not nocache))
 

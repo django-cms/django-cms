@@ -283,7 +283,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
 0 && casper.test.begin('Plugins with parent restriction cannot be pasted ' +
                   'in incorrect parents (paste button)', function (test) {
     casper.start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
             type: 'Bootstrap3RowCMSPlugin',
@@ -293,7 +293,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             }
         }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Five plugins present on the page');
         })
         // check that there is nothing now in the clipboard
@@ -319,7 +319,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
         )
         .waitForResource(/copy-plugins/)
 
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExists(
                 '.cms-clipboard-containers [title*="Bootstrap3ColumnCMSPlugin"]',
                 'Correct plugin was copied'
@@ -383,7 +383,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
 
         .waitForResource(/copy-plugins/)
 
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 6, 'Six plugins present on the page');
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggables .cms-draggable',
@@ -405,7 +405,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
     var row;
 
     casper.start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
             type: 'Bootstrap3RowCMSPlugin',
@@ -415,7 +415,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             }
         }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Five plugins present on the page');
         })
         // check that there is nothing now in the clipboard
@@ -441,7 +441,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
         )
         .waitForResource(/copy-plugins/)
 
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExists(
                 '.cms-clipboard-containers [title*="Bootstrap3ColumnCMSPlugin"]',
                 'Correct plugin was copied'
@@ -525,7 +525,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             return this.reload();
         })
 
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 6, 'Six plugins present on the page');
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggables .cms-draggable',
@@ -543,7 +543,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
 
 0 && casper.test.begin('Plugins with child restriction cannot accept other children (paste button)', function (test) {
     casper.start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
             type: 'Bootstrap3RowCMSPlugin',
@@ -553,7 +553,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             }
         }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Five plugins present on the page');
         })
         // check that there is nothing now in the clipboard
@@ -579,7 +579,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             }
         )
         .waitForResource(/copy-plugins/)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // check that there is something now in the clipboard
         .then(function () {
             test.assertElementCount('.cms-clipboard .cms-plugin', 1, '1 plugin in clipboard');
@@ -648,7 +648,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
 
         .waitForResource(/copy-plugins/)
 
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 6, 'Six plugins present on the page');
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggables .cms-draggable:last-child .cms-draggables ' +
@@ -670,7 +670,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
     var column;
 
     casper.start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
             type: 'Bootstrap3RowCMSPlugin',
@@ -680,7 +680,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             }
         }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Five plugins present on the page');
         })
         // check that there is nothing now in the clipboard
@@ -706,7 +706,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             }
         )
         .waitForResource(/copy-plugins/)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         // check that there is something now in the clipboard
         .then(function () {
             test.assertElementCount('.cms-clipboard .cms-plugin', 1, '1 plugin in clipboard');
@@ -793,7 +793,7 @@ casper.test.begin('Copy placeholder contents from the structure board', function
             return this.reload();
         })
 
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 6, 'Six plugins present on the page');
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggables .cms-draggable:first-child .cms-draggables ' +

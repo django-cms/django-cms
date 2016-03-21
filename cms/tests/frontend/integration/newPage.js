@@ -27,7 +27,7 @@ casper.test.tearDown(function (done) {
 casper.test.begin('New Page Creation', function (test) {
     casper
         .start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {

@@ -7,7 +7,6 @@ module.exports = function (casperjs) {
         /**
          * Logs in with the given parameters
          *
-         * @public
          * @param {Object} [credentials=globals.credentials]
          * @param {String} credentials.username
          * @param {String} credentials.password
@@ -24,7 +23,7 @@ module.exports = function (casperjs) {
 
         logout: function () {
             return function () {
-                return this.thenOpen(globals.adminLogoutUrl)
+                return this.wait(1000).thenOpen(globals.adminLogoutUrl)
                     .waitForSelector('#content');
             };
         },
@@ -37,27 +36,21 @@ module.exports = function (casperjs) {
          * @param {String} [opts.title] Name of the page to delete
          */
         removePage: function (opts) {
+            var that = this;
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.tree .deletelink')
+                    .waitUntilVisible('.cms-pagetree [href*="delete"]')
+                    .then(that.expandPageTree())
                     .then(function () {
                         var pageId;
                         if (opts && opts.title) {
-                            // important to pass single param, because casper acts
-                            // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
-                            pageId = this.evaluate(function (title) {
-                                return CMS.$('.col1 a > span').map(function () {
-                                    var span = $(this);
-                                    if (span.text().trim() === title) {
-                                        return span.closest('li').attr('id').split('_')[1];
-                                    }
-                                }).get()[0];
-                            }, opts.title);
+                            pageId = that.getPageId(opts.title);
                         }
+
                         if (pageId) {
-                            this.click('.tree .deletelink[href*="' + pageId + '"]');
+                            this.click('.cms-pagetree [href*="delete"][href*="' + pageId + '"]');
                         } else {
-                            this.click('.tree .deletelink'); // first one
+                            this.click('.cms-pagetree [href*="delete"]'); // first one
                         }
                     })
                     .waitUntilVisible('input[type=submit]')
@@ -68,15 +61,39 @@ module.exports = function (casperjs) {
         },
 
         /**
-        * Adds the page
+        * Adds the page. Optionally added page can be nested into
+        * a parent with given title (first in a list of equal titles taken).
         *
         * @public
         * @param {Object} opts
         * @param {String} opts.title name of the page
+        * @param {String} [opts.title] name of the parent page
         */
         addPage: function (opts) {
+            var that = this;
+
+            if (opts.parent) {
+                return function () {
+                    return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                        .waitUntilVisible('.cms-pagetree')
+                        .wait(1000)
+                        .then(that.expandPageTree())
+                        .then(function () {
+                            var pageId = that.getPageId(opts.parent);
+                            // add nested page
+                            this.click('a[href*="/admin/cms/page/add/?target=' + pageId + '"]');
+                        })
+                        .waitForSelector('#page_form', function () {
+                            this.sendKeys('#id_title', opts.title);
+                            this.click('input[name="_save"]');
+                        })
+                        .waitUntilVisible('.success');
+                };
+            }
+
+            // add page as usual
             return function () {
-                return this.thenOpen(globals.adminPagesUrl + 'add/')
+                return this.wait(1000).thenOpen(globals.adminPagesUrl + 'add/')
                     .waitUntilVisible('#id_title')
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
@@ -87,7 +104,8 @@ module.exports = function (casperjs) {
         },
 
         /**
-         * Adds the plugin (currently to the first placeholder)
+         * Adds the plugin. If the parent is not specified, plugin
+         * is added to the first placeholder on the page.
          *
          * @param {Object} opts
          * @param {String} opts.type type of the plugin to add
@@ -104,10 +122,11 @@ module.exports = function (casperjs) {
          */
         addPlugin: function (opts) {
             var xPath = casperjs.selectXPath;
+            var that = this;
 
             return function () {
                 return this.thenOpen(globals.editUrl)
-                    .waitUntilVisible('.cms-toolbar-expanded', function () {
+                    .waitForSelector('.cms-toolbar-expanded', function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
                     // only add to placeholder if no parent specified
@@ -131,15 +150,7 @@ module.exports = function (casperjs) {
                                     }).get().join('>');
                             }, opts.parent);
 
-                            // check if "Expand all" is visible
-                            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
-                                this.click(parentSelector + ' .cms-dragbar-expand-all');
-                            } else {
-                                // if not visible, then first "Collapse all"
-                                this.click(parentSelector + ' .cms-dragbar-collapse-all');
-                                this.wait(100);
-                                this.click(parentSelector + ' .cms-dragbar-expand-all');
-                            }
+                            that.expandPlaceholderPlugins(parentSelector);
 
                             this.wait(100);
                             this.click(opts.parent + ' [data-cms-tooltip="Add plugin"]');
@@ -213,7 +224,7 @@ module.exports = function (casperjs) {
                 throw new Error('Invalid arguments passed to cms.switchTo, should be either "structure" or "content"');
             }
             return function () {
-                return this.waitUntilVisible('.cms-toolbar-expanded')
+                return this.waitForSelector('.cms-toolbar-expanded')
                     .then(function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
                     });
@@ -241,6 +252,102 @@ module.exports = function (casperjs) {
                         throw new Error('Given placeholder has no plugins');
                     }
                 });
+            };
+        },
+
+        /**
+         * Opens the sideframe. Toolbar has to be there.
+         *
+         * @function openSideframe
+         */
+        openSideframe: function () {
+            return function () {
+                return this.waitForSelector('.cms-toolbar-expanded', function () {
+                    // open "Example.com" menu
+                    this.click('.cms-toolbar-item-navigation li:first-child a');
+                })
+                // open "Administration"
+                .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+                    this.click('.cms-toolbar-item-navigation-hover a[href*="/admin/cms/page"]');
+                })
+                // wait until sideframe is open
+                .waitUntilVisible('.cms-sideframe-frame');
+            };
+        },
+
+        /**
+         * Recursively expands the page tree to operate on page nodes.
+         *
+         * @function expandPageTree
+         */
+        expandPageTree: function () {
+            var that = this;
+            return function () {
+                return this.then(function () {
+                    if (this.visible('.jstree-closed')) {
+                        this.click('.jstree-closed > .jstree-ocl');
+                        // there's no clear way to check if the page was loading
+                        // or was already in the DOM
+                        return casper
+                            .then(that.waitUntilAllAjaxCallsFinish())
+                            .then(that.expandPageTree());
+                    } else {
+                        return casper.wait(250);
+                    }
+                });
+            };
+        },
+
+        /**
+         * Returns pageId. Page has to be visible in the page tree. See `expandPageTree`.
+         *
+         * @function getPageId
+         * @param {String} title page title
+         * @return {String|Boolean} page id as a string or false if couldn't be found
+         */
+        getPageId: function (title) {
+            return this._getPageIds(title)[0];
+        },
+
+        /**
+         * Returns pageIds of all the pages with same title.
+         * Pages has to be visible in the page tree. See `expandPageTree`.
+         *
+         * @function _getPageIds
+         * @private
+         * @param {String} title page title
+         * @return {String[]|Boolean} page ids as an array of strings or false if couldn't be found
+         */
+        _getPageIds: function (title) {
+            // important to pass single param, because casper acts
+            // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
+            return casper.evaluate(function (title) {
+                return CMS.$('.jstree-anchor').map(function () {
+                    var anchor = $(this);
+                    if (anchor.text().trim() === title) {
+                        return anchor.parent().data('id');
+                    }
+                }).toArray();
+            }, title);
+        },
+
+        /**
+         * Wait a bit and then wait until $.active will become 0.
+         * $.active is not documented, but it shows amount of ongoing
+         * jQuery requests.
+         *
+         * @function waitUntilAllAjaxCallsFinish
+         */
+        waitUntilAllAjaxCallsFinish: function () {
+            return function () {
+                return casper.wait(200)
+                    .waitFor(function () {
+                        var remainingAjaxRequests = this.evaluate(function () {
+                            return $.active;
+                        });
+
+                        return (remainingAjaxRequests === 0);
+                    });
             };
         }
     };

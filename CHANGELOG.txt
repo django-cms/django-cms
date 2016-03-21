@@ -10,19 +10,49 @@
 
 * Removed support for Django 1.6, 1.7 and python 2.6
 * Set the default value of CMSPlugin.position to 0 instead of null
+* Refactor language menu to allow for better integration with many languages
+* Management commands has been completely refactored for better consistency
+
+=== 3.2.3 (2016-03-09) ===
+
+- Fix the display of hyphenated language codes in the page tree
+- Fix a family of issues relating to unescaped translations in the page tree
 
 
-=== 3.2.1 (Unreleased) ===
+=== 3.2.2 (2016-03-02) ===
 
-- Fixed an issue with refreshing the UI when switching CMS language
-- Fixed an issue with sideframe urls not being remembered after reload
-- Added placeholder name to the edit tooltip
-- Fix breadcrumb in page revision list
-- Fix clash with Foundation that caused "Add plugin" button to be unusable
-- Fixed a tree corruption when pasting a nested plugin under another plugin.
-- Fix message with CMS version not showing up on hover in debug mode
-- Fix messages not being positioned correctly in debug mode
-- Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
+- Substantial improvements to the page tree and significant reduction of reloads
+- Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
+- Documentation improvements
+- Improve the display and useability of the language menu, especially in cases
+  where there are many languages.
+- Fix an issue relating to search fields in plugins
+- Fix an issue where the app-resolver would trigger locales into migrations
+- Fix cache settings
+- Fix ToolbarMiddleware.is_cms_request logic
+- Fix numerous Django 1.9 deprecations
+- Numerous other improvements to overall stability and code quality
+
+
+=== 3.2.1 (2016-01-29) ===
+
+- Add support for Django 1.9 (with some deprecation warnings).
+- Add support for django-reversion 1.10+ (required by Django 1.9+).
+- Add placeholder name to the edit tooltip.
+- Add ``attr['is_page']=True`` to CMS Page navigation nodes.
+- Add Django and Python versions to debug bar info tooltip
+- Fix an issue with refreshing the UI when switching CMS language.
+- Fix an issue with sideframe urls not being remembered after reload.
+- Fix breadcrumb in page revision list.
+- Fix clash with Foundation that caused "Add plugin" button to be unusable.
+- Fix a tree corruption when pasting a nested plugin under another plugin.
+- Fix message with CMS version not showing up on hover in debug mode.
+- Fix messages not being positioned correctly in debug mode.
+- Fix an issue where plugin parent restrictions where not respected when pasting a plugin.
+- Fix an issue where "Copy all" menu item could have been clicked on empty placeholder.
+- Fix a bug where page tree styles didn't load from STATIC_URL that pointed to a different host.
+- Fix an issue where the side-frame wouldn't refresh under some circumstances.
+- Honor CMS_RAW_ID_USERS in GlobalPagePermissionAdmin.
 
 
 === 3.2.0 (2015-11-24) ===
@@ -80,7 +110,27 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
-=== 3.1.4 ===
+=== 3.1.6 (unreleased) ===
+
+- Fix cache settings
+
+
+=== 3.1.5 (2016-01-29) ===
+
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+- Improve CMSPluginBase.render documentation
+- Fix CMSEditableObject context generation which generates to errors with django-classy-tags 0.7.1
+- Fix error in toolbar when LocaleMiddleware is not used
+- Move templates validation in app.ready
+- Fix ExtensionToolbar when language is removed but titles still exists
+- Fix pages menu missing on fresh install 3.1
+- Fix incorrect language on placeholder text for redirect field
+- Fix PageSelectWidget JS syntax
+- Fix redirect when disabling toolbar
+- Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
+
+
+=== 3.1.4 (2015-11-24) ===
 
 - Fixed a problem in ``0010_migrate_use_structure.py`` that broke some migration paths to Django 1.8
 - Fixed ``fix_tree`` command
@@ -185,7 +235,14 @@
 - Add "Structure mode" permission
 
 
-=== 3.0.16 ===
+=== 3.0.17 (unreleased) ===
+
+- Fix ExtensionToolbar when language is removed but titles still exists…
+- Fix PageSelectWidget JS syntax
+- Fix cache settings
+
+
+=== 3.0.16 (2015-11-24) ===
 
 - Fixed JavaScript error when using ``PageSelectWidget``
 - Fixed whitespace markup issues in draft mode
@@ -628,6 +685,3 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - docs updated
 - permissions now working in multisite environment
 - home is now graphically designated in tree-view
-
-==== 2.0.0 (2009-11-12) ====
-

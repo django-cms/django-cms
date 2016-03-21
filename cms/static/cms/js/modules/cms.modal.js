@@ -553,7 +553,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Initiates the stop move event from `_startResize`.
+         * Initiates the stop move event from `_startMove`.
          *
          * @method _stopMove
          * @private
@@ -687,6 +687,7 @@ var CMS = window.CMS || {};
             var row;
             var tmp;
 
+            // istanbul ignore else
             if (!djangoSuit) {
                 row = iframe.contents().find('.submit-row:eq(0)');
             } else {
@@ -720,6 +721,7 @@ var CMS = window.CMS || {};
 
             // if there are no given buttons within the submit-row area
             // scan deeper within the form itself
+            // istanbul ignore next
             if (!buttons.length) {
                 row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
                 buttons = row.find('input[type="submit"], button[type="submit"]');
@@ -871,10 +873,12 @@ var CMS = window.CMS || {};
                 }
 
                 CMS.Modal._setupCtrlEnterSave(document);
+                // istanbul ignore else
                 if (iframe[0].contentWindow && iframe[0].contentWindow.document) {
                     CMS.Modal._setupCtrlEnterSave(iframe[0].contentWindow.document);
                 }
                 // for ckeditor we need to go deeper
+                // istanbul ignore next
                 if (iframe[0].contentWindow && iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
                     $(iframe[0].contentWindow.document).ready(function () {
                         // setTimeout is required to battle CKEditor initialisation
@@ -943,6 +947,7 @@ var CMS = window.CMS || {};
                     innerTitle = iframe.contents().find('#content h1:eq(0)');
 
                     // case when there is no prefix
+                    // istanbul ignore next: never happens
                     if (opts.title === undefined && that.ui.titlePrefix.text() === '') {
                         bc = iframe.contents().find('.breadcrumbs').contents();
                         that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());

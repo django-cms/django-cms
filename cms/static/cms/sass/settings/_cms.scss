@@ -101,6 +101,7 @@ $z-layers: (
     "screenblock":      100,
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,
+    "dialog-dimmer":    9999,
     "base":             9999999,
     "default":          1,
     "below":            -1,

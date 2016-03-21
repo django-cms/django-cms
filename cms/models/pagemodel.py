@@ -19,8 +19,6 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
@@ -97,7 +95,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
 
     # Placeholders (plugins)
-    placeholders = models.ManyToManyField(Placeholder, editable=False)
+    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
 
     # Publisher fields
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
@@ -185,7 +183,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
-        to mptt, but after move is done page_moved signal is fired.
+        to django-treebeard, but after move is done page_moved signal is fired.
 
         Note for issue #1166: url conflicts are handled by updated
         check_title_slugs, overwrite_url on the moved page don't need any check
@@ -195,19 +193,26 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
-        # readability counts :)
-        is_inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
+        is_inherited_template = (
+            self.template == constants.TEMPLATE_INHERITANCE_MAGIC)
 
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
-        if position in ('left', 'right') and not target.parent and is_inherited_template:
+        if (position in ('left', 'right') and not target.parent and
+                is_inherited_template):
             self.template = self.get_template()
             if target.publisher_public_id and position == 'right':
                 public = target.publisher_public
-                if target.get_root().get_next_sibling().pk == public.get_root().pk:
-                    target = target.publisher_public
+                target_root = target.get_root()
+                if target_root.get_next_sibling():
+                    if target_root.get_next_sibling() == public.get_root():
+                        target = public
+                    else:
+                        logger.warning('tree may need rebuilding: '
+                                       'run `manage.py cms fix-tree`')
                 else:
-                    logger.warning('tree may need rebuilding: run manage.py cms fix-tree')
+                    # target's root is last 'root' node, switch to 'left'
+                    position = 'left'
         if position == 'first-child' or position == 'last-child':
             self.parent_id = target.pk
         else:
@@ -277,6 +282,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         # TODO: Make this into a "graceful" copy instead of deleting and overwriting
         # copy the placeholders (and plugins on those placeholders!)
+        from cms.models.pluginmodel import CMSPlugin
         from cms.plugin_pool import plugin_pool
 
         plugin_pool.set_plugin_meta()
@@ -339,6 +345,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         conflicting URLs as pages are copied unpublished.
         """
         from cms.extensions import extension_pool
+        from cms.models import Placeholder
 
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable("copy page is not allowed for public pages")
@@ -444,7 +451,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         menu_pool.clear(site_id=site.pk)
         return first_page
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         pages = [self.pk]
         if self.publisher_public_id:
             pages.append(self.publisher_public_id)
@@ -665,7 +672,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 if page.publisher_public.parent_id in publish_ids:
                     page.publisher_public.parent.title_cache = {}
                     page.publisher_public.parent.title_cache[language] = publish_ids[page.publisher_public.parent_id]
-                if page.publisher_public.parent.is_published(language):
+                if page.publisher_public.parent and page.publisher_public.parent.is_published(language):
                     if page.publisher_public_id in publish_ids:
                         public_title = publish_ids[page.publisher_public_id]
                     else:
@@ -956,7 +963,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             from cms.models.titlemodels import Title
 
             if version_id:
-                from reversion.models import Version
+                from cms.utils.reversion_hacks import Version
 
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
@@ -1251,6 +1258,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         Rescan and if necessary create placeholders in the current template.
         """
         # inline import to prevent circular imports
+        from cms.models.placeholdermodel import Placeholder
         from cms.utils.placeholder import get_placeholders
 
         placeholders = get_placeholders(self.get_template())
@@ -1293,12 +1301,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the previous revision
         """
-        import reversion
+        from cms.utils.reversion_hacks import reversion, Revision
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
         if self.revision_id:
-            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+            current_revision = Revision.objects.get(pk=self.revision_id)
         else:
             try:
                 current_version = versions[0]
@@ -1320,12 +1328,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the next revision
         """
-        import reversion
+        from cms.utils.reversion_hacks import reversion, Revision
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
         if self.revision_id:
-            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+            current_revision = Revision.objects.get(pk=self.revision_id)
         else:
             try:
                 current_version = versions[0]
@@ -1343,11 +1351,13 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         clean = self._apply_revision(next_revision)
         return Page.objects.get(pk=self.pk), clean
 
-    def _apply_revision(self, target_revision):
+    def _apply_revision(self, target_revision, set_dirty=False):
         """
         Revert to a specific revision
         """
+        from cms.models.pluginmodel import CMSPlugin
         from cms.utils.page_resolver import is_valid_url
+
         # Get current titles
         old_titles = list(self.title_set.all())
 
@@ -1360,7 +1370,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.placeholders.all().delete()
 
         # populate the page status data from the target version
-        target_revision.revert(True)
+        target_revision.revert(delete=True)
         rev_page = get_object_or_404(Page, pk=self.pk)
         rev_page.revision_id = target_revision.pk
         rev_page.publisher_public_id = self.publisher_public_id
@@ -1390,6 +1400,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         title.slug = old_title.slug
                         title.save()
                         clean = False
+            if set_dirty:
+                self.set_publisher_state(title.language, PUBLISHER_STATE_DIRTY)
         return clean
 
 

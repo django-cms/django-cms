@@ -99,8 +99,11 @@ var CMS = {
          * @param {Boolean} ajax if set to true first initiates **synchronous**
          *     ajax request to figure out if the browser should reload current page,
          *     move to another one, or do nothing.
+         * @param {Object} [data] optional data to be passed instead of one provided by request config
+         * @param {String} [data.model=CMS.config.request.model]
+         * @param {String|Number} [data.pk=CMS.config.request.pk]
          */
-        reloadBrowser: function (url, timeout, ajax) {
+        reloadBrowser: function (url, timeout, ajax, data) {
             var that = this;
             // is there a parent window?
             var win = this._getWindow();
@@ -115,7 +118,7 @@ var CMS = {
                     async: false,
                     type: 'GET',
                     url: parent.CMS.config.request.url,
-                    data: {
+                    data: data || {
                         model: parent.CMS.config.request.model,
                         pk: parent.CMS.config.request.pk
                     },
@@ -134,6 +137,8 @@ var CMS = {
                         } else if (url) {
                             // on_close can also provide a url, reload to the new destination
                             that.reloadBrowser(url);
+                        } else {
+                            that.reloadBrowser();
                         }
                     }
                 });

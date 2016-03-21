@@ -60,7 +60,7 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
-.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
+.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False)
 
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
     creates a :class:`cms.models.titlemodel.Title` instance for the specified
@@ -94,9 +94,11 @@ Functions and constants
     :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
+    :param integer xframe_options: X Frame Option value for Clickjacking protection
+    :param bool with_revision: Whether to create a revision for the new page.
 
 
-.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None)
+.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None, with_revision=False)
 
     Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
 
@@ -111,6 +113,7 @@ Functions and constants
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.pagemodel.Page` instance
     :param string overwrite_url: Overwritten path for this page
+    :param bool with_revision: Whether to create a revision for the new page.
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
@@ -308,6 +311,15 @@ cms.plugin_base
 
         This method returns the context to be used to render the template
         specified in :attr:`render_template`.
+
+        It's recommended to always populate the context with default values
+        by calling the render method of the super class::
+
+            def render(self, context, instance, placeholder):
+                context = super(MyPlugin, self).render(context, instance, placeholder)
+                ...
+                return context
+
 
         :param context: Current template context.
         :param instance: Plugin instance that is being rendered.
@@ -644,6 +656,20 @@ menus.base
     :param bool visible: Optional, defaults to ``True``, whether this item is
                          visible or not.
 
+
+    .. attribute:: attr
+
+        A dictionary of various additional information describing the node.
+        Nodes that represent CMS pages have the following keys in attr:
+
+        * **auth_required** (*bool*) – is authentication required to access this page
+        * **is_page** (*bool*) – Always True
+        * **navigation_extenders** (*list*) – navigation extenders connected to this node (including Apphooks)
+        * **redirect_url** (*str*) – redirect URL of page (if any)
+        * **reverse_id** (*str*) – unique identifier for the page
+        * **soft_root** (*bool*) – whether page is a soft root
+        * **visible_for_authenticated** (*bool*) – visible for authenticated users
+        * **visible_for_anonymous** (*bool*) – visible for anonymous users
 
     .. method:: get_descendants
 

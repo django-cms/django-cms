@@ -243,13 +243,13 @@ And the template (``faq/templates/faq/index.html``):
 
 .. code-block:: python
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from . import views
 
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
-    )
+    ]
 
 Finally, lets add ``faq`` to ``INSTALLED_APPS`` and create a migrations:
 
