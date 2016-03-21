@@ -211,7 +211,7 @@ class PlaceholderAdminMixin(object):
             return False
         return True
 
-    def post_add_plugin(self, request, placeholder, plugin):
+    def post_add_plugin(self, request, plugin):
         pass
 
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
@@ -260,7 +260,11 @@ class PlaceholderAdminMixin(object):
 
         plugin_admin = plugin_class(admin_site=self.admin_site)
 
-        return plugin_admin.add_view(request)
+        response = plugin_admin.add_view(request)
+
+        if request.method == "POST" and plugin_admin.object_successfully_changed:
+            self.post_add_plugin(request, plugin_admin.saved_object)
+        return response
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
