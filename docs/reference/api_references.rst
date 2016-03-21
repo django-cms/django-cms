@@ -368,7 +368,7 @@ cms.plugin_base
 
         .. important:: If the plugin class still uses the legacy attribute
                        ``cache`` and it is set to ``False``, this method will
-                       not even be called.  This behavior can be disabled by
+                       not even be called.  This behaviour can be disabled by
                        adding the class name of the plugin as a list item in the
                        CMS setting :setting:`CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE`.
 

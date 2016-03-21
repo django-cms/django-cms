@@ -203,8 +203,9 @@ used render your plugin.
 
 The :meth:`get_expiration` method is optional and is used to determine the
 period of validity of the content rendered by the plugin. A value of 0 means
-"do not cache". This method can return a future (TZ-aware) date and time or can
-simply return the number of seconds that the content is cache-able.
+"do not cache". This method can return a future (timezone-aware) date and time,
+a ``timedelta`` or can simply return the number of seconds that the content
+is cache-able.
 
 This method is not required. By default, a plugin will not affect the cache-
 ability of the page it is on. In the `HelloPlugin` above, :meth:`get_expiration`
