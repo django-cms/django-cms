@@ -87,7 +87,8 @@ module.exports = function (casperjs) {
                             this.sendKeys('#id_title', opts.title);
                             this.click('input[name="_save"]');
                         })
-                        .waitUntilVisible('.success');
+                        .waitUntilVisible('.success')
+                        .then(that.waitUntilAllAjaxCallsFinish());
                 };
             }
 
@@ -99,7 +100,8 @@ module.exports = function (casperjs) {
                         this.sendKeys('#id_title', opts.title);
                         this.click('input[name="_save"]');
                     })
-                    .waitUntilVisible('.success');
+                    .waitUntilVisible('.success')
+                    .then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -353,7 +355,7 @@ module.exports = function (casperjs) {
                         });
 
                         return (remainingAjaxRequests === 0);
-                    });
+                    }).wait(200);
             };
         }
     };
