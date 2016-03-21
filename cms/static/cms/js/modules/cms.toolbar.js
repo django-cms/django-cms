@@ -143,6 +143,19 @@ var CMS = window.CMS || {};
                 var open = false;
                 var cmdPressed = false;
 
+                // removes classes and events
+                function reset() {
+                    open = false;
+                    cmdPressed = false;
+                    lists.removeClass(hover);
+                    lists.find('ul ul').hide();
+                    navigation.find('> li').off(that.mouseEnter);
+                    that.ui.document.off(that.click);
+                    that.ui.toolbar.off(that.click, reset);
+                    that.ui.structureBoard.off(that.click);
+                    that._handleLongMenus();
+                }
+
                 // remove events from first level
                 navigation.find('a').on(that.click + ', ' + that.key, function (e) {
                     var el = $(this);
@@ -275,19 +288,6 @@ var CMS = window.CMS || {};
                 lists.on(that.pointerLeave, '> ul', function () {
                     lists.find('li').removeClass(hover);
                 });
-
-                // removes classes and events
-                function reset() {
-                    open = false;
-                    cmdPressed = false;
-                    lists.removeClass(hover);
-                    lists.find('ul ul').hide();
-                    navigation.find('> li').off(that.mouseEnter);
-                    that.ui.document.off(that.click);
-                    that.ui.toolbar.off(that.click, reset);
-                    that.ui.structureBoard.off(that.click);
-                    that._handleLongMenus();
-                }
             });
 
             // attach event for first page publish
