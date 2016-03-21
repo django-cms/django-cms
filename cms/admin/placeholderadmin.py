@@ -34,7 +34,6 @@ from cms.utils import (
     get_language_from_request,
     permissions,
 )
-from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_language_list, force_language
 from cms.utils.plugins import (
     requires_reload,
@@ -247,14 +246,14 @@ class PlaceholderAdminMixin(object):
         """
         for required in ['placeholder_id', 'plugin_type', 'plugin_language']:
             if required not in request.GET:
-                return HttpResponseBadRequest(force_unicode(
+                return HttpResponseBadRequest(force_text(
                     _("Invalid request, missing '%s' parameter") % required
                 ))
         plugin_type = request.GET['plugin_type']
         try:
             plugin_class = plugin_pool.get_plugin(plugin_type)
         except KeyError:
-            return HttpResponseBadRequest(force_unicode(
+            return HttpResponseBadRequest(force_text(
                 _("Invalid plugin type '%s'") % plugin_type
             ))
 
