@@ -183,10 +183,10 @@ CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE
 default
     ``[]``
 
-Setting the :attribute:`cache` to ``False`` on a plugin whose class name is in
+Setting the ``cache`` to ``False`` on a plugin whose class name is in
 this list will have no effect. This allows plugin developers wishing to provide
 support for :meth:`get_expiration` for CMS 3.3 and later while still supporting
-older CMS versions with :attribute:`cache` set to ``False`` if necessary.
+older CMS versions with ``cache`` set to ``False`` if necessary.
 
 
 .. setting:: CMS_PLACEHOLDER_CONF
