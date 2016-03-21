@@ -56,7 +56,9 @@ module.exports = function (casperjs) {
                     .waitUntilVisible('input[type=submit]')
                     .then(function () {
                         this.click('input[type=submit]');
-                    });
+                    })
+                    .wait(1000)
+                    .then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -76,7 +78,7 @@ module.exports = function (casperjs) {
                 return function () {
                     return this.wait(1000).thenOpen(globals.adminPagesUrl)
                         .waitUntilVisible('.cms-pagetree')
-                        .wait(1000)
+                        .then(that.waitUntilAllAjaxCallsFinish())
                         .then(that.expandPageTree())
                         .then(function () {
                             var pageId = that.getPageId(opts.parent);
@@ -87,7 +89,8 @@ module.exports = function (casperjs) {
                             this.sendKeys('#id_title', opts.title);
                             this.click('input[name="_save"]');
                         })
-                        .waitUntilVisible('.success');
+                        .waitUntilVisible('.success')
+                        .then(that.waitUntilAllAjaxCallsFinish());
                 };
             }
 
@@ -99,7 +102,8 @@ module.exports = function (casperjs) {
                         this.sendKeys('#id_title', opts.title);
                         this.click('input[name="_save"]');
                     })
-                    .waitUntilVisible('.success');
+                    .waitUntilVisible('.success')
+                    .then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -125,7 +129,7 @@ module.exports = function (casperjs) {
             var that = this;
 
             return function () {
-                return this.thenOpen(globals.editUrl)
+                return this.then(that.waitUntilAllAjaxCallsFinish()).thenOpen(globals.editUrl)
                     .waitForSelector('.cms-toolbar-expanded', function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
@@ -194,7 +198,7 @@ module.exports = function (casperjs) {
                         }
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
-                    }).waitForResource(/edit-plugin/);
+                    }).waitForResource(/edit-plugin/).then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -292,7 +296,7 @@ module.exports = function (casperjs) {
                             .then(that.waitUntilAllAjaxCallsFinish())
                             .then(that.expandPageTree());
                     } else {
-                        return casper.wait(250);
+                        return casper.wait(1000);
                     }
                 });
             };
@@ -343,11 +347,17 @@ module.exports = function (casperjs) {
                 return casper.wait(200)
                     .waitFor(function () {
                         var remainingAjaxRequests = this.evaluate(function () {
-                            return $.active;
+                            var amount = 0;
+
+                            try {
+                                amount = $.active;
+                            } catch (e) {}
+
+                            return amount;
                         });
 
                         return (remainingAjaxRequests === 0);
-                    });
+                    }).wait(200);
             };
         }
     };
