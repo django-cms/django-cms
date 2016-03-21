@@ -344,9 +344,12 @@ module.exports = function (casperjs) {
                     .waitFor(function () {
                         var remainingAjaxRequests = this.evaluate(function () {
                             var amount = 0;
+
                             try {
                                 amount = $.active;
                             } catch (e) {}
+
+                            return amount;
                         });
 
                         return (remainingAjaxRequests === 0);
