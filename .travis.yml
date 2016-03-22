@@ -22,6 +22,9 @@ env:
     # sauce labs access token
     - secure: CbPfysSncBB2Ue+VOtLDa8xJvwKl73nJO647zt/9UvZ/3PilnZN9aZv2jHxGvCiFXcez+2AddKptMCcx/5EW5UfRkrWUDHrfLCULU2TfOjmufEGM1eOIXhiAun8WQ85LBzTAYy1r9D514cbU3Yzn3xGZwJljPE8JE4cx3MNN/qQ=
   matrix:
+    - FRONTEND=1 UNIT=1
+    - FRONTEND=1 LINT=1
+    - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
     - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
     - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
@@ -32,9 +35,6 @@ env:
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
-    - FRONTEND=1 UNIT=1
-    - FRONTEND=1 LINT=1
-    - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
 
 before_script:
   - pip freeze
