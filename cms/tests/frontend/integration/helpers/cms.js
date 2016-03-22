@@ -87,6 +87,8 @@ module.exports = function (casperjs) {
                         })
                         .waitForSelector('#page_form', function () {
                             this.sendKeys('#id_title', opts.title);
+                        })
+                        .wait(250, function () {
                             this.click('input[name="_save"]');
                         })
                         .waitUntilVisible('.success')
@@ -100,6 +102,8 @@ module.exports = function (casperjs) {
                     .waitUntilVisible('#id_title')
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
+                    })
+                    .wait(250, function () {
                         this.click('input[name="_save"]');
                     })
                     .waitUntilVisible('.success')
