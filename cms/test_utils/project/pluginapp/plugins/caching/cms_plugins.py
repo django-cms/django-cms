@@ -27,7 +27,7 @@ class LegacyCachePlugin(CMSPluginBase):
     render_template = "plugins/nocache.html"
 
     # And the new...
-    def get_cache_expiration(self, request, instance):
+    def get_cache_expiration(self, request, instance, placeholder):
         """Content is only valid until for 30 seconds."""
         return 30
 
@@ -42,7 +42,7 @@ class TTLCacheExpirationPlugin(CMSPluginBase):
     render_plugin = True
     render_template = "plugins/nocache.html"
 
-    def get_cache_expiration(self, request, instance):
+    def get_cache_expiration(self, request, instance, placeholder):
         """Content is only valid for the next 50 seconds."""
         return 50
 
@@ -57,7 +57,7 @@ class TimeDeltaCacheExpirationPlugin(CMSPluginBase):
     render_plugin = True
     render_template = "plugins/nocache.html"
 
-    def get_cache_expiration(self, request, instance):
+    def get_cache_expiration(self, request, instance, placeholder):
         """Content is only valid for the next 45 seconds."""
         return timedelta(seconds=45)
 
@@ -72,7 +72,7 @@ class DateTimeCacheExpirationPlugin(CMSPluginBase):
     render_plugin = True
     render_template = "plugins/nocache.html"
 
-    def get_cache_expiration(self, request, instance):
+    def get_cache_expiration(self, request, instance, placeholder):
         """Content is only valid until 40 seconds from now."""
         now = timezone.now()
         return now + timedelta(seconds=40)
