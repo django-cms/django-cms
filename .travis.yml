@@ -38,13 +38,9 @@ env:
 
 before_script:
   - pip freeze
-  - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ];
-    then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"
-  - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ];
-    then psql -c 'create database djangocms_test;' -U postgres; fi"
-  - sh -c "if [ '$DATABASE_URL' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql
-    -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
-    fi"
+  - if [ "$DATABASE_URL" == "postgres://postgres@127.0.0.1/djangocms_test" ]; then psql -c "DROP DATABASE IF EXISTS djangocms_test;" -U postgres; fi
+  - if [ "$DATABASE_URL" == "postgres://postgres@127.0.0.1/djangocms_test" ]; then psql -c "create database djangocms_test;" -U postgres; fi
+  - if [ "$DATABASE_URL" == "mysql://root@127.0.0.1/djangocms_test" ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi
 
 before_install:
   - "export DISPLAY=:99.0"
