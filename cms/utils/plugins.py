@@ -71,7 +71,7 @@ def assign_plugins(request, placeholders, template, lang=None, is_fallback=False
     # If no plugin is present in non fallback placeholders, create default plugins if enabled)
     if not plugins:
         plugins = create_default_plugins(request, non_fallback_phs, template, lang)
-    plugins = downcast_plugins(plugins, non_fallback_phs)
+    plugins = downcast_plugins(plugins, non_fallback_phs, request=request)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
     plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
@@ -144,10 +144,10 @@ def build_plugin_tree(plugins):
                   key=attrgetter('position'))
 
 
-def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
+def downcast_plugins(queryset,
+                     placeholders=None, select_placeholder=False, request=None):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
-    ignore_plugin_cache_setting = get_cms_setting('IGNORE_PLUGIN_CACHE_ATTRIBUTE')
 
     # make a map of plugin types, needed later for downcasting
     for plugin in queryset:
@@ -168,7 +168,7 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
                 for pl in placeholders:
                     if instance.placeholder_id == pl.pk:
                         instance.placeholder = pl
-                        if not cls.cache and not cls.__name__ in ignore_plugin_cache_setting:  # noqa
+                        if not cls().get_cache_expiration(request, instance, pl) and not cls.cache:  # noqa
                             pl.cache_placeholder = False
             # make the equivalent list of qs, but with downcasted instances
     return [plugin_lookup.get(plugin.pk, plugin) for plugin in queryset]

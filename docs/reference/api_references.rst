@@ -267,14 +267,11 @@ cms.plugin_base
         If present and set to ``False``, the plugin will prevent the caching of
         the resulting page.
 
-        .. important:: This attribute is now deprecated and will be removed in a
-                       future release. Its functionality is replaced by the much
+        .. important:: Setting this to ``False`` will effectively disable the
+                       CMS page cache and all upstream caches for pages where
+                       the plugin appears. This may be useful in certain cases
+                       but for general cache management, consider using the much
                        more capable :meth:`get_cache_expiration`.
-
-        Adding the plugin's class name to the setting :setting:`IGNORE_PLUGIN_CACHE_ATTRIBUTE`
-        will disable the effects of setting ``cache`` to False. This makes it
-        possible for plugin authors to support both methods of affecting
-        the cache.
 
     .. attribute:: change_form_template
 
@@ -328,7 +325,7 @@ cms.plugin_base
         Returns the URL to the icon to be used for the given instance when that
         instance is used inside a text plugin.
 
-    .. method:: get_cache_expiration(request, instance)
+    .. method:: get_cache_expiration(request, instance, placeholder)
 
         Provides expiration value to the placeholder, and in turn to the page
         for determining the appropriate Cache-Control headers to add to the
@@ -365,20 +362,6 @@ cms.plugin_base
         Similarly, ``datetime`` values earlier than now will be treated as
         :data:`EXPIRE_NOW`. Values greater than :data:`MAX_EXPIRATION_TTL` seconds in the
         future will be treated as :data:`MAX_EXPIRATION_TTL` seconds in the future.
-
-        .. important:: If the plugin class still uses the legacy attribute
-                       ``cache`` and it is set to ``False``, this method will
-                       not even be called.  This behaviour can be disabled by
-                       adding the class name of the plugin as a list item in the
-                       CMS setting :setting:`CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE`.
-
-                       Plugins that wish to expire their rendered contents
-                       immediately should instead define::
-
-                           from cms.constants import EXPIRE_NOW
-
-                           def get_cache_expiration(self, **kwargs):
-                               return EXPIRE_NOW
 
         :param request: Relevant ``HTTPRequest`` instance.
         :param instance: The ``CMSPlugin`` instance that is being rendered.

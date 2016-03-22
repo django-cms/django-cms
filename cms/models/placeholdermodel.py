@@ -326,7 +326,8 @@ class Placeholder(models.Model):
                 # This placeholder has a plugin with an effective
                 # `cache = False` setting, so, no point in continuing.
                 return EXPIRE_NOW
-            plugin_expiration = plugin.get_cache_expiration(request, instance)
+            plugin_expiration = plugin.get_cache_expiration(
+                request, instance, self)
 
             # The plugin_expiration should only ever be either: None, a TZ-aware
             # datetime, or an integer.
