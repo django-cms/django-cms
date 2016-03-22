@@ -329,7 +329,7 @@ casper.test.begin('Pages can be reordered', function (test) {
         // switch to sideframe
         .withFrame(0, function () {
             var drop;
-            casper.waitUntilVisible('.cms-pagetree', function () {
+            casper.waitUntilVisible('.cms-pagetree', cms.waitUntilAllAjaxCallsFinish()).then(function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
                         { name: 'Homepage' },
@@ -577,7 +577,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         })
         .wait(1000)
         .withFrame(0, function () {
-            casper.waitUntilVisible('.cms-pagetree', function () {
+            casper.waitUntilVisible('.cms-pagetree').then(cms.waitUntilAllAjaxCallsFinish()).then(function () {
                 pageId = cms.getPageId('Homepage');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished',
@@ -601,7 +601,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         })
         .wait(1000)
         .withFrame(0, function () {
-            casper.waitUntilVisible('.cms-pagetree', function () {
+            casper.waitUntilVisible('.cms-pagetree').then(cms.waitUntilAllAjaxCallsFinish()).then(function () {
                 pageId = cms.getPageId('Homepage');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.unpublished',
@@ -695,7 +695,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree')
+                .then(cms.waitUntilAllAjaxCallsFinish())
+                .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage',
@@ -824,7 +826,8 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     window.location.reload();
                 })
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree', cms.waitUntilAllAjaxCallsFinish())
+                .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage',
