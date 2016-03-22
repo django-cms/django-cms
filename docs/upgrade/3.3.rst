@@ -20,9 +20,7 @@ What's new in 3.3
 * Management commands has been completely refactored for better consistency (see
   `backward_incompatible_3.3`_ for details)
 * Introduction of the method `get_cache_expiration` on CMSPluginBase to be used
-  by plugins for declaring their rendered content's period of validity. This
-  replaces the functionality provided by the class attribute CMSPluginBase.cache
-  which is now deprecated and will be removed in version 3.4
+  by plugins for declaring their rendered content's period of validity.
 
 .. _backward_incompatible_3.3:
 

@@ -323,7 +323,7 @@ class CacheTestCase(CMSTestCase):
             plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
             plugin_pool.unregister_plugin(NoCachePlugin)
 
-    def test_enable_legacy_cache_plugins(self):
+    def test_dual_legacy_cache_plugins(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
 
@@ -332,39 +332,9 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.register_plugin(LegacyCachePlugin)
         add_plugin(placeholder1, "TextPlugin", 'en', body="English")
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
-        # Adds a no-cache plugin. This will prevent the page from caching.
-        add_plugin(placeholder1, "LegacyCachePlugin", 'en')
-        # Ensure that we're testing in an environment WITHOUT the MW cache, as
-        # we are testing the internal page cache, not the MW cache.
-        exclude = [
-            'django.middleware.cache.UpdateCacheMiddleware',
-            'django.middleware.cache.CacheMiddleware',
-            'django.middleware.cache.FetchFromCacheMiddleware',
-        ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
-            page1.publish('en')
-            request = self.get_request('/en/')
-            request.current_page = Page.objects.get(pk=page1.pk)
-            request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
-                response = self.client.get('/en/')
-            self.assertTrue('no-cache' in response['Cache-Control'])
-
-        plugin_pool.unregister_plugin(LegacyCachePlugin)
-
-    def test_disable_legacy_cache_plugins(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
-
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
-        plugin_pool.register_plugin(LegacyCachePlugin)
-        add_plugin(placeholder1, "TextPlugin", 'en', body="English")
-        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
-        # Adds a no-cache plugin. This would prevent the page from caching,
-        # except we've disabled that with CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE.
+        # Adds a no-cache plugin. In older versions of the CMS, this would
+        # prevent the page from caching in, but since this plugin also defines
+        # get_cache_expiration() it is ignored.
         add_plugin(placeholder1, "LegacyCachePlugin", 'en')
         # Ensure that we're testing in an environment WITHOUT the MW cache, as
         # we are testing the internal page cache, not the MW cache.
@@ -377,7 +347,7 @@ class CacheTestCase(CMSTestCase):
 
         # from django.core.cache import cache; cache.clear()
 
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes, CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE=['LegacyCachePlugin', ]):  # noqa
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):  # noqa
             page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)

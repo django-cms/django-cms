@@ -149,9 +149,7 @@ In ``cms_plugins.py``, you place your plugins. For our example, include the foll
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
         render_template = "hello_plugin.html"
-
-        def get_cache_expiration(self, **kwargs):
-            return 0
+        cache = False
 
     plugin_pool.register_plugin(HelloPlugin)
 
@@ -195,23 +193,14 @@ is ``True`` (the default):
 * ``get_render_template``: A method that returns a template path to render the
   plugin with.
 
-In addition to those attributes, you can also define a :meth:`render` and/or
-:meth:`get_cache_expiration` method on your sub-classes.
+In addition to those attributes, you can also override the :ref:`render` method
+which determines the template context variables that are used render your
+plugin. By default, this method only adds ``instance`` and ``placeholder``
+objects to your context, but plugins can override this to include any context
+that is required.
 
-The :ref:`render` method determines the template context variables that are
-used render your plugin.
-
-The :meth:`get_cache_expiration` method is optional and is used to determine the
-period of validity of the content rendered by the plugin. A value of 0 means
-"do not cache". This method can return a future (timezone-aware) date and time,
-a ``timedelta`` or can simply return the number of seconds that the content
-is cache-able.
-
-This method is not required. By default, a plugin will not affect the cache-
-ability of the page it is on. In the `HelloPlugin` above,
-:meth:`get_cache_expiration` was used to return 0 ("no-cache") because we want
-each visitor to see output that is specific to him or her, we need to tell the
-cms to not cache any pages where this plugin is used.
+A number of other methods are available for overriding on your CMSPluginBase
+sub-classes. See: :module:`cms.plugin_base` for further details.
 
 
 ***************
