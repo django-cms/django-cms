@@ -151,7 +151,7 @@ to run linting continuously, do::
 
 
 Unit tests
-----------
+==========
 
 Unit tests can be run like this::
 
@@ -180,7 +180,7 @@ the build entirely using ``[skip ci]``.
 
 
 Integration tests
------------------
+=================
 
 In order to run integration tests you'll have to install at least the verison
 of django CMS from the current directory and djangocms-helper into into your virtualenv.
@@ -208,8 +208,7 @@ The integration test suite itself can be run against the test server in a separa
     gulp tests:integration
 
 While debugging you can use the ``--tests`` parameter as well in order to run test
-suites separately. Note, that usually in order to perform any action you'll need to
-login first, so the login suite should precede the one you want to run::
+suites separately.::
 
     gulp tests:integration --tests=loginAdmin,toolbar
 
