@@ -92,6 +92,7 @@ module.exports = function (casperjs) {
                             this.click('input[name="_save"]');
                         })
                         .waitUntilVisible('.success')
+                        .waitForUrl(/cms/)
                         .then(that.waitUntilAllAjaxCallsFinish());
                 };
             }
@@ -106,6 +107,7 @@ module.exports = function (casperjs) {
                     .wait(250, function () {
                         this.click('input[name="_save"]');
                     })
+                    .waitForUrl(/cms/)
                     .waitUntilVisible('.success')
                     .then(that.waitUntilAllAjaxCallsFinish());
             };

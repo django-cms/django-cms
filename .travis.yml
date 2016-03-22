@@ -25,22 +25,23 @@ env:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
     - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+    # - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    # - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+    # - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='customuserapp.User'
+    # - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='emailuserapp.EmailUser'
+    # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
 
 before_script:
   - pip freeze
   - if [ "$DATABASE_URL" == "postgres://postgres@127.0.0.1/djangocms_test" ]; then psql -c "DROP DATABASE IF EXISTS djangocms_test;" -U postgres; fi
   - if [ "$DATABASE_URL" == "postgres://postgres@127.0.0.1/djangocms_test" ]; then psql -c "create database djangocms_test;" -U postgres; fi
   - if [ "$DATABASE_URL" == "mysql://root@127.0.0.1/djangocms_test" ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi
+  - if [ "$FRONTEND" == 1 ] then nvm install 0.12.7 && nvm use 0.12.7; fi
 
 before_install:
   - "export DISPLAY=:99.0"
