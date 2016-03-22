@@ -21,6 +21,8 @@ env:
     - secure: RotktnZ0AqeTDYfh2O472pPiolQJ2ZDRPUKGDajYWgnG2n94K7hBd4pnA1H/cd42sOyReC3lmmweWNSbG0DLD9+X+s0fwaqKcWGnYsLAcjOWaNXPMwvvgaivadT34JmS9Wv29zNudPL2A6zNw0CB+YVxUZIA4Cm9984AxbYJGSk=
     # sauce labs access token
     - secure: CbPfysSncBB2Ue+VOtLDa8xJvwKl73nJO647zt/9UvZ/3PilnZN9aZv2jHxGvCiFXcez+2AddKptMCcx/5EW5UfRkrWUDHrfLCULU2TfOjmufEGM1eOIXhiAun8WQ85LBzTAYy1r9D514cbU3Yzn3xGZwJljPE8JE4cx3MNN/qQ=
+    # temporary solution until https://github.com/ariya/phantomjs/issues/13953 is resolved
+    - PHANTOMJS_CDNURL=http://cnpmjs.org/downloads
   matrix:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
