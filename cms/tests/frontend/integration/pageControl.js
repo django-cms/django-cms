@@ -315,6 +315,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
         .wait(100)
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
         // wait until we have the navigation displayed again
+        .wait(1000)
         .waitUntilVisible('.nav', function () {
             test.assertExists(
                 xPath('//ul[@class="nav"]/li/a[contains(@href,"' + SECOND_PAGE_TITLE.toLowerCase() + '")]' +
