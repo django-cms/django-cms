@@ -41,7 +41,6 @@ before_script:
   - if [ "$DATABASE_URL" == "postgres://postgres@127.0.0.1/djangocms_test" ]; then psql -c "DROP DATABASE IF EXISTS djangocms_test;" -U postgres; fi
   - if [ "$DATABASE_URL" == "postgres://postgres@127.0.0.1/djangocms_test" ]; then psql -c "create database djangocms_test;" -U postgres; fi
   - if [ "$DATABASE_URL" == "mysql://root@127.0.0.1/djangocms_test" ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi
-  - if [ "$FRONTEND" == 1 ] then nvm install 0.12.7 && nvm use 0.12.7; fi
 
 before_install:
   - "export DISPLAY=:99.0"
@@ -52,6 +51,7 @@ before_install:
 
 install:
   - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; pip freeze; fi
+  - if [ "$FRONTEND" == 1 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g npm@2; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g gulp@3.9.0; fi
   - if [ "$FRONTEND" == 1 ]; then npm install; fi
