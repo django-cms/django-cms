@@ -182,7 +182,7 @@ the build entirely using ``[skip ci]``.
 Integration tests
 =================
 
-In order to run integration tests you'll have to install at least the verison
+In order to run integration tests you'll have to install at least the version
 of django CMS from the current directory and djangocms-helper into into your virtualenv.
 All commands should be run from the root of the repository. If you do not have
 virtualenv yet, create and activate it first::
@@ -201,7 +201,7 @@ Now you'll be able to run a test server with this command::
 
 Note, that the last command would take over your shell and remove SQLite
 database and run migrations on the new one. Take a look inside `testserver.py`
-or `travis.yml` if you need to customize the test server settings.
+or `travis.yml` if you need to customise the test server settings.
 
 The integration test suite itself can be run against the test server in a separate shell::
 
