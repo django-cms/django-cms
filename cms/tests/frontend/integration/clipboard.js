@@ -146,6 +146,87 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
         });
 });
 
+casper.test.begin('Copy placeholder contents from the structure board', function (test) {
+    var contentNumber;
+
+    casper
+        .start(globals.editUrl)
+        // go to the Structure mode
+        .then(cms.switchTo('structure'))
+        .waitUntilVisible('.cms-structure', function () {
+            // click settings for last content plugin
+            this.click('.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-settings');
+        })
+        // check that there is nothing in the clipboard
+        .then(function () {
+            test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
+        })
+        .waitUntilVisible(
+            '.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-item a[data-rel="copy"]',
+            function () {
+                test.assertVisible(
+                    '.cms-structure .cms-dragarea:nth-child(2) ' +
+                        '.cms-submenu-item.cms-submenu-item-disabled a[data-rel="copy"]',
+                    'Copy all is disabled if there are no plugins'
+                );
+                this.click('.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-item a[data-rel="copy"]');
+            }
+        )
+        .then(function () {
+            test.assertNotVisible(
+                '.cms-structure .cms-dragarea:nth-child(2) ' +
+                    '.cms-submenu-item.cms-submenu-item-disabled a[data-rel="copy"]',
+                'Dropdown hides if disabled item is clicked'
+            );
+        })
+        // try to copy contents of non-empty placeholder
+        .then(function () {
+            this.click('.cms-structure .cms-dragarea:nth-child(1) .cms-submenu-settings');
+        })
+        // check that there is still nothing in the clipboard
+        .then(function () {
+            test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
+        })
+        // try to copy contents of empty placeholder
+        .waitUntilVisible(
+            '.cms-structure .cms-dragarea:nth-child(1) .cms-submenu-item a[data-rel="copy"]',
+            function () {
+                this.click('.cms-structure .cms-dragarea:nth-child(1) .cms-submenu-item a[data-rel="copy"]');
+            }
+        )
+        .waitForResource(/copy-plugins/)
+        // check that there is something now in the clipboard
+        .then(function () {
+            test.assertElementCount('.cms-clipboard .cms-plugin', 1, '1 plugin in clipboard');
+            test.assertExists(
+                '.cms-clipboard-containers [title*="Placeholder"]',
+                '"Placeholder" plugin was copied'
+            );
+        })
+
+        // click settings for second placeholder
+        .waitForSelector('.cms-toolbar-expanded', function () {
+            // click settings for last content plugin
+            this.click('.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-settings');
+        })
+        // select paste button from dropdown list
+        .waitUntilVisible(
+            '.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-item a[data-rel="paste"]',
+            function () {
+                this.click('.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-item a[data-rel="paste"]');
+            }
+        )
+        .waitForResource(/move-plugin/)
+        .wait(2000)
+        .waitForSelector('.cms-toolbar-expanded', function () {
+            test.assertElementCount('.cms-structure .cms-draggable', 4, 'Four plugins present on the page');
+        })
+        .then(cms.clearClipboard())
+        .run(function () {
+            test.done();
+        });
+});
+
 casper.test.begin('Plugins with parent restriction cannot be pasted ' +
                   'in incorrect parents (paste button)', function (test) {
     casper.start(globals.editUrl)
