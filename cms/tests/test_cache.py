@@ -48,7 +48,7 @@ class CacheTestCase(CMSTestCase):
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(9):
             self.render_template_obj(template, {}, request)
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
@@ -135,7 +135,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(6):
                 output = self.render_template_obj(template, {}, request)
             with self.assertNumQueries(FuzzyInt(14, 24)):  # was 19
                 response = self.client.get('/en/')
@@ -293,7 +293,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+            with self.assertNumQueries(FuzzyInt(14, 26)):
                 response = self.client.get('/en/')
                 resp1 = response.content.decode('utf8').split("$$$")[1]
             self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
@@ -411,7 +411,7 @@ class CacheTestCase(CMSTestCase):
             # Test that this means the page is actually not cached.
             #
             page1.publish('en')
-            with self.assertNumQueries(FuzzyInt(1, 21)):
+            with self.assertNumQueries(FuzzyInt(1, 24)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
