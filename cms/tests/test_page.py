@@ -1218,7 +1218,7 @@ class PagesTestCase(CMSTestCase):
             # trigger the get_languages query so it doesn't get in our way
             context = self.get_context(page=page)
             context['request'].current_page.get_languages()
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(37):
                 for i, placeholder in enumerate(placeholders):
                     content = get_placeholder_content(context, context['request'], page, placeholder.slot, False, None)
                     for j in range(5):
