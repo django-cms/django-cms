@@ -178,6 +178,8 @@ different real browsers, but you can opt out of running them on saucelabs using
 ``[skip saucelabs]`` marker in the commit message, similar to how you would skip
 the build entirely using ``[skip ci]``.
 
+We're using Jasmine as a test framework and Istanbul as a code coverage tool.
+
 
 Integration tests
 =================
@@ -192,8 +194,8 @@ virtualenv yet, create and activate it first::
 
 Then install minimum required dependencies::
 
+    pip install test_requirements/django-1.8.txt
     pip install -e .
-    pip install djangocms-helper
 
 Now you'll be able to run a test server with this command::
 
@@ -201,7 +203,7 @@ Now you'll be able to run a test server with this command::
 
 Note, that the last command would take over your shell and remove SQLite
 database and run migrations on the new one. Take a look inside `testserver.py`
-or `travis.yml` if you need to customise the test server settings.
+or `.travis.yml` if you need to customise the test server settings.
 
 The integration test suite itself can be run against the test server in a separate shell::
 
@@ -210,7 +212,9 @@ The integration test suite itself can be run against the test server in a separa
 While debugging you can use the ``--tests`` parameter as well in order to run test
 suites separately.::
 
+    gulp tests:integration --tests=pagetree
     gulp tests:integration --tests=loginAdmin,toolbar
+
 
 
 *************
