@@ -18,6 +18,7 @@ from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
+from cms.utils.conf import get_cms_setting
 
 
 @python_2_unicode_compatible
@@ -322,15 +323,16 @@ class Placeholder(models.Model):
         for plugin_item in self.get_plugins(lang):
             instance, plugin = plugin_item.get_plugin_instance()
 
-            if not self.cache_placeholder:
+            if not self.cache_placeholder or not get_cms_setting('PLUGIN_CACHE'):  # noqa
                 # This placeholder has a plugin with an effective
-                # `cache = False` setting, so, no point in continuing.
+                # `cache = False` setting or the developer has explicitly
+                # disabled the PLUGIN_CACHE, so, no point in continuing.
                 return EXPIRE_NOW
             plugin_expiration = plugin.get_cache_expiration(
                 request, instance, self)
 
             # The plugin_expiration should only ever be either: None, a TZ-aware
-            # datetime, or an integer.
+            # datetime, a timedelta, or an integer.
             if plugin_expiration is None:
                 # Do not consider plugins that return None
                 continue

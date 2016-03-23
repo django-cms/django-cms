@@ -25,6 +25,7 @@ def details(request, slug):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
+    response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
             not request.toolbar.edit_mode and
@@ -38,7 +39,8 @@ def details(request, slug):
             response = HttpResponse(content)
             response._headers = headers
             # Recalculate the max-age header for this cached response
-            max_age = int((expires_datetime - now()).total_seconds() + 0.5)
+            max_age = int(
+                (expires_datetime - response_timestamp).total_seconds() + 0.5)
             patch_cache_control(response, max_age=max_age)
             return response
 

@@ -200,7 +200,7 @@ objects to your context, but plugins can override this to include any context
 that is required.
 
 A number of other methods are available for overriding on your CMSPluginBase
-sub-classes. See: :module:`cms.plugin_base` for further details.
+sub-classes. See: :mod:`cms.plugin_base` for further details.
 
 
 ***************
