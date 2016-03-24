@@ -26,7 +26,9 @@ env:
   matrix:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
-    - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
     - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
@@ -113,11 +115,25 @@ matrix:
       env: FRONTEND=1 LINT=1
 
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - python: 3.5
-      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+
+    - python: 3.3
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - python: 3.4
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - python: 3.5
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+
+    - python: 3.3
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - python: 3.4
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - python: 3.5
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
 
   allow_failures:
     - python: 2.7
