@@ -4,6 +4,51 @@
 // INFO: please not that all related styles to the pagetree itselfs are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
+// HEADER
+.cms-pagetree-container-custom {
+    background: #f7f7f7;
+}
+
+.cms-pagetree-header {
+    clear: both;
+    overflow: hidden;
+
+    .cms-pagetree-title {
+        float: left;
+        
+    }
+
+    .cms-pagetree-search {
+        float: right;
+        padding: 0;
+        margin: 0;
+        background: none;
+        box-shadow: none;
+    }
+
+    .cms-pagetree-buttons {
+        float: right;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .cms-pagetree-container {
     // overflow: auto;
 

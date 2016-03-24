@@ -21,7 +21,7 @@
 
 {% if not is_popup %}
     {% block breadcrumbs %}
-        <div class="breadcrumbs">
+        <div class="breadcrumbs cms-pagetree-breadcrumbs">
             <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
             <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
             {{ opts.verbose_name_plural|capfirst|escape }}
@@ -34,67 +34,87 @@
 {% endif %}
 
 {% block object-tools %}
-    <ul class="object-tools">
-        {% if has_recover_permission %}
-            <li>
-                <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
-                    {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
-                        Recover deleted {{ name }}
-                    {% endblocktrans %}
-                </a>
-            </li>
-        {% endif %}
-        {% if has_add_permission %}
-            <li>
-                <a href="{% url opts|admin_urlname:'add' %}" class="addlink">
-                    {% blocktrans with cl.opts.verbose_name as name %}
-                        Add {{ name }}
-                    {% endblocktrans %}
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-{% endblock object-tools %}
+    <div class="cms-pagetree-container cms-pagetree-container-custom">
+        <div class="cms-pagetree-header">
+            <h1 class="cms-pagetree-title">{% trans "Page Tree" %}</h1>
 
-{% block search %}
-    <form method="post" class="cms-tree-search cms-tree-search-site js-cms-tree-search-site">
-        {% if cl.has_access_to_multiple_sites %}
-            <label for="field-site-select">{% trans "Pages on:" %}</label>
-            <select id="field-site-select" name="site__exact">
-                {% for site in cl.sites %}
-                    <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected{% endif %}>{{ site.name }}</option>
-                {% endfor %}
-            </select>
-            <input type="hidden" name="copy">
-            {% csrf_token %}
-        {% else %}
-            <input type="hidden" value="{{ cl.sites.0.pk }}">
-        {% endif %}
-    </form>
+            <div class="cms-pagetree-buttons">
+                <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
+                    <a href="cms-pagetree-dropdown-trigger"><span class="cms-icon cms-icon-arrow"></span></a>
+                    <ul class="cms-pagetree-dropdown-container">
+                        {% for site in cl.sites %}
+                            <li{% if site.pk == cl.current_site.pk %} class="active"{% endif %}>
+                                <a href="#{{ site.pk }}">{{ site.name }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if has_recover_permission %}
+                            <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
+                            <li>
+                                <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
+                                    {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
+                                        Recover deleted {{ name }}
+                                    {% endblocktrans %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
 
-    <div class="cms-tree-search">
-        {% search_form cl %}
-    </div>
-{% endblock %}
+                    {# event #}
+                    <form method="post" class="cms-hidden">
+                        <select id="field-site-select" name="site__exact">
+                            {% for site in cl.sites %}
+                                <option value="{{ site.pk }}">{{ site.name }}</option>
+                            {% endfor %}
+                            {% csrf_token %}
+                        </select>
+                    </form>
+                </div>
 
-{% block filters %}
-    {% if cl.has_filters %}
-        <div class="cms-tree-filters">
-            <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
-                {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
-            </a>
-            <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
-                <h2>{% trans "Filter" %}</h2>
-                {% for spec in cl.filter_specs %}
-                    {% clean_admin_list_filter cl spec %}
-                {% endfor %}
+                {% if has_add_permission %}
+                    <a href="{% url opts|admin_urlname:'add' %}" class="addlink">
+                        {% blocktrans with cl.opts.verbose_name as name %}
+                            New {{ name }}
+                        {% endblocktrans %}
+                    </a>
+                {% endif %}
+            </div>
+
+            <form method="get" class="cms-pagetree-search">
+                <label for="searchbar" class="cms-hidden">{% trans "Search" %}</label>
+                <input type="text" size="40" name="q" value="" id="searchbar" placeholder="{% trans "Search" %}">
+                <input type="submit" value="Search">
+            </form>
+            <!-- hidden action fields -->
+            <div class="cms-hidden">
+                {% search_form cl %}
+                {% if cl.has_filters %}
+                    <div class="cms-tree-filters">
+                        <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
+                            {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
+                        </a>
+                        <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
+                            <h2>{% trans "Filter" %}</h2>
+                            {% for spec in cl.filter_specs %}
+                                {% clean_admin_list_filter cl spec %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    {% endif %}
-{% endblock %}
+    </div>
+{% endblock object-tools %}
+
+{% block search %}{% endblock %}
+{% block filters %}{% endblock %}
 
 {% block result_list %}
     <div class="clear"></div>
+
+    <div>
+        <h2>{% trans "Main Navigation" %}</h2>
+        <p>Option Menu for pasting</p>
+    </div>
 
     {# INFO: javascript is loaded from cms.pagetree.js #}
     {% if cl.get_items or cl.get_items and cl.is_filtered %}
