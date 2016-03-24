@@ -9,27 +9,9 @@ from cms.cache.page import set_page_cache
 from cms.models import Page
 from cms.utils import get_template_from_request
 from cms.utils.conf import get_cms_setting
+from cms.page_plugin import page_plugin_pool
 
-
-def render_page(request, page, current_language, slug):
-    """
-    Renders a page
-    """
-    template_name = get_template_from_request(request, page, no_current_page=True)
-    # fill the context
-    context = {}
-    context['lang'] = current_language
-    context['current_page'] = page
-    context['has_change_permissions'] = page.has_change_permission(request)
-    context['has_view_permissions'] = page.has_view_permission(request)
-
-    if not context['has_view_permissions']:
-        return _handle_no_page(request, slug)
-
-    response = TemplateResponse(request, template_name, context)
-
-    response.add_post_render_callback(set_page_cache)
-
+def add_xframe_options(page, response):
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
     xframe_options = page.get_xframe_options()
     # xframe_options can be None if there's no xframe information on the page
@@ -50,6 +32,36 @@ def render_page(request, page, current_language, slug):
         response['X-Frame-Options'] = 'DENY'
     return response
 
+def render_page(request, page, current_language, slug):
+    """
+    Renders a page
+    """
+    template_name = get_template_from_request(request, page, no_current_page=True)
+    # fill the context
+    context = {}
+    context['lang'] = current_language
+    context['current_page'] = page
+    context['has_change_permissions'] = page.has_change_permission(request)
+    context['has_view_permissions'] = page.has_view_permission(request)
+
+    if not context['has_view_permissions']:
+        return _handle_no_page(request, slug)
+
+    response = TemplateResponse(request, template_name, context)
+
+    response.add_post_render_callback(set_page_cache)
+
+    response = add_xframe_options(page, response)
+
+    # Apply page plugins
+    page_plugins = page_plugin_pool.get_all_plugins()
+
+    if page_plugins:
+        for plugin in page_plugins:
+            response = plugin().render_page(request, page, current_language, slug, response)
+
+    return response
+
 
 def _handle_no_page(request, slug):
     context = {}
@@ -66,4 +78,3 @@ def _handle_no_page(request, slug):
         exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
         raise exc
     raise Http404('CMS Page not found: %s' % request.path)
-
