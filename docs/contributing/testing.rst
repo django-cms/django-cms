@@ -14,7 +14,7 @@ behave as it expected, and help identify what's going wrong if something breaks
 it.
 
 Not insisting on good tests when code is committed is like letting a gang of
-teenagers without a driving licence borrow your car on a Friday night, even if
+teenagers without a driving license borrow your car on a Friday night, even if
 you think they are very nice teenagers and they really promise to be careful.
 
 We certainly do want your contributions and fixes, but we need your tests with
@@ -101,7 +101,7 @@ and it should then run without errors.
 Advanced testing options
 ========================
 
-Run ``manage.py test --help`` for full list of advanced options.
+Run ``manage.py test --help`` for the full list of advanced options.
 
 Use ``--parallel`` to distribute the test cases across your CPU cores.
 
@@ -133,13 +133,97 @@ script to run tests.
     You may do so using ``xvfb-run -s"-screen 0 1280x720x8" ...``.
 
 
+**********************
+Running Frontend Tests
+**********************
+
+We have two types of frontend tests: unit tests and integration tests.
+For unit tests we are using `Karma <http://karma-runner.github.io/>`_ as a
+test runner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
+
+Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are
+built using `CasperJS <http://casperjs.org/>`_.
+
+Linting runs against the test files as well with ``gulp tests:lint``. In order
+to run linting continuously, do::
+
+    gulp watch
+
+
+Unit tests
+==========
+
+Unit tests can be run like this::
+
+    gulp tests:unit
+
+If your code is failing and you want to run only specific files, you can provide
+the ``--tests`` parameter with comma separated file names, like this::
+
+    gulp tests:unit --tests=cms.base,cms.modal
+
+If you want to run tests continuously you can use the watch command::
+
+    gulp tests:unit:watch
+
+This will rerun the suite whenever source or test file is changed.
+By default the tests are running on `PhantomJS <http://phantomjs.org/>`_, but
+when running Karma in watch mode you can also visit the server it spawns with an
+actual browser.
+
+    INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
+
+On Travis CI we are using SauceLabs integration to run tests in a set of
+different real browsers, but you can opt out of running them on saucelabs using
+``[skip saucelabs]`` marker in the commit message, similar to how you would skip
+the build entirely using ``[skip ci]``.
+
+We're using Jasmine as a test framework and Istanbul as a code coverage tool.
+
+
+Integration tests
+=================
+
+In order to run integration tests you'll have to install at least the version
+of django CMS from the current directory and djangocms-helper into into your virtualenv.
+All commands should be run from the root of the repository. If you do not have
+virtualenv yet, create and activate it first::
+
+    virtualenv env
+    . env/bin/activate
+
+Then install minimum required dependencies::
+
+    pip install test_requirements/django-1.8.txt
+    pip install -e .
+
+Now you'll be able to run a test server with this command::
+
+    rm -f testdb.sqlite; python testserver.py
+
+Note, that the last command would take over your shell and remove SQLite
+database and run migrations on the new one. Take a look inside `testserver.py`
+or `.travis.yml` if you need to customise the test server settings.
+
+The integration test suite itself can be run against the test server in a separate shell::
+
+    gulp tests:integration
+
+While debugging you can use the ``--tests`` parameter as well in order to run test
+suites separately.::
+
+    gulp tests:integration --tests=pagetree
+    gulp tests:integration --tests=loginAdmin,toolbar
+
+
+
 *************
 Writing tests
 *************
 
 Contributing tests is widely regarded as a very prestigious contribution (you're
 making everybody's future work much easier by doing so). We'll always accept contributions of
-test without code, but not code without test - which should give you an idea of how important
+a test without code, but not code without a test - which should give you an idea of how important
 tests are.
 
 

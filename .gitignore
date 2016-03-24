@@ -43,6 +43,7 @@ share/
 !.jshintrc
 cms/static/cms/compass_app_log.txt
 !cms/static/cms/js/dist
+cms/tests/frontend/coverage
 node_modules
 .idea
 .better_test.db
