@@ -186,29 +186,29 @@ gulp.task('tests:integration', function (done) {
             'createContent',
             'users',
             'addNewUser',
-            'newPage'
+            'newPage',
+            'pageControl',
+            'modal',
+            'permissions',
+            'logout'
         ],
         [
-            'pageControl',
-            'permissions',
             'pageTypes',
             'switchLanguage',
             'editContent',
             'editContentTools',
             'publish',
-            'logout',
             'loginToolbar',
             'changeSettings'
         ],
         [
+            'pagetree',
             'disableToolbar',
             'dragndrop',
             'history',
             'revertLive',
             'narrowScreen',
-            'clipboard',
-            'modal',
-            'pagetree'
+            'clipboard'
         ]
     ];
 
