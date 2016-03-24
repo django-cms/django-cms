@@ -108,7 +108,7 @@ describe('CMS.Navigation', function () {
         it('calculates available width for the menu to fit in', function () {
             expect(nav._calculateAvailableWidth()).toEqual(jasmine.any(Number));
             // make the logo and toolbar right padding equal across browsers
-            nav.ui.toolbarRightPart.css('padding-right', 10)
+            nav.ui.toolbarRightPart.css('padding-right', 10);
             nav.ui.logo.css('width', 100);
 
             [300, 500, 678].forEach(function (width) {
@@ -260,8 +260,8 @@ describe('CMS.Navigation', function () {
             nav._handleResize();
 
             expect($.fn.addClass).toHaveBeenCalledTimes(2);
-            expect($.fn.addClass.calls.argsFor(0)).toEqual(['cms-toolbar-item-navigation-children'])
-            expect($.fn.addClass.calls.argsFor(1)).toEqual(['cms-toolbar-item-navigation-children'])
+            expect($.fn.addClass.calls.argsFor(0)).toEqual(['cms-toolbar-item-navigation-children']);
+            expect($.fn.addClass.calls.argsFor(1)).toEqual(['cms-toolbar-item-navigation-children']);
         });
     });
 
