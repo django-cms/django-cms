@@ -136,7 +136,7 @@ casper.test.begin('Correctly displays languages', function (test) {
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree', function () {
+            casper.waitForSelector('.cms-pagetree').wait(3000).then(cms.expandPageTree()).then(function () {
                 var pageId = cms.getPageId('Homepage');
                 // check that languages look correct
                 test.assertExists(
@@ -171,7 +171,7 @@ casper.test.begin('Info dropdown can be shown', function (test) {
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree', function () {
+            casper.waitForSelector('.cms-pagetree').wait(3000).then(cms.expandPageTree()).then(function () {
                 var pageId = cms.getPageId('Homepage');
 
                 // check that languages look correct
@@ -219,7 +219,7 @@ casper.test.begin('Settings and advanced settings are accessible', function (tes
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree', function () {
+            casper.waitForSelector('.cms-pagetree').wait(3000).then(cms.expandPageTree()).then(function () {
                 var pageId = cms.getPageId('Homepage');
                 // check that languages look correct
 
@@ -237,6 +237,7 @@ casper.test.begin('Settings and advanced settings are accessible', function (tes
             })
             .waitForUrl(/page/)
             .waitForSelector('.cms-pagetree')
+            .wait(3000).then(cms.expandPageTree())
             .thenEvaluate(function () {
                 var clickEvent = $.Event('click', { shiftKey: true });
 
@@ -293,6 +294,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
             })
             .waitUntilVisible('.success')
             .waitUntilVisible('.cms-pagetree')
+            .wait(3000)
             .then(cms.waitUntilAllAjaxCallsFinish())
             .then(cms.expandPageTree())
             .then(function () {
@@ -1179,6 +1181,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
         .withFrame(0, function () {
             var secondPageId;
             casper.waitUntilVisible('.cms-pagetree')
+                .wait(1000)
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1462,6 +1465,7 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
             var secondPageId;
             var drop;
             casper.waitUntilVisible('.cms-pagetree')
+                .wait(3000)
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1481,7 +1485,10 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
                         q: 'seco'
                     }, true);
                 })
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree')
+                .wait(3000)
+                .then(cms.expandPageTree())
+                .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
                             { name: 'Second' },
