@@ -203,6 +203,7 @@ var CMS = window.CMS || {};
                     remainingWidth += this.items.rightTotalWidth;
 
                     var newLeftMostItemIndex = this.items.right.length;
+                    // istanbul ignore if: this moves items to the right one by one
                     if (false) {
                         // if you want to move items from the right one by one
                         while (remainingWidth - this.items.right[newLeftMostItemIndex - 1].width > 0) {
