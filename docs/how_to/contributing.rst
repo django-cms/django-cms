@@ -84,7 +84,7 @@ integration tests.
 Depending on your contribution, you will write a mix of them.
 
 Let's start with something simple. We'll assume you have set up your environment correctly as
-`described above <start-contributing>`_.
+:ref:`described above <start-contributing>`.
 
 Let's say you want to test the behaviour of the ``CMSPluginBase.render`` method:
 
