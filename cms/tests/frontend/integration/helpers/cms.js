@@ -93,7 +93,8 @@ module.exports = function (casperjs) {
                         })
                         .waitUntilVisible('.success')
                         .waitForUrl(/cms/)
-                        .then(that.waitUntilAllAjaxCallsFinish());
+                        .then(that.waitUntilAllAjaxCallsFinish())
+                        .wait(1000);
                 };
             }
 
@@ -109,7 +110,8 @@ module.exports = function (casperjs) {
                     })
                     .waitForUrl(/cms/)
                     .waitUntilVisible('.success')
-                    .then(that.waitUntilAllAjaxCallsFinish());
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .wait(1000);
             };
         },
 
