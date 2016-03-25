@@ -1,4 +1,4 @@
-.. _upgrade-to-3.2.2:
+.. _upgrade-to-3.2.3:
 
 ###################
 3.2.3 release notes
