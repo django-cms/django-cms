@@ -89,6 +89,7 @@ module.exports = function (casperjs) {
                         .waitForSelector('#page_form', function () {
                             this.sendKeys('#id_title', opts.title);
                         })
+                        .waitForUrl(/add/)
                         .wait(250, function () {
                             this.click('input[name="_save"]');
                         })
@@ -103,6 +104,7 @@ module.exports = function (casperjs) {
             // add page as usual
             return function () {
                 return this.wait(1000).thenOpen(globals.adminPagesUrl + 'add/')
+                    .waitForUrl(/add/)
                     .waitUntilVisible('#id_title')
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
