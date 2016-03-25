@@ -173,6 +173,7 @@ module.exports = function (casperjs) {
                         // ensure previous content has been changed
                         return this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
                     })
+                    .waitForResource(/add-plugin/)
                     .withFrame(0, function () {
                         // we cannot pass the options as object because casper js
                         // treats objects/arrays in a funny way, so we stringify it
