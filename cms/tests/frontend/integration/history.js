@@ -129,7 +129,7 @@ casper.test.begin('History', function (test) {
                 xPath('//a[.//span[text()[contains(.,"View history...")]]]')
             );
         })
-        .wait(100)
+        .wait(1000)
         // Wait for modal
         .withFrame(0, function () {
             casper.waitForSelector('#change-history', function () {
