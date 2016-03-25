@@ -37,6 +37,7 @@ casper.test.begin('User Add Content', function (test) {
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
+        .waitForResource(/add-plugin/)
         .wait(2000)
         .withFrame(0, function () {
             // wait until modal fully loads
