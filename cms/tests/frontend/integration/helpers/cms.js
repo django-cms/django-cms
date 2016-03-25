@@ -171,6 +171,7 @@ module.exports = function (casperjs) {
                             this.click(opts.parent + ' [data-cms-tooltip="Add plugin"]');
                         }
                     })
+                    .wait(200)
                     .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                         this.then(function () {
                             this.click(xPath('//a[@href="' + opts.type + '"]'));
