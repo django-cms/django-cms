@@ -285,12 +285,13 @@ module.exports = function (casperjs) {
                     // open "Example.com" menu
                     this.click('.cms-toolbar-item-navigation li:first-child a');
                 })
-                // open "Administration"
+                // open "Pages"
                 .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
                     this.click('.cms-toolbar-item-navigation-hover a[href*="/admin/cms/page"]');
                 })
                 // wait until sideframe is open
-                .waitUntilVisible('.cms-sideframe-frame');
+                .waitUntilVisible('.cms-sideframe-frame')
+                .wait(1000);
             };
         },
 
