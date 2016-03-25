@@ -190,7 +190,8 @@ gulp.task('tests:integration', function (done) {
             'pageControl',
             'modal',
             'permissions',
-            'logout'
+            'logout',
+            'clipboard'
         ],
         [
             'pageTypes',
@@ -207,8 +208,7 @@ gulp.task('tests:integration', function (done) {
             'dragndrop',
             'history',
             'revertLive',
-            'narrowScreen',
-            'clipboard'
+            'narrowScreen'
         ]
     ];
 
