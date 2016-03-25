@@ -53,6 +53,7 @@ module.exports = function (casperjs) {
                             this.click('.cms-pagetree [href*="delete"]'); // first one
                         }
                     })
+                    .waitForUrl(/delete/)
                     .waitUntilVisible('input[type=submit]')
                     .then(function () {
                         this.click('input[type=submit]');
