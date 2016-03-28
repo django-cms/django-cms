@@ -75,11 +75,15 @@ def assign_plugins(request, placeholders, template, lang=None, is_fallback=False
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
     plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
+    all_plugins_groups = plugin_groups.copy()
     for group in plugin_groups:
         plugin_groups[group] = build_plugin_tree(plugin_groups[group])
     groups = fallbacks.copy()
     groups.update(plugin_groups)
     for placeholder in placeholders:
+        # This is all the plugins.
+        setattr(placeholder, '_all_plugins_cache', all_plugins_groups.get(placeholder.pk, []))
+        # This one is only the root plugins.
         setattr(placeholder, '_plugins_cache', groups.get(placeholder.pk, []))
 
 
