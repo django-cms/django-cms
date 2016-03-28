@@ -317,22 +317,38 @@ class Placeholder(models.Model):
         :type response_timestamp: datetime
         :rtype: int
         """
-        lang = getattr(request, 'LANGUAGE_CODE', None)
-
         min_ttl = MAX_EXPIRATION_TTL
-        for plugin_item in self.get_plugins(lang):
-            instance, plugin = plugin_item.get_plugin_instance()
 
-            if not self.cache_placeholder or not get_cms_setting('PLUGIN_CACHE'):  # noqa
-                # This placeholder has a plugin with an effective
-                # `cache = False` setting or the developer has explicitly
-                # disabled the PLUGIN_CACHE, so, no point in continuing.
-                return EXPIRE_NOW
+        if not self.cache_placeholder or not get_cms_setting('PLUGIN_CACHE'):
+            # This placeholder has a plugin with an effective
+            # `cache = False` setting or the developer has explicitly
+            # disabled the PLUGIN_CACHE, so, no point in continuing.
+            return EXPIRE_NOW
+
+        def inner_plugin_iterator(lang):
+            """
+            The placeholder will have a cache of all the concrete plugins it
+            uses already, but just in case it doesn't, we have a code-path to
+            generate them anew.
+
+            This is made extra private as an inner function to avoid any other
+            process stealing our yields.
+            """
+            if hasattr(self, '_all_plugins_cache'):
+                for instance in self._all_plugins_cache:
+                    plugin = instance.get_plugin_class_instance()
+                    yield instance, plugin
+            else:
+                for plugin_item in self.get_plugins(lang):
+                    yield plugin_item.get_plugin_instance()
+
+        language = getattr(request, 'LANGUAGE_CODE', None)
+        for instance, plugin in inner_plugin_iterator(language):
             plugin_expiration = plugin.get_cache_expiration(
                 request, instance, self)
 
-            # The plugin_expiration should only ever be either: None, a TZ-aware
-            # datetime, a timedelta, or an integer.
+            # The plugin_expiration should only ever be either: None, a TZ-
+            # aware datetime, a timedelta, or an integer.
             if plugin_expiration is None:
                 # Do not consider plugins that return None
                 continue
