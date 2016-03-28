@@ -46,7 +46,7 @@ def set_page_cache(response):
         # This *must* be TZ-aware
         timestamp = now()
 
-        placeholders = request.current_page.get_placeholders()
+        placeholders = getattr(request, 'placeholders', [])
 
         # Checks if there's a plugin using the legacy "cache = False"
         if all(ph.cache_placeholder for ph in placeholders):

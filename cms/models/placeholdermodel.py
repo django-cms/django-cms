@@ -317,7 +317,7 @@ class Placeholder(models.Model):
         :type response_timestamp: datetime
         :rtype: int
         """
-        lang = getattr(request, 'lang', None)
+        lang = getattr(request, 'LANGUAGE_CODE', None)
 
         min_ttl = MAX_EXPIRATION_TTL
         for plugin_item in self.get_plugins(lang):
