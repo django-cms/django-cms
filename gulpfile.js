@@ -214,6 +214,8 @@ gulp.task('tests:integration', function (done) {
 
     var files = [];
 
+    // on travis we split up integration tests into three buckets,
+    // and set which bucket will be used through environment variable
     switch (process.env.INTEGRATION_TESTS_BUCKET) {
         case '1':
         case '2':
