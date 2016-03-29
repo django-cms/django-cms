@@ -155,6 +155,7 @@ var CMS = window.CMS || {};
                     that.ui.document.off(that.click);
                     that.ui.toolbar.off(that.click, reset);
                     that.ui.structureBoard.off(that.click);
+                    that.ui.window.off(that.resize + '.menu.reset');
                     that._handleLongMenus();
                 }
 
@@ -241,7 +242,7 @@ var CMS = window.CMS || {};
                     that.ui.document.on(that.click, reset);
                     that.ui.structureBoard.on(that.click, reset);
                     that.ui.toolbar.on(that.click, reset);
-                    that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
+                    that.ui.window.on(that.resize + '.menu.reset', CMS.API.Helpers.throttle(reset, 1000));
                     // update states
                     open = true;
                 });
