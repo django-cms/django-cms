@@ -48,7 +48,7 @@ var PROJECT_PATTERNS = {
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
-        PROJECT_PATH.sass + '/**/*.{scss,sass}',
+        PROJECT_PATH.sass + '/**/*.{scss,sass}'
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'
@@ -175,36 +175,59 @@ gulp.task('tests:unit:watch', function () {
 gulp.task('tests:integration', function (done) {
     process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
 
-    var files = [
-        'loginAdmin',
-        'toolbar',
-        'addFirstPage',
-        'wizard',
-        'editMode',
-        'sideframe',
-        'createContent',
-        'users',
-        'addNewUser',
-        'newPage',
-        'pageControl',
-        'permissions',
-        'pageTypes',
-        'switchLanguage',
-        'editContent',
-        'editContentTools',
-        'publish',
-        'logout',
-        'loginToolbar',
-        'changeSettings',
-        'disableToolbar',
-        'dragndrop',
-        'history',
-        'revertLive',
-        'narrowScreen',
-        'clipboard',
-        'modal',
-        'pagetree'
+    var buckets = [
+        [
+            'loginAdmin',
+            'toolbar',
+            'addFirstPage',
+            'wizard',
+            'editMode',
+            'sideframe',
+            'createContent',
+            'users',
+            'addNewUser',
+            'newPage',
+            'pageControl',
+            'modal',
+            'permissions',
+            'logout',
+            'clipboard'
+        ],
+        [
+            'pageTypes',
+            'switchLanguage',
+            'editContent',
+            'editContentTools',
+            'publish',
+            'loginToolbar',
+            'changeSettings'
+        ],
+        [
+            'pagetree',
+            'disableToolbar',
+            'dragndrop',
+            'history',
+            'revertLive',
+            'narrowScreen'
+        ]
     ];
+
+    var files = [];
+
+    // on travis we split up integration tests into three buckets,
+    // and set which bucket will be used through environment variable
+    switch (process.env.INTEGRATION_TESTS_BUCKET) {
+        case '1':
+        case '2':
+        case '3':
+            files = buckets[Number(process.env.INTEGRATION_TESTS_BUCKET) - 1];
+            break;
+        default:
+            files = buckets.reduce(function (memo, bucket) {
+                return memo.concat(bucket);
+            }, []);
+    }
+
     var pre = ['setup'];
 
     if (argv && argv.tests) {

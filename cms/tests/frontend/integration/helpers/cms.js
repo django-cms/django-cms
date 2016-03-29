@@ -53,6 +53,7 @@ module.exports = function (casperjs) {
                             this.click('.cms-pagetree [href*="delete"]'); // first one
                         }
                     })
+                    .waitForUrl(/delete/)
                     .waitUntilVisible('input[type=submit]')
                     .then(function () {
                         this.click('input[type=submit]');
@@ -88,18 +89,22 @@ module.exports = function (casperjs) {
                         .waitForSelector('#page_form', function () {
                             this.sendKeys('#id_title', opts.title);
                         })
+                        .waitForUrl(/add/)
                         .wait(250, function () {
                             this.click('input[name="_save"]');
                         })
+                        .waitForResource(/add/)
                         .waitUntilVisible('.success')
                         .waitForUrl(/cms/)
-                        .then(that.waitUntilAllAjaxCallsFinish());
+                        .then(that.waitUntilAllAjaxCallsFinish())
+                        .wait(1000);
                 };
             }
 
             // add page as usual
             return function () {
                 return this.wait(1000).thenOpen(globals.adminPagesUrl + 'add/')
+                    .waitForUrl(/add/)
                     .waitUntilVisible('#id_title')
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
@@ -107,9 +112,11 @@ module.exports = function (casperjs) {
                     .wait(250, function () {
                         this.click('input[name="_save"]');
                     })
+                    .waitForResource(/add/)
                     .waitForUrl(/cms/)
                     .waitUntilVisible('.success')
-                    .then(that.waitUntilAllAjaxCallsFinish());
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .wait(1000);
             };
         },
 
@@ -166,6 +173,7 @@ module.exports = function (casperjs) {
                             this.click(opts.parent + ' [data-cms-tooltip="Add plugin"]');
                         }
                     })
+                    .wait(200)
                     .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                         this.then(function () {
                             this.click(xPath('//a[@href="' + opts.type + '"]'));
@@ -173,6 +181,7 @@ module.exports = function (casperjs) {
                         // ensure previous content has been changed
                         return this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
                     })
+                    .waitForResource(/add-plugin/)
                     .withFrame(0, function () {
                         // we cannot pass the options as object because casper js
                         // treats objects/arrays in a funny way, so we stringify it
@@ -276,12 +285,13 @@ module.exports = function (casperjs) {
                     // open "Example.com" menu
                     this.click('.cms-toolbar-item-navigation li:first-child a');
                 })
-                // open "Administration"
+                // open "Pages"
                 .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
                     this.click('.cms-toolbar-item-navigation-hover a[href*="/admin/cms/page"]');
                 })
                 // wait until sideframe is open
-                .waitUntilVisible('.cms-sideframe-frame');
+                .waitUntilVisible('.cms-sideframe-frame')
+                .wait(1000);
             };
         },
 
