@@ -25,7 +25,11 @@ describe('CMS.Toolbar', function () {
                 spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                     return {};
                 });
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
@@ -65,7 +69,7 @@ describe('CMS.Toolbar', function () {
         // this spec can be thoroughly expanded, but for the moment just checking for the
         // class and event is sufficient
         it('initializes the states', function (done) {
-            spyOn(CMS.Toolbar.prototype, '_initialStates').and.callThrough();
+            CMS.Toolbar.prototype._initialStates.and.callThrough();
             CMS.settings = { sideframe: {}, version: 'fake' };
             CMS.config = { settings: { version: 'fake' }, auth: true };
             jasmine.clock().install();
@@ -95,12 +99,13 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             $(function () {
-                CMS.settings = {
+                CMS.settings = $.extend(CMS.settings, {
                     toolbar: 'collapsed'
-                };
+                });
                 spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                     return {};
                 });
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 done();
             });
@@ -133,14 +138,17 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'collapsed'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             $(function () {
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
@@ -241,14 +249,18 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
@@ -361,14 +373,18 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
@@ -395,15 +411,19 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             jasmine.Ajax.install();
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
@@ -641,14 +661,18 @@ describe('CMS.Toolbar', function () {
                     publish: 'publish?'
                 }
             };
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
@@ -831,14 +855,18 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 toolbar.ui.window = $('<div></div>');
                 toolbar.ui.screenBlock = $('<div></div>');
                 spyOn($.fn, 'css').and.callThrough();
@@ -894,9 +922,9 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             fakeWindow = {
                 location: {
                     href: ''
@@ -906,18 +934,25 @@ describe('CMS.Toolbar', function () {
                 return {};
             });
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 spyOn(CMS.Modal.prototype, 'initialize');
                 spyOn(CMS.Sideframe.prototype, 'initialize');
                 spyOn(toolbar, 'openAjax');
                 spyOn(CMS.API.Helpers, '_getWindow').and.returnValue(fakeWindow);
                 spyOn(CMS.API.Messages, 'open');
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function (done) {
             fixture.cleanup();
+            setTimeout(function () {
+                done();
+            }, 200);
         });
 
         it('return false if item is disabled', function () {
@@ -999,15 +1034,19 @@ describe('CMS.Toolbar', function () {
                     debug: 'DEBUG!'
                 }
             };
-            CMS.settings = {
+            CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            };
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
             $(function () {
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 toolbar.ui.container.append('<div class="cms-debug-bar"></div>');
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
 
                 spyOn(CMS.API.Messages, 'open');
                 jasmine.clock().install();
@@ -1015,9 +1054,12 @@ describe('CMS.Toolbar', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function (done) {
             jasmine.clock().uninstall();
             fixture.cleanup();
+            setTimeout(function () {
+                done();
+            }, 200);
         });
 
         it('shows debug information after timeout', function () {

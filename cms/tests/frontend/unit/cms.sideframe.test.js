@@ -17,6 +17,9 @@ describe('CMS.Sideframe', function () {
         var sideframe;
         beforeEach(function (done) {
             $(function () {
+                CMS.settings = {
+                    sideframe: {}
+                };
                 sideframe = new CMS.Sideframe();
                 done();
             });
@@ -92,12 +95,16 @@ describe('CMS.Sideframe', function () {
                 spyOn(sideframe, 'setSettings').and.callFake(function (input) {
                     return input;
                 });
+                spyOn(sideframe, 'getSettings').and.callFake(function () {
+                    return { sideframe: {} };
+                });
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
                 done();
             });
         });
 
         afterEach(function () {
+            sideframe.ui.body.off();
             fixture.cleanup();
         });
 
@@ -298,16 +305,21 @@ describe('CMS.Sideframe', function () {
         });
 
         it('is chainable', function () {
+            spyOn(sideframe, '_content');
             expect(sideframe.open({ url: url })).toEqual(sideframe);
         });
 
-        it('empties frame holder before injecting iframe (to remove events)', function () {
+        it('empties frame holder before injecting iframe (to remove events)', function (done) {
             spyOn($.fn, 'empty').and.callThrough();
             sideframe.ui.frame.append('<div>I should not be here</div>');
             expect(sideframe.ui.frame).toHaveText('I should not be here');
             sideframe.open({ url: url });
             expect(sideframe.ui.frame).not.toHaveText('I should not be here');
             expect($.fn.empty).toHaveBeenCalled();
+
+            sideframe.ui.frame.find('iframe').on('load', function () {
+                done();
+            });
         });
 
         it('adds specific classes on the iframe body', function (done) {
@@ -325,6 +337,7 @@ describe('CMS.Sideframe', function () {
             CMS.config.debug = true;
             sideframe.open({ url: url });
 
+            expect(CMS.settings.sideframe).toEqual({});
             sideframe.ui.frame.find('iframe').on('load', function () {
                 expect($(this.contentDocument.body)).toHaveClass('cms-debug');
                 done();
@@ -392,6 +405,9 @@ describe('CMS.Sideframe', function () {
                 sideframe = new CMS.Sideframe();
                 spyOn(sideframe, 'setSettings').and.callFake(function (input) {
                     return input;
+                });
+                spyOn(sideframe, 'getSettings').and.callFake(function () {
+                    return { sideframe: {} };
                 });
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
                 done();
