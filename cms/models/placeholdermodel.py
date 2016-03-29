@@ -18,6 +18,7 @@ from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
+from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 
 
@@ -342,7 +343,7 @@ class Placeholder(models.Model):
                 for plugin_item in self.get_plugins(lang):
                     yield plugin_item.get_plugin_instance()
 
-        language = getattr(request, 'LANGUAGE_CODE', None)
+        language = get_language_from_request(request, self.page)
         for instance, plugin in inner_plugin_iterator(language):
             plugin_expiration = plugin.get_cache_expiration(
                 request, instance, self)
