@@ -709,16 +709,16 @@ var CMS = window.CMS || {};
             var sideframe = $('.cms-sideframe');
 
             // automatically resize screenblock window according to given attributes
-            $(window).on(this.resize, function () {
+            that.ui.window.on(that.resize, function () {
                 blocker.css({
-                    'width': $(this).width() - sideframe.width(),
-                    'height': $(window).height()
+                    'width': that.ui.window.width() - sideframe.width(),
+                    'height': that.ui.window.height()
                 });
             }).trigger('resize');
 
             // set update interval
             setInterval(function () {
-                $(window).trigger(that.resize);
+                that.ui.window.trigger(that.resize);
             }, interval);
         },
 
