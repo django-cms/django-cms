@@ -885,7 +885,7 @@ describe('CMS.Toolbar', function () {
         });
 
         it('creates resize handler to resize the blocker element', function () {
-            expect(toolbar.ui.window).not.toHandle(toolbar.resize);
+            expect(toolbar.ui.window).not.toHandle(toolbar.resize + '.screenblock');
             toolbar._screenBlock();
             expect($.fn.css).toHaveBeenCalledWith({
                 width: 0,
@@ -902,7 +902,7 @@ describe('CMS.Toolbar', function () {
                 width: 200,
                 height: 200
             });
-            expect(toolbar.ui.window).toHandle(toolbar.resize);
+            expect(toolbar.ui.window).toHandle(toolbar.resize + '.screenblock');
         });
         it('sets the interval to trigger resize', function () {
             jasmine.clock().install();
