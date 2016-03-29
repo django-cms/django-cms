@@ -159,7 +159,7 @@ var CMS = window.CMS || {};
                 }
 
                 // remove events from first level
-                navigation.find('a').on(that.click + ', ' + that.key, function (e) {
+                navigation.find('a').on(that.click + ' ' + that.key, function (e) {
                     var el = $(this);
                     // we need to restore the default behaviour once a user
                     // presses ctrl/cmd and clicks on the entry. In this
