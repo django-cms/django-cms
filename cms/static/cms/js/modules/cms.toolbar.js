@@ -7,6 +7,7 @@
 /**
  * @module CMS
  */
+/* istanbul ignore next */
 var CMS = window.CMS || {};
 
 // #############################################################################
@@ -68,6 +69,7 @@ var CMS = window.CMS || {};
             this.scroll = 'scroll.cms.toolbar';
             this.key = 'keydown.cms.toolbar keyup.cms.toolbar';
 
+            // istanbul ignore next: function is always reassigned
             this.timer = function () {};
             this.lockToolbar = false;
 
@@ -673,6 +675,7 @@ var CMS = window.CMS || {};
          */
         _debug: function _debug() {
             var timeout = 1000;
+            // istanbul ignore next: function always reassigned
             var timer = function () {};
 
             // bind message event
