@@ -185,7 +185,7 @@ var CMS = window.CMS || {};
 
                         if (cmdPressed) {
                             // control the behaviour when ctrl/cmd is pressed
-                            window.open(el.attr('href'), '_blank');
+                            CMS.API.Helpers._getWindow().open(el.attr('href'), '_blank');
                         } else {
                             // otherwise delegate as usual
                             that._delegate($(this));
@@ -327,7 +327,7 @@ var CMS = window.CMS || {};
                         },
                         'success': function () {
                             var url = CMS.API.Helpers.makeURL(
-                                window.location.href.split('?')[0],
+                                CMS.API.Helpers._getWindow().location.href.split('?')[0],
                                 [CMS.settings.edit_off + '=true']
                             );
                             CMS.API.Helpers.reloadBrowser(url);
@@ -645,7 +645,7 @@ var CMS = window.CMS || {};
                     });
                     break;
                 default:
-                    window.location.href = el.attr('href');
+                    CMS.API.Helpers._getWindow().location.href = el.attr('href');
             }
         },
 
