@@ -1173,14 +1173,12 @@ class RenderPlaceholder(AsTag):
         if isinstance(placeholder, string_types):
             placeholder = PlaceholderModel.objects.get(slot=placeholder)
         if not hasattr(request, 'placeholders'):
-            request.placeholders = set()
-        # Please never exclude any rendered placeholders from this set for any
-        # reason. This is the placeholder cache.
-        request.placeholders.add(placeholder)
+            request.placeholders = []
+        if placeholder.has_change_permission(request):
+            request.placeholders.append(placeholder)
         context = copy(context)
         return safe(placeholder.render(context, width, lang=language,
-                                       editable=editable,
-                                       use_cache=not nocache))
+                                       editable=editable, use_cache=not nocache))
 
     def get_value_for_context(self, context, **kwargs):
         return self._get_value(context, editable=False, **kwargs)

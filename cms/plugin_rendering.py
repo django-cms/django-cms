@@ -112,10 +112,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context.push()
     request = context['request']
     if not hasattr(request, 'placeholders'):
-        request.placeholders = set()
-    # Please never exclude any rendered placeholders from this set for any
-    # reason. This is the placeholder cache.
-    request.placeholders.add(placeholder)
+        request.placeholders = []
+    if placeholder.has_change_permission(request) or not placeholder.cache_placeholder:
+        request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
