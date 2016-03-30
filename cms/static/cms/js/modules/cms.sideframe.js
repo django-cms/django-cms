@@ -512,17 +512,11 @@ var CMS = window.CMS || {};
          * @param {String} url url to be stored in `this.history.back`
          */
         _addToHistory: function _addToHistory(url) {
-            var iframe = this.ui.frame.find('iframe');
-
             // we need to update history first
             this.history.back.push(url);
-            // and than set local variables
-            var length = this.history.back.length;
 
-            // store current url if array is empty
-            if (this.history.back.length <= 0) {
-                this.history.back.push(iframe.attr('src'));
-            }
+            // and then set local variables
+            var length = this.history.back.length;
 
             // check for duplicates
             if (this.history.back[length - 1] === this.history.back[length - 2]) {
