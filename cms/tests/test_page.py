@@ -1205,7 +1205,9 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
     def test_plugin_loading_queries(self):
-        with self.settings(CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'),)):
+        with self.settings(
+                CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
+        ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
             placeholders = list(page.placeholders.all())
             for i, placeholder in enumerate(placeholders):
@@ -1218,7 +1220,7 @@ class PagesTestCase(CMSTestCase):
             # trigger the get_languages query so it doesn't get in our way
             context = self.get_context(page=page)
             context['request'].current_page.get_languages()
-            with self.assertNumQueries(37):
+            with self.assertNumQueries(4):
                 for i, placeholder in enumerate(placeholders):
                     content = get_placeholder_content(context, context['request'], page, placeholder.slot, False, None)
                     for j in range(5):
