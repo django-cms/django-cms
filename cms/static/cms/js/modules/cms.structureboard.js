@@ -175,14 +175,14 @@ var CMS = window.CMS || {};
             // keyboard handling
             // only if there is a structure / content switcher
             if (that.ui.toolbarModeSwitcher.length) {
-                that.ui.doc.on('keydown', function (e) {
+                that.ui.doc.on('keydown.cms.structureboard.switcher', function (e) {
                     // check if we have an important focus
                     var haveFocusedField = document.activeElement !== document.body;
                     if (e.keyCode === CMS.KEYS.SPACE && !haveFocusedField) {
                         e.preventDefault();
                         if (CMS.settings.mode === 'structure') {
                             that.hide();
-                        } else if (CMS.settings.mode === 'edit') {
+                        } else /* istanbul ignore else */ if (CMS.settings.mode === 'edit') {
                             that.show();
                         }
                     }
@@ -394,7 +394,7 @@ var CMS = window.CMS || {};
          * @private
          * @deprecated as of CMS 3.2
          */
-        _resizeBoard: function () {
+        _resizeBoard: /* istanbul ignore next */ function () {
             // calculate placeholder position
             var id = null;
             var area = null;
