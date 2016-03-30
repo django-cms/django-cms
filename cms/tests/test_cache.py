@@ -87,7 +87,10 @@ class CacheTestCase(CMSTestCase):
 
         placeholder1 = page1.placeholders.filter(slot='body')[0]
         placeholder2 = page1.placeholders.filter(slot='right-column')[0]
-        plugin_pool.register_plugin(NoCachePlugin)
+        try:
+            plugin_pool.register_plugin(NoCachePlugin)
+        except PluginAlreadyRegistered:
+            pass
         add_plugin(placeholder1, 'TextPlugin', 'en', body="English")
         add_plugin(placeholder2, 'TextPlugin', 'en', body="Deutsch")
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
@@ -276,7 +279,10 @@ class CacheTestCase(CMSTestCase):
             plugin_pool.register_plugin(DateTimeCacheExpirationPlugin)
         except PluginAlreadyRegistered:
             pass
-        plugin_pool.register_plugin(NoCachePlugin)
+        try:
+            plugin_pool.register_plugin(NoCachePlugin)
+        except PluginAlreadyRegistered:
+            pass
         add_plugin(placeholder1, "TextPlugin", 'en', body="English")
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
 
