@@ -12,6 +12,8 @@
         "casper",
         "beforeEach",
         "afterEach",
+        "beforeAll",
+        "afterAll",
         "spyOn",
         "spyOnEvent",
         "fixture",
