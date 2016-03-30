@@ -305,7 +305,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.user = AnonymousUser()
         request.current_page = page
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(4):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
 
@@ -324,7 +324,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page.publisher_public
         request.user = user
         template = "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}"
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(4):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
