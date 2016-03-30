@@ -48,7 +48,7 @@ class CacheTestCase(CMSTestCase):
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(FuzzyInt(5, 9)):
             self.render_template_obj(template, {}, request)
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
@@ -105,7 +105,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(FuzzyInt(21, 25)):
+            with self.assertNumQueries(FuzzyInt(18, 25)):
                 response1 = self.client.get('/en/')
                 content1 = response1.content
 
@@ -154,7 +154,7 @@ class CacheTestCase(CMSTestCase):
             self.assertNotEqual(output, output2)
             self.assertNotEqual(resp1, resp2)
 
-            plugin_pool.unregister_plugin(NoCachePlugin)
+        plugin_pool.unregister_plugin(NoCachePlugin)
 
     def test_timedelta_cache_plugin(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
@@ -188,7 +188,7 @@ class CacheTestCase(CMSTestCase):
                 response = self.client.get('/en/')
             self.assertTrue('max-age=45' in response['Cache-Control'], response['Cache-Control'])
 
-            plugin_pool.unregister_plugin(TimeDeltaCacheExpirationPlugin)
+        plugin_pool.unregister_plugin(TimeDeltaCacheExpirationPlugin)
 
     def test_datetime_cache_plugin(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
@@ -222,7 +222,7 @@ class CacheTestCase(CMSTestCase):
                 response = self.client.get('/en/')
             self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
 
-            plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
+        plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
 
     def TTLCacheExpirationPlugin(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
@@ -319,9 +319,9 @@ class CacheTestCase(CMSTestCase):
             # As will the Last-Modified timestamp.
             self.assertEqual(response['Last-Modified'], last_modified1)
 
-            plugin_pool.unregister_plugin(TTLCacheExpirationPlugin)
-            plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
-            plugin_pool.unregister_plugin(NoCachePlugin)
+        plugin_pool.unregister_plugin(TTLCacheExpirationPlugin)
+        plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
+        plugin_pool.unregister_plugin(NoCachePlugin)
 
     def test_dual_legacy_cache_plugins(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
