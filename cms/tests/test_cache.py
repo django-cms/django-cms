@@ -308,7 +308,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(14, 26)):
                 response = self.client.get('/en/')
                 resp1 = response.content.decode('utf8').split("$$$")[1]
-            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
             cache_control1 = response['Cache-Control']
             expires1 = response['Expires']
             last_modified1 = response['Last-Modified']
