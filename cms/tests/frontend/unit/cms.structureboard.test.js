@@ -722,7 +722,11 @@ describe('CMS.StructureBoard', function () {
             }));
         });
 
-        it('adds event handler for cms.update to actualize empty placeholders');
+        it('adds event handler for cms.update to actualize empty placeholders', function () {
+            expect(board.ui.sortables).toHandle('cms.update');
+            // cheating here a bit
+            expect(CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name).toEqual('actualizeEmptyPlaceholders')
+        });
 
         it('defines how draggable helper is created', function () {
             var options = board.ui.sortables.nestedSortable('option');
@@ -895,8 +899,211 @@ describe('CMS.StructureBoard', function () {
                 expect(item).not.toHaveClass('cms-is-dragging');
                 expect(item).not.toHaveClass('cms-draggable-stack');
             });
-            it('unbinds interrupt event');
-            it('resets data-touch-action attribute');
+
+            it('unbinds interrupt event', function () {
+                var spy = jasmine.createSpy();
+                board.ui.doc.on('keyup.cms.interrupt', spy);
+                options.beforeStop(null, { item: $('<div></div>') });
+                board.ui.doc.trigger('keyup.cms.interrupt');
+                expect(spy).not.toHaveBeenCalled();
+                expect(board.ui.doc).not.toHandle('keyup.cms.interrupt');
+            });
+
+            it('resets data-touch-action attribute', function () {
+                board.ui.content.removeAttr('data-touch-action');
+                options.beforeStop(null, { item: $('<div></div>') });
+                expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
+            });
+        });
+
+        describe('update', function () {
+            it('returns false if it is not possible to update', function () {
+                board.state = false;
+                expect(options.update()).toEqual(false);
+            });
+
+            it('actualizes collapsible status', function () {
+                var textPlugin = $('.cms-draggable-1');
+                var randomPlugin = $('.cms-draggable-2');
+                var helper = options.helper(null, textPlugin);
+
+                // we need to start first to set a private variable original container
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                expect(randomPlugin.find('> .cms-dragitem')).not.toHaveClass('cms-dragitem-collapsable');
+                expect(randomPlugin.find('> .cms-dragitem')).not.toHaveClass('cms-dragitem-expanded');
+
+                textPlugin.appendTo(randomPlugin.find('.cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect(randomPlugin.find('> .cms-dragitem')).toHaveClass('cms-dragitem-collapsable');
+                expect(randomPlugin.find('> .cms-dragitem')).toHaveClass('cms-dragitem-expanded');
+
+                // and back
+
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                textPlugin.appendTo($('.cms-dragarea-1').find('> .cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect(randomPlugin.find('> .cms-dragitem')).not.toHaveClass('cms-dragitem-collapsable');
+                expect(randomPlugin.find('> .cms-dragitem')).toHaveClass('cms-dragitem-expanded');
+            });
+
+            it('returns false if we moved plugin inside same container ' +
+               'and the event is fired on the container', function () {
+                var textPlugin = $('.cms-draggable-1');
+                var randomPlugin = $('.cms-draggable-2');
+                var helper = options.helper(null, textPlugin);
+                var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
+
+                // and one more time
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                textPlugin.prependTo(placeholderDraggables);
+                expect(
+                    options.update.bind(textPlugin)(null, { item: textPlugin, helper: helper })
+                ).toEqual(false);
+            });
+
+            it('triggers event on the plugin when necessary', function () {
+                var plugin = $('.cms-plugin-1');
+                var textPlugin = $('.cms-draggable-1');
+                var randomPlugin = $('.cms-draggable-2');
+                var helper = options.helper(null, textPlugin);
+                var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
+
+                var spy = jasmine.createSpy();
+                plugin.on('cms.plugins.update', spy);
+
+                // we need to start first to set a private variable original container
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                textPlugin.appendTo(randomPlugin.find('.cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect(spy).toHaveBeenCalledTimes(1);
+
+
+                // and back
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                textPlugin.appendTo($('.cms-dragarea-1').find('> .cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect(spy).toHaveBeenCalledTimes(2);
+
+
+                // and one more time
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                textPlugin.prependTo(placeholderDraggables);
+                options.update.bind(placeholderDraggables)(null, { item: textPlugin, helper: helper });
+
+                expect(spy).toHaveBeenCalledTimes(3);
+            });
+
+            it('triggers event on the plugin in clipboard', function () {
+                $(fixture.el).prepend('<div class="cms-clipboard"></div>');
+
+                var plugin = $('.cms-plugin-1');
+                var textPlugin = $('.cms-draggable-1');
+                var randomPlugin = $('.cms-draggable-2');
+                var helper = options.helper(null, textPlugin);
+
+                plugin.prependTo('.cms-clipboard');
+
+                var pluginSpy = jasmine.createSpy();
+                var clipboardSpy = jasmine.createSpy();
+                plugin.on('cms.plugins.update', pluginSpy);
+                plugin.on('cms.plugin.update', clipboardSpy);
+
+                // we need to start first to set a private variable original container
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                textPlugin.appendTo(randomPlugin.find('.cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect(pluginSpy).not.toHaveBeenCalled();
+                expect(clipboardSpy).toHaveBeenCalledTimes(1);
+
+            });
+
+            it('actualizes empty placeholders', function () {
+                var firstPlaceholder = board.ui.dragareas.eq(0);
+                var firstPlaceholderCopyAll = firstPlaceholder
+                    .find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+                var secondPlaceholder = board.ui.dragareas.eq(1);
+                var secondPlaceholderCopyAll = secondPlaceholder
+                    .find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+
+                expect(firstPlaceholder).toHaveClass('cms-dragarea-empty');
+                expect(firstPlaceholderCopyAll).toHaveClass('cms-submenu-item-disabled');
+                expect(secondPlaceholder).not.toHaveClass('cms-dragarea-empty');
+                expect(secondPlaceholderCopyAll).not.toHaveClass('cms-submenu-item-disabled');
+
+                options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
+
+                secondPlaceholder.find('> .cms-draggables').contents()
+                    .appendTo(firstPlaceholder.find('> .cms-draggables'));
+
+                board.state = true;
+                options.update({}, { item: $('<div class="cms-plugin-1"></div>'), helper: $('<div></div>') });
+
+                expect(firstPlaceholder).not.toHaveClass('cms-dragarea-empty');
+                expect(firstPlaceholderCopyAll).not.toHaveClass('cms-submenu-item-disabled');
+                expect(secondPlaceholder).toHaveClass('cms-dragarea-empty');
+                expect(secondPlaceholderCopyAll).toHaveClass('cms-submenu-item-disabled');
+
+                // now check that the plugin currently being dragged does not count
+                // towards "plugins count"
+                firstPlaceholder.find('> .cms-draggables').contents()
+                    .appendTo(secondPlaceholder.find('> .cms-draggables'));
+                firstPlaceholder.find('> .cms-draggables').append(
+                    $('<div class="cms-draggable cms-draggable-is-dragging"></div>')
+                );
+
+                options.update({}, { item: $('<div class="cms-plugin-1"></div>'), helper: $('<div></div>') });
+
+                expect(firstPlaceholder).toHaveClass('cms-dragarea-empty');
+                expect(firstPlaceholderCopyAll).toHaveClass('cms-submenu-item-disabled');
+                expect(secondPlaceholder).not.toHaveClass('cms-dragarea-empty');
+                expect(secondPlaceholderCopyAll).not.toHaveClass('cms-submenu-item-disabled');
+            });
+
+            it('hides empty sortables', function () {
+                var textPlugin = $('.cms-draggable-1');
+                var randomPlugin = $('.cms-draggable-2');
+                var helper = options.helper(null, textPlugin);
+                var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
+
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                expect($('.cms-draggables.cms-hidden').length).toEqual(0);
+
+                textPlugin.appendTo(randomPlugin.find('.cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect($('.cms-draggables.cms-hidden').length).toEqual(0);
+
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
+
+                expect($('.cms-draggables.cms-hidden').length).toEqual(0);
+
+                textPlugin.appendTo($('.cms-dragarea-1').find('> .cms-draggables'));
+                options.update(null, { item: textPlugin, helper: helper });
+
+                expect($('.cms-draggables.cms-hidden').length).toEqual(1);
+            });
         });
     });
 });
