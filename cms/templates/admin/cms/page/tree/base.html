@@ -40,7 +40,7 @@
 
             <div class="cms-pagetree-buttons">
                 <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
-                    <a href="cms-pagetree-dropdown-trigger"><span class="cms-icon cms-icon-arrow"></span></a>
+                    <a href="cms-pagetree-dropdown-trigger"><span class="cms-icon cms-icon-squares"></span></a>
                     <ul class="cms-pagetree-dropdown-container">
                         {% for site in cl.sites %}
                             <li{% if site.pk == cl.current_site.pk %} class="active"{% endif %}>
@@ -71,7 +71,7 @@
                 </div>
 
                 {% if has_add_permission %}
-                    <a href="{% url opts|admin_urlname:'add' %}" class="cms-btn cms-btn-action">
+                    <a href="{% url opts|admin_urlname:'add' %}" class="cms-pagetree-create cms-btn cms-btn-action">
                         {% blocktrans with cl.opts.verbose_name as name %}
                             New {{ name }}
                         {% endblocktrans %}
