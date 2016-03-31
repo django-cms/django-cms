@@ -590,7 +590,7 @@ describe('CMS.StructureBoard', function () {
         });
 
         afterEach(function () {
-            board.ui.doc.off();
+            board.ui.doc.off('keydown.cms.structureboard.switcher');
             fixture.cleanup();
         });
 
@@ -698,7 +698,7 @@ describe('CMS.StructureBoard', function () {
         });
 
         afterEach(function () {
-            board.ui.doc.off();
+            board.ui.doc.off('keyup.cms.interrupt');
             fixture.cleanup();
         });
 
@@ -874,7 +874,7 @@ describe('CMS.StructureBoard', function () {
                 expect($.ui.sortable.prototype._mouseStop).toHaveBeenCalledTimes(1);
                 expect(spy).toHaveBeenCalledTimes(1 + board.ui.sortables.length);
 
-                board.ui.doc.off();
+                board.ui.doc.off('keyup.cms.interrupt');
 
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
 
@@ -1153,18 +1153,154 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(false);
                 });
 
-                it('uses plugin bounds if pasted into the plugin');
+                it('uses placeholder bounds', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var placeholder = $('.cms-dragarea-1 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+                    pluginEdit.data('settings', { plugin_parent_restriction: [], plugin_type: 'OnlyThisPlugin' });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
+                    expect(board.state).toEqual(true);
+                });
+
+                it('uses plugin bounds if pasted into the plugin', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                    expect(board.state).toEqual(false);
+                });
+
+                it('uses plugin bounds if pasted into the plugin', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OtherPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                    expect(board.state).toEqual(false);
+                });
+
+                it('uses plugin bounds if pasted into the plugin', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: [] });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
+                    expect(board.state).toEqual(true);
+                });
 
                 it('uses placeholderParent bounds', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
 
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: [] });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    // it's important that placeholder is used, and not .cms-draggable-1
+                    expect(options.isAllowed($('.cms-draggable-1'), placeholder, $('.cms-draggable-1'))).toEqual(true);
+                    expect(board.state).toEqual(true);
                 });
             });
 
             describe('parent bonds of the plugin', function () {
                 it('respects parent bounds of the plugin', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
 
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: ['TestPlugin'], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: [], plugin_type: 'TestPlugin' });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
+                    expect(board.state).toEqual(true);
                 });
-                it('works around "0" parent restriction for PlaceholderPlugin');
+
+                it('respects parent bounds of the plugin', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: ['TestPlugin'], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: [], plugin_type: 'OtherType' });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                    expect(board.state).toEqual(false);
+                });
+
+                it('works around "0" parent restriction for PlaceholderPlugin', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var parentPluginStructure = $('.cms-draggable-2');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var parentPluginEdit = $('.cms-plugin-2');
+                    var placeholder = $('.cms-draggable-2 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+
+                    pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
+
+                    pluginEdit.data('settings', { plugin_parent_restriction: ['0'], plugin_type: 'OtherPlugin' });
+                    parentPluginEdit.data('settings', { plugin_restriction: [], plugin_type: 'OtherType' });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
+                    expect(board.state).toEqual(true);
+                });
             });
         });
     });
