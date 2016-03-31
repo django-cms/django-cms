@@ -7,6 +7,7 @@
 /**
  * @module CMS
  */
+/* istanbul ignore next */
 var CMS = window.CMS || {};
 
 // #############################################################################
@@ -131,6 +132,7 @@ var CMS = window.CMS || {};
             this._setSettingsMenu(this.ui.submenu);
             this._setAddPluginModal(this.ui.dragbar.find('.cms-submenu-add'));
 
+            // istanbul ignore next
             CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
             // enable expanding/collapsing globally within the placeholder

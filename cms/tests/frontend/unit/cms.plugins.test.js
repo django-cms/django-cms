@@ -1377,4 +1377,64 @@ describe('CMS.Plugin', function () {
             );
         });
     });
+
+    describe('._scrollToElement', function () {
+        var plugin;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('does nothing if element is in viewport already', function () {
+            spyOn($.fn, 'animate');
+            plugin._scrollToElement($('.cms-draggable-2'), { duration: 100, offset: 20 });
+            expect($.fn.animate).not.toHaveBeenCalled();
+        });
+
+        it('animates structureboard to the point when it is in viewport', function () {
+            // window, element
+            spyOn($.fn, 'height').and.returnValues(200, 20);
+            spyOn($.fn, 'position').and.returnValues({
+                top: 300
+            });
+            spyOn($.fn, 'scrollTop').and.returnValues(30);
+            spyOn($.fn, 'animate');
+            plugin._scrollToElement($('<div></div>'), { duration: 100, offset: 20 });
+
+            expect($.fn.animate).toHaveBeenCalledWith({
+                scrollTop: 300 + 20 + 20 + 30 - 200
+            }, 100);
+        });
+
+        it('has default values');
+    });
 });
