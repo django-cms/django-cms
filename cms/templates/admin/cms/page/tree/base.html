@@ -71,7 +71,7 @@
                 </div>
 
                 {% if has_add_permission %}
-                    <a href="{% url opts|admin_urlname:'add' %}" class="addlink">
+                    <a href="{% url opts|admin_urlname:'add' %}" class="cms-btn cms-btn-action">
                         {% blocktrans with cl.opts.verbose_name as name %}
                             New {{ name }}
                         {% endblocktrans %}

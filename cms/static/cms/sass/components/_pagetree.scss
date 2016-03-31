@@ -4,6 +4,21 @@
 // INFO: please not that all related styles to the pagetree itselfs are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
+// HELPERS
+.cms-btn {
+    display: inline-block;
+    color: $white !important;
+    line-height: $toolbar-button-height;
+    height: $toolbar-button-height;
+    font-size: $toolbar-button-font-size;
+    padding: 0 $toolbar-button-padding-horizontal;
+    &:hover {
+        color: $white !important;
+    }
+}
+
+
+
 // HEADER
 .cms-pagetree-container-custom {
     background: #f7f7f7;
@@ -15,7 +30,7 @@
 
     .cms-pagetree-title {
         float: left;
-        
+        padding: 20px;
     }
 
     .cms-pagetree-search {
@@ -30,6 +45,7 @@
         float: right;
     }
 }
+
 
 
 
