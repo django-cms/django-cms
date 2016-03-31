@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import HttpResponseRedirect, HttpResponse
+from django.utils.cache import patch_cache_control
 from django.utils.http import urlquote
+from django.utils.timezone import now
 from django.utils.translation import get_language
 
 from cms.apphook_pool import apphook_pool
@@ -22,7 +25,7 @@ def details(request, slug):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
-
+    response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
             not request.toolbar.edit_mode and
@@ -32,9 +35,13 @@ def details(request, slug):
     ):
         cache_content = get_page_cache(request)
         if cache_content is not None:
-            content, headers = cache_content
+            content, headers, expires_datetime = cache_content
             response = HttpResponse(content)
             response._headers = headers
+            # Recalculate the max-age header for this cached response
+            max_age = int(
+                (expires_datetime - response_timestamp).total_seconds() + 0.5)
+            patch_cache_control(response, max_age=max_age)
             return response
 
     # Get a Page model object from the request
