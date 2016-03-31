@@ -174,6 +174,42 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def parent(self):
         return self.cms_plugin_instance.parent
 
+    def get_cache_expiration(self, request, instance, placeholder):
+        """
+        Provides hints to the placeholder, and in turn to the page for
+        determining the appropriate Cache-Control headers to add to the
+        HTTPResponse object.
+
+        Must return one of:
+            - None: This means the placeholder and the page will not even
+              consider this plugin when calculating the page expiration;
+
+            - A TZ-aware `datetime` of a specific date and time in the future
+              when this plugin's content expires;
+
+            - A `datetime.timedelta` instance indicating how long, relative to
+              the response timestamp that the content can be cached;
+
+            - An integer number of seconds that this plugin's content can be
+              cached.
+
+        There are constants are defined in `cms.constants` that may be helpful:
+            - `EXPIRE_NOW`
+            - `MAX_EXPIRATION_TTL`
+
+        An integer value of 0 (zero) or `EXPIRE_NOW` effectively means "do not
+        cache". Negative values will be treated as `EXPIRE_NOW`. Values
+        exceeding the value `MAX_EXPIRATION_TTL` will be set to that value.
+
+        Negative `timedelta` values or those greater than `MAX_EXPIRATION_TTL`
+        will also be ranged in the same manner.
+
+        Similarly, `datetime` values earlier than now will be treated as
+        `EXPIRE_NOW`. Values greater than `MAX_EXPIRATION_TTL` seconds in the
+        future will be treated as `MAX_EXPIRATION_TTL` seconds in the future.
+        """
+        return None
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         """
         We just need the popup interface here

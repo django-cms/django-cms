@@ -182,11 +182,6 @@ There are two required attributes on those classes:
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
-* ``cache``: This is a property that tells the plugin rendering system in django
-  CMS whether to cache the plugin’s output to speed-up subsequent views of the
-  same plugin. By default, the cms caches. Since we want each visitor to see
-  output that is specific to him or her, we need to tell the cms to not cache
-  this plugin.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
 is ``True`` (the default):
@@ -198,9 +193,14 @@ is ``True`` (the default):
 * ``get_render_template``: A method that returns a template path to render the
   plugin with.
 
-In addition to those attributes, you can also define a :meth:`render` method on
-your sub-classes. It is specifically this :ref:`render` method that is the
-**view** for your plugin.
+In addition to those attributes, you can also override the :ref:`render` method
+which determines the template context variables that are used render your
+plugin. By default, this method only adds ``instance`` and ``placeholder``
+objects to your context, but plugins can override this to include any context
+that is required.
+
+A number of other methods are available for overriding on your CMSPluginBase
+sub-classes. See: :mod:`cms.plugin_base` for further details.
 
 
 ***************

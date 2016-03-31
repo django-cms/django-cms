@@ -1,0 +1,20 @@
+{
+    "node": true,
+    "predef": [
+        "$",
+        "module",
+        "process",
+        "it",
+        "CMS",
+        "expect",
+        "jasmine",
+        "describe",
+        "casper",
+        "beforeEach",
+        "afterEach",
+        "spyOn",
+        "spyOnEvent",
+        "fixture",
+        "pending"
+    ]
+}

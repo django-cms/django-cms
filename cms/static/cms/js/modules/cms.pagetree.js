@@ -173,6 +173,10 @@ var CMS = window.CMS || {};
                     inside_pos: 'last',
                     // disable the multi selection of nodes for now
                     drag_selection: false,
+                    // disable dragging if filtered
+                    is_draggable: function () {
+                        return (that.options.filtered) ? false : true;
+                    },
                     // disable CMD/CTRL copy
                     copy: false
                 },
@@ -674,14 +678,18 @@ var CMS = window.CMS || {};
          * @private
          */
         _checkHelpers: function _checkHelpers() {
-            if (this.cache.type) {
+            if (this.cache.type && this.cache.id) {
                 this._showHelpers(this.cache.type);
             }
 
-            // hide cut element if it is visible
+            // hide cut element and it's descendants' paste helpers if it is visible
             if (this.cache.type === 'cut' && this.cache.target) {
-                $('.jsgrid_' + this.cache.id + '_col .cms-tree-item-helpers')
-                    .addClass('cms-hidden');
+                var descendantIds = this.ui.tree.jstree(true).get_node(this.cache.id).children_d;
+
+                [this.cache.id].concat(descendantIds).forEach(function (id) {
+                    $('.jsgrid_' + id + '_col .cms-tree-item-helpers')
+                        .addClass('cms-hidden');
+                });
             }
         },
 

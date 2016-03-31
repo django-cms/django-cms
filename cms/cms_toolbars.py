@@ -61,7 +61,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.page = get_page_draft(self.request.current_page)
 
     def init_placeholders_from_request(self):
-        self.placeholders = getattr(self.request, 'placeholders', [])
+        self.placeholders = getattr(self.request, 'placeholders', {})
         self.statics = getattr(self.request, 'static_placeholders', [])
 
     def populate(self):
@@ -78,7 +78,7 @@ class PlaceholderToolbar(CMSToolbar):
             if self.page.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
-        elif self.placeholders:
+        elif any([ph for ph, perms in self.placeholders.values() if perms]):
             return self.add_structure_mode_item()
 
         for sp in self.statics:
