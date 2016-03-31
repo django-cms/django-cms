@@ -306,6 +306,8 @@ var CMS = window.CMS || {};
                     pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
                     return false;
                 }
+            } else {
+                return false;
             }
 
             return true;

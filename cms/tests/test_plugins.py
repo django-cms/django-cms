@@ -3,9 +3,7 @@ import base64
 import datetime
 import json
 import os
-from distutils.version import LooseVersion
 
-import django
 from django import http
 from django.conf import settings
 from django.conf.urls import url
