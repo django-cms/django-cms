@@ -1173,9 +1173,14 @@ class RenderPlaceholder(AsTag):
         if isinstance(placeholder, string_types):
             placeholder = PlaceholderModel.objects.get(slot=placeholder)
         if not hasattr(request, 'placeholders'):
-            request.placeholders = []
-        if placeholder.has_change_permission(request):
-            request.placeholders.append(placeholder)
+            request.placeholders = {}
+        perms = (placeholder.has_change_permission(request) or not placeholder.cache_placeholder)
+        if not perms or placeholder.slot not in request.placeholders:
+            request.placeholders[placeholder.slot] = (placeholder, perms)
+        else:
+            request.placeholders[placeholder.slot] = (
+                placeholder, perms and request.placeholders[placeholder.slot][1]
+            )
         context = copy(context)
         return safe(placeholder.render(context, width, lang=language,
                                        editable=editable, use_cache=not nocache))
