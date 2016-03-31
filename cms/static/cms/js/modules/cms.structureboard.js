@@ -558,7 +558,7 @@ var CMS = window.CMS || {};
                     // save original state events
                     var original = $('.cms-plugin-' + that.getId(originalItem));
                     // cancel if item has no settings
-                    if (original.length === 0 || original.data('settings') === null) {
+                    if (original.length === 0 || !original.data('settings')) {
                         return false;
                     }
                     var parent_bounds = $.grep(original.data('settings').plugin_parent_restriction, function (r) {
