@@ -161,7 +161,7 @@ var CMS = window.CMS || {};
             this.ui.dimmer.show();
             this.ui.frame.addClass('cms-loader');
 
-            // show loader
+            // istanbul ignore else: always show loader
             if (CMS.API && CMS.API.Toolbar) {
                 CMS.API.Toolbar.showLoader();
             }
@@ -234,6 +234,7 @@ var CMS = window.CMS || {};
              * @function forceRerenderOnIOS
              * @private
              */
+            // istanbul ignore next
             function forceRerenderOnIOS() {
                 var w = that.ui.sideframe.width();
                 that.ui.sideframe.animate({ 'width': w + 1 }, 0);
@@ -271,7 +272,7 @@ var CMS = window.CMS || {};
                 // than show
                 iframe.show();
 
-                // force style recalculation on iOS
+                // istanbul ignore if: force style recalculation on iOS
                 if (iOS) {
                     forceRerenderOnIOS();
                 }
@@ -346,7 +347,7 @@ var CMS = window.CMS || {};
                 }
             }
 
-            // trigger API handlers
+            // istanbul ignore else: always trigger API handlers
             if (CMS.API && CMS.API.Toolbar) {
                 // FIXME: initialization needs to be done after our libs are loaded
                 CMS.API.Toolbar.open();
@@ -412,6 +413,7 @@ var CMS = window.CMS || {};
             });
             this.ui.frame.removeClass('cms-loader');
 
+            // istanbul ignore else
             if (CMS.API && CMS.API.Toolbar) {
                 CMS.API.Toolbar._lock(false);
             }
@@ -432,7 +434,7 @@ var CMS = window.CMS || {};
         _startResize: function _startResize() {
             var that = this;
             var outerOffset = 30;
-            var timer = function () {};
+            var timer;
 
             // create event for stopping
             this.ui.body.on(this.pointerUp, function (e) {
@@ -512,17 +514,11 @@ var CMS = window.CMS || {};
          * @param {String} url url to be stored in `this.history.back`
          */
         _addToHistory: function _addToHistory(url) {
-            var iframe = this.ui.frame.find('iframe');
-
             // we need to update history first
             this.history.back.push(url);
-            // and than set local variables
-            var length = this.history.back.length;
 
-            // store current url if array is empty
-            if (this.history.back.length <= 0) {
-                this.history.back.push(iframe.attr('src'));
-            }
+            // and then set local variables
+            var length = this.history.back.length;
 
             // check for duplicates
             if (this.history.back[length - 1] === this.history.back[length - 2]) {
