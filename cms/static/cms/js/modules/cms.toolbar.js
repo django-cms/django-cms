@@ -7,6 +7,7 @@
 /**
  * @module CMS
  */
+/* istanbul ignore next */
 var CMS = window.CMS || {};
 
 // #############################################################################
@@ -60,7 +61,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.toolbar';
             this.touchStart = 'touchstart.cms.toolbar';
             this.pointerUp = 'pointerup.cms.toolbar';
-            this.pointerOverOut = 'pointerover.cms.toolbar pointerout.csm.toolbar';
+            this.pointerOverOut = 'pointerover.cms.toolbar pointerout.cms.toolbar';
             this.pointerLeave = 'pointerleave.csm.toolbar';
             this.mouseEnter = 'mouseenter.cms.toolbar';
             this.mouseLeave = 'mouseleave.cms.toolbar';
@@ -68,6 +69,7 @@ var CMS = window.CMS || {};
             this.scroll = 'scroll.cms.toolbar';
             this.key = 'keydown.cms.toolbar keyup.cms.toolbar';
 
+            // istanbul ignore next: function is always reassigned
             this.timer = function () {};
             this.lockToolbar = false;
 
@@ -153,11 +155,12 @@ var CMS = window.CMS || {};
                     that.ui.document.off(that.click);
                     that.ui.toolbar.off(that.click, reset);
                     that.ui.structureBoard.off(that.click);
+                    that.ui.window.off(that.resize + '.menu.reset');
                     that._handleLongMenus();
                 }
 
                 // remove events from first level
-                navigation.find('a').on(that.click + ', ' + that.key, function (e) {
+                navigation.find('a').on(that.click + ' ' + that.key, function (e) {
                     var el = $(this);
                     // we need to restore the default behaviour once a user
                     // presses ctrl/cmd and clicks on the entry. In this
@@ -182,7 +185,7 @@ var CMS = window.CMS || {};
 
                         if (cmdPressed) {
                             // control the behaviour when ctrl/cmd is pressed
-                            window.open(el.attr('href'), '_blank');
+                            CMS.API.Helpers._getWindow().open(el.attr('href'), '_blank');
                         } else {
                             // otherwise delegate as usual
                             that._delegate($(this));
@@ -239,7 +242,7 @@ var CMS = window.CMS || {};
                     that.ui.document.on(that.click, reset);
                     that.ui.structureBoard.on(that.click, reset);
                     that.ui.toolbar.on(that.click, reset);
-                    that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
+                    that.ui.window.on(that.resize + '.menu.reset', CMS.API.Helpers.throttle(reset, 1000));
                     // update states
                     open = true;
                 });
@@ -324,7 +327,7 @@ var CMS = window.CMS || {};
                         },
                         'success': function () {
                             var url = CMS.API.Helpers.makeURL(
-                                window.location.href.split('?')[0],
+                                CMS.API.Helpers._getWindow().location.href.split('?')[0],
                                 [CMS.settings.edit_off + '=true']
                             );
                             CMS.API.Helpers.reloadBrowser(url);
@@ -642,7 +645,7 @@ var CMS = window.CMS || {};
                     });
                     break;
                 default:
-                    window.location.href = el.attr('href');
+                    CMS.API.Helpers._getWindow().location.href = el.attr('href');
             }
         },
 
@@ -673,6 +676,7 @@ var CMS = window.CMS || {};
          */
         _debug: function _debug() {
             var timeout = 1000;
+            // istanbul ignore next: function always reassigned
             var timer = function () {};
 
             // bind message event
@@ -705,16 +709,16 @@ var CMS = window.CMS || {};
             var sideframe = $('.cms-sideframe');
 
             // automatically resize screenblock window according to given attributes
-            $(window).on(this.resize, function () {
+            that.ui.window.on(that.resize + '.screenblock', function () {
                 blocker.css({
-                    'width': $(this).width() - sideframe.width(),
-                    'height': $(window).height()
+                    'width': that.ui.window.width() - sideframe.width(),
+                    'height': that.ui.window.height()
                 });
-            }).trigger('resize');
+            }).trigger(that.resize + '.screenblock');
 
             // set update interval
             setInterval(function () {
-                $(window).trigger(that.resize);
+                that.ui.window.trigger(that.resize + '.screenblock');
             }, interval);
         },
 
