@@ -725,7 +725,7 @@ describe('CMS.StructureBoard', function () {
         it('adds event handler for cms.update to actualize empty placeholders', function () {
             expect(board.ui.sortables).toHandle('cms.update');
             // cheating here a bit
-            expect(CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name).toEqual('actualizeEmptyPlaceholders')
+            expect(CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name).toEqual('actualizeEmptyPlaceholders');
         });
 
         it('defines how draggable helper is created', function () {
@@ -1256,7 +1256,10 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginEdit.data('settings', { plugin_parent_restriction: ['TestPlugin'], plugin_type: 'OtherPlugin' });
+                    pluginEdit.data('settings', {
+                        plugin_parent_restriction: ['TestPlugin'],
+                        plugin_type: 'OtherPlugin'
+                    });
                     parentPluginEdit.data('settings', { plugin_restriction: [], plugin_type: 'TestPlugin' });
                     placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
 
@@ -1275,7 +1278,10 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginEdit.data('settings', { plugin_parent_restriction: ['TestPlugin'], plugin_type: 'OtherPlugin' });
+                    pluginEdit.data('settings', {
+                        plugin_parent_restriction: ['TestPlugin'],
+                        plugin_type: 'OtherPlugin'
+                    });
                     parentPluginEdit.data('settings', { plugin_restriction: [], plugin_type: 'OtherType' });
                     placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
 
