@@ -1105,5 +1105,67 @@ describe('CMS.StructureBoard', function () {
                 expect($('.cms-draggables.cms-hidden').length).toEqual(1);
             });
         });
+
+        describe('isAllowed', function () {
+            it('returns false if CMS.API is locked', function () {
+                CMS.API.locked = true;
+                board.state = 'mock';
+                expect(options.isAllowed()).toEqual(false);
+                expect(board.state).toEqual('mock');
+            });
+
+            it('returns false if there is no item', function () {
+                CMS.API.locked = false;
+                board.state = 'mock';
+                expect(options.isAllowed()).toEqual(false);
+                expect(board.state).toEqual('mock');
+            });
+
+            it('returns false if item has no settings', function () {
+                board.state = 'mock';
+                expect(options.isAllowed(null, null, $('.cms-draggable-1'))).toEqual(false);
+                expect(board.state).toEqual('mock');
+            });
+
+            it('returns false if parent cannot have children', function () {
+                board.state = 'mock';
+                var pluginStructure = $('.cms-draggable-1');
+                var pluginEdit = $('.cms-plugin-1');
+                var placeholder = $('.cms-draggables').eq(0);
+                placeholder.parent().addClass('cms-draggable-disabled');
+                pluginEdit.data('settings', { plugin_parent_restriction: [] });
+
+                expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                expect(board.state).toEqual('mock');
+            });
+
+            describe('bounds of a place we put current plugin in', function () {
+                it('uses placeholder bounds', function () {
+                    board.state = 'mock';
+                    var pluginStructure = $('.cms-draggable-1');
+                    var pluginEdit = $('.cms-plugin-1');
+                    var placeholder = $('.cms-dragarea-1 > .cms-draggables');
+                    var placeholderEdit = $('.cms-placeholder-1');
+                    pluginEdit.data('settings', { plugin_parent_restriction: [] });
+                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+
+                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                    expect(board.state).toEqual(false);
+                });
+
+                it('uses plugin bounds if pasted into the plugin');
+
+                it('uses placeholderParent bounds', function () {
+
+                });
+            });
+
+            describe('parent bonds of the plugin', function () {
+                it('respects parent bounds of the plugin', function () {
+
+                });
+                it('works around "0" parent restriction for PlaceholderPlugin');
+            });
+        });
     });
 });
