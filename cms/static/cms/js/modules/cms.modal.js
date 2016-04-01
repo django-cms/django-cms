@@ -33,7 +33,6 @@ var CMS = window.CMS || {};
             minHeight: 400,
             minWidth: 800,
             modalDuration: 200,
-            newPlugin: false,
             resizable: true,
             maximizable: true,
             minimizable: true
@@ -182,12 +181,6 @@ var CMS = window.CMS || {};
                 throw new Error('The arguments passed to "open" were invalid.');
             }
 
-            // handle remove option when plugin is new
-            // cancel open process when switching context
-            if (CMS._newPlugin && !this._deletePlugin()) {
-                return false;
-            }
-
             // We have to rebind events every time we open a modal
             // because the event handlers contain references to the instance
             // and since we reuse the same markup we need to update
@@ -209,11 +202,6 @@ var CMS = window.CMS || {};
 
             this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
             this.maximized = false;
-
-            // new plugin will freeze the creation process
-            if (this.options.newPlugin) {
-                CMS._newPlugin = this.options.newPlugin;
-            }
 
             // because a new instance is called, we have to ensure minimized state is removed #3620
             if (this.ui.body.hasClass('cms-modal-minimized')) {
@@ -399,16 +387,9 @@ var CMS = window.CMS || {};
                 this.reloadBrowser(this.options.onClose, false, true);
             }
 
-            // handle remove option when plugin is new
-            if (CMS._newPlugin) {
-                this._deletePlugin({
-                    hideAfter: true
-                });
-            } else {
-                this._hide({
-                    duration: this.options.modalDuration / 2
-                });
-            }
+            this._hide({
+                duration: this.options.modalDuration / 2
+            });
         },
 
         /**
@@ -1028,42 +1009,6 @@ var CMS = window.CMS || {};
             this.ui.frame.empty().append(opts.html);
             this.ui.titlePrefix.text(opts.title || '');
             this.ui.titleSuffix.text(opts.subtitle || '');
-        },
-
-        /**
-         * _deletePlugin removes a plugin once created when clicking
-         * on delete or the close item. If we don't do this, an empty
-         * plugin is generated
-         * https://github.com/divio/django-cms/pull/4381 will eventually
-         * provide a better solution
-         *
-         * @method _deletePlugin
-         * @private
-         * @param {Object} [opts] general objects element that holds settings
-         * @param {Boolean} [opts.hideAfter] hides the modal after the ajax requests succeeds
-         */
-        _deletePlugin: function _deletePlugin(opts) {
-            var that = this;
-            var data = CMS._newPlugin;
-            var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
-            var text = CMS.config.lang.confirmEmpty.replace(
-                '{1}', CMS._newPlugin.breadcrumb[CMS._newPlugin.breadcrumb.length - 1].title
-            );
-
-            // trigger an ajax request
-            return CMS.API.Toolbar.openAjax({
-                url: data['delete'],
-                post: post,
-                text: text,
-                callback: function () {
-                    CMS._newPlugin = false;
-                    if (opts && opts.hideAfter) {
-                        that._hide({
-                            duration: 100
-                        });
-                    }
-                }
-            });
         }
     });
 
