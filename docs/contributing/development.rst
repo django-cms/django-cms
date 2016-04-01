@@ -82,30 +82,49 @@ Similarly, substantial patches with significant implications for the codebase
 from other members of the community should be reviewed and discussed by more
 than one core developer before being accepted.
 
+
 Current core developers
 =======================
 
 * Angelo Dini http://github.com/finalangel
-* Benjamin Wohlwend http://github.com/piquadrat
 * Daniele Procida http://github.com/evildmp
 * Iacopo Spalletti http://github.com/yakky
 * Jonas Obrist http://github.com/ojii
 * Martin Koistinen http://github.com/mkoistinen
-* Paulo Alvarado http://github.com/czpython
 * Patrick Lauber http://github.com/digi604
+* Paulo Alvarado http://github.com/czpython
 * Stefan Foulis http://github.com/stefanfoulis
+* Vadim Sikora https://github.com/vxsx
+
 
 Retired core developers
 =======================
 
 * Chris Glass http://github.com/chrisglass
 * Øyvind Saltvik http://github.com/fivethreeo
+* Benjamin Wohlwend http://github.com/piquadrat
+
+Following a year or so of inactivity, a core developer will be moved to the
+"Retired" list, with the understanding that they can rejoin the project in the
+future whenever they choose.
 
 
-Election of new core developers
-===============================
+Becoming a core developer
+=========================
 
-New members of the core team are selected by the technical board.
+Anyone can become a core developer. You don't need to be an expert developer, or
+know more than anyone else about the internals of the CMS. You just have to be a
+regular contributor, who makes a sustained and valuable contribution to the
+project.
+
+This contribution can take many forms - not just commits to our codebase. For
+example, documentation is a valuable contribution, and so is simply being a
+member of the community who spends time assisting others.
+
+Any member of the core team can nominate a new person for membership. The
+nomination will be discussed by the technical board, and assuming there are no
+objections raised, approved.
+
 
 .. _technical_board:
 
@@ -141,11 +160,11 @@ developers who have retired, or for other reasons.
 Composition of the board
 ========================
 
-The members of the technical board will include key developers from Divio and
-others in the django CMS development community - developers who work *with*
-django CMS, as well as developers *of* django CMS - in order to help ensure
-that all perspectives are represented in important decisions about the software
-and the project.
+The the technical board will include key developers from Divio and others in the
+django CMS development community - developers who work *with* django CMS, as
+well as developers *of* django CMS - in order to help ensure that all
+perspectives are represented in important decisions about the software and the
+project.
 
 The board may also include representatives of the django CMS community who are
 not developers but who have a valuable expertise in key fields (user
@@ -154,7 +173,8 @@ experience, design, content management, etc).
 The current members of the technical board are:
 
 * Angelo Dini
-* Daniele Procida
+* Christian Bertschy
+* Daniele Procida (Chair)
 * Iacopo Spalletti
 * Jonas Obrist
 * Martin Koistinen

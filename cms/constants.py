@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 REFRESH_PAGE = 'REFRESH_PAGE'
 URL_CHANGE = 'URL_CHANGE'
@@ -27,3 +26,7 @@ PAGE_USERNAME_MAX_LENGTH = 255
 REVISION_INITIAL_COMMENT = "Initial version."
 
 SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
+
+EXPIRE_NOW = 0
+# HTTP Specification says max caching should only be up to one year.
+MAX_EXPIRATION_TTL = 365 * 24 * 3600

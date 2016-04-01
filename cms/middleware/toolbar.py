@@ -130,8 +130,8 @@ class ToolbarMiddleware(object):
         from django.utils.cache import add_never_cache_headers
 
         if ((hasattr(request, 'toolbar') and request.toolbar.edit_mode) or
-            not all(ph.cache_placeholder
-                    for ph in getattr(request, 'placeholders', ()))):
+                not all(ph.cache_placeholder
+                        for ph, __ in getattr(request, 'placeholders', {}).values())):
             add_never_cache_headers(response)
 
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:

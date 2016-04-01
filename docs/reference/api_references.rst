@@ -239,6 +239,13 @@ cms.constants
 
     Constant used by the toolbar.
 
+.. data:: EXPIRE_NOW
+
+    Constant of 0 (zero) used for cache control headers
+
+.. data:: MAX_EXPIRATION_TTL
+
+    Constant of 31536000 or 365 days in seconds used for cache control headers
 
 
 ***************
@@ -254,6 +261,17 @@ cms.plugin_base
     .. attribute:: admin_preview
 
         Defaults to ``False``, if ``True``, displays a preview in the admin.
+
+    .. attribute:: cache
+
+        If present and set to ``False``, the plugin will prevent the caching of
+        the resulting page.
+
+        .. important:: Setting this to ``False`` will effectively disable the
+                       CMS page cache and all upstream caches for pages where
+                       the plugin appears. This may be useful in certain cases
+                       but for general cache management, consider using the much
+                       more capable :meth:`get_cache_expiration`.
 
     .. attribute:: change_form_template
 
@@ -306,6 +324,49 @@ cms.plugin_base
 
         Returns the URL to the icon to be used for the given instance when that
         instance is used inside a text plugin.
+
+    .. method:: get_cache_expiration(request, instance, placeholder)
+
+        Provides expiration value to the placeholder, and in turn to the page
+        for determining the appropriate Cache-Control headers to add to the
+        HTTPResponse object.
+
+        Must return one of:
+
+            :``None``:
+                This means the placeholder and the page will not even consider
+                this plugin when calculating the page expiration.
+
+            :``datetime``:
+                A specific date and time (timezone-aware) in the future when
+                this plugin's content expires.
+
+                .. important:: The returned ``datetime`` must be timezone-aware
+                               or the plugin will be ignored (with a warning)
+                               during expiration calculations.
+
+            :``int``:
+                An number of seconds that this plugin's content can be cached.
+
+        There are constants are defined in ``cms.constants`` that may be
+        useful: :data:`EXPIRE_NOW` and :data:`MAX_EXPIRATION_TTL`.
+
+        An integer value of ``0`` (zero) or :data:`EXPIRE_NOW` effectively means
+        "do not cache". Negative values will be treated as :data:`EXPIRE_NOW`.
+        Values exceeding the value :data:`MAX_EXPIRATION_TTL` will be set to
+        that value.
+
+        Negative ``timedelta`` values or those greater than :data:`MAX_EXPIRATION_TTL`
+        will also be ranged in the same manner.
+
+        Similarly, ``datetime`` values earlier than now will be treated as
+        :data:`EXPIRE_NOW`. Values greater than :data:`MAX_EXPIRATION_TTL` seconds in the
+        future will be treated as :data:`MAX_EXPIRATION_TTL` seconds in the future.
+
+        :param request: Relevant ``HTTPRequest`` instance.
+        :param instance: The ``CMSPlugin`` instance that is being rendered.
+        :rtype: ``None`` or ``datetime`` or ``int``
+
 
     .. method:: render(context, instance, placeholder)
 
