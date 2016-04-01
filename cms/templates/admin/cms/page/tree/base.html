@@ -41,6 +41,10 @@
         <h1 class="cms-pagetree-header-title">{% trans "Page Tree" %} <span>({{ cl.current_site }})</span></h1>
 
         <div class="cms-pagetree-header-body">
+            {# INFO: show reset button when filtering is active #}
+            {% if cl.is_filtered or request.GET.q %}
+                <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
+            {% endif %}
             {# SEARCH #}
             <form method="get" class="cms-pagetree-header-search">
                 <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
@@ -49,7 +53,7 @@
                     <span class="cms-icon cms-icon-search"></span>
                 </button>
             </form>
-            <div class="cms-hidden">
+            <div class="cms-pagetree-header-search-copy cms-hidden">
                 {% search_form cl %}
                 {% if cl.has_filters %}
                     <div class="cms-tree-filters">
@@ -202,11 +206,6 @@
                 <a href="{{ add_url }}" class="addlink">Add page</a> now.
             {% endblocktrans %}
         </div>
-    {% endif %}
-
-    {# INFO: show reset button when filtering is active #}
-    {% if cl.is_filtered or request.GET.q %}
-        <a href="{% url opts|admin_urlname:'changelist' %}" class="reset">{% trans "Reset filter" %}</a>
     {% endif %}
 
     {# INFO: used when copying nodes #}

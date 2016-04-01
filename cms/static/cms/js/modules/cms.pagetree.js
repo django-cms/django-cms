@@ -665,7 +665,22 @@ var CMS = window.CMS || {};
          * @private
          */
         _setSearch: function () {
-            // console.log('trigger');
+            var fakeForm = this.ui.container.find('.cms-pagetree-header-search');
+            var realForm = this.ui.container.find('.cms-pagetree-header-search-copy form');
+            var fakeField = fakeForm.find('.cms-pagetree-header-search-field');
+            var realField = realForm.find('#searchbar');
+
+            // prepopulate
+            fakeField.val(realField.val());
+
+            // event
+            fakeForm.on('submit', function (e) {
+                e.preventDefault();
+                realForm.find('#searchbar')
+                    .val(fakeField.val())
+                    .end()
+                    .submit();
+            });
         },
 
         /**
