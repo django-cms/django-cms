@@ -340,14 +340,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             'admin/cms/plugin/close_modal.html', {'is_popup': True}
         )
 
-    def response_add(self, request, obj, post_url_continue=None):
-        if admin.options.IS_POPUP_VAR in request.POST:
-            # prevent Django from rendering it's popup_close html
-            # Django's template assumes certain js functions
-            # and so will throw an error when adding plugins.
-            return self.render_close_modal()
-        return super(CMSPluginBase, self).response_add(request, obj, post_url_continue)
-
     def response_post_save_add(self, request, obj):
         """
         Always redirect to index. Usually CMS Plugins aren't registered with
@@ -408,6 +400,12 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         New version will be created in admin.views.edit_plugin
         """
         self.object_successfully_changed = True
+
+        if admin.options.IS_POPUP_VAR in request.POST:
+            # prevent Django from rendering it's popup_close html
+            # Django's template assumes certain js functions
+            # and so will throw an error when adding plugins.
+            return self.render_close_modal()
 
         post_url_continue = reverse('admin:cms_page_edit_plugin',
                 args=(obj._get_pk_val(),),
