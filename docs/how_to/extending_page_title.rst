@@ -120,8 +120,6 @@ in one of your apps, and add the relevant menu entries for the extension on each
 
 Here's a simple version for our example::
 
-Since 3.0.6 a simplified toolbar API is available to handle the more common cases::
-
     from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
     from django.utils.translation import ugettext_lazy as _
