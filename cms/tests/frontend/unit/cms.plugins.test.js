@@ -1435,6 +1435,23 @@ describe('CMS.Plugin', function () {
             }, 100);
         });
 
-        it('has default values');
+        it('has default values', function () {
+            // window, element
+            spyOn($.fn, 'height').and.returnValues(200, 20);
+            spyOn($.fn, 'position').and.returnValues({
+                top: 300
+            });
+            spyOn($.fn, 'scrollTop').and.returnValues(30);
+            spyOn($.fn, 'animate');
+            plugin._scrollToElement($('<div></div>'));
+
+            expect($.fn.animate).toHaveBeenCalledWith({
+                scrollTop: 300 + 20 + 50 + 30 - 200
+            }, 200);
+        });
+    });
+
+    describe('._setupActions()', function () {
+
     });
 });
