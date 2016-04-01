@@ -335,15 +335,26 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             request, form_url, extra_context
         )
 
-    def response_post_save_add(self, request, obj):
-        """
-        Always redirect to index. Usually CMS Plugins aren't registred with
-        an admin site directly and the add_view is accessed via frontend
-        editing.
-        """
+    def render_close_modal(self):
         return render_to_response(
             'admin/cms/plugin/close_modal.html', {'is_popup': True}
         )
+
+    def response_add(self, request, obj, post_url_continue=None):
+        if admin.options.IS_POPUP_VAR in request.POST:
+            # prevent Django from rendering it's popup_close html
+            # Django's template assumes certain js functions
+            # and so will throw an error when adding plugins.
+            return self.render_close_modal()
+        return super(CMSPluginBase, self).response_add(request, obj, post_url_continue)
+
+    def response_post_save_add(self, request, obj):
+        """
+        Always redirect to index. Usually CMS Plugins aren't registered with
+        an admin site directly and the add_view is accessed via frontend
+        editing.
+        """
+        return self.render_close_modal()
 
     def save_model(self, request, obj, form, change):
         """
