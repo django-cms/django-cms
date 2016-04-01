@@ -33,58 +33,22 @@
     {% endblock %}
 {% endif %}
 
+{% block content_title %}{% endblock %}
+
 {% block object-tools %}
-    <div class="cms-pagetree-container cms-pagetree-container-custom">
-        <div class="cms-pagetree-header">
-            <h1 class="cms-pagetree-title">{% trans "Page Tree" %}</h1>
+    <div class="cms-pagetree cms-pagetree-header">
+        {# HEADER TITLE #}
+        <h1 class="cms-pagetree-header-title">{% trans "Page Tree" %} <span>({{ cl.current_site }})</span></h1>
 
-            <div class="cms-pagetree-buttons">
-                <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
-                    <a href="cms-pagetree-dropdown-trigger"><span class="cms-icon cms-icon-squares"></span></a>
-                    <ul class="cms-pagetree-dropdown-container">
-                        {% for site in cl.sites %}
-                            <li{% if site.pk == cl.current_site.pk %} class="active"{% endif %}>
-                                <a href="#{{ site.pk }}">{{ site.name }}</a>
-                            </li>
-                        {% endfor %}
-                        {% if has_recover_permission %}
-                            <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
-                            <li>
-                                <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
-                                    {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
-                                        Recover deleted {{ name }}
-                                    {% endblocktrans %}
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-
-                    {# event #}
-                    <form method="post" class="cms-hidden">
-                        <select id="field-site-select" name="site__exact">
-                            {% for site in cl.sites %}
-                                <option value="{{ site.pk }}">{{ site.name }}</option>
-                            {% endfor %}
-                            {% csrf_token %}
-                        </select>
-                    </form>
-                </div>
-
-                {% if has_add_permission %}
-                    <a href="{% url opts|admin_urlname:'add' %}" class="cms-pagetree-create cms-btn cms-btn-action">
-                        {% blocktrans with cl.opts.verbose_name as name %}
-                            New {{ name }}
-                        {% endblocktrans %}
-                    </a>
-                {% endif %}
-            </div>
-
-            <form method="get" class="cms-pagetree-search">
-                <label for="searchbar" class="cms-hidden">{% trans "Search" %}</label>
-                <input type="text" size="40" name="q" value="" id="searchbar" placeholder="{% trans "Search" %}">
-                <input type="submit" value="Search">
+        <div class="cms-pagetree-header-body">
+            {# SEARCH #}
+            <form method="get" class="cms-pagetree-header-search">
+                <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
+                <input type="text" class="cms-pagetree-header-search-field" size="40" name="q" id="field-searchbar" placeholder="{% trans "Search" %}">
+                <button type="submit" class="cms-pagetree-header-search-btn">
+                    <span class="cms-icon cms-icon-search"></span>
+                </button>
             </form>
-            <!-- hidden action fields -->
             <div class="cms-hidden">
                 {% search_form cl %}
                 {% if cl.has_filters %}
@@ -101,6 +65,52 @@
                     </div>
                 {% endif %}
             </div>
+
+            {# ... DROPDOWN #}
+            <div class="cms-pagetree-dropdown cms-pagetree-dropdown-header">
+                <a href="#" class="cms-pagetree-dropdown-trigger js-cms-tree-tooltip-trigger">
+                    <span class="cms-icon cms-icon-squares"></span>
+                </a>
+                <ul class="cms-pagetree-dropdown-container js-cms-tree-tooltip-container">
+                    <li>
+                        <span class="label">{% trans "Sites" %}</span>
+                    </li>
+                    {% for site in cl.sites %}
+                        <li{% if site.pk == cl.current_site.pk %} class="active"{% endif %}>
+                            <a href="#{{ site.pk }}" class="js-cms-pagetree-site-trigger" data-id="{{ site.pk }}">{{ site.name }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if has_recover_permission %}
+                        <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
+                        <li>
+                            <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
+                                {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
+                                    Restore deleted {{ name }}
+                                {% endblocktrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                {# this form is triggered when switching the site on "js-cms-pagetree-site-trigger" #}
+                <form method="post" class="js-cms-pagetree-site-form cms-hidden">
+                    <select id="field-site-select" name="site__exact">
+                        {% for site in cl.sites %}
+                            <option value="{{ site.pk }}">{{ site.name }}</option>
+                        {% endfor %}
+                        {% csrf_token %}
+                    </select>
+                </form>
+            </div>
+
+            {# CREATE NEW PAGE #}
+            {% if has_add_permission %}
+                <a href="{% url opts|admin_urlname:'add' %}" class="cms-pagetree-header-create cms-btn cms-btn-action">
+                    {% blocktrans with cl.opts.verbose_name|title as name %}
+                        New {{ name }}
+                    {% endblocktrans %}
+                </a>
+            {% endif %}
         </div>
     </div>
 {% endblock object-tools %}
@@ -111,15 +121,17 @@
 {% block result_list %}
     <div class="clear"></div>
 
-    <div>
+    <div class="cms-pagetree cms-pagetree-section">
         <h2>{% trans "Main Navigation" %}</h2>
-        <p>Option Menu for pasting</p>
+        <div class="cms-pagetree-section-nav">
+            {# <span class="cms-icon cms-icon-menu"></span> #}
+        </div>
     </div>
 
     {# INFO: javascript is loaded from cms.pagetree.js #}
     {% if cl.get_items or cl.get_items and cl.is_filtered %}
-        <div class="cms-pagetree-container">
-            <div class="cms-pagetree js-cms-pagetree" data-json='{
+        <div class="cms-pagetree cms-pagetree-container">
+            <div class="js-cms-pagetree" data-json='{
                 "urls": {
                     "tree": "{% url 'admin:get_tree' %}",
                     "move": "./{id}/move-page/",
@@ -182,12 +194,14 @@
         </div>
     {% else %}
         {# INFO: show add a page button when there are no items #}
-        {% url opts|admin_urlname:'add' as add_url %}
-        {% blocktrans %}
-            <em>There is no page around yet.</em>
-            <br>
-            <a href="{{ add_url }}" class="addlink">Add page</a> now.
-        {% endblocktrans %}
+        <div class="cms-pagetree cms-pagetree-empty">
+            {% url opts|admin_urlname:'add' as add_url %}
+            {% blocktrans %}
+                <em>There is no page around yet.</em>
+                <br>
+                <a href="{{ add_url }}" class="addlink">Add page</a> now.
+            {% endblocktrans %}
+        </div>
     {% endif %}
 
     {# INFO: show reset button when filtering is active #}

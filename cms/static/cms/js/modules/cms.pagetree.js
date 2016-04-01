@@ -55,12 +55,13 @@ var CMS = window.CMS || {};
          * @private
          */
         _setupUI: function _setupUI() {
-            var pagetree = $('.cms-pagetree-container');
+            var pagetree = $('.cms-pagetree');
             this.ui = {
                 container: pagetree,
                 document: $(document),
                 tree: pagetree.find('.js-cms-pagetree'),
-                dialog: $('.js-cms-tree-dialog')
+                dialog: $('.js-cms-tree-dialog'),
+                siteForm: $('.js-cms-pagetree-site-form')
             };
         },
 
@@ -262,9 +263,21 @@ var CMS = window.CMS || {};
                 that._reloadHelper();
             });
 
+            // propagnate the sites dropdown to the hidden sites form
+            this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function (e) {
+                e.preventDefault();
+                // prevent if parent is active
+                if ($(this).parent().hasClass('active')) {
+                    return false;
+                }
+                that.ui.siteForm.find('select')
+                    .val($(this).data().id).end().submit();
+            });
+
             // additional event handlers
             this._setFilter();
             this._setTooltips();
+            this._setSearch();
 
             // make sure ajax post requests are working
             this._setAjaxPost('.js-cms-tree-item-menu a');
@@ -643,6 +656,16 @@ var CMS = window.CMS || {};
                     that.showError(error.statusText);
                 });
             });
+        },
+
+        /**
+         * Sets events for the search on the header.
+         *
+         * @method _setSearch
+         * @private
+         */
+        _setSearch: function () {
+            // console.log('trigger');
         },
 
         /**

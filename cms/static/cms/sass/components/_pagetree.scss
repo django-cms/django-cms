@@ -8,81 +8,256 @@
 .cms-btn {
     display: inline-block;
     color: $white !important;
-    line-height: $toolbar-button-height;
-    height: $toolbar-button-height;
+    line-height: $toolbar-button-height + 2px;
+    height: $toolbar-button-height + 2px;
     font-size: $toolbar-button-font-size;
-    padding: 0 $toolbar-button-padding-horizontal;
-    &:hover {
+    padding: 0 $toolbar-button-padding-horizontal + 10px;
+    &:hover,
+    &:active,
+    &:focus {
         color: $white !important;
     }
 }
 
-
-
-// HEADER
-.cms-pagetree-container-custom {
-    background: #f7f7f7;
-}
-
-.cms-pagetree-header {
-    clear: both;
-    overflow: hidden;
-
-    .cms-pagetree-title {
-        float: left;
-        padding: 20px;
-    }
-
-    .cms-pagetree-search {
-        float: right;
-        padding: 0;
-        margin: 0;
-        background: none;
-        box-shadow: none;
-    }
-
-    .cms-pagetree-buttons {
-        float: right;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.cms-pagetree-container {
-    // overflow: auto;
-
-    margin-bottom: $pagetree-bottom-offset;
-}
-.cms-pagetree-container,
-.cms-pagetree {
-    // helper classes
-    .cms-hidden {
-        display: none !important;
-    }
+.cms-hidden {
+    display: none !important;
 }
 .hidden {
     display: none !important;
 }
 
+// we need to add this to get drag & drop to work on internet explorer,
+// more specifically on a microsoft surface
+.jstree li {
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
+//###########################################################
+// CONTAINER
+// general container around the jstree or elements
+.cms-pagetree {
+    box-shadow: $dropdown-shadow;
+    border: $pagetree-border;
+}
+
+//###########################################################
+// HEADER
+// handles top header area styles
+.cms-pagetree-header {
+    position: relative;
+    z-index: z(pagetree, header);
+    min-height: $pagetree-header-height;
+    padding: $pagetree-header-padding;
+    margin: -40px 0 0 0;
+    background: $pagetree-header-background;
+    box-shadow: $pagetree-box-shadow;
+    &:before {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background-color: $white;
+    }
+}
+
+.cms-pagetree-header-title {
+    float: left;
+    padding-top: 6px;
+    margin: 0 !important;
+    span {
+        font-weight: normal;
+    }
+}
+
+.cms-pagetree-header-body {
+    float: right;
+}
+
+.cms-pagetree-header-search {
+    float: left;
+    padding: 0;
+    margin: -3px 0 0;
+    background: none;
+    box-shadow: none;
+    .cms-pagetree-header-search-btn {
+        position: relative;
+        top: 3px;
+        color: $white !important;
+        outline: none;
+        padding: 8px 10px !important;
+        border: none !important;
+        background: $color-primary !important;
+        &:hover {
+            background: darken($color-primary, 5%) !important;
+        }
+        &:active,
+        &:focus {
+            color: $white !important;
+            background: darken($color-primary, 15%) !important;
+        }
+    }
+    .cms-pagetree-header-search-field {
+        width: 168px !important;
+        padding-right: 35px !important;
+        transition: width $speed-base;
+        &:active,
+        &:focus {
+            width: 268px !important;
+        }
+    }
+}
+
+.cms-pagetree-dropdown-header {
+    float: left;
+    padding: 0 10px;
+    margin-left: $pagetree-header-space;
+
+    .cms-pagetree-dropdown-container {
+        right: 9px;
+        top: 30px;
+        min-width: $dropdown-width + 25px;
+        a {
+            padding: 5px $submenu-item-padding-horizontal;
+        }
+        .active {
+            font-weight: bold;
+        }
+        // modification for the arrow
+        &:before {
+            margin-left: -24px;
+            margin-top: -9px;
+        }
+    }
+
+    .cms-pagetree-dropdown-trigger {
+        float: left;
+        color: $gray !important;
+        padding: 9px 10px 4px;
+    }
+}
+
+.cms-pagetree-header-create {
+    float: left;
+    margin-left: $pagetree-header-space;
+}
+
+// BREADCRUMB
+.cms-pagetree-breadcrumbs {
+    margin-bottom: -30px !important;
+    border: none !important;
+}
+
+//###########################################################
+// SECTION
+// separates different navigations
+.cms-pagetree-section {
+    position: relative;
+    z-index: z(pagetree, section);
+    min-height: $pagetree-section-height;
+    padding: $pagetree-section-padding;
+    border-top: none;
+    border-bottom: none;
+    background: $white;
+    box-shadow: $pagetree-box-shadow;
+    h2,
+    p {
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+    h2 {
+        float: left;
+        font-weight: bold;
+    }
+}
+.cms-pagetree-section-nav {
+    float: right;
+}
+
+//###########################################################
+// DROPDOWN
+// dropdowns used for menus
+.cms-pagetree-dropdown {
+    position: relative;
+}
+.cms-pagetree-dropdown-trigger {}
+.cms-pagetree-dropdown-container {
+    // references found in _subnav.scss
+    display: none;
+    position: absolute;
+    z-index: z(structure, content, dropdown);
+    right: -2px;
+    top: 25px;
+    padding: 4px 0;
+    min-width: $dropdown-width;
+    background: $submenu-dropdown-bgcolor;
+    border-radius: $border-radius-normal;
+    box-shadow: $dropdown-shadow;
+    transform: translateZ(0);
+
+    a {
+        display: block;
+        line-height: 1.5;
+        padding: 10px $submenu-item-padding-horizontal;
+        &:hover,
+        &:active,
+        &:focus {
+            color: $white !important;
+            background: $color-primary;
+        }
+    }
+    // label
+    .label {
+        display: block;
+        font-weight: bold;
+        font-size: 90%;
+        line-height: 1.5;
+        padding: 5px $submenu-item-padding-horizontal 0;
+    }
+
+    li {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    // adds arrow
+    &:before {
+        position: absolute;
+        z-index: z(below);
+        content: '';
+        left: 100%;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        transform: rotate(45deg);
+        background-color: $submenu-dropdown-bgcolor;
+    }
+}
+
+.cms-pagetree-dropdown-separator {
+    padding: 0;
+    margin: 4px 1px !important;
+    line-height: 1;
+    height: 1px;
+    background: $gray-lighter;
+}
+
+//##############################################################################
+// JSTREE
+.cms-pagetree-container {
+    // overflow: auto;
+    position: relative;
+    z-index: z(pagetree, container);
+    margin-bottom: $pagetree-bottom-offset;
+    border-top: none !important;
+}
+
 .cms-tree-col {
-    height: $pagetree-header-height;
+    height: $pagetree-jstree-header-height;
 }
 
 .cms-tree-item {
@@ -91,13 +266,6 @@
 
 .cms-tree-reload {
     float: right;
-}
-
-// we need to add this to get drag & drop to work on internet explorer,
-// more specifically on a microsoft surface
-.jstree li {
-    -ms-touch-action: none;
-    touch-action: none;
 }
 
 //###########################################################
@@ -352,6 +520,17 @@
 }
 
 //###########################################################
+// OTHER
+
+// searchform or filtering
+.cms-pagetree-empty {
+    padding: $pagetree-header-padding;
+    border-top: none;
+    .addlink {
+        padding-left: 0;
+    }
+}
+
 // django default admin theme adaptions
 .cms-tree-col {
     line-height: 16px;
@@ -431,7 +610,7 @@
         font-size: $font-size-small;
         font-color: $gray;
         text-align: center;
-        padding: $pagetree-header-padding;
+        padding: $pagetree-jstree-header-padding;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
     }
