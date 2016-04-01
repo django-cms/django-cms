@@ -318,39 +318,24 @@ var CMS = window.CMS || {};
          * @param {String} parent id of a parent plugin
          */
         addPlugin: function (type, name, parent) {
-            // cancel request if already in progress
-            if (CMS.API.locked) {
-                return false;
-            }
-            CMS.API.locked = true;
-
-            var that = this;
-            var data = {
+            var params = {
                 placeholder_id: this.options.placeholder_id,
                 plugin_type: type,
-                plugin_parent: parent || '',
-                plugin_language: this.options.plugin_language,
-                csrfmiddlewaretoken: this.csrf
+                plugin_language: this.options.plugin_language
             };
+            if (parent) {
+                params.plugin_parent = parent;
+            }
+            var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
+            var modal = new CMS.Modal({
+                newPlugin: this.newPlugin || false,
+                onClose: this.options.onClose || false,
+                redirectOnClose: this.options.redirectOnClose || false
+            });
 
-            $.ajax({
-                type: 'POST',
-                url: this.options.urls.add_plugin,
-                data: data,
-                success: function (data) {
-                    CMS.API.locked = false;
-                    that.newPlugin = data;
-                    that.editPlugin(data.url, name, data.breadcrumb);
-                },
-                error: function (jqXHR) {
-                    CMS.API.locked = false;
-                    var msg = CMS.config.lang.error;
-                    // trigger error
-                    CMS.API.Messages.open({
-                        message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
-                        error: true
-                    });
-                }
+            modal.open({
+                url: url,
+                title: name
             });
         },
 
@@ -404,56 +389,6 @@ var CMS = window.CMS || {};
             }
             CMS.API.locked = true;
 
-<<<<<<< HEAD
-                return true;
-            },
-
-            /**
-             * Calls api to create a plugin and then proceeds to edit it.
-             *
-             * @method addPlugin
-             * @param {String} type type of the plugin, e.g "Bootstrap3ColumnCMSPlugin"
-             * @param {String} name name of the plugin, e.g. "Column"
-             * @param {String} parent id of a parent plugin
-             */
-            addPlugin: function (type, name, parent) {
-                var params = {
-                    placeholder_id: this.options.placeholder_id,
-                    plugin_type: type,
-                    plugin_language: this.options.plugin_language
-                };
-                if (parent) {
-                    params.plugin_parent = parent;
-                }
-                var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
-                var modal = new CMS.Modal({
-                    newPlugin: this.newPlugin || false,
-                    onClose: this.options.onClose || false,
-                    redirectOnClose: this.options.redirectOnClose || false
-                });
-                modal.open(url, name);
-            },
-
-            /**
-             * Opens the modal for editing a plugin.
-             *
-             * @method editPlugin
-             * @param {String} url editing url
-             * @param {String} name Name of the plugin, e.g. "Column"
-             * @param {Object[]} breadcrumb array of objects representing a breadcrumb,
-             *     each item is `{ title: 'string': url: 'string' }`
-             */
-            editPlugin: function (url, name, breadcrumb) {
-                // trigger modal window
-                var modal = new CMS.Modal({
-                    newPlugin: this.newPlugin || false,
-                    onClose: this.options.onClose || false,
-                    redirectOnClose: this.options.redirectOnClose || false
-                });
-                if (!this.newPlugin) {
-                    modal.on('cms.modal.loaded', function removePlaceholder() {
-                        $('.cms-add-plugin-placeholder').remove();
-=======
             var move = (options || source_language) ? true : false;
 
             // set correct options
@@ -493,7 +428,6 @@ var CMS = window.CMS || {};
                     CMS.API.Messages.open({
                         message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
->>>>>>> develop
                     });
                 }
             };
