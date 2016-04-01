@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.utils.encoding import force_text
-from django.utils.timezone import get_current_timezone_name
+from django.utils.timezone import get_current_timezone_name, now
 from cms.cache import _get_cache_version, _set_cache_version, _clean_key, _get_cache_key
 from cms.utils import get_cms_setting
 
@@ -14,14 +14,18 @@ def _placeholder_cache_key(placeholder, lang):
     return cache_key
 
 
-def set_placeholder_cache(placeholder, lang, content):
+def set_placeholder_cache(placeholder, lang, content, request):
     """
     Caches the rendering of a placeholder
     """
     from django.core.cache import cache
+
     cache.set(_placeholder_cache_key(placeholder, lang),
               content,
-              get_cms_setting('CACHE_DURATIONS')['content'],
+              min(
+                  get_cms_setting('CACHE_DURATIONS')['content'],
+                  placeholder.get_cache_expiration(request, now())
+              ),
               version=_get_cache_version())
     _set_cache_version(_get_cache_version())
 
