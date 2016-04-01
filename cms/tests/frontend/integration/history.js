@@ -61,21 +61,6 @@ casper.test.begin('History', function (test) {
         .waitForResource(/undo/)
         .wait(1500)
         .waitForSelector('.cms-toolbar-expanded', function () {
-            // Clicking again on undo after resource have been loaded
-            this.click(
-                // mouse clicks on the History link
-                xPath('//a[.//span[text()[contains(.,"History")]]]')
-            );
-        })
-        .wait(10, function () {
-            this.click(
-                // mouse clicks on the Undo link
-                xPath('//a[.//span[text()[contains(.,"Undo")]]]')
-            );
-        })
-        .waitForResource(/undo/)
-        .wait(1500)
-        .waitForSelector('.cms-toolbar-expanded', function () {
             // Counts plugins in the first placeholder if there's only one
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
@@ -99,21 +84,6 @@ casper.test.begin('History', function (test) {
         // Clicking again on redo after resource have been loaded
         .waitForResource(/redo/)
         .wait(1000)
-        .waitForSelector('.cms-toolbar-expanded', function () {
-            this.click(
-                // mouse clicks on the History link
-                xPath('//a[.//span[text()[contains(.,"History")]]]')
-            );
-        })
-        .wait(10, function () {
-            this.click(
-                // mouse clicks on the redo link
-                xPath('//a[.//span[text()[contains(.,"Redo")]]]')
-            );
-        })
-        // Counts if there are two plugin in the first placeholder
-        .waitForResource(/redo/)
-        .wait(1500)
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
