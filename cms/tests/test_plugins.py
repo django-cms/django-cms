@@ -3,13 +3,7 @@ import base64
 import datetime
 import json
 import os
-from distutils.version import LooseVersion
-try:
-    from django.utils import unittest
-except ImportError:
-    import unittest
 
-import django
 from django import http
 from django.conf import settings
 from django.conf.urls import url
@@ -927,8 +921,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         expected = sorted([plugins[4].pk, plugins[5].pk])
         self.assertEqual(idlist, expected)
 
-    @unittest.skipIf(LooseVersion(django.get_version()) < LooseVersion('1.7'),
-                     reason='test not supported in Django 1.6')
     def test_search_pages(self):
         """
         Test search for pages
