@@ -240,6 +240,7 @@ describe('CMS.Plugin', function () {
 
     describe('.addPlugin()', function () {
         var plugin;
+        var fakeModal;
         beforeEach(function (done) {
             fixture.load('plugins.html');
             CMS.config = {
@@ -266,6 +267,13 @@ describe('CMS.Plugin', function () {
                         copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
+                fakeModal = {
+                    on: jasmine.createSpy(),
+                    open: jasmine.createSpy()
+                };
+                spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+                    return fakeModal;
+                });
                 done();
             });
         });
@@ -275,123 +283,46 @@ describe('CMS.Plugin', function () {
             fixture.cleanup();
         });
 
-        it('makes a request to the API', function () {
-            CMS.API.locked = false;
-            expect(plugin.addPlugin('TestPlugin', 'Test Plugin', 1)).toEqual(undefined);
-            var request = jasmine.Ajax.requests.mostRecent();
-            expect(request.url).toEqual('/en/admin/cms/page/add-plugin/');
-            expect(request.method).toEqual('POST');
-            expect(request.data()).toEqual({
-                placeholder_id: ['1'],
-                plugin_type: ['TestPlugin'],
-                plugin_parent: ['1'],
-                plugin_language: [''],
-                csrfmiddlewaretoken: ['CSRF_TOKEN']
+        it('opens the modal with correct url', function () {
+            plugin.addPlugin('TextPlugin', 'Text plugin', 12);
+
+            expect(CMS.Modal.prototype.initialize).toHaveBeenCalledWith({
+                onClose: false,
+                redirectOnClose: false
+            });
+
+            expect(fakeModal.open).toHaveBeenCalledWith({
+                url: '/en/admin/cms/page/add-plugin/' +
+                     '?placeholder_id=1&plugin_type=TextPlugin&plugin_language=&plugin_parent=12',
+                title: 'Text plugin'
             });
         });
 
-        it('does not make a request if CMS.API is locked', function () {
-            CMS.API.locked = true;
-            expect(plugin.addPlugin('TestPlugin', 'Test Plugin', 1)).toEqual(false);
-            expect(jasmine.Ajax.requests.count()).toEqual(0);
-            CMS.API.locked = false;
-        });
+        it('opens the modal with correct url', function () {
+            plugin.options.onClose = 'mock';
+            plugin.options.redirectOnClose = 'another mock';
 
-        it('edits newly created plugin if request succeeded', function () {
-            spyOn($, 'ajax').and.callFake(function (ajax) {
-                ajax.success({
-                    url: 'edit-url',
-                    breadcrumb: 'does not matter yet'
-                });
+            plugin.addPlugin('TextPlugin', 'Text plugin');
+
+            expect(CMS.Modal.prototype.initialize).toHaveBeenCalledWith({
+                onClose: 'mock',
+                redirectOnClose: 'another mock'
             });
-            spyOn(plugin, 'editPlugin');
 
-            plugin.addPlugin('TestPlugin', 'Test Plugin', 1);
-
-            expect(plugin.editPlugin).toHaveBeenCalledWith('edit-url', 'Test Plugin', 'does not matter yet');
-        });
-
-        it('sets newPlugin option if request succeeded', function () {
-            spyOn($, 'ajax').and.callFake(function (ajax) {
-                ajax.success({
-                    url: 'edit-url',
-                    breadcrumb: 'does not matter yet',
-                    whatever: 'whatever'
-                });
-            });
-            spyOn(plugin, 'editPlugin');
-
-            expect(plugin.newPlugin).toEqual(undefined);
-            plugin.addPlugin('TestPlugin', 'Test Plugin', 1);
-            expect(plugin.newPlugin).toEqual({
-                url: 'edit-url',
-                breadcrumb: 'does not matter yet',
-                whatever: 'whatever'
+            expect(fakeModal.open).toHaveBeenCalledWith({
+                url: '/en/admin/cms/page/add-plugin/' +
+                     '?placeholder_id=1&plugin_type=TextPlugin&plugin_language=',
+                title: 'Text plugin'
             });
         });
 
-        it('locks/unlocks the CMS.API if request is successful', function () {
-            spyOn($, 'ajax').and.callFake(function (ajax) {
-                expect(CMS.API.locked).toEqual(true);
-                ajax.success({});
-                expect(CMS.API.locked).toEqual(false);
-            });
-            spyOn(plugin, 'editPlugin');
+        it('adds event to remove any existing "add plugin" placeholders', function () {
+            plugin.addPlugin('TextPlugin', 'Text plugin');
+            expect(fakeModal.on).toHaveBeenCalledWith('cms.modal.closed', jasmine.any(Function));
 
-            plugin.addPlugin('TestPlugin', 'Test Plugin', 1);
-        });
-
-        it('locks/unlocks the CMS.API if request is not successful', function () {
-            CMS.API.Messages = new CMS.Messages();
-            spyOn($, 'ajax').and.callFake(function (ajax) {
-                expect(CMS.API.locked).toEqual(true);
-                ajax.error({});
-                expect(CMS.API.locked).toEqual(false);
-            });
-            spyOn(plugin, 'editPlugin');
-
-            plugin.addPlugin('TestPlugin', 'Test Plugin', 1);
-        });
-
-        it('shows the error message if request failed', function () {
-            CMS.API.Messages = new CMS.Messages();
-            CMS.config.lang.error = 'Following error occured: ';
-            spyOn(CMS.API.Messages, 'open');
-            spyOn($, 'ajax').and.callFake(function (ajax) {
-                ajax.error({
-                    responseText: 'Failed to add plugin'
-                });
-            });
-            spyOn(plugin, 'editPlugin');
-
-            plugin.addPlugin('TestPlugin', 'Test Plugin', 1);
-
-            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                message: 'Following error occured: Failed to add plugin',
-                error: true
-            });
-        });
-
-        // this is not really supposed to happen
-        it('shows generic error message if request failed', function () {
-            CMS.API.Messages = new CMS.Messages();
-            CMS.config.lang.error = '';
-            spyOn(CMS.API.Messages, 'open');
-            spyOn($, 'ajax').and.callFake(function (ajax) {
-                ajax.error({
-                    responseText: '',
-                    status: '418',
-                    statusText: "I'm a teapot"
-                });
-            });
-            spyOn(plugin, 'editPlugin');
-
-            plugin.addPlugin('TestPlugin', 'Test Plugin');
-
-            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                message: "418 I'm a teapot",
-                error: true
-            });
+            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
+            fakeModal.on.calls.argsFor(0)[1]();
+            expect($('.cms-add-plugin-placeholder')).not.toExist();
         });
     });
 
@@ -449,7 +380,6 @@ describe('CMS.Plugin', function () {
         });
 
         it('creates and opens a modal to edit freshly created plugin', function () {
-            plugin.newPlugin = true;
             plugin.editPlugin('/edit-plugin-url', 'Random Plugin', ['breadcrumb']);
             expect(fakeModal.open).toHaveBeenCalledWith({
                 url: '/edit-plugin-url',
@@ -1275,7 +1205,6 @@ describe('CMS.Plugin', function () {
             };
             spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function (params) {
                 expect(params).toEqual({
-                    newPlugin: false,
                     onClose: false,
                     redirectOnClose: false
                 });

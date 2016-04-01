@@ -328,7 +328,6 @@ var CMS = window.CMS || {};
             }
             var url = this.options.urls.add_plugin + '?' + $.param(params);
             var modal = new CMS.Modal({
-                newPlugin: this.newPlugin || false,
                 onClose: this.options.onClose || false,
                 redirectOnClose: this.options.redirectOnClose || false
             });
@@ -354,15 +353,12 @@ var CMS = window.CMS || {};
         editPlugin: function (url, name, breadcrumb) {
             // trigger modal window
             var modal = new CMS.Modal({
-                newPlugin: this.newPlugin || false,
                 onClose: this.options.onClose || false,
                 redirectOnClose: this.options.redirectOnClose || false
             });
-            if (!this.newPlugin) {
-                modal.on('cms.modal.loaded', function removePlaceholder() {
-                    $('.cms-add-plugin-placeholder').remove();
-                });
-            }
+            modal.on('cms.modal.loaded', function removePlaceholder() {
+                $('.cms-add-plugin-placeholder').remove();
+            });
             modal.on('cms.modal.closed', function removePlaceholder() {
                 $('.cms-add-plugin-placeholder').remove();
             });
@@ -654,7 +650,6 @@ var CMS = window.CMS || {};
         deletePlugin: function (url, name, breadcrumb) {
             // trigger modal window
             var modal = new CMS.Modal({
-                newPlugin: this.newPlugin || false,
                 onClose: this.options.onClose || false,
                 redirectOnClose: this.options.redirectOnClose || false
             });
