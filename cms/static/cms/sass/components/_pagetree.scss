@@ -205,6 +205,7 @@
 
     a {
         display: block;
+        color: $gray;
         line-height: 1.5;
         padding: 10px $submenu-item-padding-horizontal;
         &:hover,
@@ -217,7 +218,8 @@
     // label
     .label {
         display: block;
-        font-weight: bold;
+        font-weight: normal;
+        color: $gray-lighter;
         font-size: 90%;
         line-height: 1.5;
         padding: 5px $submenu-item-padding-horizontal 0;
