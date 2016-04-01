@@ -326,7 +326,7 @@ var CMS = window.CMS || {};
             if (parent) {
                 params.plugin_parent = parent;
             }
-            var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
+            var url = this.options.urls.add_plugin + '?' + $.param(params);
             var modal = new CMS.Modal({
                 newPlugin: this.newPlugin || false,
                 onClose: this.options.onClose || false,
@@ -336,6 +336,9 @@ var CMS = window.CMS || {};
             modal.open({
                 url: url,
                 title: name
+            });
+            modal.on('cms.modal.closed', function removePlaceholder() {
+                $('.cms-add-plugin-placeholder').remove();
             });
         },
 
