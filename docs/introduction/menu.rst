@@ -10,7 +10,7 @@ We can hook into the django CMS menu system to add our own nodes to that
 navigation menu.
 
 For this we need a file called ``cms_menus.py`` in our application. Add
-``polls_plugin/cms_menus.py``:
+``cms_menus.py`` in ``polls_cms_integration/``:
 
 .. code-block:: python
 
@@ -56,7 +56,7 @@ What's happening here:
 This menu class is not active until attached to the apphook we created earlier.
 So open your ``cms_apps.py`` and add::
 
-    from polls_plugin.cms_menus import PollsMenu
+    from polls_cms_integration.cms_menus import PollsMenu
 
 for importing ``PollsMenu`` and::
 
@@ -66,3 +66,12 @@ to the ``PollsApp`` class.
 
 Any page that is attached to the ``Polls`` application will now have sub-menu
 items for each of the Polls in the database.
+
+.. note::
+
+    The point here is to illustrate the basic principles. In this actual case, note that:
+
+    * If you're going to use sub-pages, you'll need to improve the menu styling to make it work a
+      bit better.
+    * Since the Polls page lists all the Polls in it anyway, this isn't really the most practical
+      addition to the menu.

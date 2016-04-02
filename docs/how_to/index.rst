@@ -14,6 +14,7 @@ the same territory as the :doc:`/introduction/index`, but in more detail.
     custom_plugins
     menus
     apphooks
+    namespaced_apphooks
     templates
     extending_page_title
     toolbar
