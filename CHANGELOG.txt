@@ -1,3 +1,8 @@
+=== 3.2.4 (unreleased) ===
+
+- Fixed regression when page couldn't be copied if CMS_PERMISSION was False
+
+
 === 3.2.3 (2016-03-09) ===
 
 - Fix the display of hyphenated language codes in the page tree
