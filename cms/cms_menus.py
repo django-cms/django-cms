@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.functional import SimpleLazyObject
 from django.utils.translation import get_language
 
 from cms import constants
@@ -39,14 +40,8 @@ def get_visible_page_objects(request, pages, site=None):
     if has_global_page_permission(request, site, can_view=True):
         return pages
 
-    def has_global_perm():
-        if has_global_perm.cache < 0:
-            if request.user.has_perm('cms.view_page'):
-                has_global_perm.cache = 1
-            else:
-                has_global_perm.cache = 0
-        return bool(has_global_perm.cache)
-    has_global_perm.cache = -1
+    has_global_perm = SimpleLazyObject(lambda: request.user.has_perm('cms.view_page'))
+    user_groups = SimpleLazyObject(lambda: set(request.user.groups.values_list('pk', flat=True)))
 
     def has_permission_membership(page_id):
         """
@@ -54,17 +49,9 @@ def get_visible_page_objects(request, pages, site=None):
         """
         user_pk = request.user.pk
         for perm in restricted_pages[page_id]:
-            if perm.user_id == user_pk:
-                return True
-            if not perm.group_id:
-                continue
-            if has_permission_membership.user_groups is None:
-                has_permission_membership.user_groups = request.user.groups.all().values_list(
-                    'pk', flat=True)
-            if perm.group_id in has_permission_membership.user_groups:
+            if perm.user_id == user_pk or perm.group_id in user_groups:
                 return True
         return False
-    has_permission_membership.user_groups = None
 
     visible_pages = []
     for page in pages:
@@ -78,9 +65,7 @@ def get_visible_page_objects(request, pages, site=None):
         elif is_auth_user:
             # setting based handling of unrestricted pages
             # check group and user memberships to restricted pages
-            if is_restricted and has_permission_membership(page_id):
-                to_add = True
-            elif has_global_perm():
+            if is_restricted and has_permission_membership(page_id) or has_global_perm:
                 to_add = True
         if to_add:
             visible_pages.append(page)
@@ -199,7 +184,7 @@ class CMSMenu(Menu):
         actual_pages = []
 
         # cache view perms
-        visible_pages = get_visible_pages(request, pages, site)
+        visible_pages = set(get_visible_pages(request, pages, site))
         for page in pages:
             # Pages are ordered by path, therefore the first page is the root
             # of the page tree (a.k.a "home")
