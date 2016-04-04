@@ -38,7 +38,7 @@
 {% block object-tools %}
     <div class="cms-pagetree cms-pagetree-header">
         {# HEADER TITLE #}
-        <h1 class="cms-pagetree-header-title">{% trans "Page Tree" %} <span>({{ cl.current_site }})</span></h1>
+        <h1 class="cms-pagetree-header-title">{% trans "Page Tree" %} <span>({{ cl.current_site.name }})</span></h1>
 
         <div class="cms-pagetree-header-body">
             {# INFO: show reset button when filtering is active #}
@@ -46,28 +46,43 @@
                 <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
             {% endif %}
             {# SEARCH #}
-            <form method="get" class="cms-pagetree-header-search">
+            <form action="{% url opts|admin_urlname:'changelist' %}" method="get" class="cms-pagetree-header-search js-cms-pagetree-header-search">
                 <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
-                <input type="text" class="cms-pagetree-header-search-field" size="40" name="q" id="field-searchbar" placeholder="{% trans "Search" %}">
+                <div class="cms-pagetree-header-search-field">
+                    <input type="text" size="40" name="q" id="field-searchbar" value="{{ request.GET.q }}" placeholder="{% trans "Search" %}">
+                    {% if cl.has_filters %}
+                        <div class="cms-pagetree-header-filter-trigger js-cms-pagetree-header-filter-trigger">
+                            <a href="#"><span class="cms-icon cms-icon-arrow"></span></a>
+                        </div>
+                        <div class="cms-pagetree-header-filter-container js-cms-pagetree-header-filter-container">
+                            {% for filter in cl.filter_specs %}
+                                {{ filter }}
+                                <label for="field-{{ filter.title|slugify }}">{{ filter.title }}</label>
+                                <select name="{{ filter.lookup_kwarg }}" id="field-{{ filter.title|slugify }}">
+                                    {% for choices in filter.choices %}
+                                        <option>{{ choices }}</option>
+                                    {% endfor %}
+                                    {% comment %}
+                                    {% clean_admin_list_filter cl filter %}
+                                    {% for choice in choices %}
+                                        <option{% if choice.selected %} selected="selected"{% endif %}
+                                            value="{{ choice.value|default:"-1" }}">{{ choice.display }}</option>
+                                    {% endfor %}
+                                    {% endcomment %}
+                                </select>
+                            {% endfor %}
+                            <a href="#" class="cms-pagetree-header-search-close js-cms-pagetree-header-search-close">
+                                <span class="cms-icon cms-icon-close"></span>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
                 <button type="submit" class="cms-pagetree-header-search-btn">
                     <span class="cms-icon cms-icon-search"></span>
                 </button>
             </form>
-            <div class="cms-pagetree-header-search-copy cms-hidden">
+            <div class="js-cms-pagetree-header-search-copy cms-hidden">
                 {% search_form cl %}
-                {% if cl.has_filters %}
-                    <div class="cms-tree-filters">
-                        <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
-                            {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
-                        </a>
-                        <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
-                            <h2>{% trans "Filter" %}</h2>
-                            {% for spec in cl.filter_specs %}
-                                {% clean_admin_list_filter cl spec %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
             </div>
 
             {# ... DROPDOWN #}

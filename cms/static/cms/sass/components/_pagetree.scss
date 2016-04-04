@@ -76,6 +76,7 @@
     float: right;
 }
 
+// SEARCH
 .cms-pagetree-header-search {
     float: left;
     padding: 0;
@@ -88,6 +89,7 @@
         color: $white !important;
         outline: none;
         padding: 8px 10px !important;
+        margin-left: 5px;
         border: none !important;
         background: $color-primary !important;
         &:hover {
@@ -99,14 +101,74 @@
             background: darken($color-primary, 15%) !important;
         }
     }
-    .cms-pagetree-header-search-field {
-        width: 168px !important;
+    .cms-pagetree-header-search-field input {
+        width: $pagetree-header-search-width !important;
         padding-right: 35px !important;
+        margin-top: 2px;
         transition: width $speed-base;
         &:active,
         &:focus {
-            width: 268px !important;
+            width: $pagetree-header-search-width * 2 !important;
         }
+    }
+    .cms-pagetree-header-search-field-active input {
+        width: $pagetree-header-search-width * 2 !important;
+    }
+}
+.cms-pagetree-header-search-field {
+    position: relative;
+    float: left;
+}
+.cms-pagetree-header-filter-trigger {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px;
+    transform: rotate(270deg);
+    &:hover .cms-icon,
+    &:active .cms-icon,
+    &:focus .cms-icon {
+        color: $color-primary;
+    }
+    .cms-icon {
+        font-size: 11px;
+        color: $gray;
+    }
+}
+.cms-pagetree-header-filter-container {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 38px;
+    width: 100%;
+    padding: 10px 20px 20px;
+    border-radius: $border-radius-base;
+    box-shadow: $pagetree-box-shadow;
+    background: $white;
+    box-sizing: border-box;
+    label {
+        display: block;
+        color: $gray-lighter;
+        padding: 10px 0 0 0;
+    }
+    select {
+        min-width: auto;
+        max-width: 300px;
+    }
+}
+.cms-pagetree-header-search-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px;
+    &:hover .cms-icon,
+    &:active .cms-icon,
+    &:focus .cms-icon {
+        color: $color-primary;
+    }
+    .cms-icon {
+        font-size: 12px;
+        color: $gray;
     }
 }
 .cms-pagetree-header-search-reset {
@@ -115,6 +177,7 @@
     padding: 7px $pagetree-header-space;
 }
 
+// DROPDOWN
 .cms-pagetree-dropdown-header {
     float: left;
     padding: 0 10px;
@@ -151,6 +214,7 @@
 
 // BREADCRUMB
 .cms-pagetree-breadcrumbs {
+    padding-left: 20px !important;
     margin-bottom: -30px !important;
     border: none !important;
 }
@@ -219,7 +283,7 @@
     .label {
         display: block;
         font-weight: normal;
-        color: $gray-lighter;
+        color: $gray-light;
         font-size: 90%;
         line-height: 1.5;
         padding: 5px $submenu-item-padding-horizontal 0;

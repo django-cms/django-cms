@@ -275,7 +275,6 @@ var CMS = window.CMS || {};
             });
 
             // additional event handlers
-            this._setFilter();
             this._setTooltips();
             this._setSearch();
 
@@ -539,38 +538,6 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Handles filter button display (Filter: Off).
-         *
-         * @method _setFilter
-         * @private
-         */
-        _setFilter: function _setFilter() {
-            var that = this;
-            var trigger = $('.js-cms-tree-filter-trigger');
-            var container = $('.js-cms-tree-filter-container');
-
-            trigger.on(this.click, function (e) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                container.toggleClass('hidden');
-
-                that.ui.document.one(that.click, function () {
-                    container.addClass('hidden');
-                });
-            });
-
-            container.on(that.click, function (e) {
-                e.stopImmediatePropagation();
-            });
-
-            // attach event for site filtering
-            $('.js-cms-tree-search-site select').on('change', function () {
-                $(this).closest('form').submit();
-            });
-        },
-
-        /**
          * Sets up general tooltips that can have a list of links or content.
          *
          * @method _setTooltips
@@ -665,21 +632,15 @@ var CMS = window.CMS || {};
          * @private
          */
         _setSearch: function () {
-            var fakeForm = this.ui.container.find('.cms-pagetree-header-search');
-            var realForm = this.ui.container.find('.cms-pagetree-header-search-copy form');
-            var fakeField = fakeForm.find('.cms-pagetree-header-search-field');
-            var realField = realForm.find('#searchbar');
+            var trigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
+            var container = this.ui.container.find('.js-cms-pagetree-header-filter-container');
+            var close = container.find('.js-cms-pagetree-header-search-close');
 
-            // prepopulate
-            fakeField.val(realField.val());
-
-            // event
-            fakeForm.on('submit', function (e) {
+            trigger.add(close).on(this.click, function (e) {
                 e.preventDefault();
-                realForm.find('#searchbar')
-                    .val(fakeField.val())
-                    .end()
-                    .submit();
+                container.toggle();
+                container.parent()
+                    .toggleClass('cms-pagetree-header-search-field-active');
             });
         },
 
