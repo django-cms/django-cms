@@ -331,7 +331,9 @@ class ToolbarTests(ToolbarTestBase):
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)
-        request = self.get_page_request(page, self.get_staff(), '/')
+        staff = self.get_staff()
+        assert staff.user_permissions.get().name == 'Can change page'
+        request = self.get_page_request(page, staff, '/')
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
