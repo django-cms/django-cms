@@ -30,8 +30,8 @@ show_menu
 The ``show_menu`` tag renders the navigation of the current page.
 You can overwrite the appearance and the HTML if you add a ``menu/menu.html``
 template to your project or edit the one provided with django CMS.
-``show_menu`` takes four optional parameters: ``start_level``, ``end_level``,
-``extra_inactive``, and ``extra_active``.
+``show_menu`` takes six optional parameters: ``start_level``, ``end_level``,
+``extra_inactive``, ``extra_active``, ``namespace`` and ``root_id``.
 
 The first two parameters, ``start_level`` (default=0) and ``end_level``
 (default=100) specify from which level the navigation should be rendered and at
@@ -44,6 +44,10 @@ descendant of the current active node.
 
 The fourth parameter, ``extra_active`` (default=100), specifies how
 many levels of descendants of the currently active node should be displayed.
+
+The fifth parameter,  ``namespace`` specifies the namespace of the menu. if empty will use all namespaces.
+
+The sixth parameter ``root_id`` specifies the id of the root node.
 
 You can supply a ``template`` parameter to the tag.
 

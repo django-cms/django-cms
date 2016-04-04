@@ -25,8 +25,7 @@ We'll work with this second method.
 Create the toolbar
 ******************
 
-Create a new ``cms_toolbars.py`` file in your Polls application (note: *not* in
-the Polls Plugin application):
+Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application:
 
 .. code-block:: python
 
@@ -41,7 +40,7 @@ the Polls Plugin application):
     class PollToolbar(CMSToolbar):
         supported_apps = (
             'polls',
-            'polls_plugin',
+            'polls_cms_integration',
         )
         watch_models = [Poll,]
 
@@ -61,15 +60,18 @@ the Polls Plugin application):
                 url=admin_reverse('polls_poll_add'),
             )
 
+.. note:: Don't forget to restart the runserver to have your new toolbar item recognised.
+
 
 What this all means
 ===================
 
-What we're doing above is this:
+Right now you don't need to know exactly what this does, but once you've got it working here's
+a quick run-down what the code above does:
 
-* defining a ``CMSToolbar`` sub-class
-* registering the toolbar class with ``@toolbar_pool.register``
-* defining a ``populate()`` method that adds an item to the menu
+* defines a ``CMSToolbar`` sub-class
+* registers the toolbar class with ``@toolbar_pool.register``
+* defines a ``populate()`` method that adds an item to the menu
 
 The ``populate()`` method:
 
@@ -100,7 +102,7 @@ method will only be called if the current user is a staff user.
 ``is_current_app``. Usually you don't need to set ``supported_apps``, but in
 our case we need it so ``is_current_app`` can be detected properly (because the
 views for the poll app are in ``polls`` and our ``cms_toolbars.py`` is in the
-``polls_plugin`` app).
+``polls_cms_integration`` app).
 
 
 **************
@@ -108,6 +110,9 @@ See it at work
 **************
 
 Visit your Polls page on your site, and you'll see a new *Polls* item in the toolbar.
+
+It gives you quick access to the list of Polls in the Admin, and gives you a shortcut for
+creating a new Poll.
 
 There's a lot more to django CMS toolbar classes than this - see
 :doc:`/how_to/toolbar` for more.

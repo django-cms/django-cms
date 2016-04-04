@@ -100,6 +100,7 @@ describe('CMS.Modal', function () {
         });
 
         it('throws an error when no url or html options were passed', function () {
+            spyOn(modal, '_loadIframe');
             expect(modal.open.bind(modal)).toThrowError(
                 Error, 'The arguments passed to "open" were invalid.'
             );
@@ -2206,7 +2207,12 @@ describe('CMS.Modal', function () {
 
                 body.on('keydown.cms', function (e) {
                     if (modal.close.calls.count()) {
-                        done();
+                        // have to wait till next frame here
+                        // because Edge is too fast and it cleans up
+                        // the test case _before_ second trigger call finishes
+                        setTimeout(function () {
+                            done();
+                        }, 0);
                     }
                 });
 
