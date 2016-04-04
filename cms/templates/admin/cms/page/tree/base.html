@@ -56,7 +56,6 @@
                         </div>
                         <div class="cms-pagetree-header-filter-container js-cms-pagetree-header-filter-container">
                             {% for filter in cl.filter_specs %}
-                                {{ filter }}
                                 <label for="field-{{ filter.title|slugify }}">{{ filter.title }}</label>
                                 <select name="{{ filter.lookup_kwarg }}" id="field-{{ filter.title|slugify }}">
                                     {% for choices in filter.choices %}

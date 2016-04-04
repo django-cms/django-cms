@@ -324,7 +324,9 @@
     position: relative;
     z-index: z(pagetree, container);
     margin-bottom: $pagetree-bottom-offset;
-    border-top: none !important;
+    border: 1px solid $gray-lighter;
+    border-top: none;
+    border-bottom: none;
 }
 
 .cms-tree-col {
@@ -661,13 +663,7 @@
 // DJANGO-CMS THEME
 
 // general wrapper
-.cms-pagetree-container {
-    border: 1px solid $gray-lighter;
-}
 .jstree-grid-wrapper {
-    padding-bottom: $pagetree-bottom-padding !important;
-    border-left: 1px solid $white;
-    border-bottom: 1px solid $white;
     background: $gray-lightest;
 }
 
