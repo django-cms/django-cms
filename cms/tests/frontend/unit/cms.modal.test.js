@@ -589,9 +589,11 @@ describe('CMS.Modal', function () {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
+                $('html').removeClass('cms-modal-maximized');
                 modal.ui.window = $('<div style="width: 2000px; height: 2000px;"></div>').prependTo(fixture.el);
                 // have to show the modal so the css values can be retrieved
                 modal.ui.modal.show();
+                modal.ui.modal.addClass('cms-modal-open');
                 done();
             });
         });
@@ -601,6 +603,8 @@ describe('CMS.Modal', function () {
         });
 
         it('fits the modal to the screen if there is enough space', function () {
+            spyOn($.fn, 'css').and.returnValue(0);
+
             expect(modal._calculateNewPosition({})).toEqual({
                 width: 1700,
                 height: 1700,
@@ -608,10 +612,14 @@ describe('CMS.Modal', function () {
                 left: 1000
             });
 
+            $.fn.css.and.callThrough();
+
             modal.ui.window.css({
                 width: 1500,
                 height: 1500
             });
+
+            $.fn.css.and.returnValue(0);
 
             expect(modal._calculateNewPosition({})).toEqual({
                 width: 1200,
