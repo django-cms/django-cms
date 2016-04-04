@@ -237,19 +237,19 @@ class PlaceholderAdminMixin(object):
         Shows the add plugin form and saves it on POST.
 
         Requires the following GET parameters:
-
             - placeholder_id
             - plugin_type
             - plugin_language
             - plugin_parent (optional)
             - plugin_position (optional)
         """
-        for required in ['placeholder_id', 'plugin_type', 'plugin_language']:
-            if required not in request.GET:
-                return HttpResponseBadRequest(force_text(
-                    _("Invalid request, missing '%s' parameter") % required
+        plugin_type = request.GET.get('plugin_type')
+
+        if not plugin_type:
+            return HttpResponseBadRequest(force_text(
+                    _("Invalid request, missing plugin_type parameter")
                 ))
-        plugin_type = request.GET['plugin_type']
+
         try:
             plugin_class = plugin_pool.get_plugin(plugin_type)
         except KeyError:

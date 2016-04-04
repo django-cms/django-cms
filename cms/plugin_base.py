@@ -231,19 +231,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def has_add_permission(self, request):
-        """
-        By default requires the user to have permission to add the plugin
-        instance and add permission of the object to which the plugin is
-        added (eg a page).
-        """
-        if 'placeholder_id' not in request.GET:
-            return False
-        if not super(CMSPluginBase, self).has_add_permission(request):
-            return False
-        placeholder = Placeholder.objects.get(pk=request.GET['placeholder_id'])
-        return placeholder.has_add_permission(request)
-
     def has_change_permission(self, request, obj=None):
         """
         By default requires the user to have permission to change the plugin
@@ -251,8 +238,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         """
         if obj:
             return obj.has_change_permission(request)
-        else:
-            return self.has_add_permission(request)
+        # When obj is None, we can't check permissions correctly
+        # because we need a placeholder object to do so.
+        return False
     has_delete_permission = has_change_permission
 
     def get_form(self, request, obj=None, **kwargs):
@@ -276,54 +264,23 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return Form
 
     def add_view_check_request(self, request):
-        from cms.utils.plugins import has_reached_plugin_limit
-        plugin_type = self.__class__.__name__
+        from cms.admin.forms import PluginAddValidationForm
 
-        placeholder = get_object_or_404(
-            Placeholder, pk=request.GET['placeholder_id']
+        form = PluginAddValidationForm(
+            data=request.GET,
+            plugin_type=self.__class__.__name__,
         )
 
-        language = request.GET['plugin_language']
-        if language not in get_language_list():
-            return HttpResponseBadRequest(force_text(
-                _("Language must be set to a supported language!")
-            ))
+        if not form.is_valid():
+            return HttpResponse(form.errors.as_text())
 
-        parent_id = request.GET.get('plugin_parent', None)
+        placeholder = form.cleaned_data['placeholder_id']
 
-        if parent_id:
-            parent = get_object_or_404(CMSPlugin, pk=parent_id)
-
-            if parent.language != language:
-                return HttpResponseBadRequest(force_text(
-                    _("Parent plugin language must be same as language!")
-                ))
-
-            if parent.placeholder_id != placeholder.pk:
-                return HttpResponseBadRequest(force_text(
-                    _("Parent plugin placeholder must be same as placeholder!")
-                ))
-
-        if not self.has_add_permission(request):
-            return HttpResponseForbidden(force_text(
-                _('You do not have permission to add a plugin')
-            ))
-
-        if placeholder.page:
-            template = placeholder.page.get_template()
-        else:
-            template = None
-        try:
-            has_reached_plugin_limit(
-                placeholder,
-                plugin_type,
-                language,
-                template=template
-            )
-        except PluginLimitReached as er:
-            return HttpResponseBadRequest(er)
-
-        return True
+        if (self.has_add_permission(request) and
+                placeholder.has_add_permission(request)):
+            return True
+        response = force_text(_('You do not have permission to add a plugin'))
+        return HttpResponseForbidden(response)
 
     def add_view(self, request, form_url='', extra_context=None):
         result = self.add_view_check_request(request)
