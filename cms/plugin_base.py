@@ -3,14 +3,10 @@ import json
 import re
 import warnings
 
-from django.http import HttpResponse
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.http import HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import render_to_response
 
-from cms.utils import get_language_list
-from cms.exceptions import PluginLimitReached
-from cms.models import Placeholder
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
@@ -272,7 +268,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         )
 
         if not form.is_valid():
-            return HttpResponse(form.errors.as_text())
+            return HttpResponseBadRequest(form.errors.as_text())
 
         placeholder = form.cleaned_data['placeholder_id']
 

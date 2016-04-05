@@ -667,12 +667,13 @@ class PluginAddValidationForm(forms.Form):
         from cms.utils.plugins import has_reached_plugin_limit
 
         data = self.cleaned_data
+
+        if self.errors:
+            return data
+
         language = data['plugin_language']
         placeholder = data['placeholder_id']
         parent_plugin = data.get('plugin_parent')
-
-        if self.errors:
-            return self.cleaned_data
 
         if language not in get_language_list():
             message = ugettext("Language must be set to a supported language!")
