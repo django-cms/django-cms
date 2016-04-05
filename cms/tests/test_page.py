@@ -21,6 +21,7 @@ from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title, publish_page
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title, EmptyTitle
@@ -764,6 +765,72 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page2.get_path(), '')
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data3['slug'])
+
+    def test_move_page_sibling_integrity(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_home = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_home)
+
+            # Create parent page
+            page_root = create_page("Parent", 'col_three.html', "en")
+            page_root.publish('en')
+
+            # Create child pages
+            page_child_1 = create_page(
+                "Child 1",
+                template=constants.TEMPLATE_INHERITANCE_MAGIC,
+                language="en",
+                parent=page_root,
+            )
+            page_child_1.publish('en')
+
+            page_child_2 = create_page(
+                "Child 2",
+                template=constants.TEMPLATE_INHERITANCE_MAGIC,
+                language="en",
+                parent=page_root,
+            )
+            page_child_2.publish('en')
+
+            # Create another root page that was meant as child page
+            page_accidental_root = create_page("Child 3", 'col_three.html', "en")
+
+            # Correct our mistake.
+            # Move accidental root page to be child of parent page
+            data = {
+                "id": page_accidental_root.pk,
+                "target": page_root.pk,
+                "position": "0",
+            }
+            response = self.client.post(
+                URL_CMS_PAGE_MOVE % page_accidental_root.pk,
+                data,
+            )
+            self.assertEqual(response.status_code, 200)
+
+            page_root = page_root.reload()
+
+            # Ensure move worked
+            self.assertEqual(page_root.get_descendants().count(), 3)
+
+            # Ensure page is still unpublished
+            self.assertEqual(
+                page_accidental_root.get_publisher_state("en"),
+                PUBLISHER_STATE_DIRTY
+            )
+
+            # Ensure child one is still published
+            self.assertEqual(
+                page_child_1.get_publisher_state("en"),
+                PUBLISHER_STATE_DEFAULT
+            )
+
+            # Ensure child two is still published
+            self.assertEqual(
+                page_child_2.get_publisher_state("en"),
+                PUBLISHER_STATE_DEFAULT
+            )
 
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
