@@ -57,6 +57,7 @@ var CMS = window.CMS || {};
         _setupUI: function _setupUI() {
             var pagetree = $('.cms-pagetree');
             this.ui = {
+                document: $(document),
                 container: pagetree,
                 document: $(document),
                 tree: pagetree.find('.js-cms-pagetree'),
@@ -632,6 +633,8 @@ var CMS = window.CMS || {};
          * @private
          */
         _setSearch: function () {
+            var that = this;
+
             var filterActive = false;
             var filterTrigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
             var filterContainer = this.ui.container.find('.js-cms-pagetree-header-filter-container');
@@ -646,10 +649,12 @@ var CMS = window.CMS || {};
             var timeout = 200;
 
             // add active class when focusing the search field
-            searchField.on('focus', function () {
+            searchField.on('focus', function (e) {
+                e.stopImmediatePropagation();
                 searchContainer.addClass(filterClass);
             });
-            searchField.on('blur', function () {
+            searchField.on('blur', function (e) {
+                e.stopImmediatePropagation();
                 // timeout is required to prevent the search field from jumping
                 // between enlarging and shrinking
                 setTimeout(function () {
@@ -657,20 +662,32 @@ var CMS = window.CMS || {};
                         searchContainer.removeClass(filterClass);
                     }
                 }, timeout);
+                that.ui.document.off(that.click);
             });
 
             // shows/hides filter box
             filterTrigger.add(filterClose).on(this.click, function (e) {
                 e.preventDefault();
+                e.stopImmediatePropagation();
                 if (!filterActive) {
                     filterContainer.show();
                     searchContainer.addClass(filterClass);
+                    that.ui.document.on(that.click, function () {
+                        filterActive = true;
+                        filterTrigger.trigger(that.click);
+                    });
                     filterActive = true;
                 } else {
                     filterContainer.hide();
                     searchContainer.removeClass(filterClass);
+                    that.ui.document.off(that.click);
                     filterActive = false;
                 }
+            });
+
+            // prevent closing when on filter container
+            filterContainer.on('click', function (e) {
+                e.stopImmediatePropagation();
             });
 
             // add hidden fields to the form to maintain filter params
