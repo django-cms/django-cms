@@ -1042,7 +1042,10 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 200)
                 response = admin_instance.add_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(
+                    response.content,
+                    b"* __all__\n  * This placeholder already has the maximum number of plugins (2).",
+                )
 
     def test_type_limit(self):
         placeholder = self.get_placeholder()
@@ -1092,7 +1095,10 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
                 response = admin_instance.move_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(
+                    response.content,
+                    "This placeholder already has the maximum number of plugins (2)."
+                )
 
     def test_type_limit_on_plugin_move(self):
         admin_instance = self.get_admin()
