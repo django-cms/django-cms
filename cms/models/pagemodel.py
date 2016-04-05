@@ -231,9 +231,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # Make sure to update the slug and path of the target page.
         page_utils.check_title_slugs(target)
 
-        if self.publisher_public_id:
+        if moved_page.publisher_public_id:
             # Ensure we have up to date mptt properties
-            public_page = Page.objects.get(pk=self.publisher_public_id)
+            public_page = Page.objects.get(pk=moved_page.publisher_public_id)
             # Ensure that the page is in the right position and save it
             moved_page._publisher_save_public(public_page)
             public_page = public_page.reload()
@@ -245,14 +245,16 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # If the target (parent) page is not published
         # and the page being moved is published.
         titles = (
-            self.title_set
-            .filter(language__in=self.get_languages())
+            moved_page
+            .title_set
+            .filter(language__in=moved_page.get_languages())
             .values_list('language', 'published')
         )
 
-        if self.parent_id:
+        if moved_page.parent_id:
             parent_titles = (
-                self.parent
+                moved_page
+                .parent
                 .title_set
                 .values_list('language', 'published')
             )
@@ -261,27 +263,27 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             parent_titles_by_language = {}
 
         for language, published in titles:
-            if self.parent_id:
+            if moved_page.parent_id:
                 parent_is_published = parent_titles_by_language.get(language)
 
                 if parent_is_published and published:
                     # this looks redundant but it's necessary
                     # for all the descendants of the page being
                     # copied to be set to the correct state.
-                    self.publish(language)
+                    moved_page.publish(language)
                 else:
                     # mark the page being copied (source) as "pending"
-                    self.mark_as_pending(language)
+                    moved_page.mark_as_pending(language)
                     # mark all descendants of source as "pending"
-                    self.mark_descendants_pending(language)
+                    moved_page.mark_descendants_pending(language)
             else:
                 if published:
-                    self.publish(language)
+                    moved_page.publish(language)
                 else:
                     # mark the page being copied (source) as "pending"
-                    self.mark_as_pending(language)
+                    moved_page.mark_as_pending(language)
                     # mark all descendants of source as "pending"
-                    self.mark_descendants_pending(language)
+                    moved_page.mark_descendants_pending(language)
 
         from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
