@@ -103,7 +103,7 @@ class FrontendEditableAdminMixin(object):
                 'message': force_text(_("You do not have permission to edit this item"))
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
-            # Dinamically creates the form class with only `field_name` field
+            # Dynamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
