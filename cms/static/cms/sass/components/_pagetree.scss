@@ -50,8 +50,8 @@
     min-height: $pagetree-header-height;
     padding: $pagetree-header-padding;
     margin: -40px 0 0 0;
-    background: $pagetree-header-background;
     box-shadow: $pagetree-box-shadow;
+    background: $pagetree-header-background;
     &:before {
         content: "";
         position: absolute;
@@ -81,13 +81,13 @@
     float: left;
     padding: 0;
     margin: -3px 0 0;
-    background: none;
     box-shadow: none;
+    background: none;
     .cms-pagetree-header-search-btn {
         position: relative;
         top: 3px;
-        color: $white !important;
         outline: none;
+        color: $white !important;
         padding: 8px 10px !important;
         margin-left: 5px;
         border: none !important;
@@ -101,19 +101,20 @@
             background: darken($color-primary, 15%) !important;
         }
     }
-    .cms-pagetree-header-search-field input {
-        width: $pagetree-header-search-width !important;
-        padding-right: 35px !important;
-        margin-top: 2px;
-        transition: width $speed-base;
+    .cms-pagetree-header-filter {
+        position: relative;
+        float: left;
+        input {
+            width: $pagetree-header-search-width !important;
+            padding-right: 35px !important;
+            margin-top: 2px;
+            transition: width $speed-base;
+        }
     }
-    .cms-pagetree-header-search-field-active input {
+    // active state on focus or when opening the filters
+    .cms-pagetree-header-filter-active input {
         width: $pagetree-header-search-width * 2 !important;
     }
-}
-.cms-pagetree-header-search-field {
-    position: relative;
-    float: left;
 }
 .cms-pagetree-header-filter-trigger {
     position: absolute;
@@ -141,16 +142,16 @@
     width: 100%;
     padding: 5px 20px 15px;
     max-height: $pagetree-header-filter-height;
-    border-radius: $border-radius-base;
     box-shadow: $pagetree-box-shadow;
     box-sizing: border-box;
+    border-radius: $border-radius-base;
     background: $white;
     h3 {
         color: $gray;
         font-size: 14px;
         font-weight: normal;
         text-transform: uppercase;
-        padding: 10px 0 0 0;
+        padding-left: 10px;
     }
     ul,
     li {
@@ -189,9 +190,9 @@
 }
 
 // DROPDOWN
-.cms-pagetree-dropdown-header {
+.cms-pagetree-dropdown-menu {
     float: left;
-    padding: 0 10px;
+    padding-left: 10px;
     margin-left: $pagetree-header-space;
 
     .cms-pagetree-dropdown-container {
@@ -220,7 +221,7 @@
 
 .cms-pagetree-header-create {
     float: left;
-    margin-left: $pagetree-header-space;
+    margin-left: $pagetree-header-space + 10px;
 }
 
 // BREADCRUMB
@@ -237,10 +238,10 @@
     z-index: z(pagetree, section);
     min-height: $pagetree-section-height;
     padding: $pagetree-section-padding;
+    box-shadow: $pagetree-box-shadow;
     border-top: none;
     border-bottom: none;
     background: $white;
-    box-shadow: $pagetree-box-shadow;
     h2,
     p {
         padding: 0;

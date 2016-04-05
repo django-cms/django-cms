@@ -636,24 +636,25 @@ var CMS = window.CMS || {};
             var filterTrigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
             var filterContainer = this.ui.container.find('.js-cms-pagetree-header-filter-container');
             var filterClose = filterContainer.find('.js-cms-pagetree-header-search-close');
+            var filterClass = 'cms-pagetree-header-filter-active';
 
             var visibleForm = this.ui.container.find('.js-cms-pagetree-header-search');
             var hiddenForm = this.ui.container.find('.js-cms-pagetree-header-search-copy form');
 
-            var searchContainer = this.ui.container.find('.cms-pagetree-header-search-field');
+            var searchContainer = this.ui.container.find('.cms-pagetree-header-filter');
             var searchField = searchContainer.find('#field-searchbar');
             var timeout = 200;
 
             // add active class when focusing the search field
             searchField.on('focus', function () {
-                searchContainer.addClass('cms-pagetree-header-search-field-active');
+                searchContainer.addClass(filterClass);
             });
             searchField.on('blur', function () {
                 // timeout is required to prevent the search field from jumping
                 // between enlarging and shrinking
                 setTimeout(function () {
                     if (!filterActive) {
-                        searchContainer.removeClass('cms-pagetree-header-search-field-active');
+                        searchContainer.removeClass(filterClass);
                     }
                 }, timeout);
             });
@@ -663,11 +664,11 @@ var CMS = window.CMS || {};
                 e.preventDefault();
                 if (!filterActive) {
                     filterContainer.show();
-                    searchContainer.addClass('cms-pagetree-header-search-field-active');
+                    searchContainer.addClass(filterClass);
                     filterActive = true;
                 } else {
                     filterContainer.hide();
-                    searchContainer.removeClass('cms-pagetree-header-search-field-active');
+                    searchContainer.removeClass(filterClass);
                     filterActive = false;
                 }
             });
