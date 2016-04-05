@@ -39,7 +39,7 @@ module.exports = function (casperjs) {
             var that = this;
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.cms-pagetree [href*="delete"]')
+                    .waitUntilVisible('.cms-pagetree-jstree [href*="delete"]')
                     .then(that.expandPageTree())
                     .then(function () {
                         var pageId;
@@ -48,9 +48,9 @@ module.exports = function (casperjs) {
                         }
 
                         if (pageId) {
-                            this.click('.cms-pagetree [href*="delete"][href*="' + pageId + '"]');
+                            this.click('.cms-pagetree-jstree [href*="delete"][href*="' + pageId + '"]');
                         } else {
-                            this.click('.cms-pagetree [href*="delete"]'); // first one
+                            this.click('.cms-pagetree-jstree [href*="delete"]'); // first one
                         }
                     })
                     .waitForUrl(/delete/)
@@ -78,7 +78,7 @@ module.exports = function (casperjs) {
             if (opts.parent) {
                 return function () {
                     return this.wait(1000).thenOpen(globals.adminPagesUrl)
-                        .waitUntilVisible('.cms-pagetree')
+                        .waitUntilVisible('.cms-pagetree-jstree')
                         .then(that.waitUntilAllAjaxCallsFinish())
                         .then(that.expandPageTree())
                         .then(function () {
