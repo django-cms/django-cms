@@ -632,20 +632,47 @@ var CMS = window.CMS || {};
          * @private
          */
         _setSearch: function () {
-            var trigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
-            var container = this.ui.container.find('.js-cms-pagetree-header-filter-container');
-            var close = container.find('.js-cms-pagetree-header-search-close');
+            var filterActive = false;
+            var filterTrigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
+            var filterContainer = this.ui.container.find('.js-cms-pagetree-header-filter-container');
+            var filterClose = filterContainer.find('.js-cms-pagetree-header-search-close');
+
             var visibleForm = this.ui.container.find('.js-cms-pagetree-header-search');
             var hiddenForm = this.ui.container.find('.js-cms-pagetree-header-search-copy form');
 
-            trigger.add(close).on(this.click, function (e) {
-                e.preventDefault();
-                container.toggle();
-                container.parent()
-                    .toggleClass('cms-pagetree-header-search-field-active');
+            var searchContainer = this.ui.container.find('.cms-pagetree-header-search-field');
+            var searchField = searchContainer.find('#field-searchbar');
+            var timeout = 200;
+
+            // add active class when focusing the search field
+            searchField.on('focus', function () {
+                searchContainer.addClass('cms-pagetree-header-search-field-active');
+            });
+            searchField.on('blur', function () {
+                // timeout is required to prevent the search field from jumping
+                // between enlarging and shrinking
+                setTimeout(function () {
+                    if (!filterActive) {
+                        searchContainer.removeClass('cms-pagetree-header-search-field-active');
+                    }
+                }, timeout);
             });
 
-            // add hidden fields
+            // shows/hides filter box
+            filterTrigger.add(filterClose).on(this.click, function (e) {
+                e.preventDefault();
+                if (!filterActive) {
+                    filterContainer.show();
+                    searchContainer.addClass('cms-pagetree-header-search-field-active');
+                    filterActive = true;
+                } else {
+                    filterContainer.hide();
+                    searchContainer.removeClass('cms-pagetree-header-search-field-active');
+                    filterActive = false;
+                }
+            });
+
+            // add hidden fields to the form to maintain filter params
             visibleForm.append(hiddenForm.find('input[type="hidden"]'));
         },
 

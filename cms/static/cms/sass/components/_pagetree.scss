@@ -106,10 +106,6 @@
         padding-right: 35px !important;
         margin-top: 2px;
         transition: width $speed-base;
-        &:active,
-        &:focus {
-            width: $pagetree-header-search-width * 2 !important;
-        }
     }
     .cms-pagetree-header-search-field-active input {
         width: $pagetree-header-search-width * 2 !important;
@@ -229,7 +225,6 @@
 
 // BREADCRUMB
 .cms-pagetree-breadcrumbs {
-    padding-left: 20px !important;
     margin-bottom: -30px !important;
     border: none !important;
 }
