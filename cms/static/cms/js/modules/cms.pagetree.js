@@ -453,44 +453,62 @@ var CMS = window.CMS || {};
                 data.target = node.target;
             }
 
-            // we need to load a dialog first, to check if permissions should
-            // be copied or not
-            $.ajax({
-                method: 'post',
-                url: that.options.urls.copyPermission.replace('{id}', data.id),
-                data: data
-            // the dialog is loaded via the ajax respons originating from
-            // `templates/admin/cms/page/tree/copy_premissions.html`
-            }).done(function (dialog) {
-                that.ui.dialog.append(dialog);
-            }).fail(function (error) {
-                that.showError(error.statusText);
-            });
-
-            // attach events to the permission dialog
-            this.ui.dialog.off(this.click, '.cancel').on(this.click, '.cancel', function (e) {
-                e.preventDefault();
-                // remove just copied node
-                that.ui.tree.jstree('delete_node', obj.node.id);
-                $('.js-cms-dialog').remove();
-                $('.js-cms-dialog-dimmer').remove();
-            }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
-                e.preventDefault();
-                var formData = $(this).closest('form').serialize().split('&');
-                // loop through form data and attach to obj
-                for (var i = 0; i < formData.length; i++) {
-                    data[formData[i].split('=')[0]] = formData[i].split('=')[1];
-                }
-                // send the real ajax request for copying the plugin
+            if (that.options.permission) {
+                // we need to load a dialog first, to check if permissions should
+                // be copied or not
                 $.ajax({
                     method: 'post',
-                    url: that.options.urls.copy.replace('{id}', data.id),
+                    url: that.options.urls.copyPermission.replace('{id}', data.id),
                     data: data
-                }).done(function () {
-                    that._reloadHelper();
+                // the dialog is loaded via the ajax respons originating from
+                // `templates/admin/cms/page/tree/copy_premissions.html`
+                }).done(function (dialog) {
+                    that.ui.dialog.append(dialog);
                 }).fail(function (error) {
                     that.showError(error.statusText);
                 });
+
+                // attach events to the permission dialog
+                this.ui.dialog.off(this.click, '.cancel').on(this.click, '.cancel', function (e) {
+                    e.preventDefault();
+                    // remove just copied node
+                    that.ui.tree.jstree('delete_node', obj.node.id);
+                    $('.js-cms-dialog').remove();
+                    $('.js-cms-dialog-dimmer').remove();
+                }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
+                    e.preventDefault();
+                    var formData = $(this).closest('form').serialize().split('&');
+
+                    // loop through form data and attach to obj
+                    for (var i = 0; i < formData.length; i++) {
+                        data[formData[i].split('=')[0]] = formData[i].split('=')[1];
+                    }
+
+                    that._saveCopiedNode(data);
+                });
+            } else {
+                this._saveCopiedNode(data);
+            }
+        },
+
+        /**
+         * Sends the request to copy a node.
+         *
+         * @method _saveCopiedNode
+         * @private
+         * @param {Object} data node position information
+         */
+        _saveCopiedNode: function _saveCopiedNode(data) {
+            var that = this;
+            // send the real ajax request for copying the plugin
+            return $.ajax({
+                method: 'post',
+                url: that.options.urls.copy.replace('{id}', data.id),
+                data: data
+            }).done(function () {
+                that._reloadHelper();
+            }).fail(function (error) {
+                that.showError(error.statusText);
             });
         },
 
