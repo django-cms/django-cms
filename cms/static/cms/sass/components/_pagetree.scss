@@ -19,11 +19,20 @@
     }
 }
 
-.cms-hidden {
-    display: none !important;
-}
+.cms-hidden,
 .hidden {
     display: none !important;
+}
+.cms-clear {
+    clear: both;
+    overflow: hidden;
+}
+.cms-clear-mobile {
+    clear: both;
+    overflow: hidden;
+    @media (min-width: $pagetree-mobile) {
+        display: none;
+    }
 }
 
 // we need to add this to get drag & drop to work on internet explorer,
@@ -64,25 +73,32 @@
 }
 
 .cms-pagetree-header-title {
-    float: left;
     padding-top: 6px;
-    margin: 0 !important;
+    margin: 0 0 5px !important;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+    }
     span {
         font-weight: normal;
     }
 }
 
 .cms-pagetree-header-body {
-    float: right;
+    @media (min-width: $pagetree-mobile) {
+        float: right;
+    }
 }
 
 // SEARCH
 .cms-pagetree-header-search {
-    float: left;
     padding: 0;
-    margin: -3px 0 0;
+    margin: 5px 0 10px;
     box-shadow: none;
     background: none;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+        margin: -3px 0 ;
+    }
     .cms-pagetree-header-search-btn {
         position: relative;
         top: 3px;
@@ -113,7 +129,9 @@
     }
     // active state on focus or when opening the filters
     .cms-pagetree-header-filter-active input {
-        width: $pagetree-header-search-width * 2 !important;
+        @media (min-width: $pagetree-mobile) {
+            width: $pagetree-header-search-width * 2 !important;
+        }
     }
 }
 .cms-pagetree-header-filter-trigger {
@@ -191,12 +209,15 @@
 
 // DROPDOWN
 .cms-pagetree-dropdown-menu {
-    float: left;
+    float: right;
     padding-left: 10px;
     margin-left: $pagetree-header-space;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+    }
 
     .cms-pagetree-dropdown-container {
-        right: 9px;
+        right: -1px;
         top: 30px;
         min-width: $dropdown-width + 25px;
         a {
@@ -220,8 +241,10 @@
 }
 
 .cms-pagetree-header-create {
-    float: left;
-    margin-left: $pagetree-header-space + 10px;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+        margin-left: $pagetree-header-space + 10px;
+    }
 }
 
 // BREADCRUMB
