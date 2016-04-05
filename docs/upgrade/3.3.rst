@@ -16,6 +16,7 @@ by major code cleanup to remove compatibility shims.
 What's new in 3.3
 *****************
 
+* Improve compatibility with Django 1.9 esp. relating to the handling of `related_name`s of model fields in plugins.
 * Set the default value of CMSPlugin.position to 0 instead of null
 * Management commands has been completely refactored for better consistency (see
   `backward_incompatible_3.3`_ for details)

@@ -12,6 +12,8 @@
 * Added unit tests for CMS JavaScript files
 * Added frontend integration tests (written with Casper JS)
 * Provides the ability to declare cache expiration periods on a per-plugin basis
+* Improve compatibility with Django 1.9 esp. relating to the handling of
+  `related_name`s of model fields in plugins.
 
 === 3.2.3 (2016-03-09) ===
 
