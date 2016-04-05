@@ -263,20 +263,21 @@ var CMS = window.CMS || {};
                 that._reloadHelper();
             });
 
-            // propagnate the sites dropdown to the hidden sites form
+            // propagate the sites dropdown "li > a" entries to the hidden sites form
             this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function (e) {
                 e.preventDefault();
+                var el = $(this);
                 // prevent if parent is active
-                if ($(this).parent().hasClass('active')) {
+                if (el.parent().hasClass('active')) {
                     return false;
                 }
                 that.ui.siteForm.find('select')
-                    .val($(this).data().id).end().submit();
+                    .val(el.data().id).end().submit();
             });
 
             // additional event handlers
-            this._setTooltips();
-            this._setSearch();
+            this._setupTooltips();
+            this._setupSearch();
 
             // make sure ajax post requests are working
             this._setAjaxPost('.js-cms-tree-item-menu a');
@@ -558,10 +559,10 @@ var CMS = window.CMS || {};
         /**
          * Sets up general tooltips that can have a list of links or content.
          *
-         * @method _setTooltips
+         * @method _setupTooltips
          * @private
          */
-        _setTooltips: function _setTooltips() {
+        _setupTooltips: function _setupTooltips() {
             var that = this;
             var triggerCls = '.js-cms-tree-tooltip-trigger';
             var containerCls = '.js-cms-tree-tooltip-container';
@@ -646,11 +647,12 @@ var CMS = window.CMS || {};
         /**
          * Sets events for the search on the header.
          *
-         * @method _setSearch
+         * @method _setupSearch
          * @private
          */
-        _setSearch: function () {
+        _setupSearch: function _setupSearch() {
             var that = this;
+            var click = this.click + '.search';
 
             var filterActive = false;
             var filterTrigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
@@ -679,25 +681,25 @@ var CMS = window.CMS || {};
                         searchContainer.removeClass(filterClass);
                     }
                 }, timeout);
-                that.ui.document.off(that.click);
+                that.ui.document.off(click);
             });
 
             // shows/hides filter box
-            filterTrigger.add(filterClose).on(this.click, function (e) {
+            filterTrigger.add(filterClose).on(click, function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 if (!filterActive) {
                     filterContainer.show();
                     searchContainer.addClass(filterClass);
-                    that.ui.document.on(that.click, function () {
+                    that.ui.document.on(click, function () {
                         filterActive = true;
-                        filterTrigger.trigger(that.click);
+                        filterTrigger.trigger(click);
                     });
                     filterActive = true;
                 } else {
                     filterContainer.hide();
                     searchContainer.removeClass(filterClass);
-                    that.ui.document.off(that.click);
+                    that.ui.document.off(click);
                     filterActive = false;
                 }
             });

@@ -224,7 +224,7 @@
         top: 30px;
         min-width: $dropdown-width + 25px;
         a {
-            padding: 5px $submenu-item-padding-horizontal;
+            padding: 5px $pagetree-dropdown-padding-horizontal;
         }
         .active {
             font-weight: bold;
@@ -291,7 +291,6 @@
 }
 .cms-pagetree-dropdown-trigger {}
 .cms-pagetree-dropdown-container {
-    // references found in _subnav.scss
     display: none;
     position: absolute;
     z-index: z(structure, content, dropdown);
