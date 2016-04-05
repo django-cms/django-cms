@@ -635,6 +635,8 @@ var CMS = window.CMS || {};
             var trigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
             var container = this.ui.container.find('.js-cms-pagetree-header-filter-container');
             var close = container.find('.js-cms-pagetree-header-search-close');
+            var visibleForm = this.ui.container.find('.js-cms-pagetree-header-search');
+            var hiddenForm = this.ui.container.find('.js-cms-pagetree-header-search-copy form');
 
             trigger.add(close).on(this.click, function (e) {
                 e.preventDefault();
@@ -642,6 +644,9 @@ var CMS = window.CMS || {};
                 container.parent()
                     .toggleClass('cms-pagetree-header-search-field-active');
             });
+
+            // add hidden fields
+            visibleForm.append(hiddenForm.find('input[type="hidden"]'));
         },
 
         /**

@@ -123,6 +123,7 @@
     position: absolute;
     right: 0;
     top: 0;
+    cursor: pointer;
     padding: 10px;
     transform: rotate(270deg);
     &:hover .cms-icon,
@@ -137,23 +138,37 @@
 }
 .cms-pagetree-header-filter-container {
     display: none;
+    overflow: auto;
     position: absolute;
     left: 0;
     top: 38px;
     width: 100%;
-    padding: 10px 20px 20px;
+    padding: 5px 20px 15px;
+    max-height: $pagetree-header-filter-height;
     border-radius: $border-radius-base;
     box-shadow: $pagetree-box-shadow;
-    background: $white;
     box-sizing: border-box;
-    label {
-        display: block;
-        color: $gray-lighter;
+    background: $white;
+    h3 {
+        color: $gray;
+        font-size: 14px;
+        font-weight: normal;
+        text-transform: uppercase;
         padding: 10px 0 0 0;
     }
-    select {
-        min-width: auto;
-        max-width: 300px;
+    ul,
+    li {
+        list-style-type: none;
+        padding: 2px 0;
+        margin: 0;
+    }
+    // color states
+    li a {
+        color: $gray-light;
+    }
+    .selected a {
+        color: $color-primary;
+        font-weight: bold;
     }
 }
 .cms-pagetree-header-search-close {

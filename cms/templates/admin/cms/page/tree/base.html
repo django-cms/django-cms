@@ -46,7 +46,7 @@
                 <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
             {% endif %}
             {# SEARCH #}
-            <form action="{% url opts|admin_urlname:'changelist' %}" method="get" class="cms-pagetree-header-search js-cms-pagetree-header-search">
+            <form method="get" class="cms-pagetree-header-search js-cms-pagetree-header-search">
                 <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
                 <div class="cms-pagetree-header-search-field">
                     <input type="text" size="40" name="q" id="field-searchbar" value="{{ request.GET.q }}" placeholder="{% trans "Search" %}">
@@ -55,20 +55,8 @@
                             <a href="#"><span class="cms-icon cms-icon-arrow"></span></a>
                         </div>
                         <div class="cms-pagetree-header-filter-container js-cms-pagetree-header-filter-container">
-                            {% for filter in cl.filter_specs %}
-                                <label for="field-{{ filter.title|slugify }}">{{ filter.title }}</label>
-                                <select name="{{ filter.lookup_kwarg }}" id="field-{{ filter.title|slugify }}">
-                                    {% for choices in filter.choices %}
-                                        <option>{{ choices }}</option>
-                                    {% endfor %}
-                                    {% comment %}
-                                    {% clean_admin_list_filter cl filter %}
-                                    {% for choice in choices %}
-                                        <option{% if choice.selected %} selected="selected"{% endif %}
-                                            value="{{ choice.value|default:"-1" }}">{{ choice.display }}</option>
-                                    {% endfor %}
-                                    {% endcomment %}
-                                </select>
+                            {% for spec in cl.filter_specs %}
+                                {% clean_admin_list_filter cl spec %}
                             {% endfor %}
                             <a href="#" class="cms-pagetree-header-search-close js-cms-pagetree-header-search-close">
                                 <span class="cms-icon cms-icon-close"></span>
