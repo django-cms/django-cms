@@ -26,7 +26,7 @@
             <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
             {{ opts.verbose_name_plural|capfirst|escape }}
             {# TODO might remove this or add reset #}
-            {% if request.REQUEST.q %}
+            {% if request.GET.q or request.POST.q %}
             &rsaquo; {% trans "Search" %}
             {% endif %}
         </div>
