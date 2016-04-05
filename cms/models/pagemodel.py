@@ -217,6 +217,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.parent_id = target.pk
         else:
             self.parent_id = target.parent_id
+
         self.save()
         moved_page = self.move(target, pos=position)
 
@@ -226,7 +227,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         # check the slugs
         page_utils.check_title_slugs(moved_page)
-        ## Make sure to update the slug and path of the target page.
+
+        # Make sure to update the slug and path of the target page.
         page_utils.check_title_slugs(target)
 
         if self.publisher_public_id:
@@ -238,6 +240,49 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             cms_signals.page_moved.send(sender=Page, instance=public_page)
 
             page_utils.check_title_slugs(public_page)
+
+        # Update the descendants to "PENDING"
+        # If the target (parent) page is not published
+        # and the page being moved is published.
+        titles = (
+            self.title_set
+            .filter(language__in=self.get_languages())
+            .values_list('language', 'published')
+        )
+
+        if self.parent_id:
+            parent_titles = (
+                self.parent
+                .title_set
+                .values_list('language', 'published')
+            )
+            parent_titles_by_language = dict(parent_titles)
+        else:
+            parent_titles_by_language = {}
+
+        for language, published in titles:
+            if self.parent_id:
+                parent_is_published = parent_titles_by_language.get(language)
+
+                if parent_is_published and published:
+                    # this looks redundant but it's necessary
+                    # for all the descendants of the page being
+                    # copied to be set to the correct state.
+                    self.publish(language)
+                else:
+                    # mark the page being copied (source) as "pending"
+                    self.mark_as_pending(language)
+                    # mark all descendants of source as "pending"
+                    self.mark_descendants_pending(language)
+            else:
+                if published:
+                    self.publish(language)
+                else:
+                    # mark the page being copied (source) as "pending"
+                    self.mark_as_pending(language)
+                    # mark all descendants of source as "pending"
+                    self.mark_descendants_pending(language)
+
         from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
@@ -738,20 +783,36 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     def mark_descendants_pending(self, language):
         assert self.publisher_is_draft
+
         # Go through all children of our public instance
         public_page = self.publisher_public
-        from cms.models import Title
+
         if public_page:
             descendants = public_page.get_descendants().filter(title_set__language=language)
+
             for child in descendants:
-                try:
-                    child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
-                except Title.DoesNotExist:
-                    continue
-                draft = child.publisher_public
-                if draft and draft.is_published(language) and draft.get_publisher_state(
-                        language) == PUBLISHER_STATE_DEFAULT:
-                    draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
+                child.mark_as_pending(language)
+
+    def mark_as_pending(self, language):
+        from cms.models import Title
+
+        public = self.get_public_object()
+
+        if public:
+            try:
+                public.set_publisher_state(
+                    language,
+                    PUBLISHER_STATE_PENDING,
+                    published=False
+                )
+            except Title.DoesNotExist:
+                return
+
+        draft = self.get_draft_object()
+
+        if draft and draft.is_published(language) and draft.get_publisher_state(
+                language) == PUBLISHER_STATE_DEFAULT:
+            draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
 
     def revert(self, language):
         """Revert the draft version to the same state as the public version
