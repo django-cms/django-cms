@@ -522,7 +522,7 @@ class PagesTestCase(CMSTestCase):
             page.save()
             page.publish('en')
             req.current_page = page
-            req.REQUEST = {}
+            req.GET = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
 
     def test_page_obj_change_data_from_template_tags(self):
@@ -551,7 +551,7 @@ class PagesTestCase(CMSTestCase):
             page.publish('en')
             after_change = tz_now()
             req.current_page = page
-            req.REQUEST = {}
+            req.GET = {}
 
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(
