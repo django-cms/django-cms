@@ -57,7 +57,6 @@ var CMS = window.CMS || {};
         _setupUI: function _setupUI() {
             var pagetree = $('.cms-pagetree');
             this.ui = {
-                document: $(document),
                 container: pagetree,
                 document: $(document),
                 tree: pagetree.find('.js-cms-pagetree'),
