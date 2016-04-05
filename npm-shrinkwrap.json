@@ -9733,15 +9733,15 @@
                   "from": "dashdash@>=1.10.1 <2.0.0",
                   "resolved": "https://registry.npmjs.org/dashdash/-/dashdash-1.12.2.tgz"
                 },
-                "deep-extend": {
-                  "version": "0.4.1",
-                  "from": "deep-extend@~0.4.0",
-                  "resolved": "https://registry.npmjs.org/deep-extend/-/deep-extend-0.4.1.tgz"
-                },
                 "debug": {
                   "version": "2.2.0",
                   "from": "debug@~2.2.0",
                   "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz"
+                },
+                "deep-extend": {
+                  "version": "0.4.1",
+                  "from": "deep-extend@~0.4.0",
+                  "resolved": "https://registry.npmjs.org/deep-extend/-/deep-extend-0.4.1.tgz"
                 },
                 "delayed-stream": {
                   "version": "1.0.0",
@@ -10023,15 +10023,15 @@
                   "from": "semver@~5.1.0",
                   "resolved": "https://registry.npmjs.org/semver/-/semver-5.1.0.tgz"
                 },
-                "sshpk": {
-                  "version": "1.7.3",
-                  "from": "sshpk@^1.7.0",
-                  "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.7.3.tgz"
-                },
                 "sntp": {
                   "version": "1.0.9",
                   "from": "sntp@1.x.x",
                   "resolved": "https://registry.npmjs.org/sntp/-/sntp-1.0.9.tgz"
+                },
+                "sshpk": {
+                  "version": "1.7.3",
+                  "from": "sshpk@^1.7.0",
+                  "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.7.3.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
@@ -13513,10 +13513,61 @@
         }
       }
     },
-    "shelljs": {
-      "version": "0.6.0",
-      "from": "shelljs@latest",
-      "resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.6.0.tgz"
+    "terminate": {
+      "version": "1.0.8",
+      "from": "terminate@latest",
+      "resolved": "https://registry.npmjs.org/terminate/-/terminate-1.0.8.tgz",
+      "dependencies": {
+        "ps-tree": {
+          "version": "1.0.1",
+          "from": "ps-tree@1.0.1",
+          "resolved": "https://registry.npmjs.org/ps-tree/-/ps-tree-1.0.1.tgz",
+          "dependencies": {
+            "event-stream": {
+              "version": "3.3.2",
+              "from": "event-stream@>=3.3.0 <3.4.0",
+              "resolved": "https://registry.npmjs.org/event-stream/-/event-stream-3.3.2.tgz",
+              "dependencies": {
+                "through": {
+                  "version": "2.3.8",
+                  "from": "through@>=2.3.1 <2.4.0",
+                  "resolved": "https://registry.npmjs.org/through/-/through-2.3.8.tgz"
+                },
+                "duplexer": {
+                  "version": "0.1.1",
+                  "from": "duplexer@>=0.1.1 <0.2.0",
+                  "resolved": "https://registry.npmjs.org/duplexer/-/duplexer-0.1.1.tgz"
+                },
+                "from": {
+                  "version": "0.1.3",
+                  "from": "from@>=0.0.0 <1.0.0",
+                  "resolved": "https://registry.npmjs.org/from/-/from-0.1.3.tgz"
+                },
+                "map-stream": {
+                  "version": "0.1.0",
+                  "from": "map-stream@>=0.1.0 <0.2.0",
+                  "resolved": "https://registry.npmjs.org/map-stream/-/map-stream-0.1.0.tgz"
+                },
+                "pause-stream": {
+                  "version": "0.0.11",
+                  "from": "pause-stream@0.0.11",
+                  "resolved": "https://registry.npmjs.org/pause-stream/-/pause-stream-0.0.11.tgz"
+                },
+                "split": {
+                  "version": "0.3.3",
+                  "from": "split@>=0.3.0 <0.4.0",
+                  "resolved": "https://registry.npmjs.org/split/-/split-0.3.3.tgz"
+                },
+                "stream-combiner": {
+                  "version": "0.0.4",
+                  "from": "stream-combiner@>=0.0.4 <0.1.0",
+                  "resolved": "https://registry.npmjs.org/stream-combiner/-/stream-combiner-0.0.4.tgz"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

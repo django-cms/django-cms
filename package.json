@@ -30,6 +30,7 @@
     "karma-sauce-launcher": "^0.3.0",
     "minimist": "1.1.1",
     "phantomjs-prebuilt": "^2.1.5",
-    "shelljs": "^0.6.0"
+    "shelljs": "^0.6.0",
+    "terminate": "^1.0.8"
   }
 }
