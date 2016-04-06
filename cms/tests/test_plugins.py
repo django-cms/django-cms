@@ -40,7 +40,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD,
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGIN_DELETE, URL_CMS_PLUGINS_COPY)
+    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGINS_COPY)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -279,47 +279,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertTrue('/edit-plugin/%s/'% columns.pk in text_breadcrumbs[0]['url'])
         self.assertTrue('/edit-plugin/%s/'% column.pk, text_breadcrumbs[1]['url'])
         self.assertTrue('/edit-plugin/%s/'% text_plugin.pk, text_breadcrumbs[2]['url'])
-
-    def test_add_cancel_plugin(self):
-        """
-        Test that you can cancel a new plugin before editing and
-        that the plugin is removed.
-        """
-        # add a new text plugin
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
-        plugin_data = {
-            'plugin_type': "TextPlugin",
-            'plugin_language': settings.LANGUAGES[0][0],
-            'placeholder_id': page.placeholders.get(slot="body").pk,
-            'plugin_parent': '',
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEqual(response.status_code, 200)
-        pk = CMSPlugin.objects.all()[0].pk
-        expected = {
-            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
-            "breadcrumb": [
-                {
-                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
-                    "title": "Text"
-                }
-            ],
-            'delete': URL_CMS_PLUGIN_DELETE % pk
-        }
-        output = json.loads(response.content.decode('utf8'))
-        self.assertEqual(output, expected)
-        # now click cancel instead of editing
-        response = self.client.get(output['url'])
-        self.assertEqual(response.status_code, 200)
-        data = {
-            "body": "Hello World",
-            "_cancel": True,
-        }
-        response = self.client.post(output['url'], data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(0, Text.objects.count())
 
     def test_extract_images_from_text(self):
         img_path = os.path.join(os.path.dirname(__file__), 'data', 'image.jpg')

@@ -10,16 +10,17 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 from cms.apphook_pool import apphook_pool
+from cms.exceptions import PluginLimitReached
 from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title,
-                        EmptyTitle, GlobalPagePermission)
+from cms.models import (CMSPlugin, Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title,
+                        Placeholder, EmptyTitle, GlobalPagePermission)
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple
+from cms.utils.i18n import get_language_list, get_language_tuple
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import is_valid_url
@@ -644,3 +645,64 @@ class PageUserGroupForm(GenericCmsPermissionForm):
             group.save()
         save_permissions(self.cleaned_data, group)
         return group
+
+
+class PluginAddValidationForm(forms.Form):
+    placeholder_id = forms.ModelChoiceField(
+        queryset=Placeholder.objects.all(),
+        required=True,
+    )
+    plugin_language = forms.CharField(required=True)
+    plugin_parent = forms.ModelChoiceField(
+        CMSPlugin.objects.all(),
+        required=False,
+    )
+    plugin_position = forms.IntegerField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.plugin_type = kwargs.pop('plugin_type')
+        super(PluginAddValidationForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        from cms.utils.plugins import has_reached_plugin_limit
+
+        data = self.cleaned_data
+
+        if self.errors:
+            return data
+
+        language = data['plugin_language']
+        placeholder = data['placeholder_id']
+        parent_plugin = data.get('plugin_parent')
+
+        if language not in get_language_list():
+            message = ugettext("Language must be set to a supported language!")
+            self.add_error('plugin_language', message)
+            return self.cleaned_data
+
+        if parent_plugin:
+            if parent_plugin.language != language:
+                message = ugettext("Parent plugin language must be same as language!")
+                self.add_error('plugin_language', message)
+                return self.cleaned_data
+
+            if parent_plugin.placeholder_id != placeholder.pk:
+                message = ugettext("Parent plugin placeholder must be same as placeholder!")
+                self.add_error('placeholder_id', message)
+                return self.cleaned_data
+
+        if placeholder.page:
+            template = placeholder.page.get_template()
+        else:
+            template = None
+
+        try:
+            has_reached_plugin_limit(
+                placeholder,
+                self.plugin_type,
+                language,
+                template=template
+            )
+        except PluginLimitReached as error:
+            self.add_error(None, force_text(error))
+        return self.cleaned_data
