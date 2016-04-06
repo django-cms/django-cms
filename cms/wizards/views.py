@@ -6,7 +6,6 @@ from django.forms import Form
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import NoReverseMatch
-from django.db import transaction
 
 from django.template.response import SimpleTemplateResponse
 from django.utils.translation import get_language_from_request
