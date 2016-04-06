@@ -23,21 +23,7 @@ from .forms import (
 )
 
 
-class WizardViewMixin(object):
-    language_code = None
-
-    @transaction.atomic
-    def dispatch(self, request, *args, **kwargs):
-        response = super(WizardViewMixin, self).dispatch(
-            request, *args, **kwargs)
-        return response
-
-    def get_form_kwargs(self):
-        kwargs = super(WizardViewMixin, self).get_form_kwargs()
-        return kwargs
-
-
-class WizardCreateView(WizardViewMixin, SessionWizardView):
+class WizardCreateView(SessionWizardView):
     template_name = 'cms/wizards/start.html'
     file_storage = FileSystemStorage(
         location=os.path.join(settings.MEDIA_ROOT, 'wizard_tmp_files'))
