@@ -19,6 +19,7 @@ var uglify = require('gulp-uglify');
 var KarmaServer = require('karma').Server;
 var child_process = require('child_process');
 var spawn = require('child_process').spawn;
+var terminate = require('terminate');
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -247,18 +248,36 @@ gulp.task('tests:integration', function (done) {
         });
     }
 
-    var casperChild = spawn('./node_modules/.bin/casperjs', ['test', '--web-security=no'].concat(tests));
-
-    casperChild.stdout.on('data', function (data) {
-        gutil.log('CasperJS:', data.toString().slice(0, -1));
+    child_process.execSync('rm -rf testdb.sqlite');
+    // child_process.execSync('pkill -f testserver');
+    var server = spawn('python', ['testserver.py']);
+    gutil.log('Starting a server');
+    server.stdout.on('data', function (data) {
+        console.log(data.toString().slice(0, -1));
     });
 
-    casperChild.on('close', function (code) {
-        if (argv && argv.screenshots) {
-            child_process.execSync('rm ' + tests.join(' '));
-        }
+    server.stderr.on('data', function (data) {
+        gutil.log('Server: ', data.toString().slice(0, -1));
+    });
 
-        done(code);
+    var sleep = spawn('sleep', ['40']);
+
+    sleep.on('close', function () {
+        var casperChild = spawn('./node_modules/.bin/casperjs', ['test', '--web-security=no'].concat(tests));
+
+        casperChild.stdout.on('data', function (data) {
+            gutil.log('CasperJS:', data.toString().slice(0, -1));
+        });
+
+        casperChild.on('close', function (code) {
+            if (argv && argv.screenshots) {
+                child_process.execSync('rm ' + tests.join(' '));
+            }
+
+            terminate(server.pid, function (err, status) {
+                done(code);
+            });
+        });
     });
 });
 

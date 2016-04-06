@@ -7,11 +7,16 @@ import sys
 def noop_gettext(s):
     return s
 
-gettext = noop_gettext
+permission = True
 
+if '--CMS_PERMISSION=False' in sys.argv:
+    permission = False
+
+gettext = noop_gettext
+print sys.argv
 
 HELPER_SETTINGS = dict(
-    CMS_PERMISSION=True,
+    CMS_PERMISSION=permission,
     LANGUAGES=(
         ('en', u'English'),
         ('de', u'Deutsch'),
