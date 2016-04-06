@@ -108,9 +108,10 @@ class PlaceholderToolbar(CMSToolbar):
         disabled = user and hasattr(self, "page") and len(
             list(entry_choices(user, self.page))) == 0
 
-        url = '{url}?page={page}&edit'.format(
+        url = '{url}?page={page}&language={lang}&edit'.format(
             url=reverse("cms_wizard_create"),
-            page=page_pk
+            page=page_pk,
+            lang=self.request.LANGUAGE_CODE,
         )
         self.toolbar.add_modal_button(title, url,
                                       side=self.toolbar.RIGHT,

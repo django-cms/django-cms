@@ -20,8 +20,9 @@ from cms.models.titlemodels import EmptyTitle
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.compat.dj import is_installed
-from cms.utils.urlutils import static_with_version
 from cms.utils.conf import get_cms_setting
+from cms.utils.urlutils import static_with_version
+from cms.wizards.forms import BaseFormMixin
 
 try:
     # djangocms_text_ckeditor is not guaranteed to be available
@@ -93,7 +94,7 @@ class PageTypeSelect(forms.widgets.Select):
         js = tuple(map(static_with_version, js))
 
 
-class BaseCMSPageForm(forms.Form):
+class BaseCMSPageForm(BaseFormMixin, forms.Form):
     title = forms.CharField(
         label=_(u'Title'), max_length=255,
         help_text=_(u"Provide a title for the new page."))
