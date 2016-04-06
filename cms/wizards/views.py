@@ -127,14 +127,15 @@ class WizardCreateView(SessionWizardView):
         This step only runs if all forms are valid. Simply emits a simple
         template that uses JS to redirect to the newly created object.
         """
-        form_two = list(form_list)[1]
+        form_one, form_two = list(form_list)
         instance = form_two.save()
         url = self.get_success_url(instance)
+        language = form_one.cleaned_data['language']
         if not url:
             page = self.get_origin_page()
             if page:
                 try:
-                    url = page.get_absolute_url(self.language_code)
+                    url = page.get_absolute_url(language)
                 except NoReverseMatch:
                     url = '/'
             else:
