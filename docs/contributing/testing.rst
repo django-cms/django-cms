@@ -197,17 +197,19 @@ Then install minimum required dependencies::
     pip install test_requirements/django-1.8.txt
     pip install -e .
 
-Now you'll be able to run a test server with this command::
-
-    rm -f testdb.sqlite; python testserver.py
-
-Note, that the last command would take over your shell and remove SQLite
-database and run migrations on the new one. Take a look inside `testserver.py`
-or `.travis.yml` if you need to customise the test server settings.
-
-The integration test suite itself can be run against the test server in a separate shell::
+Now you'll be able to run a tests with this command::
 
     gulp tests:integration
+
+The command will start a server, wait for a minute for the migrations to run
+and will run integration tests against it.  It will use ``testdb.sqlite`` as the
+database. If you want to start with a clean state you could use ``--clean``
+argument.
+
+Some tests require different server configuration, so it is possible that the
+server will stop, and another variation will start with different arguments.
+Take a look inside `testserver.py` if you need to customise the test server
+settings.
 
 While debugging you can use the ``--tests`` parameter as well in order to run test
 suites separately.::
@@ -215,7 +217,15 @@ suites separately.::
     gulp tests:integration --tests=pagetree
     gulp tests:integration --tests=loginAdmin,toolbar
 
+If specified tests require different servers they will be grouped to speed
+things up, so the order might not be the same as you specify in the argument.
 
+When running locally, it sometimes helps to visualise the tests output. For that
+you can install casper-summoner utility (``npm install -g casper-summoner``),
+and run the tests with additional ``--screenshots`` argument. It will create
+``screenshots`` folder with screenshots of almost every step of each test.
+Subsequent runs will override the existing files. Note that this is experimental
+and may change in the future.
 
 *************
 Writing tests
