@@ -402,8 +402,6 @@ var integrationTests = {
 gulp.task('tests:integration', function (done) {
     process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
 
-    var serverPid;
-
     integrationTests
         .prepareFiles()
         .then(function (groupedTests) {
@@ -411,6 +409,8 @@ gulp.task('tests:integration', function (done) {
                 var tests = groupedTests[serverArgs].map(function (obj) {
                     return obj.file;
                 });
+                var serverPid;
+
 
                 return integrationTests.startServer(serverArgs)
                     .then(function (pid) {
