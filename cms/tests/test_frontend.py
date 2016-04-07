@@ -210,21 +210,6 @@ class ToolbarBasicTests(CMSLiveTests):
         self.driver.implicitly_wait(2)
         super(ToolbarBasicTests, self).setUp()
 
-    def test_toolbar_login(self):
-        User = get_user_model()
-        create_page('Home', 'simple.html', 'en', published=True)
-        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.assertTrue(User.objects.all().count(), 1)
-        self.driver.get(url)
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input.submit()
-        self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
-
     def test_toolbar_login_view(self):
         User = get_user_model()
         create_page('Home', 'simple.html', 'en', published=True)
