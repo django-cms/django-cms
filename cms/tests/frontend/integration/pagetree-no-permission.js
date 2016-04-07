@@ -77,6 +77,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
+                .wait(3000)
                 .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(function () {
                     test.assertExists(
@@ -92,6 +93,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                         'Second page was copied into itself'
                     );
                 })
+                .then(cms.expandPageTree())
                 .then(function () {
                     this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
                 })
@@ -112,6 +114,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .wait(3000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -139,6 +142,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.waitUntilAllAjaxCallsFinish())
+                .wait(3000)
                 .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -257,6 +261,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .wait(3000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
@@ -309,6 +314,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
+                .wait(3000)
                 .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
