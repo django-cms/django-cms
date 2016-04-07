@@ -1376,7 +1376,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         })
         response = self.client.post(add_url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/cms/plugin/close_modal.html')
+        self.assertTemplateUsed(response, 'admin/cms/page/close_frame.html')
 
         # there should be only 1 plugin
         self.assertEqual(1, CMSPlugin.objects.all().count())

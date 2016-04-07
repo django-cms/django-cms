@@ -3,13 +3,17 @@ import json
 import re
 import warnings
 
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response
 
 from django import forms
 from django.contrib import admin
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    PermissionDenied,
+    ValidationError,
+)
 from django.core.urlresolvers import reverse
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
@@ -259,7 +263,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return Form
 
-    def add_view_check_request(self, request):
+    def validate_add_request(self, request):
         from cms.admin.forms import PluginAddValidationForm
 
         form = PluginAddValidationForm(
@@ -268,29 +272,34 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         )
 
         if not form.is_valid():
-            return HttpResponseBadRequest(form.errors.as_text())
+            error = list(form.errors.values())[0]
+            raise ValidationError(message=force_text(error))
 
         placeholder = form.cleaned_data['placeholder_id']
 
         if (self.has_add_permission(request) and
                 placeholder.has_add_permission(request)):
-            return True
-        response = force_text(_('You do not have permission to add a plugin'))
-        return HttpResponseForbidden(response)
+            data = form.cleaned_data
+            data['plugin_type'] = form.plugin_type
+            return data
+        raise PermissionDenied
 
     def add_view(self, request, form_url='', extra_context=None):
-        result = self.add_view_check_request(request)
-
-        if isinstance(result, HttpResponse):
-            return result
+        try:
+            self.validate_add_request(request)
+        except PermissionDenied:
+            message = force_text(_('You do not have permission to add a plugin'))
+            return HttpResponseForbidden(message)
+        except ValidationError as error:
+            return HttpResponseBadRequest(error.message)
 
         return super(CMSPluginBase, self).add_view(
             request, form_url, extra_context
         )
 
-    def render_close_modal(self):
+    def render_close_frame(self):
         return render_to_response(
-            'admin/cms/plugin/close_modal.html', {'is_popup': True}
+            'admin/cms/page/close_frame.html', {'is_popup': True}
         )
 
     def response_post_save_add(self, request, obj):
@@ -299,7 +308,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         an admin site directly and the add_view is accessed via frontend
         editing.
         """
-        return self.render_close_modal()
+        return self.render_close_frame()
 
     def save_model(self, request, obj, form, change):
         """
@@ -358,7 +367,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             # prevent Django from rendering it's popup_close html
             # Django's template assumes certain js functions
             # and so will throw an error when adding plugins.
-            return self.render_close_modal()
+            return self.render_close_frame()
 
         post_url_continue = reverse('admin:cms_page_edit_plugin',
                 args=(obj._get_pk_val(),),
