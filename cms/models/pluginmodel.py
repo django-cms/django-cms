@@ -48,6 +48,20 @@ class PluginModelBase(ModelBase):
         # create a new class (using the super-metaclass)
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
 
+        # Set the one-to-one parent-child field to not create the reverse
+        # related descriptor to avoid name clashes for plugins with the same
+        # fieldnames. Skip this check if the parent-child field has been
+        # explicitly defined in the plugin subclass
+        #
+        # NOTE: We only do concrete classes, skipping the abstract ones
+        if 'cmsplugin_ptr' not in attrs and not new_class._meta.abstract:
+            for field in new_class._meta.fields:
+                if field.name == 'cmsplugin_ptr':
+                    app_label = new_class._meta.app_label
+                    model_name = new_class._meta.concrete_model._meta.model_name
+                    field.rel.related_name = '{0}_{1}'.format(
+                        app_label, model_name)
+
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
         meta = attr_meta or getattr(new_class, '_render_meta', None)
