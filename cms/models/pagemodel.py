@@ -840,14 +840,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 if not publisher_public.parent_id:
                     publisher_public = page._publisher_save_public(publisher_public)
 
-                # query and caching optimization
-
-                if publisher_public.parent_id and not publisher_public.parent:
-                    page.publisher_public.parent = Page.objects.get(pk=page.publisher_public.parent_id)
-
                 # Check if the parent of this page's
                 # public version is published.
-                if page.publisher_public.parent.is_published(language):
+                if publisher_public.parent.is_published(language):
                     public_title = titles_by_page_id.get(page.publisher_public_id)
 
                     if public_title and not public_title.published:
