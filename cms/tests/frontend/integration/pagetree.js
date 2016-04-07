@@ -8,6 +8,8 @@ var globals = require('./settings/globals');
 var casperjs = require('casper');
 var cms = require('./helpers/cms')(casperjs);
 var xPath = casperjs.selectXPath;
+var createJSTreeXPathFromTree = cms.createJSTreeXPathFromTree;
+var getPasteHelpersXPath = cms.getPasteHelpersXPath;
 
 var closeWizard = function () {
     return function () {
@@ -17,80 +19,6 @@ var closeWizard = function () {
         })
         .waitWhileVisible('.cms-modal');
     };
-};
-
-/**
- * @function createJSTreeXPathFromTree
- * @param {Object[]} tree tree object, see example
- * @param {Object} [opts]
- * @param {Object} [opts.topLevel=true] is it the top level?
- * @example tree
- *
- *     [
- *         {
- *             name: 'Homepage'
- *             children: [
- *                 {
- *                     name: 'Nested'
- *                 }
- *             ]
- *         },
- *         {
- *             name: 'Sibling'
- *         }
- *     ]
- */
-var createJSTreeXPathFromTree = function (tree, opts) {
-    var xPath = '';
-    var topLevel = opts && typeof opts.topLevel !== 'undefined' ? topLevel : true;
-
-    tree.forEach(function (node, index) {
-        if (index === 0) {
-            if (topLevel) {
-                xPath += '//';
-            } else {
-                xPath += './';
-            }
-            xPath += 'li[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name + '")]${children}]';
-        } else {
-            xPath += '/following-sibling::li' +
-                '[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name + '")]${children}]';
-        }
-
-        if (node.children) {
-            xPath = xPath.replace(
-                '${children}',
-                '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                '[' + createJSTreeXPathFromTree(node.children, { topLevel: false }) + ']'
-            );
-        } else {
-            xPath = xPath.replace('${children}', '');
-        }
-    });
-
-    return xPath;
-};
-
-/**
- * @function getPasteHelpersXPath
- * @public
- * @param {Object} opts
- * @param {Boolean} visible get visible or hidden helpers
- * @param {String|Number} [pageId] optional id of the page to filter helpers
- */
-var getPasteHelpersXPath = function (opts) {
-    var xpath = '//*[self::div or self::span][contains(@class, "cms-tree-item-helpers")]';
-    if (opts && opts.visible) {
-        xpath += '[not(contains(@class, "cms-hidden"))]';
-    } else {
-        xpath += '[contains(@class, "cms-hidden")]';
-    }
-    xpath += '[./a[contains(text(), "Paste")]';
-    if (opts && opts.pageId) {
-        xpath += '[contains(@data-id, "' + opts.pageId + '")]';
-    }
-    xpath += ']';
-    return xpath;
 };
 
 casper.test.setUp(function (done) {
