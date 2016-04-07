@@ -367,7 +367,7 @@ module.exports = function (casperjs) {
                             var amount = 0;
 
                             try {
-                                amount = $.active;
+                                amount = CMS.$.active;
                             } catch (e) {}
 
                             return amount;
