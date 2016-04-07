@@ -17,7 +17,7 @@ admin_preview
 
 Default: ``False``
 
-Should the plugin be previewed in admin when you click on the plugin or save it?
+If ``True``, displays a preview in the admin.
 
 
 allow_children
@@ -44,7 +44,7 @@ Please use something like this or something similar:
 
 Be sure to access ``instance.child_plugin_instances`` to get all children.
 They are pre-filled and ready to use. To finally render your child plugins use
-the ``{% render_plugin %}`` templatetag.
+the ``{% render_plugin %}`` template tag.
 
 See also: `child_classes`_, `parent_classes`_, `require_parent`_
 
@@ -223,7 +223,7 @@ get_render_template
 
 If you need to determine the plugin render model at render time
 you can implement :meth:`get_render_template` method on the plugin
-class; this method taks the same arguments as ``render``.
+class; this method takes the same arguments as ``render``.
 The method **must** return a valid template file path.
 
 Example::
@@ -302,7 +302,7 @@ fallback icon.
 * ``icon_context``: A dictionary containing information about the needed icon
   like `width`, `height`, `theme`, etc
 
-Usually this method should return the icon url. But, it may depends on the text
+Usually this method should return the icon URL. But, it may depends on the text
 editor because what is needed may differ. Please consult the documentation of
 your text editor plugin.
 
@@ -444,7 +444,7 @@ See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
 add_url
 -------
 
-Returns the url to call to add a plugin instance; useful to implement plugin-specific
+Returns the URL to call to add a plugin instance; useful to implement plugin-specific
 logic in a custom view
 
 Default: None (``cms_page_add_plugin`` view is used)
@@ -452,7 +452,7 @@ Default: None (``cms_page_add_plugin`` view is used)
 edit_url
 --------
 
-Returns the url to call to edit a plugin instance; useful to implement plugin-specific
+Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
 logic in a custom view
 
 Default: None (``cms_page_edit_plugin`` view is used)
@@ -460,7 +460,7 @@ Default: None (``cms_page_edit_plugin`` view is used)
 move_url
 --------
 
-Returns the url to call to move a plugin instance; useful to implement plugin-specific
+Returns the URL to call to move a plugin instance; useful to implement plugin-specific
 logic in a custom view
 
 Default: None (``cms_page_move_plugin`` view is used)
@@ -468,7 +468,7 @@ Default: None (``cms_page_move_plugin`` view is used)
 delete_url
 ----------
 
-Returns the url to call to delete a plugin instance; useful to implement plugin-specific
+Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
 logic in a custom view
 
 Default: None (``cms_page_delete_plugin`` view is used)
@@ -476,7 +476,7 @@ Default: None (``cms_page_delete_plugin`` view is used)
 copy_url
 --------
 
-Returns the url to call to copy a plugin instance; useful to implement plugin-specific
+Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
 logic in a custom view
 
 Default: None (``cms_page_copy_plugins`` view is used)

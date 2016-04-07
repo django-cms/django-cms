@@ -1,3 +1,5 @@
+.. _reference:
+
 #########
 Reference
 #########
@@ -14,3 +16,4 @@ Technical reference material.
     fields
     templatetags
     cli
+    wizards

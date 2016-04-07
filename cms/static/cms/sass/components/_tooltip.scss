@@ -1,0 +1,43 @@
+//##############################################################################
+// TOOLTIP
+
+// used when hover over plugins in edit mode
+.cms-tooltip,
+.cms-tooltip-touch {
+    @include icon(pencil);
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: $tooltip-font-size;
+    line-height: $tooltip-line-height;
+    font-weight: bold;
+    color: $tooltip-first-line-color;
+    white-space: nowrap;
+    padding: 0px nth($tooltip-padding, 2) 0px $tooltip-icon-area-size;
+    margin: 0;
+    border-radius: $border-radius-base;
+    background: $gray-darker;
+
+    &:before {
+        @extend %icon;
+        font-size: $tooltip-icon-size;
+        top: 50%;
+        left: ($tooltip-icon-area-size - $tooltip-icon-size) / 2;
+        margin-top: -($tooltip-icon-size / 2);
+        position: absolute;
+    }
+
+    span {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: -(nth($tooltip-padding, 1) - 1px);
+        float: right;
+        color: $tooltip-second-line-color;
+        font-weight: normal;
+        padding: 0 nth($tooltip-padding, 2);
+        border-radius: $border-radius-base 0 $border-radius-base $border-radius-base;
+        background: $gray-darker;
+    }
+}

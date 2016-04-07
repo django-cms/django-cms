@@ -31,7 +31,7 @@ with django CMS
 Updates to ``settings.py``
 **************************
 
-The following changes will need to be made in your settings.py file::
+The following changes will need to be made in your ``settings.py`` file::
 
     ADMIN_MEDIA_PREFIX = '/static/admin'
     STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
@@ -45,8 +45,8 @@ The following changes will need to be made in your settings.py file::
 
 .. note::
 
-    Please make sure the ``static`` subfolder exists in your
-    project and is writable.
+    Please make sure the ``static`` sub-folder exists in your
+    project and is writeable.
 
 .. note::
 

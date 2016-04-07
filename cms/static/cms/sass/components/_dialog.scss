@@ -1,0 +1,56 @@
+//##############################################################################
+// DIALOG
+
+// used in: /cms/admin/page/tree/copy_premissions
+.cms-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: z(dialog);
+    box-sizing: border-box;
+    width: $dialog-width;
+    margin: -100px 0 0 (-$dialog-width/2);
+    padding: $padding-large;
+    border: 1px solid $gray-lighter;
+    border-radius: $dialog-border-radius;
+    background: $white;
+    box-shadow: $dialog-shadow;
+    transform: translateZ(0);
+
+    h1 {
+        margin: 0 0 $padding-normal;
+        padding: 0;
+    }
+    form {
+        margin: $padding-normal 0;
+        padding: $padding-normal 0;
+        border-top: 1px solid $gray-lighter;
+        label {
+            display: inline;
+        }
+        input[type="checkbox"] {
+            position: relative;
+            top: -3px;
+        }
+        p {
+            padding: $padding-normal 0;
+        }
+    }
+
+    @media (max-width: ($dialog-width + 2 * $padding-large)) {
+        right: 0;
+        left: 0;
+        width: 80%;
+        margin: -100px auto 0;
+    }
+}
+
+.cms-dialog-dimmer {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: z(dialog-dimmer);
+    width: 100%;
+    height: 100%;
+    background: $pagetree-dimmer;
+}

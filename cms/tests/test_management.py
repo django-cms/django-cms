@@ -1,0 +1,554 @@
+# -*- coding: utf-8 -*-
+from __future__ import with_statement
+import uuid
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core import management
+from django.core.management import CommandError
+from django.test.utils import override_settings
+try:
+    from django.test.utils import override_system_checks
+except ImportError:
+    override_system_checks = None
+from django.utils.six.moves import StringIO
+
+from cms.api import create_page, add_plugin, create_title
+from cms.management.commands import cms
+from cms.management.commands.subcommands.list import plugin_report
+from cms.models import Page, StaticPlaceholder
+from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
+from cms.test_utils.fixtures.navextenders import NavextendersFixture
+from cms.test_utils.testcases import CMSTestCase
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
+
+APPHOOK = "SampleApp"
+APPHOOK_NAMESPACE = "NamespacedApp"
+PLUGIN = "TextPlugin"
+
+TEST_INSTALLED_APPS = [
+    "django.contrib.auth",
+    "cms",
+    "menus",
+    "sekizai",
+    "cms.test_utils.project.sampleapp",
+    "treebeard",
+]
+if settings.AUTH_USER_MODEL == "emailuserapp.EmailUser":
+    TEST_INSTALLED_APPS.append("cms.test_utils.project.emailuserapp")
+if settings.AUTH_USER_MODEL == "customuserapp.User":
+    TEST_INSTALLED_APPS.append("cms.test_utils.project.customuserapp")
+
+
+class ManagementTestCase(CMSTestCase):
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_list_apphooks(self):
+        out = StringIO()
+        create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+        command = cms.Command()
+        command.stdout = out
+        command.handle("list", "apphooks", interactive=False)
+        self.assertEqual(out.getvalue(), "SampleApp (draft)\n")
+
+    def test_uninstall_apphooks_without_apphook(self):
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
+        self.assertEqual(out.getvalue(), "no 'SampleApp' apphooks found\n")
+
+    def test_fix_tree(self):
+        create_page("home", "nav_playground.html", "en")
+        page1 = create_page("page", "nav_playground.html", "en")
+        page1.depth = 3
+        page1.numchild = 4
+        page1.path = "00100010"
+        page1.save()
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("fix-tree", interactive=False)
+        self.assertEqual(out.getvalue(), 'fixing page treefixing plugin treeall done')
+        page1 = page1.reload()
+        self.assertEqual(page1.path, "0002")
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 0)
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_uninstall_apphooks_with_apphook(self):
+        create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+        create_page(
+            'Hello 2', "nav_playground.html", "en", apphook=APPHOOK_NAMESPACE,
+            apphook_namespace='any'
+        )
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+        self.assertEqual(Page.objects.filter(
+            application_urls=APPHOOK_NAMESPACE, application_namespace='any'
+        ).count(), 1)
+        command = cms.Command()
+        out = StringIO()
+        command.stdout = out
+        command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
+        self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
+
+        out = StringIO()
+        command.stdout = out
+        command.handle("uninstall", "apphooks", APPHOOK_NAMESPACE, interactive=False)
+        self.assertEqual(out.getvalue(), "1 'NamespacedApp' apphooks uninstalled\n")
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK_NAMESPACE).count(), 0)
+        self.assertEqual(Page.objects.filter(application_namespace='any').count(), 0)
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_list_plugins(self):
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
+                                 name="A Link", url="https://www.django-cms.org")
+        self.assertEqual(
+            CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
+            2)
+        self.assertEqual(
+            CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(),
+            1)
+
+        # create a CMSPlugin with an unsaved instance
+        instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
+        instanceless_plugin.save()
+
+        # create a bogus CMSPlugin to simulate one which used to exist but
+        # is no longer installed
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+        bogus_plugin.save()
+
+        report = plugin_report()
+
+        # there should be reports for three plugin types
+        self.assertEqual(
+            len(report),
+            3)
+
+        # check the bogus plugin
+        bogus_plugins_report = report[0]
+        self.assertEqual(
+            bogus_plugins_report["model"],
+            None)
+
+        self.assertEqual(
+            bogus_plugins_report["type"],
+            u'BogusPlugin')
+
+        self.assertEqual(
+            bogus_plugins_report["instances"][0],
+            bogus_plugin)
+
+        # check the link plugin
+        link_plugins_report = report[1]
+        self.assertEqual(
+            link_plugins_report["model"],
+            link_plugin.__class__)
+
+        self.assertEqual(
+            link_plugins_report["type"],
+            u'LinkPlugin')
+
+        self.assertEqual(
+            link_plugins_report["instances"][0].get_plugin_instance()[0],
+            link_plugin)
+
+        # check the text plugins
+        text_plugins_report = report[2]
+        self.assertEqual(
+            text_plugins_report["model"],
+            TextPlugin.model)
+
+        self.assertEqual(
+            text_plugins_report["type"],
+            u'TextPlugin')
+
+        self.assertEqual(
+            len(text_plugins_report["instances"]),
+            3)
+
+        self.assertEqual(
+            text_plugins_report["instances"][2],
+            instanceless_plugin)
+
+        self.assertEqual(
+            text_plugins_report["unsaved_instances"],
+            [instanceless_plugin])
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_delete_orphaned_plugins(self):
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, "LinkPlugin", "en",
+                   name="A Link", url="https://www.django-cms.org")
+
+        instanceless_plugin = CMSPlugin(
+            language="en", plugin_type="TextPlugin")
+        instanceless_plugin.save()
+
+        # create a bogus CMSPlugin to simulate one which used to exist but
+        # is no longer installed
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+        bogus_plugin.save()
+
+        report = plugin_report()
+
+        # there should be reports for three plugin types
+        self.assertEqual(
+            len(report),
+            3)
+
+        # check the bogus plugin
+        bogus_plugins_report = report[0]
+        self.assertEqual(
+            len(bogus_plugins_report["instances"]),
+            1)
+
+        # check the link plugin
+        link_plugins_report = report[1]
+        self.assertEqual(
+            len(link_plugins_report["instances"]),
+            1)
+
+        # check the text plugins
+        text_plugins_report = report[2]
+        self.assertEqual(
+            len(text_plugins_report["instances"]),
+            3)
+
+        self.assertEqual(
+            len(text_plugins_report["unsaved_instances"]),
+            1)
+
+        management.call_command(
+            'cms', 'delete_orphaned_plugins',
+            stdout=StringIO(), interactive=False)
+        report = plugin_report()
+
+        # there should be reports for two plugin types (one should have been deleted)
+        self.assertEqual(
+            len(report),
+            2)
+
+        # check the link plugin
+        link_plugins_report = report[0]
+        self.assertEqual(
+            len(link_plugins_report["instances"]),
+            1)
+
+        # check the text plugins
+        text_plugins_report = report[1]
+        self.assertEqual(
+            len(text_plugins_report["instances"]),
+            2)
+
+        self.assertEqual(
+            len(text_plugins_report["unsaved_instances"]),
+            0)
+
+    # in Django 1.7 (but not in 1.8), call_command() runs system checks. This
+    # can be removed when support for 1.7 is dropped
+    if override_system_checks:
+        test_delete_orphaned_plugins = override_system_checks([])(test_delete_orphaned_plugins)
+
+    def test_uninstall_plugins_without_plugin(self):
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("uninstall", "plugins", PLUGIN, interactive=False)
+        self.assertEqual(out.getvalue(), "no 'TextPlugin' plugins found\n")
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
+    def test_uninstall_plugins_with_plugin(self):
+        out = StringIO()
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 1)
+        command = cms.Command()
+        command.stdout = out
+        command.handle("uninstall", "plugins", PLUGIN, interactive=False)
+        self.assertEqual(out.getvalue(), "1 'TextPlugin' plugins uninstalled\n")
+        self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 0)
+
+
+class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
+
+    def _fill_page_body(self, page, lang):
+        ph_en = page.placeholders.get(slot="body")
+        # add misc plugins
+        mcol1 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child")
+        add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
+        col2 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
+        mcol2 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child", target=col2)
+        add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
+        col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
+        # add a *nested* link plugin
+        add_plugin(ph_en, "LinkPlugin", lang, target=col4,
+                                    name="A Link", url="https://www.django-cms.org")
+        static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()), site_id=1)
+        static_placeholder.save()
+        add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
+
+    def setUp(self):
+        pages = Page.objects.drafts()
+        for page in pages:
+            self._fill_page_body(page, "en")
+
+    def test_copy_langs(self):
+        """
+        Various checks here:
+
+         * plugins are exactly doubled, half per language with no orphaned plugin
+         * the bottom-most plugins in the nesting chain maintain the same position and the same content
+         * the top-most plugin are of the same type
+        """
+        site = 1
+        number_start_plugins = CMSPlugin.objects.all().count()
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-lang", "en", "de")
+        pages = Page.objects.on_site(site).drafts()
+        for page in pages:
+            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+        # These asserts that no orphaned plugin exists
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
+        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
+
+        root_page = Page.objects.on_site(site).get_home()
+        root_plugins = CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
+
+        first_plugin_en, _ = root_plugins.get(language='en', parent=None).get_plugin_instance()
+        first_plugin_de, _ = root_plugins.get(language='de', parent=None).get_plugin_instance()
+
+        self.assertEqual(first_plugin_en.plugin_type, first_plugin_de.plugin_type)
+
+        link_en, _ = root_plugins.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
+        link_de, _ = root_plugins.get(language='de', plugin_type='LinkPlugin').get_plugin_instance()
+
+        self.assertEqual(link_en.url, link_de.url)
+        self.assertEqual(link_en.get_position_in_placeholder(), link_de.get_position_in_placeholder())
+
+        stack_plugins = CMSPlugin.objects.filter(placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
+
+        stack_text_en, _ = stack_plugins.get(language='en', plugin_type='TextPlugin').get_plugin_instance()
+        stack_text_de, _ = stack_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
+
+        self.assertEqual(stack_text_en.plugin_type, stack_text_de.plugin_type)
+        self.assertEqual(stack_text_en.body, stack_text_de.body)
+
+    def test_copy_sites(self):
+        """
+        Various checks here:
+
+         * plugins are exactly doubled, half per site with no orphaned plugin
+         * the bottom-most plugins in the nesting chain maintain the same position and the same content
+         * the top-most plugin are of the same type
+        """
+        site_1_pk = 1
+        site_2 = Site.objects.create(name='site 2')
+        site_2_pk = site_2.pk
+        phs = []
+        for page in Page.objects.on_site(site_1_pk).drafts():
+            phs.extend(page.placeholders.values_list('pk', flat=True))
+        number_start_plugins = CMSPlugin.objects.filter(placeholder__in=phs).count()
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-site", site_1_pk, site_2_pk)
+        for page in Page.objects.on_site(site_1_pk).drafts():
+            page.publish('en')
+        for page in Page.objects.on_site(site_2_pk).drafts():
+            page.publish('en')
+        pages_1 = list(Page.objects.on_site(site_1_pk).drafts())
+        pages_2 = list(Page.objects.on_site(site_2_pk).drafts())
+        for index, page in enumerate(pages_1):
+            self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
+            self.assertEqual(page.depth, pages_2[index].depth)
+
+        phs_1 = []
+        phs_2 = []
+        for page in Page.objects.on_site(site_1_pk).drafts():
+            phs_1.extend(page.placeholders.values_list('pk', flat=True))
+        for page in Page.objects.on_site(site_2_pk).drafts():
+            phs_2.extend(page.placeholders.values_list('pk', flat=True))
+
+        # These asserts that no orphaned plugin exists
+        self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
+        self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
+
+        root_page_1 = Page.objects.on_site(site_1_pk).get_home(site_1_pk)
+        root_page_2 = Page.objects.on_site(site_2_pk).get_home(site_2_pk)
+        root_plugins_1 = CMSPlugin.objects.filter(placeholder=root_page_1.placeholders.get(slot="body"))
+        root_plugins_2 = CMSPlugin.objects.filter(placeholder=root_page_2.placeholders.get(slot="body"))
+
+        first_plugin_1, _ = root_plugins_1.get(language='en', parent=None).get_plugin_instance()
+        first_plugin_2, _ = root_plugins_2.get(language='en', parent=None).get_plugin_instance()
+
+        self.assertEqual(first_plugin_1.plugin_type, first_plugin_2.plugin_type)
+
+        link_1, _ = root_plugins_1.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
+        link_2, _ = root_plugins_2.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
+
+        self.assertEqual(link_1.url, link_2.url)
+        self.assertEqual(link_1.get_position_in_placeholder(), link_2.get_position_in_placeholder())
+
+    def test_copy_existing_title(self):
+        """
+        Even if a title already exists the copy is successfull, the original
+        title remains untouched
+        """
+        site = 1
+        number_start_plugins = CMSPlugin.objects.all().count()
+
+        # create an empty title language
+        root_page = Page.objects.on_site(site).get_home()
+        create_title("de", "root page de", root_page)
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-lang", "en", "de")
+        pages = Page.objects.on_site(site).drafts()
+        for page in pages:
+            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+
+        # Original Title untouched
+        self.assertEqual("root page de", Page.objects.on_site(site).get_home().get_title("de"))
+
+        # Plugins still copied
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
+        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
+
+    def test_copy_filled_placeholder(self):
+        """
+        If an existing title in the target language has plugins in a placeholder
+        that placeholder is skipped
+        """
+        site = 1
+        number_start_plugins = CMSPlugin.objects.all().count()
+
+        # create an empty title language
+        root_page = Page.objects.on_site(site).get_home()
+        create_title("de", "root page de", root_page)
+        ph = root_page.placeholders.get(slot="body")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World")
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-lang", "en", "de")
+
+        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
+        # one placeholder (with 7 plugins) is skipped, so the difference must be 6
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins-6)
+
+    def test_copy_filled_placeholder_force_copy(self):
+        """
+        If an existing title in the target language has plugins in a placeholder
+        and the command is called with *force-copy*, the plugins are copied on
+        top of the existing one
+        """
+        site = 1
+        number_start_plugins = CMSPlugin.objects.all().count()
+
+        # create an empty title language
+        root_page = Page.objects.on_site(site).get_home()
+        create_title("de", "root page de", root_page)
+        ph = root_page.placeholders.get(slot="body")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World")
+
+        root_plugins = CMSPlugin.objects.filter(placeholder=ph)
+        text_de_orig, _ = root_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-lang", "en", "de", "force-copy")
+
+        CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
+
+        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
+        # we have an existing plugin in one placeholder, so we have one more
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins+1)
+
+    def test_copy_from_non_existing_lang(self):
+        """
+        If an existing title in the target language has plugins in a placeholder
+        and the command is called with *force-copy*, the plugins are copied on
+        top of the existing one
+        """
+        site = 1
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-lang", "de", "fr", "verbose")
+        text = out.getvalue()
+        page_count = Page.objects.on_site(site).drafts().count() + 1
+        for idx in range(1, page_count):
+            self.assertTrue(text.find("Skipping page page%d, language de not defined" % idx) > -1)
+
+    def test_copy_site_safe(self):
+        """
+        Check that copy of languages on one site does not interfere with other
+        sites
+        """
+        site_other = 1
+        site_active = 2
+        origina_site1_langs = {}
+
+        number_start_plugins = CMSPlugin.objects.all().count()
+        site_obj = Site.objects.create(domain="sample2.com", name="sample2.com", pk=site_active)
+
+        for page in Page.objects.on_site(1).drafts():
+            origina_site1_langs[page.pk] = set(page.get_languages())
+
+        p1 = create_page('page1', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
+        create_page('page4', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
+        create_page('page2', published=True, in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
+
+        for page in Page.objects.on_site(site_active).drafts():
+            self._fill_page_body(page, 'de')
+
+        number_site2_plugins = CMSPlugin.objects.all().count() - number_start_plugins
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-lang", "de", "fr", "site=%s" % site_active)
+
+        for page in Page.objects.on_site(site_other).drafts():
+            self.assertEqual(origina_site1_langs[page.pk], set(page.get_languages()))
+
+        for page in Page.objects.on_site(site_active).drafts():
+            self.assertEqual(set(('de', 'fr')), set(page.get_languages()))
+
+        # plugins for site 1
+        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
+        # plugins for site 2 de
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_site2_plugins)
+        # plugins for site 2 fr
+        self.assertEqual(CMSPlugin.objects.filter(language='fr').count(), number_site2_plugins)
+        # global number of plugins
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins + number_site2_plugins*2)
+
+    def test_copy_bad_languages(self):
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        with self.assertRaises(CommandError) as command_error:
+            command.handle("copy-lang", "it", "fr")
+
+        self.assertEqual(str(command_error.exception), 'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')

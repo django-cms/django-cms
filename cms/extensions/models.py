@@ -1,7 +1,10 @@
+from django.db.models import ManyToManyField
+
 from cms.constants import PUBLISHER_STATE_DIRTY
 from django.db import models
 
 from cms.models import Page, Title
+from cms.utils.compat import DJANGO_1_7
 
 
 class BaseExtension(models.Model):
@@ -22,6 +25,18 @@ class BaseExtension(models.Model):
         :param oldinstance: the draft version of the extension
         """
         pass
+
+    @classmethod
+    def _get_related_objects(cls):
+        if DJANGO_1_7:
+            return list(cls._meta.get_all_related_objects())
+        else:
+            fields = cls._meta._get_fields(
+                forward=False, reverse=True,
+                include_parents=True,
+                include_hidden=False,
+            )
+            return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
     def copy(self, target, language):
         """

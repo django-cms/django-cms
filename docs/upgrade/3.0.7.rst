@@ -16,7 +16,7 @@ What's new in 3.0.7
 Bug Fixes
 =========
 
-* Fixes an issue with placeholderadmin permissions
+* Fixes an issue with ``placeholderadmin`` permissions
 * Numerous fixes for minor issues with the frontend UI
 * Fixes issue where the CMS would not reload pages properly if the URL contained a `#` symbol
 * Fixes an issue relating to `limit_choices_to` in `forms.MultiValueFields`
@@ -27,4 +27,4 @@ Project & Community Governance
 
 * Updates to community and project governance documentation
 * Added list of retired core developers
-* Added branch policy documentaion
+* Added branch policy documentation

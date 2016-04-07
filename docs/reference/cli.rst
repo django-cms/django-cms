@@ -20,7 +20,7 @@ Informational commands
 
 The ``list`` command is used to display information about your installation.
 
-It has two subcommands:
+It has two sub-commands:
 
 * ``cms list plugins`` lists all plugins that are used in your project.
 * ``cms list apphooks`` lists all apphooks that are used in your project.
@@ -59,7 +59,7 @@ Orphaned plugins are ones that exist in the CMSPlugins table, but:
 * have no corresponding saved instance in that particular plugin type's table
 
 Such plugins will cause problems when trying to use operations that need to copy
-pages (and thefore plugins), which includes ``cms moderator on`` as well as page
+pages (and therefore plugins), which includes ``cms moderator on`` as well as page
 copy operations in the admin.
 
 It is advised to run ``cms list plugins`` periodically, and ``cms
@@ -71,7 +71,7 @@ delete_orphaned_plugins`` when required.
 The ``uninstall`` subcommand can be used to make uninstalling a CMS
 Plugin or an apphook easier.
 
-It has two subcommands:
+It has two sub-commands:
 
 * ``cms uninstall plugins <plugin name> [<plugin name 2> [...]]`` uninstalls
   one or several plugins by **removing** them from all pages where they are
@@ -110,7 +110,7 @@ It accepts the following options
 
 * ``force-copy``: set to copy content even if a placeholder already has content;
   if set, copied content will be appended to the original one;
-* ``site``: specifiy a SITE_ID to operate on sites different from the current one;
+* ``site``: specify a SITE_ID to operate on sites different from the current one;
 * ``verbose``: set for more verbose output.
 
 Example::
@@ -125,7 +125,7 @@ Example::
 The ``copy-site`` subcommand can be used to copy content (pages and plugins)
 from one site to another.
 The subcommand copy content from the ``from_site`` to ``to_site``; please note
-that static placehoders are copied as they are shared across sites.
+that static placeholders are copied as they are shared across sites.
 The whole source tree is copied, in the root of the target website.
 Existing pages on the target website are not modified.
 
