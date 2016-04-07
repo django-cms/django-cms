@@ -235,8 +235,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             # Ensure we have up to date mptt properties
             public_page = Page.objects.get(pk=moved_page.publisher_public_id)
             # Ensure that the page is in the right position and save it
-            moved_page._publisher_save_public(public_page)
-            public_page = public_page.reload()
+            public_page = moved_page._publisher_save_public(public_page)
             cms_signals.page_moved.send(sender=Page, instance=public_page)
 
             page_utils.check_title_slugs(public_page)
@@ -838,6 +837,13 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 publisher_public = page.publisher_public
 
                 if not publisher_public.parent_id:
+                    # This page clearly has a parent because it shows up
+                    # when calling self.get_descendants()
+                    # So this condition can be True when a published page
+                    # is moved under a page that has never been published.
+                    # It's draft version (page) has a reference to the new parent
+                    # but it's live version does not because it was never set
+                    # since it didn't exist when the move happened.
                     publisher_public = page._publisher_save_public(publisher_public)
 
                 # Check if the parent of this page's
