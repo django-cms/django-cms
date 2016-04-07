@@ -13,7 +13,6 @@ if '--CMS_PERMISSION=False' in sys.argv:
     permission = False
 
 gettext = noop_gettext
-print sys.argv
 
 HELPER_SETTINGS = dict(
     CMS_PERMISSION=permission,
