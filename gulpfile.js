@@ -411,7 +411,6 @@ gulp.task('tests:integration', function (done) {
                 });
                 var serverPid;
 
-
                 return integrationTests.startServer(serverArgs)
                     .then(function (pid) {
                         serverPid = pid;
