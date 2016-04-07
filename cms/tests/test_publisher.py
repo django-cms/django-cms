@@ -785,7 +785,8 @@ class PublishingTests(TestCase):
         page = self.create_page("Page", published=True)
         child_1 = self.create_page("Child", parent=page, published=False)
         child_1_2 = self.create_page("Grandchild2", parent=child_1, published=False)
-        child_1_3 = self.create_page("Grandchild3", parent=child_1, published=True)
+
+        self.create_page("Grandchild3", parent=child_1, published=True)
 
         # Reload "Child" page because it's tree attributes changed when adding
         # children to it above.
