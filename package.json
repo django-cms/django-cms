@@ -2,6 +2,7 @@
   "name": "djangoCMS",
   "private": true,
   "devDependencies": {
+    "bluebird": "^3.3.4",
     "browserslist-saucelabs": "^0.2.3",
     "casperjs": "^1.1.0-beta5",
     "gulp": "3.9.0",
@@ -28,6 +29,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-phantomjs-shim": "^1.1.2",
     "karma-sauce-launcher": "^0.3.0",
+    "lodash": "^4.8.2",
     "minimist": "1.1.1",
     "phantomjs-prebuilt": "^2.1.5",
     "shelljs": "^0.6.0",
