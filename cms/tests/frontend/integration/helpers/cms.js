@@ -121,6 +121,74 @@ module.exports = function (casperjs) {
         },
 
         /**
+         * _modifyPageAdvancedSettings
+         *
+         * @private
+         * @param opts
+         */
+        _modifyPageAdvancedSettings: function _modifyPageAdvancedSettings(opts) {
+            var that = this;
+            return function () {
+                return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.cms-pagetree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .then(function () {
+                        var pageId = that.getPageId(opts.page);
+                        this.thenOpen(globals.adminPagesUrl + pageId + '/advanced-settings/');
+                    })
+                    .waitForSelector('#page_form', function () {
+                        this.fill('#page_form', opts.fields, true);
+                    })
+                    .waitForUrl(/page/)
+                    .waitUntilVisible('.success')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .wait(1000);
+            };
+        },
+
+        addApphookToPage: function addApphookToPage(opts) {
+            return this._modifyPageAdvancedSettings({
+                page: opts.page,
+                fields: {
+                    application_urls: opts.apphook
+                }
+            });
+        },
+
+        setPageTemplate: function setPageTemplate(opts) {
+            return this._modifyPageAdvancedSettings({
+                page: opts.page,
+                fields: {
+                    template: opts.template
+                }
+            });
+        },
+
+        publishPage: function publishPage(opts) {
+            var that = this;
+            return function () {
+                var pageId;
+                return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.cms-pagetree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .then(function () {
+                        pageId = that.getPageId(opts.page);
+                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span');
+                    })
+                    .waitUntilVisible('.cms-tree-tooltip-container', function () {
+                        this.click('.cms-tree-tooltip-container-open a[href*="/en/publish/"]');
+                    })
+                    .waitForResource(/publish/)
+                    .waitUntilVisible('.cms-pagetree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .wait(1000);
+            };
+        },
+
+        /**
          * Adds the plugin. If the parent is not specified, plugin
          * is added to the first placeholder on the page.
          *
