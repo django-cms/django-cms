@@ -79,6 +79,10 @@ HELPER_SETTINGS = dict(
         'djangocms_grid',
         'filer',
         'aldryn_bootstrap3',
+        'cms.test_utils.project.placeholderapp',
+    ],
+    MIDDLEWARE_CLASSES=[
+        'cms.middleware.utils.ApphookReloadMiddleware',
     ],
     TEMPLATE_DIRS=(
         os.path.join(
@@ -88,6 +92,7 @@ HELPER_SETTINGS = dict(
     CMS_TEMPLATES=(
         ('fullwidth.html', 'Fullwidth'),
         ('page.html', 'Standard page'),
+        ('simple.html', 'Simple page'),
     ),
 )
 

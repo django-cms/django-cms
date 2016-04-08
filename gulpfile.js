@@ -125,7 +125,8 @@ var INTEGRATION_TESTS = [
         'editContentTools',
         'publish',
         'loginToolbar',
-        'changeSettings'
+        'changeSettings',
+        'toolbar-login-apphooks'
     ],
     [
         'pagetree',
