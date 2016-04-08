@@ -249,53 +249,82 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if obj:
             return form_class
 
-        plugin_type = self.__class__.__name__
+        plugin_data = self.validate_add_request(request)
 
         class Form(form_class):
+
             def __init__(self, *args, **kwargs):
                 super(Form, self).__init__(*args, **kwargs)
-                self.instance.language = request.GET['plugin_language']
-                self.instance.placeholder_id = request.GET['placeholder_id']
-                self.instance.parent_id = request.GET.get(
-                    'plugin_parent', None
-                )
-                self.instance.plugin_type = plugin_type
-
+                self.instance.language = plugin_data['plugin_language']
+                self.instance.placeholder = plugin_data['placeholder_id']
+                self.instance.parent = plugin_data.get('plugin_parent', None)
+                self.instance.plugin_type = plugin_data['plugin_type']
+                self.instance.position = plugin_data['position']
         return Form
 
     def validate_add_request(self, request):
         from cms.admin.forms import PluginAddValidationForm
 
-        form = PluginAddValidationForm(
-            data=request.GET,
-            plugin_type=self.__class__.__name__,
-        )
+        if getattr(self, "cms_plugin_instance"):
+            # cms_plugin_instance points to an instance of CMSPlugin
+            # this instance is set when the user edits plugin
+            # that has no real instance aka a "ghost plugin".
+            # This can easily happen in <= CMS 3.2 if the user
+            # adds a plugin and then reloads the page without canceling
+            # or submitting the form.
+            # No need to validate the data in this plugin because
+            # it's already been created.
+            plugin = self.cms_plugin_instance
+            plugin_data = {
+                'placeholder_id': plugin.placeholder,
+                'plugin_language': plugin.language,
+                'plugin_parent': plugin.parent,
+                'plugin_position': plugin.position,
+                'plugin_type': plugin.plugin_type,
+            }
+        else:
+            form = PluginAddValidationForm(
+                data=request.GET,
+                plugin_type=self.__class__.__name__,
+            )
 
-        if not form.is_valid():
-            error = list(form.errors.values())[0]
-            raise ValidationError(message=force_text(error))
+            if form.is_valid():
+                plugin_data = form.cleaned_data
+                plugin_data['plugin_type'] = form.plugin_type
+            else:
+                error = list(form.errors.values())[0]
+                raise ValidationError(message=force_text(error))
 
-        placeholder = form.cleaned_data['placeholder_id']
+        if not plugin_data['placeholder_id'].has_add_permission(request):
+            # No need to run self.has_add_permission(request)
+            # This method (validate_add_request) is called on get_form
+            # and get_form is called after Django checks permissions.
+            raise PermissionDenied
 
-        if (self.has_add_permission(request) and
-                placeholder.has_add_permission(request)):
-            data = form.cleaned_data
-            data['plugin_type'] = form.plugin_type
-            return data
-        raise PermissionDenied
+        parent = plugin_data.get('plugin_parent')
+
+        if parent:
+            position = parent.cmsplugin_set.count()
+        else:
+            position = CMSPlugin.objects.filter(
+                parent__isnull=True,
+                language=plugin_data['plugin_language'],
+                placeholder=plugin_data['placeholder_id'],
+            ).count()
+
+        plugin_data['position'] = position
+        return plugin_data
 
     def add_view(self, request, form_url='', extra_context=None):
         try:
-            self.validate_add_request(request)
+            response = super(CMSPluginBase, self).add_view(
+                request, form_url, extra_context)
         except PermissionDenied:
             message = force_text(_('You do not have permission to add a plugin'))
             return HttpResponseForbidden(message)
         except ValidationError as error:
             return HttpResponseBadRequest(error.message)
-
-        return super(CMSPluginBase, self).add_view(
-            request, form_url, extra_context
-        )
+        return response
 
     def render_close_frame(self):
         return render_to_response(
@@ -327,19 +356,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 # subclassing cms_plugin_instance (one to one relation)
                 value = getattr(self.cms_plugin_instance, field.name)
                 setattr(obj, field.name, value)
-        # When adding an object, it won't have a position
-        if not obj.position:
-            if obj.parent_id:
-                position = CMSPlugin.objects.filter(
-                    parent_id=obj.parent_id
-                ).count()
-            else:
-                position = CMSPlugin.objects.filter(
-                    parent__isnull=True,
-                    language=obj.language,
-                    placeholder_id=obj.placeholder_id,
-                ).count()
-            obj.position = position
 
         # remember the saved object
         self.saved_object = obj
