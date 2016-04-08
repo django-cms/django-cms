@@ -121,10 +121,11 @@ module.exports = function (casperjs) {
         },
 
         /**
-         * _modifyPageAdvancedSettings
-         *
+         * @function _modifyPageAdvancedSettings
          * @private
-         * @param opts
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {Object} opts.fields { fieldName: value, ... }
          */
         _modifyPageAdvancedSettings: function _modifyPageAdvancedSettings(opts) {
             var that = this;
@@ -147,6 +148,12 @@ module.exports = function (casperjs) {
             };
         },
 
+        /**
+         * @function addApphookToPage
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} opts.apphook app name
+         */
         addApphookToPage: function addApphookToPage(opts) {
             return this._modifyPageAdvancedSettings({
                 page: opts.page,
@@ -156,6 +163,12 @@ module.exports = function (casperjs) {
             });
         },
 
+        /**
+         * @function setPageTemplate
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} opts.tempalte template file name (e.g. simple.html)
+         */
         setPageTemplate: function setPageTemplate(opts) {
             return this._modifyPageAdvancedSettings({
                 page: opts.page,
@@ -165,6 +178,11 @@ module.exports = function (casperjs) {
             });
         },
 
+        /**
+         * @function publishPage
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         */
         publishPage: function publishPage(opts) {
             var that = this;
             return function () {
