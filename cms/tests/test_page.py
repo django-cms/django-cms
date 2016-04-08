@@ -766,7 +766,7 @@ class PagesTestCase(CMSTestCase):
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data3['slug'])
 
-    def test_move_page_sibling_integrity(self):
+    def test_move_page_integrity(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_home = self.get_new_page_data()
@@ -793,31 +793,67 @@ class PagesTestCase(CMSTestCase):
             )
             page_child_2.publish('en')
 
-            # Create another root page that was meant as child page
-            page_accidental_root = create_page("Child 3", 'col_three.html', "en")
+            # Create two root pages that ware meant as child pages
+            page_child_3 = create_page("Child 3", 'col_three.html', "en")
+            page_child_4 = create_page("Child 4", 'col_three.html', "en", published=True)
 
             # Correct our mistake.
-            # Move accidental root page to be child of parent page
+            # Move page_child_3 to be child of parent page
             data = {
-                "id": page_accidental_root.pk,
+                "id": page_child_3.pk,
                 "target": page_root.pk,
                 "position": "0",
             }
             response = self.client.post(
-                URL_CMS_PAGE_MOVE % page_accidental_root.pk,
+                URL_CMS_PAGE_MOVE % page_child_3.pk,
+                data,
+            )
+            self.assertEqual(response.status_code, 200)
+
+            # Un-publish page_child_4
+            page_child_4.unpublish('en')
+
+            # Move page_child_4 to be child of parent page
+            data = {
+                "id": page_child_4.pk,
+                "target": page_root.pk,
+                "position": "0",
+            }
+            response = self.client.post(
+                URL_CMS_PAGE_MOVE % page_child_4.pk,
                 data,
             )
             self.assertEqual(response.status_code, 200)
 
             page_root = page_root.reload()
+            page_child_4 = page_child_4.reload()
 
             # Ensure move worked
-            self.assertEqual(page_root.get_descendants().count(), 3)
+            self.assertEqual(page_root.get_descendants().count(), 4)
 
-            # Ensure page is still unpublished
+            # Ensure page_child_3 is still unpublished
             self.assertEqual(
-                page_accidental_root.get_publisher_state("en"),
+                page_child_3.get_publisher_state("en"),
                 PUBLISHER_STATE_DIRTY
+            )
+            self.assertEqual(page_child_3.is_published("en"), False)
+
+            # Ensure page_child_4 is still unpublished
+            self.assertEqual(
+                page_child_4.get_publisher_state("en"),
+                PUBLISHER_STATE_DIRTY
+            )
+            self.assertEqual(page_child_4.is_published("en"), False)
+
+            # And it's public page is still has the published state
+            # but is marked as unpublished
+            self.assertEqual(
+                page_child_4.publisher_public.get_publisher_state("en"),
+                PUBLISHER_STATE_DEFAULT
+            )
+            self.assertEqual(
+                page_child_4.publisher_public.is_published("en"),
+                False,
             )
 
             # Ensure child one is still published
@@ -825,12 +861,14 @@ class PagesTestCase(CMSTestCase):
                 page_child_1.get_publisher_state("en"),
                 PUBLISHER_STATE_DEFAULT
             )
+            self.assertEqual(page_child_1.is_published("en"), True)
 
             # Ensure child two is still published
             self.assertEqual(
                 page_child_2.get_publisher_state("en"),
                 PUBLISHER_STATE_DEFAULT
             )
+            self.assertEqual(page_child_2.is_published("en"), True)
 
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
