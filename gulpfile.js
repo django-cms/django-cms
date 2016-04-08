@@ -229,6 +229,10 @@ var integrationTests = {
             if (argv && argv.clean) {
                 child_process.execSync('rm -rf testdb.sqlite');
             }
+            if (argv && argv.server === false) {
+                resolve(false);
+                return;
+            }
             var server = spawn('python', ['testserver.py', args]);
             gutil.log('Starting a server');
             server.stdout.on('data', function (data) {
@@ -423,14 +427,18 @@ gulp.task('tests:integration', function (done) {
                     })
                     .then(function (exitCode) {
                         return new Promise(function (resolve, reject) {
-                            terminate(serverPid, function () {
-                                items.push(exitCode);
+                            var finish = function () {
                                 if (exitCode === 0) {
                                     resolve(items);
                                 } else {
                                     reject('Failure');
                                 }
-                            });
+                            };
+                            if (serverPid) {
+                                terminate(serverPid, finish);
+                            } else {
+                                finish();
+                            }
                         });
                     });
             }, []);
