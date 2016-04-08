@@ -16,7 +16,7 @@ from cms.models import CMSPlugin, Title, Page
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
+from cms.utils.i18n import get_language_tuple, force_language, get_language_dict, get_default_language
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting, get_language_from_request
 from cms.utils.permissions import (
@@ -108,10 +108,12 @@ class PlaceholderToolbar(CMSToolbar):
         disabled = user and hasattr(self, "page") and len(
             list(entry_choices(user, self.page))) == 0
 
+        lang = get_language_from_request(self.request, current_page=self.page) or get_default_language()
+
         url = '{url}?page={page}&language={lang}&edit'.format(
             url=reverse("cms_wizard_create"),
             page=page_pk,
-            lang=get_language_from_request(self.request),
+            lang=lang,
         )
         self.toolbar.add_modal_button(title, url,
                                       side=self.toolbar.RIGHT,
