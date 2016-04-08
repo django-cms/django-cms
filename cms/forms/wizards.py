@@ -20,8 +20,8 @@ from cms.models.titlemodels import EmptyTitle
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.compat.dj import is_installed
-from cms.utils.urlutils import static_with_version
 from cms.utils.conf import get_cms_setting
+from cms.utils.urlutils import static_with_version
 
 try:
     # djangocms_text_ckeditor is not guaranteed to be available
