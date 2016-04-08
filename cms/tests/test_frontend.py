@@ -202,65 +202,6 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
                 del sys.modules[module]
 
 
-class ToolbarBasicTests(CMSLiveTests):
-    def setUp(self):
-        self.user = self.get_superuser()
-        Site.objects.create(domain='example.org', name='example.org')
-        self.base_url = self.live_server_url
-        self.driver.implicitly_wait(2)
-        super(ToolbarBasicTests, self).setUp()
-
-    def test_toolbar_login_view(self):
-        User = get_user_model()
-        create_page('Home', 'simple.html', 'en', published=True)
-        ex1 = Example1.objects.create(
-            char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
-            date_field=datetime.datetime.now()
-        )
-        try:
-            apphook_pool.register(Example1App)
-        except AppAlreadyRegistered:
-            pass
-        self.reload_urls()
-        create_page('apphook', 'simple.html', 'en', published=True,
-                    apphook=Example1App)
-
-
-        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys("what")
-        password_input.submit()
-        self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
-
-    def test_toolbar_login_cbv(self):
-        User = get_user_model()
-        try:
-            apphook_pool.register(Example1App)
-        except AppAlreadyRegistered:
-            pass
-        self.reload_urls()
-        create_page('Home', 'simple.html', 'en', published=True)
-        ex1 = Example1.objects.create(
-            char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
-            date_field=datetime.datetime.now()
-        )
-        create_page('apphook', 'simple.html', 'en', published=True,
-                    apphook=Example1App)
-        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys("what")
-        password_input.submit()
-        self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
-
-
 @override_settings(
     LANGUAGE_CODE='en',
     LANGUAGES=(('en', 'English'),
