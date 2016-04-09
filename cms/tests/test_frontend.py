@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 import os
 import sys
 import time
@@ -30,11 +29,7 @@ from selenium.common.exceptions import NoSuchElementException, NoAlertPresentExc
 
 from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
-from cms.apphook_pool import apphook_pool
-from cms.exceptions import AppAlreadyRegistered
 from cms.models import CMSPlugin, Page, Placeholder
-from cms.test_utils.project.placeholderapp.cms_apps import Example1App
-from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.conf import get_cms_setting
