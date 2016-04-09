@@ -53,14 +53,17 @@ class PluginModelBase(ModelBase):
         # fieldnames. Skip this check if the parent-child field has been
         # explicitly defined in the plugin subclass
         #
-        # NOTE: We only do concrete classes, skipping the abstract ones
-        if 'cmsplugin_ptr' not in attrs and not new_class._meta.abstract:
+        # NOTE: We skip abstract and proxied classes which are not autonomous ORM objects
+        if ('cmsplugin_ptr' not in attrs and
+                not new_class._meta.abstract and
+                not new_class._meta.proxy):
             for field in new_class._meta.fields:
-                if field.name == 'cmsplugin_ptr':
+                # NOTE: if related_name is already set, do not overwrite it
+                if field.name == 'cmsplugin_ptr' and field.rel.related_name is None:
                     app_label = new_class._meta.app_label
                     model_name = new_class._meta.concrete_model._meta.model_name
-                    field.rel.related_name = '{0}_{1}'.format(
-                        app_label, model_name)
+                    related = '{0}_{1}'.format(app_label, model_name)
+                    field.rel.related_name = related
 
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
