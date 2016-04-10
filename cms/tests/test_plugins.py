@@ -1872,3 +1872,23 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
         plugin_model = TestPluginBetaModel.objects.all()[0]
         self.assertEqual("ALPHA", plugin_model.alpha)
         self.assertEqual("BETA", plugin_model.beta)
+
+
+class MovePluginTestCase(PluginsTestBaseCase):
+
+    def test_move(self):
+        page = api.create_page('home', 'col_two.html', 'en')
+        ph = page.get_placeholders().get(slot='col_sidebar')
+        api.add_plugin(ph, 'TextPlugin', 'en', body='first')
+        api.add_plugin(ph, 'TextPlugin', 'en', body='second')
+        api.add_plugin(ph, 'TextPlugin', 'en', body='third')
+        qs1 = list(ph.get_plugins().order_by('path').values_list('pk', flat=True))
+        qs2 = list(ph.get_plugins().order_by('position').values_list('pk', flat=True))
+        self.assertListEqual(qs1, qs2)
+
+        last = ph.get_plugins().last()
+        last.move(last.get_siblings().first(), 'first-sibling')
+
+        qs1 = list(ph.get_plugins().order_by('path').values_list('pk', flat=True))
+        qs2 = list(ph.get_plugins().order_by('position').values_list('pk', flat=True))
+        self.assertListEqual(qs1, qs2)
