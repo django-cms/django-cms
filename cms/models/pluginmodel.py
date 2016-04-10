@@ -254,9 +254,9 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         super(CMSPlugin, self).move(target, pos)
         self = self.reload()
         try:
-            new_pos = max(CMSPlugin.objects.filter(parent_id=self.parent_id,
+            new_pos = max(CMSPlugin.objects.filter(parent_id=self.parent_id, path__lte=self.path,
                                                    placeholder_id=self.placeholder_id,
-                                                   language=self.language).exclude(pk=self.pk).order_by('depth', 'path').values_list('position', flat=True)) + 1
+                                                   language=self.language).exclude(pk=self.pk).order_by('path').values_list('position', flat=True)) + 1
         except ValueError:
             # This is the first plugin in the set
             new_pos = 0
