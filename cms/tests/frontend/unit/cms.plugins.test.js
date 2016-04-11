@@ -1529,5 +1529,16 @@ describe('CMS.Plugin', function () {
             expect(CMS.API.Toolbar._delegate).toHaveBeenCalledTimes(1);
             expect(CMS.API.Toolbar._delegate).toHaveBeenCalledWith(link);
         });
+
+        it('delegates to add plugin', function () {
+            spyOn(plugin, 'addPlugin');
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'add');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.addPlugin).toHaveBeenCalledWith('shmock', 'Submenu item', 'mock');
+        });
     });
 });
