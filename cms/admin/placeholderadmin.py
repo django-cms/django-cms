@@ -373,42 +373,15 @@ class PlaceholderAdminMixin(object):
         cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
         instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
+
         if not self.has_change_plugin_permission(request, cms_plugin):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this plugin")))
+
         plugin_admin.cms_plugin_instance = cms_plugin
         try:
             plugin_admin.placeholder = cms_plugin.placeholder
         except Placeholder.DoesNotExist:
             pass
-        if request.method == "POST":
-            # set the continue flag, otherwise plugin_admin will make redirect
-            # to list view, which actually doesn't exists
-            mutable_post = request.POST.copy()
-            mutable_post['_continue'] = True
-            request.POST = mutable_post
-        if request.POST.get("_cancel", False):
-            # cancel button was clicked
-            context = {
-                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-                'plugin': cms_plugin,
-                'is_popup': True,
-                "type": cms_plugin.get_plugin_name(),
-                'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
-                'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
-                'cancel': True,
-            }
-            instance = cms_plugin.get_plugin_instance()[0]
-            if instance:
-                context['name'] = force_text(instance)
-            else:
-                # cancelled before any content was added to plugin
-                cms_plugin.delete()
-                context.update({
-                    "deleted": True,
-                    'name': force_text(cms_plugin),
-                })
-            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
 
         if not instance:
             # instance doesn't exist, call add view

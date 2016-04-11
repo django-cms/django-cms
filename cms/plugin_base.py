@@ -15,6 +15,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.urlresolvers import reverse
+from django.template.defaultfilters import force_escape, escapejs
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -267,7 +268,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         if getattr(self, "cms_plugin_instance"):
             # cms_plugin_instance points to an instance of CMSPlugin
-            # this instance is set when the user edits plugin
             # that has no real instance aka a "ghost plugin".
             # This can easily happen in <= CMS 3.2 if the user
             # adds a plugin and then reloads the page without canceling
@@ -326,9 +326,18 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             return HttpResponseBadRequest(error.message)
         return response
 
-    def render_close_frame(self):
+    def render_close_frame(self, obj):
+        context = {
+            'plugin': obj,
+            'is_popup': True,
+            'name': force_text(obj),
+            "type": obj.get_plugin_name(),
+            'plugin_id': obj.pk,
+            'icon': force_escape(obj.get_instance_icon_src()),
+            'alt': force_escape(obj.get_instance_icon_alt()),
+        }
         return render_to_response(
-            'admin/cms/page/close_frame.html', {'is_popup': True}
+            'admin/cms/page/plugin/confirm_form.html', context
         )
 
     def response_post_save_add(self, request, obj):
@@ -337,7 +346,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         an admin site directly and the add_view is accessed via frontend
         editing.
         """
-        return self.render_close_frame()
+        return self.render_close_frame(obj)
 
     def save_model(self, request, obj, form, change):
         """
@@ -383,7 +392,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             # prevent Django from rendering it's popup_close html
             # Django's template assumes certain js functions
             # and so will throw an error when adding plugins.
-            return self.render_close_frame()
+            return self.render_close_frame(obj)
 
         post_url_continue = reverse('admin:cms_page_edit_plugin',
                 args=(obj._get_pk_val(),),

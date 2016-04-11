@@ -11,9 +11,8 @@ window.CMS || window.parent.CMS || document.write(
 </script>
 <script>
 (function(Window) {
-// CMS.$ will be passed for $
-Window.CMS.$(document).ready(function () {
     // the dataBridge is used to access plugin information from different ressources
+    // Do NOT move this!!!
     Window.CMS.API.Helpers.dataBridge = {
         'plugin_id': '{{ plugin_id|unlocalize }}',
         'plugin_type': '{{ type }}',
@@ -21,6 +20,8 @@ Window.CMS.$(document).ready(function () {
         'plugin_icon': '{{ icon }}',
         'plugin_desc': '{{ alt }}'
     };
+// CMS.$ will be passed for $
+Window.CMS.$(document).ready(function () {
     // save current plugin
     Window.CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:500 }});
 });
