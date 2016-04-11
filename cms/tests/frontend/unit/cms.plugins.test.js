@@ -856,6 +856,10 @@ describe('CMS.Plugin', function () {
                 dragbars: [],
                 states: []
             };
+            CMS.API.Toolbar = {
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
 
             $(function () {
                 CMS.Plugin._initializeGlobalHandlers();
@@ -1006,6 +1010,11 @@ describe('CMS.Plugin', function () {
                     }
                 };
 
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
                 plugin = new CMS.Plugin('cms-plugin-1', {
                     type: 'plugin',
                     plugin_id: 1,
@@ -1131,6 +1140,26 @@ describe('CMS.Plugin', function () {
                 copy_plugin: 'new-copy-url',
                 newObject: true
             });
+        });
+
+        it('shows and hides the loader if success', function (done) {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success({});
+                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                done();
+            });
+            plugin.movePlugin();
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+        });
+
+        it('shows and hides the loader if error', function (done) {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.error({});
+                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                done();
+            });
+            plugin.movePlugin();
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
         });
 
         it('shows success animation', function () {
