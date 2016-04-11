@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-import time
 from importlib import import_module
 try:
     from urllib.parse import urlparse
@@ -21,15 +20,12 @@ from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 
-from cms.api import create_page, create_title, add_plugin
+from cms.api import create_page
 from cms.appresolver import clear_app_resolvers
-from cms.models import CMSPlugin, Page, Placeholder
+from cms.models import Page, Placeholder
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.conf import get_cms_setting
@@ -195,139 +191,6 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
         for module in url_modules:
             if module in sys.modules:
                 del sys.modules[module]
-
-
-@override_settings(
-    LANGUAGE_CODE='en',
-    LANGUAGES=(('en', 'English'),
-               ('it', 'Italian')),
-    CMS_LANGUAGES={
-        1: [{'code' : 'en',
-             'name': 'English',
-             'public': True},
-            {'code': 'it',
-             'name': 'Italian',
-             'public': True},
-        ],
-        'default': {
-            'public': True,
-            'hide_untranslated': False,
-        },
-    },
-    SITE_ID=1,
-)
-class PlaceholderBasicTests(FastLogin, CMSLiveTests):
-    def setUp(self):
-        Site.objects.create(domain='example.org', name='example.org')
-
-        self.page = create_page('Home', 'simple.html', 'en', published=True)
-        self.italian_title = create_title('it', 'Home italian', self.page)
-
-        self.placeholder = self.page.placeholders.all()[0]
-
-        add_plugin(self.placeholder, 'TextPlugin', 'en', body='test')
-
-        self.base_url = self.live_server_url
-
-        self.user = self._create_user('admin', True, True, True)
-
-        self.driver.implicitly_wait(5)
-
-        super(PlaceholderBasicTests, self).setUp()
-
-    def _login(self):
-        username = getattr(self.user, get_user_model().USERNAME_FIELD)
-        password = username
-        self._fastlogin(username=username, password=password)
-
-    def test_copy_from_language(self):
-        self._login()
-        self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-
-        # check if there are no plugins in italian version of the page
-
-        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
-        self.assertEqual(len(italian_plugins), 0)
-
-        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        build_button.click()
-
-        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu-settings')
-        submenu.click()
-
-        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
-        copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
-        copy_from_english.click()
-
-        # Done, check if the text plugin was copied and it is only one
-
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(2)')))
-
-        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
-        self.assertEqual(len(italian_plugins), 1)
-
-        plugin_instance = italian_plugins[0].get_plugin_instance()[0]
-
-        self.assertEqual(plugin_instance.body, 'test')
-
-    def test_copy_to_from_clipboard(self):
-        self.assertEqual(CMSPlugin.objects.count(), 1)
-        self._login()
-
-        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        build_button.click()
-
-        cms_draggable = self.driver.find_element_by_css_selector('.cms-dragarea-1 .cms-draggable')
-
-        hov = ActionChains(self.driver).move_to_element(cms_draggable)
-        hov.perform()
-
-        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu-settings')
-        submenu.click()
-
-        copy = cms_draggable.find_element_by_css_selector('.cms-submenu-dropdown a[data-rel="copy"]')
-        copy.click()
-
-        menu_trigger = self.driver.find_element_by_css_selector('.cms-toolbar-left .cms-toolbar-item-navigation li:first-child')
-
-        menu_trigger.click()
-
-        self.driver.find_element_by_css_selector('.cms-clipboard-trigger a').click()
-
-        # necessary sleeps for making a "real" drag and drop, that works with the clipboard
-        time.sleep(0.3)
-
-        self.assertEqual(CMSPlugin.objects.count(), 2)
-
-        drag = ActionChains(self.driver).click_and_hold(
-            self.driver.find_element_by_css_selector('.cms-clipboard-containers .cms-draggable:nth-child(1)')
-        )
-
-        drag.perform()
-
-        time.sleep(0.1)
-
-        drag = ActionChains(self.driver).move_to_element(
-            self.driver.find_element_by_css_selector('.cms-dragarea-1')
-        )
-        drag.perform()
-
-        time.sleep(0.2)
-
-        drag = ActionChains(self.driver).move_by_offset(
-            0, 10
-        ).release()
-
-        drag.perform()
-
-        time.sleep(0.5)
-
-        self.assertEqual(CMSPlugin.objects.count(), 3)
-
-        plugins = self.page.placeholders.all()[0].get_plugins_list('en')
-
-        self.assertEqual(len(plugins), 2)
 
 
 @override_settings(
