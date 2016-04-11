@@ -326,7 +326,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             return HttpResponseBadRequest(error.message)
         return response
 
-    def render_close_frame(self, obj):
+    def render_close_frame(self, obj, extra_context=None):
         context = {
             'plugin': obj,
             'is_popup': True,
@@ -336,6 +336,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             'icon': force_escape(obj.get_instance_icon_src()),
             'alt': force_escape(obj.get_instance_icon_alt()),
         }
+
+        if extra_context:
+            context.update(extra_context)
         return render_to_response(
             'admin/cms/page/plugin/confirm_form.html', context
         )
