@@ -657,7 +657,6 @@ class PluginAddValidationForm(forms.Form):
         CMSPlugin.objects.all(),
         required=False,
     )
-    plugin_position = forms.IntegerField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.plugin_type = kwargs.pop('plugin_type')
