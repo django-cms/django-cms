@@ -8,9 +8,13 @@ def noop_gettext(s):
     return s
 
 permission = True
+cms_toolbar_edit_on = 'edit'
 
 if '--CMS_PERMISSION=False' in sys.argv:
     permission = False
+
+if '--CMS_TOOLBAR_URL__EDIT_ON=test-edit' in sys.argv:
+    cms_toolbar_edit_on = 'test-edit'
 
 gettext = noop_gettext
 
@@ -41,6 +45,7 @@ HELPER_SETTINGS = dict(
         'content': 0,
         'permissions': 0,
     },
+    CMS_TOOLBAR_URL__EDIT_ON=cms_toolbar_edit_on,
     # required for integration tests
     LOGIN_URL='/admin/login/?user-login=test',
     CMS_LANGUAGES={

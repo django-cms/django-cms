@@ -126,7 +126,15 @@ var INTEGRATION_TESTS = [
         'publish',
         'loginToolbar',
         'changeSettings',
-        'toolbar-login-apphooks'
+        'toolbar-login-apphooks',
+        {
+            serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
+            file: 'copy-from-language'
+        },
+        {
+            serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
+            file: 'pagetree-no-permission'
+        }
     ],
     [
         'pagetree',
@@ -134,11 +142,7 @@ var INTEGRATION_TESTS = [
         'dragndrop',
         'history',
         'revertLive',
-        'narrowScreen',
-        {
-            serverArgs: '--CMS_PERMISSION=False',
-            file: 'pagetree-no-permission'
-        }
+        'narrowScreen'
     ]
 ];
 
@@ -222,7 +226,7 @@ var integrationTests = {
      * Respects `clean` cli argument to remove the existing local database.
      *
      * @method startServer
-     * @param {String} args plain string of arguments to be passed to testserver.py
+     * @param {String} args plain string of arguments to be passed to testserver.py (space separated)
      * @returns {Promise} fullfilled when sleep ends
      */
     startServer: function startServer(args) {
@@ -234,7 +238,7 @@ var integrationTests = {
                 resolve(false);
                 return;
             }
-            var server = spawn('python', ['testserver.py', args]);
+            var server = spawn('python', ['testserver.py'].concat(args.split(' ')));
             gutil.log('Starting a server');
             server.stdout.on('data', function (data) {
                 console.log(data.toString().slice(0, -1));
@@ -331,7 +335,10 @@ var integrationTests = {
             files = fileNames.map(function (fileName) {
                 return _.find(files, function (file) {
                     return file.file === fileName;
-                });
+                }) || {
+                    file: fileName,
+                    serverArgs: ''
+                };
             });
         }
 
