@@ -1452,6 +1452,82 @@ describe('CMS.Plugin', function () {
     });
 
     describe('._setupActions()', function () {
+        var plugin;
+        var tmpl = '<div class="cms-plugin-picker" data-parent-id="mock"><div class="cms-submenu-item {1}">' +
+            '<a href="{2}">Submenu item</a>' +
+            '</div></div>';
 
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy(),
+                    _delegate: jasmine.createSpy()
+                };
+                spyOn(CMS.Plugin, '_hideSettingsMenu');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('sets up touch event stopper', function () {
+            expect(plugin.ui.submenu.parent().find('.cms-submenu-edit')).toHandle(plugin.touchStart);
+            spyOn($.Event.prototype, 'stopPropagation')
+            plugin.ui.submenu.parent().find('.cms-submenu-edit').trigger(plugin.touchStart);
+            expect($.Event.prototype.stopPropagation).toHaveBeenCalled();
+        });
+
+        it('sets up click handlers on submenu items', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#href')).find('> div');
+            var link = nav.find('a');
+
+            plugin._setupActions(nav);
+
+            expect(link).toHandle(plugin.click);
+
+            spyOn($.Event.prototype, 'preventDefault')
+            spyOn($.Event.prototype, 'stopPropagation')
+
+            link.trigger(plugin.click);
+            expect($.Event.prototype.stopPropagation).toHaveBeenCalledTimes(1);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
+        });
+
+        it('by default delegates to toolbar', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#href')).find('> div');
+            var link = nav.find('a');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar._delegate).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar._delegate).toHaveBeenCalledWith(link);
+        });
     });
 });
