@@ -421,6 +421,19 @@ describe('CMS.Modal', function () {
             fixture.cleanup();
         });
 
+        it('returns false if modal-close event is prevented', function () {
+            CMS.API.Helpers.addEventListener('modal-close', function (e, opts) {
+                e.preventDefault();
+                expect(opts.instance).toEqual(modal);
+            });
+
+            spyOn(modal, '_hide').and.callThrough();
+            modal.open({ html: '<div></div>' });
+            expect(modal.close()).toEqual(false);
+            expect(modal._hide).not.toHaveBeenCalled();
+            CMS.API.Helpers.removeEventListener('modal-close');
+        });
+
         it('closes the modal', function (done) {
             modal.open({ html: '<div></div>' });
 
@@ -1016,6 +1029,7 @@ describe('CMS.Modal', function () {
             jasmine.clock().tick(modal.options.duration);
             expect(modal.maximize).toHaveBeenCalled();
         });
+
         it('removes the handler to close by ESC', function () {
             var spy = jasmine.createSpy();
 
@@ -1026,6 +1040,15 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).not.toHandle('keydown.cms.close');
             modal.ui.body.trigger('keydown.cms.close');
             expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('triggers modal-closed event', function (done) {
+            CMS.API.Helpers.addEventListener('modal-closed', function (e, opts) {
+                expect(opts.instance).toEqual(modal);
+                done();
+            });
+            modal._hide();
+            jasmine.clock().tick(modal.options.duration);
         });
     });
 
@@ -1534,7 +1557,7 @@ describe('CMS.Modal', function () {
             expect(modal.saved).toEqual(false);
             expect(modal.hideFrame).toEqual(undefined);
             expect(modal.close).toHaveBeenCalled();
-            expect(modal.options.onClose).toEqual(false);
+            expect(modal.options.onClose).toEqual(null);
             expect($.fn.hide).toHaveBeenCalledTimes(1);
         });
 
