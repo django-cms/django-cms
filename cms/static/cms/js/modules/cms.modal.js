@@ -366,8 +366,7 @@ var CMS = window.CMS || {};
             // add esc close event
             this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
                 if (e.keyCode === CMS.KEYS.ESC) {
-                    that.options.onClose = null;
-                    that.close();
+                    that._cancelHandler();
                 }
             });
 
@@ -381,6 +380,12 @@ var CMS = window.CMS || {};
          * @method close
          */
         close: function close() {
+            var event = CMS.API.Helpers.dispatchEvent('modal-close', { instance: this });
+
+            if (event.isDefaultPrevented()) {
+                return false;
+            }
+
             // handle refresh option
             if (this.options.onClose) {
                 this.reloadBrowser(this.options.onClose, false, true);
@@ -423,6 +428,7 @@ var CMS = window.CMS || {};
                     that.maximize();
                 }
                 that.trigger('cms.modal.closed');
+                CMS.API.Helpers.dispatchEvent('modal-closed', { instance: that });
             }, this.options.duration);
 
             this.ui.body.off('keydown.cms.close');
