@@ -182,9 +182,12 @@ module.exports = function (casperjs) {
          * @function publishPage
          * @param {Object} opts options
          * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} [opts.language='en'] language to publish
          */
         publishPage: function publishPage(opts) {
             var that = this;
+            var language = typeof opts.language !== 'undefined' ? opts.language : 'en';
+
             return function () {
                 var pageId;
                 return this.wait(1000).thenOpen(globals.adminPagesUrl)
@@ -193,10 +196,10 @@ module.exports = function (casperjs) {
                     .then(that.expandPageTree())
                     .then(function () {
                         pageId = that.getPageId(opts.page);
-                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span');
+                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/' + language + '/preview/"] span');
                     })
                     .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                        this.click('.cms-tree-tooltip-container-open a[href*="/en/publish/"]');
+                        this.click('.cms-tree-tooltip-container-open a[href*="/' + language + '/publish/"]');
                     })
                     .waitForResource(/publish/)
                     .waitUntilVisible('.cms-pagetree')
