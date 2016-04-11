@@ -149,9 +149,8 @@ var CMS = window.CMS || {};
             this.ui.closeAndCancel
                 .off(this.click + ' ' + this.touchEnd)
                 .on(this.click + ' ' + this.touchEnd, function (e) {
-                that.options.onClose = null;
                 e.preventDefault();
-                that.close();
+                that._cancelHandler();
             });
 
             // elements within the window
@@ -773,8 +772,7 @@ var CMS = window.CMS || {};
             // manually add cancel button at the end
             cancel.on(that.click, function (e) {
                 e.preventDefault();
-                that.options.onClose = false;
-                that.close();
+                that._cancelHandler();
             });
             cancel.wrap(group);
             render.append(cancel.parent());
@@ -950,7 +948,7 @@ var CMS = window.CMS || {};
                     // attach close event
                     body.on('keydown.cms', function (e) {
                         if (e.keyCode === CMS.KEYS.ESC) {
-                            that.close();
+                            that._cancelHandler();
                         }
                     });
 
@@ -1009,6 +1007,17 @@ var CMS = window.CMS || {};
             this.ui.frame.empty().append(opts.html);
             this.ui.titlePrefix.text(opts.title || '');
             this.ui.titleSuffix.text(opts.subtitle || '');
+        },
+
+        /**
+         * Called whenever default modal action is canceled.
+         *
+         * @method _cancelHandler
+         * @private
+         */
+        _cancelHandler: function _cancelHandler() {
+            this.options.onClose = null;
+            this.close();
         }
     });
 
