@@ -11,6 +11,7 @@
   respective animations.
 * Added unit tests for CMS JavaScript files
 * Added frontend integration tests (written with Casper JS)
+* Removed frontend integration tests (written with Selenium)
 * Provides the ability to declare cache expiration periods on a per-plugin basis
 
 === 3.2.3 (2016-03-09) ===
