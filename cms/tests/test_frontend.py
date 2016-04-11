@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 import os
 import sys
 import time
@@ -30,11 +29,7 @@ from selenium.common.exceptions import NoSuchElementException, NoAlertPresentExc
 
 from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
-from cms.apphook_pool import apphook_pool
-from cms.exceptions import AppAlreadyRegistered
 from cms.models import CMSPlugin, Page, Placeholder
-from cms.test_utils.project.placeholderapp.cms_apps import Example1App
-from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.conf import get_cms_setting
@@ -200,80 +195,6 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
         for module in url_modules:
             if module in sys.modules:
                 del sys.modules[module]
-
-
-class ToolbarBasicTests(CMSLiveTests):
-    def setUp(self):
-        self.user = self.get_superuser()
-        Site.objects.create(domain='example.org', name='example.org')
-        self.base_url = self.live_server_url
-        self.driver.implicitly_wait(2)
-        super(ToolbarBasicTests, self).setUp()
-
-    def test_toolbar_login(self):
-        User = get_user_model()
-        create_page('Home', 'simple.html', 'en', published=True)
-        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.assertTrue(User.objects.all().count(), 1)
-        self.driver.get(url)
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input.submit()
-        self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
-
-    def test_toolbar_login_view(self):
-        User = get_user_model()
-        create_page('Home', 'simple.html', 'en', published=True)
-        ex1 = Example1.objects.create(
-            char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
-            date_field=datetime.datetime.now()
-        )
-        try:
-            apphook_pool.register(Example1App)
-        except AppAlreadyRegistered:
-            pass
-        self.reload_urls()
-        create_page('apphook', 'simple.html', 'en', published=True,
-                    apphook=Example1App)
-
-
-        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys("what")
-        password_input.submit()
-        self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
-
-    def test_toolbar_login_cbv(self):
-        User = get_user_model()
-        try:
-            apphook_pool.register(Example1App)
-        except AppAlreadyRegistered:
-            pass
-        self.reload_urls()
-        create_page('Home', 'simple.html', 'en', published=True)
-        ex1 = Example1.objects.create(
-            char_1='char_1', char_2='char_1', char_3='char_3', char_4='char_4',
-            date_field=datetime.datetime.now()
-        )
-        create_page('apphook', 'simple.html', 'en', published=True,
-                    apphook=Example1App)
-        url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys("what")
-        password_input.submit()
-        self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
 
 @override_settings(

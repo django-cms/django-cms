@@ -144,6 +144,9 @@ test runner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
 Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are
 built using `CasperJS <http://casperjs.org/>`_.
 
+In order to be able to run them you need to install necessary dependencies as
+outlined in :ref:`frontend tooling installation instructions <contributing_frontend>`.
+
 Linting runs against the test files as well with ``gulp tests:lint``. In order
 to run linting continuously, do::
 
@@ -226,6 +229,11 @@ and run the tests with additional ``--screenshots`` argument. It will create
 ``screenshots`` folder with screenshots of almost every step of each test.
 Subsequent runs will override the existing files. Note that this is experimental
 and may change in the future.
+
+It might sometimes be useful not to restart the server when creating the tests,
+for that you can run ``python testserver.py`` with necessary arguments in one
+shell and ``gulp tests:integration --no-server`` in another. However you would
+need to clean the state yourself if the test you've been writing fails.
 
 *************
 Writing tests
