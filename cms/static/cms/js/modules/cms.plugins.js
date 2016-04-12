@@ -1138,12 +1138,6 @@ var CMS = window.CMS || {};
                     item.prevUntil('.cms-submenu-item-title').last().prev().show();
                 }
             });
-
-            // if there is no element visible, show only first categoriy
-            list.siblings('.cms-submenu-dropdown-children').show();
-            if (items.add(titles).filter(':visible').length <= 0) {
-                list.siblings('.cms-submenu-dropdown-children').hide();
-            }
         },
 
         /**

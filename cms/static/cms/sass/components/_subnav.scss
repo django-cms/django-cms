@@ -79,9 +79,6 @@
 .cms-submenu-dropdown-bottom {
     bottom: $structure-dragbar-height + $structure-dragarea-space;
 }
-.cms-submenu-dropdown-children {
-    right: $submenu-icon-area-size * 2 + $submenu-right * 3;
-}
 
 // TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
 .cms-submenu-dropdown-settings {
