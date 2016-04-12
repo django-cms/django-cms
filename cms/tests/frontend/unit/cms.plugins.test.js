@@ -1514,7 +1514,8 @@ describe('CMS.Plugin', function () {
                 CMS.API.Toolbar = {
                     showLoader: jasmine.createSpy(),
                     hideLoader: jasmine.createSpy(),
-                    _delegate: jasmine.createSpy()
+                    _delegate: jasmine.createSpy(),
+                    openAjax: jasmine.createSpy()
                 };
                 spyOn(CMS.Plugin, '_hideSettingsMenu');
                 done();
@@ -1568,6 +1569,45 @@ describe('CMS.Plugin', function () {
             link.trigger(plugin.click);
             expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
             expect(plugin.addPlugin).toHaveBeenCalledWith('shmock', 'Submenu item', 'mock');
+        });
+
+        it('delegates to add ajax plugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'ajax_add');
+            link.data('on-success', 'ON_SUCCESS');
+            link.data('post', { data: 'data' });
+            link.data('text', 'TEXT');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
+                url: '#shmock',
+                post: JSON.stringify({ data: 'data' }),
+                text: 'TEXT',
+                callback: jasmine.any(Function),
+                onSuccess: 'ON_SUCCESS'
+            });
+        });
+
+        it('delegates to edit plugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'edit');
+            spyOn(plugin, 'editPlugin');
+            plugin.options = {
+                urls: { edit_plugin: 'edit_plugin_url' },
+                plugin_name: 'MockPlugin',
+                plugin_breadcrumb: 'MockBreadcrumb'
+            };
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.editPlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.editPlugin).toHaveBeenCalledWith(
+                'edit_plugin_url',
+                'MockPlugin',
+                'MockBreadcrumb'
+            );
         });
     });
 });
