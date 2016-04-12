@@ -1,4 +1,4 @@
-/* globals window */
+/* globals window, document */
 'use strict';
 
 describe('CMS.Plugin', function () {
@@ -1691,6 +1691,96 @@ describe('CMS.Plugin', function () {
                 'MockPlugin',
                 'Breadcrumb'
             );
+        });
+    });
+
+    describe('_setupKeyBoardTraversing()', function () {
+        var plugin;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy(),
+                    _delegate: jasmine.createSpy(),
+                    openAjax: jasmine.createSpy()
+                };
+                done();
+            });
+        });
+
+        afterEach(function () {
+            $(document).off(plugin.keyDown + '.traverse');
+            fixture.cleanup();
+        });
+
+        it('returns if there is no plugin picker in the modal', function () {
+            expect(plugin._setupKeyboardTraversing()).toEqual(undefined);
+            expect($(document)).not.toHandle(plugin.keyDown + '.traverse');
+        });
+
+        it('unbinds old traversing keydown events', function () {
+            $(fixture.el).append('<div class="cms-modal-markup"></div>');
+            plugin.ui.dragitem.find('.cms-plugin-picker').appendTo('.cms-modal-markup');
+            var spy = jasmine.createSpy();
+            $(document).on(plugin.keyDown + '.traverse', spy);
+            plugin._setupKeyboardTraversing();
+            $(document).trigger(plugin.keyDown + '.traverse');
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('binds traversing keydown events', function () {
+            $(fixture.el).append('<div class="cms-modal-markup"></div>');
+            var picker = plugin.ui.dragitem.find('.cms-plugin-picker').show().appendTo('.cms-modal-markup');
+            plugin._setupKeyboardTraversing();
+            var anchors = picker.find('.cms-submenu-item:visible a');
+
+            var down = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.DOWN
+            });
+            var down1 = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.TAB
+            });
+            var up = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.UP
+            });
+            var up1 = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.TAB,
+                shiftKey: true
+            });
+
+            spyOn($.Event.prototype, 'preventDefault');
+            $(document).trigger(down);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
+            $(document).trigger(down1);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(2);
+            $(document).trigger(up);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(3);
+            $(document).trigger(up1);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(4);
         });
     });
 });
