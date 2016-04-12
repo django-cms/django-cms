@@ -8,6 +8,7 @@
         {% csrf_token %}
         {{ wizard.management_form }}
         {{ form.page }}
+        {{ form.language }}
 
         {% if form.errors %}
             <p class="errornote">

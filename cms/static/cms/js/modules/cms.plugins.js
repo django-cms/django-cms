@@ -294,17 +294,21 @@ var CMS = window.CMS || {};
             }
 
             var bounds = this.options.plugin_restriction;
-            var type = clipboardPlugin.data('settings').plugin_type;
-            var parent_bounds = $.grep(clipboardPlugin.data('settings').plugin_parent_restriction, function (r) {
-                // special case when PlaceholderPlugin has a parent restriction named "0"
-                return r !== '0';
-            });
-            var currentPluginType = this.options.plugin_type;
+            if (clipboardPlugin.data('settings')) {
+                var type = clipboardPlugin.data('settings').plugin_type;
+                var parent_bounds = $.grep(clipboardPlugin.data('settings').plugin_parent_restriction, function (r) {
+                    // special case when PlaceholderPlugin has a parent restriction named "0"
+                    return r !== '0';
+                });
+                var currentPluginType = this.options.plugin_type;
 
-            if ((bounds.length && $.inArray(type, bounds) === -1) ||
-                (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
-                pasteItem.addClass('cms-submenu-item-disabled');
-                pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
+                if ((bounds.length && $.inArray(type, bounds) === -1) ||
+                    (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
+                    return false;
+                }
+            } else {
                 return false;
             }
 
@@ -594,6 +598,8 @@ var CMS = window.CMS || {};
                 move_a_copy: options.move_a_copy
             };
 
+            CMS.API.Toolbar.showLoader();
+
             $.ajax({
                 type: 'POST',
                 url: options.urls.move_plugin,
@@ -613,6 +619,7 @@ var CMS = window.CMS || {};
 
                     // enable actions again
                     CMS.API.locked = false;
+                    CMS.API.Toolbar.hideLoader();
 
                     // TODO: show only if (response.status)
                     that._showSuccess(dragitem);
@@ -625,6 +632,7 @@ var CMS = window.CMS || {};
                         message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
                     });
+                    CMS.API.Toolbar.hideLoader();
                 }
             });
 

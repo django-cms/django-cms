@@ -12,7 +12,7 @@ Install the ``polls`` application
 
 Install the application from its GitHub repository using ``pip -e`` - this also places it in your virtualenv's ``src`` directory as a cloned Git repository::
 
-    pip install -e git+http://git@github.com/divio/django-polls.git#egg=django-polls
+    pip install -e git+http://git@github.com/divio/django-polls.git#egg=polls
 
 
 You should end up with a folder structure similar to this::
@@ -109,9 +109,9 @@ Refresh the ``/polls/`` page again, which should now be properly integrated into
 So now we have integrated the standard polls application into our project.
 
 
-*****************************************
-Create a new ``polls_plugin`` application
-*****************************************
+**************************************************
+Create a new ``polls_cms_integration`` application
+**************************************************
 
 So far, however, the polls application has been integrated into the project, but not into django CMS
 itself.
@@ -120,9 +120,9 @@ If you're already familiar with the CMS for a little, you'll have
 encountered django CMS *Plugins* - the objects you can place into placeholders on
 your pages: "Text", "Image" and so forth.
 
-We're now going to extend the Django poll application so we can embed a poll easily
-into any CMS page. We'll put this integration code in a separate package in our
-project.
+We're now going to extend the Django poll application so we can embed a poll easily into any CMS
+page. We'll put this integration code in a separate package, a *Polls/CMS Integration* application
+in our project.
 
 .. note:: **Why not build the plugin code into the polls application package?**
 
@@ -130,15 +130,15 @@ project.
     it's what we would recommend. For a third-party application such as Polls however, placing the
     plugin code into a separate package means we don't have to modify or fork the original.
 
-Create a new package at the project root called ``polls_plugin``::
+Create a new package at the project root called ``polls_cms_integration``::
 
-    python manage.py startapp polls_plugin
+    python manage.py startapp polls_cms_integration
 
 So our workspace looks like this::
 
     env/
         src/  # the django polls application is in here
-    polls_plugin/  # the newly-created application
+    polls_cms_integration/  # the newly-created application
         __init__.py
         admin.py
         models.py
@@ -192,7 +192,7 @@ For our poll plugin, we're going to write the following plugin class:
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from polls_plugin.models import PollPluginModel
+    from polls_cms_integration.models import PollPluginModel
     from django.utils.translation import ugettext as _
 
 
@@ -200,7 +200,7 @@ For our poll plugin, we're going to write the following plugin class:
         model = PollPluginModel  # model where plugin data are saved
         module = _("Polls")
         name = _("Poll Plugin")  # name of the plugin in the interface
-        render_template = "djangocms_polls/poll_plugin.html"
+        render_template = "polls_cms_integration/poll_plugin.html"
 
         def render(self, context, instance, placeholder):
             context.update({'instance': instance})
@@ -227,8 +227,8 @@ The template
 The ``render_template`` attribute in the plugin class is required, and tells the plugin which
 :attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>` to use when rendering.
 
-In this case the template needs to be at
-``polls_plugin/templates/djangocms_polls/poll_plugin.html`` and should look something like this:
+In this case the template needs to be at ``polls_cms_integration
+/templates/polls_cms_integration/poll_plugin.html`` and should look something like this:
 
 .. code-block:: html+django
 
@@ -250,17 +250,17 @@ In this case the template needs to be at
     </form>
 
 
-******************************************
-Integrate the ``polls_plugin`` application
-******************************************
+***************************************************
+Integrate the ``polls_cms_integration`` application
+***************************************************
 
-The final step is to integrate the ``polls_plugin`` application into the project.
+The final step is to integrate the ``polls_cms_integration`` application into the project.
 
-Add ``polls_plugin`` to ``INSTALLED_APPS`` in ``settings.py`` and create a database migration to
-add the plugin table::
+Add ``polls_cms_integration`` to ``INSTALLED_APPS`` in ``settings.py`` and create a database
+migration to add the plugin table::
 
-    python manage.py makemigrations polls_plugin
-    python manage.py migrate polls_plugin
+    python manage.py makemigrations polls_cms_integration
+    python manage.py migrate polls_cms_integration
 
 Finally, start the runserver and visit http://localhost:8000/.
 

@@ -7,11 +7,15 @@ import sys
 def noop_gettext(s):
     return s
 
+permission = True
+
+if '--CMS_PERMISSION=False' in sys.argv:
+    permission = False
+
 gettext = noop_gettext
 
-
 HELPER_SETTINGS = dict(
-    CMS_PERMISSION=True,
+    CMS_PERMISSION=permission,
     LANGUAGES=(
         ('en', u'English'),
         ('de', u'Deutsch'),
@@ -75,6 +79,10 @@ HELPER_SETTINGS = dict(
         'djangocms_grid',
         'filer',
         'aldryn_bootstrap3',
+        'cms.test_utils.project.placeholderapp',
+    ],
+    MIDDLEWARE_CLASSES=[
+        'cms.middleware.utils.ApphookReloadMiddleware',
     ],
     TEMPLATE_DIRS=(
         os.path.join(
@@ -84,6 +92,7 @@ HELPER_SETTINGS = dict(
     CMS_TEMPLATES=(
         ('fullwidth.html', 'Fullwidth'),
         ('page.html', 'Standard page'),
+        ('simple.html', 'Simple page'),
     ),
 )
 

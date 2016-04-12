@@ -475,7 +475,7 @@ To finish up, please update your database::
 
 Finally, your existing pages will be unpublished, so publish them with the ``publisher`` command::
 
-    python manage.py cms publisher_publish
+    python manage.py publisher_publish
 
 That's it!
 

@@ -121,6 +121,92 @@ module.exports = function (casperjs) {
         },
 
         /**
+         * @function _modifyPageAdvancedSettings
+         * @private
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {Object} opts.fields { fieldName: value, ... }
+         */
+        _modifyPageAdvancedSettings: function _modifyPageAdvancedSettings(opts) {
+            var that = this;
+            return function () {
+                return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.cms-pagetree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .then(function () {
+                        var pageId = that.getPageId(opts.page);
+                        this.thenOpen(globals.adminPagesUrl + pageId + '/advanced-settings/');
+                    })
+                    .waitForSelector('#page_form', function () {
+                        this.fill('#page_form', opts.fields, true);
+                    })
+                    .waitForUrl(/page/)
+                    .waitUntilVisible('.success')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .wait(1000);
+            };
+        },
+
+        /**
+         * @function addApphookToPage
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} opts.apphook app name
+         */
+        addApphookToPage: function addApphookToPage(opts) {
+            return this._modifyPageAdvancedSettings({
+                page: opts.page,
+                fields: {
+                    application_urls: opts.apphook
+                }
+            });
+        },
+
+        /**
+         * @function setPageTemplate
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} opts.tempalte template file name (e.g. simple.html)
+         */
+        setPageTemplate: function setPageTemplate(opts) {
+            return this._modifyPageAdvancedSettings({
+                page: opts.page,
+                fields: {
+                    template: opts.template
+                }
+            });
+        },
+
+        /**
+         * @function publishPage
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         */
+        publishPage: function publishPage(opts) {
+            var that = this;
+            return function () {
+                var pageId;
+                return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.cms-pagetree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .then(function () {
+                        pageId = that.getPageId(opts.page);
+                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span');
+                    })
+                    .waitUntilVisible('.cms-tree-tooltip-container', function () {
+                        this.click('.cms-tree-tooltip-container-open a[href*="/en/publish/"]');
+                    })
+                    .waitForResource(/publish/)
+                    .waitUntilVisible('.cms-pagetree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .wait(1000);
+            };
+        },
+
+        /**
          * Adds the plugin. If the parent is not specified, plugin
          * is added to the first placeholder on the page.
          *
@@ -367,7 +453,7 @@ module.exports = function (casperjs) {
                             var amount = 0;
 
                             try {
-                                amount = $.active;
+                                amount = CMS.$.active;
                             } catch (e) {}
 
                             return amount;
@@ -376,6 +462,81 @@ module.exports = function (casperjs) {
                         return (remainingAjaxRequests === 0);
                     }).wait(200);
             };
+        },
+
+        /**
+         * @function createJSTreeXPathFromTree
+         * @param {Object[]} tree tree object, see example
+         * @param {Object} [opts]
+         * @param {Object} [opts.topLevel=true] is it the top level?
+         * @example tree
+         *
+         *     [
+         *         {
+         *             name: 'Homepage'
+         *             children: [
+         *                 {
+         *                     name: 'Nested'
+         *                 }
+         *             ]
+         *         },
+         *         {
+         *             name: 'Sibling'
+         *         }
+         *     ]
+         */
+        createJSTreeXPathFromTree: function createJSTreeXPathFromTree(tree, opts) {
+            var xPath = '';
+            var topLevel = opts && typeof opts.topLevel !== 'undefined' ? topLevel : true;
+
+            tree.forEach(function (node, index) {
+                if (index === 0) {
+                    if (topLevel) {
+                        xPath += '//';
+                    } else {
+                        xPath += './';
+                    }
+                    xPath += 'li[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name +
+                        '")]${children}]';
+                } else {
+                    xPath += '/following-sibling::li' +
+                        '[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name + '")]${children}]';
+                }
+
+                if (node.children) {
+                    xPath = xPath.replace(
+                        '${children}',
+                        '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                        '[' + createJSTreeXPathFromTree(node.children, { topLevel: false }) + ']'
+                    );
+                } else {
+                    xPath = xPath.replace('${children}', '');
+                }
+            });
+
+            return xPath;
+        },
+
+        /**
+         * @function getPasteHelpersXPath
+         * @public
+         * @param {Object} opts
+         * @param {Boolean} visible get visible or hidden helpers
+         * @param {String|Number} [pageId] optional id of the page to filter helpers
+         */
+        getPasteHelpersXPath: function getPasteHelpersXPath(opts) {
+            var xpath = '//*[self::div or self::span][contains(@class, "cms-tree-item-helpers")]';
+            if (opts && opts.visible) {
+                xpath += '[not(contains(@class, "cms-hidden"))]';
+            } else {
+                xpath += '[contains(@class, "cms-hidden")]';
+            }
+            xpath += '[./a[contains(text(), "Paste")]';
+            if (opts && opts.pageId) {
+                xpath += '[contains(@data-id, "' + opts.pageId + '")]';
+            }
+            xpath += ']';
+            return xpath;
         }
     };
 };
