@@ -217,6 +217,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.parent_id = target.pk
         else:
             self.parent_id = target.parent_id
+
         self.save()
         moved_page = self.move(target, pos=position)
 
@@ -226,18 +227,60 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         # check the slugs
         page_utils.check_title_slugs(moved_page)
-        ## Make sure to update the slug and path of the target page.
+
+        # Make sure to update the slug and path of the target page.
         page_utils.check_title_slugs(target)
 
-        if self.publisher_public_id:
+        if moved_page.publisher_public_id:
             # Ensure we have up to date mptt properties
-            public_page = Page.objects.get(pk=self.publisher_public_id)
+            public_page = Page.objects.get(pk=moved_page.publisher_public_id)
             # Ensure that the page is in the right position and save it
-            moved_page._publisher_save_public(public_page)
-            public_page = public_page.reload()
+            public_page = moved_page._publisher_save_public(public_page)
             cms_signals.page_moved.send(sender=Page, instance=public_page)
 
             page_utils.check_title_slugs(public_page)
+
+        # Update the descendants to "PENDING"
+        # If the target (parent) page is not published
+        # and the page being moved is published.
+        titles = (
+            moved_page
+            .title_set
+            .filter(language__in=moved_page.get_languages())
+            .values_list('language', 'published')
+        )
+
+        if moved_page.parent_id:
+            parent_titles = (
+                moved_page
+                .parent
+                .title_set
+                .values_list('language', 'published')
+            )
+            parent_titles_by_language = dict(parent_titles)
+        else:
+            parent_titles_by_language = {}
+
+        for language, published in titles:
+            if moved_page.parent_id:
+                parent_is_published = parent_titles_by_language.get(language)
+
+                if parent_is_published and published:
+                    # this looks redundant but it's necessary
+                    # for all the descendants of the page being
+                    # copied to be set to the correct state.
+                    moved_page.mark_as_published(language)
+                    moved_page.mark_descendants_as_published(language)
+                elif published:
+                    # page is published but it's parent is not
+                    # mark the page being copied (source) as "pending"
+                    moved_page.mark_as_pending(language)
+                    # mark all descendants of source as "pending"
+                    moved_page.mark_descendants_pending(language)
+            elif published:
+                moved_page.mark_as_published(language)
+                moved_page.mark_descendants_as_published(language)
+
         from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
@@ -646,50 +689,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         # Check if there are some children which are waiting for parents to
         # become published.
-        from cms.models import Title
-        publish_set = list(self.get_descendants().filter(title_set__published=True,
-                                                    title_set__language=language).select_related('publisher_public', 'publisher_public__parent').order_by('depth', 'path'))
-        #prefetch the titles
-        publish_ids = {}
-        for page in publish_set:
-            publish_ids[page.pk] = None
-            if page.publisher_public_id:
-                publish_ids[page.publisher_public.pk] = None
-        titles = Title.objects.filter(page__pk__in=publish_ids.keys(), language=language)
-        for title in titles:
-            publish_ids[title.page_id] = title
+        self.mark_descendants_as_published(language)
 
-        for page in publish_set:
-            if page.pk in publish_ids and publish_ids[page.pk]:
-                page.title_cache = {}
-                page.title_cache[language] = publish_ids[page.pk]
-            if page.publisher_public_id:
-                if not page.publisher_public.parent_id:
-                    page._publisher_save_public(page.publisher_public)
-                #query and caching optimization
-                if page.publisher_public.parent_id and not page.publisher_public.parent:
-                    page.publisher_public.parent = Page.objects.get(pk=page.publisher_public.parent_id)
-                if page.publisher_public.parent_id in publish_ids:
-                    page.publisher_public.parent.title_cache = {}
-                    page.publisher_public.parent.title_cache[language] = publish_ids[page.publisher_public.parent_id]
-                if page.publisher_public.parent and page.publisher_public.parent.is_published(language):
-                    if page.publisher_public_id in publish_ids:
-                        public_title = publish_ids[page.publisher_public_id]
-                    else:
-                        public_title = None
-                    draft_title = publish_ids[page.pk]
-                    if public_title and not public_title.published:
-                        public_title._publisher_keep_state = True
-                        public_title.published = True
-                        public_title.publisher_state = PUBLISHER_STATE_DEFAULT
-                        public_title.save()
-                    if draft_title.publisher_state == PUBLISHER_STATE_PENDING:
-                        draft_title.publisher_state = PUBLISHER_STATE_DEFAULT
-                        draft_title._publisher_keep_state = True
-                        draft_title.save()
-            elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
-                page.publish(language)
-                # fire signal after publishing is done
+        # fire signal after publishing is done
         import cms.signals as cms_signals
 
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
@@ -717,8 +719,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if hasattr(self, 'title_cache'):
             self.title_cache[language] = title
         public_title.published = False
-
         public_title.save()
+
         public_page = self.publisher_public
         public_placeholders = public_page.get_placeholders()
         for pl in public_placeholders:
@@ -736,22 +738,133 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         return True
 
+    def mark_as_pending(self, language):
+        public = self.get_public_object()
+
+        if public:
+            state = public.get_publisher_state(language)
+            # keep the same state
+            # only set the page as unpublished
+            public.set_publisher_state(
+                language,
+                state=state,
+                published=False
+            )
+
+        draft = self.get_draft_object()
+
+        if draft and draft.is_published(language) and draft.get_publisher_state(
+                language) == PUBLISHER_STATE_DEFAULT:
+            # Only change the state if the draft page is published
+            # and it's state is the default (0)
+            draft.set_publisher_state(language, state=PUBLISHER_STATE_PENDING)
+
     def mark_descendants_pending(self, language):
         assert self.publisher_is_draft
+
         # Go through all children of our public instance
         public_page = self.publisher_public
-        from cms.models import Title
+
         if public_page:
             descendants = public_page.get_descendants().filter(title_set__language=language)
+
             for child in descendants:
-                try:
-                    child.set_publisher_state(language, PUBLISHER_STATE_PENDING, published=False)
-                except Title.DoesNotExist:
-                    continue
-                draft = child.publisher_public
-                if draft and draft.is_published(language) and draft.get_publisher_state(
-                        language) == PUBLISHER_STATE_DEFAULT:
-                    draft.set_publisher_state(language, PUBLISHER_STATE_PENDING)
+                child.mark_as_pending(language)
+
+    def mark_as_published(self, language):
+        from cms.models import Title
+
+        public = self.get_public_object()
+
+        if public:
+            try:
+                public_published = public.is_published(language)
+            except Title.DoesNotExist:
+                public_published = False
+
+            if public_published:
+                public.set_publisher_state(
+                    language,
+                    state=PUBLISHER_STATE_DEFAULT,
+                    published=True
+                )
+
+        draft = self.get_draft_object()
+
+        if draft.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+            draft.set_publisher_state(language, PUBLISHER_STATE_DEFAULT)
+
+    def mark_descendants_as_published(self, language):
+        if not self.publisher_is_draft:
+            raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
+
+        # Check if there are some children which are waiting for parents to
+        # become published.
+        from cms.models import Title
+
+        # List of published draft pages
+        publish_set = list(
+            self.get_descendants()
+            .filter(title_set__published=True, title_set__language=language)
+            .select_related('publisher_public', 'publisher_public__parent')
+            .order_by('depth', 'path')
+        )
+
+        # prefetch the titles
+        page_ids = []
+
+        for page in publish_set:
+            if not page.pk in page_ids:
+                page_ids.append(page.pk)
+
+            publisher_id = page.publisher_public_id
+
+            if publisher_id and not publisher_id in page_ids:
+                page_ids.append(publisher_id)
+
+        titles = Title.objects.filter(page__pk__in=page_ids, language=language)
+        titles_by_page_id = {}
+
+        for title in titles:
+            titles_by_page_id[title.page_id] = title
+
+        for page in publish_set:
+            if page.pk in titles_by_page_id:
+                page.title_cache = {language: titles_by_page_id[page.pk]}
+
+            if page.publisher_public_id:
+                # Page has a public version
+                publisher_public = page.publisher_public
+
+                if not publisher_public.parent_id:
+                    # This page clearly has a parent because it shows up
+                    # when calling self.get_descendants()
+                    # So this condition can be True when a published page
+                    # is moved under a page that has never been published.
+                    # It's draft version (page) has a reference to the new parent
+                    # but it's live version does not because it was never set
+                    # since it didn't exist when the move happened.
+                    publisher_public = page._publisher_save_public(publisher_public)
+
+                # Check if the parent of this page's
+                # public version is published.
+                if publisher_public.parent.is_published(language):
+                    public_title = titles_by_page_id.get(page.publisher_public_id)
+
+                    if public_title and not public_title.published:
+                        public_title._publisher_keep_state = True
+                        public_title.published = True
+                        public_title.publisher_state = PUBLISHER_STATE_DEFAULT
+                        public_title.save()
+
+                    draft_title = titles_by_page_id[page.pk]
+
+                    if draft_title.publisher_state == PUBLISHER_STATE_PENDING:
+                        draft_title.publisher_state = PUBLISHER_STATE_DEFAULT
+                        draft_title._publisher_keep_state = True
+                        draft_title.save()
+            elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+                page.publish(language)
 
     def revert(self, language):
         """Revert the draft version to the same state as the public version
@@ -1248,6 +1361,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         obj = obj.move(next_sibling.publisher_public, pos="left")
             else:
                 obj.save()
+        return obj
 
     def move(self, target, pos=None):
         super(Page, self).move(target, pos)

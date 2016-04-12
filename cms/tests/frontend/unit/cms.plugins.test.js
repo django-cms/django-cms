@@ -1,4 +1,4 @@
-/* globals window */
+/* globals window, document */
 'use strict';
 
 describe('CMS.Plugin', function () {
@@ -856,6 +856,10 @@ describe('CMS.Plugin', function () {
                 dragbars: [],
                 states: []
             };
+            CMS.API.Toolbar = {
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
 
             $(function () {
                 CMS.Plugin._initializeGlobalHandlers();
@@ -1006,6 +1010,11 @@ describe('CMS.Plugin', function () {
                     }
                 };
 
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
                 plugin = new CMS.Plugin('cms-plugin-1', {
                     type: 'plugin',
                     plugin_id: 1,
@@ -1131,6 +1140,26 @@ describe('CMS.Plugin', function () {
                 copy_plugin: 'new-copy-url',
                 newObject: true
             });
+        });
+
+        it('shows and hides the loader if success', function (done) {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success({});
+                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                done();
+            });
+            plugin.movePlugin();
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+        });
+
+        it('shows and hides the loader if error', function (done) {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.error({});
+                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                done();
+            });
+            plugin.movePlugin();
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
         });
 
         it('shows success animation', function () {
@@ -1375,6 +1404,469 @@ describe('CMS.Plugin', function () {
                 'Test Text Plugin',
                 'whatever'
             );
+        });
+    });
+
+    describe('._scrollToElement', function () {
+        var plugin;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('does nothing if element is in viewport already', function () {
+            spyOn($.fn, 'animate');
+            plugin._scrollToElement($('.cms-draggable-2'), { duration: 100, offset: 20 });
+            expect($.fn.animate).not.toHaveBeenCalled();
+        });
+
+        it('animates structureboard to the point when it is in viewport', function () {
+            // window, element
+            spyOn($.fn, 'height').and.returnValues(200, 20);
+            spyOn($.fn, 'position').and.returnValues({
+                top: 300
+            });
+            spyOn($.fn, 'scrollTop').and.returnValues(30);
+            spyOn($.fn, 'animate');
+            plugin._scrollToElement($('<div></div>'), { duration: 100, offset: 20 });
+
+            expect($.fn.animate).toHaveBeenCalledWith({
+                scrollTop: 300 + 20 + 20 + 30 - 200
+            }, 100);
+        });
+
+        it('has default values', function () {
+            // window, element
+            spyOn($.fn, 'height').and.returnValues(200, 20);
+            spyOn($.fn, 'position').and.returnValues({
+                top: 300
+            });
+            spyOn($.fn, 'scrollTop').and.returnValues(30);
+            spyOn($.fn, 'animate');
+            plugin._scrollToElement($('<div></div>'));
+
+            expect($.fn.animate).toHaveBeenCalledWith({
+                scrollTop: 300 + 20 + 50 + 30 - 200
+            }, 200);
+        });
+    });
+
+    describe('._setupActions()', function () {
+        var plugin;
+        var tmpl = '<div class="cms-plugin-picker" data-parent-id="mock"><div class="cms-submenu-item {1}">' +
+            '<a href="{2}">Submenu item</a>' +
+            '</div></div>';
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy(),
+                    _delegate: jasmine.createSpy(),
+                    openAjax: jasmine.createSpy()
+                };
+                spyOn(CMS.Plugin, '_hideSettingsMenu');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('sets up touch event stopper', function () {
+            expect(plugin.ui.submenu.parent().find('.cms-submenu-edit')).toHandle(plugin.touchStart);
+            spyOn($.Event.prototype, 'stopPropagation');
+            plugin.ui.submenu.parent().find('.cms-submenu-edit').trigger(plugin.touchStart);
+            expect($.Event.prototype.stopPropagation).toHaveBeenCalled();
+        });
+
+        it('sets up click handlers on submenu items', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#href')).find('> div');
+            var link = nav.find('a');
+
+            plugin._setupActions(nav);
+
+            expect(link).toHandle(plugin.click);
+
+            spyOn($.Event.prototype, 'preventDefault');
+            spyOn($.Event.prototype, 'stopPropagation');
+
+            link.trigger(plugin.click);
+            expect($.Event.prototype.stopPropagation).toHaveBeenCalledTimes(1);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
+        });
+
+        it('by default delegates to toolbar', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#href')).find('> div');
+            var link = nav.find('a');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar._delegate).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar._delegate).toHaveBeenCalledWith(link);
+        });
+
+        it('delegates to add plugin', function () {
+            spyOn(plugin, 'addPlugin');
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'add');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.addPlugin).toHaveBeenCalledWith('shmock', 'Submenu item', 'mock');
+        });
+
+        it('delegates to add ajax plugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'ajax_add');
+            link.data('on-success', 'ON_SUCCESS');
+            link.data('post', { data: 'data' });
+            link.data('text', 'TEXT');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
+                url: '#shmock',
+                post: JSON.stringify({ data: 'data' }),
+                text: 'TEXT',
+                callback: jasmine.any(Function),
+                onSuccess: 'ON_SUCCESS'
+            });
+        });
+
+        it('delegates to edit plugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'edit');
+            spyOn(plugin, 'editPlugin');
+            plugin.options = {
+                urls: { edit_plugin: 'edit_plugin_url' },
+                plugin_name: 'MockPlugin',
+                plugin_breadcrumb: 'MockBreadcrumb'
+            };
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.editPlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.editPlugin).toHaveBeenCalledWith(
+                'edit_plugin_url',
+                'MockPlugin',
+                'MockBreadcrumb'
+            );
+        });
+
+        it('delegates to copy-from-language', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'copy-lang');
+            link.attr('data-language', 'MOCK LANGUAGE');
+            spyOn(plugin, 'copyPlugin');
+            plugin.options = 'MOCKED OPTIONS';
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.copyPlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.copyPlugin).toHaveBeenCalledWith(
+                'MOCKED OPTIONS',
+                'MOCK LANGUAGE'
+            );
+        });
+
+        it('delegates to copyPlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'copy');
+            link.parent().addClass('cms-submenu-item-disabled');
+            spyOn(plugin, 'copyPlugin');
+            plugin.options = 'MOCKED OPTIONS';
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.copyPlugin).not.toHaveBeenCalled();
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+
+            link.parent().removeClass('cms-submenu-item-disabled');
+            link.trigger(plugin.click);
+            expect(plugin.copyPlugin).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+        });
+
+        it('delegates to cutPlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'cut');
+            spyOn(plugin, 'cutPlugin');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.cutPlugin).toHaveBeenCalledTimes(1);
+        });
+
+        it('delegates to pastePlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'paste');
+            link.parent().addClass('cms-submenu-item-disabled');
+            spyOn(plugin, 'pastePlugin');
+            plugin.options = 'MOCKED OPTIONS';
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.pastePlugin).not.toHaveBeenCalled();
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+
+            link.parent().removeClass('cms-submenu-item-disabled');
+            link.trigger(plugin.click);
+            expect(plugin.pastePlugin).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+        });
+
+        it('delegates to deletePlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'delete');
+            spyOn(plugin, 'deletePlugin');
+            plugin._setupActions(nav);
+            plugin.options = {
+                urls: { delete_plugin: 'DELETE_URL' },
+                plugin_name: 'MockPlugin',
+                plugin_breadcrumb: 'Breadcrumb'
+            };
+            link.trigger(plugin.click);
+
+            expect(plugin.deletePlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.deletePlugin).toHaveBeenCalledWith(
+                'DELETE_URL',
+                'MockPlugin',
+                'Breadcrumb'
+            );
+        });
+    });
+
+    describe('_setupKeyBoardTraversing()', function () {
+        var plugin;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy(),
+                    _delegate: jasmine.createSpy(),
+                    openAjax: jasmine.createSpy()
+                };
+                done();
+            });
+        });
+
+        afterEach(function () {
+            $(document).off(plugin.keyDown + '.traverse');
+            fixture.cleanup();
+        });
+
+        it('returns if there is no plugin picker in the modal', function () {
+            expect(plugin._setupKeyboardTraversing()).toEqual(undefined);
+            expect($(document)).not.toHandle(plugin.keyDown + '.traverse');
+        });
+
+        it('unbinds old traversing keydown events', function () {
+            $(fixture.el).append('<div class="cms-modal-markup"></div>');
+            plugin.ui.dragitem.find('.cms-plugin-picker').appendTo('.cms-modal-markup');
+            var spy = jasmine.createSpy();
+            $(document).on(plugin.keyDown + '.traverse', spy);
+            plugin._setupKeyboardTraversing();
+            $(document).trigger(plugin.keyDown + '.traverse');
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('binds traversing keydown events', function () {
+            $(fixture.el).append('<div class="cms-modal-markup"></div>');
+            var picker = plugin.ui.dragitem.find('.cms-plugin-picker').show().appendTo('.cms-modal-markup');
+            plugin._setupKeyboardTraversing();
+            var anchors = picker.find('.cms-submenu-item:visible a');
+
+            var down = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.DOWN
+            });
+            var down1 = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.TAB
+            });
+            var up = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.UP
+            });
+            var up1 = $.Event(plugin.keyDown + '.traverse', {
+                keyCode: CMS.KEYS.TAB,
+                shiftKey: true
+            });
+
+            spyOn($.Event.prototype, 'preventDefault');
+            $(document).trigger(down);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
+            $(document).trigger(down1);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(2);
+            $(document).trigger(up);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(3);
+            $(document).trigger(up1);
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(4);
+        });
+    });
+
+    describe('_filterPluginsList()', function () {
+        var plugin;
+        var picker;
+        var items;
+        var titles;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                picker = $('.cms-plugin-picker');
+                picker.appendTo(fixture.el).show();
+                items = picker.find('.cms-submenu-item');
+                titles = picker.find('.cms-submenu-item-title');
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy(),
+                    _delegate: jasmine.createSpy(),
+                    openAjax: jasmine.createSpy()
+                };
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('shows everything if empty query is given', function () {
+            expect(items.add(titles)).toBeVisible();
+            items.add(titles).hide();
+            expect(items.add(titles)).not.toBeVisible();
+            expect(plugin._filterPluginsList(picker, $('<input value="">'))).toEqual(false);
+            expect(items.add(titles)).toBeVisible();
+        });
+
+        it('shows nothing if non-matching query is given', function () {
+            expect(items.add(titles)).toBeVisible();
+            items.add(titles).hide();
+            expect(items.add(titles)).not.toBeVisible();
+            expect(plugin._filterPluginsList(picker, $('<input value="ask;dfjha;ksjdfhaksjdhf">'))).not.toEqual(false);
+            expect(items.add(titles)).not.toBeVisible();
+        });
+
+
+        it('filters plugins', function () {
+            expect(plugin._filterPluginsList(picker, $('<input value="Text">'))).not.toEqual(false);
+            expect(items.filter(':visible').length).toEqual(2);
+            expect(titles.filter(':visible').length).toEqual(1);
+            expect(titles.filter(':visible').text()).toMatch(/Generic/);
+
+            expect(plugin._filterPluginsList(picker, $('<input value="Style">'))).not.toEqual(false);
+            expect(items.filter(':visible').length).toEqual(2);
+            expect(titles.filter(':visible').length).toEqual(1);
+            expect(titles.filter(':visible').text()).toMatch(/Generic/);
+        });
+
+        it('filters categories', function () {
+            expect(plugin._filterPluginsList(picker, $('<input value="Bootstrap">'))).not.toEqual(false);
+            expect(items.filter(':visible').length).toEqual(15);
+            expect(titles.filter(':visible').length).toEqual(1);
+            expect(titles.filter(':visible').text()).toMatch(/Bootstrap/);
         });
     });
 });

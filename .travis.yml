@@ -13,6 +13,13 @@ addons:
     packages:
     - enchant
 
+branches:
+  only:
+    - master
+    - develop
+    - release/3.2.x
+    - support/3.1.x
+
 env:
   global:
     # coveralls
@@ -29,16 +36,16 @@ env:
     - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
-    - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+    - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
 before_script:
   - pip freeze
@@ -47,9 +54,6 @@ before_script:
   - if [ "$DATABASE_URL" == "mysql://root@127.0.0.1/djangocms_test" ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi
 
 before_install:
-  - "export DISPLAY=:99.0"
-  # xvfb is started in this way to ensure the screen size is 1280x1024x8
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/cucumber_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x8"
   - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[skip saucelabs\]'; export USE_SAUCE_LABS=$?; true
 
@@ -65,7 +69,7 @@ install:
 script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ]; then gulp lint; fi;
-  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; pip freeze; sh cms/tests/frontend/integration/run_testserver.sh; sleep 60; gulp tests:integration; fi;
+  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; pip freeze; gulp tests:integration; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
@@ -82,24 +86,24 @@ matrix:
   exclude:
 
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 AUTH_USER_MODEL='customuserapp.User'
+      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
     - python: 3.3
-      env: DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
     - python: 3.3
-      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.3
-      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
     - python: 3.3
-      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
     - python: 3.3
       env: FRONTEND=1 UNIT=1
@@ -137,20 +141,20 @@ matrix:
 
   allow_failures:
     - python: 2.7
-      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 2.7
 
-      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
 
     - python: 3.4
-      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.4
-      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
 
     - python: 3.5
-      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.5
-      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+      env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
 
   fast_finish: true
 
