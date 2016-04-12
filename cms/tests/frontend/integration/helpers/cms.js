@@ -132,7 +132,7 @@ module.exports = function (casperjs, settings) {
             var that = this;
             return function () {
                 return this.wait(1000).thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.cms-pagetree')
+                    .waitUntilVisible('.cms-pagetree-jstree')
                     .then(that.waitUntilAllAjaxCallsFinish())
                     .then(that.expandPageTree())
                     .then(function () {
@@ -192,7 +192,7 @@ module.exports = function (casperjs, settings) {
             return function () {
                 var pageId;
                 return this.wait(1000).thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.cms-pagetree')
+                    .waitUntilVisible('.cms-pagetree-jstree')
                     .then(that.waitUntilAllAjaxCallsFinish())
                     .then(that.expandPageTree())
                     .then(function () {
@@ -203,7 +203,7 @@ module.exports = function (casperjs, settings) {
                         this.click('.cms-tree-tooltip-container-open a[href*="/' + language + '/publish/"]');
                     })
                     .waitForResource(/publish/)
-                    .waitUntilVisible('.cms-pagetree')
+                    .waitUntilVisible('.cms-pagetree-jstree')
                     .then(that.waitUntilAllAjaxCallsFinish())
                     .then(that.expandPageTree())
                     .wait(1000);
