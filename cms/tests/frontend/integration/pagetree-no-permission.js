@@ -94,13 +94,6 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     );
                 })
                 .then(cms.expandPageTree())
-                .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
-                })
-                // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
-                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Homepage') + '"]');
-                })
                 // try to copy into parent
                 .then(function () {
                     this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
