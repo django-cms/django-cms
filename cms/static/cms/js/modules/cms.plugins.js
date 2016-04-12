@@ -1042,12 +1042,13 @@ var CMS = window.CMS || {};
             }
             // add key events
             doc.off(this.keyDown + '.traverse');
+            // istanbul ignore next: not really possible to reproduce focus state in unit tests
             doc.on(this.keyDown + '.traverse', function (e) {
                 var anchors = dropdown.find('.cms-submenu-item:visible a');
                 var index = anchors.index(anchors.filter(':focus'));
 
                 // bind arrow down and tab keys
-                if (e.keyCode === CMS.KEYS.DOWN || e.keyCode === CMS.KEYS.TAB) {
+                if (e.keyCode === CMS.KEYS.DOWN || (e.keyCode === CMS.KEYS.TAB && !e.shiftKey)) {
                     e.preventDefault();
                     if (index >= 0 && index < anchors.length - 1) {
                         anchors.eq(index + 1).focus();
