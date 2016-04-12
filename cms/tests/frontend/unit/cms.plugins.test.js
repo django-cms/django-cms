@@ -1783,4 +1783,90 @@ describe('CMS.Plugin', function () {
             expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(4);
         });
     });
+
+    describe('_filterPluginsList()', function () {
+        var plugin;
+        var picker;
+        var items;
+        var titles;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                picker = $('.cms-plugin-picker');
+                picker.appendTo(fixture.el).show();
+                items = picker.find('.cms-submenu-item');
+                titles = picker.find('.cms-submenu-item-title');
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy(),
+                    _delegate: jasmine.createSpy(),
+                    openAjax: jasmine.createSpy()
+                };
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('shows everything if empty query is given', function () {
+            expect(items.add(titles)).toBeVisible();
+            items.add(titles).hide();
+            expect(items.add(titles)).not.toBeVisible();
+            expect(plugin._filterPluginsList(picker, $('<input value="">'))).toEqual(false);
+            expect(items.add(titles)).toBeVisible();
+        });
+
+        it('shows nothing if non-matching query is given', function () {
+            expect(items.add(titles)).toBeVisible();
+            items.add(titles).hide();
+            expect(items.add(titles)).not.toBeVisible();
+            expect(plugin._filterPluginsList(picker, $('<input value="ask;dfjha;ksjdfhaksjdhf">'))).not.toEqual(false);
+            expect(items.add(titles)).not.toBeVisible();
+        });
+
+
+        it('filters plugins', function () {
+            expect(plugin._filterPluginsList(picker, $('<input value="Text">'))).not.toEqual(false);
+            expect(items.filter(':visible').length).toEqual(2);
+            expect(titles.filter(':visible').length).toEqual(1);
+            expect(titles.filter(':visible').text()).toMatch(/Generic/);
+
+            expect(plugin._filterPluginsList(picker, $('<input value="Style">'))).not.toEqual(false);
+            expect(items.filter(':visible').length).toEqual(2);
+            expect(titles.filter(':visible').length).toEqual(1);
+            expect(titles.filter(':visible').text()).toMatch(/Generic/);
+        });
+
+        it('filters categories', function () {
+            expect(plugin._filterPluginsList(picker, $('<input value="Bootstrap">'))).not.toEqual(false);
+            expect(items.filter(':visible').length).toEqual(15);
+            expect(titles.filter(':visible').length).toEqual(1);
+            expect(titles.filter(':visible').text()).toMatch(/Bootstrap/);
+        });
+    });
 });
