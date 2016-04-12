@@ -52,8 +52,7 @@ There's more than one way to do this, but here's one to help you get started::
     python manage.py test
 
 
-It can take a few minutes to run. Note that the selenium tests included in the
-test suite require that you have Firefox installed.
+It can take a few minutes to run.
 
 When you run tests against your own new code, don't forget that it's useful to
 repeat them for different versions of Python and Django.
@@ -116,21 +115,6 @@ Use ``--migrate`` to run migrations during tests.
 
 To use a different database, set the ``DATABASE_URL`` environment variable to a
 dj-database-url compatible value.
-
-
-Using X virtual framebuffer for headless frontend testing
----------------------------------------------------------
-
-On Linux systems with X you can use `X virtual framebuffer
-<http://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml>`_ to run frontend tests headless
-(without the browser window actually showing). To do so, it's recommended to use the ``xvfb-run``
-script to run tests.
-
-.. important::
-
-    The frontend tests have a minimum screen size to run successfully. You must
-    set the screen size of the virtual frame buffer to at least 1280x720x8.
-    You may do so using ``xvfb-run -s"-screen 0 1280x720x8" ...``.
 
 
 **********************

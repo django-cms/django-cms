@@ -1,8 +1,9 @@
 /* global document, localStorage */
 'use strict';
-var globals = require('../settings/globals');
 
-module.exports = function (casperjs) {
+module.exports = function (casperjs, settings) {
+    var globals = typeof settings === 'undefined' ? require('../settings/globals') : settings;
+
     return {
         /**
          * Logs in with the given parameters
@@ -182,9 +183,12 @@ module.exports = function (casperjs) {
          * @function publishPage
          * @param {Object} opts options
          * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} [opts.language='en'] language to publish
          */
         publishPage: function publishPage(opts) {
             var that = this;
+            var language = typeof opts.language !== 'undefined' ? opts.language : 'en';
+
             return function () {
                 var pageId;
                 return this.wait(1000).thenOpen(globals.adminPagesUrl)
@@ -193,10 +197,10 @@ module.exports = function (casperjs) {
                     .then(that.expandPageTree())
                     .then(function () {
                         pageId = that.getPageId(opts.page);
-                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span');
+                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/' + language + '/preview/"] span');
                     })
                     .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                        this.click('.cms-tree-tooltip-container-open a[href*="/en/publish/"]');
+                        this.click('.cms-tree-tooltip-container-open a[href*="/' + language + '/publish/"]');
                     })
                     .waitForResource(/publish/)
                     .waitUntilVisible('.cms-pagetree')
@@ -229,9 +233,7 @@ module.exports = function (casperjs) {
 
             return function () {
                 return this.then(that.waitUntilAllAjaxCallsFinish()).thenOpen(globals.editUrl)
-                    .waitForSelector('.cms-toolbar-expanded', function () {
-                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-                    })
+                    .then(that.switchTo('structure'))
                     // only add to placeholder if no parent specified
                     .thenBypassIf(opts.parent, 1)
                     .waitUntilVisible('.cms-structure', function () {
@@ -320,18 +322,18 @@ module.exports = function (casperjs) {
          * @param {String} view 'structure' or 'content'
          */
         switchTo: function (view) {
-            var url;
+            var pos;
             if (view === 'structure') {
-                url = 'build';
+                pos = 'first';
             } else if (view === 'content') {
-                url = 'edit';
+                pos = 'last';
             } else {
                 throw new Error('Invalid arguments passed to cms.switchTo, should be either "structure" or "content"');
             }
             return function () {
                 return this.waitForSelector('.cms-toolbar-expanded')
                     .then(function () {
-                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
+                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn:' + pos + '-child');
                     });
             };
         },
