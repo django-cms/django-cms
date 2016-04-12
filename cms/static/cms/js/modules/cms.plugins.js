@@ -996,7 +996,7 @@ var CMS = window.CMS || {};
                         );
                         break;
                     case 'copy-lang':
-                        that.copyPlugin(this.options, el.attr('data-language'));
+                        that.copyPlugin(that.options, el.attr('data-language'));
                         break;
                     case 'copy':
                         if (!el.parent().hasClass('cms-submenu-item-disabled')) {

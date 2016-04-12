@@ -1528,7 +1528,7 @@ describe('CMS.Plugin', function () {
 
         it('sets up touch event stopper', function () {
             expect(plugin.ui.submenu.parent().find('.cms-submenu-edit')).toHandle(plugin.touchStart);
-            spyOn($.Event.prototype, 'stopPropagation')
+            spyOn($.Event.prototype, 'stopPropagation');
             plugin.ui.submenu.parent().find('.cms-submenu-edit').trigger(plugin.touchStart);
             expect($.Event.prototype.stopPropagation).toHaveBeenCalled();
         });
@@ -1541,8 +1541,8 @@ describe('CMS.Plugin', function () {
 
             expect(link).toHandle(plugin.click);
 
-            spyOn($.Event.prototype, 'preventDefault')
-            spyOn($.Event.prototype, 'stopPropagation')
+            spyOn($.Event.prototype, 'preventDefault');
+            spyOn($.Event.prototype, 'stopPropagation');
 
             link.trigger(plugin.click);
             expect($.Event.prototype.stopPropagation).toHaveBeenCalledTimes(1);
@@ -1607,6 +1607,89 @@ describe('CMS.Plugin', function () {
                 'edit_plugin_url',
                 'MockPlugin',
                 'MockBreadcrumb'
+            );
+        });
+
+        it('delegates to copy-from-language', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'copy-lang');
+            link.attr('data-language', 'MOCK LANGUAGE');
+            spyOn(plugin, 'copyPlugin');
+            plugin.options = 'MOCKED OPTIONS';
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.copyPlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.copyPlugin).toHaveBeenCalledWith(
+                'MOCKED OPTIONS',
+                'MOCK LANGUAGE'
+            );
+        });
+
+        it('delegates to copyPlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'copy');
+            link.parent().addClass('cms-submenu-item-disabled');
+            spyOn(plugin, 'copyPlugin');
+            plugin.options = 'MOCKED OPTIONS';
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.copyPlugin).not.toHaveBeenCalled();
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+
+            link.parent().removeClass('cms-submenu-item-disabled');
+            link.trigger(plugin.click);
+            expect(plugin.copyPlugin).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+        });
+
+        it('delegates to cutPlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'cut');
+            spyOn(plugin, 'cutPlugin');
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.cutPlugin).toHaveBeenCalledTimes(1);
+        });
+
+        it('delegates to pastePlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'paste');
+            link.parent().addClass('cms-submenu-item-disabled');
+            spyOn(plugin, 'pastePlugin');
+            plugin.options = 'MOCKED OPTIONS';
+            plugin._setupActions(nav);
+            link.trigger(plugin.click);
+            expect(plugin.pastePlugin).not.toHaveBeenCalled();
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+
+            link.parent().removeClass('cms-submenu-item-disabled');
+            link.trigger(plugin.click);
+            expect(plugin.pastePlugin).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+        });
+
+        it('delegates to deletePlugin', function () {
+            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var link = nav.find('a');
+            link.attr('data-rel', 'delete');
+            spyOn(plugin, 'deletePlugin');
+            plugin._setupActions(nav);
+            plugin.options = {
+                urls: { delete_plugin: 'DELETE_URL' },
+                plugin_name: 'MockPlugin',
+                plugin_breadcrumb: 'Breadcrumb'
+            };
+            link.trigger(plugin.click);
+
+            expect(plugin.deletePlugin).toHaveBeenCalledTimes(1);
+            expect(plugin.deletePlugin).toHaveBeenCalledWith(
+                'DELETE_URL',
+                'MockPlugin',
+                'Breadcrumb'
             );
         });
     });
