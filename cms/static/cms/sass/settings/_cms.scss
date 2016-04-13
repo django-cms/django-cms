@@ -95,6 +95,12 @@ $z-layers: (
             "dropdown":    1002,
         ),
     ),
+    // pagetree zindex
+    "pagetree": (
+        "header":       101,
+        "section":      11,
+        "container":    1,
+    ),
     // parent dependant, but should be higher than quicksearch, but
     // lower than dropdown
     "hovertooltip":     1001,

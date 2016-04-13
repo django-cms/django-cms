@@ -55,12 +55,13 @@ var CMS = window.CMS || {};
          * @private
          */
         _setupUI: function _setupUI() {
-            var pagetree = $('.cms-pagetree-container');
+            var pagetree = $('.cms-pagetree');
             this.ui = {
                 container: pagetree,
                 document: $(document),
                 tree: pagetree.find('.js-cms-pagetree'),
-                dialog: $('.js-cms-tree-dialog')
+                dialog: $('.js-cms-tree-dialog'),
+                siteForm: $('.js-cms-pagetree-site-form')
             };
         },
 
@@ -262,9 +263,21 @@ var CMS = window.CMS || {};
                 that._reloadHelper();
             });
 
+            // propagate the sites dropdown "li > a" entries to the hidden sites form
+            this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function (e) {
+                e.preventDefault();
+                var el = $(this);
+                // prevent if parent is active
+                if (el.parent().hasClass('active')) {
+                    return false;
+                }
+                that.ui.siteForm.find('select')
+                    .val(el.data().id).end().submit();
+            });
+
             // additional event handlers
-            this._setFilter();
-            this._setTooltips();
+            this._setupTooltips();
+            this._setupSearch();
 
             // make sure ajax post requests are working
             this._setAjaxPost('.js-cms-tree-item-menu a');
@@ -544,44 +557,12 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Handles filter button display (Filter: Off).
-         *
-         * @method _setFilter
-         * @private
-         */
-        _setFilter: function _setFilter() {
-            var that = this;
-            var trigger = $('.js-cms-tree-filter-trigger');
-            var container = $('.js-cms-tree-filter-container');
-
-            trigger.on(this.click, function (e) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                container.toggleClass('hidden');
-
-                that.ui.document.one(that.click, function () {
-                    container.addClass('hidden');
-                });
-            });
-
-            container.on(that.click, function (e) {
-                e.stopImmediatePropagation();
-            });
-
-            // attach event for site filtering
-            $('.js-cms-tree-search-site select').on('change', function () {
-                $(this).closest('form').submit();
-            });
-        },
-
-        /**
          * Sets up general tooltips that can have a list of links or content.
          *
-         * @method _setTooltips
+         * @method _setupTooltips
          * @private
          */
-        _setTooltips: function _setTooltips() {
+        _setupTooltips: function _setupTooltips() {
             var that = this;
             var triggerCls = '.js-cms-tree-tooltip-trigger';
             var containerCls = '.js-cms-tree-tooltip-container';
@@ -661,6 +642,75 @@ var CMS = window.CMS || {};
                     that.showError(error.statusText);
                 });
             });
+        },
+
+        /**
+         * Sets events for the search on the header.
+         *
+         * @method _setupSearch
+         * @private
+         */
+        _setupSearch: function _setupSearch() {
+            var that = this;
+            var click = this.click + '.search';
+
+            var filterActive = false;
+            var filterTrigger = this.ui.container.find('.js-cms-pagetree-header-filter-trigger');
+            var filterContainer = this.ui.container.find('.js-cms-pagetree-header-filter-container');
+            var filterClose = filterContainer.find('.js-cms-pagetree-header-search-close');
+            var filterClass = 'cms-pagetree-header-filter-active';
+
+            var visibleForm = this.ui.container.find('.js-cms-pagetree-header-search');
+            var hiddenForm = this.ui.container.find('.js-cms-pagetree-header-search-copy form');
+
+            var searchContainer = this.ui.container.find('.cms-pagetree-header-filter');
+            var searchField = searchContainer.find('#field-searchbar');
+            var timeout = 200;
+
+            // add active class when focusing the search field
+            searchField.on('focus', function (e) {
+                e.stopImmediatePropagation();
+                searchContainer.addClass(filterClass);
+            });
+            searchField.on('blur', function (e) {
+                e.stopImmediatePropagation();
+                // timeout is required to prevent the search field from jumping
+                // between enlarging and shrinking
+                setTimeout(function () {
+                    if (!filterActive) {
+                        searchContainer.removeClass(filterClass);
+                    }
+                }, timeout);
+                that.ui.document.off(click);
+            });
+
+            // shows/hides filter box
+            filterTrigger.add(filterClose).on(click, function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                if (!filterActive) {
+                    filterContainer.show();
+                    searchContainer.addClass(filterClass);
+                    that.ui.document.on(click, function () {
+                        filterActive = true;
+                        filterTrigger.trigger(click);
+                    });
+                    filterActive = true;
+                } else {
+                    filterContainer.hide();
+                    searchContainer.removeClass(filterClass);
+                    that.ui.document.off(click);
+                    filterActive = false;
+                }
+            });
+
+            // prevent closing when on filter container
+            filterContainer.on('click', function (e) {
+                e.stopImmediatePropagation();
+            });
+
+            // add hidden fields to the form to maintain filter params
+            visibleForm.append(hiddenForm.find('input[type="hidden"]'));
         },
 
         /**
