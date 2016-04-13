@@ -537,8 +537,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder.pk = placeholder.id = 99
         context = SekizaiContext()
         context['request'] = AttributeObject(
-            REQUEST={'language': 'en'},
-            GET=[],
+            GET={'language': 'en'},
             session={},
             path='/',
             user=self.test_user,

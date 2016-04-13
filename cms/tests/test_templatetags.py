@@ -61,7 +61,7 @@ class TemplatetagTests(CMSTestCase):
 
         class FakeRequest(object):
             current_page = FakePage()
-            REQUEST = {'language': 'en'}
+            GET = {'language': 'en'}
 
         request = FakeRequest()
         template = '{% load cms_tags %}{% page_attribute page_title %}'
@@ -244,7 +244,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
         class FakeRequest(object):
             current_page = page
-            REQUEST = {'language': 'en'}
+            GET = {'language': 'en'}
 
         placeholder = _get_placeholder(page, page, dict(request=FakeRequest()), 'col_right')
         page.placeholders.get(slot='col_right')

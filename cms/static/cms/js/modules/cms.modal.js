@@ -428,6 +428,7 @@ var CMS = window.CMS || {};
                     that.maximize();
                 }
                 that.trigger('cms.modal.closed');
+                CMS.API.Toolbar.hideLoader();
                 CMS.API.Helpers.dispatchEvent('modal-closed', { instance: that });
             }, this.options.duration);
 

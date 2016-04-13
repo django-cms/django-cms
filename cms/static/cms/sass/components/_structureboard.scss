@@ -53,8 +53,9 @@
         z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
-        transform: translateZ(0);
         user-select: none;
+        transform: translateZ(0);
+
         -webkit-overflow-scrolling: touch;
     }
 
@@ -81,8 +82,8 @@
         height: 100%;
         padding: ($toolbar-height + 40px) 5%;
         @media (max-width: 480px) {
-            padding-left: 0;
             padding-right: 0;
+            padding-left: 0;
         }
     }
     .cms-dragarea-simple {
@@ -175,7 +176,7 @@
     }
     .cms-dragarea-empty .cms-draggables-root {
         position: relative;
-        min-height: 46px;
+        min-height: 50px;
         border: 2px solid $btn-default-border;
         border-radius: $border-radius-base;
     }
@@ -185,11 +186,12 @@
         display: block !important; // fixes hide/show with jqueryui so the scroll doesn't jump
         top: 0;
         left: 0;
+        white-space: nowrap;
         margin-left: 0 !important;
         padding: 0;
         border-radius: $border-radius-base;
-        white-space: nowrap;
         list-style-type: none;
+
         -ms-touch-action: none;
         touch-action: none;
 
@@ -214,13 +216,13 @@
             border: 2px solid $structure-bgcolor;
         }
         .cms-dragitem-text {
-            position: relative;
             display: block;
+            position: relative;
             overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
-            padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
+            text-overflow: ellipsis;
             margin-right: $submenu-icon-area-size * 3 + $submenu-right * 4;
+            padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
         }
         .cms-dragitem-collapsable .cms-dragitem-text {
             padding-left: $structure-dragitem-icon-space;
@@ -274,6 +276,13 @@
             color: $gray;
             line-height: 44px;
             padding-left: 20px;
+        }
+        > .cms-draggables-root > .cms-add-plugin-placeholder {
+            position: absolute;
+            right: 0;
+            left: 0;
+            height: 50px;
+            margin: -2px;
         }
     }
 
@@ -342,12 +351,12 @@
             @extend %icon;
             position: absolute;
             top: 50%;
-            cursor: pointer;
             left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
             color: $submenu-icon-color;
             font-size: $structure-dragitem-icon-size;
             margin-top: -$structure-dragitem-icon-size/2;
             margin-left: $structure-dragarea-padding-horizontal - 10px;
+            cursor: pointer;
             transform: rotate(180deg);
         }
         .cms-dragitem-text {
