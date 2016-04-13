@@ -64,9 +64,7 @@ casper.test.begin('Correctly displays languages', function (test) {
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree-jstree')
-                .wait(3000).then(cms.expandPageTree()).then(function () {
-
+            casper.waitForSelector('.cms-pagetree-jstree').wait(3000).then(cms.expandPageTree()).then(function () {
                 var pageId = cms.getPageId('Homepage');
 
                 // check that languages look correct
