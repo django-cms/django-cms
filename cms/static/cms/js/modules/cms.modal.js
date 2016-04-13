@@ -443,6 +443,7 @@ var CMS = window.CMS || {};
                     that.maximize();
                 }
                 that.trigger('cms.modal.closed');
+                CMS.API.Toolbar.hideLoader();
             }, this.options.duration);
 
             this.ui.body.off('keydown.cms.close');
