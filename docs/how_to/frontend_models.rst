@@ -15,13 +15,6 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
 
 .. warning::
 
-    Templatetags used by this feature mark as safe the content of the rendered
-    model attribute. This may be a security risk if used on fields which may
-    hold non-trusted content. Be aware, and use the templatetags accordingly.
-
-
-.. warning::
-
     This feature is only partially compatible with django-hvad: using
     ``render_model`` with hvad-translated fields (say
     {% render_model object 'translated_field' %} return error if the

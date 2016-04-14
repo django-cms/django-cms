@@ -13,6 +13,7 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
+from django.utils.html import escape
 from django.utils.translation import ugettext_lazy as _, override
 
 from cms.api import create_page, create_title, add_plugin
@@ -789,44 +790,45 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
-                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
+                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
     def test_filters_date(self):
-        user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
-                       char_3="char_3",
-                       char_4="char_4", date_field=datetime.date(2012, 1, 1))
-        ex1.save()
-        template_text = '''{% extends "base.html" %}
+        # Ensure we have a consistent testing env...
+        with self.settings(USE_L10N=False, DATE_FORMAT="M. d, Y"):
+            user = self.get_staff()
+            page = create_page('Test', 'col_two.html', 'en', published=True)
+            ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
+                           char_3="char_3",
+                           char_4="char_4", date_field=datetime.date(2012, 1, 2))
+            ex1.save()
+            template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" %}</h1>
 {% endblock content %}
 '''
-        request = self.get_page_request(page, user, edit=True)
+            request = self.get_page_request(page, user, edit=True)
+            response = detail_view(request, ex1.pk, template_string=template_text)
+            self.assertContains(
+                response,
+                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                    'placeholderapp', 'example1', 'date_field', ex1.pk,
+                    ex1.date_field.strftime("%b. %d, %Y")))
 
-        response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
-            response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
-                'placeholderapp', 'example1', 'date_field', ex1.pk,
-                ex1.date_field.strftime("%Y-%m-%d")))
-
-        template_text = '''{% extends "base.html" %}
+            template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" 'date:"Y m d"' %}</h1>
 {% endblock content %}
 '''
-        response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
-            response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
-                'placeholderapp', 'example1', 'date_field', ex1.pk,
-                ex1.date_field.strftime("%Y %m %d")))
+            response = detail_view(request, ex1.pk, template_string=template_text)
+            self.assertContains(
+                response,
+                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                    'placeholderapp', 'example1', 'date_field', ex1.pk,
+                    ex1.date_field.strftime("%Y %m %d")))
 
     def test_filters_notoolbar(self):
         user = self.get_staff()
@@ -845,7 +847,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response,
-                            '<h1>%s</h1>' % truncatewords(ex1.char_1, 2))
+                            '<h1>%s</h1>' % truncatewords(escape(ex1.char_1), 2))
 
     def test_no_cms(self):
         user = self.get_staff()
