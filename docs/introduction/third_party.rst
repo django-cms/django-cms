@@ -172,6 +172,5 @@ You can add new articles using the admin or the new *News* menu that now appears
 You can also insert a *Latest articles* plugin into another page - like all good
 django CMS applications, Aldryn News & Blog comes with plugins.
 
-In the next tutorial, we're going to integrate our Polls application into the toolbar too.
 
 .. _aldryn-boilerplates: https://github.com/aldryn/aldryn-boilerplates

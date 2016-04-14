@@ -549,16 +549,26 @@
 .cms-toolbar-trigger-expanded a span {
     transform: rotate(90deg);
 }
-.cms-toolbar-loader a span {
-    @extend .cms-icon-loader;
-    position: absolute;
-    margin-top: -($toolbar-trigger-loader-size / 2);
-    margin-left: -($toolbar-trigger-loader-size / 2);
-    font-size: $toolbar-trigger-loader-size;
-    line-height: $toolbar-trigger-loader-size;
-    color: $color-primary;
-    background: transparent;
-    animation: cms-spin 2s infinite linear;
+.cms-toolbar-loader {
+    a {
+        span {
+            @extend .cms-icon-loader;
+            position: absolute;
+            margin-top: -($toolbar-trigger-loader-size / 2);
+            margin-left: -($toolbar-trigger-loader-size / 2);
+            font-size: $toolbar-trigger-loader-size;
+            line-height: $toolbar-trigger-loader-size;
+            background: transparent;
+            animation: cms-spin 2s infinite linear;
+        }
+        &,
+        &:hover,
+        &:focus {
+            span {
+                color: $color-primary;
+            }
+        }
+    }
 }
 
 // TODO Reimplement blinking if unpublished content is present

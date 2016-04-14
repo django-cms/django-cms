@@ -14,7 +14,7 @@
     font-weight: bold;
     color: $tooltip-first-line-color;
     white-space: nowrap;
-    padding: 0px nth($tooltip-padding, 2) 0px $tooltip-icon-area-size;
+    padding: 0 nth($tooltip-padding, 2) 0 $tooltip-icon-area-size;
     margin: 0;
     border-radius: $border-radius-base;
     background: $gray-darker;

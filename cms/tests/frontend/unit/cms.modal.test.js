@@ -1001,6 +1001,12 @@ describe('CMS.Modal', function () {
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.closed');
         });
 
+        it('hides tooblar loader', function () {
+            modal._hide({ duration: 10000000 });
+            jasmine.clock().tick(modal.options.duration);
+            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
+        });
+
         it('resets minimize state', function () {
             modal.minimized = true;
             modal._hide();
@@ -1095,11 +1101,14 @@ describe('CMS.Modal', function () {
             });
 
             spyOn($.fn, 'css').and.callFake(function (props) {
-                expect(props).toEqual({
-                    left: 20 - (100 - 23),
-                    top: 30 - (100 - 28)
-                });
-                done();
+                if (props && typeof props.left !== 'undefined' &&
+                    typeof props.top !== 'undefined' && Object.keys(props).length === 2) {
+                    expect(props).toEqual({
+                        left: 20 - (100 - 23),
+                        top: 30 - (100 - 28)
+                    });
+                    done();
+                }
             });
 
             modal._startMove({
@@ -1109,7 +1118,9 @@ describe('CMS.Modal', function () {
                 }
             });
 
-            modal.ui.body.trigger(event);
+            setTimeout(function () {
+                modal.ui.body.trigger(event);
+            }, 1000);
         });
 
         it('adds data-touch-action attribute', function () {
