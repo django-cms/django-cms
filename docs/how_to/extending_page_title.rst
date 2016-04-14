@@ -200,6 +200,10 @@ page extension to every page, a page may not have the ``iconextension``
 relationship available, hence the use of the ``{% if ... %}...{% endif %}``
 above.
 
+In order to access to a title extension in page templates you will need to access the title object with the
+get_title_obj function:
+
+    {{ request.current_page.get_title_obj.your_title_extension }}
 
 With menus
 ==========
