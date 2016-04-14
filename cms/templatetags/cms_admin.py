@@ -146,7 +146,7 @@ class CleanAdminListFilter(InclusionTag):
     and not everybody
     """
     name = 'clean_admin_list_filter'
-    template = 'admin/filter.html'
+    template = 'admin/cms/page/tree/filter.html'
 
     options = Options(
         Argument('cl'),

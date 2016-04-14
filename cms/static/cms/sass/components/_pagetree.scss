@@ -4,24 +4,369 @@
 // INFO: please not that all related styles to the pagetree itselfs are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
-.cms-pagetree-container {
-    // overflow: auto;
-
-    margin-bottom: $pagetree-bottom-offset;
-}
-.cms-pagetree-container,
-.cms-pagetree {
-    // helper classes
-    .cms-hidden {
-        display: none !important;
+// HELPERS
+.cms-btn {
+    display: inline-block;
+    color: $white !important;
+    line-height: $toolbar-button-height + 2px;
+    height: $toolbar-button-height + 2px;
+    font-size: $toolbar-button-font-size;
+    padding: 0 $toolbar-button-padding-horizontal + 10px;
+    &:hover,
+    &:active,
+    &:focus {
+        color: $white !important;
     }
 }
+
+.cms-hidden,
 .hidden {
     display: none !important;
 }
+.cms-clear {
+    clear: both;
+    overflow: hidden;
+}
+.cms-clear-mobile {
+    clear: both;
+    overflow: hidden;
+    @media (min-width: $pagetree-mobile) {
+        display: none;
+    }
+}
+
+// we need to add this to get drag & drop to work on internet explorer,
+// more specifically on a microsoft surface
+.jstree li {
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
+//###########################################################
+// CONTAINER
+// general container around the jstree or elements
+.cms-pagetree {
+    box-shadow: $dropdown-shadow;
+    border: $pagetree-border;
+}
+
+//###########################################################
+// HEADER
+// handles top header area styles
+.cms-pagetree-header {
+    position: relative;
+    z-index: z(pagetree, header);
+    min-height: $pagetree-header-height;
+    padding: $pagetree-header-padding;
+    margin: -40px 0 0 0;
+    box-shadow: $pagetree-box-shadow;
+    background: $pagetree-header-background;
+    &:before {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background-color: $white;
+    }
+}
+.cms-admin-sideframe .cms-pagetree-header {
+    margin-top: -25px;
+}
+
+.cms-pagetree-header-title {
+    padding-top: 6px;
+    margin: 0 0 5px !important;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+    }
+    span {
+        font-weight: normal;
+    }
+}
+
+.cms-pagetree-header-body {
+    @media (min-width: $pagetree-mobile) {
+        float: right;
+    }
+}
+
+// SEARCH
+.cms-pagetree-header-search {
+    padding: 0;
+    margin: 5px 0 10px;
+    box-shadow: none;
+    background: none;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+        margin: -3px 0 ;
+    }
+    .cms-pagetree-header-search-btn {
+        position: relative;
+        top: 3px;
+        outline: none;
+        color: $white !important;
+        padding: 8px 10px !important;
+        margin-left: 5px;
+        border: none !important;
+        background: $color-primary !important;
+        &:hover {
+            background: darken($color-primary, 5%) !important;
+        }
+        &:active,
+        &:focus {
+            color: $white !important;
+            background: darken($color-primary, 15%) !important;
+        }
+    }
+    .cms-pagetree-header-filter {
+        position: relative;
+        float: left;
+        input {
+            width: $pagetree-header-search-width !important;
+            padding-right: 35px !important;
+            margin-top: 2px;
+            transition: width $speed-base;
+        }
+    }
+    // active state on focus or when opening the filters
+    .cms-pagetree-header-filter-active input {
+        @media (min-width: $pagetree-mobile) {
+            width: $pagetree-header-search-width * 2 !important;
+        }
+    }
+}
+.cms-pagetree-header-filter-trigger {
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    padding: 10px;
+    transform: rotate(270deg);
+    &:hover .cms-icon,
+    &:active .cms-icon,
+    &:focus .cms-icon {
+        color: $color-primary;
+    }
+    .cms-icon {
+        font-size: 11px;
+        color: $gray;
+    }
+}
+.cms-pagetree-header-filter-container {
+    display: none;
+    overflow: auto;
+    position: absolute;
+    left: 0;
+    top: 38px;
+    width: 100%;
+    padding: 5px 20px 15px;
+    max-height: $pagetree-header-filter-height;
+    box-shadow: $pagetree-box-shadow;
+    box-sizing: border-box;
+    border-radius: $border-radius-base;
+    background: $white;
+    h3 {
+        color: $gray;
+        font-size: 14px;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 10px 0 0 0;
+    }
+    ul,
+    li {
+        list-style-type: none;
+        padding: 2px 0;
+        margin: 0;
+    }
+    // color states
+    li a {
+        color: $gray-light;
+    }
+    .selected a {
+        color: $color-primary;
+        font-weight: bold;
+    }
+}
+.cms-pagetree-header-search-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px;
+    &:hover .cms-icon,
+    &:active .cms-icon,
+    &:focus .cms-icon {
+        color: $color-primary;
+    }
+    .cms-icon {
+        font-size: 12px;
+        color: $gray;
+    }
+}
+.cms-pagetree-header-search-reset {
+    float: left;
+    font-size: 90%;
+    padding: 7px $pagetree-header-space;
+}
+
+// DROPDOWN
+.cms-pagetree-dropdown-menu {
+    float: right;
+    padding-left: 10px;
+    margin-left: $pagetree-header-space;
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+    }
+
+    .cms-pagetree-dropdown-container {
+        right: -1px;
+        top: 30px;
+        min-width: $dropdown-width + 25px;
+        a {
+            padding: 5px $pagetree-dropdown-padding-horizontal;
+        }
+        .active {
+            font-weight: bold;
+        }
+        // modification for the arrow
+        &:before {
+            margin-left: -24px;
+            margin-top: -9px;
+        }
+    }
+
+    .cms-pagetree-dropdown-trigger {
+        float: left;
+        color: $gray !important;
+        padding: 9px 10px 4px;
+    }
+}
+
+.cms-pagetree-header-create {
+    @media (min-width: $pagetree-mobile) {
+        float: left;
+        margin-left: $pagetree-header-space + 10px;
+    }
+}
+
+// BREADCRUMB
+.cms-pagetree-breadcrumbs {
+    margin-bottom: -30px !important;
+    border: none !important;
+}
+
+//###########################################################
+// SECTION
+// separates different navigations
+.cms-pagetree-section {
+    position: relative;
+    z-index: z(pagetree, section);
+    min-height: $pagetree-section-height;
+    padding: $pagetree-section-padding;
+    box-shadow: $pagetree-box-shadow;
+    border-top: none;
+    border-bottom: none;
+    background: $white;
+    h2,
+    p {
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+    h2 {
+        float: left;
+        font-weight: bold;
+    }
+}
+.cms-pagetree-section-nav {
+    float: right;
+}
+
+//###########################################################
+// DROPDOWN
+// dropdowns used for menus
+.cms-pagetree-dropdown {
+    position: relative;
+}
+.cms-pagetree-dropdown-trigger {}
+.cms-pagetree-dropdown-container {
+    display: none;
+    position: absolute;
+    z-index: z(structure, content, dropdown);
+    right: -2px;
+    top: 25px;
+    padding: 4px 0;
+    min-width: $dropdown-width;
+    background: $submenu-dropdown-bgcolor;
+    border-radius: $border-radius-normal;
+    box-shadow: $dropdown-shadow;
+    transform: translateZ(0);
+
+    a {
+        display: block;
+        color: $gray;
+        line-height: 1.5;
+        padding: 10px $submenu-item-padding-horizontal;
+        &:hover,
+        &:active,
+        &:focus {
+            color: $white !important;
+            background: $color-primary;
+        }
+    }
+    // label
+    .label {
+        display: block;
+        font-weight: normal;
+        color: $gray-light;
+        font-size: 90%;
+        line-height: 1.5;
+        padding: 5px $submenu-item-padding-horizontal 0;
+    }
+
+    li {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    // adds arrow
+    &:before {
+        position: absolute;
+        z-index: z(below);
+        content: '';
+        left: 100%;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        transform: rotate(45deg);
+        background-color: $submenu-dropdown-bgcolor;
+    }
+}
+
+.cms-pagetree-dropdown-separator {
+    padding: 0;
+    margin: 4px 1px !important;
+    line-height: 1;
+    height: 1px;
+    background: $gray-lighter;
+}
+
+//##############################################################################
+// JSTREE
+.cms-pagetree-container {
+    // overflow: auto;
+    position: relative;
+    z-index: z(pagetree, container);
+    margin-bottom: $pagetree-bottom-offset;
+    border: 1px solid $gray-lighter;
+    border-top: none;
+    border-bottom: none;
+}
 
 .cms-tree-col {
-    height: $pagetree-header-height;
+    height: $pagetree-jstree-header-height;
 }
 
 .cms-tree-item {
@@ -30,13 +375,6 @@
 
 .cms-tree-reload {
     float: right;
-}
-
-// we need to add this to get drag & drop to work on internet explorer,
-// more specifically on a microsoft surface
-.jstree li {
-    -ms-touch-action: none;
-    touch-action: none;
 }
 
 //###########################################################
@@ -291,6 +629,17 @@
 }
 
 //###########################################################
+// OTHER
+
+// searchform or filtering
+.cms-pagetree-empty {
+    padding: $pagetree-header-padding;
+    border-top: none;
+    .addlink {
+        padding-left: 0;
+    }
+}
+
 // django default admin theme adaptions
 .cms-tree-col {
     line-height: 16px;
@@ -350,13 +699,7 @@
 // DJANGO-CMS THEME
 
 // general wrapper
-.cms-pagetree-container {
-    border: 1px solid $gray-lighter;
-}
 .jstree-grid-wrapper {
-    padding-bottom: $pagetree-bottom-padding !important;
-    border-left: 1px solid $white;
-    border-bottom: 1px solid $white;
     background: $gray-lightest;
 }
 
@@ -370,7 +713,7 @@
         font-size: $font-size-small;
         font-color: $gray;
         text-align: center;
-        padding: $pagetree-header-padding;
+        padding: $pagetree-jstree-header-padding;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
     }

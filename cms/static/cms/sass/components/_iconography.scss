@@ -125,8 +125,11 @@
     @if $filename == sitemap {
         $char: "E021";
     }
-    @if $filename == window {
+    @if $filename == squares {
         $char: "E022";
+    }
+    @if $filename == window {
+        $char: "E023";
     }
 
     @return $char;
@@ -278,6 +281,10 @@
 
 .cms-icon-sitemap {
     @include icon(sitemap);
+}
+
+.cms-icon-squares {
+    @include icon(squares);
 }
 
 .cms-icon-window {

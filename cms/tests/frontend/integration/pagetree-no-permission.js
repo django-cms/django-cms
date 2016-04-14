@@ -29,7 +29,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
         // switch to sideframe
         .withFrame(0, function () {
             var secondPageId;
-            casper.waitUntilVisible('.cms-pagetree')
+            casper.waitUntilVisible('.cms-pagetree-jstree')
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -76,7 +76,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree')
+                .waitUntilVisible('.cms-pagetree-jstree')
                 .wait(3000)
                 .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(function () {
@@ -106,9 +106,9 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .waitUntilVisible('.cms-pagetree-jstree', cms.expandPageTree())
                 .wait(3000)
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree-jstree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage',
@@ -134,7 +134,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     window.location.reload();
                 })
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree', cms.waitUntilAllAjaxCallsFinish())
+                .waitUntilVisible('.cms-pagetree-jstree', cms.waitUntilAllAjaxCallsFinish())
                 .wait(3000)
                 .then(function () {
                     test.assertExists(
@@ -170,10 +170,10 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree')
+                .waitUntilVisible('.cms-pagetree-jstree')
                 .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(cms.expandPageTree())
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree-jstree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
                             {
@@ -207,7 +207,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     window.location.reload();
                 })
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree')
+                .waitUntilVisible('.cms-pagetree-jstree')
                 .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -253,9 +253,9 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .waitUntilVisible('.cms-pagetree-jstree', cms.expandPageTree())
                 .wait(3000)
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree-jstree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
                             {
@@ -306,7 +306,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     window.location.reload();
                 })
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree')
+                .waitUntilVisible('.cms-pagetree-jstree')
                 .wait(3000)
                 .then(function () {
                     test.assertExists(
