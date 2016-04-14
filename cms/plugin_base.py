@@ -292,7 +292,10 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 plugin_data = form.cleaned_data
                 plugin_data['plugin_type'] = form.plugin_type
             else:
-                error = list(form.errors.values())[0]
+                # list() is necessary for python 3 compatibility.
+                # errors is s dict mapping fields to a list of errors
+                # for that field.
+                error = list(form.errors.values())[0][0]
                 raise ValidationError(message=force_text(error))
 
         if not plugin_data['placeholder_id'].has_add_permission(request):

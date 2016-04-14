@@ -14,7 +14,7 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404, render
-from django.template.defaultfilters import force_escape, escapejs
+from django.template.defaultfilters import force_escape
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text

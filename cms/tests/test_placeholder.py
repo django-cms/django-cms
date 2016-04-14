@@ -1044,7 +1044,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
                     response.content,
-                    b"* __all__\n  * This placeholder already has the maximum number of plugins (2).",
+                    b"This placeholder already has the maximum number of plugins (2).",
                 )
 
     def test_type_limit(self):
@@ -1070,7 +1070,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
                     response.content,
-                    b"* __all__\n  * This placeholder already has the "
+                    b"This placeholder already has the "
                     b"maximum number (1) of allowed Text plugins."
                 )
 
