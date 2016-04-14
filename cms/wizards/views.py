@@ -6,7 +6,6 @@ from django.forms import Form
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import NoReverseMatch
-from django.db import transaction
 
 from django.template.response import SimpleTemplateResponse
 from django.utils.translation import get_language_from_request
@@ -23,23 +22,7 @@ from .forms import (
 )
 
 
-class WizardViewMixin(object):
-    language_code = None
-
-    @transaction.atomic
-    def dispatch(self, request, *args, **kwargs):
-        self.language_code = get_language_from_request(request, check_path=True)
-        response = super(WizardViewMixin, self).dispatch(
-            request, *args, **kwargs)
-        return response
-
-    def get_form_kwargs(self):
-        kwargs = super(WizardViewMixin, self).get_form_kwargs()
-        kwargs.update({'wizard_language': self.language_code})
-        return kwargs
-
-
-class WizardCreateView(WizardViewMixin, SessionWizardView):
+class WizardCreateView(SessionWizardView):
     template_name = 'cms/wizards/start.html'
     file_storage = FileSystemStorage(
         location=os.path.join(settings.MEDIA_ROOT, 'wizard_tmp_files'))
@@ -95,12 +78,15 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         kwargs['wizard_user'] = self.request.user
         if self.is_second_step(step):
             kwargs['wizard_page'] = self.get_origin_page()
+            kwargs['wizard_language'] = self.get_origin_language()
         else:
             page_pk = self.page_pk or self.request.GET.get('page', None)
             if page_pk and page_pk != 'None':
                 kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
             else:
                 kwargs['wizard_page'] = None
+            kwargs['wizard_language'] = self.request.GET.get(
+                'language', get_language_from_request(self.request))
         return kwargs
 
     def get_form_initial(self, step):
@@ -108,6 +94,7 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         initial = super(WizardCreateView, self).get_form_initial(step)
         if self.is_first_step(step):
             initial['page'] = self.request.GET.get('page')
+            initial['language'] = self.request.GET.get('language')
         return initial
 
     def get_step_2_form(self, step=None, data=None, files=None):
@@ -139,14 +126,15 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         This step only runs if all forms are valid. Simply emits a simple
         template that uses JS to redirect to the newly created object.
         """
-        form_two = list(form_list)[1]
+        form_one, form_two = list(form_list)
         instance = form_two.save()
         url = self.get_success_url(instance)
+        language = form_one.cleaned_data['language']
         if not url:
             page = self.get_origin_page()
             if page:
                 try:
-                    url = page.get_absolute_url(self.language_code)
+                    url = page.get_absolute_url(language)
                 except NoReverseMatch:
                     url = '/'
             else:
@@ -162,10 +150,15 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         data = self.get_cleaned_data_for_step('0')
         return data.get('page')
 
+    def get_origin_language(self):
+        data = self.get_cleaned_data_for_step('0')
+        return data.get('language')
+
     def get_success_url(self, instance):
         entry = self.get_selected_entry()
+        language = self.get_origin_language()
         success_url = entry.get_success_url(
             obj=instance,
-            language=self.language_code
+            language=language,
         )
         return success_url

@@ -1,13 +1,33 @@
 // #############################################################################
 // SETTINGS
 
-$pagetree-header-height: 24px;
+$pagetree-mobile: $screen-mobile + 200px;
+$pagetree-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+$pagetree-border: 1px solid $gray-lighter;
+
+// top header area
+$pagetree-header-background: lighten($gray-lightest, 2%);
+$pagetree-header-height: 34px;
+$pagetree-header-padding: 15px 20px;
+$pagetree-header-space: 10px;
+$pagetree-header-search-width: 168px;
+$pagetree-header-filter-height: 400px;
+
+// dropdown
+$pagetree-dropdown-padding-horizontal: $submenu-item-padding-horizontal;
+
+// menu sections
+$pagetree-section-padding: 15px 20px;
+$pagetree-section-height: 15px;
+$pagetree-section-border: 1px solid $gray-lighter;
+
+// jstree main container
+$pagetree-jstree-header-height: 24px;
 $pagetree-bottom-offset: 25px;
 $pagetree-cell-height: 40px;
 
 // general paddings for elements
-$pagetree-bottom-padding: 5px;
-$pagetree-header-padding: 3px 6px;
+$pagetree-jstree-header-padding: 3px 6px;
 $pagetree-anchor-padding: 9px 25px;
 $pagetree-nesting-padding: 20px;
 $pagetree-cell-padding: 7px 8px;

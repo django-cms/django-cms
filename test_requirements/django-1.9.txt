@@ -2,6 +2,6 @@
 Django>=1.9,<1.10
 https://github.com/divio/djangocms-text-ckeditor/archive/feature/sane-add-plugin.zip
 django-reversion==1.10,<1.11
-django-hvad==1.4
+django-hvad==1.5
 django-formtools
 django-debug-toolbar

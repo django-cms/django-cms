@@ -7,6 +7,7 @@
 /**
  * @module CMS
  */
+/* istanbul ignore next */
 var CMS = window.CMS || {};
 
 // #############################################################################
@@ -131,6 +132,7 @@ var CMS = window.CMS || {};
             this._setSettingsMenu(this.ui.submenu);
             this._setAddPluginModal(this.ui.dragbar.find('.cms-submenu-add'));
 
+            // istanbul ignore next
             CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
             // enable expanding/collapsing globally within the placeholder
@@ -292,17 +294,21 @@ var CMS = window.CMS || {};
             }
 
             var bounds = this.options.plugin_restriction;
-            var type = clipboardPlugin.data('settings').plugin_type;
-            var parent_bounds = $.grep(clipboardPlugin.data('settings').plugin_parent_restriction, function (r) {
-                // special case when PlaceholderPlugin has a parent restriction named "0"
-                return r !== '0';
-            });
-            var currentPluginType = this.options.plugin_type;
+            if (clipboardPlugin.data('settings')) {
+                var type = clipboardPlugin.data('settings').plugin_type;
+                var parent_bounds = $.grep(clipboardPlugin.data('settings').plugin_parent_restriction, function (r) {
+                    // special case when PlaceholderPlugin has a parent restriction named "0"
+                    return r !== '0';
+                });
+                var currentPluginType = this.options.plugin_type;
 
-            if ((bounds.length && $.inArray(type, bounds) === -1) ||
-                (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
-                pasteItem.addClass('cms-submenu-item-disabled');
-                pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
+                if ((bounds.length && $.inArray(type, bounds) === -1) ||
+                    (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
+                    return false;
+                }
+            } else {
                 return false;
             }
 
@@ -576,6 +582,8 @@ var CMS = window.CMS || {};
                 move_a_copy: options.move_a_copy
             };
 
+            CMS.API.Toolbar.showLoader();
+
             $.ajax({
                 type: 'POST',
                 url: options.urls.move_plugin,
@@ -595,6 +603,7 @@ var CMS = window.CMS || {};
 
                     // enable actions again
                     CMS.API.locked = false;
+                    CMS.API.Toolbar.hideLoader();
 
                     // TODO: show only if (response.status)
                     that._showSuccess(dragitem);
@@ -607,6 +616,7 @@ var CMS = window.CMS || {};
                         message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
                     });
+                    CMS.API.Toolbar.hideLoader();
                 }
             });
 
@@ -969,7 +979,7 @@ var CMS = window.CMS || {};
                         );
                         break;
                     case 'copy-lang':
-                        that.copyPlugin(this.options, el.attr('data-language'));
+                        that.copyPlugin(that.options, el.attr('data-language'));
                         break;
                     case 'copy':
                         if (!el.parent().hasClass('cms-submenu-item-disabled')) {
@@ -1015,12 +1025,13 @@ var CMS = window.CMS || {};
             }
             // add key events
             doc.off(this.keyDown + '.traverse');
+            // istanbul ignore next: not really possible to reproduce focus state in unit tests
             doc.on(this.keyDown + '.traverse', function (e) {
                 var anchors = dropdown.find('.cms-submenu-item:visible a');
                 var index = anchors.index(anchors.filter(':focus'));
 
                 // bind arrow down and tab keys
-                if (e.keyCode === CMS.KEYS.DOWN || e.keyCode === CMS.KEYS.TAB) {
+                if (e.keyCode === CMS.KEYS.DOWN || (e.keyCode === CMS.KEYS.TAB && !e.shiftKey)) {
                     e.preventDefault();
                     if (index >= 0 && index < anchors.length - 1) {
                         anchors.eq(index + 1).focus();
@@ -1110,12 +1121,6 @@ var CMS = window.CMS || {};
                     item.prevUntil('.cms-submenu-item-title').last().prev().show();
                 }
             });
-
-            // if there is no element visible, show only first categoriy
-            list.siblings('.cms-submenu-dropdown-children').show();
-            if (items.add(titles).filter(':visible').length <= 0) {
-                list.siblings('.cms-submenu-dropdown-children').hide();
-            }
         },
 
         /**
