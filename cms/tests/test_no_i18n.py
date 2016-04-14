@@ -172,16 +172,6 @@ class TestNoI18N(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         txt = Text.objects.get(pk=created_plugin_id)
         self.assertEqual("Hello World", txt.body)
-        # edit body, but click cancel button
-        data = {
-            "body": "Hello World!!",
-            "_cancel": True,
-        }
-        edit_url = '%s%d/' % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
-        response = self.client.post(edit_url, data)
-        self.assertEqual(response.status_code, 200)
-        txt = Text.objects.all()[0]
-        self.assertEqual("Hello World", txt.body)
 
     def test_toolbar_no_locale(self):
         page = create_page('test', 'nav_playground.html', 'en-us', published=True)

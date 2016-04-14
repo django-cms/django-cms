@@ -15,7 +15,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.urlresolvers import reverse
-from django.template.defaultfilters import force_escape, escapejs
+from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _

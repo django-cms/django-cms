@@ -1165,17 +1165,6 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 text_plugin = Text.objects.get(pk=plugin.pk)
                 self.assertEqual('Hello World', text_plugin.body)
 
-                # edit again, but this time press cancel
-                data = {
-                    'body': 'Hello World!!',
-                    '_cancel': True,
-                }
-                request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin.pk)
-                self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin.pk)
-                self.assertEqual('Hello World', text_plugin.body)
-
     def test_placeholder_post_move_hook_resolve(self):
         # We test that moving a plugin from placeholder A
         # registered with admin A calls the move plugin hooks
