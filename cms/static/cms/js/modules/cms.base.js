@@ -525,7 +525,7 @@ var CMS = {
          * @method dispatchEvent
          * @param {String} eventName event name
          * @param {Object} payload whatever payload required for the consumer
-         * @returns {$.Event} event that was just triggered;
+         * @returns {$.Event} event that was just triggered
          */
         dispatchEvent: function dispatchEvent(eventName, payload) {
             var event = $.Event(_ns(eventName));
