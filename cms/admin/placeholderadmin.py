@@ -14,7 +14,6 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404, render
-from django.template.defaultfilters import force_escape, escapejs
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
@@ -378,10 +377,7 @@ class PlaceholderAdminMixin(object):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this plugin")))
 
         plugin_admin.cms_plugin_instance = cms_plugin
-        try:
-            plugin_admin.placeholder = cms_plugin.placeholder
-        except Placeholder.DoesNotExist:
-            pass
+        plugin_admin.placeholder = cms_plugin.placeholder
 
         if not instance:
             # instance doesn't exist, call add view
@@ -392,20 +388,9 @@ class PlaceholderAdminMixin(object):
             # change_view method, is better if it will be loaded again, so
             # just pass id to plugin_admin
             response = plugin_admin.change_view(request, str(plugin_id))
+
         if request.method == "POST" and plugin_admin.object_successfully_changed:
             self.post_edit_plugin(request, plugin_admin.saved_object)
-            saved_object = plugin_admin.saved_object
-            context = {
-                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-                'plugin': saved_object,
-                'is_popup': True,
-                'name': force_text(saved_object),
-                "type": saved_object.get_plugin_name(),
-                'plugin_id': plugin_id,
-                'icon': force_escape(saved_object.get_instance_icon_src()),
-                'alt': force_escape(saved_object.get_instance_icon_alt()),
-            }
-            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return response
 
     @method_decorator(require_POST)

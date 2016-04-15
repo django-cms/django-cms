@@ -9,13 +9,13 @@ from django.shortcuts import render_to_response
 
 from django import forms
 from django.contrib import admin
+from django.contrib import messages
 from django.core.exceptions import (
     ImproperlyConfigured,
     PermissionDenied,
     ValidationError,
 )
-from django.core.urlresolvers import reverse
-from django.template.defaultfilters import force_escape, escapejs
+from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -292,7 +292,10 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 plugin_data = form.cleaned_data
                 plugin_data['plugin_type'] = form.plugin_type
             else:
-                error = list(form.errors.values())[0]
+                # list() is necessary for python 3 compatibility.
+                # errors is s dict mapping fields to a list of errors
+                # for that field.
+                error = list(form.errors.values())[0][0]
                 raise ValidationError(message=force_text(error))
 
         if not plugin_data['placeholder_id'].has_add_permission(request):
@@ -343,14 +346,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             'admin/cms/page/plugin/confirm_form.html', context
         )
 
-    def response_post_save_add(self, request, obj):
-        """
-        Always redirect to index. Usually CMS Plugins aren't registered with
-        an admin site directly and the add_view is accessed via frontend
-        editing.
-        """
-        return self.render_close_frame(obj)
-
     def save_model(self, request, obj, form, change):
         """
         Override original method, and add some attributes to obj
@@ -374,34 +369,21 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 
-    def response_change(self, request, obj):
-        """
-        Just set a flag, so we know something was changed, and can make
-        new version if reversion installed.
-        New version will be created in admin.views.edit_plugin
-        """
-        self.object_successfully_changed = True
-        return super(CMSPluginBase, self).response_change(request, obj)
-
     def response_add(self, request, obj, **kwargs):
-        """
-        Just set a flag, so we know something was changed, and can make
-        new version if reversion installed.
-        New version will be created in admin.views.edit_plugin
-        """
         self.object_successfully_changed = True
+        # Normally we would add the user message to say the object
+        # was added successfully but looks like the CMS has not
+        # supported this and can lead to issues with plugins
+        # like ckeditor.
+        return self.render_close_frame(obj)
 
-        if admin.options.IS_POPUP_VAR in request.POST:
-            # prevent Django from rendering it's popup_close html
-            # Django's template assumes certain js functions
-            # and so will throw an error when adding plugins.
-            return self.render_close_frame(obj)
-
-        post_url_continue = reverse('admin:cms_page_edit_plugin',
-                args=(obj._get_pk_val(),),
-                current_app=self.admin_site.name)
-        kwargs.setdefault('post_url_continue', post_url_continue)
-        return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
+    def response_change(self, request, obj):
+        self.object_successfully_changed = True
+        opts = self.model._meta
+        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
+        self.message_user(request, msg, messages.SUCCESS)
+        return self.render_close_frame(obj)
 
     def log_addition(self, request, obj, bypass=None):
         pass

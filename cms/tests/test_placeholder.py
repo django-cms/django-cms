@@ -1044,7 +1044,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
                     response.content,
-                    b"* __all__\n  * This placeholder already has the maximum number of plugins (2).",
+                    b"This placeholder already has the maximum number of plugins (2).",
                 )
 
     def test_type_limit(self):
@@ -1070,7 +1070,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
                     response.content,
-                    b"* __all__\n  * This placeholder already has the "
+                    b"This placeholder already has the "
                     b"maximum number (1) of allowed Text plugins."
                 )
 
@@ -1158,17 +1158,6 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 )
                 data = {
                     'body': 'Hello World',
-                }
-                request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin.pk)
-                self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin.pk)
-                self.assertEqual('Hello World', text_plugin.body)
-
-                # edit again, but this time press cancel
-                data = {
-                    'body': 'Hello World!!',
-                    '_cancel': True,
                 }
                 request = self.get_post_request(data)
                 response = admin_instance.edit_plugin(request, plugin.pk)
