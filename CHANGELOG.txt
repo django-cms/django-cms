@@ -13,6 +13,7 @@
 * Added frontend integration tests (written with Casper JS)
 * Removed frontend integration tests (written with Selenium)
 * Provides the ability to declare cache expiration periods on a per-plugin basis
+* Removes disabled action button border
 
 === 3.2.3 (2016-03-09) ===
 
