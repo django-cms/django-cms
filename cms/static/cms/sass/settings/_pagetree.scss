@@ -24,11 +24,12 @@ $pagetree-section-border: 1px solid $gray-lighter;
 // jstree main container
 $pagetree-jstree-header-height: 24px;
 $pagetree-bottom-offset: 25px;
-$pagetree-cell-height: 40px;
+$pagetree-cell-height: 46px;
 
 // general paddings for elements
 $pagetree-jstree-header-padding: 3px 6px;
-$pagetree-anchor-padding: 9px 25px;
+$pagetree-anchor-padding: 12px 25px;
+$pagetree-anchor-padding-with-icon: 12px 25px 12px 45px;
 $pagetree-nesting-padding: 20px;
 $pagetree-cell-padding: 7px 8px;
 
@@ -39,10 +40,10 @@ $pagetree-icon-size: 18px;
 $pagetree-icon-offset: 5px;
 $pagetree-icon-padding: 0 3px;
 
-$pagetree-lang-size: 15px;
+$pagetree-lang-size: 16px;
 
 $pagetree-tooltip-min-width: 130px;
-$pagetree-tooltip-offset: 25px;
+$pagetree-tooltip-offset: 30px;
 $pagetree-tooltip-header-padding: 2px 10px;
 $pagetree-tooltip-anchor-padding: 10px;
 
@@ -50,3 +51,5 @@ $pagetree-search-width: 175px;
 
 // used for copy and paste
 $pagetree-dimmer: $sideframe-dimmer;
+
+$pagetree-cell-inner-height: $pagetree-cell-height - 2 * nth($pagetree-cell-padding, 1);
