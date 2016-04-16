@@ -966,19 +966,44 @@
 }
 
 #jstree-marker {
-    position: absolute;
+    position: fixed;
+    right: 3%;
+    z-index: z("pagetree", "drag-marker");
     margin: -$pagetree-marker-size 0 0 0;
     border-right: 0;
     border-top: $pagetree-marker-size solid transparent;
     border-bottom: $pagetree-marker-size solid transparent;
-    border-left: $pagetree-marker-size solid $black;
-    width: 0;
+    border-left: $pagetree-marker-size solid $color-primary;
     height: 0;
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        height: 3px;
+        top: -1px;
+        left: -2px;
+        right: 0;
+        background-color: $color-primary;
+    }
+    &.jstree-marker-child {
+        border: 2px solid $color-primary;
+        height: 46px;
+        margin: -24px 0 0 0;
+        background-color: rgba($color-primary, 0.1);
+        box-sizing: border-box;
+
+        &:after {
+            display: none;
+        }
+    }
 }
 
 .cms-pagetree-wrapper.cms-admin-sideframe {
     .messagelist + #content {
         margin-top: 117px !important;
+    }
+    #container .breadcrumbs {
+        left: 20px;
     }
     #container .breadcrumbs + .messagelist + #content,
     #container .breadcrumbs + #content {

@@ -146,7 +146,15 @@ var CMS = window.CMS || {};
                     // disable open/close animations
                     animation: 0,
                     // core setting to allow actions
-                    check_callback: function () {
+                    check_callback: function (operation, node, node_parent, node_position, more) {
+                        if ((operation === 'move_node' || operation === 'copy_node') && more && more.dnd) {
+                            if (more.pos === 'i') {
+                                $('#jstree-marker').addClass('jstree-marker-child');
+                            } else {
+                                $('#jstree-marker').removeClass('jstree-marker-child');
+                            }
+                        }
+
                         // cancel dragging when filtering is active by setting `false`
                         return (that.options.filtered) ? false : true;
                     },
