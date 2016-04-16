@@ -366,11 +366,39 @@
 }
 
 .cms-tree-col {
-    height: $pagetree-jstree-header-height;
+    height: $pagetree-cell-inner-height;
+    min-width: $pagetree-cell-inner-height;
+    display: block;
 }
 
 .cms-tree-item {
-    display: inline-block;
+    display: table;
+    width: 100%;
+    text-align: center;
+    height: $pagetree-cell-inner-height;
+    & + .cms-tree-item {
+        margin-left: 10px;
+    }
+
+}
+.cms-tree-item-wrapper {
+    float: right;
+    display: table-row;
+    min-width: $pagetree-cell-inner-height;
+    .cms-tree-item {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+        min-width: $pagetree-cell-inner-height;
+    }
+    .cms-tree-item-inner {
+        display: block;
+    }
+}
+.cms-tree-item-inner {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .cms-tree-reload {
@@ -384,7 +412,7 @@
     display: none;
     position: absolute;
     right: $pagetree-tooltip-offset;
-    top: -$pagetree-icon-offset;
+    top: 2px;
     z-index: 100;
     text-align: left;
     border-radius: $border-radius-base;
@@ -454,8 +482,10 @@
 // used for the sitemap and apphook icons
 .cms-tree-item-icons {
     position: relative;
-    top: $pagetree-icon-offset;
-    padding: $pagetree-icon-padding;
+
+    .cms-icon {
+        display: block;
+    }
 
     span:before {
         color: $gray-light;
@@ -471,16 +501,17 @@
 // shows preview eye icon
 .cms-tree-item-preview {
     position: relative;
-    // need custom positioning here
-    top: 2px;
-    left: 3px;
 
     a {
         @extend %icon;
         @include icon(eye);
         font-size: $pagetree-icon-size;
+        line-height: $pagetree-icon-size;
+        height: $pagetree-icon-size;
+        display: block;
 
         &:before {
+            display: block;
             color: $gray-darker;
         }
         &:hover:before {
@@ -504,9 +535,9 @@
 .cms-tree-item-lang {
     // required for tooltip
     position: relative;
-    top: $pagetree-icon-offset;
-    .cms-tree-tooltip-container {
-        right: $pagetree-tooltip-offset - 3;
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-lang-size;
     }
 }
 .cms-tree-lang-container span {
@@ -516,7 +547,7 @@
     height: $pagetree-lang-size;
     border-radius: 100%;
     // will change according to states
-    border: 1px solid $white;
+    border: 2px solid $white;
     background: $white;
     &.empty {
         border-color: $gray-light;
@@ -556,9 +587,18 @@
 // shows language bubbles
 .cms-tree-item-menu {
     position: relative;
-    top: $pagetree-icon-offset - 1;
+
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-icon-size - 4;
+    }
+
+    .cms-icon {
+        display: block;
+    }
 
     .cms-icon:before {
+        display: block;
         font-size: $pagetree-icon-size - 4;
         color: $gray-darker;
     }
@@ -572,11 +612,18 @@
 // icon used at the end to display additional help
 .cms-tree-item-info {
     position: relative;
-    top: $pagetree-icon-offset;
-    left: 1px;
 
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-icon-size - 2px;
+    }
+
+    .cms-icon {
+        display: block;
+    }
     .cms-icon:before {
-        font-size: $pagetree-icon-size;
+        display: block;
+        font-size: $pagetree-icon-size - 2px;
     }
 
     p {
@@ -587,6 +634,10 @@
     strong {
         color: $gray-light;
         font-weight: normal;
+    }
+    a {
+        display: inline-block;
+        line-height: 1;
     }
 }
 
@@ -638,11 +689,6 @@
     .addlink {
         padding-left: 0;
     }
-}
-
-// django default admin theme adaptions
-.cms-tree-col {
-    line-height: 16px;
 }
 
 //##############################################################################
@@ -796,6 +842,9 @@
         height: $pagetree-cell-height;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
+        > span {
+            display: block;
+        }
         // don't apply these styles for the first column
         &.jstree-django-cms {
             height: auto;
@@ -871,7 +920,6 @@
 
 .cms-tree-item-helpers a {
     position: relative;
-    top: 2px;
     font-size: $font-size-normal;
     .cms-icon {
         position: relative;
