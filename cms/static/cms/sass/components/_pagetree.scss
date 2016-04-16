@@ -752,12 +752,11 @@
 // specificity required for admin styles and jstree resets
 .jstree-django-cms {
     .jstree {
-        padding-left: $pagetree-nesting-padding / 2;
     }
     // header column
     .jstree-grid-header {
         font-size: $font-size-small;
-        font-color: $gray;
+        color: $gray;
         text-align: center;
         padding: $pagetree-jstree-header-padding;
         border-bottom: 1px solid $gray-lighter;
@@ -770,40 +769,37 @@
 
     //###########################################################
     // styles for nesting elements
-    .jstree-container-ul {
-        margin-left: $pagetree-nesting-padding;
-    }
     .jstree-children {
         margin-left: $pagetree-nesting-padding;
+    }
+    .jstree-container-ul {
+        margin-left: -1px;
     }
     .jstree-ocl {
         float: left;
         position: relative;
-        left: -$pagetree-nesting-padding;
+        left: $pagetree-nesting-padding;
         font-size: 12px;
         color: $gray-light;
-        padding: 15px 10px 10px 0;
+        padding: 18px 10px 10px 0;
         @extend %icon;
+        &:before {
+            // can only apply transforms to non-inline elements
+            display: inline-block;
+        }
     }
     .jstree-open > .jstree-ocl,
     .jstree-closed > .jstree-ocl {
         cursor: pointer;
-        &:after {
-            content: "";
-            display: block;
-            position: absolute;
-            right: 2px;
-            top: 20px;
-            width: 8px;
-            height: 2px;
-            background: $gray-lighter;
-        }
     }
     .jstree-open > .jstree-ocl {
-        @include icon(minus-square-o);
+        @include icon(arrow-right);
+        &:before {
+            transform: rotate(90deg);
+        }
     }
     .jstree-closed > .jstree-ocl {
-        @include icon(plus-square-o);
+        @include icon(arrow-right);
     }
     .jstree-loading > .jstree-ocl {
         @include icon(loader);
@@ -834,6 +830,14 @@
             color: $gray !important;
         }
     }
+    .jstree-open,
+    .jstree-closed,
+    .jstree-loading {
+        > .jstree-anchor {
+            padding: $pagetree-anchor-padding-with-icon;
+        }
+    }
+
     .cms-tree-node-filtered .jstree-anchor {
         cursor: default;
     }
