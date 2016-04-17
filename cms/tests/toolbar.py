@@ -772,29 +772,30 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         )
 
     def test_filters(self):
-        user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
-                       char_3="char_3",
-                       char_4="char_4")
-        ex1.save()
-        template_text = '''{% extends "base.html" %}
+        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
+            user = self.get_staff()
+            page = create_page('Test', 'col_two.html', 'en', published=True)
+            ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
+                           char_3="char_3",
+                           char_4="char_4")
+            ex1.save()
+            template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
 {% endblock content %}
 '''
-        request = self.get_page_request(page, user, edit=True)
-        response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
-            response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
-                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
+            request = self.get_page_request(page, user, edit=True)
+            response = detail_view(request, ex1.pk, template_string=template_text)
+            self.assertContains(
+                response,
+                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
     def test_filters_date(self):
         # Ensure we have a consistent testing env...
-        with self.settings(USE_L10N=False, DATE_FORMAT="M. d, Y"):
+        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False, USE_L10N=False, DATE_FORMAT="M. d, Y"):
             user = self.get_staff()
             page = create_page('Test', 'col_two.html', 'en', published=True)
             ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
@@ -831,23 +832,24 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                     ex1.date_field.strftime("%Y %m %d")))
 
     def test_filters_notoolbar(self):
-        user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
-                       char_3="char_3",
-                       char_4="char_4")
-        ex1.save()
-        template_text = '''{% extends "base.html" %}
+        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
+            user = self.get_staff()
+            page = create_page('Test', 'col_two.html', 'en', published=True)
+            ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
+                           char_3="char_3",
+                           char_4="char_4")
+            ex1.save()
+            template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% render_model instance "char_1" "" "" 'truncatewords:2'  %}</h1>
+<h1>{% render_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
 {% endblock content %}
 '''
-        request = self.get_page_request(page, user, edit=False)
-        response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(response,
-                            '<h1>%s</h1>' % truncatewords(escape(ex1.char_1), 2))
+            request = self.get_page_request(page, user, edit=False)
+            response = detail_view(request, ex1.pk, template_string=template_text)
+            self.assertContains(response,
+                                '<h1>%s</h1>' % truncatewords(escape(ex1.char_1), 2))
 
     def test_no_cms(self):
         user = self.get_staff()
