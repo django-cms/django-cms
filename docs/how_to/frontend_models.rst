@@ -15,6 +15,14 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
 
 .. warning::
 
+    By default and for consistency with previous releases, templatetags used
+    by this feature mark as safe the content of the rendered
+    model attribute. This may be a security risk if used on fields which may
+    hold non-trusted content. Be aware, and use the templatetags accordingly.
+    To change this behaviour, set the setting: :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS` to False.
+
+.. warning::
+
     This feature is only partially compatible with django-hvad: using
     ``render_model`` with hvad-translated fields (say
     {% render_model object 'translated_field' %} return error if the
@@ -25,12 +33,13 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
 Templatetags
 ************
 
-This feature relies on four templatetags sharing common code:
+This feature relies on five templatetags sharing common code:
 
 * :ttag:`render_model`
 * :ttag:`render_model_icon`
 * :ttag:`render_model_add`
 * :ttag:`render_model_block`
+* :ttag:`render_model_add_block`
 
 Look at the tag-specific page for a detailed reference; in the examples
 below ``render_model`` is assumed.
