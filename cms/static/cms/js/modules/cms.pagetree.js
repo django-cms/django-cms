@@ -147,7 +147,7 @@ var CMS = window.CMS || {};
                     animation: 0,
                     // core setting to allow actions
                     check_callback: function (operation, node, node_parent, node_position, more) {
-                        if ((operation === 'move_node' || operation === 'copy_node') && more && more.dnd) {
+                        if ((operation === 'move_node' || operation === 'copy_node') && more && more.pos) {
                             if (more.pos === 'i') {
                                 $('#jstree-marker').addClass('jstree-marker-child');
                             } else {
