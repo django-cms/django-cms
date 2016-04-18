@@ -168,9 +168,11 @@ var CMS = window.CMS || {};
                     },
                     error: function (error) {
                         // ignore warnings about dragging parent into child
-                        if (error.error !== 'check') {
-                            that.showError(error.reason);
+                        var errorData = JSON.parse(error.data);
+                        if (error.error === 'check' && errorData && errorData.chk === 'move_node') {
+                            return;
                         }
+                        that.showError(error.reason);
                     },
                     themes: {
                         name: 'django-cms'
