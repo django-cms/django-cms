@@ -1002,13 +1002,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
-        # Test with setting=False, but use "safe_mode" parameter
+        # Test with setting=False, but use "filter" parameter to include "safe"
         with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
             template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% render_model instance "char_1" "" "" 'truncatewords:2' "" "" True %}</h1>
+<h1>{% render_model instance "char_1" "" "" "truncatewords:2|safe" %}</h1>
 {% endblock content %}
 '''
             request = self.get_page_request(page, user, edit=True)
@@ -1051,31 +1051,6 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
-    def test_mark_safe(self):
-        template_text = '''{% extends "base.html" %}
-{% load cms_tags %}
-
-{% block content %}
-<h1>{% render_model instance "char_1" "" "" 'truncatewords:2' "" "" True %}</h1>
-{% endblock content %}
-'''
-        user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
-                       char_3="char_3",
-                       char_4="char_4")
-        ex1.save()
-
-        # With CMS override settings (False), using "mark_safe" parameter set to
-        # True (assert that the resulting output is NOT escaped).
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-            request = self.get_page_request(page, user, edit=True)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
-                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
-
     def test_filters_date(self):
         # Ensure we have a consistent testing env...
         with self.settings(USE_L10N=False, DATE_FORMAT="M. d, Y"):
@@ -1110,13 +1085,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                         'placeholderapp', 'example1', 'date_field', ex1.pk,
                         ex1.date_field.strftime("%b. %d, %Y")))
 
-            # Test with setting=False, but use "safe_mode" parameter
+            # Test with setting=False, but use "filter" parameter to add "safe"
             with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
                 template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% render_model instance "date_field" "" "" "" "" "" True %}</h1>
+<h1>{% render_model instance "date_field" "" "" "safe" %}</h1>
 {% endblock content %}
 '''
                 request = self.get_page_request(page, user, edit=True)
@@ -1167,13 +1142,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             self.assertContains(response,
                                 '<h1>%s</h1>' % truncatewords(escape(ex1.char_1), 2))
 
-        # Test with setting=False, but use "safe_mode" parameter
+        # Test with setting=False, but use "filter" parameter to add "safe"
         with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
             template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
-<h1>{% render_model instance "char_1" "" "" 'truncatewords:2' "" "" True %}</h1>
+<h1>{% render_model instance "char_1" "" "" 'truncatewords:2|safe' "" "" %}</h1>
 {% endblock content %}
 '''
             request = self.get_page_request(page, user, edit=False)

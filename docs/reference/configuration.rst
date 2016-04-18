@@ -661,20 +661,11 @@ default
     This setting is deprecated and will be removed in a future release.
     Developers are encouraged to carefully consider the source of any content
     displayed by the ``render_model*`` template tags and only add the optional
-    parameter ``mark_safe`` on model fields that are known to be cleansed of
+    template filter ``safe`` on model fields that are known to be cleansed of
     any malicious strings.
 
 This setting affects how certain template tags display model-based content. In
-particular, the template tags:
-
-- :ttag:`render_model`,
-- :ttag:`render_model_add`,
-- :ttag:`render_model_add_block`,
-- :ttag:`render_model_block`, and
-- :ttag:`render_model_icon`
-
-When this setting is ``True`` these tags will mark as safe all content
-*regardless of the value of their optional parameter ``mark_safe``*.
+particular, the template tag: :ttag:`render_model`.
 
 .. :setting:: CMS_UNESCAPED_RENDER_MODEL_TAGS
 

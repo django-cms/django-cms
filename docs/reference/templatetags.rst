@@ -491,9 +491,6 @@ This will render to:
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``mark_safe`` (optional, default value: ``False``): When set to ``True``
-  this tag will mark as safe the contents of any edit fields. **Please read
-  notice below concerning the setting ``CMS_UNESCAPED_RENDER_MODEL_TAGS``.**
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
 
@@ -561,19 +558,8 @@ method is available; also templatetags and filters are available in the block.
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``mark_safe`` (optional, default value: ``False``): When set to ``True``
-  this tag will mark as safe the contents of any edit fields. **Please read
-  notice below concerning the setting ``CMS_UNESCAPED_RENDER_MODEL_TAGS``.**
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
-
-.. warning::
-
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
 
 .. templatetag:: render_model_icon
 .. versionadded:: 3.0
@@ -623,19 +609,8 @@ It will render to something like:
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``mark_safe`` (optional, default value: ``False``): When set to ``True``
-  this tag will mark as safe the contents of any edit fields. **Please read
-  notice below concerning the setting ``CMS_UNESCAPED_RENDER_MODEL_TAGS``.**
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
-
-.. warning::
-
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
 
 .. templatetag:: render_model_add
 .. versionadded:: 3.0
@@ -681,19 +656,8 @@ It will render to something like:
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``mark_safe`` (optional, default value: ``False``): When set to ``True``
-  this tag will mark as safe the contents of any edit fields. **Please read
-  notice below concerning the setting ``CMS_UNESCAPED_RENDER_MODEL_TAGS``.**
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
-
-.. warning::
-
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
 
 .. warning::
 
@@ -752,23 +716,11 @@ It will render to something like:
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``mark_safe`` (optional, default value: ``False``): When set to ``True``
-  this tag will mark as safe the contents of any edit fields. **Please read
-  notice below concerning the setting ``CMS_UNESCAPED_RENDER_MODEL_TAGS``.**
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
 
-.. warning::
-
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
-
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 .. templatetag:: page_language_url
-
 
 page_language_url
 =================

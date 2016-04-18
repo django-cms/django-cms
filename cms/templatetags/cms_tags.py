@@ -23,7 +23,7 @@ from django.utils.encoding import smart_text, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.six import string_types
-from django.utils.safestring import mark_safe as django_mark_safe
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
 
 from classytags.arguments import (Argument, MultiValueArgument,
@@ -222,12 +222,12 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
             continue
         if not edit_mode and get_cms_setting('PLACEHOLDER_CACHE'):
             if hasattr(placeholder, 'content_cache'):
-                return django_mark_safe(placeholder.content_cache)
+                return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):
                 cached_value = get_placeholder_cache(placeholder, get_language())
                 if cached_value is not None:
                     restore_sekizai_context(context, cached_value['sekizai'])
-                    return django_mark_safe(cached_value['content'])
+                    return mark_safe(cached_value['content'])
         if not get_plugins(request, placeholder, page.get_template()):
             continue
         content = render_placeholder(placeholder, context, name)
@@ -569,7 +569,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         cached_value = get_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name)
         if cached_value:
             restore_sekizai_context(context, cached_value['sekizai'])
-            return {'content': django_mark_safe(cached_value['content'])}
+            return {'content': mark_safe(cached_value['content'])}
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
     if not page:
         return {'content': ''}
@@ -587,7 +587,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
                                    {'content': content, 'sekizai': changes})
 
     if content:
-        return {'content': django_mark_safe(content)}
+        return {'content': mark_safe(content)}
     return {'content': ''}
 
 
@@ -659,7 +659,7 @@ class CMSToolbar(RenderBlock):
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
-                context['addons'] = django_mark_safe(toolbar.render_addons(context))
+                context['addons'] = mark_safe(toolbar.render_addons(context))
         else:
             language = None
         # render everything below the tag
@@ -674,7 +674,7 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
         request.toolbar.post_template_populate()
         with force_language(language):
-            addons = django_mark_safe(toolbar.post_template_render_addons(context))
+            addons = mark_safe(toolbar.post_template_render_addons(context))
             toolbar = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
         return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
@@ -698,7 +698,6 @@ class CMSEditableObject(InclusionTag):
         Argument('filters', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
-        Argument('mark_safe', default=False, required=False),
         'as',
         Argument('varname', required=False, resolve=False),
     )
@@ -804,7 +803,7 @@ class CMSEditableObject(InclusionTag):
                 extra_context['redirect_on_close'] = ''
         return extra_context
 
-    def _get_content(self, context, instance, attribute, language, filters, mark_safe):
+    def _get_content(self, context, instance, attribute, language, filters):
         """
         Renders the requested attribute
         """
@@ -828,7 +827,7 @@ class CMSEditableObject(InclusionTag):
         return extra_context
 
     def _get_data_context(self, context, instance, attribute, edit_fields,
-                          language, filters, view_url, view_method, mark_safe):
+                          language, filters, view_url, view_method):
         """
         Renders the requested attribute and attach changeform trigger to it
 
@@ -862,12 +861,12 @@ class CMSEditableObject(InclusionTag):
                                                 edit_fields, language, view_url,
                                                 view_method)
         extra_context.update(self._get_content(extra_context, instance, attribute,
-                                               language, filters, mark_safe))
+                                               language, filters))
         # content is for non-edit template content.html
         # rendered_content is for edit template plugin.html
         # in this templatetag both hold the same content
-        if mark_safe or get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            extra_context['content'] = django_mark_safe(extra_context['content'])
+        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
+            extra_context['content'] = mark_safe(extra_context['content'])
         else:
             extra_context['content'] = extra_context['content']
         extra_context['rendered_content'] = extra_context['content']
@@ -937,7 +936,6 @@ class CMSEditableObjectIcon(CMSEditableObject):
         Argument('language', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
-        Argument('mark_safe', default=False, required=False),
         'as',
         Argument('varname', required=False, resolve=False),
     )
@@ -946,7 +944,6 @@ class CMSEditableObjectIcon(CMSEditableObject):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
-        kwargs.pop('mark_safe')
         kwargs.pop('varname')
         extra_context = self._get_empty_context(context, **kwargs)
         extra_context['render_model_icon'] = True
@@ -967,13 +964,12 @@ class CMSEditableObjectAdd(CMSEditableObject):
         Argument('language', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
-        Argument('mark_safe', default=False, required=False),
         'as',
         Argument('varname', required=False, resolve=False),
     )
 
     def get_context(self, context, instance, language, view_url, view_method,
-                    mark_safe, varname):
+                    varname):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
@@ -998,7 +994,6 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         Argument('language', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
-        Argument('mark_safe', default=False, required=False),
         'as',
         Argument('varname', required=False, resolve=False),
         blocks=[('endrender_model_add_block', 'nodelist')],
@@ -1012,9 +1007,8 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        mark_safe = kwargs.get('mark_safe')
-        if mark_safe or get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            data['content'] = django_mark_safe(kwargs['nodelist'].render(data))
+        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
+            data['content'] = mark_safe(kwargs['nodelist'].render(data))
         else:
             data['content'] = kwargs['nodelist'].render(data)
         data['rendered_content'] = data['content']
@@ -1033,7 +1027,6 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         instance = kwargs.pop('instance')
         if isinstance(instance, Model) and not instance.pk:
             instance.pk = 0
-        kwargs.pop('mark_safe')
         kwargs.pop('varname')
         kwargs.pop('nodelist')
         extra_context = self._get_empty_context(context, instance, None,
@@ -1057,7 +1050,6 @@ class CMSEditableObjectBlock(CMSEditableObject):
         Argument('language', default=None, required=False),
         Argument('view_url', default=None, required=False),
         Argument('view_method', default=None, required=False),
-        Argument('mark_safe', default=False, required=False),
         'as',
         Argument('varname', required=False, resolve=False),
         blocks=[('endrender_model_block', 'nodelist')],
@@ -1071,9 +1063,8 @@ class CMSEditableObjectBlock(CMSEditableObject):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        mark_safe = kwargs.get('mark_safe')
-        if mark_safe or get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            data['content'] = django_mark_safe(kwargs['nodelist'].render(data))
+        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
+            data['content'] = mark_safe(kwargs['nodelist'].render(data))
         else:
             data['content'] = kwargs['nodelist'].render(data)
         data['rendered_content'] = data['content']
@@ -1091,7 +1082,6 @@ class CMSEditableObjectBlock(CMSEditableObject):
         context. Context here is to be intended as the context of the nodelist
         in the block.
         """
-        kwargs.pop('mark_safe')
         kwargs.pop('varname')
         kwargs.pop('nodelist')
         extra_context = self._get_empty_context(context, **kwargs)
