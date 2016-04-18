@@ -1018,6 +1018,7 @@
     }
 }
 
+
 .cms-pagetree-wrapper.cms-admin-sideframe {
     .messagelist + #content {
         margin-top: 117px !important;
@@ -1029,5 +1030,8 @@
     #container .breadcrumbs + #content {
         margin-left: 0 !important;
         margin-right: 0 !important;
+    }
+    #jstree-marker {
+        right: 0;
     }
 }
