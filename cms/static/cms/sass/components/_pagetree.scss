@@ -834,6 +834,7 @@
         border: 1px solid $gray-lighter;
         border-right: none;
         background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+        image-rendering: pixelated;
 
         &:hover {
             color: $gray !important;
