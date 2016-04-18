@@ -711,6 +711,11 @@
 
     .jstree-is-dragging {
         opacity: 0.1 !important;
+        + .jstree-grid-cell {
+            height: $pagetree-cell-height + 1;
+            border-top: 1px solid $gray-lighter;
+            margin-top: -1px;
+        }
     }
 
     // grid settings and resets added by `jstree.grid.js`
