@@ -146,7 +146,15 @@ var CMS = window.CMS || {};
                     // disable open/close animations
                     animation: 0,
                     // core setting to allow actions
-                    check_callback: function () {
+                    check_callback: function (operation, node, node_parent, node_position, more) {
+                        if ((operation === 'move_node' || operation === 'copy_node') && more && more.pos) {
+                            if (more.pos === 'i') {
+                                $('#jstree-marker').addClass('jstree-marker-child');
+                            } else {
+                                $('#jstree-marker').removeClass('jstree-marker-child');
+                            }
+                        }
+
                         // cancel dragging when filtering is active by setting `false`
                         return (that.options.filtered) ? false : true;
                     },
@@ -159,6 +167,11 @@ var CMS = window.CMS || {};
                         'nodes': this.options.lang.nodes
                     },
                     error: function (error) {
+                        // ignore warnings about dragging parent into child
+                        var errorData = JSON.parse(error.data);
+                        if (error.error === 'check' && errorData && errorData.chk === 'move_node') {
+                            return;
+                        }
                         that.showError(error.reason);
                     },
                     themes: {
@@ -206,6 +219,37 @@ var CMS = window.CMS || {};
             this.ui.tree.on('after_open.jstree', function (e, el) {
                 that._storeNodeId(el.node.data.id);
                 that._checkHelpers();
+            });
+
+            this.ui.document.on('dnd_start.vakata', function (e, data) {
+                var element = $(data.element);
+                var node = element.parent();
+
+                node.addClass('jstree-is-dragging');
+                data.data.nodes.forEach(function (nodeId) {
+                    var descendantIds = that._getDescendantsIds(nodeId);
+
+                    [nodeId].concat(descendantIds).forEach(function (node) {
+                        $('.jsgrid_' + node + '_col').addClass('jstree-is-dragging');
+                    });
+                });
+
+                if (!node.hasClass('jstree-leaf')) {
+                    data.helper.addClass('is-stacked');
+                }
+            });
+
+            this.ui.document.on('dnd_stop.vakata', function (e, data) {
+                var element = $(data.element);
+                var node = element.parent();
+                node.removeClass('jstree-is-dragging');
+                data.data.nodes.forEach(function (nodeId) {
+                    var descendantIds = that._getDescendantsIds(nodeId);
+
+                    [nodeId].concat(descendantIds).forEach(function (node) {
+                        $('.jsgrid_' + node + '_col').removeClass('jstree-is-dragging');
+                    });
+                });
             });
 
             // store moved position node
@@ -752,7 +796,7 @@ var CMS = window.CMS || {};
 
             // hide cut element and it's descendants' paste helpers if it is visible
             if (this.cache.type === 'cut' && this.cache.target) {
-                var descendantIds = this.ui.tree.jstree(true).get_node(this.cache.id).children_d;
+                var descendantIds = this._getDescendantsIds(this.cache.id);
 
                 [this.cache.id].concat(descendantIds).forEach(function (id) {
                     $('.jsgrid_' + id + '_col .cms-tree-item-helpers')
@@ -813,8 +857,17 @@ var CMS = window.CMS || {};
             var msg = tpl.replace('{msg}', '<strong>' + this.options.lang.error + '</strong> ' + message);
 
             messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
-        }
+        },
 
+        /**
+         * @method _getDescendantsIds
+         * @private
+         * @param {String} nodeId jstree id of the node, e.g. j1_3
+         * @returns {String[]} array of ids
+         */
+        _getDescendantsIds: function _getDescendantsIds(nodeId) {
+            return this.ui.tree.jstree(true).get_node(nodeId).children_d;
+        }
     });
 
     // shorthand for jQuery(document).ready();

@@ -326,8 +326,8 @@
     .cms-draggable-stack {
         overflow: hidden;
         height: $structure-dragitem-fullheight !important;
-        box-shadow: 1px 1px 1px rgba($black ,0.2),
-        4px 4px 0 0 $color-primary;
+        box-shadow: 1px 1px 1px rgba($black, 0.2),
+            4px 4px 0 0 $color-primary;
     }
 
     .cms-dragitem {

@@ -366,11 +366,39 @@
 }
 
 .cms-tree-col {
-    height: $pagetree-jstree-header-height;
+    height: $pagetree-cell-inner-height;
+    min-width: $pagetree-cell-inner-height;
+    display: block;
 }
 
 .cms-tree-item {
-    display: inline-block;
+    display: table;
+    width: 100%;
+    text-align: center;
+    height: $pagetree-cell-inner-height;
+    & + .cms-tree-item {
+        margin-left: 10px;
+    }
+
+}
+.cms-tree-item-wrapper {
+    float: right;
+    display: table-row;
+    min-width: $pagetree-cell-inner-height;
+    .cms-tree-item {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+        min-width: $pagetree-cell-inner-height;
+    }
+    .cms-tree-item-inner {
+        display: block;
+    }
+}
+.cms-tree-item-inner {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .cms-tree-reload {
@@ -384,7 +412,7 @@
     display: none;
     position: absolute;
     right: $pagetree-tooltip-offset;
-    top: -$pagetree-icon-offset;
+    top: 2px;
     z-index: 100;
     text-align: left;
     border-radius: $border-radius-base;
@@ -454,8 +482,10 @@
 // used for the sitemap and apphook icons
 .cms-tree-item-icons {
     position: relative;
-    top: $pagetree-icon-offset;
-    padding: $pagetree-icon-padding;
+
+    .cms-icon {
+        display: block;
+    }
 
     span:before {
         color: $gray-light;
@@ -471,16 +501,17 @@
 // shows preview eye icon
 .cms-tree-item-preview {
     position: relative;
-    // need custom positioning here
-    top: 2px;
-    left: 3px;
 
     a {
         @extend %icon;
         @include icon(eye);
         font-size: $pagetree-icon-size;
+        line-height: $pagetree-icon-size;
+        height: $pagetree-icon-size;
+        display: block;
 
         &:before {
+            display: block;
             color: $gray-darker;
         }
         &:hover:before {
@@ -504,9 +535,9 @@
 .cms-tree-item-lang {
     // required for tooltip
     position: relative;
-    top: $pagetree-icon-offset;
-    .cms-tree-tooltip-container {
-        right: $pagetree-tooltip-offset - 3;
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-lang-size;
     }
 }
 .cms-tree-lang-container span {
@@ -516,7 +547,7 @@
     height: $pagetree-lang-size;
     border-radius: 100%;
     // will change according to states
-    border: 1px solid $white;
+    border: 2px solid $white;
     background: $white;
     &.empty {
         border-color: $gray-light;
@@ -556,9 +587,18 @@
 // shows language bubbles
 .cms-tree-item-menu {
     position: relative;
-    top: $pagetree-icon-offset - 1;
+
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-icon-size - 4;
+    }
+
+    .cms-icon {
+        display: block;
+    }
 
     .cms-icon:before {
+        display: block;
         font-size: $pagetree-icon-size - 4;
         color: $gray-darker;
     }
@@ -572,11 +612,18 @@
 // icon used at the end to display additional help
 .cms-tree-item-info {
     position: relative;
-    top: $pagetree-icon-offset;
-    left: 1px;
 
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-icon-size - 2px;
+    }
+
+    .cms-icon {
+        display: block;
+    }
     .cms-icon:before {
-        font-size: $pagetree-icon-size;
+        display: block;
+        font-size: $pagetree-icon-size - 2px;
     }
 
     p {
@@ -587,6 +634,10 @@
     strong {
         color: $gray-light;
         font-weight: normal;
+    }
+    a {
+        display: inline-block;
+        line-height: 1;
     }
 }
 
@@ -640,11 +691,6 @@
     }
 }
 
-// django default admin theme adaptions
-.cms-tree-col {
-    line-height: 16px;
-}
-
 //##############################################################################
 // PAGETREE THEME
 
@@ -661,6 +707,15 @@
         list-style-type: none;
         padding: 0;
         margin: 0;
+    }
+
+    .jstree-is-dragging {
+        opacity: 0.1 !important;
+        + .jstree-grid-cell {
+            height: $pagetree-cell-height + 1;
+            border-top: 1px solid $gray-lighter;
+            margin-top: -1px;
+        }
     }
 
     // grid settings and resets added by `jstree.grid.js`
@@ -706,12 +761,11 @@
 // specificity required for admin styles and jstree resets
 .jstree-django-cms {
     .jstree {
-        padding-left: $pagetree-nesting-padding / 2;
     }
     // header column
     .jstree-grid-header {
         font-size: $font-size-small;
-        font-color: $gray;
+        color: $gray;
         text-align: center;
         padding: $pagetree-jstree-header-padding;
         border-bottom: 1px solid $gray-lighter;
@@ -724,40 +778,37 @@
 
     //###########################################################
     // styles for nesting elements
-    .jstree-container-ul {
-        margin-left: $pagetree-nesting-padding;
-    }
     .jstree-children {
         margin-left: $pagetree-nesting-padding;
+    }
+    .jstree-container-ul {
+        margin-left: -1px;
     }
     .jstree-ocl {
         float: left;
         position: relative;
-        left: -$pagetree-nesting-padding;
+        left: $pagetree-nesting-padding;
         font-size: 12px;
         color: $gray-light;
-        padding: 15px 10px 10px 0;
+        padding: 18px 10px 10px 0;
         @extend %icon;
+        &:before {
+            // can only apply transforms to non-inline elements
+            display: inline-block;
+        }
     }
     .jstree-open > .jstree-ocl,
     .jstree-closed > .jstree-ocl {
         cursor: pointer;
-        &:after {
-            content: "";
-            display: block;
-            position: absolute;
-            right: 2px;
-            top: 20px;
-            width: 8px;
-            height: 2px;
-            background: $gray-lighter;
-        }
     }
     .jstree-open > .jstree-ocl {
-        @include icon(minus-square-o);
+        @include icon(arrow-right);
+        &:before {
+            transform: rotate(90deg);
+        }
     }
     .jstree-closed > .jstree-ocl {
-        @include icon(plus-square-o);
+        @include icon(arrow-right);
     }
     .jstree-loading > .jstree-ocl {
         @include icon(loader);
@@ -783,11 +834,20 @@
         border: 1px solid $gray-lighter;
         border-right: none;
         background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+        image-rendering: pixelated;
 
         &:hover {
             color: $gray !important;
         }
     }
+    .jstree-open,
+    .jstree-closed,
+    .jstree-loading {
+        > .jstree-anchor {
+            padding: $pagetree-anchor-padding-with-icon;
+        }
+    }
+
     .cms-tree-node-filtered .jstree-anchor {
         cursor: default;
     }
@@ -796,6 +856,9 @@
         height: $pagetree-cell-height;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
+        > span {
+            display: block;
+        }
         // don't apply these styles for the first column
         &.jstree-django-cms {
             height: auto;
@@ -871,7 +934,6 @@
 
 .cms-tree-item-helpers a {
     position: relative;
-    top: 2px;
     font-size: $font-size-normal;
     .cms-icon {
         position: relative;
@@ -889,8 +951,8 @@
     height: $pagetree-cell-height;
     padding: $pagetree-anchor-padding !important;
     margin-left: -$pagetree-marker-size + 1;
-    border: 1px solid $gray-lighter;
-    background: $white;
+    background: $color-primary url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+    color: $white;
     // copy icon triggered when pressing `CMD`
     .jstree-copy {
         color: $white;
@@ -905,25 +967,67 @@
         position: absolute;
         top: 0;
         left: -5px;
-        width: 5px;
-        height: 100%;
-        background: $gray-lighter;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(white, 0.6);
     }
     .jstree-ok {
-        background-color: $color-success;
+        display: none;
+    }
+
+}
+.is-stacked {
+    #jstree-dnd  {
+        box-shadow: 1px 1px 1px rgba($black, 0.2), 4px 4px 0 0 $color-primary;
     }
     .jstree-er {
-        background-color: $color-danger;
+        box-shadow: 4px 4px 0 0 rgba(white, 0.6);
     }
 }
 
 #jstree-marker {
-    position: absolute;
+    position: fixed;
+    right: 3%;
+    z-index: z("pagetree", "drag-marker");
     margin: -$pagetree-marker-size 0 0 0;
     border-right: 0;
     border-top: $pagetree-marker-size solid transparent;
     border-bottom: $pagetree-marker-size solid transparent;
-    border-left: $pagetree-marker-size solid $black;
-    width: 0;
+    border-left: $pagetree-marker-size solid $color-primary;
     height: 0;
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        height: 3px;
+        top: -1px;
+        left: -2px;
+        right: 0;
+        background-color: $color-primary;
+    }
+    &.jstree-marker-child {
+        border: 2px solid $color-primary;
+        height: 46px;
+        margin: -24px 0 0 0;
+        background-color: rgba($color-primary, 0.1);
+        box-sizing: border-box;
+
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.cms-pagetree-wrapper.cms-admin-sideframe {
+    .messagelist + #content {
+        margin-top: 117px !important;
+    }
+    #container .breadcrumbs {
+        left: 20px;
+    }
+    #container .breadcrumbs + .messagelist + #content,
+    #container .breadcrumbs + #content {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
 }
