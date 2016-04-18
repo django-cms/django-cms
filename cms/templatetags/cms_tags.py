@@ -1008,10 +1008,7 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            data['content'] = mark_safe(kwargs['nodelist'].render(data))
-        else:
-            data['content'] = kwargs['nodelist'].render(data)
+        data['content'] = kwargs['nodelist'].render(data)
         data['rendered_content'] = data['content']
         output = render_to_string(template, data)
         context.pop()
@@ -1064,10 +1061,7 @@ class CMSEditableObjectBlock(CMSEditableObject):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            data['content'] = mark_safe(kwargs['nodelist'].render(data))
-        else:
-            data['content'] = kwargs['nodelist'].render(data)
+        data['content'] = kwargs['nodelist'].render(data)
         data['rendered_content'] = data['content']
         output = render_to_string(template, data)
         context.pop()
