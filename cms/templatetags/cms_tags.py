@@ -22,8 +22,8 @@ from django.utils import six
 from django.utils.encoding import smart_text, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.six import string_types
 from django.utils.safestring import mark_safe
+from django.utils.six import string_types
 from django.utils.translation import ugettext_lazy as _, get_language
 
 from classytags.arguments import (Argument, MultiValueArgument,
@@ -32,8 +32,6 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from classytags.values import StringValue
-from sekizai.helpers import Watcher
-from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 from cms import __version__
 from cms.cache.page import get_page_url_cache, set_page_url_cache
@@ -51,6 +49,9 @@ from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
+
+from sekizai.helpers import Watcher
+from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 
 register = template.Library()
