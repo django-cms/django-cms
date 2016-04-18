@@ -219,6 +219,37 @@ var CMS = window.CMS || {};
                 that._checkHelpers();
             });
 
+            this.ui.document.on('dnd_start.vakata', function (e, data) {
+                var element = $(data.element);
+                var node = element.parent();
+
+                node.addClass('jstree-is-dragging');
+                data.data.nodes.forEach(function (nodeId) {
+                    var descendantIds = that._getDescendantsIds(nodeId);
+
+                    [nodeId].concat(descendantIds).forEach(function (node) {
+                        $('.jsgrid_' + node + '_col').addClass('jstree-is-dragging');
+                    });
+                });
+
+                if (!node.hasClass('jstree-leaf')) {
+                    data.helper.addClass('is-stacked');
+                }
+            });
+
+            this.ui.document.on('dnd_stop.vakata', function (e, data) {
+                var element = $(data.element);
+                var node = element.parent();
+                node.removeClass('jstree-is-dragging');
+                data.data.nodes.forEach(function (nodeId) {
+                    var descendantIds = that._getDescendantsIds(nodeId);
+
+                    [nodeId].concat(descendantIds).forEach(function (node) {
+                        $('.jsgrid_' + node + '_col').removeClass('jstree-is-dragging');
+                    });
+                });
+            });
+
             // store moved position node
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
                 if (!that.cache.type || that.cache.type === 'cut') {
@@ -763,7 +794,7 @@ var CMS = window.CMS || {};
 
             // hide cut element and it's descendants' paste helpers if it is visible
             if (this.cache.type === 'cut' && this.cache.target) {
-                var descendantIds = this.ui.tree.jstree(true).get_node(this.cache.id).children_d;
+                var descendantIds = this._getDescendantsIds(this.cache.id);
 
                 [this.cache.id].concat(descendantIds).forEach(function (id) {
                     $('.jsgrid_' + id + '_col .cms-tree-item-helpers')
@@ -824,8 +855,17 @@ var CMS = window.CMS || {};
             var msg = tpl.replace('{msg}', '<strong>' + this.options.lang.error + '</strong> ' + message);
 
             messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
-        }
+        },
 
+        /**
+         * @method _getDescendantsIds
+         * @private
+         * @param {String} nodeId jstree id of the node, e.g. j1_3
+         * @returns {String[]} array of ids
+         */
+        _getDescendantsIds: function _getDescendantsIds(nodeId) {
+            return this.ui.tree.jstree(true).get_node(nodeId).children_d;
+        }
     });
 
     // shorthand for jQuery(document).ready();

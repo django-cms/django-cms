@@ -709,6 +709,10 @@
         margin: 0;
     }
 
+    .jstree-is-dragging {
+        opacity: 0.1 !important;
+    }
+
     // grid settings and resets added by `jstree.grid.js`
     .jstree-grid-header,
     .jstree-grid-separator {
@@ -941,8 +945,8 @@
     height: $pagetree-cell-height;
     padding: $pagetree-anchor-padding !important;
     margin-left: -$pagetree-marker-size + 1;
-    border: 1px solid $gray-lighter;
-    background: $white;
+    background: $color-primary url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+    color: $white;
     // copy icon triggered when pressing `CMD`
     .jstree-copy {
         color: $white;
@@ -957,15 +961,21 @@
         position: absolute;
         top: 0;
         left: -5px;
-        width: 5px;
-        height: 100%;
-        background: $gray-lighter;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(white, 0.6);
     }
     .jstree-ok {
-        background-color: $color-success;
+        display: none;
+    }
+
+}
+.is-stacked {
+    #jstree-dnd  {
+        box-shadow: 1px 1px 1px rgba($black, 0.2), 4px 4px 0 0 $color-primary;
     }
     .jstree-er {
-        background-color: $color-danger;
+        box-shadow: 4px 4px 0 0 rgba(white, 0.6);
     }
 }
 
