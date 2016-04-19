@@ -12,7 +12,10 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.placeholder import get_toolbar_plugin_struct
+from cms.utils.request_ip_resolvers import get_request_ip_resolver
 from menus.menu_pool import menu_pool
+
+get_request_ip = get_request_ip_resolver()
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
@@ -47,21 +50,6 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     return output
 
 
-def get_client_ip(request):
-
-    ip_address = None
-
-    ip_addresses = request.META.get('HTTP_X_FORWARDED_FOR')
-    if ip_addresses:
-        ip_address_list = ip_addresses.split(',')
-        ip_address = ip_address_list[0]
-
-    if not ip_address:
-        ip_address = request.META.get('REMOTE_ADDR') or None
-
-    return ip_address
-
-
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
@@ -72,7 +60,7 @@ class ToolbarMiddleware(object):
         internal_ips = get_cms_setting('INTERNAL_IPS')
 
         if internal_ips:
-            client_ip = get_client_ip(request)
+            client_ip = get_request_ip(request)
             if client_ip not in internal_ips:
                 return False
 
