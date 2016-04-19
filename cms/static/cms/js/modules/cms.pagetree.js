@@ -641,9 +641,13 @@ var CMS = window.CMS || {};
                 });
             });
 
-            // stop propagnation on the element
+            // stop propagation on the element
             this.ui.container.on(this.click, menuCls, function (e) {
                 e.stopImmediatePropagation();
+            });
+
+            this.ui.container.on(this.click, menuCls + ' a', function () {
+                $(menuCls).removeClass('cms-pagetree-dropdown-menu-open');
             });
         },
 
