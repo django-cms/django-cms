@@ -196,7 +196,6 @@ def reorder_plugins(placeholder, parent_id, language, order):
 
     if order:
         plugins = plugins.filter(pk__in=order)
-        print order
 
         for plugin in plugins.iterator():
             position = order.index(plugin.pk)
