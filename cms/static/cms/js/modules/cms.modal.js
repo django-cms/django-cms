@@ -904,7 +904,7 @@ var CMS = window.CMS || {};
                 messages = messageList.find('li');
                 if (messages.length) {
                     CMS.API.Messages.open({
-                        message: messages.eq(0).text()
+                        message: messages.eq(0).html()
                     });
                 }
                 messageList.remove();
