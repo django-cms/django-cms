@@ -421,7 +421,7 @@
     background: $submenu-dropdown-bgcolor;
     border-radius: $border-radius-normal;
     box-shadow: $dropdown-shadow;
-    /* transform: translateZ(0); */
+    transform: translateZ(0);
 
     a {
         display: block;
@@ -433,6 +433,11 @@
         &:focus {
             color: $white !important;
             background: $color-primary;
+        }
+    }
+    &.cms-pagetree-dropdown-menu-condensed {
+        a {
+            padding: 5px $pagetree-dropdown-padding-horizontal;
         }
     }
     .active {
