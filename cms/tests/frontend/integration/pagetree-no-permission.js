@@ -44,7 +44,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
 
                     secondPageId = cms.getPageId('Second');
 
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -58,7 +58,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 // click on it again
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
                             visible: true
@@ -67,7 +67,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                         'Paste buttons hide when clicked on copy again'
                     );
                     // open them again
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // then try to paste into itself
                 .then(function () {
@@ -96,7 +96,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .then(cms.expandPageTree())
                 // try to copy into parent
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -160,7 +160,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 // try to copy into root
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -242,7 +242,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 // then try to copy sibling into a sibling (homepage into sibling "second" page)
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
+                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -358,7 +358,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
 
                 // then try to copy a page into own child
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
+                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
