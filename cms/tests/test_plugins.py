@@ -248,6 +248,36 @@ class PluginsTestCase(PluginsTestBaseCase):
             rendered_live_placeholder = live_placeholder.render(self.get_context(live_page.get_absolute_url(), page=live_page), None)
             self.assertEqual(rendered_live_placeholder, "I'm the firstI'm the secondI'm the third")
 
+        columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
+        column = api.add_plugin(
+            placeholder,
+            "ColumnPlugin",
+            "en",
+            target=columns,
+            width='10%',
+        )
+
+        data = {
+            'placeholder_id': placeholder.id,
+            'plugin_id': text_plugin_1.id,
+            'plugin_parent': '',
+            'plugin_language': 'en',
+            'plugin_order[]': [
+                text_plugin_1.id,
+                text_plugin_2.id,
+                text_plugin_3.id,
+                columns.id,
+                column.id,
+            ],
+        }
+        response = self.client.post(URL_CMS_PLUGIN_MOVE, data)
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(
+            response,
+            'order parameter references plugins in different trees',
+            status_code=400,
+        )
+
     def test_plugin_breadcrumbs(self):
         """
         Test the plugin breadcrumbs order

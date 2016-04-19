@@ -194,6 +194,9 @@ def reorder_plugins(placeholder, parent_id, language, order):
         language=language,
     ).order_by('position')
 
+    # Make sure we're dealing with a list
+    order = list(order)
+
     if order:
         plugins = plugins.filter(pk__in=order)
 
