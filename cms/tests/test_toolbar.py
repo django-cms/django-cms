@@ -128,6 +128,21 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
+    def test_cms_internal_ips_unset(self):
+        with self.settings(CMS_INTERNAL_IPS=[]):
+            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            self.assertTrue(hasattr(request, 'toolbar'))
+
+    def test_cms_internal_ips_set_no_match(self):
+        with self.settings(CMS_INTERNAL_IPS=['123.45.67.89', ]):
+            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            self.assertFalse(hasattr(request, 'toolbar'))
+
+    def test_cms_internal_ips_set_match(self):
+        with self.settings(CMS_INTERNAL_IPS=['127.0.0.0', '127.0.0.1', '127.0.0.2', ]):
+            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            self.assertTrue(hasattr(request, 'toolbar'))
+
 
 @override_settings(CMS_PERMISSION=False)
 class ToolbarTests(ToolbarTestBase):
