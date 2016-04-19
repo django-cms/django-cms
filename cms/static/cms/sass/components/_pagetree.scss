@@ -336,6 +336,9 @@
     top: -1px;
     width: 205px;
 }
+.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil {
+    @include icon(cogs);
+}
 
 //###########################################################
 // DROPDOWN

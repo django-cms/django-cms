@@ -222,6 +222,17 @@ var CMS = window.CMS || {};
                 that._checkHelpers();
             });
 
+            this.ui.document.on('keydown.pagetree.alt-mode', function (e) {
+                if (e.keyCode === CMS.KEYS.SHIFT) {
+                    that.ui.container.addClass('cms-pagetree-alt-mode');
+                }
+            });
+            this.ui.document.on('keyup.pagetree.alt-mode', function (e) {
+                if (e.keyCode === CMS.KEYS.SHIFT) {
+                    that.ui.container.removeClass('cms-pagetree-alt-mode');
+                }
+            });
+
             this.ui.document.on('dnd_start.vakata', function (e, data) {
                 var element = $(data.element);
                 var node = element.parent();
