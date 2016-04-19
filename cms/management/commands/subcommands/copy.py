@@ -29,10 +29,14 @@ class CopyLangCommand(SubcommandsCommand):
         parser.add_argument('--force', action='store_false', dest='only_empty', default=True,
                             help='If set content is copied even if destination language already '
                                  'has content.')
+        parser.add_argument('--skip-content', action='store_false', dest='copy_content',
+                            default=True, help='If set content is not copied, and the command '
+                                               'will only create titles in the given language.')
 
     def handle(self, *args, **options):
         verbose = options.get('verbosity') > 1
         only_empty = options.get('only_empty')
+        copy_content = options.get('copy_content')
         from_lang = options.get('from_lang')
         to_lang = options.get('to_lang')
         try:
@@ -60,27 +64,29 @@ class CopyLangCommand(SubcommandsCommand):
                     title.publisher_state = 0
                     title.language = to_lang
                     title.save()
-                # copy plugins using API
-                if verbose:
-                    self.stdout.write('copying plugins for %s from %s\n' % (page.get_page_title(from_lang), from_lang))
-                copy_plugins_to_language(page, from_lang, to_lang, only_empty)
+                if copy_content:
+                    # copy plugins using API
+                    if verbose:
+                        self.stdout.write('copying plugins for %s from %s\n' % (page.get_page_title(from_lang), from_lang))
+                    copy_plugins_to_language(page, from_lang, to_lang, only_empty)
             else:
                 if verbose:
                     self.stdout.write('Skipping page %s, language %s not defined\n' % (page.get_page_title(page.get_languages()[0]), from_lang))
 
-        for static_placeholder in StaticPlaceholder.objects.all():
-            plugin_list = []
-            for plugin in static_placeholder.draft.get_plugins():
-                if plugin.language == from_lang:
-                    plugin_list.append(plugin)
+        if copy_content:
+            for static_placeholder in StaticPlaceholder.objects.all():
+                plugin_list = []
+                for plugin in static_placeholder.draft.get_plugins():
+                    if plugin.language == from_lang:
+                        plugin_list.append(plugin)
 
-            if plugin_list:
-                if verbose:
-                    self.stdout.write(
-                        'copying plugins from static_placeholder "%s" in "%s" to "%s"\n' % (
-                            static_placeholder.name, from_lang, to_lang)
-                    )
-                copy_plugins_to(plugin_list, static_placeholder.draft, to_lang)
+                if plugin_list:
+                    if verbose:
+                        self.stdout.write(
+                            'copying plugins from static_placeholder "%s" in "%s" to "%s"\n' % (
+                                static_placeholder.name, from_lang, to_lang)
+                        )
+                    copy_plugins_to(plugin_list, static_placeholder.draft, to_lang)
 
         self.stdout.write('all done')
 
