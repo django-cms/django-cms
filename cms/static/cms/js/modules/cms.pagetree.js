@@ -321,7 +321,7 @@ var CMS = window.CMS || {};
             });
 
             // additional event handlers
-            this._setupTooltips();
+            this._setupDropdowns();
             this._setupSearch();
 
             // make sure ajax post requests are working
@@ -604,15 +604,15 @@ var CMS = window.CMS || {};
         /**
          * Sets up general tooltips that can have a list of links or content.
          *
-         * @method _setupTooltips
+         * @method _setupDropdowns
          * @private
          */
-        _setupTooltips: function _setupTooltips() {
+        _setupDropdowns: function _setupDropdowns() {
             var that = this;
-            var triggerCls = '.js-cms-tree-tooltip-trigger';
-            var containerCls = '.js-cms-tree-tooltip-container';
+            var triggerCls = '.js-cms-pagetree-dropdown-trigger';
+            var menuCls = '.js-cms-pagetree-dropdown-menu';
             var triggers;
-            var containers;
+            var menus;
             var index;
 
             // attach event to the trigger
@@ -621,28 +621,28 @@ var CMS = window.CMS || {};
                 e.stopImmediatePropagation();
 
                 triggers = $(triggerCls);
-                containers = $(containerCls);
+                menus = $(menuCls);
                 index = triggers.index(this);
 
                 // cancel if opened tooltip is triggered again
-                if (containers.eq(index).is(':visible')) {
-                    containers.removeClass('cms-tree-tooltip-container-open');
+                if (menus.eq(index).is(':visible')) {
+                    menus.removeClass('cms-pagetree-dropdown-menu-open');
                     return false;
                 }
 
                 // otherwise show the dropdown
-                containers
-                    .removeClass('cms-tree-tooltip-container-open')
+                menus
+                    .removeClass('cms-pagetree-dropdown-menu-open')
                     .eq(index)
-                    .addClass('cms-tree-tooltip-container-open');
+                    .addClass('cms-pagetree-dropdown-menu-open');
 
                 that.ui.document.one(that.click, function () {
-                    containers.removeClass('cms-tree-tooltip-container-open');
+                    menus.removeClass('cms-pagetree-dropdown-menu-open');
                 });
             });
 
             // stop propagnation on the element
-            this.ui.container.on(this.click, containerCls, function (e) {
+            this.ui.container.on(this.click, menuCls, function (e) {
                 e.stopImmediatePropagation();
             });
         },

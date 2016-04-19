@@ -14,7 +14,7 @@ $pagetree-header-search-width: 168px;
 $pagetree-header-filter-height: 400px;
 
 // dropdown
-$pagetree-dropdown-padding-horizontal: $submenu-item-padding-horizontal;
+$pagetree-dropdown-padding-horizontal: $submenu-item-padding-horizontal - 5px;
 
 // menu sections
 $pagetree-section-padding: 15px 20px;
