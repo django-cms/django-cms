@@ -643,7 +643,7 @@ class PlaceholderAdminMixin(object):
         target_placeholder_admin = self._get_attached_admin(placeholder)
 
         if move_a_copy:  # "paste"
-            plugins = [plugin] + list(plugin.get_descendants())
+            plugins = list(plugin.get_tree())
             self.post_copy_plugins(request, source_placeholder, placeholder, plugins)
 
             if (target_placeholder_admin and
