@@ -995,7 +995,7 @@
 }
 
 #jstree-marker {
-    position: fixed;
+    position: absolute;
     right: 3%;
     z-index: z("pagetree", "drag-marker");
     margin: -$pagetree-marker-size 0 0 0;
