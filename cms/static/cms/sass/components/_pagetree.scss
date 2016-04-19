@@ -1,22 +1,16 @@
 //##############################################################################
 // PAGETREE
 
-// INFO: please not that all related styles to the pagetree itselfs are
+// INFO: please note that all related styles to the pagetree itself are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
 // HELPERS
-.cms-btn {
+.cms-btn-toolbar {
     display: inline-block;
-    color: $white !important;
     line-height: $toolbar-button-height + 2px;
     height: $toolbar-button-height + 2px;
     font-size: $toolbar-button-font-size;
     padding: 0 $toolbar-button-padding-horizontal + 10px;
-    &:hover,
-    &:active,
-    &:focus {
-        color: $white !important;
-    }
 }
 
 .cms-hidden,
@@ -211,29 +205,12 @@
 }
 
 // DROPDOWN
-.cms-pagetree-dropdown-menu {
+.cms-pagetree-sites-list {
     float: right;
     padding-left: 10px;
     margin-left: $pagetree-header-space;
     @media (min-width: $pagetree-mobile) {
         float: left;
-    }
-
-    .cms-pagetree-dropdown-container {
-        right: -1px;
-        top: 30px;
-        min-width: $dropdown-width + 25px;
-        a {
-            padding: 5px $pagetree-dropdown-padding-horizontal;
-        }
-        .active {
-            font-weight: bold;
-        }
-        // modification for the arrow
-        &:before {
-            margin-left: -24px;
-            margin-top: -9px;
-        }
     }
 
     .cms-pagetree-dropdown-trigger {
@@ -283,68 +260,6 @@
     float: right;
 }
 
-//###########################################################
-// DROPDOWN
-// dropdowns used for menus
-.cms-pagetree-dropdown {
-    position: relative;
-}
-.cms-pagetree-dropdown-trigger {}
-.cms-pagetree-dropdown-container {
-    display: none;
-    position: absolute;
-    z-index: z(structure, content, dropdown);
-    right: -2px;
-    top: 25px;
-    padding: 4px 0;
-    min-width: $dropdown-width;
-    background: $submenu-dropdown-bgcolor;
-    border-radius: $border-radius-normal;
-    box-shadow: $dropdown-shadow;
-    transform: translateZ(0);
-
-    a {
-        display: block;
-        color: $gray;
-        line-height: 1.5;
-        padding: 10px $submenu-item-padding-horizontal;
-        &:hover,
-        &:active,
-        &:focus {
-            color: $white !important;
-            background: $color-primary;
-        }
-    }
-    // label
-    .label {
-        display: block;
-        font-weight: normal;
-        color: $gray-light;
-        font-size: 90%;
-        line-height: 1.5;
-        padding: 5px $submenu-item-padding-horizontal 0;
-    }
-
-    li {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    // adds arrow
-    &:before {
-        position: absolute;
-        z-index: z(below);
-        content: '';
-        left: 100%;
-        width: $dropdown-arrow-side;
-        height: $dropdown-arrow-side;
-        margin-left: -($dropdown-arrow-side / 2);
-        transform: rotate(45deg);
-        background-color: $submenu-dropdown-bgcolor;
-    }
-}
-
 .cms-pagetree-dropdown-separator {
     padding: 0;
     margin: 4px 1px !important;
@@ -370,6 +285,12 @@
     min-width: $pagetree-cell-inner-height;
     display: block;
 }
+.cms-tree-col-padding-sm {
+    margin-top: -3px;
+    margin-left: -4px;
+    margin-right: -4px;
+    height: $pagetree-cell-inner-height + 6px;
+}
 
 .cms-tree-item {
     display: table;
@@ -377,7 +298,7 @@
     text-align: center;
     height: $pagetree-cell-inner-height;
     & + .cms-tree-item {
-        margin-left: 10px;
+        padding-left: 4px;
     }
 
 }
@@ -408,6 +329,7 @@
 //###########################################################
 // TOOLTIP
 // handles tooltip styling
+// TODO should be no more tooltips
 .cms-tree-tooltip-container {
     display: none;
     position: absolute;
@@ -473,9 +395,105 @@
         display: block;
     }
 }
+.cms-tree-item-button .cms-pagetree-dropdown-menu {
+    right: 40px;
+    top: -1px;
+}
 .cms-tree-tooltip-wrapper {
     padding: 10px;
 }
+
+//###########################################################
+// DROPDOWN
+// dropdowns used for menus
+.cms-pagetree-dropdown {
+    position: relative;
+}
+.cms-pagetree-dropdown-trigger {}
+
+.cms-pagetree-dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: z(pagetree, dropdown);
+    right: -1px;
+    top: 30px;
+    min-width: $dropdown-width + 25px;
+    background: $submenu-dropdown-bgcolor;
+    border-radius: $border-radius-normal;
+    box-shadow: $dropdown-shadow;
+    /* transform: translateZ(0); */
+
+    a {
+        display: block;
+        color: $gray;
+        line-height: 1.5;
+        padding: 10px $pagetree-dropdown-padding-horizontal;
+        &:hover,
+        &:active,
+        &:focus {
+            color: $white !important;
+            background: $color-primary;
+        }
+    }
+    .active {
+        font-weight: bold;
+    }
+    // label
+    .label {
+        display: block;
+        font-weight: normal;
+        color: $gray-light;
+        font-size: 90%;
+        line-height: 1.5;
+        padding: 5px $submenu-item-padding-horizontal 0;
+    }
+
+    li {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .cms-icon {
+        margin-right: 10px;
+    }
+
+    // adds arrow
+    &:before {
+        position: absolute;
+        z-index: z(below);
+        content: '';
+        left: 100%;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        background-color: $submenu-dropdown-bgcolor;
+        box-shadow: $dropdown-shadow;
+        transform: rotate(45deg) translateZ(0);
+    }
+
+    &.cms-tree-tooltip-container-open {
+        display: block;
+    }
+    .cms-pagetree-dropdown-menu-inner {
+        background-color: $white;
+        margin: 0;
+        padding: 4px 0 !important;
+        border-radius: $border-radius-normal;
+    }
+}
+.cms-pagetree-dropdown-menu-arrow-top-right {
+    &:before {
+        margin-left: -24px;
+        margin-top: -5px;
+    }
+}
+.cms-pagetree-dropdown-menu-arrow-right-top {
+    &:before {
+        top: 18px;
+    }
+}
+
 
 //###########################################################
 // ICONS
@@ -866,6 +884,23 @@
             background: none;
         }
     }
+    .cms-btn {
+        display: inline-block;
+        box-sizing: border-box;
+        width: $pagetree-cell-inner-height + 7;
+        height: $pagetree-cell-inner-height + 5;
+        position: relative;
+        &:before {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-top: -8px;
+            margin-left: -8px;
+        }
+    }
+    .cms-btn.cms-btn-no-border {
+        border: none !important;
+    }
     .jstree-grid-cell-regular {
         text-align: center;
         padding: $pagetree-cell-padding;
@@ -897,6 +932,17 @@
             padding-right: $pagetree-icon-offset;
             margin-left: $pagetree-icon-offset;
         }
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        border: 0;
     }
 }
 

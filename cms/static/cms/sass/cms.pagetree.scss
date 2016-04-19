@@ -3,6 +3,8 @@
  * @copyright: https://github.com/divio/django-cms
  */
 
+$pagetree: true;
+
 //##############################################################################
 // IMPORT SETTINGS
 @import "settings/all";
@@ -11,5 +13,7 @@
 //##############################################################################
 // IMPORT COMPONENTS
 @import "components/iconography";
-@import "components/button";
+.cms-pagetree-wrapper {
+    @import "components/button";
+}
 @import "components/pagetree";

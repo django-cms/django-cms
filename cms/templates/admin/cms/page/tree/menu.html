@@ -119,26 +119,80 @@
         </div>
     '
     data-coloptions='
-        <div class="cms-tree-col">
+        <div class="cms-tree-col cms-tree-col-padding-sm">
             <div class="cms-tree-item-wrapper">
                 {% if has_change_permission %}
-                    <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                        <div class="cms-tree-item-inner">
-                            <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" class="js-cms-tree-advanced-settings"
-                                data-url="{% url 'admin:cms_page_advanced' page.id %}"
-                                title="{% filter escapejs %}{% trans "Page settings (SHIFT-click for advanced settings)" %}{% endfilter %}">
-                                <span class="cms-icon cms-icon-cogs"></span>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy"
-                        data-id="{{ page.pk }}"
-                        data-apphook="{{ page.application_urls|default_if_none:'' }}">
-                        <div class="cms-tree-item-inner">
-                            <a href="#" title="{% filter escapejs %}{% trans 'Copy' %}{% endfilter %}"><span class="cms-icon cms-icon-copy"></span></a>
-                        </div>
+                    <div class="cms-tree-item cms-tree-item-button">
+                        <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
+                            class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
+                            data-url="{% url 'admin:cms_page_advanced' page.id %}"
+                            title="{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}">
+                            <span class="sr-only">{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}</span>
+                        </a>
                     </div>
                 {% endif %}
+                {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
+                    <div class="cms-tree-item cms-tree-item-button">
+                        <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child" title="{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}"
+                            class="cms-btn cms-btn-default cms-icon cms-icon-plus">
+                            <span class="sr-only">{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}</span>
+                        </a>
+                    </div>
+                {% endif %}
+                <div class="cms-tree-item cms-tree-item-button">
+                    <a href="#" class="js-cms-tree-tooltip-trigger cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                        <span class="sr-only">{% filter escapejs %}{% trans "Options" %}{% endfilter %}</span>
+                    </a>
+
+                    <div class="cms-tree-tooltip-container js-cms-tree-tooltip-container cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
+                        <ul class="cms-pagetree-dropdown-menu-inner">
+                            <li><span class="label">{% filter escapejs %}{% trans "Pick an action" %}{% endfilter %}</span></li>
+                            <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
+                            {% if has_change_permission %}
+                                <li class="js-cms-tree-item-copy"
+                                    data-id="{{ page.pk }}"
+                                    data-apphook="{{ page.application_urls|default_if_none:'' }}">
+                                    <a href="#" title="{% filter escapejs %}{% trans 'Copy' %}{% endfilter %}">
+                                        <span class="cms-icon cms-icon-copy"></span>
+                                        <span>{% filter escapejs %}{% trans 'Copy' %}{% endfilter %}<span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <!--
+                            <div class="cms-tree-tooltip-wrapper">
+                                {% if page.publication_date %}
+                                    <p><strong>{% filter escapejs %}{% trans "publication date" %}{% endfilter %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
+                                {% endif %}
+                                {% if page.publication_end_date %}
+                                    <p><strong>{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
+                                {% endif %}
+                                <p>
+                                    <strong>{% filter escapejs %}{% trans "is restricted" %}{% endfilter %}:</strong>
+                                    {% if page|is_restricted:request %}
+                                        {% filter escapejs %}{% trans "Yes" %}{% endfilter %}
+                                    {% else %}
+                                        {% filter escapejs %}{% trans "No" %}{% endfilter %}
+                                    {% endif %}
+                                </p>
+                                {% if page.changed_by %}
+                                    <p><strong>{% filter escapejs %}{% trans "last change by" %}{% endfilter %}:</strong> {{ page.changed_by }}</p>
+                                {% endif %}
+                                {% if page.get_template_display %}
+                                    <p><strong>{% filter escapejs %}{% trans "template" %}{% endfilter %}:</strong> {{ page.get_template_display }}</p>
+                                {% endif %}
+                                {% if metadata %}
+                                    <p><strong>{% filter escapejs %}{% trans "meta" %}{% endfilter %}:</strong> {{ metadata }}</p>
+                                {% endif %}
+                                {% if page.site %}
+                                    <p><strong>{% filter escapejs %}{% trans "site" %}{% endfilter %}:</strong> {{ page.site }}</p>
+                                {% endif %}
+                            </div>
+                            -->
+                        </ul>
+                    </div>
+                </div>
+            <!--
                 {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
                     <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
                         <div class="cms-tree-item-inner">
@@ -164,50 +218,47 @@
                         </div>
                     </div>
                 {% endif %}
-            </div>
-        </div>
-    '
-    data-colinfo='
-        <div class="cms-tree-col">
-            <div class="cms-tree-item cms-tree-item-info">
-                <div class="cms-tree-item-inner">
-                    <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
-                        class="cms-tree-info-container js-cms-tree-tooltip-trigger">
-                        <span class="cms-icon cms-icon-info"></span>
-                    </a>
+                <div class="cms-tree-item cms-tree-item-info">
+                    <div class="cms-tree-item-inner">
+                        <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
+                            class="cms-tree-info-container js-cms-tree-tooltip-trigger">
+                            <span class="cms-icon cms-icon-info"></span>
+                        </a>
 
-                    <div class="cms-tree-tooltip-container js-cms-tree-tooltip-container">
-                        <h3>{% filter escapejs %}{% trans "Information:" %}{% endfilter %}</h3>
-                        <div class="cms-tree-tooltip-wrapper">
-                            {% if page.publication_date %}
-                                <p><strong>{% filter escapejs %}{% trans "publication date" %}{% endfilter %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
-                            {% endif %}
-                            {% if page.publication_end_date %}
-                                <p><strong>{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
-                            {% endif %}
-                            <p>
-                                <strong>{% filter escapejs %}{% trans "is restricted" %}{% endfilter %}:</strong>
-                                {% if page|is_restricted:request %}
-                                    {% filter escapejs %}{% trans "Yes" %}{% endfilter %}
-                                {% else %}
-                                    {% filter escapejs %}{% trans "No" %}{% endfilter %}
+                        <div class="cms-tree-tooltip-container js-cms-tree-tooltip-container">
+                            <h3>{% filter escapejs %}{% trans "Information:" %}{% endfilter %}</h3>
+                            <div class="cms-tree-tooltip-wrapper">
+                                {% if page.publication_date %}
+                                    <p><strong>{% filter escapejs %}{% trans "publication date" %}{% endfilter %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
                                 {% endif %}
-                            </p>
-                            {% if page.changed_by %}
-                                <p><strong>{% filter escapejs %}{% trans "last change by" %}{% endfilter %}:</strong> {{ page.changed_by }}</p>
-                            {% endif %}
-                            {% if page.get_template_display %}
-                                <p><strong>{% filter escapejs %}{% trans "template" %}{% endfilter %}:</strong> {{ page.get_template_display }}</p>
-                            {% endif %}
-                            {% if metadata %}
-                                <p><strong>{% filter escapejs %}{% trans "meta" %}{% endfilter %}:</strong> {{ metadata }}</p>
-                            {% endif %}
-                            {% if page.site %}
-                                <p><strong>{% filter escapejs %}{% trans "site" %}{% endfilter %}:</strong> {{ page.site }}</p>
-                            {% endif %}
+                                {% if page.publication_end_date %}
+                                    <p><strong>{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
+                                {% endif %}
+                                <p>
+                                    <strong>{% filter escapejs %}{% trans "is restricted" %}{% endfilter %}:</strong>
+                                    {% if page|is_restricted:request %}
+                                        {% filter escapejs %}{% trans "Yes" %}{% endfilter %}
+                                    {% else %}
+                                        {% filter escapejs %}{% trans "No" %}{% endfilter %}
+                                    {% endif %}
+                                </p>
+                                {% if page.changed_by %}
+                                    <p><strong>{% filter escapejs %}{% trans "last change by" %}{% endfilter %}:</strong> {{ page.changed_by }}</p>
+                                {% endif %}
+                                {% if page.get_template_display %}
+                                    <p><strong>{% filter escapejs %}{% trans "template" %}{% endfilter %}:</strong> {{ page.get_template_display }}</p>
+                                {% endif %}
+                                {% if metadata %}
+                                    <p><strong>{% filter escapejs %}{% trans "meta" %}{% endfilter %}:</strong> {{ metadata }}</p>
+                                {% endif %}
+                                {% if page.site %}
+                                    <p><strong>{% filter escapejs %}{% trans "site" %}{% endfilter %}:</strong> {{ page.site }}</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
+                -->
             </div>
         </div>
     '
