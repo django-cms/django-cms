@@ -44,6 +44,8 @@ module.exports = function (config) {
             'cms/static/cms/js/libs/jquery.min.js',
             'cms/static/cms/js/libs/class.min.js',
             'cms/static/cms/js/libs/pep.js',
+            'cms/static/cms/js/libs/jstree/jstree.min.js',
+            'cms/static/cms/js/libs/jstree/jstree.grid.min.js',
             'cms/static/cms/js/modules/jquery.ui.custom.js',
             'cms/static/cms/js/modules/jquery.ui.touchpunch.js',
             'cms/static/cms/js/modules/jquery.ui.nestedsortable.js',
@@ -58,6 +60,7 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.navigation.js',
             'cms/static/cms/js/modules/cms.toolbar.js',
             'cms/static/cms/js/modules/cms.tooltip.js',
+            'cms/static/cms/js/modules/cms.pagetree.js',
 
             // test helpers
             'cms/tests/frontend/unit/helpers/mock-ajax.js',
