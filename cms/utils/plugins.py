@@ -194,24 +194,16 @@ def reorder_plugins(placeholder, parent_id, language, order):
         language=language,
     ).order_by('position')
 
-    x = 0
-    for level_plugin in plugins:
-        if order:
-            x = 0
-            found = False
-            for pk in order:
-                if level_plugin.pk == int(pk):
-                    level_plugin.position = x
-                    level_plugin.save()
-                    found = True
-                    break
-                x += 1
-            if not found:
-                return False
-        else:
-            level_plugin.position = x
-            level_plugin.save()
-            x += 1
+    if order:
+        plugins = plugins.filter(pk__in=order)
+        print order
+
+        for plugin in plugins.iterator():
+            position = order.index(plugin.pk)
+            plugin.update(position=position)
+    else:
+        for position, plugin in enumerate(plugins.iterator()):
+            plugin.update(position=position)
     return plugins
 
 

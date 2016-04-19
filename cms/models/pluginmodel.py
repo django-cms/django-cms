@@ -233,9 +233,11 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         instance, plugin = self.get_plugin_instance()
         return force_text(plugin.icon_alt(instance)) if instance else u''
 
-    def update(self, **fields):
+    def update(self, refresh=False, **fields):
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)
-        return self.reload()
+        if refresh:
+            return self.reload()
+        return
 
     def save(self, no_signals=False, *args, **kwargs):
         if not self.depth:
@@ -256,6 +258,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     def move(self, target, pos=None):
         super(CMSPlugin, self).move(target, pos)
         self = self.reload()
+
         try:
             new_pos = max(CMSPlugin.objects.filter(parent_id=self.parent_id,
                                                    placeholder_id=self.placeholder_id,
@@ -263,9 +266,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         except ValueError:
             # This is the first plugin in the set
             new_pos = 0
-        self.position = new_pos
-        self.save()
-        return self.reload()
+        return self.update(refresh=True, position=new_pos)
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path',
