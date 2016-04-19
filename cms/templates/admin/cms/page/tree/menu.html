@@ -156,7 +156,7 @@
                     </div>
                 {% endif %}
                 <div class="cms-tree-item cms-tree-item-button">
-                    <a href="#" class="js-cms-pagetree-dropdown-trigger cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                    <a data-id="{{ page.pk }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                         <span class="sr-only">{% filter escapejs %}{% trans "Options" %}{% endfilter %}</span>
                     </a>
 
