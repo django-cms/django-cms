@@ -487,7 +487,14 @@ class PlaceholderAdminMixin(object):
             plugin_id = get_int(request.POST.get('plugin_id'))
         except TypeError:
             raise RuntimeError("'plugin_id' is a required parameter.")
-        plugin = CMSPlugin.objects.get(pk=plugin_id)
+
+        plugin = (
+            CMSPlugin
+            .objects
+            .select_related('placeholder')
+            .get(pk=plugin_id)
+        )
+
         try:
             placeholder_id = get_int(request.POST.get('placeholder_id'))
         except TypeError:
@@ -569,6 +576,12 @@ class PlaceholderAdminMixin(object):
             plugin = new_plugins[0][0]
         else:
             # Regular move
+
+            plugin_data = {
+                'language': language,
+                'placeholder': placeholder,
+            }
+
             if parent_id:
                 if plugin.parent_id != parent_id:
                     parent = CMSPlugin.objects.get(pk=parent_id)
@@ -579,24 +592,20 @@ class PlaceholderAdminMixin(object):
                         return HttpResponseBadRequest(force_text(
                             _('parent must be in the same language as '
                               'plugin_language')))
-                    plugin.parent_id = parent.pk
-                    plugin.language = language
-                    plugin.save()
+                    plugin = plugin.update(parent=parent, **plugin_data)
                     plugin = plugin.move(parent, pos='last-child')
+                else:
+                    plugin = plugin.update(parent=None, **plugin_data)
             else:
-                sibling = CMSPlugin.get_last_root_node()
-                plugin.parent = plugin.parent_id = None
-                plugin.placeholder = placeholder
-                plugin.save()
-                plugin = plugin.move(sibling, pos='right')
+                target = CMSPlugin.get_last_root_node()
+                plugin = plugin.update(parent=None, **plugin_data)
+                plugin = plugin.move(target, pos='right')
+
+            # Update all children to match the parent's
+            # language and placeholder
+            plugin.get_descendants().update(**plugin_data)
 
             plugins = [plugin] + list(plugin.get_descendants())
-
-            # Don't neglect the children
-            for child in plugins:
-                child.placeholder = placeholder
-                child.language = language
-                child.save()
 
         reorder_plugins(placeholder, parent_id, language, order)
 

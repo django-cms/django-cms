@@ -233,6 +233,10 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         instance, plugin = self.get_plugin_instance()
         return force_text(plugin.icon_alt(instance)) if instance else u''
 
+    def update(self, **fields):
+        CMSPlugin.objects.filter(pk=self.pk).update(**fields)
+        return self.reload()
+
     def save(self, no_signals=False, *args, **kwargs):
         if not self.depth:
             if self.parent_id or self.parent:
