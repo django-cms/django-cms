@@ -47,6 +47,21 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     return output
 
 
+def get_client_ip(request):
+
+    ip_address = None
+
+    ip_addresses = request.META.get('HTTP_X_FORWARDED_FOR')
+    if ip_addresses:
+        ip_address_list = ip_addresses.split(',')
+        ip_address = ip_address_list[0]
+
+    if not ip_address:
+        ip_address = request.META.get('REMOTE_ADDR') or None
+
+    return ip_address
+
+
 class ToolbarMiddleware(object):
     """
     Middleware to set up CMS Toolbar.
@@ -54,6 +69,12 @@ class ToolbarMiddleware(object):
 
     def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
+        internal_ips = get_cms_setting('INTERNAL_IPS')
+
+        if internal_ips:
+            client_ip = get_client_ip(request)
+            if client_ip not in internal_ips:
+                return False
 
         if not toolbar_hide:
             return True
