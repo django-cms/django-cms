@@ -160,16 +160,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         # now edit the plugin
         txt = self._edit_text_plugin(created_plugin_id, "Hello World")
         self.assertEqual("Hello World", txt.body)
-        # edit body, but click cancel button
-        data = {
-            "body": "Hello World!!",
-            "_cancel": True,
-        }
-        edit_url = '%s%d/' % (URL_CMS_PLUGIN_EDIT, created_plugin_id)
-        response = self.client.post(edit_url, data)
-        self.assertEqual(response.status_code, 200)
-        txt = Text.objects.all()[0]
-        self.assertEqual("Hello World", txt.body)
 
     def test_plugin_edit_marks_page_dirty(self):
         page_data = self.get_new_page_data()
@@ -1376,7 +1366,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         })
         response = self.client.post(add_url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/cms/plugin/close_modal.html')
+        self.assertTemplateUsed(response, 'admin/cms/page/plugin/confirm_form.html')
 
         # there should be only 1 plugin
         self.assertEqual(1, CMSPlugin.objects.all().count())

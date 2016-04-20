@@ -3,14 +3,19 @@ import json
 import re
 import warnings
 
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response
 
 from django import forms
 from django.contrib import admin
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.contrib import messages
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    PermissionDenied,
+    ValidationError,
+)
+from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -245,61 +250,101 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if obj:
             return form_class
 
-        plugin_type = self.__class__.__name__
+        plugin_data = self.validate_add_request(request)
 
         class Form(form_class):
+
             def __init__(self, *args, **kwargs):
                 super(Form, self).__init__(*args, **kwargs)
-                self.instance.language = request.GET['plugin_language']
-                self.instance.placeholder_id = request.GET['placeholder_id']
-                self.instance.parent_id = request.GET.get(
-                    'plugin_parent', None
-                )
-                self.instance.plugin_type = plugin_type
-
+                self.instance.language = plugin_data['plugin_language']
+                self.instance.placeholder = plugin_data['placeholder_id']
+                self.instance.parent = plugin_data.get('plugin_parent', None)
+                self.instance.plugin_type = plugin_data['plugin_type']
+                self.instance.position = plugin_data['position']
         return Form
 
-    def add_view_check_request(self, request):
+    def validate_add_request(self, request):
         from cms.admin.forms import PluginAddValidationForm
 
-        form = PluginAddValidationForm(
-            data=request.GET,
-            plugin_type=self.__class__.__name__,
-        )
+        if getattr(self, "cms_plugin_instance"):
+            # cms_plugin_instance points to an instance of CMSPlugin
+            # that has no real instance aka a "ghost plugin".
+            # This can easily happen in <= CMS 3.2 if the user
+            # adds a plugin and then reloads the page without canceling
+            # or submitting the form.
+            # No need to validate the data in this plugin because
+            # it's already been created.
+            plugin = self.cms_plugin_instance
+            plugin_data = {
+                'placeholder_id': plugin.placeholder,
+                'plugin_language': plugin.language,
+                'plugin_parent': plugin.parent,
+                'plugin_position': plugin.position,
+                'plugin_type': plugin.plugin_type,
+            }
+        else:
+            form = PluginAddValidationForm(
+                data=request.GET,
+                plugin_type=self.__class__.__name__,
+            )
 
-        if not form.is_valid():
-            return HttpResponseBadRequest(form.errors.as_text())
+            if form.is_valid():
+                plugin_data = form.cleaned_data
+                plugin_data['plugin_type'] = form.plugin_type
+            else:
+                # list() is necessary for python 3 compatibility.
+                # errors is s dict mapping fields to a list of errors
+                # for that field.
+                error = list(form.errors.values())[0][0]
+                raise ValidationError(message=force_text(error))
 
-        placeholder = form.cleaned_data['placeholder_id']
+        if not plugin_data['placeholder_id'].has_add_permission(request):
+            # No need to run self.has_add_permission(request)
+            # This method (validate_add_request) is called on get_form
+            # and get_form is called after Django checks permissions.
+            raise PermissionDenied
 
-        if (self.has_add_permission(request) and
-                placeholder.has_add_permission(request)):
-            return True
-        response = force_text(_('You do not have permission to add a plugin'))
-        return HttpResponseForbidden(response)
+        parent = plugin_data.get('plugin_parent')
+
+        if parent:
+            position = parent.cmsplugin_set.count()
+        else:
+            position = CMSPlugin.objects.filter(
+                parent__isnull=True,
+                language=plugin_data['plugin_language'],
+                placeholder=plugin_data['placeholder_id'],
+            ).count()
+
+        plugin_data['position'] = position
+        return plugin_data
 
     def add_view(self, request, form_url='', extra_context=None):
-        result = self.add_view_check_request(request)
+        try:
+            response = super(CMSPluginBase, self).add_view(
+                request, form_url, extra_context)
+        except PermissionDenied:
+            message = force_text(_('You do not have permission to add a plugin'))
+            return HttpResponseForbidden(message)
+        except ValidationError as error:
+            return HttpResponseBadRequest(error.message)
+        return response
 
-        if isinstance(result, HttpResponse):
-            return result
+    def render_close_frame(self, obj, extra_context=None):
+        context = {
+            'plugin': obj,
+            'is_popup': True,
+            'name': force_text(obj),
+            "type": obj.get_plugin_name(),
+            'plugin_id': obj.pk,
+            'icon': force_escape(obj.get_instance_icon_src()),
+            'alt': force_escape(obj.get_instance_icon_alt()),
+        }
 
-        return super(CMSPluginBase, self).add_view(
-            request, form_url, extra_context
-        )
-
-    def render_close_modal(self):
+        if extra_context:
+            context.update(extra_context)
         return render_to_response(
-            'admin/cms/plugin/close_modal.html', {'is_popup': True}
+            'admin/cms/page/plugin/confirm_form.html', context
         )
-
-    def response_post_save_add(self, request, obj):
-        """
-        Always redirect to index. Usually CMS Plugins aren't registered with
-        an admin site directly and the add_view is accessed via frontend
-        editing.
-        """
-        return self.render_close_modal()
 
     def save_model(self, request, obj, form, change):
         """
@@ -318,53 +363,27 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 # subclassing cms_plugin_instance (one to one relation)
                 value = getattr(self.cms_plugin_instance, field.name)
                 setattr(obj, field.name, value)
-        # When adding an object, it won't have a position
-        if not obj.position:
-            if obj.parent_id:
-                position = CMSPlugin.objects.filter(
-                    parent_id=obj.parent_id
-                ).count()
-            else:
-                position = CMSPlugin.objects.filter(
-                    parent__isnull=True,
-                    language=obj.language,
-                    placeholder_id=obj.placeholder_id,
-                ).count()
-            obj.position = position
 
         # remember the saved object
         self.saved_object = obj
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 
-    def response_change(self, request, obj):
-        """
-        Just set a flag, so we know something was changed, and can make
-        new version if reversion installed.
-        New version will be created in admin.views.edit_plugin
-        """
-        self.object_successfully_changed = True
-        return super(CMSPluginBase, self).response_change(request, obj)
-
     def response_add(self, request, obj, **kwargs):
-        """
-        Just set a flag, so we know something was changed, and can make
-        new version if reversion installed.
-        New version will be created in admin.views.edit_plugin
-        """
         self.object_successfully_changed = True
+        # Normally we would add the user message to say the object
+        # was added successfully but looks like the CMS has not
+        # supported this and can lead to issues with plugins
+        # like ckeditor.
+        return self.render_close_frame(obj)
 
-        if admin.options.IS_POPUP_VAR in request.POST:
-            # prevent Django from rendering it's popup_close html
-            # Django's template assumes certain js functions
-            # and so will throw an error when adding plugins.
-            return self.render_close_modal()
-
-        post_url_continue = reverse('admin:cms_page_edit_plugin',
-                args=(obj._get_pk_val(),),
-                current_app=self.admin_site.name)
-        kwargs.setdefault('post_url_continue', post_url_continue)
-        return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
+    def response_change(self, request, obj):
+        self.object_successfully_changed = True
+        opts = self.model._meta
+        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
+        self.message_user(request, msg, messages.SUCCESS)
+        return self.render_close_frame(obj)
 
     def log_addition(self, request, obj, bypass=None):
         pass

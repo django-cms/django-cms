@@ -1064,7 +1064,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(
                 response,
-                'admin/cms/plugin/close_modal.html'
+                'admin/cms/page/plugin/confirm_form.html'
             )
         link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)
         self.assertEqual(link_plugin.parent_id, text_plugin_en.pk)
