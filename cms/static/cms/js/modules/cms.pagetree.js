@@ -2,16 +2,12 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-// #############################################################################
-// NAMESPACES
 /**
  * @module CMS
  */
 /* istanbul ignore next */
 var CMS = window.CMS || {};
 
-// #############################################################################
-// MODAL
 (function ($) {
     'use strict';
 
@@ -21,7 +17,6 @@ var CMS = window.CMS || {};
      *
      * @class PageTree
      * @namespace CMS
-     * @uses CMS.API.Helpers
      */
     CMS.PageTree = new CMS.Class({
         // TODO add mechanics to set the home page
@@ -236,6 +231,8 @@ var CMS = window.CMS || {};
             this.ui.document.on('dnd_start.vakata', function (e, data) {
                 var element = $(data.element);
                 var node = element.parent();
+
+                that._dropdowns.closeAllDropdowns();
 
                 node.addClass('jstree-is-dragging');
                 data.data.nodes.forEach(function (nodeId) {
@@ -619,46 +616,8 @@ var CMS = window.CMS || {};
          * @private
          */
         _setupDropdowns: function _setupDropdowns() {
-            var that = this;
-            var triggerCls = '.js-cms-pagetree-dropdown-trigger';
-            var menuCls = '.js-cms-pagetree-dropdown-menu';
-            var triggers;
-            var menus;
-            var index;
-
-            // attach event to the trigger
-            this.ui.container.on(this.click, triggerCls, function (e) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                triggers = $(triggerCls);
-                menus = $(menuCls);
-                index = triggers.index(this);
-
-                // cancel if opened tooltip is triggered again
-                if (menus.eq(index).is(':visible')) {
-                    menus.removeClass('cms-pagetree-dropdown-menu-open');
-                    return false;
-                }
-
-                // otherwise show the dropdown
-                menus
-                    .removeClass('cms-pagetree-dropdown-menu-open')
-                    .eq(index)
-                    .addClass('cms-pagetree-dropdown-menu-open');
-
-                that.ui.document.one(that.click, function () {
-                    menus.removeClass('cms-pagetree-dropdown-menu-open');
-                });
-            });
-
-            // stop propagation on the element
-            this.ui.container.on(this.click, menuCls, function (e) {
-                e.stopImmediatePropagation();
-            });
-
-            this.ui.container.on(this.click, menuCls + ' a', function () {
-                $(menuCls).removeClass('cms-pagetree-dropdown-menu-open');
+            this._dropdowns = new CMS.PageTreeDropdowns({
+                container: this.ui.container
             });
         },
 

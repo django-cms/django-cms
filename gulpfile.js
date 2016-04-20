@@ -76,6 +76,7 @@ var JS_BUNDLES = {
     'bundle.admin.pagetree.min.js': [
         PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
         PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.dropdown.js',
         PROJECT_PATH.js + '/modules/cms.pagetree.js'
     ],
     'bundle.toolbar.min.js': [
