@@ -487,7 +487,14 @@ class PlaceholderAdminMixin(object):
             plugin_id = get_int(request.POST.get('plugin_id'))
         except TypeError:
             raise RuntimeError("'plugin_id' is a required parameter.")
-        plugin = CMSPlugin.objects.get(pk=plugin_id)
+
+        plugin = (
+            CMSPlugin
+            .objects
+            .select_related('placeholder')
+            .get(pk=plugin_id)
+        )
+
         try:
             placeholder_id = get_int(request.POST.get('placeholder_id'))
         except TypeError:
@@ -502,7 +509,9 @@ class PlaceholderAdminMixin(object):
         move_a_copy = (move_a_copy and move_a_copy != "0" and
                        move_a_copy.lower() != "false")
 
+        source_language = plugin.language
         source_placeholder = plugin.placeholder
+
         if not language and plugin.language:
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
@@ -569,6 +578,12 @@ class PlaceholderAdminMixin(object):
             plugin = new_plugins[0][0]
         else:
             # Regular move
+
+            plugin_data = {
+                'language': language,
+                'placeholder': placeholder,
+            }
+
             if parent_id:
                 if plugin.parent_id != parent_id:
                     parent = CMSPlugin.objects.get(pk=parent_id)
@@ -579,24 +594,43 @@ class PlaceholderAdminMixin(object):
                         return HttpResponseBadRequest(force_text(
                             _('parent must be in the same language as '
                               'plugin_language')))
-                    plugin.parent_id = parent.pk
-                    plugin.language = language
-                    plugin.save()
+                    plugin = plugin.update(refresh=True, parent=parent, **plugin_data)
                     plugin = plugin.move(parent, pos='last-child')
+                else:
+                    plugin = plugin.update(refresh=True, **plugin_data)
             else:
-                sibling = CMSPlugin.get_last_root_node()
-                plugin.parent = plugin.parent_id = None
-                plugin.placeholder = placeholder
-                plugin.save()
-                plugin = plugin.move(sibling, pos='right')
+                target = CMSPlugin.get_last_root_node()
+                plugin = plugin.update(refresh=True, parent=None, **plugin_data)
+                plugin = plugin.move(target, pos='right')
 
-            plugins = [plugin] + list(plugin.get_descendants())
+            # Update all children to match the parent's
+            # language and placeholder
+            plugin.get_descendants().update(**plugin_data)
 
-            # Don't neglect the children
-            for child in plugins:
-                child.placeholder = placeholder
-                child.language = language
-                child.save()
+        if order:
+            # order should be a list of plugin primary keys
+            # it's important that the plugins being referenced
+            # are all part of the same tree.
+            order = [int(pk) for pk in order]
+            plugins_in_tree = CMSPlugin.objects.filter(
+                parent=parent_id,
+                placeholder=placeholder,
+                language=language,
+                pk__in=order,
+            )
+
+            if len(order) != plugins_in_tree.count():
+                # Seems like order does not match the tree on the db
+                message = _('order parameter references plugins in different trees')
+                return HttpResponseBadRequest(force_text(message))
+
+        # Mark the target placeholder as dirty
+        placeholder.mark_as_dirty(language)
+
+        if placeholder != source_placeholder:
+            # Plugin is being moved or copied into a separate placeholder
+            # Mark source placeholder as dirty
+            source_placeholder.mark_as_dirty(source_language)
 
         reorder_plugins(placeholder, parent_id, language, order)
 
@@ -609,6 +643,7 @@ class PlaceholderAdminMixin(object):
         target_placeholder_admin = self._get_attached_admin(placeholder)
 
         if move_a_copy:  # "paste"
+            plugins = list(plugin.get_tree())
             self.post_copy_plugins(request, source_placeholder, placeholder, plugins)
 
             if (target_placeholder_admin and
