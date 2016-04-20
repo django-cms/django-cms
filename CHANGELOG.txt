@@ -527,4 +527,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 === 3.1.6 (unreleased) ===
 
+- Addresses security vulnerabilities in the `render_model` template tag that could
+  lead to escalation of privileges or other security issues.
+
 - Fix cache settings
