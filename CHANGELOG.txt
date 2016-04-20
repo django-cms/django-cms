@@ -15,7 +15,8 @@
 * Provides the ability to declare cache expiration periods on a per-plugin basis
 * Minor UI improvements
 * Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
-  the toolbar will appear for authorized users. If left unset, does nothing.
+  the toolbar will appear for authorized users. If left unset, retains the
+  existing behavior of allowing toolbar for authorized users at any IP address.
 
 
 === 3.2.3 (2016-03-09) ===
