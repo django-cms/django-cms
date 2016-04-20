@@ -14,6 +14,7 @@ describe('CMS.PageTreeDropdowns', function () {
 
     it('has default options', function () {
         expect(CMS.PageTreeDropdowns.prototype.options).toEqual({
+            dropdownSelector: '.js-cms-pagetree-dropdown',
             triggerSelector: '.js-cms-pagetree-dropdown-trigger',
             menuSelector: '.js-cms-pagetree-dropdown-menu',
             openCls: 'cms-pagetree-dropdown-menu-open'
@@ -144,8 +145,8 @@ describe('CMS.PageTreeDropdowns', function () {
             $(function () {
                 trigger1 = $('<div class="js-cms-pagetree-dropdown-trigger"></div>');
                 trigger2 = $('<div class="js-cms-pagetree-dropdown-trigger"></div>');
-                menu1 = $('<div class="js-cms-pagetree-dropdown-menu"></div>');
-                menu2 = $('<div class="js-cms-pagetree-dropdown-menu"></div>');
+                menu1 = $('<div class="js-cms-pagetree-dropdown"></div>');
+                menu2 = $('<div class="js-cms-pagetree-dropdown"></div>');
 
                 dropdowns = new CMS.PageTreeDropdowns({
                     container: $('.cms-pagetree')
@@ -199,7 +200,7 @@ describe('CMS.PageTreeDropdowns', function () {
                 });
                 dropdowns.ui.container.append(
                     '<div ' +
-                        'class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu ' +
+                        'class="js-cms-pagetree-dropdown cms-pagetree-dropdown ' +
                         dropdowns.options.openCls + '"></div>'
                 );
                 done();
@@ -211,10 +212,10 @@ describe('CMS.PageTreeDropdowns', function () {
         });
 
         it('closes all dropdowns', function () {
-            expect(dropdowns.ui.container.find(dropdowns.options.menuSelector))
+            expect(dropdowns.ui.container.find(dropdowns.options.dropdownSelector))
                 .toHaveClass(dropdowns.options.openCls);
             dropdowns.closeAllDropdowns();
-            expect(dropdowns.ui.container.find(dropdowns.options.menuSelector))
+            expect(dropdowns.ui.container.find(dropdowns.options.dropdownSelector))
                 .not.toHaveClass(dropdowns.options.openCls);
         });
     });
