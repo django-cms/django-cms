@@ -25,6 +25,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
 APPHOOK = "SampleApp"
+APPHOOK_NAMESPACE = "NamespacedApp"
 PLUGIN = "TextPlugin"
 
 TEST_INSTALLED_APPS = [
@@ -78,14 +79,28 @@ class ManagementTestCase(CMSTestCase):
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
-        out = StringIO()
         create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+        create_page(
+            'Hello 2', "nav_playground.html", "en", apphook=APPHOOK_NAMESPACE,
+            apphook_namespace='any'
+        )
         self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+        self.assertEqual(Page.objects.filter(
+            application_urls=APPHOOK_NAMESPACE, application_namespace='any'
+        ).count(), 1)
         command = cms.Command()
+        out = StringIO()
         command.stdout = out
         command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
         self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
         self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
+
+        out = StringIO()
+        command.stdout = out
+        command.handle("uninstall", "apphooks", APPHOOK_NAMESPACE, interactive=False)
+        self.assertEqual(out.getvalue(), "1 'NamespacedApp' apphooks uninstalled\n")
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK_NAMESPACE).count(), 0)
+        self.assertEqual(Page.objects.filter(application_namespace='any').count(), 0)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_list_plugins(self):
