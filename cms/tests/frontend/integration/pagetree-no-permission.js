@@ -59,6 +59,8 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 // click on it again
                 .then(function () {
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
+                })
+                .then(function () {
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
                             visible: true
@@ -66,6 +68,8 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                         0,
                         'Paste buttons hide when clicked on copy again'
                     );
+                })
+                .then(function () {
                     // open them again
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
