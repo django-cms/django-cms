@@ -643,6 +643,38 @@ The path to the media root of the cms media files.
 
 .. setting:: CMS_MEDIA_URL
 
+
+CMS_UNESCAPED_RENDER_MODEL_TAGS
+===============================
+
+default
+    True
+
+.. warning::
+    In this version of django CMS, this setting has a default value of
+    ``True`` to provide behavior consistent with previous releases.
+    However, all developers are encouraged to set this value to ``False`` to
+    help prevent a range of security vulnerabilities stemming from
+    HTML, Javascript, and CSS Code Injection.
+
+.. important::
+    This setting is deprecated and will be removed in a near-future release.
+    Developers are encouraged to carefully consider the source of any content
+    displayed by the ``render_model`` template tag and only add the optional
+    template filter ``safe`` on model fields that are known to be cleansed of
+    any malicious strings.
+
+    When this setting is removed, the ``render_model`` template tag will no
+    longer automatically mark as "safe" their output. Any content that is
+    intended to be displayed as rendered markup will require the ``safe``
+    filter applied when displaying with the ``render_model`` tag.
+
+This setting affects how certain template tags display model-based content. In
+particular, the template tag: :ttag:`render_model`.
+
+.. :setting:: CMS_UNESCAPED_RENDER_MODEL_TAGS
+
+
 CMS_MEDIA_URL
 =============
 

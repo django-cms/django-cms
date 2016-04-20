@@ -567,7 +567,7 @@ $(document).ready(function () {
 
 				// show messages in toolbar if provided
 				var messages = iframe.contents().find('.messagelist li');
-					if(messages.length) CMS.API.Toolbar.openMessage(messages.eq(0).text());
+					if(messages.length) CMS.API.Toolbar.openMessage(messages.eq(0).html());
 					messages.remove();
 				var contents = iframe.contents();
 

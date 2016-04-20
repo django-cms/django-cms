@@ -32,8 +32,6 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from classytags.values import StringValue
-from sekizai.helpers import Watcher
-from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 from cms import __version__
 from cms.cache.page import get_page_url_cache, set_page_url_cache
@@ -51,6 +49,9 @@ from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
+
+from sekizai.helpers import Watcher
+from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 
 register = template.Library()
@@ -640,7 +641,7 @@ class CMSToolbar(RenderBlock):
     name = 'cms_toolbar'
 
     options = Options(
-        Argument('name', required=False), # just here so sekizai thinks this is a RenderBlock
+        Argument('name', required=False),  # just here so sekizai thinks this is a RenderBlock
         parser_class=SekizaiParser,
     )
 
@@ -653,13 +654,13 @@ class CMSToolbar(RenderBlock):
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
-        context['cms_version'] =  __version__
+        context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
-                context['addons'] =  mark_safe(toolbar.render_addons(context))
+                context['addons'] = mark_safe(toolbar.render_addons(context))
         else:
             language = None
         # render everything below the tag
@@ -861,11 +862,14 @@ class CMSEditableObject(InclusionTag):
                                                 edit_fields, language, view_url,
                                                 view_method)
         extra_context.update(self._get_content(extra_context, instance, attribute,
-                                         language, filters))
+                                               language, filters))
         # content is for non-edit template content.html
         # rendered_content is for edit template plugin.html
         # in this templatetag both hold the same content
-        extra_context['content'] = mark_safe(extra_context['content'])
+        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
+            extra_context['content'] = mark_safe(extra_context['content'])
+        else:
+            extra_context['content'] = extra_context['content']
         extra_context['rendered_content'] = extra_context['content']
         return extra_context
 
@@ -907,16 +911,15 @@ class CMSEditableObject(InclusionTag):
         extra_context['rendered_content'] = ''
         return extra_context
 
-    def get_context(self, context, instance, attribute, edit_fields,
-                    language, filters, view_url, view_method, varname):
+    def get_context(self, context, **kwargs):
         """
         Uses _get_data_context to render the requested attributes
         """
-        extra_context = self._get_data_context(context, instance, attribute,
-                                               edit_fields, language, filters,
-                                               view_url, view_method)
+        kwargs.pop('varname')
+        extra_context = self._get_data_context(context, **kwargs)
         extra_context['render_model'] = True
         return extra_context
+
 register.tag(CMSEditableObject)
 
 
@@ -938,13 +941,12 @@ class CMSEditableObjectIcon(CMSEditableObject):
         Argument('varname', required=False, resolve=False),
     )
 
-    def get_context(self, context, instance, edit_fields, language,
-                    view_url, view_method, varname):
+    def get_context(self, context, **kwargs):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
-        extra_context = self._get_empty_context(context, instance, edit_fields,
-                                                language, view_url, view_method)
+        kwargs.pop('varname')
+        extra_context = self._get_empty_context(context, **kwargs)
         extra_context['render_model_icon'] = True
         return extra_context
 register.tag(CMSEditableObjectIcon)
@@ -967,16 +969,16 @@ class CMSEditableObjectAdd(CMSEditableObject):
         Argument('varname', required=False, resolve=False),
     )
 
-    def get_context(self, context, instance, language,
-                    view_url, view_method, varname):
+    def get_context(self, context, instance, language, view_url, view_method,
+                    varname):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
         if isinstance(instance, Model) and not instance.pk:
             instance.pk = 0
         extra_context = self._get_empty_context(context, instance, None,
-                                                language, view_url, view_method,
-                                                editmode=False)
+                                                language, view_url,
+                                                view_method, editmode=False)
         extra_context['render_model_add'] = True
         return extra_context
 register.tag(CMSEditableObjectAdd)
@@ -1006,7 +1008,7 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        data['content'] = mark_safe(kwargs['nodelist'].render(data))
+        data['content'] = kwargs['nodelist'].render(data)
         data['rendered_content'] = data['content']
         output = render_to_string(template, data)
         context.pop()
@@ -1016,16 +1018,17 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         else:
             return output
 
-    def get_context(self, context, instance, language,
-                    view_url, view_method, varname, nodelist):
+    def get_context(self, context, **kwargs):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
+        instance = kwargs.pop('instance')
         if isinstance(instance, Model) and not instance.pk:
             instance.pk = 0
+        kwargs.pop('varname')
+        kwargs.pop('nodelist')
         extra_context = self._get_empty_context(context, instance, None,
-                                                language, view_url, view_method,
-                                                editmode=False)
+                                                editmode=False, **kwargs)
         extra_context['render_model_add'] = True
         return extra_context
 register.tag(CMSEditableObjectAddBlock)
@@ -1058,7 +1061,7 @@ class CMSEditableObjectBlock(CMSEditableObject):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        data['content'] = mark_safe(kwargs['nodelist'].render(data))
+        data['content'] = kwargs['nodelist'].render(data)
         data['rendered_content'] = data['content']
         output = render_to_string(template, data)
         context.pop()
@@ -1068,16 +1071,16 @@ class CMSEditableObjectBlock(CMSEditableObject):
         else:
             return output
 
-    def get_context(self, context, instance, edit_fields, language,
-                    view_url, view_method, varname, nodelist):
+    def get_context(self, context, **kwargs):
         """
         Uses _get_empty_context and adds the `instance` object to the local
         context. Context here is to be intended as the context of the nodelist
         in the block.
         """
-        extra_context = self._get_empty_context(context, instance, edit_fields,
-                                                language, view_url, view_method)
-        extra_context['instance'] = instance
+        kwargs.pop('varname')
+        kwargs.pop('nodelist')
+        extra_context = self._get_empty_context(context, **kwargs)
+        extra_context['instance'] = kwargs.get('instance')
         extra_context['render_model_block'] = True
         return extra_context
 register.tag(CMSEditableObjectBlock)
