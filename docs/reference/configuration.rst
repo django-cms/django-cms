@@ -658,11 +658,16 @@ default
     HTML, Javascript, and CSS Code Injection.
 
 .. important::
-    This setting is deprecated and will be removed in a future release.
+    This setting is deprecated and will be removed in a near-future release.
     Developers are encouraged to carefully consider the source of any content
-    displayed by the ``render_model*`` template tags and only add the optional
+    displayed by the ``render_model`` template tag and only add the optional
     template filter ``safe`` on model fields that are known to be cleansed of
     any malicious strings.
+
+    When this setting is removed, the ``render_model`` template tag will no
+    longer automatically mark as "safe" their output. Any content that is
+    intended to be displayed as rendered markup will require the ``safe``
+    filter applied when displaying with the ``render_model`` tag.
 
 This setting affects how certain template tags display model-based content. In
 particular, the template tag: :ttag:`render_model`.
