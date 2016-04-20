@@ -334,6 +334,49 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(stack_text_en.plugin_type, stack_text_de.plugin_type)
         self.assertEqual(stack_text_en.body, stack_text_de.body)
 
+    def test_copy_langs_no_content(self):
+        """
+        Various checks here:
+
+         * page structure is copied
+         * no plugin is copied
+        """
+        site = 1
+        number_start_plugins = CMSPlugin.objects.all().count()
+
+        out = StringIO()
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--skip-content',
+            interactive=False, stdout=out
+        )
+        pages = Page.objects.on_site(site).drafts()
+        for page in pages:
+            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+        # These asserts that no orphaned plugin exists
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins)
+        self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), 0)
+
+        root_page = Page.objects.on_site(site).get_home()
+        root_plugins = CMSPlugin.objects.filter(
+            placeholder=root_page.placeholders.get(slot="body"))
+
+        first_plugin_en, _ = root_plugins.get(language='en', parent=None).get_plugin_instance()
+        first_plugin_de = None
+        with self.assertRaises(CMSPlugin.DoesNotExist):
+            first_plugin_de, _ = root_plugins.get(language='de', parent=None).get_plugin_instance()
+
+        self.assertIsNone(first_plugin_de)
+
+        stack_plugins = CMSPlugin.objects.filter(
+            placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
+
+        stack_text_en, _ = stack_plugins.get(language='en',
+                                             plugin_type='TextPlugin').get_plugin_instance()
+        with self.assertRaises(CMSPlugin.DoesNotExist):
+            stack_text_de, _ = stack_plugins.get(language='de',
+                                                 plugin_type='TextPlugin').get_plugin_instance()
+
     def test_copy_sites(self):
         """
         Various checks here:
