@@ -324,39 +324,26 @@ var CMS = window.CMS || {};
          * @param {String} parent id of a parent plugin
          */
         addPlugin: function (type, name, parent) {
-            // cancel request if already in progress
-            if (CMS.API.locked) {
-                return false;
-            }
-            CMS.API.locked = true;
-
-            var that = this;
-            var data = {
+            var params = {
                 placeholder_id: this.options.placeholder_id,
                 plugin_type: type,
-                plugin_parent: parent || '',
-                plugin_language: this.options.plugin_language,
-                csrfmiddlewaretoken: this.csrf
+                plugin_language: this.options.plugin_language
             };
+            if (parent) {
+                params.plugin_parent = parent;
+            }
+            var url = this.options.urls.add_plugin + '?' + $.param(params);
+            var modal = new CMS.Modal({
+                onClose: this.options.onClose || false,
+                redirectOnClose: this.options.redirectOnClose || false
+            });
 
-            $.ajax({
-                type: 'POST',
-                url: this.options.urls.add_plugin,
-                data: data,
-                success: function (data) {
-                    CMS.API.locked = false;
-                    that.newPlugin = data;
-                    that.editPlugin(data.url, name, data.breadcrumb);
-                },
-                error: function (jqXHR) {
-                    CMS.API.locked = false;
-                    var msg = CMS.config.lang.error;
-                    // trigger error
-                    CMS.API.Messages.open({
-                        message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
-                        error: true
-                    });
-                }
+            modal.open({
+                url: url,
+                title: name
+            });
+            modal.on('cms.modal.closed', function removePlaceholder() {
+                $('.cms-add-plugin-placeholder').remove();
             });
         },
 
@@ -372,15 +359,12 @@ var CMS = window.CMS || {};
         editPlugin: function (url, name, breadcrumb) {
             // trigger modal window
             var modal = new CMS.Modal({
-                newPlugin: this.newPlugin || false,
                 onClose: this.options.onClose || false,
                 redirectOnClose: this.options.redirectOnClose || false
             });
-            if (!this.newPlugin) {
-                modal.on('cms.modal.loaded', function removePlaceholder() {
-                    $('.cms-add-plugin-placeholder').remove();
-                });
-            }
+            modal.on('cms.modal.loaded', function removePlaceholder() {
+                $('.cms-add-plugin-placeholder').remove();
+            });
             modal.on('cms.modal.closed', function removePlaceholder() {
                 $('.cms-add-plugin-placeholder').remove();
             });
@@ -676,7 +660,6 @@ var CMS = window.CMS || {};
         deletePlugin: function (url, name, breadcrumb) {
             // trigger modal window
             var modal = new CMS.Modal({
-                newPlugin: this.newPlugin || false,
                 onClose: this.options.onClose || false,
                 redirectOnClose: this.options.redirectOnClose || false
             });

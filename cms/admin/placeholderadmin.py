@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 
-from django.conf import settings
 from django.conf.urls import url
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
@@ -15,7 +14,6 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404, render
-from django.template.defaultfilters import force_escape, escapejs
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
@@ -104,7 +102,7 @@ class FrontendEditableAdminMixin(object):
                 'message': force_text(_("You do not have permission to edit this item"))
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
-            # Dinamically creates the form class with only `field_name` field
+            # Dynamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
@@ -211,7 +209,7 @@ class PlaceholderAdminMixin(object):
             return False
         return True
 
-    def post_add_plugin(self, request, placeholder, plugin):
+    def post_add_plugin(self, request, plugin):
         pass
 
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
@@ -232,67 +230,39 @@ class PlaceholderAdminMixin(object):
     def get_placeholder_template(self, request, placeholder):
         pass
 
-    @method_decorator(require_POST)
     @xframe_options_sameorigin
     def add_plugin(self, request):
         """
-        POST request should have the following data:
+        Shows the add plugin form and saves it on POST.
 
-        - placeholder_id
-        - plugin_type
-        - plugin_language
-        - plugin_parent (optional)
+        Requires the following GET parameters:
+            - placeholder_id
+            - plugin_type
+            - plugin_language
+            - plugin_parent (optional)
+            - plugin_position (optional)
         """
-        parent = None
-        plugin_type = request.POST['plugin_type']
-        placeholder_id = request.POST.get('placeholder_id', None)
-        placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        parent_id = request.POST.get('plugin_parent', None)
-        language = request.POST.get('plugin_language') or get_language_from_request(request)
-        if not self.has_add_plugin_permission(request, placeholder, plugin_type):
-            return HttpResponseForbidden(force_text(_('You do not have permission to add a plugin')))
+        plugin_type = request.GET.get('plugin_type')
+
+        if not plugin_type:
+            return HttpResponseBadRequest(force_text(
+                    _("Invalid request, missing plugin_type parameter")
+                ))
+
         try:
-            has_reached_plugin_limit(placeholder, plugin_type, language,
-                                     template=self.get_placeholder_template(request, placeholder))
-        except PluginLimitReached as er:
-            return HttpResponseBadRequest(er)
-            # page add-plugin
-        if not parent_id:
-            position = request.POST.get('plugin_order',
-                                        CMSPlugin.objects.filter(language=language, placeholder=placeholder).count())
-        # in-plugin add-plugin
-        else:
-            parent = get_object_or_404(CMSPlugin, pk=parent_id)
-            placeholder = parent.placeholder
-            position = request.POST.get('plugin_order',
-                                        CMSPlugin.objects.filter(language=language, parent=parent).count())
-            # placeholder (non-page) add-plugin
+            plugin_class = plugin_pool.get_plugin(plugin_type)
+        except KeyError:
+            return HttpResponseBadRequest(force_text(
+                _("Invalid plugin type '%s'") % plugin_type
+            ))
 
-        # Sanity check to make sure we're not getting bogus values from JavaScript:
-        if settings.USE_I18N:
-            if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
-                return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
-            if parent and parent.language != language:
-                return HttpResponseBadRequest(force_text(_("Parent plugin language must be same as language!")))
-        else:
-            language = settings.LANGUAGE_CODE
-        plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
+        plugin_admin = plugin_class(admin_site=self.admin_site)
 
-        if parent:
-            plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-            plugin.parent_id = parent.pk
-        plugin.save()
-        self.post_add_plugin(request, placeholder, plugin)
-        response = {
-            'url': force_text(
-                admin_reverse("%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.model_name),
-                        args=[plugin.pk])),
-            'delete': force_text(
-                admin_reverse("%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.model_name),
-                        args=[plugin.pk])),
-            'breadcrumb': plugin.get_breadcrumb(),
-        }
-        return HttpResponse(json.dumps(response), content_type='application/json')
+        response = plugin_admin.add_view(request)
+
+        if request.method == "POST" and plugin_admin.object_successfully_changed:
+            self.post_add_plugin(request, plugin_admin.saved_object)
+        return response
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
@@ -402,42 +372,12 @@ class PlaceholderAdminMixin(object):
         cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
         instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
+
         if not self.has_change_plugin_permission(request, cms_plugin):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this plugin")))
+
         plugin_admin.cms_plugin_instance = cms_plugin
-        try:
-            plugin_admin.placeholder = cms_plugin.placeholder
-        except Placeholder.DoesNotExist:
-            pass
-        if request.method == "POST":
-            # set the continue flag, otherwise plugin_admin will make redirect
-            # to list view, which actually doesn't exists
-            mutable_post = request.POST.copy()
-            mutable_post['_continue'] = True
-            request.POST = mutable_post
-        if request.POST.get("_cancel", False):
-            # cancel button was clicked
-            context = {
-                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-                'plugin': cms_plugin,
-                'is_popup': True,
-                "type": cms_plugin.get_plugin_name(),
-                'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
-                'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
-                'cancel': True,
-            }
-            instance = cms_plugin.get_plugin_instance()[0]
-            if instance:
-                context['name'] = force_text(instance)
-            else:
-                # cancelled before any content was added to plugin
-                cms_plugin.delete()
-                context.update({
-                    "deleted": True,
-                    'name': force_text(cms_plugin),
-                })
-            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
+        plugin_admin.placeholder = cms_plugin.placeholder
 
         if not instance:
             # instance doesn't exist, call add view
@@ -448,20 +388,9 @@ class PlaceholderAdminMixin(object):
             # change_view method, is better if it will be loaded again, so
             # just pass id to plugin_admin
             response = plugin_admin.change_view(request, str(plugin_id))
+
         if request.method == "POST" and plugin_admin.object_successfully_changed:
             self.post_edit_plugin(request, plugin_admin.saved_object)
-            saved_object = plugin_admin.saved_object
-            context = {
-                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-                'plugin': saved_object,
-                'is_popup': True,
-                'name': force_text(saved_object),
-                "type": saved_object.get_plugin_name(),
-                'plugin_id': plugin_id,
-                'icon': force_escape(saved_object.get_instance_icon_src()),
-                'alt': force_escape(saved_object.get_instance_icon_alt()),
-            }
-            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return response
 
     @method_decorator(require_POST)

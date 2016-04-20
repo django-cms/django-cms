@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils.http import urlencode
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
@@ -144,14 +145,15 @@ class PermissionModeratorTests(CMSTestCase):
         with self.login_user_context(user):
             placeholder = page.placeholders.all()[0]
             post_data = {
+                'body': 'Test'
+            }
+            url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
                 'plugin_language': 'en',
-                'plugin_parent': '',
                 'placeholder_id': placeholder.pk,
                 'plugin_type': 'TextPlugin'
-            }
-            url = URL_CMS_PLUGIN_ADD
+            })
             response = self.client.post(url, post_data)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             return response.content.decode('utf8')
 
     def test_super_can_add_page_to_root(self):

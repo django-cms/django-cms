@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
+from cms.test_utils.project.sampleapp.cms_apps import SampleApp
+from cms.test_utils.util.context_managers import apphooks
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -37,16 +39,31 @@ if settings.AUTH_USER_MODEL == "customuserapp.User":
 class ManagementTestCase(CMSTestCase):
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_list_apphooks(self):
-        out = StringIO()
-        create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
-        management.call_command('cms', 'list', 'apphooks', interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), "SampleApp (draft)\n")
+        with apphooks(SampleApp):
+            out = StringIO()
+            create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+            management.call_command(
+                "cms",
+                "list",
+                "apphooks",
+                interactive=False,
+                stdout=out,
+            )
+            self.assertEqual(out.getvalue(), "SampleApp (draft)\n")
 
     def test_uninstall_apphooks_without_apphook(self):
-        out = StringIO()
-        management.call_command('cms', 'uninstall', 'apphooks', APPHOOK, interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), "no 'SampleApp' apphooks found\n")
+        with apphooks():
+            out = StringIO()
+            management.call_command(
+                "cms",
+                "uninstall",
+                "apphooks",
+                APPHOOK,
+                interactive=False,
+                stdout=out,
+            )
+            self.assertEqual(out.getvalue(), "no 'SampleApp' apphooks found\n")
 
     def test_fix_tree(self):
         create_page("home", "nav_playground.html", "en")
@@ -65,12 +82,20 @@ class ManagementTestCase(CMSTestCase):
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
-        out = StringIO()
-        create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
-        management.call_command('cms', 'uninstall', 'apphooks', APPHOOK, interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
-        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
+        with apphooks(SampleApp):
+            out = StringIO()
+            create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+            management.call_command(
+                "cms",
+                "uninstall",
+                "apphooks",
+                APPHOOK,
+                interactive=False,
+                stdout=out,
+            )
+            self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
+            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_list_plugins(self):

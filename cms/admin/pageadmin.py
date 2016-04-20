@@ -608,7 +608,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return True
 
     @create_revision()
-    def post_add_plugin(self, request, placeholder, plugin):
+    def post_add_plugin(self, request, plugin):
+        placeholder = plugin.placeholder
+
         if is_installed('reversion') and placeholder.page:
             plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
             message = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {
