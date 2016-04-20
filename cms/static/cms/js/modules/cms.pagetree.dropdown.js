@@ -53,34 +53,13 @@ var CMS = window.CMS || {};
          */
         _events: function _events() {
             var that = this;
-            var triggers;
-            var menus;
-            var index;
 
             // attach event to the trigger
             this.ui.container.on(this.click, this.options.triggerSelector, function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
-                triggers = $(that.options.triggerSelector);
-                menus = $(that.options.menuSelector);
-                index = triggers.index(this);
-
-                // cancel if opened tooltip is triggered again
-                if (menus.eq(index).is(':visible')) {
-                    menus.removeClass(that.options.openCls);
-                    return false;
-                }
-
-                // otherwise show the dropdown
-                menus
-                    .removeClass(that.options.openCls)
-                    .eq(index)
-                    .addClass(that.options.openCls);
-
-                that.ui.document.one(that.click, function () {
-                    menus.removeClass(that.options.openCls);
-                });
+                that._toggleDropdown(this);
             });
 
             // stop propagation on the element
@@ -91,6 +70,33 @@ var CMS = window.CMS || {};
             this.ui.container.on(this.click, that.options.menuSelector + ' a', function () {
                 that.closeAllDropdowns();
             });
+
+            this.ui.document.on(this.click, function () {
+                that.closeAllDropdowns();
+            });
+        },
+
+        /**
+         * @method _toggleDropdown
+         * @param {jQuery} trigger trigger clicked
+         * @private
+         */
+        _toggleDropdown: function _toggleDropdown(trigger) {
+            var triggers = $(this.options.triggerSelector);
+            var menus = $(this.options.menuSelector);
+            var index = triggers.index(trigger);
+
+            // cancel if opened tooltip is triggered again
+            if (menus.eq(index).is(':visible')) {
+                menus.removeClass(this.options.openCls);
+                return false;
+            }
+
+            // otherwise show the dropdown
+            menus
+                .removeClass(this.options.openCls)
+                .eq(index)
+                .addClass(this.options.openCls);
         },
 
         /**
