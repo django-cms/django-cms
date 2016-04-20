@@ -6,7 +6,9 @@
 # Andre Manzano <andremanzano@gmail.com>, 2014
 # Cleber de Souza Corrêa <cscorrea@gmail.com>, 2014
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2011
+# Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2011
 # Felipe Bessa Coelho <fcoelho_9@hotmail.com>, 2014
+# felipemocruha <felipemocruha@gmail.com>, 2013
 # felipemocruha <felipemocruha@gmail.com>, 2013
 # Guilherme Vierno <guilhermevierno@gmail.com>, 2015
 # Henrique Bastos <henrique@bastos.net>, 2013
@@ -26,7 +28,7 @@ msgstr ""
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
 "PO-Revision-Date: 2015-12-29 21:09+0000\n"
 "Last-Translator: Rodrigo Macedo <rodrigomacedo@rmsolucoeseminformatica.com>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/digi604/django-cms/language/pt_BR/)\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

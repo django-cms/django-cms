@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models import signals, Model
+from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import six, timezone
@@ -22,6 +22,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.helpers import reversion_register
 from cms.utils.urlutils import admin_reverse
 
@@ -163,36 +164,43 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
+        request = None
+        current_app = None
+        if context:
+            request = context.get('request', None)
+            if request:
+                current_app = getattr(request, 'current_app', None)
+            if not current_app:
+                current_app = context.current_app if context else None
+
         if instance and not (admin and not plugin.admin_preview):
             if not placeholder or not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
-            current_app = context.current_app if context else None
             context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
-            request = context.get('request', None)
             page = None
             if request:
                 page = request.current_page
             plugin.cms_plugin_instance = instance
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
+            context['allowed_parent_classes'] = plugin.get_parent_classes(placeholder_slot, page)
             if plugin.render_plugin:
                 template = plugin._get_render_template(context, instance, placeholder)
                 if not template:
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            return render_plugin(context, instance, placeholder, template, processors, context.current_app)
+            return render_plugin(context, instance, placeholder, template, processors, current_app)
         else:
             from cms.middleware.toolbar import toolbar_plugin_processor
 
             if processors and toolbar_plugin_processor in processors:
                 if not placeholder:
                     placeholder = self.placeholder
-                current_app = context.current_app if context else None
                 context = PluginContext(context, self, placeholder, current_app=current_app)
                 template = None
-                return render_plugin(context, self, placeholder, template, processors, context.current_app)
+                return render_plugin(context, self, placeholder, template, processors, current_app)
         return ""
 
     def get_media_path(self, filename):
@@ -370,6 +378,18 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         """
         pass
 
+    @classmethod
+    def _get_related_objects(cls):
+        if DJANGO_1_7:
+            return list(cls._meta.get_all_related_objects())
+        else:
+            fields = cls._meta._get_fields(
+                forward=False, reverse=True,
+                include_parents=True,
+                include_hidden=False,
+            )
+            return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+
     def has_change_permission(self, request):
         page = self.placeholder.page if self.placeholder else None
         if page:
@@ -461,6 +481,43 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             Model.delete(self, *args, **kwargs)
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
+
+    def get_action_urls(self, js_compat=True):
+        if js_compat:
+            # TODO: Remove this condition
+            # once the javascript files have been refactored
+            # to use the new naming schema (ending in _url).
+            data = {
+                'edit_plugin': self.get_edit_url(),
+                'add_plugin': self.get_add_url(),
+                'delete_plugin': self.get_delete_url(),
+                'move_plugin': self.get_move_url(),
+                'copy_plugin': self.get_copy_url(),
+            }
+        else:
+            data = {
+                'edit_url': self.get_edit_url(),
+                'add_url': self.get_add_url(),
+                'delete_url': self.get_delete_url(),
+                'move_url': self.get_move_url(),
+                'copy_url': self.get_copy_url(),
+            }
+        return data
+
+    def get_add_url(self):
+        return self.add_url or self.placeholder.get_add_url()
+
+    def get_edit_url(self):
+        return self.edit_url or self.placeholder.get_edit_url(self.pk)
+
+    def get_delete_url(self):
+        return self.delete_url or self.placeholder.get_delete_url(self.pk)
+
+    def get_move_url(self):
+        return self.move_url or self.placeholder.get_move_url()
+
+    def get_copy_url(self):
+        return self.copy_url or self.placeholder.get_copy_url()
 
     @property
     def add_url(self):

@@ -3,10 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# affy <me@afflicto.net>, 2014
 # Eirik Krogstad <eirikkr@gmail.com>, 2013,2015
+# fivethreeo <oyvind.saltvik@gmail.com>, 2011
 # affy <me@afflicto.net>, 2014
 # fivethreeo <oyvind.saltvik@gmail.com>, 2011
 # Sindre Myren <smyrman@gmail.com>, 2011
+# Sindre Myren <smyrman@gmail.com>, 2011
+# Stein Strindhaug <stein.strindhaug@gmail.com>, 2012
 # Stein Strindhaug <stein.strindhaug@gmail.com>, 2012
 msgid ""
 msgstr ""
@@ -15,7 +19,7 @@ msgstr ""
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Norwegian (http://www.transifex.com/digi604/django-cms/language/no/)\n"
+"Language-Team: Norwegian (http://www.transifex.com/divio/django-cms/language/no/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

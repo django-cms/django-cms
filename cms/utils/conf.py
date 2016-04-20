@@ -31,6 +31,7 @@ def default(name):
 
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
+    'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
@@ -60,9 +61,12 @@ DEFAULTS = {
     'TOOLBAR_URL__BUILD': 'build',
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
-    'APP_NAME':None,
-    'TOOLBAR_HIDE':False,
+    'APP_NAME': None,
+    'TOOLBAR_HIDE': False,
     'UNESCAPED_RENDER_MODEL_TAGS': True,
+    'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
+    'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
+    'WIZARD_CONTENT_PLUGIN_BODY': 'body',
 }
 
 
@@ -150,7 +154,7 @@ def get_templates():
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _(constants.TEMPLATE_INHERITANCE_LABEL)))
+        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
 

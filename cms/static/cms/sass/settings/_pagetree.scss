@@ -1,0 +1,32 @@
+// #############################################################################
+// SETTINGS
+
+$pagetree-header-height: 24px;
+$pagetree-bottom-offset: 25px;
+$pagetree-cell-height: 40px;
+
+// general paddings for elements
+$pagetree-bottom-padding: 5px;
+$pagetree-header-padding: 3px 6px;
+$pagetree-anchor-padding: 9px 25px;
+$pagetree-nesting-padding: 20px;
+$pagetree-cell-padding: 7px 8px;
+
+// marker used for positioning when moving nodes
+$pagetree-marker-size: 6px;
+
+$pagetree-icon-size: 18px;
+$pagetree-icon-offset: 5px;
+$pagetree-icon-padding: 0 3px;
+
+$pagetree-lang-size: 15px;
+
+$pagetree-tooltip-min-width: 130px;
+$pagetree-tooltip-offset: 25px;
+$pagetree-tooltip-header-padding: 2px 10px;
+$pagetree-tooltip-anchor-padding: 10px;
+
+$pagetree-search-width: 175px;
+
+// used for copy and paste
+$pagetree-dimmer: $sideframe-dimmer;

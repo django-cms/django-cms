@@ -1,3 +1,5 @@
+.. _how-to:
+
 #############
 How-to guides
 #############
@@ -21,3 +23,6 @@ the same territory as the :doc:`/introduction/index`, but in more detail.
     caching
     frontend_models
     sitemap
+    page_types
+    wizards
+    contributing

@@ -14,7 +14,7 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7
+from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
 from cms.utils.compat.dj import is_installed, get_app_paths
 
 
@@ -193,6 +193,7 @@ def check_sekizai(output):
         else:
             section.finish_error("Sekizai configuration has errors")
 
+
 @define_check
 def check_i18n(output):
     with output.section("Internationalization") as section:
@@ -216,6 +217,27 @@ def check_i18n(output):
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+
+
+@define_check
+def check_middlewares(output):
+    with output.section("Middlewares") as section:
+        required_middlewares = (
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+            'cms.middleware.language.LanguageCookieMiddleware',
+        )
+        for middleware in required_middlewares:
+            if middleware not in settings.MIDDLEWARE_CLASSES:
+                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+
 
 @define_check
 def check_deprecated_settings(output):
@@ -250,6 +272,7 @@ def check_plugin_instances(output):
         else:
             section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
 
+
 @define_check
 def check_copy_relations(output):
     from cms.plugin_pool import plugin_pool
@@ -278,7 +301,7 @@ def check_copy_relations(output):
                     c_to_s(plugin_class),
                     c_to_s(rel.model),
                 ))
-            for rel in plugin_class._meta.get_all_related_objects():
+            for rel in plugin_class._get_related_objects():
                 if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
@@ -296,12 +319,17 @@ def check_copy_relations(output):
                         c_to_s(extension),
                         c_to_s(rel.related.parent_model),
                     ))
+                elif DJANGO_1_8:
+                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                        c_to_s(extension),
+                        c_to_s(rel.related.model),
+                    ))
                 else:
                     section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        extension,
-                        rel.related,
+                        c_to_s(extension),
+                        c_to_s(rel.remote_field.model),
                     ))
-            for rel in extension._meta.get_all_related_objects():
+            for rel in extension._get_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(extension),
@@ -328,7 +356,10 @@ def _load_all_templates(directory):
             elif path.endswith('.html'):
                 with open(path, 'rb') as fobj:
                     source = fobj.read().decode(settings.FILE_CHARSET)
-                    lexer = Lexer(source, path)
+                    if DJANGO_1_8:
+                        lexer = Lexer(source, path)
+                    else:
+                        lexer = Lexer(source)
                     yield lexer.tokenize(), path
 
 @define_check

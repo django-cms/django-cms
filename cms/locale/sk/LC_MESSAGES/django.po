@@ -10,9 +10,9 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-11-11 17:31+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Slovak (http://www.transifex.com/digi604/django-cms/language/sk/)\n"
+"PO-Revision-Date: 2015-12-18 14:19+0000\n"
+"Last-Translator: dellax <michalnebbia@gmail.com>\n"
+"Language-Team: Slovak (http://www.transifex.com/divio/django-cms/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,7 +34,7 @@ msgstr "Aktuálny jazyk polí s obsahom."
 
 #: admin/forms.py:71 forms/wizards.py:81
 msgid "Page type"
-msgstr ""
+msgstr "Typ stránky"
 
 #: admin/forms.py:72 forms/wizards.py:79
 msgid "Title"
@@ -71,7 +71,7 @@ msgstr "Prepísať to, čo je zobrazené v hornej časti vášho prehliadača al
 
 #: admin/forms.py:81
 msgid "Description meta tag"
-msgstr ""
+msgstr "Popisný meta tag"
 
 #: admin/forms.py:83
 msgid "A description of the page used by search engines."
@@ -83,7 +83,7 @@ msgstr "Už existuje stránka s týmto identifikátorom"
 
 #: admin/forms.py:160
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Slug nesmie byť prázdny"
 
 #: admin/forms.py:188
 msgid "Application"
@@ -119,11 +119,11 @@ msgstr "Presmeruje sa na túto URL."
 
 #: admin/forms.py:204
 msgid "Start typing..."
-msgstr ""
+msgstr "Začnite písať..."
 
 #: admin/forms.py:213
 msgid "Application configurations"
-msgstr ""
+msgstr "Konfigúrácia aplikácie"
 
 #: admin/forms.py:219
 msgid "Language independent options"
@@ -230,19 +230,19 @@ msgstr "Pokročilé nastavenia"
 
 #: admin/pageadmin.py:356 cms_toolbars.py:507
 msgid "Publishing dates"
-msgstr ""
+msgstr "Dátumy publikácie"
 
 #: admin/pageadmin.py:362
 msgid "Change Permissions"
-msgstr ""
+msgstr "Upraviť obmedzenia"
 
 #: admin/pageadmin.py:405
 msgid "Add Page Type"
-msgstr ""
+msgstr "Pridať typ stránky"
 
 #: admin/pageadmin.py:409
 msgid "Add Page Copy"
-msgstr ""
+msgstr "Pridať kópiu stránky"
 
 #: admin/pageadmin.py:609
 #, python-format
@@ -262,7 +262,7 @@ msgstr "Zásuvný modul %(plugin_name)s bol zmenený na pozícii%(position)s v %
 
 #: admin/pageadmin.py:640
 msgid "Plugins were moved"
-msgstr ""
+msgstr "Pluginy boli presunuté"
 
 #: admin/pageadmin.py:647
 #, python-format
@@ -317,7 +317,7 @@ msgstr ""
 
 #: admin/pageadmin.py:864
 msgid "Page moved"
-msgstr ""
+msgstr "Stránka bola presunutá"
 
 #: admin/pageadmin.py:910 admin/placeholderadmin.py:272
 #: admin/placeholderadmin.py:318
@@ -355,7 +355,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1072
 msgid "This page was never published"
-msgstr ""
+msgstr "Táto stránka ešte nebola publikovaná"
 
 #: admin/pageadmin.py:1075
 #, python-format
@@ -392,7 +392,7 @@ msgstr "Nemáte právo meniť status (zobrazenie v navigácii) tejto stránky"
 
 #: admin/pageadmin.py:1278
 msgid "Page Types"
-msgstr ""
+msgstr "Typy stránok"
 
 #: admin/pageadmin.py:1358
 msgid "You do not have permission to edit this page"
@@ -498,20 +498,20 @@ msgstr ""
 
 #: cms_plugins.py:56 cms_plugins.py:65
 msgid "Create Alias"
-msgstr ""
+msgstr "Vytvoriť alias"
 
 #: cms_toolbars.py:93
 msgid "Structure"
-msgstr ""
+msgstr "Štruktúra"
 
 #: cms_toolbars.py:94 forms/wizards.py:84
 msgid "Content"
-msgstr ""
+msgstr "Obash"
 
 #: cms_toolbars.py:98 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
-msgstr ""
+msgstr "Vytvoriť"
 
 #: cms_toolbars.py:151
 msgid "Sites"
@@ -527,7 +527,7 @@ msgstr ""
 
 #: cms_toolbars.py:163
 msgid "User settings"
-msgstr ""
+msgstr "Používateľské nastavenia"
 
 #: cms_toolbars.py:168
 msgid "Clipboard..."
@@ -539,17 +539,17 @@ msgstr ""
 
 #: cms_toolbars.py:177
 msgid "Disable toolbar"
-msgstr ""
+msgstr "Skryť lištu nástrojov"
 
 #: cms_toolbars.py:191
 msgid "Users"
-msgstr ""
+msgstr "Používatelia"
 
 #: cms_toolbars.py:210 tests/test_toolbar.py:744 tests/test_toolbar.py:759
 #: tests/test_toolbar.py:792
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Odhlásiť %s"
 
 #: cms_toolbars.py:210
 msgid "Logout"
@@ -557,25 +557,25 @@ msgstr "Odhlásenie"
 
 #: cms_toolbars.py:348
 msgid "Publish changes"
-msgstr ""
+msgstr "Publikovať zmeny"
 
 #: cms_toolbars.py:350
 msgid "Publish page now"
-msgstr ""
+msgstr "Publikovať zmeny ihneď"
 
 #: cms_toolbars.py:392 cms_toolbars.py:476
 msgid "Page settings"
-msgstr ""
+msgstr "Nastavenia stránky"
 
 #: cms_toolbars.py:410
 #, python-format
 msgid "Add %(language)s Translation"
-msgstr ""
+msgstr "Pridať %(language)s preklad"
 
 #: cms_toolbars.py:418
 #, python-format
 msgid "Delete %(language)s Translation"
-msgstr ""
+msgstr "Vymazať %(language)s preklad"
 
 #: cms_toolbars.py:427
 #, python-format
@@ -589,7 +589,7 @@ msgstr ""
 
 #: cms_toolbars.py:442
 msgid "Pages"
-msgstr ""
+msgstr "Stránky"
 
 #: cms_toolbars.py:450 templates/admin/cms/page/permissions.html:5
 #: tests/test_wizards.py:58 tests/test_wizards.py:81
@@ -598,47 +598,47 @@ msgstr "Stránka"
 
 #: cms_toolbars.py:453
 msgid "Add Page"
-msgstr ""
+msgstr "Pridať stránku"
 
 #: cms_toolbars.py:457
 msgid "New Page"
-msgstr ""
+msgstr "Nová stránka"
 
 #: cms_toolbars.py:458
 msgid "New Sub Page"
-msgstr ""
+msgstr "Nová podstránka"
 
 #: cms_toolbars.py:459
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "Duplikovať túto stránku"
 
 #: cms_toolbars.py:471
 msgid "Edit this Page"
-msgstr ""
+msgstr "Upraviť túto stránku"
 
 #: cms_toolbars.py:481
 msgid "Templates"
-msgstr ""
+msgstr "Šablóny"
 
 #: cms_toolbars.py:497
 msgid "Advanced settings"
-msgstr ""
+msgstr "Pokročilé nastavenia"
 
 #: cms_toolbars.py:503
 msgid "Permissions"
-msgstr ""
+msgstr "Oprávnenia"
 
 #: cms_toolbars.py:513
 msgid "Hide in navigation"
-msgstr ""
+msgstr "Skryť v navigácii"
 
 #: cms_toolbars.py:513
 msgid "Display in navigation"
-msgstr ""
+msgstr "Zobraziť v navigácii"
 
 #: cms_toolbars.py:520
 msgid "Unpublish page"
-msgstr "odpublikované"
+msgstr "Odpublikovať stránku"
 
 #: cms_toolbars.py:523
 msgid "Publish page"
@@ -650,7 +650,7 @@ msgstr "Odstrániť stránku"
 
 #: cms_toolbars.py:543
 msgid "Save as Page Type"
-msgstr ""
+msgstr "Uložiť ako typ stránky"
 
 #: cms_toolbars.py:548
 #: templates/admin/cms/page/history/revision_header.html:10
@@ -659,11 +659,11 @@ msgstr "História"
 
 #: cms_toolbars.py:566
 msgid "Undo"
-msgstr ""
+msgstr "Krok späť"
 
 #: cms_toolbars.py:567
 msgid "Redo"
-msgstr ""
+msgstr "Vykonať znova"
 
 #: cms_toolbars.py:572
 msgid "Are you sure you want to revert to live?"
@@ -675,23 +675,23 @@ msgstr ""
 
 #: cms_toolbars.py:576
 msgid "View history"
-msgstr ""
+msgstr "Zobraziť históriu"
 
 #: cms_wizards.py:84
 msgid "New page"
-msgstr ""
+msgstr "Nová stránka"
 
 #: cms_wizards.py:88
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Vytvorí novú stránku k práve zobrazenej stránke"
 
 #: cms_wizards.py:92
 msgid "New sub page"
-msgstr ""
+msgstr "Nová podstránka"
 
 #: cms_wizards.py:96
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Vytvorá podstránku pod touto stránkou"
 
 #: forms/fields.py:33
 msgid "Select a valid site"
@@ -1362,7 +1362,7 @@ msgstr "Filter"
 
 #: templates/admin/cms/page/tree/base_header.html:8
 msgid "View"
-msgstr ""
+msgstr "Zobraziť"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
@@ -1370,7 +1370,7 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/base_header.html:13
 msgid "Actions"
-msgstr ""
+msgstr "Akcie"
 
 #: templates/admin/cms/page/tree/base_header.html:14
 msgid "Info"
@@ -1447,7 +1447,7 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/menu_item.html:54
 msgid "Page settings (SHIFT-click for advanced settings)"
-msgstr ""
+msgstr "Nastavenia stránky (SHIFT klik pre pokročilé nastavenia)"
 
 #: templates/admin/cms/page/tree/menu_item.html:54
 msgid "page settings"
@@ -1491,15 +1491,15 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/menu_item.html:76
 msgid "Information"
-msgstr ""
+msgstr "Informácie"
 
 #: templates/admin/cms/page/tree/menu_item.html:84
 msgid "is restricted"
-msgstr ""
+msgstr "je obmedzené?"
 
 #: templates/admin/cms/page/tree/menu_item.html:86
 msgid "last change by"
-msgstr ""
+msgstr "naposledy upravil"
 
 #: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
@@ -1511,7 +1511,7 @@ msgstr ""
 
 #: templates/cms/toolbar/dragbar.html:11
 msgid "Copy all"
-msgstr ""
+msgstr "Kopírovať všetko"
 
 #: templates/cms/toolbar/dragbar.html:13
 msgid "Copy from"
@@ -1520,16 +1520,16 @@ msgstr ""
 #: templates/cms/toolbar/dragbar.html:15
 #: templates/cms/toolbar/dragitem.html:32
 msgid "Paste"
-msgstr ""
+msgstr "Prilepiť"
 
 #: templates/cms/toolbar/dragbar.html:16
 msgid "Empty all"
-msgstr ""
+msgstr "Zmazať všetko"
 
 #: templates/cms/toolbar/dragbar.html:21
 #: templates/cms/toolbar/dragitem.html:43
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Filtrovať pluginy..."
 
 #: templates/cms/toolbar/dragbar.html:28
 msgid "This is a static placeholder"
@@ -1537,11 +1537,11 @@ msgstr ""
 
 #: templates/cms/toolbar/dragbar.html:30
 msgid "Expand all"
-msgstr ""
+msgstr "Rozbaliť všetko"
 
 #: templates/cms/toolbar/dragbar.html:31
 msgid "Collapse all"
-msgstr ""
+msgstr "Zbaliť všetko"
 
 #: templates/cms/toolbar/dragitem.html:12
 msgid "You cannot add plugins to this plugin."
@@ -1551,7 +1551,7 @@ msgstr ""
 #: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
 #: templatetags/cms_tags.py:754
 msgid "Edit"
-msgstr ""
+msgstr "Upraviť"
 
 #: templates/cms/toolbar/dragitem.html:22
 msgid "This plugin cannot be moved or edited outside of its parent"
@@ -1575,7 +1575,7 @@ msgstr "Dostupné zásuvné moduly"
 
 #: templates/cms/toolbar/items/live_draft.html:6
 msgid "View published"
-msgstr ""
+msgstr "Zobraziť publikované"
 
 #: templates/cms/toolbar/items/login.html:16
 msgid "Login"
@@ -1591,7 +1591,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:12
 msgid "Double-click to edit"
-msgstr ""
+msgstr "Dvoj-klik pre úpravu"
 
 #: templates/cms/toolbar/toolbar.html:13
 msgid "Tap to edit"
@@ -1640,7 +1640,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
 msgid "Cancel"
-msgstr ""
+msgstr "Zrušiť"
 
 #: templates/cms/toolbar/toolbar_javascript.html:34
 msgid "The following error occured:"
@@ -1752,7 +1752,7 @@ msgstr ""
 
 #: templates/cms/wizards/start.html:29
 msgid "Next"
-msgstr ""
+msgstr "Ďalej"
 
 #: templatetags/cms_admin.py:61
 msgid "unpublished changes"

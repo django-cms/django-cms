@@ -1,0 +1,71 @@
+// #############################################################################
+// BUTTONS
+
+// taken from bootstrap with adaptations
+@function important($important) {
+    @if($important == true) {
+        @return !important;
+    } @else {
+        @return unquote('');
+    }
+}
+@mixin button-variant($color, $background, $border, $important: false) {
+    background-image: none important($important);
+    margin-bottom: 0; // For input.btn
+    border-radius: $btn-border-radius-base important($important);
+    color: $color important($important);
+    background-color: $background important($important);
+    border: 1px solid $border important($important);
+    -webkit-appearance: none;
+
+    &:focus,
+    &.focus {
+        color: $color important($important);
+        background-color: darken($background, 5%) important($important);
+        border-color: darken($border, 5%) important($important);
+        text-decoration: none important($important);
+    }
+    &:hover {
+        color: $color important($important);
+        background-color: darken($background, 5%) important($important);
+        border-color: darken($border, 5%) important($important);
+        text-decoration: none important($important);
+    }
+    &:active,
+    &.cms-btn-active {
+        color: $color important($important);
+        background-color: darken($background, 10%) important($important);
+        border-color: darken($border, 10%) important($important);
+        box-shadow: $btn-active-shadow important($important);
+
+        &:hover,
+        &:focus,
+        &.focus {
+            color: $color important($important);
+            background-color: darken($background, 17%) important($important);
+            border-color: darken($border, 25%) important($important);
+        }
+    }
+    &:active,
+    &.cms-btn-active {
+        background-image: none important($important);
+    }
+    &.cms-btn-disabled,
+    &[disabled] {
+        &,
+        &:hover,
+        &:focus,
+        &.focus,
+        &:active,
+        &.cms-btn-active {
+            background-color: rgba($background, 0.4) important($important);
+            border-color: rgba($border, 0.4) important($important);
+            color: lighten($color, 50%) important(1);
+            cursor: not-allowed;
+            box-shadow: none important($important);
+            &:before {
+                color: rgba($color, 0.4) important(1);
+            }
+        }
+    }
+}

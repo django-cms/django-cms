@@ -1,23 +1,13 @@
 .. _upgrade-to-3.0.16:
 
-#########################################
-3.0.16 release notes - Unreleased - Draft
-#########################################
+####################
+3.0.16 release notes
+####################
 
 ********************
-What's new in 3.0.16
+Bug-fixes
 ********************
 
-Bug Fixes
-=========
-
-* Fix JS error when using PageSelectWidget
-* Fix whitespace markup issues in draft mode
-* Detect plugin migrations layout in tests
-
-
-
-Thanks
-======
-
-TBD
+- Fixed JavaScript error when using ``PageSelectWidget``
+- Fixed whitespace markup issues in draft mode
+- Added plugin migrations layout detection in tests

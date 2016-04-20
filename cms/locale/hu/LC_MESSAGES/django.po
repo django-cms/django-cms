@@ -4,11 +4,14 @@
 # 
 # Translators:
 # Attila Kovacs <akal.mailbox@gmail.com>, 2013
+# fazekasda <fazekasda@gmail.com>, 2012
 # fazekasda <fazekasda@gmail.com>, 2013-2014
 # fazekasda <fazekasda@gmail.com>, 2012
 # Szabo L. <lortechnet@gmail.com>, 2013
 # Tibor Balogh, 2014
 # Tibor Balogh, 2014
+# Tibor Balogh, 2014
+# Viktor Nagy, 2013
 # Viktor Nagy, 2013
 msgid ""
 msgstr ""
@@ -17,7 +20,7 @@ msgstr ""
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Hungarian (http://www.transifex.com/digi604/django-cms/language/hu/)\n"
+"Language-Team: Hungarian (http://www.transifex.com/divio/django-cms/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

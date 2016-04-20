@@ -1,0 +1,597 @@
+//##############################################################################
+// TOOLBAR
+
+.cms-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: z(toolbar, base);
+    min-height: $toolbar-height;
+    margin-top: -$toolbar-height - 10px;
+    border-bottom: 1px solid $toolbar-border !important;
+    background-color: $white;
+    box-shadow: $toolbar-shadow;
+    backface-visibility: hidden;
+
+    &.cms-toolbar-non-sticky {
+        position: absolute;
+    }
+
+    .cms-toolbar-expanded & {
+        margin-top: 0;
+    }
+
+    .cms-toolbar-left {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: z(toolbar, left);
+        padding-left: $toolbar-left-space;
+    }
+    .cms-toolbar-right {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: z(toolbar, right);
+        padding-right: $toolbar-trigger-width + 2px;
+    }
+
+    .cms-toolbar-left .cms-toolbar-item {
+        margin-right: $toolbar-left-space;
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+    .cms-toolbar-right .cms-toolbar-item {
+        margin-right: $toolbar-right-space;
+    }
+
+    // items
+    .cms-toolbar-item {
+        float: left;
+    }
+}
+
+//###########################################################
+// #TOOLBAR/debug#
+&.cms-toolbar-debug {
+    .cms-toolbar {
+        top: $toolbar-debug-height !important;
+    }
+    .cms-toolbar-trigger {
+        top: $toolbar-debug-height !important;
+    }
+
+    .cms-debug-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: z(debug);
+        width: 100%;
+        height: $toolbar-debug-height;
+        border-bottom: 1px solid $gray-lighter;
+        background-color: $toolbar-debug-bgcolor;
+        background-image: linear-gradient($gradient-striped-dark);
+        background-size: $toolbar-debug-bgsize;
+    }
+}
+&.cms-toolbar-debug #container {
+    padding-top: $toolbar-height + $toolbar-debug-height !important;
+}
+
+//###########################################################
+// #TOOLBAR/navigation#
+.cms-toolbar-item-navigation {
+    li {
+        position: relative;
+        float: left;
+    }
+    li a {
+        float: left;
+        color: $toolbar-menu-item-color;
+        padding: $toolbar-menu-item-padding;
+        line-height: $toolbar-height;
+        height: $toolbar-height;
+        cursor: default;
+    }
+    li ul {
+        display: none;
+    }
+    > li:first-child > a span {
+        font-weight: 600;
+    }
+    .cms-icon {
+        display: none;
+        position: absolute;
+        top: 50%;
+        right: 7px;
+        margin-top: -($toolbar-dropdown-item-icon-size / 2);
+        font-size: $toolbar-dropdown-item-icon-size;
+        transform: rotate(180deg);
+    }
+
+    // hover effect
+    .cms-toolbar-item-navigation-hover {
+        ul {
+            display: block;
+            position: absolute;
+            top: $toolbar-height;
+            left: 0;
+            min-width: $toolbar-dropdown-min-width;
+            padding: $toolbar-dropdown-padding;
+            border: 1px solid $white;
+            border-top: none;
+            border-radius: 0 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius;
+            background-color: $toolbar-dropdown-bgcolor;
+            background: rgba($toolbar-dropdown-bgcolor, 0.97);
+            box-shadow: $toolbar-dropdown-shadow;
+        }
+        ul li {
+            float: none;
+        }
+        ul li a {
+            display: block;
+            float: none;
+            white-space: nowrap;
+            line-height: $toolbar-dropdown-item-height;
+            height: $toolbar-dropdown-item-height;
+            padding: $toolbar-dropdown-item-padding;
+            cursor: pointer;
+        }
+        ul ul {
+            border-top: 1px solid $gray-lightest;
+            border-radius: 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius 0;
+        }
+
+        // second level
+        .cms-toolbar-item-navigation-children {
+            ul {
+                display: none;
+                top: -(nth($toolbar-dropdown-padding, 1) + 1px);
+                left: 100%;
+            }
+            > a {
+                cursor: default;
+            }
+            > a span {
+                display: block;
+                .cms-icon {
+                    display: block;
+                }
+
+            }
+        }
+
+        // anchor hover
+        > a {
+            color: $toolbar-menu-item-hover-color !important;
+            background: $toolbar-menu-item-hover-bgcolor;
+        }
+
+        // add active style
+        .cms-toolbar-item-navigation-active > a {
+            font-weight: 800;
+        }
+    }
+
+    .cms-toolbar-item-navigation-break {
+        @include hide-content();
+        height: 1px;
+        margin: 0 0 4px;
+        padding: 0 0 4px;
+        border-bottom: 1px solid $gray-lighter;
+    }
+
+    .cms-toolbar-item-navigation-disabled {
+        a {
+            cursor: default !important;
+            opacity: 0.2;
+            &:hover,
+            &:active,
+            &:focus {
+                color: $toolbar-menu-item-color !important;
+                background: none !important;
+                box-shadow: none;
+            }
+        }
+        ul {
+            display: none !important;
+        }
+    }
+}
+
+.cms-toolbar-more {
+    display: none;
+
+    .cms-toolbar-item-navigation-children {
+        padding: 0;
+    }
+
+    .cms-toolbar-item {
+        float: none;
+        margin: $toolbar-menu-item-padding !important;
+        overflow: hidden;
+        margin-top: 5px;
+        margin-bottom: 8px;
+    }
+    .cms-toolbar-item-cms-mode-switcher a {
+        float: left !important;
+        width: 50%;
+    }
+    .cms-toolbar-item-buttons {
+        .cms-btn {
+            text-align: center;
+        }
+    }
+
+    .cms-btn {
+        color: $btn-default-color;
+    }
+    .cms-btn-action {
+        color: $btn-action-color;
+    }
+    .cms-more-buttons + .cms-toolbar-item-navigation-children {
+        padding-top: 8px;
+        border-top: 1px solid $gray-lighter;
+    }
+}
+.cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+    position: fixed;
+    width: 100%;
+    // 100vw is better because if the user's content exceeds the viewport width
+    // the dropdown will also go out of the screen, which is not ideal, esp. on mobile
+    // technically we should also adapt toolbar trigger, but it would involve calc
+    // which is not very performant.
+    width: 100vw;
+    top: $toolbar-height;
+    bottom: 0;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+
+    .cms-icon {
+        display: none !important;
+    }
+
+    > li {
+        border-bottom: 1px solid $gray-lighter;
+    }
+
+    .cms-more-buttons {
+        border-bottom: none;
+    }
+
+    li a:not(.cms-btn) {
+        color: $toolbar-menu-item-color !important;
+        background: transparent !important;
+    }
+    li a {
+        position: relative;
+        line-height: 1.4 * $toolbar-dropdown-item-height;
+        height: 1.4 * $toolbar-dropdown-item-height;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    ul {
+        display: block !important;
+        border: none;
+        box-shadow: none;
+        position: relative;
+        left: 0;
+        top: 0;
+        border-radius: 0;
+        margin-left: 20px;
+    }
+}
+&.cms-toolbar-debug .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+    top: $toolbar-height + $toolbar-debug-height;
+}
+.cms-toolbar-item-cms-mode-switcher {
+    display: none;
+}
+
+//###########################################################
+// #TOOLBAR/dialog#
+.cms-messages {
+    display: none;
+    position: fixed;
+    top: $toolbar-height;
+    z-index: z(messages);
+    color: $messages-color;
+    font-size: $messages-font-size;
+    font-weight: $messages-font-weight;
+    line-height: $messages-line-height;
+    width: $messages-width;
+    min-height: $messages-line-height;
+    margin: 0;
+    padding: $messages-padding;
+    border-radius: 0 0 $messages-border-radius $messages-border-radius;
+    background: rgba($messages-bgcolor, 0.74);
+    transition: top $speed-base;
+    * {
+        color: $messages-color;
+        font-size: $messages-font-size;
+        font-weight: $messages-font-weight;
+        line-height: $messages-line-height;
+    }
+
+    a {
+        color: $color-primary;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    strong {
+        color: lighten($color-primary, 10%);
+        font-weight: $messages-font-weight;
+    }
+    ul {
+        display: inline;
+        color: $messages-color;
+    }
+    ul li {
+        display: inline;
+        color: $messages-color;
+        font-weight: $messages-font-weight;
+    }
+
+    .cms-messages-close {
+        cursor: pointer;
+        display: none;
+        float: right;
+        position: relative;
+        width: $messages-close-area-size;
+        height: $messages-line-height;
+        text-align: right;
+        span {
+            font-size: $messages-close-icon-size;
+        }
+        &:hover span {
+            color: $color-primary;
+        }
+    }
+}
+.cms-messages-error strong {
+    color: $color-danger;
+}
+&.cms-toolbar-debug .cms-messages {
+    margin-top: $toolbar-debug-height;
+}
+
+//###########################################################
+// #TOOLBAR/elements/logo#
+.cms-toolbar-item-logo {
+    margin-right: $toolbar-left-space;
+
+    a {
+        @extend .cms-icon;
+        @extend .cms-icon-logo;
+        font-size: $toolbar-logo-height;
+        line-height: $toolbar-height;
+        height: $toolbar-height;
+        transition: color $speed-base;
+
+        span {
+            display: none;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: $color-primary;
+        }
+    }
+}
+
+// #TOOLBAR/elements/form#
+.cms-form-login {
+    label {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: $toolbar-height;
+        padding-left: $toolbar-left-space;
+        margin: 0;
+        cursor: pointer;
+    }
+    label span {
+        display: inline-block;
+    }
+    input[type="text"],
+    input[type="password"] {
+        color: $login-form-input-color;
+        font-size: $login-form-input-font-size;
+        height: $login-form-input-height - 2px;
+        line-height: $login-form-input-height - 2px;
+        width: $login-form-input-width;
+        margin: 0;
+        padding: 0 $login-form-input-padding-horizontal;
+        border: 1px solid $login-form-input-border;
+        border-radius: $login-form-input-border-radius;
+        box-shadow: 0 1px 0 $white;
+
+        &:focus {
+            transition: outline 0.2s;
+            border-color: $color-primary;
+            box-shadow: inset 0 0 2px $gray-lighter;
+        }
+    }
+    input[type="submit"] {
+        display: block;
+        font-size: $login-form-input-font-size - 1px;
+        text-transform: uppercase;
+        height: $login-form-input-height - 2px;
+        line-height: $login-form-input-height - 2px;
+        padding: 0 $login-form-submit-padding-horizontal;
+        &:-moz-focus-inner {
+            border: 0;
+        }
+    }
+
+    .cms-error {
+        color: $color-danger;
+    }
+    .cms-error input {
+        border: 1px solid $color-danger;
+    }
+
+    // overlap with logo when it gets too small
+    @media (max-width: $screen-tablet - 280px) {
+        margin-left: -110px;
+    }
+    // mobile only
+    @media (max-width: $screen-tablet) {
+        position: relative;
+        // remove spaces
+        font-size: 1px;
+        line-height: 0;
+        background: $white;
+        label {
+            position: relative;
+            padding: 0;
+            margin-right: -1px;
+            margin-bottom: -1px;
+        }
+        label span {
+            position: absolute;
+            left: 5px;
+            top: 0;
+            z-index: 1;
+            color: $gray-light;
+        }
+        // setup inputs
+        input[type="text"] {
+            border-radius: $border-radius-base 0 0 $border-radius-base;
+        }
+        input[type="password"] {
+            border-radius: 0;
+        }
+        input[type="text"],
+        input[type="password"] {
+            position: relative;
+            z-index: 10;
+            width: 95px;
+            &:focus,
+            &:valid {
+                background: $white;
+            }
+        }
+        input[type="submit"] {
+            border-radius: 0 $border-radius-base $border-radius-base 0;
+            padding: 0 $login-form-submit-padding-horizontal / 2;
+        }
+    }
+}
+
+// #TOOLBAR/elements/buttongroups#
+.cms-toolbar-item-buttons {
+    $margin: ($toolbar-height - $toolbar-button-height) / 2;
+    margin: $margin 0 $margin;
+
+    a {
+        float: left;
+        line-height: $toolbar-button-height;
+        height: $toolbar-button-height;
+        font-size: $toolbar-button-font-size;
+        padding: 0 $toolbar-button-padding-horizontal;
+    }
+    a:first-child {
+        border-radius: $toolbar-button-border-radius 0 0 $toolbar-button-border-radius;
+    }
+    a:last-child {
+        border-radius: 0 $toolbar-button-border-radius $toolbar-button-border-radius 0;
+    }
+    a:only-child {
+        border-radius: $toolbar-button-border-radius;
+    }
+}
+
+// #TOOLBAR/elements/toggler#
+.cms-toolbar-trigger {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: z(toolbar-trigger);
+    border-bottom: 1px solid $toolbar-border;
+    border-left: 1px solid $toolbar-border;
+    background: $white;
+
+    a {
+        display: block;
+        width: $toolbar-trigger-width;
+        height: $toolbar-trigger-height - 1px;
+        text-align: center;
+        border-top: 1px solid $white;
+        border-left: 1px solid $white;
+        background: $white;
+        &:hover {
+            background: $white;
+        }
+        &:hover span,
+        &:active span,
+        &:focus span {
+            color: $gray-darkest;
+        }
+        span {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -($toolbar-trigger-icon-size / 2);
+            margin-top: -($toolbar-trigger-icon-size / 2 + 1px);
+            font-size: $toolbar-trigger-icon-size;
+            color: $gray-darker;
+            transition: transform $speed-base;
+            transform: rotate(270deg);
+            background: none;
+        }
+    }
+}
+// #TOOLBAR/elements/loader#
+.cms-toolbar-trigger-expanded a span {
+    transform: rotate(90deg);
+}
+.cms-toolbar-loader a span {
+    @extend .cms-icon-loader;
+    position: absolute;
+    margin-top: -($toolbar-trigger-loader-size / 2);
+    margin-left: -($toolbar-trigger-loader-size / 2);
+    font-size: $toolbar-trigger-loader-size;
+    line-height: $toolbar-trigger-loader-size;
+    color: $color-primary;
+    background: transparent;
+    animation: cms-spin 2s infinite linear;
+}
+
+// TODO Reimplement blinking if unpublished content is present
+//###########################################################
+// #TOOLBAR/blocker#
+.cms-screenblock {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: z(screenblock);
+    color: $screenblock-color;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background-color: $screenblock-bgcolor;
+    background: rgba($screenblock-bgcolor, 0.9);
+}
+
+.cms-screenblock-inner {
+    margin-top: $screenblock-inner-position;
+    h1 {
+        font-size: 28px;
+        line-height: 30px;
+    }
+    h1,
+    p {
+        color: $gray-light;
+        text-align: center;
+    }
+    a {
+        color: $white;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+}

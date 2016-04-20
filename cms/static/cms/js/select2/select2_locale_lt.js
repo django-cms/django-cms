@@ -12,7 +12,7 @@
         formatInputTooShort: function (input, min) { return "Įrašykite dar" + character(min - input.length); },
         formatInputTooLong: function (input, max) { return "Pašalinkite" + character(input.length - max); },
         formatSelectionTooBig: function (limit) {
-        	return "Jūs galite pasirinkti tik " + limit + " element" + ((limit%100 > 9 && limit%100 < 21) || limit%10 == 0 ? "ų" : limit%10 > 1 ? "us" : "ą");
+            return "Jūs galite pasirinkti tik " + limit + " element" + ((limit%100 > 9 && limit%100 < 21) || limit%10 == 0 ? "ų" : limit%10 > 1 ? "us" : "ą");
         },
         formatLoadMore: function (pageNumber) { return "Kraunama daugiau rezultatų…"; },
         formatSearching: function () { return "Ieškoma…"; }

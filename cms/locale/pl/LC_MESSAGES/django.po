@@ -3,11 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# angularcircle, 2012-2013
 # angularcircle, 2013
 # angularcircle, 2012
 # ar4s <arkadiusz.adamski@gmail.com>, 2014-2015
 # Arkadiusz Błasiak <ares1112@gmail.com>, 2015
 # Jakub Paczkowski <jakub@paczkowski.eu>, 2013
+# ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
@@ -15,6 +17,7 @@
 # Rafał Łopatka <rafal.lopatka@outlook.com>, 2015
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014-2015
+# sebastian1 <sebastian@kalinowski.eu>, 2012
 # sebastian1 <sebastian@kalinowski.eu>, 2012
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014
@@ -24,9 +27,9 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-11-11 17:31+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Polish (http://www.transifex.com/digi604/django-cms/language/pl/)\n"
+"PO-Revision-Date: 2015-12-17 21:23+0000\n"
+"Last-Translator: Piotr Jakimiak <legolass71@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -525,7 +528,7 @@ msgstr "Zawartość"
 #: cms_toolbars.py:98 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
-msgstr ""
+msgstr "Utwórz"
 
 #: cms_toolbars.py:151
 msgid "Sites"
@@ -545,11 +548,11 @@ msgstr "Ustawienia użytkownika"
 
 #: cms_toolbars.py:168
 msgid "Clipboard..."
-msgstr ""
+msgstr "Schowek..."
 
 #: cms_toolbars.py:171
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Wyczyść schowek"
 
 #: cms_toolbars.py:177
 msgid "Disable toolbar"
@@ -693,7 +696,7 @@ msgstr "Przegląd historii"
 
 #: cms_wizards.py:84
 msgid "New page"
-msgstr ""
+msgstr "Nowa strona"
 
 #: cms_wizards.py:88
 msgid "Create a new page next to the current page."
@@ -701,7 +704,7 @@ msgstr ""
 
 #: cms_wizards.py:92
 msgid "New sub page"
-msgstr ""
+msgstr "Nowa podstrona"
 
 #: cms_wizards.py:96
 msgid "Create a page below the current page."
@@ -730,7 +733,7 @@ msgstr ""
 
 #: forms/wizards.py:178
 msgid "User does not have permission to add page."
-msgstr ""
+msgstr "Użytkownik nie ma uprawnień do tworzenia stron."
 
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:60
 #: migrations/0001_initial.py:83 migrations/0001_initial.py:123
@@ -1356,7 +1359,7 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:108
 msgid "Show all"
-msgstr ""
+msgstr "Pokaż wszystkie"
 
 #: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
@@ -1376,7 +1379,7 @@ msgstr "Filtr"
 
 #: templates/admin/cms/page/tree/base_header.html:8
 msgid "View"
-msgstr ""
+msgstr "Widok"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
@@ -1517,7 +1520,7 @@ msgstr "ostatnio zmienione przez"
 
 #: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
-msgstr ""
+msgstr "Schowek"
 
 #: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:14
 msgid "Add plugin"
@@ -1534,7 +1537,7 @@ msgstr "Skopiuj z"
 #: templates/cms/toolbar/dragbar.html:15
 #: templates/cms/toolbar/dragitem.html:32
 msgid "Paste"
-msgstr ""
+msgstr "Wklej"
 
 #: templates/cms/toolbar/dragbar.html:16
 msgid "Empty all"

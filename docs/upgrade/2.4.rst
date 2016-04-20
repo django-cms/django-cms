@@ -31,6 +31,7 @@ Django 1.4 and Python 2.6 are now the minimum required versions.
 
 Migrations overhaul
 ===================
+
 In version 2.4, migrations have been completely rewritten to address issues
 with newer South releases.
 
@@ -92,7 +93,7 @@ This replaces the old at-runtime checks.
 
 CMS_MODERATOR
 =============
-Has been removed since it is no longer in use. From 2.4 onwards, all pages
+Has been removed since it is no longer in use. From 2.4 onward, all pages
 exist in a public and draft version. Users with the ``publish_page`` permission
 can publish changes to the public site.
 
@@ -131,11 +132,11 @@ monkey-patching of the ``reverse()`` function as well. As a benefit we now
 support localisation of URLs and apphook URLs with standard Django helpers.
 
 
-For django 1.4 more infos can be found here:
+For django 1.4 more information can be found here:
 
     https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
 
-If you are still running django 1.3 you are able to archieve the same functionality with django-i18nurl. It is a backport
+If you are still running django 1.3 you are able to achieve the same functionality with django-i18nurl. It is a backport
 of the new functionality in django 1.4 and can be found here:
 
     https://github.com/brocaar/django-i18nurls
@@ -169,7 +170,7 @@ What you need to do:
         ) + urlpatterns
 
 - Change your url and reverse calls to language namespaces. We now support the django way of
-  calling other language urls either via ``{% language %}`` templatetag or via ``activate("de")`` function call in views.
+  calling other language urls either via ``{% language %}`` template tag or via ``activate("de")`` function call in views.
 
   Before::
 
@@ -187,7 +188,7 @@ What you need to do:
 Added LanguageCookieMiddleware
 ==============================
 
-To fix the behavior of django to determine the language every time from new, when you visit `/` on a page, this
+To fix the behaviour of django to determine the language every time from new, when you visit `/` on a page, this
 middleware saves the current language in a cookie with every response.
 
 To enable this middleware add the following to your `MIDDLEWARE_CLASSES` setting:
@@ -298,7 +299,7 @@ If not provided you can add all plugins that are available in this placeholder.
 How to render your child plugins in the template
 ------------------------------------------------
 
-We introduce a new templatetag in the cms_tags called ``{% render_plugin %}``
+We introduce a new template tag in the cms_tags called ``{% render_plugin %}``
 Here is an example of how the MultiColumn plugin uses it::
 
     {% load cms_tags %}
@@ -352,12 +353,12 @@ django-reversion integration changes
 to the way revisions are handled for pages.
 
      1. Only publish revisions are saved. All other revisions are deleted when you publish a page.
-     2. By default only the latest 25 publish revisions are kept. You can change this behavior with the new
+     2. By default only the latest 25 publish revisions are kept. You can change this behaviour with the new
         :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS` setting.
 
 
-Changes to the show_sub_menu templatetag
-========================================
+Changes to the show_sub_menu template tag
+=========================================
 
 the :ttag:`show_sub_menu` has received two new parameters.
 The first stays the same and is still: how many levels of menu should be displayed.
@@ -376,7 +377,7 @@ If you use placeholders in other apps or models we now support more than one lan
 If you just use the :class:`PlaceholderAdmin` it will display language tabs like the cms. If you
 use `django-hvad`_ it uses the hvad language tabs.
 
-If you want to disable this behavior you can set ``render_placeholder_language_tabs = False`` on your Admin
+If you want to disable this behaviour you can set ``render_placeholder_language_tabs = False`` on your Admin
 class that extends PlaceholderAdmin. If you use a custom ``change_form_template`` be sure to have a look at
 ``cms/templates/admin/placeholders/placeholder/change_form.html`` for how to incorporate language tabs.
 
@@ -402,8 +403,8 @@ New minimum requirements for dependencies
 Pending deprecations
 ********************
 
-* ``simple_language_changer`` will be removed in version 3.0. A bugfix makes
-  this redundant as every non managed url will behave like this.
+* ``simple_language_changer`` will be removed in version 3.0. A bug-fix makes
+  this redundant as every non-managed URL will behave like this.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
