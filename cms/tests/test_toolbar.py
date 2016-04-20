@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+
 import datetime
+import iptools
 import re
 
 from django.contrib import admin
@@ -142,6 +144,16 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
         with self.settings(CMS_INTERNAL_IPS=['127.0.0.0', '127.0.0.1', '127.0.0.2', ]):
             request = self.get_page_request(None, self.get_staff(), '/en/example/')
             self.assertTrue(hasattr(request, 'toolbar'))
+
+    def test_cms_internal_ips_iptools(self):
+        with self.settings(CMS_INTERNAL_IPS=iptools.IpRangeList(('127.0.0.0', '127.0.0.255'))):
+            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            self.assertTrue(hasattr(request, 'toolbar'))
+
+    def test_cms_internal_ips_iptools_bad_range(self):
+        with self.settings(CMS_INTERNAL_IPS=iptools.IpRangeList(('128.0.0.0', '128.0.0.255'))):
+            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            self.assertFalse(hasattr(request, 'toolbar'))
 
 
 @override_settings(CMS_PERMISSION=False)
