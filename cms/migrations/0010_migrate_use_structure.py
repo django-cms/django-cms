@@ -16,7 +16,9 @@ def forwards(apps, schema_editor):
         page_ctype = ContentType.objects.get_for_model(page_model)
         permission, __ = Permission.objects.get_or_create(
             codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
-        page_permission, __ = Permission.objects.get_or_create(codename='change_page', content_type=page_ctype)
+        page_permission, __ = Permission.objects.get_or_create(
+            codename='change_page', content_type=page_ctype, name=u'Can change page'
+        )
         for user in user_model.objects.filter(is_superuser=False, is_staff=True):
             if user.user_permissions.filter(codename='change_page', content_type_id=page_ctype.pk).exists():
                 user.user_permissions.add(permission.pk)
