@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import importlib
+
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
 from cms.utils.conf import get_cms_setting
@@ -16,7 +17,7 @@ def get_request_ip_resolver():
     """
     module, attribute = get_cms_setting('REQUEST_IP_RESOLVER').rsplit('.', 1)
     try:
-        ip_resolver_module = import_module(module)
+        ip_resolver_module = importlib.import_module(module)
         ip_resolver = getattr(ip_resolver_module, attribute)
     except ImportError:
         raise ImproperlyConfigured(
