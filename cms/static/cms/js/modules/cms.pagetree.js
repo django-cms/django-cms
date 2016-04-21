@@ -335,6 +335,8 @@ var CMS = window.CMS || {};
             // make sure ajax post requests are working
             this._setAjaxPost('.js-cms-tree-item-menu a');
             this._setAjaxPost('.js-cms-tree-lang-trigger');
+
+            this._setupPageView();
         },
 
         /**
@@ -618,6 +620,28 @@ var CMS = window.CMS || {};
         _setupDropdowns: function _setupDropdowns() {
             this._dropdowns = new CMS.PageTreeDropdowns({
                 container: this.ui.container
+            });
+        },
+
+        /**
+         * Handles page view click. Usual use case is that after you click
+         * on view page in the pagetree - sideframe is no longer needed,
+         * so we close it.
+         *
+         * @method _setupPageView
+         * @private
+         */
+        _setupPageView: function _setupPageView() {
+            var win = CMS.API.Helpers._getWindow();
+            var parent = win.parent ? win.parent : win;
+
+            this.ui.container.on(this.click, '.js-cms-pagetree-page-view', function () {
+                parent.CMS.API.Helpers.setSettings({
+                    sideframe: {
+                        url: null,
+                        hidden: true
+                    }
+                });
             });
         },
 
