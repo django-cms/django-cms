@@ -64,6 +64,9 @@
         height: 5px;
         background-color: $white;
     }
+    + .module {
+        padding-top: 0 !important;
+    }
 }
 .cms-admin-sideframe .cms-pagetree-header {
     margin-top: -25px;
@@ -161,6 +164,7 @@
     box-sizing: border-box;
     border-radius: $border-radius-base;
     background: $white;
+    z-index: z(pagetree, dropdown);
     h3 {
         color: $gray;
         font-size: 14px;
@@ -255,6 +259,12 @@
         float: left;
         font-weight: bold;
     }
+    .cms-pagetree-container + & {
+        margin-top: -1px;
+    }
+}
+.cms-pagetree-section-condensed {
+    padding: $pagetree-section-padding-condensed;
 }
 .cms-pagetree-section-nav {
     float: right;
@@ -273,8 +283,7 @@
 .cms-pagetree-container {
     // overflow: auto;
     position: relative;
-    z-index: z(pagetree, container);
-    margin-bottom: $pagetree-bottom-offset;
+    z-index: z(pagetree, tree);
     border: 1px solid $gray-lighter;
     border-top: none;
     border-bottom: none;
@@ -359,21 +368,23 @@
     box-shadow: $dropdown-shadow;
     transform: translateZ(0);
 
-    a {
+    a,
+    .cms-pagetree-dropdown-item {
         display: block;
         color: $gray;
         line-height: 1.5;
         padding: 10px $pagetree-dropdown-padding-horizontal;
         text-align: left;
-        &:hover,
-        &:active,
-        &:focus {
-            color: $white !important;
-            background: $color-primary;
-        }
+    }
+    a:hover,
+    a:active,
+    a:focus {
+        color: $white !important;
+        background: $color-primary;
     }
     &.cms-pagetree-dropdown-menu-condensed {
-        a {
+        a,
+        .cms-pagetree-dropdown-item {
             padding: 5px $pagetree-dropdown-padding-horizontal;
         }
     }
@@ -456,6 +467,11 @@
         top: 18px;
     }
 }
+.cms-pagetree-dropdown-menu-arrow-right-bottom {
+    &:before {
+        bottom: 18px;
+    }
+}
 
 //###########################################################
 // ICONS
@@ -518,47 +534,6 @@
     .cms-tree-item-inner > a {
         display: block;
         height: $pagetree-lang-size;
-    }
-    .cms-pagetree-dropdown-trigger span {
-        box-sizing: border-box;
-        display: inline-block;
-        width: $pagetree-lang-size;
-        height: $pagetree-lang-size;
-        border-radius: 100%;
-        // will change according to states
-        border: 2px solid $white;
-        background: $white;
-        &.empty {
-            border-color: $gray-light;
-            background-color: $white;
-        }
-        &.unpublished,
-        &.unpublishedparent {
-            border-color: $gray-light;
-            background-color: $gray-light;
-        }
-        &.published {
-            border-color: $color-success;
-            background-color: $color-success;
-        }
-        &.dirty {
-            animation: pulsate 2.5s ease-out infinite;
-            border-color: $color-primary;
-            background-color: $color-primary;
-        }
-    }
-}
-
-// animation for publishing
-@keyframes pulsate {
-    0% {
-        opacity: 0.5;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0.5;
     }
 }
 
