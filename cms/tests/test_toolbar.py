@@ -1000,7 +1000,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view(request, ex1.pk, template_string=template_text)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render_model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
         with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
@@ -1008,7 +1008,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view(request, ex1.pk, template_string=template_text)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
         # Test with setting=False, but use "filter" parameter to include "safe"
@@ -1024,7 +1024,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view(request, ex1.pk, template_string=template_text)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
     def test_setting_override(self):
@@ -1048,7 +1048,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view(request, ex1.pk, template_string=template_text)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
         # With CMS override settings (False) (assert that the resulting output IS escaped)
@@ -1057,7 +1057,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view(request, ex1.pk, template_string=template_text)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
     def test_filters_date(self):
@@ -1081,7 +1081,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 response = detail_view(request, ex1.pk, template_string=template_text)
                 self.assertContains(
                     response,
-                    '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                    '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                         'placeholderapp', 'example1', 'date_field', ex1.pk,
                         ex1.date_field.strftime("%Y-%m-%d")))
 
