@@ -42,7 +42,7 @@
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner">
-                    <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
+                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
                         <span>{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
                     </a>
                 </div>

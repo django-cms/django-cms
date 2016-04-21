@@ -182,13 +182,10 @@ var CMS = window.CMS || {};
             // load the iframe
             this._content(url);
 
-            // cancel animation if sideframe is already shown
-            if (isFrameVisible && currentWidth < width) {
-                // The user has performed an action that requires the
-                // sideframe to be shown, this intent outweighs any
-                // previous intent to minimize the frame.
-                CMS.settings.sideframe.hidden = false;
-            }
+            // The user has performed an action that requires the
+            // sideframe to be shown, this intent outweighs any
+            // previous intent to minimize the frame.
+            CMS.settings.sideframe.hidden = false;
 
             if (isFrameVisible && Math.round(currentWidth) === Math.round(width)) {
                 // Math.round because subpixel values
@@ -324,11 +321,6 @@ var CMS = window.CMS || {};
             var that = this;
 
             this.ui.sideframe.show();
-
-            // check if sideframe should be hidden
-            if (CMS.settings.sideframe.hidden) {
-                this._hide();
-            }
 
             // otherwise do normal behaviour
             if (animate) {
