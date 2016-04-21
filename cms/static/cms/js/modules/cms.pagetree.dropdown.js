@@ -21,6 +21,7 @@ var CMS = window.CMS || {};
      */
     CMS.PageTreeDropdowns = new CMS.Class({
         options: {
+            dropdownSelector: '.js-cms-pagetree-dropdown',
             triggerSelector: '.js-cms-pagetree-dropdown-trigger',
             menuSelector: '.js-cms-pagetree-dropdown-menu',
             openCls: 'cms-pagetree-dropdown-menu-open'
@@ -83,17 +84,17 @@ var CMS = window.CMS || {};
          */
         _toggleDropdown: function _toggleDropdown(trigger) {
             var triggers = $(this.options.triggerSelector);
-            var menus = $(this.options.menuSelector);
+            var dropdowns = $(this.options.dropdownSelector);
             var index = triggers.index(trigger);
 
             // cancel if opened tooltip is triggered again
-            if (menus.eq(index).is(':visible')) {
-                menus.removeClass(this.options.openCls);
+            if (dropdowns.eq(index).hasClass(this.options.openCls)) {
+                dropdowns.removeClass(this.options.openCls);
                 return false;
             }
 
             // otherwise show the dropdown
-            menus
+            dropdowns
                 .removeClass(this.options.openCls)
                 .eq(index)
                 .addClass(this.options.openCls);
@@ -104,9 +105,8 @@ var CMS = window.CMS || {};
          * @public
          */
         closeAllDropdowns: function closeAllDropdowns() {
-            $(this.options.menuSelector).removeClass(this.options.openCls);
+            $(this.options.dropdownSelector).removeClass(this.options.openCls);
         }
     });
-
 
 })(CMS.$);

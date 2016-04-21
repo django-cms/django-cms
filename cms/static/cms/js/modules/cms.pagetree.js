@@ -212,6 +212,7 @@ var CMS = window.CMS || {};
             this.ui.tree.on('after_close.jstree', function (e, el) {
                 that._removeNodeId(el.node.data.id);
             });
+
             this.ui.tree.on('after_open.jstree', function (e, el) {
                 that._storeNodeId(el.node.data.id);
                 that._checkHelpers();
@@ -222,6 +223,7 @@ var CMS = window.CMS || {};
                     that.ui.container.addClass('cms-pagetree-alt-mode');
                 }
             });
+
             this.ui.document.on('keyup.pagetree.alt-mode', function (e) {
                 if (e.keyCode === CMS.KEYS.SHIFT) {
                     that.ui.container.removeClass('cms-pagetree-alt-mode');
