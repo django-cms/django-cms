@@ -140,7 +140,7 @@ def details(request, slug):
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
             if app:
-                for urlpatterns in get_app_urls(app.get_urls(page)):
+                for urlpatterns in get_app_urls(app.get_urls(page, current_language)):
                     pattern_list += urlpatterns
                 try:
                     view, args, kwargs = resolve('/', tuple(pattern_list))

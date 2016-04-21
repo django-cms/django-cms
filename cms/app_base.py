@@ -60,7 +60,7 @@ class CMSApp(object):
     def menus(self, value):
         self._menus = value
 
-    def get_menus(self, page=None, **kwargs):
+    def get_menus(self, page=None, language=None, **kwargs):
         return self._menus
 
     @property
@@ -74,5 +74,5 @@ class CMSApp(object):
     def urls(self, value):
         self._urls = value
 
-    def get_urls(self, page=None, **kwargs):
+    def get_urls(self, page=None, language=None, **kwargs):
         return self._urls
