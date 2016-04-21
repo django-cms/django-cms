@@ -97,6 +97,7 @@ $z-layers: (
     ),
     // pagetree zindex
     "pagetree": (
+        "dropdown":     1000,
         "drag-marker":  102,
         "header":       101,
         "section":      11,

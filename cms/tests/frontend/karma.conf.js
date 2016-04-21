@@ -61,6 +61,7 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.toolbar.js',
             'cms/static/cms/js/modules/cms.tooltip.js',
             'cms/static/cms/js/modules/cms.pagetree.js',
+            'cms/static/cms/js/modules/cms.pagetree.dropdown.js',
 
             // test helpers
             'cms/tests/frontend/unit/helpers/mock-ajax.js',

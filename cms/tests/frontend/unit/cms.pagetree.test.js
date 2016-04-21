@@ -3,6 +3,12 @@
 describe('CMS.PageTree', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
+    beforeEach(function () {
+        spyOn(CMS.PageTreeDropdowns.prototype, 'initialize').and.returnValue({
+            closeAllDropdowns: jasmine.createSpy()
+        });
+    });
+
     it('creates a PageTree class', function () {
         expect(CMS.PageTree).toBeDefined();
     });

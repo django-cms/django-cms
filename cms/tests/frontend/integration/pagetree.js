@@ -92,54 +92,6 @@ casper.test.begin('Correctly displays languages', function (test) {
         });
 });
 
-casper.test.begin('Info dropdown can be shown', function (test) {
-    casper
-        .start()
-        .then(cms.addPage({ title: 'Homepage' }))
-        .thenOpen(globals.baseUrl)
-        .then(cms.openSideframe())
-        // switch to sideframe
-        .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree-jstree').wait(3000).then(cms.expandPageTree()).then(function () {
-                var pageId = cms.getPageId('Homepage');
-
-                // check that languages look correct
-                this.click('a[href*="page/' + pageId + '"] .cms-icon-info');
-            })
-            .waitForSelector('.cms-tree-tooltip-container-open', function () {
-                test.assertSelectorHasText(
-                    '.cms-tree-tooltip-container-open',
-                    'publication date:',
-                    'Info tooltip is shown'
-                );
-                test.assertSelectorHasText(
-                    '.cms-tree-tooltip-container-open',
-                    'is restricted',
-                    'Info tooltip is shown'
-                );
-                test.assertSelectorHasText(
-                    '.cms-tree-tooltip-container-open',
-                    'last change by',
-                    'Info tooltip is shown'
-                );
-                test.assertSelectorHasText(
-                    '.cms-tree-tooltip-container-open',
-                    'template',
-                    'Info tooltip is shown'
-                );
-                test.assertSelectorHasText(
-                    '.cms-tree-tooltip-container-open',
-                    'site',
-                    'Info tooltip is shown'
-                );
-            });
-        })
-        .then(cms.removePage())
-        .run(function () {
-            test.done();
-        });
-});
-
 casper.test.begin('Settings and advanced settings are accessible', function (test) {
     casper
         .start()
@@ -152,7 +104,7 @@ casper.test.begin('Settings and advanced settings are accessible', function (tes
                 var pageId = cms.getPageId('Homepage');
                 // check that languages look correct
 
-                this.click('a[href*="page/' + pageId + '"] .cms-icon-cogs');
+                this.click('a[href*="page/' + pageId + '"].cms-icon-pencil');
             })
             .waitForUrl(/page/)
             .waitForSelector('#content')
@@ -170,8 +122,8 @@ casper.test.begin('Settings and advanced settings are accessible', function (tes
             .thenEvaluate(function () {
                 var clickEvent = $.Event('click', { shiftKey: true });
 
-                // here we cheat a bit, it works only if there's only one cogs on the page
-                $('.cms-icon-cogs:visible').trigger(clickEvent);
+                // here we cheat a bit, it works only if there's only one edit on the page
+                $('.cms-icon-pencil:visible').trigger(clickEvent);
             })
             .waitForUrl(/advanced-settings/)
             .waitForSelector('h1')
@@ -434,10 +386,10 @@ casper.test.begin('Pages cannot be published if it does not have a title and slu
             .then(function () {
                 this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty');
             })
-            .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
+            .waitUntilVisible('.cms-pagetree-dropdown-menu', function () {
+                test.assertVisible('.cms-pagetree-dropdown-menu', 'Publishing dropdown is open');
 
-                test.assertDoesntExist('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
+                test.assertDoesntExist('.cms-pagetree-dropdown-menu-open a[href*="/de/publish/"]');
             });
         })
         .then(cms.removePage({ title: 'Homepage' }))
@@ -480,10 +432,10 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
             .waitUntilVisible('.cms-pagetree-jstree .cms-tree-item-lang', function () {
                 this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished');
             })
-            .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
+            .waitUntilVisible('.cms-pagetree-dropdown-menu', function () {
+                test.assertVisible('.cms-pagetree-dropdown-menu', 'Publishing dropdown is open');
 
-                this.click('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
+                this.click('.cms-pagetree-dropdown-menu-open a[href*="/de/publish/"]');
             })
             .waitForResource(/publish/)
             .waitForResource(/get-tree/);
@@ -500,8 +452,8 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
             .then(function () {
                 this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"]');
             })
-            .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                this.click('.cms-tree-tooltip-container-open a[href*="/de/unpublish/"]');
+            .waitUntilVisible('.cms-pagetree-dropdown-menu', function () {
+                this.click('.cms-pagetree-dropdown-menu-open a[href*="/de/unpublish/"]');
             })
             .waitForResource(/unpublish/)
             .waitForResource(/get-tree/);
@@ -524,8 +476,8 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
             .then(function () {
                 this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"]');
             })
-            .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                this.click('.cms-tree-tooltip-container-open a[href*="/en/unpublish/"]');
+            .waitUntilVisible('.cms-pagetree-dropdown-menu', function () {
+                this.click('.cms-pagetree-dropdown-menu-open a[href*="/en/unpublish/"]');
             })
             .waitForResource(/unpublish/)
             .waitForResource(/get-tree/);
@@ -570,7 +522,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
 
                     secondPageId = cms.getPageId('Second');
 
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -584,7 +536,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 // click on it again
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
+                })
+                .then(function () {
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
                             visible: true
@@ -592,8 +546,10 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         0,
                         'Paste buttons hide when clicked on copy again'
                     );
+                })
+                .then(function () {
                     // open them again
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // then try to paste into itself
                 .then(function () {
@@ -643,7 +599,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     );
                 })
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -717,7 +673,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 // try to copy into parent
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -782,7 +738,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 // try to copy into root
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -867,7 +823,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 // then try to copy sibling into a sibling (homepage into sibling "second" page)
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
+                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -984,7 +940,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
 
                 // then try to copy a page into own child
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
+                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -1043,7 +999,7 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
 
                     secondPageId = cms.getPageId('Second');
 
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"] ~ .js-cms-tree-item-cut');
+                    this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -1077,7 +1033,7 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
                     );
                 })
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"] ~ .js-cms-tree-item-cut');
+                    this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 .then(function () {
                     test.assertElementCount(
@@ -1133,7 +1089,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
 
                     secondPageId = cms.getPageId('Second');
 
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"] ~ .js-cms-tree-item-cut');
+                    this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
@@ -1220,7 +1176,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
 
                 // then try to cut the page and paste it into sibling
                 .then(function () {
-                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"] ~ .js-cms-tree-item-cut');
+                    this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 .then(function () {
                     this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Top sibling') + '"]');

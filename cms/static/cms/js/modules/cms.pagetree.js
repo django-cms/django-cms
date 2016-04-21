@@ -2,16 +2,12 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-// #############################################################################
-// NAMESPACES
 /**
  * @module CMS
  */
 /* istanbul ignore next */
 var CMS = window.CMS || {};
 
-// #############################################################################
-// MODAL
 (function ($) {
     'use strict';
 
@@ -21,7 +17,6 @@ var CMS = window.CMS || {};
      *
      * @class PageTree
      * @namespace CMS
-     * @uses CMS.API.Helpers
      */
     CMS.PageTree = new CMS.Class({
         // TODO add mechanics to set the home page
@@ -222,9 +217,22 @@ var CMS = window.CMS || {};
                 that._checkHelpers();
             });
 
+            this.ui.document.on('keydown.pagetree.alt-mode', function (e) {
+                if (e.keyCode === CMS.KEYS.SHIFT) {
+                    that.ui.container.addClass('cms-pagetree-alt-mode');
+                }
+            });
+            this.ui.document.on('keyup.pagetree.alt-mode', function (e) {
+                if (e.keyCode === CMS.KEYS.SHIFT) {
+                    that.ui.container.removeClass('cms-pagetree-alt-mode');
+                }
+            });
+
             this.ui.document.on('dnd_start.vakata', function (e, data) {
                 var element = $(data.element);
                 var node = element.parent();
+
+                that._dropdowns.closeAllDropdowns();
 
                 node.addClass('jstree-is-dragging');
                 data.data.nodes.forEach(function (nodeId) {
@@ -321,7 +329,7 @@ var CMS = window.CMS || {};
             });
 
             // additional event handlers
-            this._setupTooltips();
+            this._setupDropdowns();
             this._setupSearch();
 
             // make sure ajax post requests are working
@@ -604,46 +612,12 @@ var CMS = window.CMS || {};
         /**
          * Sets up general tooltips that can have a list of links or content.
          *
-         * @method _setupTooltips
+         * @method _setupDropdowns
          * @private
          */
-        _setupTooltips: function _setupTooltips() {
-            var that = this;
-            var triggerCls = '.js-cms-tree-tooltip-trigger';
-            var containerCls = '.js-cms-tree-tooltip-container';
-            var triggers;
-            var containers;
-            var index;
-
-            // attach event to the trigger
-            this.ui.container.on(this.click, triggerCls, function (e) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                triggers = $(triggerCls);
-                containers = $(containerCls);
-                index = triggers.index(this);
-
-                // cancel if opened tooltip is triggered again
-                if (containers.eq(index).is(':visible')) {
-                    containers.removeClass('cms-tree-tooltip-container-open');
-                    return false;
-                }
-
-                // otherwise show the dropdown
-                containers
-                    .removeClass('cms-tree-tooltip-container-open')
-                    .eq(index)
-                    .addClass('cms-tree-tooltip-container-open');
-
-                that.ui.document.one(that.click, function () {
-                    containers.removeClass('cms-tree-tooltip-container-open');
-                });
-            });
-
-            // stop propagnation on the element
-            this.ui.container.on(this.click, containerCls, function (e) {
-                e.stopImmediatePropagation();
+        _setupDropdowns: function _setupDropdowns() {
+            this._dropdowns = new CMS.PageTreeDropdowns({
+                container: this.ui.container
             });
         },
 
