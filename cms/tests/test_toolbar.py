@@ -1000,7 +1000,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view(request, ex1.pk, template_string=template_text)
             self.assertContains(
                 response,
-                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render_model">%s</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                     'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
         with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
@@ -1090,7 +1090,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 response = detail_view(request, ex1.pk, template_string=template_text)
                 self.assertContains(
                     response,
-                    '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+                    '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                         'placeholderapp', 'example1', 'date_field', ex1.pk,
                         ex1.date_field.strftime("%b. %d, %Y")))
 
