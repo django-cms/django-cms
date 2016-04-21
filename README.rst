@@ -85,5 +85,5 @@ Credits
   `django-mptt <https://github.com/django-mptt/django-mptt>`_.
 * Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
-  `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 450 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!
