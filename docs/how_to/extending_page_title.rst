@@ -177,6 +177,10 @@ In templates
 To access a page extension in page templates you can simply access the
 appropriate related_name field that is now available on the Page object.
 
+
+Page extensions
+---------------
+
 As per the normal related_name naming mechanism, the appropriate field to
 access is the same as your ``PageExtension`` model name, but lowercased. Assuming
 your Page Extension model class is ``IconExtension``, the relationship to the
@@ -200,10 +204,15 @@ page extension to every page, a page may not have the ``iconextension``
 relationship available, hence the use of the ``{% if ... %}...{% endif %}``
 above.
 
-In order to access to a title extension in page templates you will need to access the title object with the
-get_title_obj function:
+
+Title extensions
+----------------
+
+In order to access to a title extension within a template, get the ``Title`` object using
+``request.current_page.get_title_obj``, for example:
 
     {{ request.current_page.get_title_obj.your_title_extension }}
+
 
 With menus
 ==========
