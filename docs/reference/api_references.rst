@@ -63,7 +63,7 @@ Functions and constants
 .. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False)
 
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
-    creates a :class:`cms.models.titlemodel.Title` instance for the specified
+    creates a :class:`cms.models.titlemodels.Title` instance for the specified
     language.
 
     :param string title: Title of the page
@@ -100,7 +100,7 @@ Functions and constants
 
 .. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None, with_revision=False)
 
-    Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
+    Creates a :class:`cms.models.titlemodels.Title` instance and returns it.
 
     :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
     :param string title: Title of the page
@@ -247,6 +247,18 @@ cms.constants
 
     Constant of 31536000 or 365 days in seconds used for cache control headers
 
+************
+cms.app_base
+************
+
+.. module:: cms.app_base
+
+.. autoclass:: CMSApp
+    :members:
+    :private-members:
+
+    .. autoattribute:: CMSApp._urls
+    .. autoattribute:: CMSApp._menus
 
 ***************
 cms.plugin_base
