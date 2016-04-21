@@ -55,5 +55,5 @@ class CMSApp(object):
     def urls(self, value):
         self._urls = value
 
-    def get_urls(self, page=None):
+    def get_urls(self, page=None, **kwargs):
         return self._urls
