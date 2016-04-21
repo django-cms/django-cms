@@ -65,6 +65,8 @@ DEFAULTS = {
     'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'WIZARD_CONTENT_PLUGIN_BODY': 'body',
+    'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
+    'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
 }
 
 

@@ -44,15 +44,10 @@ casper.test.begin('User Add Content', function (test) {
             return this.waitUntilVisible('#content');
         })
         .then(function () {
-            this.setFilter('page.confirm', function () {
-                return true;
-            });
             // click on the "Cancel" button
             this.click('.cms-modal-item-buttons:last-child a');
         })
-        .waitWhileVisible('.cms-modal-open', function () {
-            this.removeAllFilters('page.confirm');
-        })
+        .waitWhileVisible('.cms-modal-open')
         .then(cms.switchTo('content'))
         .waitWhileVisible('.cms-structure', function () {
             test.assertSelectorDoesntHaveText('.cms-plugin p', randomText, 'Empty plugin hasn\'t been created');
@@ -98,7 +93,7 @@ casper.test.begin('User Add Content', function (test) {
         .then(function () {
             this.click('.cms-modal-buttons .cms-btn-action.default');
         })
-        .waitForResource(/edit-plugin/)
+        .waitForUrl(/.*/)
         .then(cms.switchTo('content'))
         .waitUntilVisible('.cms-plugin', function () {
             test.assertSelectorHasText('.cms-plugin p', randomText, 'Newly created text plugin can be seen on page');

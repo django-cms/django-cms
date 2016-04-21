@@ -345,7 +345,7 @@ module.exports = function (casperjs, settings) {
                         }
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
-                    }).waitForResource(/edit-plugin/).then(that.waitUntilAllAjaxCallsFinish());
+                    }).waitForUrl(/.*/).then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 

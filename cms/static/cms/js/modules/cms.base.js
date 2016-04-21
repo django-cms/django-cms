@@ -523,11 +523,14 @@ var CMS = {
         /**
          * Dispatches an event
          * @method dispatchEvent
-         * @param {String} eventName  string containing space separated event names
+         * @param {String} eventName event name
          * @param {Object} payload whatever payload required for the consumer
+         * @returns {$.Event} event that was just triggered
          */
         dispatchEvent: function dispatchEvent(eventName, payload) {
-            return CMS._eventRoot.trigger(_ns(eventName), [payload]);
+            var event = $.Event(_ns(eventName));
+            CMS._eventRoot.trigger(event, [payload]);
+            return event;
         },
 
         /**

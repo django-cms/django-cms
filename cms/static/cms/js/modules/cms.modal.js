@@ -33,7 +33,6 @@ var CMS = window.CMS || {};
             minHeight: 400,
             minWidth: 800,
             modalDuration: 200,
-            newPlugin: false,
             resizable: true,
             maximizable: true,
             minimizable: true
@@ -150,9 +149,8 @@ var CMS = window.CMS || {};
             this.ui.closeAndCancel
                 .off(this.click + ' ' + this.touchEnd)
                 .on(this.click + ' ' + this.touchEnd, function (e) {
-                that.options.onClose = null;
                 e.preventDefault();
-                that.close();
+                that._cancelHandler();
             });
 
             // elements within the window
@@ -182,12 +180,6 @@ var CMS = window.CMS || {};
                 throw new Error('The arguments passed to "open" were invalid.');
             }
 
-            // handle remove option when plugin is new
-            // cancel open process when switching context
-            if (CMS._newPlugin && !this._deletePlugin()) {
-                return false;
-            }
-
             // We have to rebind events every time we open a modal
             // because the event handlers contain references to the instance
             // and since we reuse the same markup we need to update
@@ -209,11 +201,6 @@ var CMS = window.CMS || {};
 
             this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
             this.maximized = false;
-
-            // new plugin will freeze the creation process
-            if (this.options.newPlugin) {
-                CMS._newPlugin = this.options.newPlugin;
-            }
 
             // because a new instance is called, we have to ensure minimized state is removed #3620
             if (this.ui.body.hasClass('cms-modal-minimized')) {
@@ -379,8 +366,7 @@ var CMS = window.CMS || {};
             // add esc close event
             this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
                 if (e.keyCode === CMS.KEYS.ESC) {
-                    that.options.onClose = null;
-                    that.close();
+                    that._cancelHandler();
                 }
             });
 
@@ -394,21 +380,20 @@ var CMS = window.CMS || {};
          * @method close
          */
         close: function close() {
+            var event = CMS.API.Helpers.dispatchEvent('modal-close', { instance: this });
+
+            if (event.isDefaultPrevented()) {
+                return false;
+            }
+
             // handle refresh option
             if (this.options.onClose) {
                 this.reloadBrowser(this.options.onClose, false, true);
             }
 
-            // handle remove option when plugin is new
-            if (CMS._newPlugin) {
-                this._deletePlugin({
-                    hideAfter: true
-                });
-            } else {
-                this._hide({
-                    duration: this.options.modalDuration / 2
-                });
-            }
+            this._hide({
+                duration: this.options.modalDuration / 2
+            });
         },
 
         /**
@@ -444,6 +429,7 @@ var CMS = window.CMS || {};
                 }
                 that.trigger('cms.modal.closed');
                 CMS.API.Toolbar.hideLoader();
+                CMS.API.Helpers.dispatchEvent('modal-closed', { instance: that });
             }, this.options.duration);
 
             this.ui.body.off('keydown.cms.close');
@@ -793,8 +779,7 @@ var CMS = window.CMS || {};
             // manually add cancel button at the end
             cancel.on(that.click, function (e) {
                 e.preventDefault();
-                that.options.onClose = false;
-                that.close();
+                that._cancelHandler();
             });
             cancel.wrap(group);
             render.append(cancel.parent());
@@ -970,7 +955,7 @@ var CMS = window.CMS || {};
                     // attach close event
                     body.on('keydown.cms', function (e) {
                         if (e.keyCode === CMS.KEYS.ESC) {
-                            that.close();
+                            that._cancelHandler();
                         }
                     });
 
@@ -1032,39 +1017,14 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * _deletePlugin removes a plugin once created when clicking
-         * on delete or the close item. If we don't do this, an empty
-         * plugin is generated
-         * https://github.com/divio/django-cms/pull/4381 will eventually
-         * provide a better solution
+         * Called whenever default modal action is canceled.
          *
-         * @method _deletePlugin
+         * @method _cancelHandler
          * @private
-         * @param {Object} [opts] general objects element that holds settings
-         * @param {Boolean} [opts.hideAfter] hides the modal after the ajax requests succeeds
          */
-        _deletePlugin: function _deletePlugin(opts) {
-            var that = this;
-            var data = CMS._newPlugin;
-            var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
-            var text = CMS.config.lang.confirmEmpty.replace(
-                '{1}', CMS._newPlugin.breadcrumb[CMS._newPlugin.breadcrumb.length - 1].title
-            );
-
-            // trigger an ajax request
-            return CMS.API.Toolbar.openAjax({
-                url: data['delete'],
-                post: post,
-                text: text,
-                callback: function () {
-                    CMS._newPlugin = false;
-                    if (opts && opts.hideAfter) {
-                        that._hide({
-                            duration: 100
-                        });
-                    }
-                }
-            });
+        _cancelHandler: function _cancelHandler() {
+            this.options.onClose = null;
+            this.close();
         }
     });
 
