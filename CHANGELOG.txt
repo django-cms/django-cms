@@ -20,7 +20,9 @@
 * Sideframe is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
 * Removed some unnecessary reloads happening after closing sideframe.
+* CMS handles uninstalled apphooks better
 
+=== 3.2.4 (unreleased) ==
 
 === 3.2.3 (2016-03-09) ===
 
