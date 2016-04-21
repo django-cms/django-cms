@@ -497,10 +497,10 @@ This will render to:
 .. warning::
 
     In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
+    has a default value of ``True`` to provide behaviour consistent with
     previous releases. However, all developers are encouraged to set this
     value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
 .. warning::
 

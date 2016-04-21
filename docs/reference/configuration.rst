@@ -607,7 +607,7 @@ default
 
 Must be set to the version number (eg ``'1.0.0'``) you want to use. Together
 with :setting:`CMS_UNIHANDECODE_HOST` this setting is used to build the full
-URLs for the javascript files. URLs are built like this:
+URLs for the JavaScript files. URLs are built like this:
 ``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
 
 
@@ -697,10 +697,10 @@ default
 
 .. warning::
     In this version of django CMS, this setting has a default value of
-    ``True`` to provide behavior consistent with previous releases.
+    ``True`` to provide behaviour consistent with previous releases.
     However, all developers are encouraged to set this value to ``False`` to
     help prevent a range of security vulnerabilities stemming from
-    HTML, Javascript, and CSS Code Injection.
+    HTML, JavaScript, and CSS Code Injection.
 
 .. important::
     This setting is deprecated and will be removed in a near-future release.
