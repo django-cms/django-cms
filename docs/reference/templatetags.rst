@@ -494,6 +494,13 @@ This will render to:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
+.. warning::
+
+    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
+    has a default value of ``True`` to provide behaviour consistent with
+    previous releases. However, all developers are encouraged to set this
+    value to ``False`` to help prevent a range of security vulnerabilities
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
 .. warning::
 
@@ -562,9 +569,9 @@ method is available; also template tags and filters are available in the block.
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-
 .. templatetag:: render_model_icon
 .. versionadded:: 3.0
+
 
 render_model_icon
 =================
@@ -613,9 +620,9 @@ It will render to something like:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-
 .. templatetag:: render_model_add
 .. versionadded:: 3.0
+
 
 render_model_add
 ================
@@ -660,7 +667,7 @@ It will render to something like:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-..warning::
+.. warning::
 
     If passing a class, instead of an instance, and using ``view_method``,
     please bear in mind that the method will be called over an **empty instance**
@@ -721,10 +728,7 @@ It will render to something like:
   variable for later use.
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
-
-
 .. templatetag:: page_language_url
-
 
 page_language_url
 =================

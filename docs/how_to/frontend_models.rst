@@ -20,9 +20,11 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 
 .. warning::
 
-    Template tags used by this feature mark as safe the content of the rendered
+    By default and for consistency with previous releases, templatetags used
+    by this feature mark as safe the content of the rendered
     model attribute. This may be a security risk if used on fields which may
-    hold non-trusted content. Be aware, and use the template tags accordingly.
+    hold non-trusted content. Be aware, and use the templatetags accordingly.
+    To change this behaviour, set the setting: :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS` to False.
 
 
 .. warning::
@@ -39,13 +41,14 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 Template tags
 *************
 
-This feature relies on four template tags sharing common code. All require that you ``{% load
+This feature relies on five template tags sharing common code. All require that you ``{% load
 cms_tags %}`` in your template:
 
 * :ttag:`render_model` (for editing a specific field)
 * :ttag:`render_model_block` (for editing any of the fields in a defined block)
 * :ttag:`render_model_icon` (for editing a field represented by another value, such as an image)
 * :ttag:`render_model_add` (for adding an instance of the specified model)
+* :ttag:`render_model_add_block` (for adding an instance of the specified model)
 
 Look at the tag-specific page for more detailed reference and discussion of limitations and caveats.
 
