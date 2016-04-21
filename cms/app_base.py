@@ -4,8 +4,8 @@ import warnings
 
 class CMSApp(object):
     _urls = None
+    _menus = []
     name = None
-    menus = []
     app_name = None
     app_config = None
     permissions = True
@@ -33,6 +33,14 @@ class CMSApp(object):
                 cls.urls = cls.legacy_urls
         else:
             cls.urls = cls.legacy_urls
+        # mapping the legacy menus attribute to private attribute
+        # and exposing the new API
+        if hasattr(cls, 'menus'):
+            if not isinstance(cls.menus, property):
+                cls._menus = cls.menus
+                cls.menus = cls.legacy_menus
+        else:
+            cls.menus = cls.legacy_menus
         return super(CMSApp, cls).__new__(cls)
 
     def get_configs(self):
@@ -43,6 +51,17 @@ class CMSApp(object):
 
     def get_config_add_url(self):
         raise NotImplemented('Configurable AppHooks must implement this method')
+
+    @property
+    def legacy_menus(self):
+        return self._menus
+
+    @legacy_menus.setter
+    def menus(self, value):
+        self._menus = value
+
+    def get_menus(self, page=None, **kwargs):
+        return self._menus
 
     @property
     def legacy_urls(self):
