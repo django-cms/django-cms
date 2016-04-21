@@ -13,6 +13,11 @@ addons:
     packages:
     - enchant
 
+cache:
+  directories:
+    - node_modules
+    - $HOME/.pip/cache
+
 branches:
   only:
     - master
@@ -60,6 +65,8 @@ before_install:
 install:
   - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; pip freeze; fi
   - if [ "$FRONTEND" == 1 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+  # Disable the spinner, it looks bad on Travis
+  - if [ "$FRONTEND" == 1 ]; then npm config set spin false; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g npm@2; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g gulp@3.9.0; fi
   - if [ "$FRONTEND" == 1 ]; then npm install; fi
