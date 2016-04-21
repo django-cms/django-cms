@@ -144,7 +144,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         edit = False
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
-            cached_value = get_placeholder_cache(placeholder, lang)
+            cached_value = get_placeholder_cache(placeholder, lang, request)
             if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 return mark_safe(cached_value['content'])

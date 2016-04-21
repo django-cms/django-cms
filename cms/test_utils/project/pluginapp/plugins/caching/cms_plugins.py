@@ -82,6 +82,22 @@ class DateTimeCacheExpirationPlugin(CMSPluginBase):
         return context
 
 
+class VaryCacheOnPlugin(CMSPluginBase):
+    name = 'DateTimeCacheExpiration'
+    module = 'Test'
+    render_plugin = True
+    render_template = "plugins/nocache.html"
+
+    def get_vary_cache_on(self, request, instance, placeholder):
+        return ['country-code', ]
+
+    def render(self, context, instance, placeholder):
+        request = context.get('request')
+        country_code = request.META.get('HTTP_COUNTRY_CODE') or "any"
+        context['now'] = country_code
+        return context
+
+
 class SekizaiPlugin(CMSPluginBase):
     name = 'WITH SEki'
     module = 'Test'

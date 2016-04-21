@@ -9,6 +9,7 @@ from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models import ManyToManyField
 from django.template.defaultfilters import title
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, force_text
 
@@ -387,7 +388,7 @@ class Placeholder(models.Model):
                 except ValueError:
                     # Looks like it was not very int-ish. Ignore this plugin.
                     warnings.warn(
-                        'Plugin %(plugin_class)s (%(pk)d) return '
+                        'Plugin %(plugin_class)s (%(pk)d) returned '
                         'unexpected value %(value)s for '
                         'get_cache_expiration(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
@@ -429,5 +430,48 @@ class Placeholder(models.Model):
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
 
+    def get_vary_cache_on(self, request):
+        """
+        Returns a list of VARY headers.
+        """
+        def inner_plugin_iterator(lang):
+            """See note in get_cache_expiration.inner_plugin_iterator()."""
+            if hasattr(self, '_all_plugins_cache'):
+                for instance in self._all_plugins_cache:
+                    plugin = instance.get_plugin_class_instance()
+                    yield instance, plugin
+            else:
+                for plugin_item in self.get_plugins(lang):
+                    yield plugin_item.get_plugin_instance()
+
+        if not self.cache_placeholder or not get_cms_setting('PLUGIN_CACHE'):
+            return list()
+
+        vary_list = list()
+        language = get_language_from_request(request, self.page)
+        for instance, plugin in inner_plugin_iterator(language):
+            vary_on = plugin.get_vary_cache_on(request, instance, self)
+            if not vary_on:
+                # None, or an empty iterable
+                continue
+            if isinstance(vary_on, six.string_types):
+                if vary_on.lower() not in (item.lower() for item in vary_list):
+                    vary_list.append(vary_on)
+            else:
+                try:
+                    for vary_on_item in iter(vary_on):
+                        if vary_on_item.lower() not in (item.lower() for item in vary_list):
+                            vary_list.append(vary_on_item)
+                except TypeError:
+                    warnings.warn(
+                        'Plugin %(plugin_class)s (%(pk)d) returned '
+                        'unexpected value %(value)s for '
+                        'get_vary_cache_on(), ignoring.' % {
+                            'plugin_class': plugin.__class__.__name__,
+                            'pk': instance.pk,
+                            'value': force_text(vary_on),
+                        })
+
+        return sorted(vary_list)
 
 reversion_register(Placeholder)

@@ -323,14 +323,14 @@ class RenderingTestCase(CMSTestCase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-
+        request = self.get_request('/')
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
 
-        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en', request)
         self.render(template, self.test_page, {'ex1': ex1})
-        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en', request)
 
         self.assertEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_after)
@@ -343,14 +343,14 @@ class RenderingTestCase(CMSTestCase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-
+        request = self.get_request('/')
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
 
-        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en', request)
         self.render(template, self.test_page, {'ex1': ex1})
-        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en', request)
 
         self.assertNotEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_before)

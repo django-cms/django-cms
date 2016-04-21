@@ -188,7 +188,7 @@ def _get_placeholder(current_page, page, context, name):
         fetch_placeholders = placeholders
     else:
         for placeholder in placeholders:
-            cached_value = get_placeholder_cache(placeholder, get_language())
+            cached_value = get_placeholder_cache(placeholder, get_language(), request)
             if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 placeholder.content_cache = cached_value['content']
@@ -224,7 +224,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):
-                cached_value = get_placeholder_cache(placeholder, get_language())
+                cached_value = get_placeholder_cache(placeholder, get_language(), request)
                 if cached_value is not None:
                     restore_sekizai_context(context, cached_value['sekizai'])
                     return mark_safe(cached_value['content'])
