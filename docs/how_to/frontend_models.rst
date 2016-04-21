@@ -15,10 +15,11 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
 
 .. warning::
 
-    Templatetags used by this feature mark as safe the content of the rendered
+    By default and for consistency with previous releases, templatetags used
+    by this feature mark as safe the content of the rendered
     model attribute. This may be a security risk if used on fields which may
     hold non-trusted content. Be aware, and use the templatetags accordingly.
-
+    To change this behaviour, set the setting: :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS` to False.
 
 .. warning::
 
@@ -32,7 +33,7 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
 Templatetags
 ************
 
-This feature relies on four templatetags sharing common code:
+This feature relies on some template tags sharing common code:
 
 * :ttag:`render_model`
 * :ttag:`render_model_icon`
