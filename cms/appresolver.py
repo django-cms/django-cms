@@ -3,7 +3,6 @@ from collections import OrderedDict
 from importlib import import_module
 
 from django.conf import settings
-from django.conf.urls import patterns
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
