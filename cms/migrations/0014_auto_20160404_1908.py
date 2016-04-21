@@ -22,7 +22,7 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0012_auto_20150607_2207'),
+        ('cms', '0013_urlconfrevision'),
         ('contenttypes', '__latest__'),
     ]
 
