@@ -104,7 +104,7 @@ class AppRegexURLResolver(RegexURLResolver):
                         else:
                             tried.extend([pattern])
                     else:
-                        if sub_match:
+                        if sub_match and hasattr(pattern, 'page_id'):
                             return pattern.page_id
                         tried.append(pattern.regex.pattern)
             raise Resolver404({'tried': tried, 'path': new_path})
