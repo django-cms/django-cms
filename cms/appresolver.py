@@ -50,6 +50,8 @@ def applications_page_check(request, current_page=None, path=None):
         except Resolver404:
             # Raised if the page is not managed by an apphook
             pass
+        except Page.DoesNotExist:
+            pass
     return None
 
 
@@ -92,8 +94,8 @@ class AppRegexURLResolver(RegexURLResolver):
                         else:
                             tried.extend([pattern])
                     else:
-                        if sub_match and hasattr(pattern, 'page_id'):
-                            return pattern.page_id
+                        if sub_match:
+                            return getattr(pattern, 'page_id', None)
                         tried.append(pattern.regex.pattern)
             raise Resolver404({'tried': tried, 'path': new_path})
 
