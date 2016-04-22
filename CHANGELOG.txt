@@ -1,6 +1,8 @@
 === 3.2.4 (unreleased) ===
 
 - Fixed regression when page couldn't be copied if CMS_PERMISSION was False
+- Addresses security vulnerabilities in the `render_model` template tag that could
+  lead to escalation of privileges or other security issues.
 
 
 === 3.2.3 (2016-03-09) ===
