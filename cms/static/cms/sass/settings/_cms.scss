@@ -99,8 +99,9 @@ $z-layers: (
     "pagetree": (
         "dropdown":     1000,
         "drag-marker":  102,
-        "header":       101,
-        "section":      11,
+        "header":       auto,
+        "tree":         auto,
+        "section":      auto,
         "container":    1,
     ),
     // parent dependant, but should be higher than quicksearch, but

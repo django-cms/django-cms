@@ -1,0 +1,55 @@
+.cms-pagetree-legend {
+    position: relative;
+    text-align: right;
+
+    .cms-icon-info {
+        color: $color-primary;
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+
+    .cms-pagetree-dropdown {
+        display: inline-block;
+    }
+
+    .cms-pagetree-dropdown-menu {
+        top: auto;
+        right: 100%;
+        bottom: 0;
+        left: auto;
+        margin-right: 10px;
+        margin-bottom: -90px;
+        &:before {
+            bottom: 96px;
+        }
+    }
+    .cms-pagetree-dropdown-item {
+        .cms-pagetree-node-state {
+            margin-right: 10px;
+        }
+        .cms-icon {
+            margin-right: 8px;
+        }
+    }
+
+    .cms-icon {
+        text-align: center;
+        width: 20px;
+        margin-left: -2px;
+    }
+    .cms-icon-check-square {
+        color: $color-success;
+        font-size: $pagetree-icon-size - 4;
+    }
+    .cms-icon-minus-square {
+        font-size: $pagetree-icon-size - 4;
+    }
+}
+.cms-pagetree-legend-title-wrap {
+    cursor: pointer;
+}
+.cms-pagetree-legend-title {
+    color: $gray-light;
+    vertical-align: middle;
+    text-transform: uppercase;
+}
