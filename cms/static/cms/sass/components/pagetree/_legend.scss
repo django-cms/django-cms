@@ -13,11 +13,11 @@
     }
 
     .cms-pagetree-dropdown-menu {
+        top: auto;
         right: 100%;
+        bottom: 0;
         left: auto;
         margin-right: 10px;
-        top: auto;
-        bottom: 0;
         margin-bottom: -90px;
         &:before {
             bottom: 96px;
@@ -33,13 +33,13 @@
     }
 
     .cms-icon {
-        margin-left: -2px;
-        width: 20px;
         text-align: center;
+        width: 20px;
+        margin-left: -2px;
     }
     .cms-icon-check-square {
-        font-size: $pagetree-icon-size - 4;
         color: $color-success;
+        font-size: $pagetree-icon-size - 4;
     }
     .cms-icon-minus-square {
         font-size: $pagetree-icon-size - 4;
