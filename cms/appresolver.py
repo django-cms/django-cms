@@ -136,7 +136,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
                 args.update(default_args)
             resolver = RegexURLPattern(regex, pattern.callback,
                                        args, pattern.name)
-            resolver.page_id = page_id
+        resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns
 
