@@ -36,7 +36,7 @@ Additionally, the application in which the model is defined **must** be loaded b
 
     In most cases, it is better to create a UserProfile model with a one to one relationship to
     auth.User rather than creating a custom user model. Custom user models are only necessary if
-    you intended to alter the default behavior of the User model, not simply extend it.
+    you intended to alter the default behaviour of the User model, not simply extend it.
 
     Additionally, if you do intend to use a custom user model, it is generally advisable to do so
     only at the beginning of a project, before the database is created.
@@ -229,7 +229,7 @@ plugins, as shown above with ``base.html content``.
 ``language_fallback``
     When ``True``, if the placeholder has no plugin for the current language
     it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
-    Defaults to ``False`` to maintain pre-3.0 behavior.
+    Defaults to ``False`` to maintain pre-3.0 behaviour.
 
 .. _placeholder_default_plugins:
 
@@ -437,10 +437,10 @@ On the first level you can set values for each ``SITE_ID``. In the example
 above we define two sites. The first site has 3 languages (English, German and
 French) and the second site has only Dutch.
 
-The ``default`` node defines default behavior for all languages. You can
+The ``default`` node defines default behaviour for all languages. You can
 overwrite the default settings with language-specific properties. For example
 we define ``hide_untranslated`` as ``False`` globally, but the English language
-overwrites this behavior.
+overwrites this behaviour.
 
 Every language node needs at least a ``code`` and a ``name`` property. ``code``
 is the ISO 2 code for the language, and ``name`` is the verbose name of the
@@ -641,6 +641,36 @@ default
 
 The path to the media root of the cms media files.
 
+.. :setting:: CMS_UNESCAPED_RENDER_MODEL_TAGS
+
+CMS_UNESCAPED_RENDER_MODEL_TAGS
+===============================
+
+default
+    True
+
+.. warning::
+    In this version of django CMS, this setting has a default value of
+    ``True`` to provide behaviour consistent with previous releases.
+    However, all developers are encouraged to set this value to ``False`` to
+    help prevent a range of security vulnerabilities stemming from
+    HTML, Javascript, and CSS Code Injection.
+
+.. important::
+    This setting is deprecated and will be removed in a near-future release.
+    Developers are encouraged to carefully consider the source of any content
+    displayed by the ``render_model`` template tag and only add the optional
+    template filter ``safe`` on model fields that are known to be cleansed of
+    any malicious strings.
+
+    When this setting is removed, the ``render_model`` template tag will no
+    longer automatically mark as "safe" their output. Any content that is
+    intended to be displayed as rendered markup will require the ``safe``
+    filter applied when displaying with the ``render_model`` tag.
+
+This setting affects how certain template tags display model-based content. In
+particular, the template tag: :ttag:`render_model`.
+
 .. setting:: CMS_MEDIA_URL
 
 CMS_MEDIA_URL
@@ -823,7 +853,7 @@ CMS_PLACEHOLDER_CACHE
 default
     ``True``
 
-Should the output of the various placeholder templatetags be cached?
+Should the output of the various placeholder template tags be cached?
 Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
 present the placeholders will not be cached.
 

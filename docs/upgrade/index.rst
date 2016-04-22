@@ -11,6 +11,7 @@ makes changes to your database.
 .. toctree::
     :maxdepth: 1
 
+    3.0.17
     3.0.16
     3.0.15
     3.0.14
