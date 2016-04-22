@@ -187,8 +187,9 @@ var CMS = window.CMS || {};
                     is_draggable: function () {
                         return (that.options.filtered) ? false : true;
                     },
+                    large_drop_target: true,
                     // disable CMD/CTRL copy
-                    copy: false
+                    copy: true
                 },
                 // https://github.com/deitch/jstree-grid
                 grid: {
@@ -250,22 +251,36 @@ var CMS = window.CMS || {};
                 }
             });
 
+            this.ui.document.on('dnd_move.vakata', function (e, data) {
+                var is_copy = data.data.origin && (
+                    data.data.origin.settings.dnd.always_copy ||
+                    (data.data.origin.settings.dnd.copy && (data.event.metaKey || data.event.ctrlKey))
+                );
+
+                if (is_copy) {
+                    $('.jstree-is-dragging').addClass('jstree-is-dragging-copy');
+                } else {
+                    $('.jstree-is-dragging').removeClass('jstree-is-dragging-copy');
+                }
+
+            });
+
             this.ui.document.on('dnd_stop.vakata', function (e, data) {
                 var element = $(data.element);
                 var node = element.parent();
-                node.removeClass('jstree-is-dragging');
+                node.removeClass('jstree-is-dragging jstree-is-dragging-copy');
                 data.data.nodes.forEach(function (nodeId) {
                     var descendantIds = that._getDescendantsIds(nodeId);
 
                     [nodeId].concat(descendantIds).forEach(function (node) {
-                        $('.jsgrid_' + node + '_col').removeClass('jstree-is-dragging');
+                        $('.jsgrid_' + node + '_col').removeClass('jstree-is-dragging jstree-is-dragging-copy');
                     });
                 });
             });
 
             // store moved position node
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
-                if (!that.cache.type || that.cache.type === 'cut') {
+                if (!that.cache.type && e.type !== 'copy_node' || that.cache.type === 'cut') {
                     that._moveNode(that._getNodePosition(obj)).done(function () {
                         var instance = that.ui.tree.jstree(true);
 

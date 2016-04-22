@@ -676,6 +676,9 @@
             margin-top: -1px;
         }
     }
+    .jstree-is-dragging-copy {
+        opacity: 0.9 !important;
+    }
 
     // grid settings and resets added by `jstree.grid.js`
     .jstree-grid-header,
