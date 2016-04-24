@@ -5,6 +5,7 @@
 // #IMPORTS#
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var fs = require('fs');
 var autoprefixer = require('autoprefixer');
 var postcss = require('gulp-postcss');
 var gulpif = require('gulp-if');
@@ -148,8 +149,21 @@ var INTEGRATION_TESTS = [
     ]
 ];
 
+var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
+    .match(/__version__ = '(.*?)'/)[1];
+
 // #####################################################################################################################
 // #TASKS#
+var cacheBuster = function (options) {
+    var version = options && options.version ? options.version : Math.random();
+
+    return function (css, opts) {
+        css.replaceValues(/__VERSION__/g, { fast: '__VERSION__' }, function(string) {
+            return version;
+        });
+    }
+};
+
 gulp.task('sass', function () {
     gulp.src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
@@ -161,6 +175,9 @@ gulp.task('sass', function () {
             autoprefixer({
                 cascade: false
             }),
+            cacheBuster({
+                version: CMS_VERSION
+            })
         ]))
         .pipe(minifyCss({
             rebase: false
