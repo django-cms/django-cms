@@ -1,0 +1,96 @@
+/* global window, document */
+'use strict';
+
+var globals = require('./settings/globals');
+var casperjs = require('casper');
+var cms = require('./helpers/cms')(casperjs);
+var xPath = casperjs.selectXPath;
+var createJSTreeXPathFromTree = cms.createJSTreeXPathFromTree;
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.logout())
+        .run(done);
+});
+
+casper.test.begin('Page can be copied through drag-n-drop to a sibling', function (test) {
+    casper
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var drop;
+            casper.waitUntilVisible('.cms-pagetree-jstree', cms.waitUntilAllAjaxCallsFinish()).then(function () {
+                test.assertExists(
+                    xPath(createJSTreeXPathFromTree([
+                        { name: 'Homepage' }
+                    ])),
+                    'Initial state is correct'
+                );
+
+                // usually to drag stuff in the iframe you have to calculate the position of the frame
+                // and then the position of the thing inside frame, but here sideframe is opened at 0, 0
+                // so this should be enough
+                drop = this.getElementBounds(
+                    xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]')
+                );
+
+                this.mouse.down(xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]'));
+                this.mouse.move(drop.left + drop.width / 2, drop.top + drop.height - 3);
+                this.evaluate(function () {
+                    CMS.$(document).trigger(new CMS.$.Event('keydown', { keyCode: 17, ctrlKey: true }));
+                });
+            })
+            .then(function () {
+                test.assertVisible('.jstree-copy', 'Copy indicator shown');
+                // since casper cannot trigger a mouse event with ctrlKey pressed,
+                // we fake the event with jQuery
+                this.evaluate(function () {
+                    CMS.$(document).trigger(new CMS.$.Event('mouseup', { ctrlKey: true }));
+                });
+            })
+            .waitForResource(/copy/)
+            .waitUntilVisible('.cms-dialog', function () {
+                test.assertVisible('.cms-dialog', 'Dialog shows up');
+                test.assertSelectorHasText('.cms-dialog', 'Copy options', 'Copy options dialog shows up');
+                test.assertExists(
+                    xPath(createJSTreeXPathFromTree([
+                        { name: 'Homepage' },
+                        { name: 'Homepage' }
+                    ])),
+                    'Copy page placeholder is visible in the tree'
+                );
+                this.click('.cms-dialog .default.submit');
+            })
+            .waitForResource(/copy-page/, function () {
+                test.assertExists('.jstree-initial-node.jstree-loading', 'Loading tree showed up');
+            })
+            .waitForResource(/get-tree/).wait(1000, function () {
+                test.assertDoesntExist('.jstree-initial-node.jstree-loading', 'Loading tree hides');
+            })
+            .thenEvaluate(function () {
+                window.location.reload();
+            })
+            .wait(1000).waitUntilVisible('.cms-pagetree-jstree', function () {
+                test.assertExists(
+                    xPath(createJSTreeXPathFromTree([
+                        { name: 'Homepage' },
+                        { name: 'Homepage' }
+                    ])),
+                    'Pages are in correct order after reload'
+                );
+            });
+        })
+        .then(cms.removePage())
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});

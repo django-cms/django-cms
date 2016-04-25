@@ -141,6 +141,7 @@ var INTEGRATION_TESTS = [
     ],
     [
         'pagetree',
+        'pagetree-drag-n-drop-copy',
         'disableToolbar',
         'dragndrop',
         'history',
