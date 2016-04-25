@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.db.models.signals import post_save, post_delete
+from django.utils.datastructures import SortedDict
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+
 from cms.exceptions import LanguageError
 from cms.models import Page
 from cms.models.titlemodels import Title
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.db.models.signals import post_save, post_delete
-from django.utils.datastructures import SortedDict
-from django.utils.safestring import mark_safe
 
 
 def update_site_and_page_choices(lang=None):
@@ -51,7 +53,7 @@ def update_site_and_page_choices(lang=None):
                 continue
 
             indent = u"&nbsp;&nbsp;" * title.page.level
-            page_title = mark_safe(u"%s%s" % (indent, title.title))
+            page_title = mark_safe(u"%s%s" % (indent, escape(title.title)))
             site_page_choices.append((title.page.pk, page_title))
 
         page_choices.append((sitename, site_page_choices))
