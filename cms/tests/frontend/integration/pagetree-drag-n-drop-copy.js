@@ -40,7 +40,8 @@ var acceptCopyingAndAssertNewTree = function (tree) {
             .thenEvaluate(function () {
                 window.location.reload();
             })
-            .wait(1000).waitUntilVisible('.cms-pagetree-jstree', function () {
+            .wait(1000).waitUntilVisible('.cms-pagetree-jstree', cms.expandPageTree())
+            .then(function () {
                 this.test.assertExists(
                     xPath(createJSTreeXPathFromTree(tree)),
                     'Pages are in correct order after reload'
@@ -144,6 +145,64 @@ casper.test.begin('Pages can be copied into itself', function (test) {
                 }
             ]));
         })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
+casper.test.begin('Pages can be copied as sibling child', function (test) {
+    casper
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var drop;
+            casper.waitUntilVisible('.cms-pagetree-jstree', cms.waitUntilAllAjaxCallsFinish()).then(function () {
+                test.assertExists(
+                    xPath(createJSTreeXPathFromTree([
+                        { name: 'Homepage' },
+                        { name: 'Second' }
+                    ])),
+                    'Initial state is correct'
+                );
+
+                // usually to drag stuff in the iframe you have to calculate the position of the frame
+                // and then the position of the thing inside frame, but here sideframe is opened at 0, 0
+                // so this should be enough
+                drop = this.getElementBounds(
+                    xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]')
+                );
+
+                this.mouse.down(xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Second")]'));
+                this.mouse.move(drop.left + drop.width / 2 + 10, drop.top + drop.height / 2);
+                this.evaluate(function () {
+                    CMS.$(document).trigger(new CMS.$.Event('keydown', { keyCode: 17, ctrlKey: true }));
+                });
+            })
+            .then(function () {
+                test.assertVisible('.jstree-copy', 'Copy indicator shown');
+                // since casper cannot trigger a mouse event with ctrlKey pressed,
+                // we fake the event with jQuery
+                this.evaluate(function () {
+                    CMS.$(document).trigger(new CMS.$.Event('mouseup', { ctrlKey: true }));
+                });
+            })
+            .then(acceptCopyingAndAssertNewTree([
+                {
+                    name: 'Homepage',
+                    children: [{
+                        name: 'Second'
+                    }]
+                },
+                {
+                    name: 'Second'
+                }
+            ]));
+        })
+        .then(cms.removePage())
         .then(cms.removePage())
         .run(function () {
             test.done();
