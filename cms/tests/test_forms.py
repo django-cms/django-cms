@@ -113,6 +113,10 @@ class FormsTestCase(CMSTestCase):
         page2 = create_page('Page 2', 'nav_playground.html', 'de', site=site)
         page3 = create_page('Page 3', 'nav_playground.html', 'en',
                             site=site, parent=page1)
+        # Check for injection attacks
+        page4 = create_page('Page 4<script>alert("bad-things");</script>',
+                            'nav_playground.html', 'en',
+                            site=site, parent=page1)
         # enforce the choices to be casted to a list
         site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
         self.assertEqual(page_choices, [
@@ -120,6 +124,7 @@ class FormsTestCase(CMSTestCase):
             (site.name, [
                 (page1.pk, 'Page 1'),
                 (page3.pk, '&nbsp;&nbsp;Page 3'),
+                (page4.pk, '&nbsp;&nbsp;Page 4&lt;script&gt;alert(&quot;bad-things&quot;);&lt;/script&gt;'),
                 (page2.pk, 'Page 2'),
             ])
         ])

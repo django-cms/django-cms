@@ -3,10 +3,12 @@ from collections import OrderedDict, defaultdict
 
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save, post_delete
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-from cms.cache.choices import (clean_site_choices_cache, clean_page_choices_cache,
-                               _site_cache_key, _page_cache_key)
+from cms.cache.choices import (
+    clean_site_choices_cache, clean_page_choices_cache,
+    _site_cache_key, _page_cache_key)
 from cms.exceptions import LanguageError
 from cms.models import Page, Title
 from cms.utils import i18n
@@ -50,7 +52,7 @@ def update_site_and_page_choices(lang=None):
                 continue
 
             indent = u"&nbsp;&nbsp;" * (title.page.depth - 1)
-            page_title = mark_safe(u"%s%s" % (indent, title.title))
+            page_title = mark_safe(u"%s%s" % (indent, escape(title.title)))
             site_page_choices.append((title.page.pk, page_title))
 
         page_choices.append((sitename, site_page_choices))
