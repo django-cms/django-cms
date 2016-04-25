@@ -189,12 +189,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            <li>
-                                <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
-                                    <span class="cms-icon cms-icon-eye"></span>
-                                    <span>{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
-                                </a>
-                            </li>
                             {% if has_change_permission %}
                                 <li>
                                     <a href="{% url 'admin:cms_page_advanced' page.id %}" title="{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}">
