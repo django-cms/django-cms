@@ -10,6 +10,7 @@ from cms.api import create_page, create_page_user
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
+from cms.forms.widgets import ApplicationConfigSelect
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model
 
@@ -125,6 +126,48 @@ class FormsTestCase(CMSTestCase):
         ])
         self.assertEqual(site_choices, [(site.pk, site.name)])
 
+    def test_app_config_select_escaping(self):
+        class FakeAppConfig(object):
+            def __init__(self, pk, config):
+                self.pk = pk
+                self.config = config
+
+            def __str__(self):
+                return self.config
+
+        class FakeApp(object):
+            def __init__(self, name, configs=()):
+                self.name = name
+                self.configs = configs
+
+            def __str__(self):
+                return self.name
+
+            def get_configs(self):
+                return self.configs
+
+            def get_config_add_url(self):
+                return "/fake/url/"
+
+        GoodApp = FakeApp('GoodApp', [
+            FakeAppConfig(1, 'good-app-one-config'),
+            FakeAppConfig(2, 'good-app-two-config'),
+        ])
+
+        BadApp = FakeApp('BadApp', [
+            FakeAppConfig(1, 'bad-app-one-config'),
+            FakeAppConfig(2, 'bad-app-two-config<script>alert("bad-stuff");</script>'),
+        ])
+
+        app_configs = {
+            GoodApp: GoodApp,
+            BadApp: BadApp,
+        }
+
+        app_config_select = ApplicationConfigSelect(app_configs=app_configs)
+        output = app_config_select.render('application_configurations', 1)
+        self.assertFalse('bad-app-two-config<script>alert("bad-stuff");</script>' in output)
+        self.assertTrue('bad-app-two-config&lt;script&gt;alert(&quot;bad-stuff&quot;);&lt;/script&gt;' in output)
 
     def test_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()
@@ -143,7 +186,7 @@ class FormsTestCase(CMSTestCase):
             myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser@django-cms.org")
         else:
             myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
-        
+
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',
