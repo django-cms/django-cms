@@ -262,7 +262,6 @@ var CMS = window.CMS || {};
                 } else {
                     $('.jstree-is-dragging').removeClass('jstree-is-dragging-copy');
                 }
-
             });
 
             this.ui.document.on('dnd_stop.vakata', function (e, data) {
