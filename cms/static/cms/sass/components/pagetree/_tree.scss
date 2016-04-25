@@ -615,6 +615,11 @@
         overflow: visible;
     }
 
+    .jstree-grid-column {
+        // fixes layout bug in Safari
+        vertical-align: top;
+    }
+
     // disable highlight on iOS devices
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
