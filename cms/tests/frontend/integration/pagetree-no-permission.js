@@ -368,13 +368,6 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
                     // click on "Paste" to the Direct child of Homepage
                     this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
-                })
-                .waitUntilVisible('.error', function () {
-                    test.assertSelectorHasText(
-                        '.error',
-                        'Error: Moving parent inside child',
-                        'Error should show up if you try to paste a page into it\'s child'
-                    );
                 });
         })
         // remove two top level pages
