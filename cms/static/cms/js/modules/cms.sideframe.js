@@ -30,8 +30,7 @@ var CMS = window.CMS || {};
 
         options: {
             onClose: false,
-            sideframeDuration: 300,
-            sideframeWidth: 0.8 // matches 80% of window width
+            sideframeDuration: 300
         },
 
         initialize: function initialize(options) {
@@ -63,7 +62,6 @@ var CMS = window.CMS || {};
                 window: $(window),
                 dimmer: sideframe.find('.cms-sideframe-dimmer'),
                 close: sideframe.find('.cms-sideframe-close'),
-                resize: sideframe.find('.cms-sideframe-resize'),
                 frame: sideframe.find('.cms-sideframe-frame'),
                 shim: sideframe.find('.cms-sideframe-shim'),
                 historyBack: sideframe.find('.cms-sideframe-history .cms-icon-arrow-back'),
@@ -89,13 +87,6 @@ var CMS = window.CMS || {};
 
             this.ui.close.off(this.click).on(this.click, function () {
                 that.close();
-            });
-
-            // the resize event attaches an off event to the body
-            // which is handled within _startResize()
-            this.ui.resize.off(this.pointerDown).on(this.pointerDown, function (e) {
-                e.preventDefault();
-                that._startResize();
             });
 
             // close sideframe when clicking on the dimmer
@@ -141,15 +132,6 @@ var CMS = window.CMS || {};
             var language = 'language=' + CMS.config.request.language;
             var page_id = 'page_id=' + CMS.config.request.page_id;
             var params = [];
-            var width = window.innerWidth;
-            var currentWidth = this.ui.sideframe.outerWidth();
-            var isFrameVisible = this.ui.sideframe.is(':visible');
-
-            // set the ratio for bigger devices than mobile
-            if (this.ui.body.width() >= CMS.BREAKPOINTS.mobile) {
-                width = CMS.settings.sideframe.position ||
-                    (this.options.sideframeWidth * 100 + '%');
-            }
 
             // We have to rebind events every time we open a sideframe
             // because the event handlers contain references to the instance
@@ -187,13 +169,8 @@ var CMS = window.CMS || {};
             // previous intent to minimize the frame.
             CMS.settings.sideframe.hidden = false;
 
-            if (isFrameVisible && Math.round(currentWidth) === Math.round(width)) {
-                // Math.round because subpixel values
-                animate = false;
-            }
-
             // show iframe
-            this._show(width, animate);
+            this._show(animate);
 
             return this;
         },
@@ -314,11 +291,11 @@ var CMS = window.CMS || {};
          *
          * @method _show
          * @private
-         * @param {Number} width width that the iframes opens to
          * @param {Number} [animate] Animation duration
          */
-        _show: function _show(width, animate) {
+        _show: function _show(animate) {
             var that = this;
+            var width = '90%';
 
             this.ui.sideframe.show();
 
@@ -330,13 +307,6 @@ var CMS = window.CMS || {};
                 }, this.options.sideframeDuration);
             } else {
                 this.ui.sideframe.css('width', width);
-                // reset width if larger than available space
-                if (width >= this.ui.window.width()) {
-                    this.ui.sideframe.css({
-                        width: this.ui.window.width() - 30,
-                        overflow: 'visible'
-                    });
-                }
             }
 
             // istanbul ignore else: always trigger API handlers
@@ -372,8 +342,7 @@ var CMS = window.CMS || {};
             // update settings
             CMS.settings.sideframe = {
                 url: null,
-                hidden: false,
-                width: this.options.sideframeWidth
+                hidden: false
             };
             CMS.settings = this.setSettings(CMS.settings);
 
@@ -415,61 +384,6 @@ var CMS = window.CMS || {};
             // enable scrolling again
             this.ui.body.removeClass('cms-prevent-scrolling');
             this.allowTouchScrolling($(document), 'sideframe');
-        },
-
-        /**
-         * Initiates the start resize event from `_events`.
-         *
-         * @method _startResize
-         * @private
-         */
-        _startResize: function _startResize() {
-            var that = this;
-            var outerOffset = 30;
-            var timer;
-
-            // create event for stopping
-            this.ui.body.on(this.pointerUp, function (e) {
-                e.preventDefault();
-                that._stopResize();
-            });
-
-            // this prevents the iframe from being focusable
-            this.ui.shim.css('z-index', 20);
-
-            this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
-                if (e.originalEvent.clientX <= 320) {
-                    e.originalEvent.clientX = 320;
-                }
-                if (e.originalEvent.clientX >= that.ui.window.width() - outerOffset) {
-                    e.originalEvent.clientX = that.ui.window.width() - outerOffset;
-                }
-
-                that.ui.sideframe.css('width', e.originalEvent.clientX);
-
-                // update settings
-                CMS.settings.sideframe.position = e.originalEvent.clientX;
-
-                // save position into our settings
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                    CMS.settings = that.setSettings(CMS.settings);
-                }, that.settingsRefreshTimer);
-            });
-        },
-
-        /**
-         * Initiates the stop resize event from `_startResize`.
-         *
-         * @method _stopResize
-         * @private
-         */
-        _stopResize: function _stopResize() {
-            this.ui.shim.css('z-index', 1);
-            this.ui.body
-                .off(this.pointerUp)
-                .off(this.pointerMove)
-                .removeAttr('data-touch-action');
         },
 
         /**
