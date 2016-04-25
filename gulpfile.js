@@ -3,15 +3,17 @@
 
 // #####################################################################################################################
 // #IMPORTS#
-var autoprefixer = require('gulp-autoprefixer');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var fs = require('fs');
+var autoprefixer = require('autoprefixer');
+var postcss = require('gulp-postcss');
 var gulpif = require('gulp-if');
 var iconfont = require('gulp-iconfont');
 var iconfontCss = require('gulp-iconfont-css');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
-var minifyCss = require('gulp-minify-css');
+var minifyCss = require('gulp-clean-css');
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
 var concat = require('gulp-concat');
@@ -147,8 +149,21 @@ var INTEGRATION_TESTS = [
     ]
 ];
 
+var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
+    .match(/__version__ = '(.*?)'/)[1];
+
 // #####################################################################################################################
 // #TASKS#
+var cacheBuster = function (options) {
+    var version = options && options.version ? options.version : Math.random();
+
+    return function (css, opts) {
+        css.replaceValues(/__VERSION__/g, { fast: '__VERSION__' }, function(string) {
+            return version;
+        });
+    }
+};
+
 gulp.task('sass', function () {
     gulp.src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
@@ -156,10 +171,14 @@ gulp.task('sass', function () {
         .on('error', function (error) {
             gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
         })
-        .pipe(autoprefixer({
-            browsers: ['last 3 versions'],
-            cascade: false
-        }))
+        .pipe(postcss([
+            autoprefixer({
+                cascade: false
+            }),
+            cacheBuster({
+                version: CMS_VERSION
+            })
+        ]))
         .pipe(minifyCss({
             rebase: false
         }))
