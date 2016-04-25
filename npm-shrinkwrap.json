@@ -11033,15 +11033,15 @@
                   "from": "commander@^2.9.0",
                   "resolved": "https://registry.npmjs.org/commander/-/commander-2.9.0.tgz"
                 },
-                "cryptiles": {
-                  "version": "2.0.5",
-                  "from": "cryptiles@2.x.x",
-                  "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-2.0.5.tgz"
-                },
                 "core-util-is": {
                   "version": "1.0.2",
                   "from": "core-util-is@~1.0.0",
                   "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
+                },
+                "cryptiles": {
+                  "version": "2.0.5",
+                  "from": "cryptiles@2.x.x",
+                  "resolved": "https://registry.npmjs.org/cryptiles/-/cryptiles-2.0.5.tgz"
                 },
                 "dashdash": {
                   "version": "1.12.2",
@@ -11058,15 +11058,15 @@
                   "from": "deep-extend@~0.4.0",
                   "resolved": "https://registry.npmjs.org/deep-extend/-/deep-extend-0.4.1.tgz"
                 },
-                "delegates": {
-                  "version": "1.0.0",
-                  "from": "delegates@^1.0.0",
-                  "resolved": "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz"
-                },
                 "delayed-stream": {
                   "version": "1.0.0",
                   "from": "delayed-stream@~1.0.0",
                   "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz"
+                },
+                "delegates": {
+                  "version": "1.0.0",
+                  "from": "delegates@^1.0.0",
+                  "resolved": "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz"
                 },
                 "ecc-jsbn": {
                   "version": "0.1.1",
@@ -11338,15 +11338,15 @@
                   "from": "semver@~5.1.0",
                   "resolved": "https://registry.npmjs.org/semver/-/semver-5.1.0.tgz"
                 },
-                "sntp": {
-                  "version": "1.0.9",
-                  "from": "sntp@1.x.x",
-                  "resolved": "https://registry.npmjs.org/sntp/-/sntp-1.0.9.tgz"
-                },
                 "sshpk": {
                   "version": "1.7.3",
                   "from": "sshpk@^1.7.0",
                   "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.7.3.tgz"
+                },
+                "sntp": {
+                  "version": "1.0.9",
+                  "from": "sntp@1.x.x",
+                  "resolved": "https://registry.npmjs.org/sntp/-/sntp-1.0.9.tgz"
                 },
                 "string_decoder": {
                   "version": "0.10.31",
@@ -14197,7 +14197,7 @@
     },
     "phantomjs-prebuilt": {
       "version": "2.1.7",
-      "from": "phantomjs-prebuilt@latest",
+      "from": "phantomjs-prebuilt@>=2.1.7 <3.0.0",
       "resolved": "https://registry.npmjs.org/phantomjs-prebuilt/-/phantomjs-prebuilt-2.1.7.tgz",
       "dependencies": {
         "extract-zip": {
@@ -14566,9 +14566,9 @@
                   }
                 },
                 "sshpk": {
-                  "version": "1.8.1",
+                  "version": "1.8.2",
                   "from": "sshpk@>=1.7.0 <2.0.0",
-                  "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.8.1.tgz",
+                  "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.8.2.tgz",
                   "dependencies": {
                     "asn1": {
                       "version": "0.2.3",
@@ -14606,16 +14606,9 @@
                       "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz"
                     },
                     "ecc-jsbn": {
-                      "version": "0.0.1",
-                      "from": "ecc-jsbn@>=0.0.1 <0.1.0",
-                      "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.0.1.tgz",
-                      "dependencies": {
-                        "jsbn": {
-                          "version": "0.0.0",
-                          "from": "git+https://github.com/rynomad/jsbn.git",
-                          "resolved": "git+https://github.com/rynomad/jsbn.git#bb522b0124f75424f89d49446c40a87111942c7b"
-                        }
-                      }
+                      "version": "0.1.1",
+                      "from": "ecc-jsbn@>=0.1.1 <0.2.0",
+                      "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
                     }
                   }
                 }
