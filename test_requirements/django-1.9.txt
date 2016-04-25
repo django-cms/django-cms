@@ -1,6 +1,6 @@
 -r requirements_base.txt
 Django>=1.9,<1.10
-djangocms-text-ckeditor>=2.8.1
+https://github.com/divio/djangocms-text-ckeditor/archive/feature/sane-add-plugin.zip
 django-reversion==1.10,<1.11
 django-hvad==1.5
 django-formtools

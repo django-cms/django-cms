@@ -57,10 +57,10 @@ class TreePublishRow(Tag):
     def render_tag(self, context, page, language):
         if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
             if page.is_dirty(language):
-                cls = "dirty"
+                cls = "cms-pagetree-node-state cms-pagetree-node-state-dirty dirty"
                 text = _("unpublished changes")
             else:
-                cls = "published"
+                cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
                 text = _("published")
         else:
             if language in page.languages:
@@ -68,13 +68,13 @@ class TreePublishRow(Tag):
                         language) == PUBLISHER_STATE_PENDING
                 if public_pending or page.get_publisher_state(
                         language) == PUBLISHER_STATE_PENDING:
-                    cls = "unpublishedparent"
+                    cls = "cms-pagetree-node-state cms-pagetree-node-state-unpublished-parent unpublishedparent"
                     text = _("unpublished parent")
                 else:
-                    cls = "unpublished"
+                    cls = "cms-pagetree-node-state cms-pagetree-node-state-unpublished unpublished"
                     text = _("unpublished")
             else:
-                cls = "empty"
+                cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
                 text = _("no content")
         return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_text(text)))
 

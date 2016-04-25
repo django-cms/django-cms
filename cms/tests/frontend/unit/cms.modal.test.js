@@ -50,7 +50,6 @@ describe('CMS.Modal', function () {
                     minHeight: 400,
                     minWidth: 800,
                     modalDuration: 200,
-                    newPlugin: false,
                     resizable: true,
                     maximizable: true,
                     minimizable: true
@@ -62,7 +61,6 @@ describe('CMS.Modal', function () {
                     minHeight: 300,
                     minWidth: 100,
                     modalDuration: 200,
-                    newPlugin: false,
                     resizable: true,
                     maximizable: true,
                     minimizable: true
@@ -77,7 +75,6 @@ describe('CMS.Modal', function () {
         var modal;
         beforeEach(function (done) {
             fixture.load('modal.html');
-            delete CMS._newPlugin;
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
             };
@@ -119,51 +116,6 @@ describe('CMS.Modal', function () {
             })).not.toThrow();
         });
 
-        it('does not open if there is a plugin creation in process', function () {
-            CMS._newPlugin = true;
-            spyOn(modal, '_deletePlugin').and.callFake(function () {
-                return false;
-            });
-
-            expect(modal.open({ html: '<div></div>' })).toEqual(false);
-        });
-
-        it('confirms if the user wants to remove freshly created plugin when opening new modal', function () {
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
-            jasmine.clock().install(); // stop timeout that does initialStates
-            CMS.API.Toolbar = new CMS.Toolbar();
-            CMS._newPlugin = {
-                delete: '/delete-url',
-                breadcrumb: [{ title: 'Fresh plugin' }]
-            };
-
-            CMS.config = $.extend(CMS.config, {
-                csrf: 'custom-token',
-                lang: {
-                    confirmEmpty: 'Question about {1}?'
-                }
-            });
-
-            spyOn(modal, '_deletePlugin').and.callThrough();
-            jasmine.Ajax.install();
-            spyOn(CMS.API.Toolbar, 'openAjax').and.callThrough();
-            spyOn(CMS.API.Helpers, 'secureConfirm').and.callFake(function () {
-                return false;
-            });
-
-            expect(modal.open({ html: '<div></div>' })).toEqual(false);
-            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
-                url: '/delete-url',
-                post: '{ "csrfmiddlewaretoken": "custom-token" }',
-                text: 'Question about Fresh plugin?',
-                callback: jasmine.any(Function)
-            });
-            jasmine.Ajax.uninstall();
-            jasmine.clock().uninstall();
-        });
-
         it('should be chainable', function () {
             expect(modal.open({ html: '<div></div>' })).toEqual(modal);
         });
@@ -181,17 +133,6 @@ describe('CMS.Modal', function () {
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.load');
             expect(spyEvent).toHaveBeenTriggered();
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.loaded');
-        });
-
-        it('sets CMS._newPlugin if we are opening a plugin creation modal', function () {
-            modal = new CMS.Modal({
-                newPlugin: {
-                    something: true
-                }
-            });
-
-            modal.open({ html: '<div></div>' });
-            expect(CMS._newPlugin).toEqual({ something: true });
         });
 
         it('applies correct state to modal controls 1', function () {
@@ -480,6 +421,19 @@ describe('CMS.Modal', function () {
             fixture.cleanup();
         });
 
+        it('returns false if modal-close event is prevented', function () {
+            CMS.API.Helpers.addEventListener('modal-close', function (e, opts) {
+                e.preventDefault();
+                expect(opts.instance).toEqual(modal);
+            });
+
+            spyOn(modal, '_hide').and.callThrough();
+            modal.open({ html: '<div></div>' });
+            expect(modal.close()).toEqual(false);
+            expect(modal._hide).not.toHaveBeenCalled();
+            CMS.API.Helpers.removeEventListener('modal-close');
+        });
+
         it('closes the modal', function (done) {
             modal.open({ html: '<div></div>' });
 
@@ -494,23 +448,6 @@ describe('CMS.Modal', function () {
                     done();
                 }, 10);
             }, 10);
-        });
-
-        it('does not close if there is a plugin creation in process', function (done) {
-            modal.open({ html: '<div></div>' });
-            CMS._newPlugin = true;
-            spyOn(modal, '_deletePlugin').and.callFake(function (arg) {
-                expect(arg).toEqual({ hideAfter: true });
-                return false;
-            });
-
-            expect(modal.close()).toEqual(undefined);
-            setTimeout(function () {
-                expect(modal._deletePlugin).toHaveBeenCalled();
-                expect(modal.ui.modal).toHaveClass('cms-modal-open');
-                done();
-            }, 10);
-            delete CMS._newPlugin;
         });
 
         it('reloads the browser if onClose is provided', function (done) {
@@ -665,9 +602,11 @@ describe('CMS.Modal', function () {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
+                $('html').removeClass('cms-modal-maximized');
                 modal.ui.window = $('<div style="width: 2000px; height: 2000px;"></div>').prependTo(fixture.el);
                 // have to show the modal so the css values can be retrieved
                 modal.ui.modal.show();
+                modal.ui.modal.addClass('cms-modal-open');
                 done();
             });
         });
@@ -677,6 +616,8 @@ describe('CMS.Modal', function () {
         });
 
         it('fits the modal to the screen if there is enough space', function () {
+            spyOn($.fn, 'css').and.returnValue(0);
+
             expect(modal._calculateNewPosition({})).toEqual({
                 width: 1700,
                 height: 1700,
@@ -684,10 +625,14 @@ describe('CMS.Modal', function () {
                 left: 1000
             });
 
+            $.fn.css.and.callThrough();
+
             modal.ui.window.css({
                 width: 1500,
                 height: 1500
             });
+
+            $.fn.css.and.returnValue(0);
 
             expect(modal._calculateNewPosition({})).toEqual({
                 width: 1200,
@@ -1090,6 +1035,7 @@ describe('CMS.Modal', function () {
             jasmine.clock().tick(modal.options.duration);
             expect(modal.maximize).toHaveBeenCalled();
         });
+
         it('removes the handler to close by ESC', function () {
             var spy = jasmine.createSpy();
 
@@ -1100,6 +1046,15 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).not.toHandle('keydown.cms.close');
             modal.ui.body.trigger('keydown.cms.close');
             expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('triggers modal-closed event', function (done) {
+            CMS.API.Helpers.addEventListener('modal-closed', function (e, opts) {
+                expect(opts.instance).toEqual(modal);
+                done();
+            });
+            modal._hide();
+            jasmine.clock().tick(modal.options.duration);
         });
     });
 
@@ -1613,7 +1568,7 @@ describe('CMS.Modal', function () {
             expect(modal.saved).toEqual(false);
             expect(modal.hideFrame).toEqual(undefined);
             expect(modal.close).toHaveBeenCalled();
-            expect(modal.options.onClose).toEqual(false);
+            expect(modal.options.onClose).toEqual(null);
             expect($.fn.hide).toHaveBeenCalledTimes(1);
         });
 
@@ -1636,84 +1591,6 @@ describe('CMS.Modal', function () {
             form.trigger('submit');
             expect(modal.saved).toEqual(true);
             expect(modal.hideFrame).toEqual(true);
-        });
-    });
-
-    describe('_deletePlugin()', function () {
-        var modal;
-        beforeEach(function (done) {
-            fixture.load('modal.html');
-            CMS.API.Tooltip = {
-                hide: jasmine.createSpy()
-            };
-            CMS.config = {
-                csrf: 'CSRF!',
-                lang: {
-                    confirmEmpty: '({1}) plugin is empty. Remove it?'
-                }
-            };
-            CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
-            };
-            $(function () {
-                modal = new CMS.Modal({
-                    modalDuration: 0
-                });
-                modal.ui.modal.show();
-                spyOn(modal, '_hide');
-                done();
-            });
-        });
-        afterEach(function () {
-            fixture.cleanup();
-        });
-
-        it('makes ajax request to delete new plugin', function (done) {
-            CMS.API.Toolbar.openAjax = function (ajax) {
-                expect(ajax).toEqual({
-                    url: '/delete-url',
-                    post: '{ "csrfmiddlewaretoken": "CSRF!" }',
-                    text: '(TestPlugin) plugin is empty. Remove it?',
-                    callback: jasmine.any(Function)
-                });
-                ajax.callback();
-                expect(CMS._newPlugin).toEqual(false);
-                done();
-            };
-
-            CMS._newPlugin = {
-                'delete': '/delete-url',
-                breadcrumb: [{
-                    title: 'TestPlugin'
-                }]
-            };
-            modal._deletePlugin();
-        });
-
-        it('hides the modal if the correct param is passed', function (done) {
-            CMS.API.Toolbar.openAjax = function (ajax) {
-                expect(ajax).toEqual({
-                    url: '/delete-url',
-                    post: '{ "csrfmiddlewaretoken": "CSRF!" }',
-                    text: '(ShmestPlugin) plugin is empty. Remove it?',
-                    callback: jasmine.any(Function)
-                });
-                ajax.callback();
-                expect(CMS._newPlugin).toEqual(false);
-                expect(modal._hide).toHaveBeenCalled();
-                done();
-            };
-
-            CMS._newPlugin = {
-                'delete': '/delete-url',
-                breadcrumb: [
-                    { title: 'TestPlugin' },
-                    { title: 'ShmestPlugin' }
-                ]
-            };
-            modal._deletePlugin({ hideAfter: true });
         });
     });
 
@@ -1874,7 +1751,6 @@ describe('CMS.Modal', function () {
         var modal;
         beforeEach(function (done) {
             fixture.load('modal.html');
-            delete CMS._newPlugin;
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
             };

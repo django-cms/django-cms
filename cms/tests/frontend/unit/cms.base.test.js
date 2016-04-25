@@ -1008,6 +1008,14 @@ describe('cms.base.js', function () {
                     payload: 'djangoCMS'
                 });
             });
+
+            it('returns dispatched event', function () {
+                CMS._eventRoot = $('#cms-top');
+                var fn = jasmine.createSpy();
+
+                CMS.API.Helpers.addEventListener('my-event', fn);
+                expect(CMS.API.Helpers.dispatchEvent('my-event') instanceof $.Event).toEqual(true);
+            });
         });
 
         describe('.once()', function () {

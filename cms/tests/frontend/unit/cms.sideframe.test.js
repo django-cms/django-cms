@@ -277,13 +277,6 @@ describe('CMS.Sideframe', function () {
             sideframe.ui.body.trigger(escEvent);
         });
 
-        it('hides the sideframe if it should be hidden instead', function () {
-            spyOn(sideframe, '_hide');
-            CMS.settings.sideframe.hidden = true;
-            sideframe.open({ url: url });
-            expect(sideframe._hide).toHaveBeenCalled();
-        });
-
         it('prevents scrolling of the outer body for mobile devices', function () {
             spyOn(sideframe, 'preventTouchScrolling');
             spyOn(sideframe, 'allowTouchScrolling');
@@ -328,7 +321,7 @@ describe('CMS.Sideframe', function () {
             CMS.config.debug = true;
             sideframe.open({ url: url });
 
-            expect(CMS.settings.sideframe).toEqual({});
+            expect(CMS.settings.sideframe).toEqual({ hidden: false });
             sideframe.ui.frame.find('iframe').on('load', function () {
                 expect($(this.contentDocument.body)).toHaveClass('cms-debug');
                 done();
@@ -338,7 +331,7 @@ describe('CMS.Sideframe', function () {
         it('saves the url in settings', function (done) {
             sideframe.open({ url: url });
 
-            expect(CMS.settings.sideframe).toEqual({});
+            expect(CMS.settings.sideframe).toEqual({ hidden: false });
             sideframe.ui.frame.find('iframe').on('load', function () {
                 expect(sideframe.setSettings).toHaveBeenCalled();
                 // actual url would be http://localhost:port/${url}
@@ -476,20 +469,6 @@ describe('CMS.Sideframe', function () {
             expect($.fn.animate).toHaveBeenCalledWith(
                 { width: 0 },
                 150,
-                jasmine.any(Function)
-            );
-            expect(sideframe.ui.sideframe).toBeVisible();
-            $.fn.animate.calls.mostRecent().args[2].bind(sideframe.ui.sideframe)();
-            expect(sideframe.ui.sideframe).not.toBeVisible();
-        });
-
-        it('uses the default duration of sideframe closing if settings say sideframe is hidden', function () {
-            CMS.settings.sideframe.hidden = true;
-            spyOn($.fn, 'animate');
-            sideframe.open({ url: url });
-            expect($.fn.animate).toHaveBeenCalledWith(
-                { width: 0 },
-                300,
                 jasmine.any(Function)
             );
             expect(sideframe.ui.sideframe).toBeVisible();

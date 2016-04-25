@@ -32,7 +32,6 @@ module.exports = function (casperjs, settings) {
         /**
          * removes a page by name, or the first encountered one
          *
-         * @public
          * @param {Object} opts
          * @param {String} [opts.title] Name of the page to delete
          */
@@ -40,7 +39,7 @@ module.exports = function (casperjs, settings) {
             var that = this;
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.cms-pagetree-jstree [href*="delete"]')
+                    .waitUntilVisible('.js-cms-pagetree-options')
                     .then(that.expandPageTree())
                     .then(function () {
                         var pageId;
@@ -48,11 +47,16 @@ module.exports = function (casperjs, settings) {
                             pageId = that.getPageId(opts.title);
                         }
 
-                        if (pageId) {
-                            this.click('.cms-pagetree-jstree [href*="delete"][href*="' + pageId + '"]');
-                        } else {
-                            this.click('.cms-pagetree-jstree [href*="delete"]'); // first one
-                        }
+                        var data = pageId ? '[data-id="' + pageId + '"]' : '';
+                        var href = pageId ? '[href*="' + pageId + '"]' : '';
+
+                        return this.then(function () {
+                                this.click('.js-cms-pagetree-options' + data);
+                            })
+                            .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                            .then(function () {
+                                this.click('.cms-pagetree-jstree [href*="delete"]' + href);
+                            });
                     })
                     .waitForUrl(/delete/)
                     .waitUntilVisible('input[type=submit]')
@@ -65,14 +69,54 @@ module.exports = function (casperjs, settings) {
         },
 
         /**
-        * Adds the page. Optionally added page can be nested into
-        * a parent with given title (first in a list of equal titles taken).
-        *
-        * @public
-        * @param {Object} opts
-        * @param {String} opts.title name of the page
-        * @param {String} [opts.title] name of the parent page
-        */
+         * Opens dropdown and triggers copying a page
+         *
+         * @public
+         * @param {Object} opts
+         * @param {Number|String} opts.page page id
+         */
+        triggerCopyPage: function (opts) {
+            return function () {
+                return this.then(function () {
+                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                    })
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                    .then(function () {
+                        this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"]');
+                    })
+                    .wait(100);
+            };
+        },
+
+        /**
+         * Opens dropdown and triggers cutting a page
+         *
+         * @public
+         * @param {Object} opts
+         * @param {Number|String} opts.page page id
+         */
+        triggerCutPage: function (opts) {
+            return function () {
+                return this.then(function () {
+                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                    })
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                    .then(function () {
+                        this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"] ~ .js-cms-tree-item-cut');
+                    })
+                    .wait(100);
+            };
+        },
+
+        /**
+         * Adds the page. Optionally added page can be nested into
+         * a parent with given title (first in a list of equal titles taken).
+         *
+         * @public
+         * @param {Object} opts
+         * @param {String} opts.title name of the page
+         * @param {String} [opts.title] name of the parent page
+         */
         addPage: function (opts) {
             var that = this;
 
@@ -199,8 +243,8 @@ module.exports = function (casperjs, settings) {
                         pageId = that.getPageId(opts.page);
                         this.click('.cms-tree-item-lang a[href*="' + pageId + '/' + language + '/preview/"] span');
                     })
-                    .waitUntilVisible('.cms-tree-tooltip-container', function () {
-                        this.click('.cms-tree-tooltip-container-open a[href*="/' + language + '/publish/"]');
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu', function () {
+                        this.click('.cms-pagetree-dropdown-menu-open a[href*="/' + language + '/publish/"]');
                     })
                     .waitForResource(/publish/)
                     .waitUntilVisible('.cms-pagetree-jstree')
@@ -301,7 +345,7 @@ module.exports = function (casperjs, settings) {
                         }
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
-                    }).waitForResource(/edit-plugin/).then(that.waitUntilAllAjaxCallsFinish());
+                    }).waitForUrl(/.*/).then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 

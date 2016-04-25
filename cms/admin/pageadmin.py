@@ -129,8 +129,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
-            # Deprecated in 3.2.1, please use ".../change-template/..." instead
-            pat(r'^([0-9]+)/change_template/$', self.change_template),
             pat(r'^([0-9]+)/change-template/$', self.change_template),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
@@ -610,7 +608,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return True
 
     @create_revision()
-    def post_add_plugin(self, request, placeholder, plugin):
+    def post_add_plugin(self, request, plugin):
+        placeholder = plugin.placeholder
+
         if is_installed('reversion') and placeholder.page:
             plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
             message = _(u"%(plugin_name)s plugin added to %(placeholder)s") % {

@@ -25,3 +25,6 @@ quote_type = single
 
 [*.rst]
 max_line_length = 80
+
+[*.yml]
+indent_size = 2

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
@@ -20,7 +21,7 @@ from cms.test_utils.project.sampleapp.cms_menus import StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import LanguageOverride
+from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
@@ -94,31 +95,32 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         menu_pool.discover_menus()
 
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
-            page = create_page("apphooked-page", "nav_playground.html", "en",
-                               published=True, apphook="SampleApp",
-                               navigation_extenders='StaticMenu')
+            with apphooks(SampleApp):
+                page = create_page("apphooked-page", "nav_playground.html", "en",
+                                   published=True, apphook="SampleApp",
+                                   navigation_extenders='StaticMenu')
 
-            menu_pool._expanded = False
-            self.assertFalse(menu_pool._expanded)
-            self.assertTrue(menu_pool.discovered)
-            menu_pool._expand_menus()
+                menu_pool._expanded = False
+                self.assertFalse(menu_pool._expanded)
+                self.assertTrue(menu_pool.discovered)
+                menu_pool._expand_menus()
 
-            self.assertTrue(menu_pool._expanded)
-            self.assertTrue(menu_pool.discovered)
-            # Counts the number of StaticMenu (which is expanded) and StaticMenu2
-            # (which is not) and checks the keyname for the StaticMenu instances
-            static_menus = 2
-            static_menus_2 = 1
-            for key, menu in menu_pool.menus.items():
-                if key.startswith('StaticMenu:'):
-                    static_menus -= 1
-                    self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
+                self.assertTrue(menu_pool._expanded)
+                self.assertTrue(menu_pool.discovered)
+                # Counts the number of StaticMenu (which is expanded) and StaticMenu2
+                # (which is not) and checks the keyname for the StaticMenu instances
+                static_menus = 2
+                static_menus_2 = 1
+                for key, menu in menu_pool.menus.items():
+                    if key.startswith('StaticMenu:'):
+                        static_menus -= 1
+                        self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
 
-                if key == 'StaticMenu2':
-                    static_menus_2 -= 1
+                    if key == 'StaticMenu2':
+                        static_menus_2 -= 1
 
-            self.assertEqual(static_menus, 0)
-            self.assertEqual(static_menus_2, 0)
+                self.assertEqual(static_menus, 0)
+                self.assertEqual(static_menus_2, 0)
 
     def test_multiple_menus(self):
         apphook_pool.discover_apps()
