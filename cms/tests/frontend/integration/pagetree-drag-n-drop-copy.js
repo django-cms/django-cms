@@ -374,3 +374,112 @@ casper.test.begin('Pages can be copied in between own descendants that themselve
             test.done();
         });
 });
+
+casper.test.begin('Pages can be copied in between own descendant\'s descendants', function (test) {
+    casper.start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Child 1', parent: 'Homepage' }))
+        .then(cms.addPage({ title: 'Child 1-1', parent: 'Child 1' }))
+        .then(cms.addPage({ title: 'Child 1-1-1', parent: 'Child 1-1' }))
+        .then(cms.addPage({ title: 'Child 1-1-2', parent: 'Child 1-1' }))
+        .then(cms.addPage({ title: 'Child 2', parent: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var drop;
+            casper.waitUntilVisible('.cms-pagetree-jstree', cms.waitUntilAllAjaxCallsFinish())
+            .then(cms.expandPageTree())
+            .then(function () {
+                test.assertExists(
+                    xPath(createJSTreeXPathFromTree([
+                        {
+                            name: 'Homepage',
+                            children: [
+                                {
+                                    name: 'Child 1',
+                                    children: [{
+                                        name: 'Child 1-1',
+                                        children: [
+                                            { name: 'Child 1-1-1' },
+                                            { name: 'Child 1-1-2' }
+                                        ]
+                                    }]
+                                },
+                                {
+                                    name: 'Child 2'
+                                }
+                            ]
+                        }
+                    ])),
+                    'Initial state is correct'
+                );
+
+                // usually to drag stuff in the iframe you have to calculate the position of the frame
+                // and then the position of the thing inside frame, but here sideframe is opened at 0, 0
+                // so this should be enough
+                drop = this.getElementBounds(
+                    xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Child 1")]')
+                );
+
+                this.mouse.down(xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]'));
+                this.mouse.move(drop.left + drop.width / 2, drop.top + drop.height * 3 + 3);
+                this.evaluate(function () {
+                    CMS.$(document).trigger(new CMS.$.Event('keydown', { keyCode: 17, ctrlKey: true }));
+                });
+            })
+            .then(function () {
+                test.assertVisible('.jstree-copy', 'Copy indicator shown');
+                // since casper cannot trigger a mouse event with ctrlKey pressed,
+                // we fake the event with jQuery
+                this.evaluate(function () {
+                    CMS.$(document).trigger(new CMS.$.Event('mouseup', { ctrlKey: true }));
+                });
+            })
+            .then(acceptCopyingAndAssertNewTree([
+                {
+                    name: 'Homepage',
+                    children: [
+                        {
+                            name: 'Child 1',
+                            children: [{
+                                name: 'Child 1-1',
+                                children: [
+                                    { name: 'Child 1-1-1' },
+                                    {
+                                        name: 'Homepage',
+                                        children: [
+                                            {
+                                                name: 'Child 1',
+                                                children: [{
+                                                    name: 'Child 1-1',
+                                                    children: [
+                                                        { name: 'Child 1-1-1' },
+                                                        { name: 'Child 1-1-2' }
+                                                    ]
+                                                }]
+                                            },
+                                            {
+                                                name: 'Child 2',
+                                                children: [{
+                                                    name: 'Child 2-2'
+                                                }]
+                                            }
+                                        ]
+                                    },
+                                    { name: 'Child 1-1-2' }
+                                ]
+                            }]
+                        },
+                        {
+                            name: 'Child 2'
+                        }
+                    ]
+                }
+            ]));
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
