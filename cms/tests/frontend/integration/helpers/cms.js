@@ -538,7 +538,7 @@ module.exports = function (casperjs, settings) {
             tree.forEach(function (node, index) {
                 if (index === 0) {
                     if (topLevel) {
-                        xPath += '//';
+                        xPath += '//div[contains(@class, "js-cms-pagetree")]/ul/';
                     } else {
                         xPath += './';
                     }
