@@ -262,7 +262,7 @@ Most of the time it's not necessary to touch these settings.
   will act as the top-level page in the navigation.
 * *Attached menu* allows you to add a custom menu to the page. This is
   typically used by developers to add custom menu logic to the current page.
-  Changing this requires a server restart so should only be changed in
+  Changing this requires a server restart so it should only be changed in
   consultation with developers.
 * *Application* allows you to add custom applications (e.g. a weblog app) to the
   current page. This also is typically used by developers and requires a server
