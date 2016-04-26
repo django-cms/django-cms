@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -31,7 +29,7 @@ class PublisherCommandTests(TestCase):
     def test_command_line_should_raise_without_superuser(self):
         with self.assertRaises(CommandError):
             com = PublishCommand()
-            com.handle_noargs()
+            com.handle()
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
@@ -42,7 +40,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -65,7 +63,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -90,7 +88,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', include_unpublished=True)
+            call_command('cms', 'publisher-publish', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -121,7 +119,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', language='de')
+            call_command('cms', 'publisher-publish', language='de')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -155,7 +153,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', language='de', include_unpublished=True)
+            call_command('cms', 'publisher-publish', language='de', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -194,7 +192,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEqual(not_drafts, 1)
@@ -224,7 +222,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -260,7 +258,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
 
         public = Page.objects.public()[0]
         languages = sorted(public.title_set.values_list('language', flat=True))
@@ -282,7 +280,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', site=siteB.id)
+            call_command('cms', 'publisher-publish', site=siteB.id)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -313,7 +311,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -785,29 +783,42 @@ class PublishingTests(TestCase):
 
     def test_prepublish_descendants(self):
         page = self.create_page("Page", published=True)
-        child = self.create_page("Child", parent=page, published=False)
-        gchild2 = self.create_page("Grandchild2", parent=child, published=False)
-        self.create_page("Grandchild3", parent=child, published=True)
-        gchild = self.create_page("Grandchild", published=True)
-        gchild = gchild.reload()
-        child = child.reload()
-        gchild.move_page(target=child, position='last-child')
-        gchild.reload()
-        gchild.publish('en')
-        self.assertFalse(child.is_published('en'))
-        self.assertTrue(gchild.is_published('en'))
-        self.assertEqual(gchild.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
-        child = child.reload()
-        child.publish('en')
-        gchild2 = gchild2.reload()
-        gchild2.publish('en')
-        self.assertTrue(child.is_published("en"))
-        self.assertTrue(gchild.is_published("en"))
-        self.assertEqual(gchild.get_publisher_state('en', force_reload=True), PUBLISHER_STATE_DEFAULT)
-        gchild = gchild.reload()
-        gchild2 = gchild2.reload()
-        self.assertEqual(gchild.path[4:], gchild.publisher_public.path[4:])
-        self.assertEqual(gchild.depth, gchild.publisher_public.depth)
+        child_1 = self.create_page("Child", parent=page, published=False)
+        child_1_2 = self.create_page("Grandchild2", parent=child_1, published=False)
+
+        self.create_page("Grandchild3", parent=child_1, published=True)
+
+        # Reload "Child" page because it's tree attributes changed when adding
+        # children to it above.
+        child_1 = child_1.reload()
+
+        # Create the first child of "Child" page as a published root node
+        child_1_1 = self.create_page("Grandchild", published=True)
+        # Move first child to "Child"
+        child_1_1.move_page(target=child_1, position='last-child')
+        # Publish first child
+        child_1_1.publish('en')
+
+        # Assert "Child" page is not published (we never published it)
+        self.assertFalse(child_1.is_published('en'))
+        # Assert "first child" is published (we published above)
+        self.assertTrue(child_1_1.is_published('en'))
+        # Assert "first child" is in pending state because
+        # it's parent the "Child" page is not published.
+        self.assertEqual(child_1_1.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
+
+        # Publish "Child page"
+        child_1.publish('en')
+        # Publish "second child"
+        child_1_2.publish('en')
+
+        self.assertTrue(child_1.is_published("en"))
+        self.assertTrue(child_1_1.is_published("en"))
+        # Assert "first child" is no longer in pending state
+        # and instead is in published state.
+        self.assertEqual(child_1_1.get_publisher_state('en', force_reload=True), PUBLISHER_STATE_DEFAULT)
+        self.assertEqual(child_1_1.path[4:], child_1_1.publisher_public.path[4:])
+        self.assertEqual(child_1_1.depth, child_1_1.publisher_public.depth)
 
     def test_republish_multiple_root(self):
         # TODO: The paths do not match expected behaviour

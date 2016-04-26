@@ -30,10 +30,10 @@ in the order presented here.
     templates_placeholders
     plugins
     apphooks
-    third_party
     toolbar
     menu
-    namespaced_apphooks
+    wizards
+    third_party
 
 If you want to install django CMS into an existing project, or prefer to configure django CMS by
 hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the
@@ -43,6 +43,8 @@ Either way, you'll be able to find support and help from the numerous friendly
 members of the django CMS community, either on our `mailinglist`_ or IRC
 channel ``#django-cms`` on the ``irc.freenode.net`` network.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
 
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
 

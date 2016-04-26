@@ -11,7 +11,6 @@ from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 
@@ -36,10 +35,7 @@ class PluginContext(Context):
 
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
         dict_ = flatten_context(dict_)
-        if DJANGO_1_7:
-            super(PluginContext, self).__init__(dict_, current_app=current_app)
-        else:
-            super(PluginContext, self).__init__(dict_)
+        super(PluginContext, self).__init__(dict_)
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
@@ -116,9 +112,14 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context.push()
     request = context['request']
     if not hasattr(request, 'placeholders'):
-        request.placeholders = []
-    if placeholder.has_change_permission(request) or not placeholder.cache_placeholder:
-        request.placeholders.append(placeholder)
+        request.placeholders = {}
+    perms = (placeholder.has_change_permission(request) or not placeholder.cache_placeholder)
+    if not perms or placeholder.slot not in request.placeholders:
+        request.placeholders[placeholder.slot] = (placeholder, perms)
+    else:
+        request.placeholders[placeholder.slot] = (
+            placeholder, perms and request.placeholders[placeholder.slot][1]
+        )
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
@@ -169,14 +170,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     toolbar_content = ''
 
     if edit and editable:
-        # TODO remove ``placeholders`` in 3.3
-        if not hasattr(request.toolbar, 'placeholders'):
-            request.toolbar.placeholders = {}
         if not hasattr(request.toolbar, 'placeholder_list'):
             request.toolbar.placeholder_list = []
-        if placeholder.pk not in request.toolbar.placeholders:
-            # TODO remove ``placeholders`` in 3.3
-            request.toolbar.placeholders[placeholder.pk] = placeholder
+        if placeholder not in request.toolbar.placeholder_list:
             request.toolbar.placeholder_list.append(placeholder)
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
     if content:
@@ -192,7 +188,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     result = render_to_string("cms/toolbar/content.html", flatten_context(context))
     changes = watcher.get_changes()
     if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
-        set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes})
+        set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes}, request=request)
     context.pop()
     return result
 

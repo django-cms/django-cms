@@ -60,7 +60,7 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
-.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
+.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False)
 
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
     creates a :class:`cms.models.titlemodel.Title` instance for the specified
@@ -94,9 +94,11 @@ Functions and constants
     :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
+    :param integer xframe_options: X Frame Option value for Clickjacking protection
+    :param bool with_revision: Whether to create a revision for the new page.
 
 
-.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None)
+.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None, with_revision=False)
 
     Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
 
@@ -111,6 +113,7 @@ Functions and constants
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.pagemodel.Page` instance
     :param string overwrite_url: Overwritten path for this page
+    :param bool with_revision: Whether to create a revision for the new page.
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
@@ -236,6 +239,13 @@ cms.constants
 
     Constant used by the toolbar.
 
+.. data:: EXPIRE_NOW
+
+    Constant of 0 (zero) used for cache control headers
+
+.. data:: MAX_EXPIRATION_TTL
+
+    Constant of 31536000 or 365 days in seconds used for cache control headers
 
 
 ***************
@@ -251,6 +261,17 @@ cms.plugin_base
     .. attribute:: admin_preview
 
         Defaults to ``False``, if ``True``, displays a preview in the admin.
+
+    .. attribute:: cache
+
+        If present and set to ``False``, the plugin will prevent the caching of
+        the resulting page.
+
+        .. important:: Setting this to ``False`` will effectively disable the
+                       CMS page cache and all upstream caches for pages where
+                       the plugin appears. This may be useful in certain cases
+                       but for general cache management, consider using the much
+                       more capable :meth:`get_cache_expiration`.
 
     .. attribute:: change_form_template
 
@@ -303,6 +324,49 @@ cms.plugin_base
 
         Returns the URL to the icon to be used for the given instance when that
         instance is used inside a text plugin.
+
+    .. method:: get_cache_expiration(request, instance, placeholder)
+
+        Provides expiration value to the placeholder, and in turn to the page
+        for determining the appropriate Cache-Control headers to add to the
+        HTTPResponse object.
+
+        Must return one of:
+
+            :``None``:
+                This means the placeholder and the page will not even consider
+                this plugin when calculating the page expiration.
+
+            :``datetime``:
+                A specific date and time (timezone-aware) in the future when
+                this plugin's content expires.
+
+                .. important:: The returned ``datetime`` must be timezone-aware
+                               or the plugin will be ignored (with a warning)
+                               during expiration calculations.
+
+            :``int``:
+                An number of seconds that this plugin's content can be cached.
+
+        There are constants are defined in ``cms.constants`` that may be
+        useful: :data:`EXPIRE_NOW` and :data:`MAX_EXPIRATION_TTL`.
+
+        An integer value of ``0`` (zero) or :data:`EXPIRE_NOW` effectively means
+        "do not cache". Negative values will be treated as :data:`EXPIRE_NOW`.
+        Values exceeding the value :data:`MAX_EXPIRATION_TTL` will be set to
+        that value.
+
+        Negative ``timedelta`` values or those greater than :data:`MAX_EXPIRATION_TTL`
+        will also be ranged in the same manner.
+
+        Similarly, ``datetime`` values earlier than now will be treated as
+        :data:`EXPIRE_NOW`. Values greater than :data:`MAX_EXPIRATION_TTL` seconds in the
+        future will be treated as :data:`MAX_EXPIRATION_TTL` seconds in the future.
+
+        :param request: Relevant ``HTTPRequest`` instance.
+        :param instance: The ``CMSPlugin`` instance that is being rendered.
+        :rtype: ``None`` or ``datetime`` or ``int``
+
 
     .. method:: render(context, instance, placeholder)
 

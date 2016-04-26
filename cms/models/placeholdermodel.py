@@ -1,18 +1,30 @@
 # -*- coding: utf-8 -*-
-from django.db.models import ManyToManyField
 
-from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
+import warnings
+
+from datetime import datetime, timedelta
+
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models
+from django.db.models import ManyToManyField
 from django.template.defaultfilters import title
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, force_text
 
+from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
+from cms.constants import (
+    EXPIRE_NOW,
+    MAX_EXPIRATION_TTL,
+    PUBLISHER_STATE_DIRTY,
+)
+from cms.utils import get_language_from_request
+from cms.utils.conf import get_cms_setting
 
 
 @python_2_unicode_compatible
@@ -157,15 +169,12 @@ class Placeholder(models.Model):
                                   use_cache=use_cache)
 
     def _get_related_objects(self):
-        if DJANGO_1_7:
-            return list(self._meta.get_all_related_objects())
-        else:
-            fields = self._meta._get_fields(
-                forward=False, reverse=True,
-                include_parents=True,
-                include_hidden=False,
-            )
-            return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        fields = self._meta._get_fields(
+            forward=False, reverse=True,
+            include_parents=True,
+            include_hidden=False,
+        )
+        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
     def _get_attached_fields(self):
         """
@@ -179,10 +188,7 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
@@ -198,20 +204,14 @@ class Placeholder(models.Model):
             self._attached_field_cache = None
             relations = self._get_related_objects()
             for rel in relations:
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent == Page or parent == StaticPlaceholder:
                     relations.insert(0, relations.pop(relations.index(rel)))
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
@@ -311,5 +311,123 @@ class Placeholder(models.Model):
             field = self._get_attached_field()
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
+
+    def get_cache_expiration(self, request, response_timestamp):
+        """
+        Returns the number of seconds (from «response_timestamp») that this
+        placeholder can be cached. This is derived from the plugins it contains.
+
+        This method must return: EXPIRE_NOW <= int <= MAX_EXPIRATION_IN_SECONDS
+
+        :type request: HTTPRequest
+        :type response_timestamp: datetime
+        :rtype: int
+        """
+        min_ttl = MAX_EXPIRATION_TTL
+
+        if not self.cache_placeholder or not get_cms_setting('PLUGIN_CACHE'):
+            # This placeholder has a plugin with an effective
+            # `cache = False` setting or the developer has explicitly
+            # disabled the PLUGIN_CACHE, so, no point in continuing.
+            return EXPIRE_NOW
+
+        def inner_plugin_iterator(lang):
+            """
+            The placeholder will have a cache of all the concrete plugins it
+            uses already, but just in case it doesn't, we have a code-path to
+            generate them anew.
+
+            This is made extra private as an inner function to avoid any other
+            process stealing our yields.
+            """
+            if hasattr(self, '_all_plugins_cache'):
+                for instance in self._all_plugins_cache:
+                    plugin = instance.get_plugin_class_instance()
+                    yield instance, plugin
+            else:
+                for plugin_item in self.get_plugins(lang):
+                    yield plugin_item.get_plugin_instance()
+
+        language = get_language_from_request(request, self.page)
+        for instance, plugin in inner_plugin_iterator(language):
+            plugin_expiration = plugin.get_cache_expiration(
+                request, instance, self)
+
+            # The plugin_expiration should only ever be either: None, a TZ-
+            # aware datetime, a timedelta, or an integer.
+            if plugin_expiration is None:
+                # Do not consider plugins that return None
+                continue
+            if isinstance(plugin_expiration, (datetime, timedelta)):
+                if isinstance(plugin_expiration, datetime):
+                    # We need to convert this to a TTL against the
+                    # response timestamp.
+                    try:
+                        delta = plugin_expiration - response_timestamp
+                    except TypeError:
+                        # Attempting to take the difference of a naive datetime
+                        # and a TZ-aware one results in a TypeError. Ignore
+                        # this plugin.
+                        warnings.warn(
+                            'Plugin %(plugin_class)s (%(pk)d) returned a naive '
+                            'datetime : %(value)s for get_cache_expiration(), '
+                            'ignoring.' % {
+                                'plugin_class': plugin.__class__.__name__,
+                                'pk': instance.pk,
+                                'value': force_text(plugin_expiration),
+                            })
+                        continue
+                else:
+                    # Its already a timedelta instance...
+                    delta = plugin_expiration
+                ttl = int(delta.total_seconds() + 0.5)
+            else:  # must be an int-like value
+                try:
+                    ttl = int(plugin_expiration)
+                except ValueError:
+                    # Looks like it was not very int-ish. Ignore this plugin.
+                    warnings.warn(
+                        'Plugin %(plugin_class)s (%(pk)d) return '
+                        'unexpected value %(value)s for '
+                        'get_cache_expiration(), ignoring.' % {
+                            'plugin_class': plugin.__class__.__name__,
+                            'pk': instance.pk,
+                            'value': force_text(plugin_expiration),
+                        })
+                    continue
+
+            min_ttl = min(ttl, min_ttl)
+            if min_ttl <= 0:
+                # No point in continuing, we've already hit the minimum
+                # possible expiration TTL
+                return EXPIRE_NOW
+
+        return min_ttl
+
+    def mark_as_dirty(self, language, clear_cache=True):
+        """
+        Utility method to mark the attached object of this placeholder
+        (if any) as dirty.
+        This allows us to know when the content in this placeholder
+        has been changed.
+        """
+        from cms.models import Page, StaticPlaceholder, Title
+
+        if clear_cache:
+            clear_placeholder_cache(self, language)
+
+        # Find the attached model for this placeholder
+        # This can be a static placeholder, page or none.
+        attached_model = self._get_attached_model()
+
+        if attached_model is Page:
+            Title.objects.filter(
+                page=self.page,
+                language=language,
+            ).update(publisher_state=PUBLISHER_STATE_DIRTY)
+
+        elif attached_model is StaticPlaceholder:
+            StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
+
 
 reversion_register(Placeholder)

@@ -1,3 +1,24 @@
+=== 3.3.0 (Unreleased) ===
+
+* Removed support for Django 1.6, 1.7 and python 2.6
+* Set the default value of CMSPlugin.position to 0 instead of null
+* Refactor language menu to allow for better integration with many languages
+* Management commands has been completely refactored for better consistency
+* Fix "failed to load resource" for favicon on welcome screen
+* ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding``
+  and ``cms-toolbar-collapsing`` classes are added at the beginning of their
+  respective animations.
+* Added unit tests for CMS JavaScript files
+* Added frontend integration tests (written with Casper JS)
+* Removed frontend integration tests (written with Selenium)
+* Provides the ability to declare cache expiration periods on a per-plugin basis
+* Minor UI improvements
+* Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
+  the toolbar will appear for authorized users. If left unset, retains the
+  existing behavior of allowing toolbar for authorized users at any IP address.
+
+
 === 3.2.3 (2016-03-09) ===
 
 - Fix the display of hyphenated language codes in the page tree

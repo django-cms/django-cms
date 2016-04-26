@@ -111,7 +111,7 @@ Action required
 ---------------
 
 In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
-``cms_toolbar.py`` to ``cms_toolbars.py`` and ``menu.py`` to ``menus.py``.
+``cms_toolbar.py`` to ``cms_toolbars.py`` and ``menu.py`` to ``cms_menus.py``.
 
 
 New ``ApphookReloadMiddleware``

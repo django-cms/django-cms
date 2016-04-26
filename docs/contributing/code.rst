@@ -120,6 +120,9 @@ that the fix works.
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 .. _contributing_frontend:
 
 ********
@@ -154,7 +157,7 @@ on change::
 By default, source maps are not included in the compiled files. In order to turn
 them on while developing just add the ``--debug`` option::
 
-	gulp --debug
+    gulp --debug
 
 Icons
 =====
@@ -182,10 +185,10 @@ into the font. When using *Adobe Illustrator* please mind the
 
 .. _fork: http://github.com/divio/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
-.. _Aldryn Boilerplate : http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
+.. _Aldryn Boilerplate: http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
-.. _GitHub : http://www.github.com
-.. _GitHub help : http://help.github.com
-.. _freenode : http://freenode.net/
-.. _pull request : http://help.github.com/send-pull-requests/
-.. _git : http://git-scm.com/
+.. _GitHub: http://www.github.com
+.. _GitHub help: http://help.github.com
+.. _freenode: http://freenode.net/
+.. _pull request: http://help.github.com/send-pull-requests/
+.. _git: http://git-scm.com/

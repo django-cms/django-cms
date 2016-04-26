@@ -14,7 +14,7 @@ behave as it expected, and help identify what's going wrong if something breaks
 it.
 
 Not insisting on good tests when code is committed is like letting a gang of
-teenagers without a driving licence borrow your car on a Friday night, even if
+teenagers without a driving license borrow your car on a Friday night, even if
 you think they are very nice teenagers and they really promise to be careful.
 
 We certainly do want your contributions and fixes, but we need your tests with
@@ -43,7 +43,7 @@ There's more than one way to do this, but here's one to help you get started::
 
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
-    pip install -r django-cms/test_requirements/django-1.6.txt
+    pip install -r django-cms/test_requirements/django-X.Y.txt
 
     # run the test suite
     # note that you must be in the django-cms directory when you do this,
@@ -52,8 +52,7 @@ There's more than one way to do this, but here's one to help you get started::
     python manage.py test
 
 
-It can take a few minutes to run. Note that the selenium tests included in the
-test suite require that you have Firefox installed.
+It can take a few minutes to run.
 
 When you run tests against your own new code, don't forget that it's useful to
 repeat them for different versions of Python and Django.
@@ -101,7 +100,7 @@ and it should then run without errors.
 Advanced testing options
 ========================
 
-Run ``manage.py test --help`` for full list of advanced options.
+Run ``manage.py test --help`` for the full list of advanced options.
 
 Use ``--parallel`` to distribute the test cases across your CPU cores.
 
@@ -118,20 +117,107 @@ To use a different database, set the ``DATABASE_URL`` environment variable to a
 dj-database-url compatible value.
 
 
-Using X virtual framebuffer for headless frontend testing
----------------------------------------------------------
+**********************
+Running Frontend Tests
+**********************
 
-On Linux systems with X you can use `X virtual framebuffer
-<http://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml>`_ to run frontend tests headless
-(without the browser window actually showing). To do so, it's recommended to use the ``xvfb-run``
-script to run tests.
+We have two types of frontend tests: unit tests and integration tests.
+For unit tests we are using `Karma <http://karma-runner.github.io/>`_ as a
+test runner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
 
-.. important::
+Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are
+built using `CasperJS <http://casperjs.org/>`_.
 
-    The frontend tests have a minimum screen size to run successfully. You must
-    set the screen size of the virtual frame buffer to at least 1280x720x8.
-    You may do so using ``xvfb-run -s"-screen 0 1280x720x8" ...``.
+In order to be able to run them you need to install necessary dependencies as
+outlined in :ref:`frontend tooling installation instructions <contributing_frontend>`.
 
+Linting runs against the test files as well with ``gulp tests:lint``. In order
+to run linting continuously, do::
+
+    gulp watch
+
+
+Unit tests
+==========
+
+Unit tests can be run like this::
+
+    gulp tests:unit
+
+If your code is failing and you want to run only specific files, you can provide
+the ``--tests`` parameter with comma separated file names, like this::
+
+    gulp tests:unit --tests=cms.base,cms.modal
+
+If you want to run tests continuously you can use the watch command::
+
+    gulp tests:unit:watch
+
+This will rerun the suite whenever source or test file is changed.
+By default the tests are running on `PhantomJS <http://phantomjs.org/>`_, but
+when running Karma in watch mode you can also visit the server it spawns with an
+actual browser.
+
+    INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
+
+On Travis CI we are using SauceLabs integration to run tests in a set of
+different real browsers, but you can opt out of running them on saucelabs using
+``[skip saucelabs]`` marker in the commit message, similar to how you would skip
+the build entirely using ``[skip ci]``.
+
+We're using Jasmine as a test framework and Istanbul as a code coverage tool.
+
+
+Integration tests
+=================
+
+In order to run integration tests you'll have to install at least the version
+of django CMS from the current directory and djangocms-helper into into your virtualenv.
+All commands should be run from the root of the repository. If you do not have
+virtualenv yet, create and activate it first::
+
+    virtualenv env
+    . env/bin/activate
+
+Then install minimum required dependencies::
+
+    pip install test_requirements/django-1.8.txt
+    pip install -e .
+
+Now you'll be able to run a tests with this command::
+
+    gulp tests:integration
+
+The command will start a server, wait for a minute for the migrations to run
+and will run integration tests against it.  It will use ``testdb.sqlite`` as the
+database. If you want to start with a clean state you could use ``--clean``
+argument.
+
+Some tests require different server configuration, so it is possible that the
+server will stop, and another variation will start with different arguments.
+Take a look inside `testserver.py` if you need to customise the test server
+settings.
+
+While debugging you can use the ``--tests`` parameter as well in order to run test
+suites separately.::
+
+    gulp tests:integration --tests=pagetree
+    gulp tests:integration --tests=loginAdmin,toolbar
+
+If specified tests require different servers they will be grouped to speed
+things up, so the order might not be the same as you specify in the argument.
+
+When running locally, it sometimes helps to visualise the tests output. For that
+you can install casper-summoner utility (``npm install -g casper-summoner``),
+and run the tests with additional ``--screenshots`` argument. It will create
+``screenshots`` folder with screenshots of almost every step of each test.
+Subsequent runs will override the existing files. Note that this is experimental
+and may change in the future.
+
+It might sometimes be useful not to restart the server when creating the tests,
+for that you can run ``python testserver.py`` with necessary arguments in one
+shell and ``gulp tests:integration --no-server`` in another. However you would
+need to clean the state yourself if the test you've been writing fails.
 
 *************
 Writing tests
@@ -139,7 +225,7 @@ Writing tests
 
 Contributing tests is widely regarded as a very prestigious contribution (you're
 making everybody's future work much easier by doing so). We'll always accept contributions of
-test without code, but not code without test - which should give you an idea of how important
+a test without code, but not code without a test - which should give you an idea of how important
 tests are.
 
 

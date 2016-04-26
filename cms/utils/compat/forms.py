@@ -1,22 +1,15 @@
 # -*- coding: utf-8 -*-
+import importlib
+
+from django.apps import apps
 from django.conf import settings
-try:
-    import importlib
-except ImportError:
-    # Python < 2.7
-    from django.utils import importlib
-from django.db import models
 
 
 # overide with custom classes if they exist
 if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
     # UserAdmin class
     user_app_name = settings.AUTH_USER_MODEL.split('.')[0]
-    try:
-        from django.apps import apps
-        app = apps.get_app_config(user_app_name).models_module
-    except ImportError:
-        app = models.get_app(user_app_name)
+    app = apps.get_app_config(user_app_name).models_module
 
     try:
         custom_admin = importlib.import_module(app.__name__[:-6] + "admin")

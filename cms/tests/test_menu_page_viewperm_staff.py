@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 

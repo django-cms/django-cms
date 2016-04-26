@@ -65,6 +65,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         required=False,
         widget=forms.HiddenInput
     )
+    language = forms.CharField(widget=forms.HiddenInput)
     entry = forms.ChoiceField(choices=[], widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):

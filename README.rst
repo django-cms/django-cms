@@ -19,7 +19,7 @@ Open source enterprise content management system based on the django framework.
 
 .. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
    :target: http://demo.django-cms.org/
-   :alt: Try demo with Aldryn
+   :alt: Try demo with Aldryn Cloud
 
 .. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
    It's the branch for features that will go into the next django CMS feature release.
@@ -66,7 +66,7 @@ More information on `our website <http://www.django-cms.org>`_.
 Requirements
 ************
 
-django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
 
 *************
 Documentation
@@ -103,11 +103,14 @@ Getting Help
 Please head over to our IRC channel, #django-cms, on irc.freenode.net or write
 to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 ******************
 Commercial support
 ******************
 
-This project is backed by `Divio <http://www.divio.com/>`_.
+This project is backed by `Divio <https://www.divio.com/en/commercial-support/>`_.
 If you need help implementing or hosting django CMS, please contact us:
 sales@divio.com.
 

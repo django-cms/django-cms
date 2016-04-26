@@ -1,0 +1,46 @@
+.. _upgrade-to-3.3:
+
+#################
+3.3 release notes
+#################
+
+django CMS 3.3 has been planned largely as a consolidation release, to build on the progress made
+in 3.2 and pave the way for the future ones.
+
+The largest major change is dropped support for Django 1.6 and 1.7, and Python 2.6 followed
+by major code cleanup to remove compatibility shims.
+
+.. _whats_new_3.3:
+
+*****************
+What's new in 3.3
+*****************
+
+* Set the default value of CMSPlugin.position to 0 instead of null
+* Management commands has been completely refactored for better consistency (see
+  `backward_incompatible_3.3`_ for details)
+* Introduction of the method `get_cache_expiration` on CMSPluginBase to be used
+  by plugins for declaring their rendered content's period of validity.
+
+.. _backward_incompatible_3.3:
+
+*****************************
+Backward incompatible changes
+*****************************
+
+Management commands
+===================
+
+Management commands uses now argparse instead of optparse, following the Django deprecation
+of the latter API.
+
+The commands behaviour has remained untouched.
+
+Detailed changes:
+
+ * commands now use argparse subcommand API which leads to slightly different help output
+   and other internal differences. If you use the commands by using Django's ``call_command``
+   function you will have to adapt the command invocation to reflect this.
+ * some commands have been rename replacing underscores with hyphens for consistency
+ * all arguments are now non-positional. If you use the commands by using Django's
+   ``call_command`` function you will have to adapt the command invocation to reflect this.

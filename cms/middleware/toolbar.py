@@ -12,7 +12,10 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.placeholder import get_toolbar_plugin_struct
+from cms.utils.request_ip_resolvers import get_request_ip_resolver
 from menus.menu_pool import menu_pool
+
+get_request_ip = get_request_ip_resolver()
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
@@ -54,6 +57,12 @@ class ToolbarMiddleware(object):
 
     def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
+        internal_ips = get_cms_setting('INTERNAL_IPS')
+
+        if internal_ips:
+            client_ip = get_request_ip(request)
+            if client_ip not in internal_ips:
+                return False
 
         if not toolbar_hide:
             return True
@@ -130,8 +139,8 @@ class ToolbarMiddleware(object):
         from django.utils.cache import add_never_cache_headers
 
         if ((hasattr(request, 'toolbar') and request.toolbar.edit_mode) or
-            not all(ph.cache_placeholder
-                    for ph in getattr(request, 'placeholders', ()))):
+                not all(ph.cache_placeholder
+                        for ph, __ in getattr(request, 'placeholders', {}).values())):
             add_never_cache_headers(response)
 
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:

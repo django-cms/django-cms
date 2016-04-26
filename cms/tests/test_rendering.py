@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from django.core.cache import cache
 from django.template import Template
 from django.test.utils import override_settings
@@ -539,8 +537,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder.pk = placeholder.id = 99
         context = SekizaiContext()
         context['request'] = AttributeObject(
-            REQUEST={'language': 'en'},
-            GET=[],
+            GET={'language': 'en'},
             session={},
             path='/',
             user=self.test_user,

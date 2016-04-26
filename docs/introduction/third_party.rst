@@ -34,6 +34,7 @@ to you to check them because you need to avoid duplication:
     'aldryn_apphooks_config',
     'aldryn_boilerplates',
     'aldryn_categories',
+    'aldryn_common',
     'aldryn_newsblog',
     'aldryn_people',
     'aldryn_reversion',
@@ -171,6 +172,5 @@ You can add new articles using the admin or the new *News* menu that now appears
 You can also insert a *Latest articles* plugin into another page - like all good
 django CMS applications, Aldryn News & Blog comes with plugins.
 
-In the next tutorial, we're going to integrate our Polls application into the toolbar too.
 
 .. _aldryn-boilerplates: https://github.com/aldryn/aldryn-boilerplates

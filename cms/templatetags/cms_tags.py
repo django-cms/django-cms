@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
-
+from collections import OrderedDict
+from copy import copy
 from datetime import datetime
 from itertools import chain
 from platform import python_version
-from copy import copy
-
-from classytags.utils import flatten_context
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from django.utils.datastructures import SortedDict as OrderedDict
 
 import django
 from django import template
@@ -35,6 +28,7 @@ from classytags.arguments import (Argument, MultiValueArgument,
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from classytags.utils import flatten_context
 from classytags.values import StringValue
 from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
@@ -1179,9 +1173,14 @@ class RenderPlaceholder(AsTag):
         if isinstance(placeholder, string_types):
             placeholder = PlaceholderModel.objects.get(slot=placeholder)
         if not hasattr(request, 'placeholders'):
-            request.placeholders = []
-        if placeholder.has_change_permission(request):
-            request.placeholders.append(placeholder)
+            request.placeholders = {}
+        perms = (placeholder.has_change_permission(request) or not placeholder.cache_placeholder)
+        if not perms or placeholder.slot not in request.placeholders:
+            request.placeholders[placeholder.slot] = (placeholder, perms)
+        else:
+            request.placeholders[placeholder.slot] = (
+                placeholder, perms and request.placeholders[placeholder.slot][1]
+            )
         context = copy(context)
         return safe(placeholder.render(context, width, lang=language,
                                        editable=editable, use_cache=not nocache))

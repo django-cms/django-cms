@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import itertools
 
 from django.conf import settings
@@ -10,7 +9,7 @@ from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.template import TemplateSyntaxError, Template, Context
+from django.template import TemplateSyntaxError, Template
 from django.template.loader import get_template
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -42,7 +41,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
@@ -311,10 +310,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_db_table(self):
         """
-        Test for leaking Django 1.7 Model._meta.db_table monkeypatching
-        on sqlite See #3891
-        This test for a side-effect of the above which prevents placeholder
-        fields to return the
+        Test for leaking Model._meta.db_table monkeypatching on SQLite (#3891).
         """
         example = Category.objects.create(
             name='category',
@@ -725,20 +721,14 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         that content will be added twice.
         """
         template = get_template("placeholder_tests/test_super_extends_2.html")
-        if DJANGO_1_7:
-            output = template.render(Context({}))
-        else:
-            output = template.render({})
+        output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
-        if DJANGO_1_7:
-            output = template.render(Context({}))
-        else:
-            output = template.render({})
+        output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
@@ -864,31 +854,35 @@ class PlaceholderModelTests(CMSTestCase):
         factory = RequestFactory()
         context_en['request'] = factory.get(page_en.get_absolute_url())
         render_placeholder(ex.placeholder, context_en, use_cache=False)
-        self.assertEqual(len(context_en['request'].placeholders), 0)
-        self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 0)
+        self.assertNotIn(ex.placeholder, editable)
 
         # request.placeholders is populated for superuser
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = self.get_superuser()
         render_placeholder(ex.placeholder, context_en, use_cache=False)
-        self.assertEqual(len(context_en['request'].placeholders), 1)
-        self.assertIn(ex.placeholder, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 1)
+        self.assertIn(ex.placeholder, editable)
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = user
         render_placeholder(ex.placeholder, context_en, use_cache=False)
-        self.assertEqual(len(context_en['request'].placeholders), 0)
-        self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 0)
+        self.assertNotIn(ex.placeholder, editable)
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename=get_permission_codename('change', ex._meta)))
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = get_user_model().objects.get(pk=user.pk)
         render_placeholder(ex.placeholder, context_en, use_cache=False)
-        self.assertEqual(len(context_en['request'].placeholders), 1)
-        self.assertIn(ex.placeholder, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 1)
+        self.assertIn(ex.placeholder, editable)
 
     def test_request_placeholders_permission_check_page(self):
         page_en = create_page('page_en', 'col_two.html', 'en')
@@ -900,24 +894,27 @@ class PlaceholderModelTests(CMSTestCase):
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = self.get_superuser()
         render_placeholder(placeholder_en, context_en)
-        self.assertEqual(len(context_en['request'].placeholders), 1)
-        self.assertIn(placeholder_en, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 1)
+        self.assertIn(placeholder_en, editable)
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = user
         render_placeholder(placeholder_en, context_en)
-        self.assertEqual(len(context_en['request'].placeholders), 0)
-        self.assertNotIn(placeholder_en, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 0)
+        self.assertNotIn(placeholder_en, editable)
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = get_user_model().objects.get(pk=user.pk)
         render_placeholder(placeholder_en, context_en)
-        self.assertEqual(len(context_en['request'].placeholders), 1)
-        self.assertIn(placeholder_en, context_en['request'].placeholders)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 1)
+        self.assertIn(placeholder_en, editable)
 
     def test_request_placeholders_permission_check_templatetag(self):
         """
@@ -934,24 +931,27 @@ class PlaceholderModelTests(CMSTestCase):
         request = self.get_request(language="en", page=page_en)
         request.user = self.get_superuser()
         self.render_template_obj(template, context, request)
-        self.assertEqual(len(request.placeholders), 2)
-        self.assertIn(ex1.placeholder, request.placeholders)
+        editable = [ph for ph, perms in getattr(request, 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 1)
+        self.assertIn(ex1.placeholder, editable)
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
         request = self.get_request(language="en", page=page_en)
         request.user = user
         self.render_template_obj(template, context, request)
-        self.assertEqual(len(request.placeholders), 0)
-        self.assertNotIn(ex1.placeholder, request.placeholders)
+        editable = [ph for ph, perms in getattr(request, 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 0)
+        self.assertNotIn(ex1.placeholder, editable)
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename='change_example1'))
         request = self.get_request(language="en", page=page_en)
         request.user = get_user_model().objects.get(pk=user.pk)
         self.render_template_obj(template, context, request)
-        self.assertEqual(len(request.placeholders), 2)
-        self.assertIn(ex1.placeholder, request.placeholders)
+        editable = [ph for ph, perms in getattr(request, 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 1)
+        self.assertIn(ex1.placeholder, editable)
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
@@ -1022,22 +1022,30 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
     def test_global_limit(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
-        data = {
+        get_data = {
             'plugin_type': 'LinkPlugin',
             'placeholder_id': placeholder.pk,
             'plugin_language': 'en',
         }
+        post_data = {
+            'name': 'test',
+            'url': 'http://www.example.org/'
+        }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request) # first
+            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(post_data)
+                request.GET = get_data
+                response = admin_instance.add_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request) # second
+                response = admin_instance.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request) # third
+                response = admin_instance.add_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(
+                    response.content,
+                    b"This placeholder already has the maximum number of plugins (2).",
+                )
 
     def test_type_limit(self):
         placeholder = self.get_placeholder()
@@ -1050,13 +1058,21 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request) # second
+                request = self.get_post_request({
+                    'body': 'test'
+                })
+                request.GET = data
+                response = admin_instance.add_plugin(request)  # first
+                # Note: TextPlugin returns 302 instead of 200 on successful
+                # add_view call.
+                self.assertEqual(response.status_code, 302)
+                response = admin_instance.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content,
-                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
+                self.assertEqual(
+                    response.content,
+                    b"This placeholder already has the "
+                    b"maximum number (1) of allowed Text plugins."
+                )
 
     def test_global_limit_on_plugin_move(self):
         admin_instance = self.get_admin()
@@ -1082,7 +1098,10 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
                 response = admin_instance.move_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
+                self.assertEqual(
+                    response.content,
+                    b"This placeholder already has the maximum number of plugins (2)."
+                )
 
     def test_type_limit_on_plugin_move(self):
         admin_instance = self.get_admin()
@@ -1128,36 +1147,22 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
-        data = {
-            'plugin_type': 'TextPlugin',
-            'placeholder_id': placeholder.pk,
-            'plugin_language': 'en',
-        }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request)
-                self.assertEqual(response.status_code, 200)
-                plugin_id = int(str(response.content).split('edit-plugin/')[1].split("/")[0])
+            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                plugin = add_plugin(
+                    placeholder=placeholder,
+                    plugin_type='TextPlugin',
+                    language='en',
+                    body='Test'
+                )
                 data = {
                     'body': 'Hello World',
                 }
                 request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin_id)
+                response = admin_instance.edit_plugin(request, plugin.pk)
                 self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin_id)
-                self.assertEqual('Hello World', text_plugin.body)
-
-                # edit again, but this time press cancel
-                data = {
-                    'body': 'Hello World!!',
-                    '_cancel': True,
-                }
-                request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin_id)
-                self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin_id)
+                text_plugin = Text.objects.get(pk=plugin.pk)
                 self.assertEqual('Hello World', text_plugin.body)
 
     def test_placeholder_post_move_hook_resolve(self):
@@ -1276,6 +1281,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         ex.save()
         self._placeholder = ex.placeholder
         self.example_object = ex
+        return ex
 
     def _create_plugin(self):
         self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')

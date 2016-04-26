@@ -16,9 +16,9 @@ from cms.models import CMSPlugin, Title, Page
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
+from cms.utils.i18n import get_language_tuple, force_language, get_language_dict, get_default_language
 from cms.utils.compat.dj import is_installed
-from cms.utils import get_cms_setting
+from cms.utils import get_cms_setting, get_language_from_request
 from cms.utils.permissions import (
     get_user_sites_queryset,
     has_auth_page_permission,
@@ -61,7 +61,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.page = get_page_draft(self.request.current_page)
 
     def init_placeholders_from_request(self):
-        self.placeholders = getattr(self.request, 'placeholders', [])
+        self.placeholders = getattr(self.request, 'placeholders', {})
         self.statics = getattr(self.request, 'static_placeholders', [])
 
     def populate(self):
@@ -78,7 +78,7 @@ class PlaceholderToolbar(CMSToolbar):
             if self.page.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
-        elif self.placeholders:
+        elif any([ph for ph, perms in self.placeholders.values() if perms]):
             return self.add_structure_mode_item()
 
         for sp in self.statics:
@@ -108,9 +108,12 @@ class PlaceholderToolbar(CMSToolbar):
         disabled = user and hasattr(self, "page") and len(
             list(entry_choices(user, self.page))) == 0
 
-        url = '{url}?page={page}&edit'.format(
+        lang = get_language_from_request(self.request, current_page=self.page) or get_default_language()
+
+        url = '{url}?page={page}&language={lang}&edit'.format(
             url=reverse("cms_wizard_create"),
-            page=page_pk
+            page=page_pk,
+            lang=lang,
         )
         self.toolbar.add_modal_button(title, url,
                                       side=self.toolbar.RIGHT,
@@ -409,7 +412,6 @@ class PageToolbar(CMSToolbar):
         self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 
     # Menus
-
     def change_language_menu(self):
         if self.toolbar.edit_mode and self.page:
             language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
@@ -421,32 +423,36 @@ class PageToolbar(CMSToolbar):
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
             add = [l for l in languages.items() if l not in remove]
             copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
-            if add:
+
+            if add or remove or copy:
                 language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
+
+            if add:
+                add_plugins_menu = language_menu.get_or_create_menu('{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation'))
                 page_change_url = admin_reverse('cms_page_change', args=(self.page.pk,))
-                title = _('Add %(language)s Translation')
                 for code, name in add:
                     url = add_url_parameters(page_change_url, language=code)
-                    language_menu.add_modal_item(title % {'language': name}, url=url)
+                    add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
-                language_menu.add_break(REMOVE_PAGE_LANGUAGE_BREAK)
+                remove_plugins_menu = language_menu.get_or_create_menu('{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation'))
                 translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
-                title = _('Delete %(language)s Translation')
                 disabled = len(remove) == 1
                 for code, name in remove:
                     url = add_url_parameters(translation_delete_url, language=code)
-                    language_menu.add_modal_item(title % {'language': name}, url=url, disabled=disabled)
+                    remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
-                language_menu.add_break(COPY_PAGE_LANGUAGE_BREAK)
-                page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
-                title = _('Copy all plugins from %s')
+                copy_plugins_menu = language_menu.get_or_create_menu('{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins'))
+                title = _('from %s')
                 question = _('Are you sure you want copy all plugins from %s?')
+                page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
                 for code, name in copy:
-                    language_menu.add_ajax_item(title % name, action=page_copy_url,
-                                                data={'source_language': code, 'target_language': self.current_lang},
-                                                question=question % name, on_success=self.toolbar.REFRESH_PAGE)
+                    copy_plugins_menu.add_ajax_item(
+                        title % name, action=page_copy_url,
+                        data={'source_language': code, 'target_language': self.current_lang},
+                        question=question % name, on_success=self.toolbar.REFRESH_PAGE
+                    )
 
     def change_admin_menu(self):
         if not self._changed_admin_menu and self.has_page_change_permission():

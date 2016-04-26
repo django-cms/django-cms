@@ -717,6 +717,47 @@ user under which Django will be running.
 Advanced Settings
 *****************
 
+.. setting:: CMS_INTERNAL_IPS
+
+CMS_INTERNAL_IPS
+================
+
+default
+    settings.INTERNAL_IPS
+
+By default ``CMS_INTERNAL_IPS`` takes the same value as the Django setting
+``INTERNAL_IPS`` which has a default value of an empty list.
+
+If left as an empty list (or anything Falsey, really), this setting does not
+add any restrictions to the toolbar. However, if set, the toolbar will only
+appear for client IP addresses that are in this list.
+
+This setting may also be set to an `IpRangeList` from the external package
+``iptools``. This package allows convenient syntax for defining complex IP
+address ranges.
+
+The client IP address is obtained via the :setting:`CMS_REQUEST_IP_RESOLVER`
+in the ``cms.middleware.toolbar.ToolbarMiddleware`` middleware.
+
+
+.. setting:: CMS_REQUEST_IP_RESOLVER
+
+CMS_REQUEST_IP_RESOLVER
+=======================
+
+default
+    'cms.utils.request_ip_resolvers.default_request_ip_resolver'
+
+This setting is used system-wide to provide a consistent and plug-able means
+of extracting a client IP address from the HTTP request. The default
+implementation should work for most project architectures, but if not, the
+administrator can provide their own method to handle the project's
+specific circumstances.
+
+The supplied method should accept a single argument `request` and return an
+IP address String.
+
+
 .. setting:: CMS_PERMISSION
 
 CMS_PERMISSION
