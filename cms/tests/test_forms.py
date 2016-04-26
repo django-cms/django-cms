@@ -11,8 +11,11 @@ from cms.admin.forms import (PageUserForm, PagePermissionInlineAdminForm,
                              PageUserGroupForm)
 from cms.api import create_page, create_page_user, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
+
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
+
+from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
+from cms.forms.widgets import ApplicationConfigSelect
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
 )
@@ -130,6 +133,51 @@ class FormsTestCase(CMSTestCase):
         ])
         self.assertEqual(site_choices, [(site.pk, site.name)])
 
+    def test_app_config_select_escaping(self):
+        class FakeAppConfig(object):
+            def __init__(self, pk, config):
+                self.pk = pk
+                self.config = config
+
+            def __str__(self):
+                return self.config
+
+        class FakeApp(object):
+            def __init__(self, name, configs=()):
+                self.name = name
+                self.configs = configs
+
+            def __str__(self):
+                return self.name
+
+            def get_configs(self):
+                return self.configs
+
+            def get_config_add_url(self):
+                return "/fake/url/"
+
+        GoodApp = FakeApp('GoodApp', [
+            FakeAppConfig(1, 'good-app-one-config'),
+            FakeAppConfig(2, 'good-app-two-config'),
+        ])
+
+        BadApp = FakeApp('BadApp', [
+            FakeAppConfig(1, 'bad-app-one-config'),
+            FakeAppConfig(2, 'bad-app-two-config<script>alert("bad-stuff");</script>'),
+        ])
+
+        app_configs = {
+            GoodApp: GoodApp,
+            BadApp: BadApp,
+        }
+
+        app_config_select = ApplicationConfigSelect(app_configs=app_configs)
+        output = app_config_select.render('application_configurations', 1)
+        self.assertFalse('<script>alert("bad-stuff");</script>' in output)
+        self.assertTrue('\\u0026lt\\u003Bscript\\u0026gt\\u003Balert('
+                        '\\u0026quot\\u003Bbad\\u002Dstuff\\u0026quot'
+                        '\\u003B)\\u003B\\u0026lt\\u003B/script\\u0026gt'
+                        '\\u003B' in output)
 
     def test_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()
