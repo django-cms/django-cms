@@ -5,13 +5,14 @@
 # Translators:
 # Andrii Pryz <inactive+MySmile@transifex.com>, 2013
 # Andrii Pryz <inactive+MySmile@transifex.com>, 2013
+# Anton Linevich <linevich@swebion.com>, 2016
 # asteryx <asteryx82@gmail.com>, 2015
 # asteryx <asteryx82@gmail.com>, 2015
 # roman_grankin <grankin.roman@hotmail.com>, 2014
 # yakky <i.spalletti@nephila.it>, 2015
 # Maxym Lynnyk <yakudzam@gmail.com>, 2013
 # Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013
-# Panasoft <cc072aa3@opayq.com>, 2014-2015
+# Panasoft <cc072aa3@opayq.com>, 2014-2016
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # roman_grankin <grankin.roman@hotmail.com>, 2014
 # Vusheslavov Eduard <vey@live.ru>, 2014
@@ -22,8 +23,8 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-11-11 17:31+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"PO-Revision-Date: 2016-03-23 01:18+0000\n"
+"Last-Translator: Anton Linevich <linevich@swebion.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -461,11 +462,11 @@ msgstr "У Вас немає дозволу на переміщення цьог
 
 #: admin/placeholderadmin.py:548
 msgid "parent must be in the same placeholder"
-msgstr ""
+msgstr "породжувач мусить бути в тому самому вказівнику місця заповнення"
 
 #: admin/placeholderadmin.py:551
 msgid "parent must be in the same language as plugin_language"
-msgstr ""
+msgstr "породжувач мусить бути на тій самій мові, що й мова плагіну"
 
 #: admin/placeholderadmin.py:585 admin/placeholderadmin.py:600
 msgid "You do not have permission to delete this plugin"
@@ -523,7 +524,7 @@ msgstr "Зміст"
 #: cms_toolbars.py:98 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
-msgstr ""
+msgstr "Створити"
 
 #: cms_toolbars.py:151
 msgid "Sites"
@@ -543,11 +544,11 @@ msgstr "Налаштування користувача"
 
 #: cms_toolbars.py:168
 msgid "Clipboard..."
-msgstr ""
+msgstr "Буфер обміну..."
 
 #: cms_toolbars.py:171
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Очистити буфер обміну"
 
 #: cms_toolbars.py:177
 msgid "Disable toolbar"
@@ -691,19 +692,19 @@ msgstr "Історія перегляду"
 
 #: cms_wizards.py:84
 msgid "New page"
-msgstr ""
+msgstr "Нова сторінка"
 
 #: cms_wizards.py:88
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Створити нову сторінку одразу за активною сторінкою"
 
 #: cms_wizards.py:92
 msgid "New sub page"
-msgstr ""
+msgstr "Нова вкладена сторінка"
 
 #: cms_wizards.py:96
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Створити сторінку під актиною сторінкою"
 
 #: forms/fields.py:33
 msgid "Select a valid site"
@@ -719,16 +720,16 @@ msgstr "Додати Інше"
 
 #: forms/wizards.py:80
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "Вкажіть назву для нової сторінки"
 
 #: forms/wizards.py:85
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
-msgstr ""
+msgstr "Опційно. Якщо вказується, то буде автоматично додано до нового текстового плагіну."
 
 #: forms/wizards.py:178
 msgid "User does not have permission to add page."
-msgstr ""
+msgstr "Користувач не має дозволу додавати сторінку."
 
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:60
 #: migrations/0001_initial.py:83 migrations/0001_initial.py:123
@@ -1186,7 +1187,7 @@ msgstr "Головна"
 #: templates/admin/cms/page/change_form.html:26
 #: templates/admin/cms/page/tree/menu_item.html:28
 msgid "View on site"
-msgstr ""
+msgstr "Дивитись на сайті"
 
 #: templates/admin/cms/page/change_form.html:60
 #: templates/cms/wizards/create.html:14
@@ -1343,18 +1344,18 @@ msgstr "Сторінки:"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(counter)s результат"
+msgstr[1] "%(counter)s результати"
+msgstr[2] "%(counter)s результатів"
 
 #: templates/admin/cms/page/tree/base.html:108
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s всього"
 
 #: templates/admin/cms/page/tree/base.html:108
 msgid "Show all"
-msgstr ""
+msgstr "Показати все"
 
 #: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
@@ -1374,7 +1375,7 @@ msgstr "Фільтр"
 
 #: templates/admin/cms/page/tree/base_header.html:8
 msgid "View"
-msgstr ""
+msgstr "Вигляд"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
@@ -1503,7 +1504,7 @@ msgstr "інфо"
 
 #: templates/admin/cms/page/tree/menu_item.html:76
 msgid "Information"
-msgstr ""
+msgstr "Інформація"
 
 #: templates/admin/cms/page/tree/menu_item.html:84
 msgid "is restricted"
@@ -1515,11 +1516,11 @@ msgstr "в останнє змінено"
 
 #: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
-msgstr ""
+msgstr "Буфер обміну"
 
 #: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:14
 msgid "Add plugin"
-msgstr ""
+msgstr "Додати плагін"
 
 #: templates/cms/toolbar/dragbar.html:11
 msgid "Copy all"
@@ -1532,7 +1533,7 @@ msgstr "Копіювати з"
 #: templates/cms/toolbar/dragbar.html:15
 #: templates/cms/toolbar/dragitem.html:32
 msgid "Paste"
-msgstr ""
+msgstr "Вставити"
 
 #: templates/cms/toolbar/dragbar.html:16
 msgid "Empty all"
@@ -1541,23 +1542,23 @@ msgstr "Очистити усе"
 #: templates/cms/toolbar/dragbar.html:21
 #: templates/cms/toolbar/dragitem.html:43
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Фільтрувати плагіни..."
 
 #: templates/cms/toolbar/dragbar.html:28
 msgid "This is a static placeholder"
-msgstr ""
+msgstr "Це статичний вказівник місця заповнення"
 
 #: templates/cms/toolbar/dragbar.html:30
 msgid "Expand all"
-msgstr ""
+msgstr "Розгорнути все"
 
 #: templates/cms/toolbar/dragbar.html:31
 msgid "Collapse all"
-msgstr ""
+msgstr "Згорнути все"
 
 #: templates/cms/toolbar/dragitem.html:12
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Ви не можете додавати плагіни до цього плагіну"
 
 #: templates/cms/toolbar/dragitem.html:18
 #: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
@@ -1567,11 +1568,11 @@ msgstr "Редагувати"
 
 #: templates/cms/toolbar/dragitem.html:22
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Цей плагін не може переміщуватись або редагуватися за межами своїх порождувачів"
 
 #: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Буфер обміну порожній."
 
 #: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin does not allow plugins of this type as nested plugins."
@@ -1958,7 +1959,7 @@ msgstr "Простороіменна Прграма"
 
 #: test_utils/project/sampleapp/cms_apps.py:48
 msgid "Parent app"
-msgstr ""
+msgstr "Батьківській додаток"
 
 #: test_utils/project/sampleapp/cms_apps.py:55
 msgid "Child app"
@@ -1982,15 +1983,15 @@ msgstr "приклад сторінки з моїм профілем"
 
 #: test_utils/project/sampleapp/cms_menus.py:33
 msgid "Static Menu"
-msgstr "Статичні меню"
+msgstr "Статичне меню"
 
 #: test_utils/project/sampleapp/cms_menus.py:51
 msgid "Static Menu2"
-msgstr "Статичні меню2"
+msgstr "Статичне меню2"
 
 #: test_utils/project/sampleapp/cms_menus.py:55
 msgid "Static Menu3"
-msgstr ""
+msgstr "Статичне меню3"
 
 #: test_utils/project/sampleapp/cms_toolbars.py:22
 #: test_utils/project/sampleapp/views.py:30
@@ -2023,7 +2024,7 @@ msgstr ""
 
 #: tests/test_wizards.py:70
 msgid "UserSettings"
-msgstr ""
+msgstr "Користувацькі Налаштування"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -2063,7 +2064,7 @@ msgstr "Це місце заповнення вже має максимальн�
 #: wizards/wizard_base.py:94
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Додати новий %s екземпляр."
 
 #: wizards/wizard_pool.py:79
 #, python-format
