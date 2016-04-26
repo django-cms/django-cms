@@ -70,7 +70,7 @@
                                     <span class="label">{% filter escapejs %}{% trans "Pick an action:" %}{% endfilter %}</span>
                                 </li>
                                 <li>
-                                    <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" target="_top">
+                                    <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
                                         <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
                                         <span>{% filter escapejs %}{% trans "Preview" %}{% endfilter %}</span>
                                     </a>
@@ -189,12 +189,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            <li>
-                                <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
-                                    <span class="cms-icon cms-icon-eye"></span>
-                                    <span>{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
-                                </a>
-                            </li>
                             {% if has_change_permission %}
                                 <li>
                                     <a href="{% url 'admin:cms_page_advanced' page.id %}" title="{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}">
