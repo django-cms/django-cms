@@ -76,7 +76,7 @@ The ``populate()`` method:
 * checks whether we're in a page belonging to this application
 * if so, it creates a menu if one's not already there
 * adds a menu item to list all polls in the overlay
-* adds a menu item to add a now poll as a modal window
+* adds a menu item to add a new poll as a modal window
 
 Your ``cms_toolbars.py`` file should contain classes that extend ``cms.toolbar_base.CMSToolbar``
 and are registered using ``cms.toolbar_pool.toolbar_pool.register()``. The register function can be
