@@ -521,10 +521,6 @@
             color: $black;
         }
     }
-    span {
-        display: inline-block;
-        @include hide-content();
-    }
 
     // active state for current selected page
     &-active a:before {
