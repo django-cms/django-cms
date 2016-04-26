@@ -17,6 +17,8 @@
 * Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
   the toolbar will appear for authorized users. If left unset, retains the
   existing behavior of allowing toolbar for authorized users at any IP address.
+* Sideframe is no longer resizable, opens to 90% of the screen or 100% on
+  small screens.
 
 
 === 3.2.3 (2016-03-09) ===
