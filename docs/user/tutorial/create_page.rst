@@ -73,4 +73,4 @@ whether the new page should be a sub-page - a child - of the existing page, or b
 in the hierarchy - a sibling.
 
 Once again, give the page a *Title* and some basic text content. Continue making changes to content
-and formatting, and the **Publish** it as you did previously.
+and formatting, and then **Publish** it as you did previously.
