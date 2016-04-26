@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.forms.widgets import Select, MultiWidget, TextInput
 from django.utils.encoding import force_text
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -217,7 +218,7 @@ class AppHookSelect(Select):
             selected_html = ''
 
         if option_value in self.app_namespaces:
-            data_html = mark_safe(' data-namespace="%s"' % self.app_namespaces[option_value])
+            data_html = mark_safe(' data-namespace="%s"' % escape(self.app_namespaces[option_value]))
         else:
             data_html = ''
 
@@ -261,11 +262,11 @@ class ApplicationConfigSelect(Select):
         super(ApplicationConfigSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        output = [super(ApplicationConfigSelect, self).render(name, value, attrs, choices)]
+        output = list(super(ApplicationConfigSelect, self).render(name, value, attrs, choices))
         output.append('<script>\n')
         output.append('var apphooks_configuration = {\n')
         for application, cms_app in self.app_configs.items():
-            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, force_text(config)) for config in cms_app.get_configs()])))
+            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, escape(config)) for config in cms_app.get_configs()])))  # noqa
         output.append('\n};\n')
         output.append('var apphooks_configuration_url = {\n')
         for application, cms_app in self.app_configs.items():
