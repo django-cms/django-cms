@@ -17,16 +17,27 @@
             <div class="cms-tree-item-wrapper">
                 <div class="cms-tree-item cms-tree-item-icons">
                     <div class="cms-tree-item-inner">
-                        {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% filter escapejs %}{% trans 'home' %}{% endfilter %}">{% endif %}
+                        {% if page.is_home %}
+                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                data-cms-tooltip="{% filter escapejs %}{% trans 'home' %}{% endfilter %}">
+                                <span class="cms-icon cms-icon-home"></span>
+                            </div>
+                        {% endif %}
                         {% if page.soft_root %}
-                            <a href="{% url 'admin:cms_page_advanced' page.id %}">
-                                <span class="cms-icon cms-icon-sitemap" title="{% filter escapejs %}{% trans 'softroot' %}{% endfilter %}">
-                            </a>
+                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                data-cms-tooltip="{% filter escapejs %}{% trans 'softroot' %}{% endfilter %}">
+                                <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                                    <span class="cms-icon cms-icon-sitemap"></span>
+                                </a>
+                            </div>
                         {% endif %}
                         {% if page.application_urls %}
-                            <a href="{% url 'admin:cms_page_advanced' page.id %}">
-                                <span class="cms-icon cms-icon-puzzle" title="{% filter escapejs %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endfilter %}">
-                            </a>
+                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                data-cms-tooltip="{% filter escapejs %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endfilter %}">
+                                <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                                    <span class="cms-icon cms-icon-puzzle"></span>
+                                </a>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -41,9 +52,9 @@
             <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
-                <div class="cms-tree-item-inner">
-                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
-                        <span>{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
+                <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
+                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %}">
+                        <span class="sr-only">{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
                     </a>
                 </div>
             </div>
@@ -123,9 +134,15 @@
                         <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                     {% endif %}
                         {% if page.in_navigation %}
-                            <span class="cms-icon cms-icon-check-square" title="{% filter escapejs %}{% trans "in menu" %}{% endfilter %}"></span>
+                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                data-cms-tooltip="{% filter escapejs %}{% trans "in menu" %}{% endfilter %}">
+                                <span class="cms-icon cms-icon-check-square"></span>
+                            </div>
                         {% else %}
-                            <span class="cms-icon cms-icon-minus-square" title="{% filter escapejs %}{% trans "not in menu" %}{% endfilter %}"></span>
+                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                data-cms-tooltip="{% filter escapejs %}{% trans "not in menu" %}{% endfilter %}">
+                                <span class="cms-icon cms-icon-minus-square"></span>
+                            </div>
                         {% endif %}
                     {% if has_change_permission %}
                         </a>
@@ -139,20 +156,26 @@
             <div class="cms-tree-item-wrapper">
                 {% if has_change_permission %}
                     <div class="cms-tree-item cms-tree-item-button">
-                        <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
-                            class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
-                            data-url="{% url 'admin:cms_page_advanced' page.id %}"
-                            title="{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}">
-                            <span class="sr-only">{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}</span>
-                        </a>
+                        <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                            data-cms-tooltip="{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}">
+                            <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
+                                class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
+                                data-url="{% url 'admin:cms_page_advanced' page.id %}"
+                                >
+                                <span class="sr-only">{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}</span>
+                            </a>
+                        </div>
                     </div>
                 {% endif %}
                 {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
                     <div class="cms-tree-item cms-tree-item-button">
-                        <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child" title="{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}"
-                            class="cms-btn cms-btn-default cms-icon cms-icon-plus">
-                            <span class="sr-only">{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}</span>
-                        </a>
+                        <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                            data-cms-tooltip="{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}">
+                            <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"
+                                class="cms-btn cms-btn-default cms-icon cms-icon-plus">
+                                <span class="sr-only">{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}</span>
+                            </a>
+                        </div>
                     </div>
                 {% endif %}
                 <div class="cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown">
