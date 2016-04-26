@@ -525,7 +525,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix redirect when disabling toolbar
 - Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
 
-=== 3.1.6 (unreleased) ===
+=== 3.1.6 (2016-04-26) ===
 
 - Fix cache settings
 - Fix user lookup for view restrictions/page permissions when using raw id field
