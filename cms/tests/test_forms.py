@@ -168,8 +168,11 @@ class FormsTestCase(CMSTestCase):
 
         app_config_select = ApplicationConfigSelect(app_configs=app_configs)
         output = app_config_select.render('application_configurations', 1)
-        self.assertFalse('bad-app-two-config<script>alert("bad-stuff");</script>' in output)
-        self.assertTrue('bad-app-two-config&lt;script&gt;alert(&quot;bad-stuff&quot;);&lt;/script&gt;' in output)
+        self.assertFalse('<script>alert("bad-stuff");</script>' in output)
+        self.assertTrue('\\u0026lt\\u003Bscript\\u0026gt\\u003Balert('
+                        '\\u0026quot\\u003Bbad\\u002Dstuff\\u0026quot'
+                        '\\u003B)\\u003B\\u0026lt\\u003B/script\\u0026gt'
+                        '\\u003B' in output)
 
     def test_superlazy_iterator_behaves_properly_for_sites(self):
         normal_result = get_site_choices()

@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.forms.widgets import Select, MultiWidget, TextInput
 from django.utils.encoding import force_text
-from django.utils.html import escape
+from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
@@ -266,7 +266,7 @@ class ApplicationConfigSelect(Select):
         output.append('<script>\n')
         output.append('var apphooks_configuration = {\n')
         for application, cms_app in self.app_configs.items():
-            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, escape(config)) for config in cms_app.get_configs()])))  # noqa
+            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, escapejs(escape(config))) for config in cms_app.get_configs()])))  # noqa
         output.append('\n};\n')
         output.append('var apphooks_configuration_url = {\n')
         for application, cms_app in self.app_configs.items():
