@@ -5,18 +5,22 @@
 # Translators:
 # Marco Badan <marco.badan@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Francesco Moggia <f.moggia@gmail.com>, 2013
 # yakky <i.spalletti@nephila.it>, 2011
 # yakky <i.spalletti@nephila.it>, 2013-2015
 # yakky <i.spalletti@nephila.it>, 2012
 # karim79 <karim@gorjux.net>, 2011
+# Marco Badan <marco.badan@gmail.com>, 2011
 # Marco Barberis <mbarberis@gmail.com>, 2011
+# mbi0 <marco@cruncher.ch>, 2013
 # mbi0 <marco@cruncher.ch>, 2013
 # Saverio <saverio.brancaccio@gmail.com>, 2014
 # Stefano Brentegani <sbrentegani@gmail.com>, 2013-2014
 # Stefano Brentegani <sbrentegani@gmail.com>, 2011
-# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2011,2014-2015
 # Tania Monti <tania.monti@gmx.it>, 2013
+# yakky <i.spalletti@nephila.it>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
@@ -24,7 +28,7 @@ msgstr ""
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
 "PO-Revision-Date: 2015-11-11 17:34+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Italian (http://www.transifex.com/digi604/django-cms/language/it/)\n"
+"Language-Team: Italian (http://www.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
