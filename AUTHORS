@@ -20,7 +20,7 @@ Current and previous core designers:
 * Christian Bertschy
 
 
-Contributors (based on gitlog) (493):
+Contributors (based on gitlog) (456 authors):
 
 * A. Bram Neijt
 * aaloy
@@ -30,7 +30,6 @@ Contributors (based on gitlog) (493):
 * aball
 * Adi Sieker
 * Admin Adminaras
-* Adrián Ribao
 * Adrián Ribao Martínez
 * Alberto Paro
 * Ales Kocjancic
@@ -41,7 +40,6 @@ Contributors (based on gitlog) (493):
 * Alex Marandon
 * Alexandre Leray
 * Alexey Subbotin
-* Aleš Kocjančič
 * Alvin Mites
 * Anatoly Ivanov
 * Andi Albrecht
@@ -49,13 +47,11 @@ Contributors (based on gitlog) (493):
 * Andrea Stagi
 * Andrei Avram
 * Andrei Fokau
-* Andrew Cassidy
 * Andrew Schoen
 * Angelo Dini
 * angular_circle
 * Antoine Catton
 * Anton Parkhomenko
-* Antoni Aloy López
 * AQNOUCH Mohammed
 * Arcady Usov
 * Arne Gellhaus
@@ -64,15 +60,12 @@ Contributors (based on gitlog) (493):
 * Arthur Debert
 * Artis Avotins
 * Aymeric Augustin
-* Bashar Al-Abdulhadi
 * Basile LEGAL
-* Batiste Bieler
 * behrooz
 * Behrooz Nobakht
 * Belegnar
 * Ben Northway
 * Ben Stähli
-* Beni Wohlwend
 * Benjamin
 * Benjamin Liles
 * Benjamin Wohlwend
@@ -94,7 +87,6 @@ Contributors (based on gitlog) (493):
 * Carlo Ascani
 * Carlos de Paula
 * casio
-* Catalin Dragomirescu
 * centralniak
 * Chanita Siridechkun
 * Charlie Denton
@@ -107,7 +99,6 @@ Contributors (based on gitlog) (493):
 * Chris Jones
 * Chris Wesseling
 * Chris Wilson
-* Christian Bertschy
 * Christian Strappazzon
 * Christof Hagedorn
 * Christopher Grebs
@@ -116,7 +107,6 @@ Contributors (based on gitlog) (493):
 * Claudio Bartolini
 * Colin Wirz
 * Conrado Buhrer
-* Conrado Bührer
 * Corey Farwell
 * Craig de Stigter
 * Craig Ricciuto
@@ -165,10 +155,8 @@ Contributors (based on gitlog) (493):
 * ericr
 * Erik Allik
 * Erlend Dalen
-* Eugen MechanisM
 * Eugene MechanisM
 * Evandro Miquelito
-* Evgeny Demchenko
 * evildmp
 * F. Gabriel Gosselin
 * f4nt
@@ -189,10 +177,8 @@ Contributors (based on gitlog) (493):
 * gentleShark
 * Geoffrey Hing
 * George Marshall
-* Gerard Świdersk
 * Gerard Świderski
 * Germano Gabbianelli
-* Germano Gabbianellii
 * Gilles Lenfant
 * Gleb Chipiga
 * Gregory Klupar
@@ -201,18 +187,15 @@ Contributors (based on gitlog) (493):
 * Hans Andersen
 * hedberg
 * henning
-* Henning Spran
 * Henning Sprang
 * Herbert Poul
 * hjkelly
-* homebrew79
 * Horst Gutmann
 * hysia
 * Iacopo Spalletti
 * Ian Lewis
 * ikudryavtsev
 * indexofire
-* Ionel Cristian Maries
 * Ionel Maries Cristian
 * Ivan Vershigora
 * Iván Raskovsky
@@ -232,8 +215,6 @@ Contributors (based on gitlog) (493):
 * Jason Davies
 * Jason Jenkins
 * Jason Robinson
-* Jason Zylks
-* Javi Nievas
 * Jeffrey Goettsch
 * JensDiemer
 * Jeroen Noten
@@ -248,7 +229,6 @@ Contributors (based on gitlog) (493):
 * Jonathan Stoppani
 * jordanjambazov
 * Jorge Vargas
-* Jorge Vargas (elpargo)
 * Jos van Velzen
 * Joseph Bergantine
 * Joseph Melettukunnel
@@ -257,22 +237,17 @@ Contributors (based on gitlog) (493):
 * João Luiz Lorencetti
 * Julien Poissonnier
 * Kalle Bronsen
-* kar1m
 * kater169
-* kblomqvis
 * kblomqvist
 * Kegan Holtzhausen
 * Keryn Knight
 * Kevin Richardson
-* Kim Blomqvist
 * Kim Thoenen
 * kochin
 * Kristian Øllegaard
-* Krzysztof Bandurski
 * kunitoki
 * Lars Smit
 * Lars van de Kerkhof
-* limpbrains :P
 * Lio Mendonca
 * Lionardo Mendonça
 * littlepea
@@ -297,11 +272,10 @@ Contributors (based on gitlog) (493):
 * Marijn Goedegebure
 * Mark Rogers
 * Markus Holtermann
-* Markus Zapke-Gründemann
 * Markus Zapke-Gründemann
 * Marti Raudsepp
 * Martin
-* Martin Bommeli
+* Martin Bambas
 * Martin Brochhaus
 * Martin Koistinen
 * Martin Kosír
@@ -341,7 +315,6 @@ Contributors (based on gitlog) (493):
 * Nelson Brochado
 * neoprolog
 * Nick Jones
-* Nickolay V. Shmyrev
 * nikolas
 * nsh
 * o-zander
@@ -353,7 +326,6 @@ Contributors (based on gitlog) (493):
 * Oyvind Saltvik
 * padelt
 * Pankrat
-* Paolo
 * Paolo Leggio
 * Pascal Mouret
 * pascal.beyeler
@@ -371,7 +343,6 @@ Contributors (based on gitlog) (493):
 * pcicman
 * Pedro Gracia
 * Pete Loggie
-* Peter Ciciman
 * Peter Farrell
 * Peter J. Farrell
 * Peter Landry
@@ -383,10 +354,9 @@ Contributors (based on gitlog) (493):
 * philomat
 * phuihock
 * Pigletto
+* Piotr Jakimiak
 * Piotr Kilczuk
 * piquadrat
-* poweredbypenguins
-* Pratik Vyas
 * pumalo
 * Rafal Radulski
 * raidsan
@@ -407,7 +377,6 @@ Contributors (based on gitlog) (493):
 * Robert Pogorzelski
 * Roberto
 * Roberto Bampi
-* Roberto Lopez
 * Robin Lewis
 * robint
 * Rodolfo Carvalho
@@ -421,7 +390,6 @@ Contributors (based on gitlog) (493):
 * Samuel Lüscher
 * sbussetti
 * Schoen
-* Scott Barnham
 * scottbarnham
 * sealibora
 * Sean Bleier
@@ -443,7 +411,6 @@ Contributors (based on gitlog) (493):
 * ssteinerX
 * Stavros Korokithakis
 * Stefan Foulis
-* Stefan T. Oertel
 * Stefan Wehrmeyer
 * stefanfoulis
 * Stefano Brentegani
@@ -456,7 +423,6 @@ Contributors (based on gitlog) (493):
 * Stephan Jaekel
 * Stephen Muss
 * Stephen Watkin
-* Steve R. Jones
 * Steve Steiner
 * Steven Laroche
 * Sylvain Fankhauser
@@ -466,7 +432,6 @@ Contributors (based on gitlog) (493):
 * Thomas Parslow
 * Thomas Remmert
 * Thomas Woolford
-* Tibor Balogh
 * Tim Anderegg
 * Tim Davies
 * Tim Graham
@@ -484,13 +449,11 @@ Contributors (based on gitlog) (493):
 * unknown
 * User
 * Vadim Sikora
-* Vasil Vangelovski
 * Venelin Stoykov
 * Viktor Nagy
 * Viliam Segeda
 * Vinit (Vermicelli on IRC)
 * vinit kumar
-* Vitor Figueiro
 * Vladimir Bolshakov
 * Vladyslav
 * vvangelovski

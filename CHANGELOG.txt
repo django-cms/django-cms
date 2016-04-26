@@ -527,7 +527,12 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 === 3.1.6 (unreleased) ===
 
-- Addresses security vulnerabilities in the `render_model` template tag that could
-  lead to escalation of privileges or other security issues.
-
 - Fix cache settings
+- Fix user lookup for view restrictions/page permissions when using raw id field
+- Fixes an issue relating to uninstalling a namespaced application
+- Adds "Can change page" permission
+- Addresses security vulnerabilities in the `render_model` template tag that
+  could lead to escalation of privileges or other security issues.
+- Addresses a security vulnerability in the cms' usage of the messages framework
+- Fixes security vulnerabilities in custom FormFields that could lead to
+  escalation of privileges or other security issues.
