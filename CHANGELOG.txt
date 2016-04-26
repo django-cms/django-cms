@@ -1,8 +1,17 @@
 === 3.2.4 (unreleased) ===
 
+- Fix cache settings
+- Fix user lookup for view restrictions/page permissions when using raw id field
 - Fixed regression when page couldn't be copied if CMS_PERMISSION was False
-- Addresses security vulnerabilities in the `render_model` template tag that could
-  lead to escalation of privileges or other security issues.
+- Fixes an issue relating to uninstalling a namespaced application
+- Adds "Can change page" permission
+- Fixes a number of page-tree issues the could lead data corruption under
+  certain conditions
+- Addresses security vulnerabilities in the `render_model` template tag that
+  could lead to escalation of privileges or other security issues.
+- Addresses a security vulnerability in the cms' usage of the messages framework
+- Fixes security vulnerabilities in custom FormFields that could lead to
+  escalation of privileges or other security issues.
 
 
 === 3.2.3 (2016-03-09) ===
