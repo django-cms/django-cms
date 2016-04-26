@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-24 00:58-0500\n"
+"POT-Creation-Date: 2016-04-26 11:48-0400\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -167,7 +167,7 @@ msgstr ""
 
 #: admin/forms.py:519 admin/forms.py:526 admin/forms.py:530
 #: templates/admin/cms/usersettings/change_form.html:17
-#: templatetags/cms_tags.py:755
+#: templatetags/cms_tags.py:756
 msgid "Add"
 msgstr ""
 
@@ -520,8 +520,8 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#: cms_toolbar.py:167 tests/toolbar.py:564 tests/toolbar.py:579
-#: tests/toolbar.py:611
+#: cms_toolbar.py:167 tests/toolbar.py:565 tests/toolbar.py:580
+#: tests/toolbar.py:612
 #, python-format
 msgid "Logout %s"
 msgstr ""
@@ -663,7 +663,7 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:224 forms/widgets.py:311
+#: forms/widgets.py:225 forms/widgets.py:312
 msgid "Add Another"
 msgstr ""
 
@@ -1417,8 +1417,8 @@ msgstr ""
 msgid "Drop a plugin here"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:746
-#: templatetags/cms_tags.py:749
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:747
+#: templatetags/cms_tags.py:750
 msgid "Edit"
 msgstr ""
 
@@ -1530,12 +1530,12 @@ msgstr ""
 msgid "<span>%(icon)s</span>"
 msgstr ""
 
-#: templatetags/cms_tags.py:115
+#: templatetags/cms_tags.py:116
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:116
+#: templatetags/cms_tags.py:117
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `"

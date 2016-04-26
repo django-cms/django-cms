@@ -12,9 +12,9 @@ msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-11-11 17:31+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Japanese (http://www.transifex.com/digi604/django-cms/language/ja/)\n"
+"PO-Revision-Date: 2015-12-04 12:19+0000\n"
+"Last-Translator: zundoya <zundoya@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/divio/django-cms/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -73,7 +73,7 @@ msgstr "ブラウザのタイトルやブックマークに表示されている
 
 #: admin/forms.py:81
 msgid "Description meta tag"
-msgstr ""
+msgstr "メタタグの記述"
 
 #: admin/forms.py:83
 msgid "A description of the page used by search engines."
@@ -85,7 +85,7 @@ msgstr "このスラグを使っているページが存在します"
 
 #: admin/forms.py:160
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "スラグは空ではいけません。"
 
 #: admin/forms.py:188
 msgid "Application"
@@ -345,15 +345,15 @@ msgstr ""
 
 #: admin/pageadmin.py:991
 msgid "The content was successfully published."
-msgstr ""
+msgstr "コンテンツの公開に成功しました。"
 
 #: admin/pageadmin.py:1003
 msgid "There was a problem publishing your content"
-msgstr ""
+msgstr "この内容を公開する際問題が起きました。"
 
 #: admin/pageadmin.py:1070
 msgid "You do not have permission to unpublish this page"
-msgstr ""
+msgstr "このページを非公開にする権限がありません。"
 
 #: admin/pageadmin.py:1072
 msgid "This page was never published"
@@ -423,11 +423,11 @@ msgstr "ページ権限管理"
 #: admin/placeholderadmin.py:102
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "フィールド%sが見つかりません。"
 
 #: admin/placeholderadmin.py:109
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "これを編集する権限がありません。"
 
 #: admin/placeholderadmin.py:251
 msgid "You do not have permission to add a plugin"
@@ -439,7 +439,7 @@ msgstr ""
 
 #: admin/placeholderadmin.py:380
 msgid "Plugin not found"
-msgstr ""
+msgstr "プラグインが見つかりません。"
 
 #: admin/placeholderadmin.py:385
 msgid "You do not have permission to edit this plugin"
@@ -492,15 +492,15 @@ msgstr "django CMS"
 
 #: cms_plugins.py:17
 msgid "Placeholder"
-msgstr ""
+msgstr "プレースホルダ"
 
 #: cms_plugins.py:31
 msgid "Alias"
-msgstr ""
+msgstr "エリアス"
 
 #: cms_plugins.py:56 cms_plugins.py:65
 msgid "Create Alias"
-msgstr ""
+msgstr "エリアスを作る。"
 
 #: cms_toolbars.py:93
 msgid "Structure"
@@ -541,7 +541,7 @@ msgstr ""
 
 #: cms_toolbars.py:177
 msgid "Disable toolbar"
-msgstr ""
+msgstr "ツールバー非表示"
 
 #: cms_toolbars.py:191
 msgid "Users"
@@ -551,7 +551,7 @@ msgstr "ユーザー"
 #: tests/test_toolbar.py:792
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "ログアウト %s"
 
 #: cms_toolbars.py:210
 msgid "Logout"
@@ -559,11 +559,11 @@ msgstr "ログアウト"
 
 #: cms_toolbars.py:348
 msgid "Publish changes"
-msgstr ""
+msgstr "変更を公開"
 
 #: cms_toolbars.py:350
 msgid "Publish page now"
-msgstr ""
+msgstr "今すぐ公開"
 
 #: cms_toolbars.py:392 cms_toolbars.py:476
 msgid "Page settings"
@@ -608,7 +608,7 @@ msgstr "新しいページ"
 
 #: cms_toolbars.py:458
 msgid "New Sub Page"
-msgstr ""
+msgstr "新しいサブページ"
 
 #: cms_toolbars.py:459
 msgid "Duplicate this Page"
@@ -693,7 +693,7 @@ msgstr ""
 
 #: cms_wizards.py:96
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "現在のページの下に新しいページを作成する。"
 
 #: forms/fields.py:33
 msgid "Select a valid site"
@@ -709,7 +709,7 @@ msgstr "もう一つ追加"
 
 #: forms/wizards.py:80
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "新しいページのタイトルを設定する。"
 
 #: forms/wizards.py:85
 msgid ""
@@ -928,7 +928,7 @@ msgstr "ページ"
 
 #: models/pagemodel.py:887
 msgid "Empty"
-msgstr ""
+msgstr "空"
 
 #: models/pagemodel.py:1013
 msgid "default"
@@ -1114,7 +1114,7 @@ msgstr "詳細設定"
 
 #: plugin_base.py:98
 msgid "Generic"
-msgstr ""
+msgstr "ジェネリック"
 
 #: plugin_base.py:289
 msgid "There are no further settings for this plugin. Please press save."
@@ -1176,7 +1176,7 @@ msgstr "ホーム"
 #: templates/admin/cms/page/change_form.html:26
 #: templates/admin/cms/page/tree/menu_item.html:28
 msgid "View on site"
-msgstr ""
+msgstr "サイトで確認"
 
 #: templates/admin/cms/page/change_form.html:60
 #: templates/cms/wizards/create.html:14
@@ -1501,11 +1501,11 @@ msgstr ""
 
 #: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
-msgstr ""
+msgstr "クリップボード"
 
 #: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:14
 msgid "Add plugin"
-msgstr "プラギンを追加する"
+msgstr "プラグインを追加する"
 
 #: templates/cms/toolbar/dragbar.html:11
 msgid "Copy all"
@@ -1539,11 +1539,11 @@ msgstr ""
 
 #: templates/cms/toolbar/dragbar.html:31
 msgid "Collapse all"
-msgstr ""
+msgstr "すべて折り畳む"
 
 #: templates/cms/toolbar/dragitem.html:12
 msgid "You cannot add plugins to this plugin."
-msgstr "このプラギンにはプラギンを追加できません。"
+msgstr "このプラグインにはプラグインを追加できません。"
 
 #: templates/cms/toolbar/dragitem.html:18
 #: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
@@ -1557,7 +1557,7 @@ msgstr ""
 
 #: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "クリップボードは空です。"
 
 #: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin does not allow plugins of this type as nested plugins."
@@ -1581,11 +1581,11 @@ msgstr "ログイン"
 
 #: templates/cms/toolbar/placeholder.html:14
 msgid "Add plugin to placeholder"
-msgstr "プレースホーダにプラギンを追加する"
+msgstr "プレースホーダにプラグインを追加する"
 
 #: templates/cms/toolbar/plugin.html:21
 msgid "Add plugin to"
-msgstr "にプラギンを追加する"
+msgstr "にプラグインを追加する"
 
 #: templates/cms/toolbar/toolbar.html:12
 msgid "Double-click to edit"
@@ -1663,7 +1663,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:39
 msgid "Plugin will be added here"
-msgstr "プラギンはこちらに追加されます"
+msgstr "プラグインはこちらに追加されます"
 
 #: templates/cms/toolbar/toolbar_javascript.html:57
 msgid ""
@@ -1746,15 +1746,15 @@ msgstr "戻る"
 
 #: templates/cms/wizards/start.html:14
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "次のステップに進むため以下のオプションから1つ選んでください。"
 
 #: templates/cms/wizards/start.html:29
 msgid "Next"
-msgstr ""
+msgstr "次"
 
 #: templatetags/cms_admin.py:61
 msgid "unpublished changes"
-msgstr ""
+msgstr "変更を公開しない"
 
 #: templatetags/cms_admin.py:64
 msgid "published"
@@ -1857,7 +1857,7 @@ msgstr ""
 #: test_utils/project/customuserapp/models.py:40
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "必須。300文字以下の英数字及び記号（@/./+/-/_）"
 
 #: test_utils/project/customuserapp/models.py:43
 msgid "Enter a valid username."
@@ -1877,7 +1877,7 @@ msgstr ""
 
 #: test_utils/project/customuserapp/models.py:49
 msgid "active"
-msgstr ""
+msgstr "アクティブ"
 
 #: test_utils/project/customuserapp/models.py:50
 msgid ""
@@ -2047,7 +2047,7 @@ msgstr "このプレースホルダには、プラグイン %(plugin_name)s が�
 #: wizards/wizard_base.py:94
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "新しい%sインスタンスを作成する。"
 
 #: wizards/wizard_pool.py:79
 #, python-format
