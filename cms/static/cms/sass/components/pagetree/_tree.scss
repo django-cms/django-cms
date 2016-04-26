@@ -42,6 +42,10 @@
 .cms-pagetree {
     box-shadow: $pagetree-box-shadow;
     border: $pagetree-border;
+
+    .cms-hover-tooltip {
+        z-index: auto;
+    }
 }
 
 //###########################################################
