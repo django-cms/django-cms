@@ -219,6 +219,7 @@ var CMS = {
                         CMS.API.locked = false;
                         // determine if logged in or not
                         settings = (data) ? JSON.parse(data) : CMS.config.settings;
+                        // istanbul ignore else
                         if (CMS.API.Toolbar) {
                             CMS.API.Toolbar.hideLoader();
                         }
@@ -270,6 +271,7 @@ var CMS = {
                         CMS.API.locked = false;
                         // determine if logged in or not
                         settings = (data) ? JSON.parse(data) : CMS.config.settings;
+                        // istanbul ignore else
                         if (CMS.API.Toolbar) {
                             CMS.API.Toolbar.hideLoader();
                         }
@@ -418,6 +420,7 @@ var CMS = {
                 previous = opts.leading === false ? 0 : $.now();
                 timeout = null;
                 result = func.apply(context, args);
+                // istanbul ignore else
                 if (!timeout) {
                     context = args = null;
                 }
@@ -438,6 +441,7 @@ var CMS = {
                     }
                     previous = now;
                     result = func.apply(context, args);
+                    // istanbul ignore else
                     if (!timeout) {
                         context = args = null;
                     }
