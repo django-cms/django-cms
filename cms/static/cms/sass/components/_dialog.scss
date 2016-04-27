@@ -21,7 +21,7 @@
         padding: 0;
     }
     form {
-        margin: 0 -20px;
+        margin: 0 -$padding-large;
         padding: 0 $padding-large !important;
         border-top: 1px solid $gray-lighter;
         label {
@@ -48,7 +48,7 @@
             margin-bottom: 0 !important;
         }
         .submit-row {
-            margin: 10px -20px 0;
+            margin: $padding-normal -$padding-large 0;
             padding: $padding-large $padding-large 0;
             input {
                 margin-left: 0;
