@@ -22,7 +22,7 @@
     }
     form {
         margin: 0 -20px;
-        padding: 0 20px !important;
+        padding: 0 $padding-large !important;
         border-top: 1px solid $gray-lighter;
         label {
             display: inline;
@@ -32,7 +32,7 @@
             top: -3px;
         }
         p {
-            margin: 0 20px;
+            margin: 0 $padding-large;
             margin-bottom: 0;
             padding: $padding-normal 0;
             &:after {
@@ -49,7 +49,7 @@
         }
         .submit-row {
             margin: 10px -20px 0;
-            padding: 20px 20px 0;
+            padding: $padding-large $padding-large 0;
             input {
                 margin-left: 0;
             }
