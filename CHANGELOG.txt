@@ -1,3 +1,7 @@
+=== 3.2.5 (2016-04-27) ===
+
+- Fix packaging problem with the wheel distribution
+
 === 3.2.4 (2016-04-26) ===
 
 - Fix cache settings
