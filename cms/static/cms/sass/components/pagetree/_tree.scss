@@ -42,6 +42,10 @@
 .cms-pagetree {
     box-shadow: $pagetree-box-shadow;
     border: $pagetree-border;
+
+    .cms-hover-tooltip {
+        z-index: auto;
+    }
 }
 
 //###########################################################
@@ -345,135 +349,14 @@
     top: -4px;
     width: 205px;
 }
+.cms-tree-item-button .cms-hover-tooltip {
+    &:before,
+    &:after {
+        bottom: $pagetree-cell-inner-height / 2 + 7px;
+    }
+}
 .cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil {
     @include icon(cogs);
-}
-
-//###########################################################
-// DROPDOWN
-// dropdowns used for menus
-.cms-pagetree-dropdown {
-    position: relative;
-}
-
-.cms-pagetree-dropdown-menu {
-    display: none;
-    position: absolute;
-    z-index: z(pagetree, dropdown);
-    right: -1px;
-    top: 30px;
-    min-width: $dropdown-width;
-    background: $submenu-dropdown-bgcolor;
-    border-radius: $border-radius-normal;
-    box-shadow: $dropdown-shadow;
-    transform: translateZ(0);
-
-    a,
-    .cms-pagetree-dropdown-item {
-        display: block;
-        color: $gray;
-        line-height: 1.5;
-        padding: 10px $pagetree-dropdown-padding-horizontal;
-        text-align: left;
-    }
-    a:hover,
-    a:active,
-    a:focus {
-        color: $white !important;
-        background: $color-primary;
-    }
-    &.cms-pagetree-dropdown-menu-condensed {
-        a,
-        .cms-pagetree-dropdown-item {
-            padding: 5px $pagetree-dropdown-padding-horizontal;
-        }
-    }
-    .active {
-        font-weight: bold;
-    }
-
-    .label {
-        display: block;
-        text-align: left;
-        font-weight: normal;
-        color: $gray-light;
-        font-size: 90%;
-        line-height: 1.5;
-        padding: 5px $pagetree-dropdown-padding-horizontal 0;
-    }
-
-    li {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-    p {
-        text-align: left;
-        padding: 5px $pagetree-dropdown-padding-horizontal 3px !important;
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0;
-        font-size: 12px !important;
-        strong {
-            font-size: 12px !important;
-        }
-    }
-    p + p {
-        padding-top: 0 !important;
-        margin-top: -2px;
-    }
-
-    .cms-icon {
-        margin-right: 10px;
-    }
-
-    span {
-        vertical-align: middle;
-    }
-
-    // adds arrow
-    &:before {
-        position: absolute;
-        z-index: z(below);
-        content: '';
-        left: 100%;
-        width: $dropdown-arrow-side;
-        height: $dropdown-arrow-side;
-        margin-left: -($dropdown-arrow-side / 2);
-        background-color: $submenu-dropdown-bgcolor;
-        box-shadow: $dropdown-shadow;
-        transform: rotate(45deg) translateZ(0);
-    }
-
-    .cms-pagetree-dropdown-menu-inner {
-        background-color: $white;
-        margin: 0;
-        padding: 4px 0 !important;
-        border-radius: $border-radius-normal;
-    }
-}
-
-.cms-pagetree-dropdown-menu-open .cms-pagetree-dropdown-menu {
-    display: block;
-}
-
-.cms-pagetree-dropdown-menu-arrow-top-right {
-    &:before {
-        margin-left: -24px;
-        margin-top: -5px;
-    }
-}
-
-.cms-pagetree-dropdown-menu-arrow-right-top {
-    &:before {
-        top: 18px;
-    }
-}
-.cms-pagetree-dropdown-menu-arrow-right-bottom {
-    &:before {
-        bottom: 18px;
-    }
 }
 
 //###########################################################
@@ -516,10 +399,6 @@
         &:hover:before {
             color: $black;
         }
-    }
-    span {
-        display: inline-block;
-        @include hide-content();
     }
 
     // active state for current selected page

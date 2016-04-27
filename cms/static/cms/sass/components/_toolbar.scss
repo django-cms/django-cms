@@ -398,6 +398,7 @@
     }
     input[type="text"],
     input[type="password"] {
+        display: inline-block;
         color: $login-form-input-color;
         font-size: $login-form-input-font-size;
         height: $login-form-input-height - 2px;

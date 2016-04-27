@@ -6,7 +6,7 @@
 module.exports = {
     init: function () {
         this.viewportSize();
-        this.timeout();
+        this.timeout(20000);
     },
 
     viewportSize: function (width, height) {
@@ -22,6 +22,6 @@ module.exports = {
     },
 
     timeout: function (timeout) {
-        casper.options.pageSettings.resourceTimeout = timeout || 10000;
+        casper.options.waitTimeout = timeout || 10000;
     }
 };
