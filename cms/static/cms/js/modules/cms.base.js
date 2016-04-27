@@ -126,8 +126,6 @@ var CMS = {
                         } else if (url) {
                             // on_close can also provide a url, reload to the new destination
                             that.reloadBrowser(url);
-                        } else {
-                            that.reloadBrowser();
                         }
                     }
                 });
