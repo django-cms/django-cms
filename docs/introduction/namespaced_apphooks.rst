@@ -187,7 +187,7 @@ required to set anything specific to support them; the following attributes are
 set for the view class instance:
 
 * current namespace in ``self.namespace``
-* namespace configuration (the instance of NewsBlogConfig) in ``self.config``
+* namespace configuration (the instance of FaqConfig) in ``self.config``
 * current application in the ``current_app parameter`` passed to the
   ``Response`` class
 
