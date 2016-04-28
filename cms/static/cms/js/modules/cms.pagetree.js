@@ -369,6 +369,7 @@ var CMS = window.CMS || {};
             if (this.clipboard.type === obj.type && jsTreeId === this.clipboard.id) {
                 this.clipboard.type = null;
                 this.clipboard.id = null;
+                this.clipboard.origin = null;
                 this._disablePaste();
             } else {
                 // we need to cache the node in the "clipboard" the node and type so `_enablePaste`
