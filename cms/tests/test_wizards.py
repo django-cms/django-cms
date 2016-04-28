@@ -235,8 +235,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
     def test_wizard_content_placeholder_bad_setting(self):
         """
         Tests that the PageWizard won't respect a 'bad' setting such as
-        targeting a static-placeholder. In this case, will fall back to
-        placing content on the first suitable placeholder.
+        targeting a static-placeholder. In this case, will just fail to
+        add the content (without error).
         """
         templates = get_cms_setting('TEMPLATES')
         # NOTE, there are 4 placeholders on this template, defined in this
@@ -271,8 +271,5 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
             with self.login_user_context(superuser):
                 url = page.get_absolute_url('en')
-                expected = '<div class="header">{0}</div>'.format(content)
-                unexpected = '<div class="footer">{0}</div>'.format(content)
                 response = self.client.get(url)
-                self.assertContains(response, expected, status_code=200)
-                self.assertNotContains(response, unexpected, status_code=200)
+                self.assertNotContains(response, content, status_code=200)

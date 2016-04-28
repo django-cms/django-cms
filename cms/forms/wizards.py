@@ -94,6 +94,8 @@ class PageTypeSelect(forms.widgets.Select):
 
 
 class BaseCMSPageForm(forms.Form):
+    page = None
+
     title = forms.CharField(
         label=_(u'Title'), max_length=255,
         help_text=_(u"Provide a title for the new page."))
@@ -114,7 +116,7 @@ class BaseCMSPageForm(forms.Form):
         self.instance = instance
         super(BaseCMSPageForm, self).__init__(*args, **kwargs)
 
-        if getattr(self, 'page', None):
+        if self.page:
             site = self.page.site_id
         else:
             site = Site.objects.get_current()
@@ -160,8 +162,8 @@ class CreateCMSPageForm(BaseCMSPageForm):
     @staticmethod
     def get_placeholder(page, slot=None):
         """
-        Returns the named placeholder or the first editable, non-static
-        placeholder or None.
+        Returns the named placeholder or, if no «slot» provided, the first
+        editable, non-static placeholder or None.
         """
         placeholders = page.get_placeholders()
 
@@ -169,11 +171,10 @@ class CreateCMSPageForm(BaseCMSPageForm):
             for ph in placeholders:
                 if ph.slot == slot and not ph.is_static and ph.is_editable:
                     return ph
-
-        for ph in placeholders:
-            if not ph.is_static and ph.is_editable:
-                return ph
-
+        else:
+            for ph in placeholders:
+                if not ph.is_static and ph.is_editable:
+                    return ph
         return None
 
     def clean(self):
