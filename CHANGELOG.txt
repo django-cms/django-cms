@@ -19,6 +19,7 @@
   existing behavior of allowing toolbar for authorized users at any IP address.
 * Sideframe is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
+* Removed some unnecessary reloads happening after closing sideframe.
 
 
 === 3.2.3 (2016-03-09) ===
