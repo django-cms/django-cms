@@ -137,7 +137,7 @@
         <h2>{% trans "Main Navigation" %}</h2>
         <div class="cms-pagetree-section-nav">
             <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
-                <a href="#root" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                <a href="#root" data-id="#root" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                     <span class="sr-only">{% trans "Options" %}</span>
                 </a>
 
@@ -145,7 +145,7 @@
                     <ul class="cms-pagetree-dropdown-menu-inner">
                         <li><span class="label">{% trans "Pick an action" %}</span></li>
                         <li>
-                            <a href="#" data-id="{{ page.pk }}" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
+                            <a href="#" data-id="#root" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
                                 <span class="cms-icon cms-icon-alias"></span>
                                 <span>{% trans "Paste" %}</span>
                             </a>
