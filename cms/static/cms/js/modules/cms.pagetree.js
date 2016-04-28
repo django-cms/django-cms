@@ -19,17 +19,20 @@ var CMS = window.CMS || {};
      * @namespace CMS
      */
     CMS.PageTree = new CMS.Class({
+        options: {
+            pasteSelector: '.js-cms-tree-item-paste'
+        },
         // TODO add mechanics to set the home page
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
-            this.options = $('.js-cms-pagetree').data('json');
-            this.options = $.extend(true, {}, this.options, options);
+            var opts = $('.js-cms-pagetree').data('json');
+            this.options = $.extend(true, {}, this.options, opts, options);
 
             // states and events
             this.click = 'click.cms.pagetree';
-            this.cache = {
+            this.clipboard = {
                 id: null,
-                target: null,
+                origin: null,
                 type: ''
             };
             this.successTimer = 1000;
@@ -195,6 +198,7 @@ var CMS = window.CMS || {};
                     // columns are provided from base.html options
                     width: '100%',
                     columns: columns
+
                 }
             });
         },
@@ -215,7 +219,7 @@ var CMS = window.CMS || {};
 
             this.ui.tree.on('after_open.jstree', function (e, el) {
                 that._storeNodeId(el.node.data.id);
-                that._checkHelpers();
+                that._updatePasteHelpersState();
             });
 
             this.ui.document.on('keydown.pagetree.alt-mode', function (e) {
@@ -265,7 +269,7 @@ var CMS = window.CMS || {};
 
             // store moved position node
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
-                if (!that.cache.type || that.cache.type === 'cut') {
+                if (!that.clipboard.type || that.clipboard.type === 'cut') {
                     that._moveNode(that._getNodePosition(obj)).done(function () {
                         var instance = that.ui.tree.jstree(true);
 
@@ -299,8 +303,11 @@ var CMS = window.CMS || {};
             });
 
             // attach events to paste
-            this.ui.container.on(this.click, '.cms-tree-item-helpers a', function (e) {
+            this.ui.container.on(this.click, this.options.pasteSelector, function (e) {
                 e.preventDefault();
+                if ($(this).hasClass('cms-pagetree-dropdown-item-disabled')) {
+                    return;
+                }
                 that._paste(e);
             });
 
@@ -359,17 +366,17 @@ var CMS = window.CMS || {};
 
             var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
             // resets if we click again
-            if (this.cache.type === obj.type && jsTreeId === this.cache.id) {
-                this.cache.type = null;
-                this._hideHelpers();
+            if (this.clipboard.type === obj.type && jsTreeId === this.clipboard.id) {
+                this.clipboard.type = null;
+                this.clipboard.id = null;
+                this._disablePaste();
             } else {
-                // we need to cache the node and type so `_showHelpers`
+                // we need to cache the node in the "clipboard" the node and type so `_enablePaste`
                 // will trigger the correct behaviour
-                this.cache.target = obj.element;
-                this.cache.type = obj.type;
-                this.cache.id = jsTreeId;
-                this._showHelpers();
-                this._checkHelpers();
+                this.clipboard.origin = obj.element;
+                this.clipboard.type = obj.type;
+                this.clipboard.id = jsTreeId;
+                this._updatePasteHelpersState();
             }
         },
 
@@ -382,25 +389,21 @@ var CMS = window.CMS || {};
          */
         _paste: function _paste(event) {
             // hide helpers after we picked one
-            this._hideHelpers();
+            this._disablePaste();
 
-            var copyFromId = this._getNodeId(this.cache.target);
+            var copyFromId = this._getNodeId(this.clipboard.origin);
             var copyToId = this._getNodeId($(event.currentTarget));
 
-            // copyToId contains `jstree-1`, assign to root
-            if (copyToId.indexOf('jstree-1') > -1) {
-                copyToId = '#';
-            }
-
-            if (this.cache.type === 'cut') {
+            if (this.clipboard.type === 'cut') {
                 this.ui.tree.jstree('cut', copyFromId);
             } else {
                 this.ui.tree.jstree('copy', copyFromId);
             }
 
             this.ui.tree.jstree('paste', copyToId, 'last');
-            this.cache.type = null;
-            this.cache.target = null;
+            this.clipboard.id = null;
+            this.clipboard.type = null;
+            this.clipboard.origin = null;
         },
 
         /**
@@ -576,12 +579,13 @@ var CMS = window.CMS || {};
          * @method _getElement
          * @private
          * @param {jQuery} el jQuery node form where to search
-         * @return {String|Boolean} jsTree node element id
+         * @return {String} jsTree node element id
          */
         _getNodeId: function _getElement(el) {
             var cls = el.closest('.jstree-grid-cell').attr('class');
 
-            return (cls) ? cls.replace(/.*jsgrid_(.+?)_col.*/, '$1') : false;
+            // if it's not a cell, assume it's the root node
+            return (cls) ? cls.replace(/.*jsgrid_(.+?)_col.*/, '$1') : '#';
         },
 
         /**
@@ -761,47 +765,58 @@ var CMS = window.CMS || {};
         /**
          * Shows paste helpers.
          *
-         * @method _showHelpers
+         * @method _enablePaste
+         * @param {String} [selector=this.options.pasteSelector] jquery selector
          * @private
          */
-        _showHelpers: function _showHelpers() {
+        _enablePaste: function _enablePaste(selector) {
+            var sel = typeof selector !== 'undefined' ? selector : this.options.pasteSelector;
+
             // helpers are generated on the fly, so we need to reference
             // them every single time
-            $('.cms-tree-item-helpers').removeClass('cms-hidden');
+            $(sel).removeClass('cms-pagetree-dropdown-item-disabled');
         },
 
         /**
          * Hides paste helpers.
          *
-         * @method _hideHelpers
+         * @method _disablePaste
+         * @param {String} [selector=this.options.pasteSelector] jquery selector
          * @private
          */
-        _hideHelpers: function _hideHelpers() {
+        _disablePaste: function _disablePaste(selector) {
+            var sel = typeof selector !== 'undefined' ? selector : this.options.pasteSelector;
+
             // helpers are generated on the fly, so we need to reference
             // them every single time
-            $('.cms-tree-item-helpers').addClass('cms-hidden');
-            this.cache.id = null;
+            $(sel).addClass('cms-pagetree-dropdown-item-disabled');
         },
 
         /**
-         * Checks the current state of the helpers after `after_open.jstree`
+         * Updates the current state of the helpers after `after_open.jstree`
          * or `_cutOrCopy` is triggered.
          *
-         * @method _checkHelpers
+         * @method _updatePasteHelpersState
          * @private
          */
-        _checkHelpers: function _checkHelpers() {
-            if (this.cache.type && this.cache.id) {
-                this._showHelpers(this.cache.type);
+        _updatePasteHelpersState: function _updatePasteHelpersState() {
+            var that = this;
+
+            if (this.clipboard.type && this.clipboard.id) {
+                this._enablePaste();
             }
 
             // hide cut element and it's descendants' paste helpers if it is visible
-            if (this.cache.type === 'cut' && this.cache.target) {
-                var descendantIds = this._getDescendantsIds(this.cache.id);
+            if (this.clipboard.type === 'cut' && this.clipboard.origin) {
+                var descendantIds = this._getDescendantsIds(this.clipboard.id);
+                var nodes = [this.clipboard.id];
 
-                [this.cache.id].concat(descendantIds).forEach(function (id) {
-                    $('.jsgrid_' + id + '_col .cms-tree-item-helpers')
-                        .addClass('cms-hidden');
+                if (descendantIds && descendantIds.length) {
+                    nodes = nodes.concat(descendantIds);
+                }
+
+                nodes.forEach(function (id) {
+                    that._disablePaste('.jsgrid_' + id + '_col ' + that.options.pasteSelector);
                 });
             }
         },
@@ -820,7 +835,8 @@ var CMS = window.CMS || {};
                 element.removeClass('cms-tree-node-success');
             }, this.successTimer);
             // hide elements
-            this._hideHelpers();
+            this._disablePaste();
+            this.clipboard.id = null;
         },
 
         /**
