@@ -10,6 +10,10 @@
     width: 0;
     bottom: 0;
     z-index: z(sideframe, base);
+
+    @media (max-width: $screen-tablet - 1px) {
+        width: 100% !important;
+    }
 }
 
 .cms-sideframe-frame {
@@ -38,17 +42,6 @@
     }
 }
 
-.cms-sideframe-resize {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: z(sideframe, resize);
-    width: $sideframe-resize-width;
-    height: 100%;
-    cursor: col-resize;
-    background: transparent;
-    box-shadow: $sideframe-box-shadow;
-}
 // when resizing the sideframe shime get's z-index between frame
 // and resize in order for mouse events not to trigger on iframe, same as
 // with modal

@@ -5,6 +5,8 @@
     {{ block.super }}
 {% endblock %}
 
+{% block bodyclass %}cms-admin cms-admin-modal{% endblock %}
+
 {% block content %}
     <div class="cms-content-wizard">
         {% block wizard %}{% endblock %}

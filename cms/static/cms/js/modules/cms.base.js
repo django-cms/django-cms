@@ -49,17 +49,6 @@ var CMS = {
         CMD_RIGHT: 93,
         CMD_FIREFOX: 224,
         CTRL: 17
-    },
-    /**
-     * Provides breakpoints for certain device widths
-     *
-     * @module CMS
-     * @submodule CMS.BREAKPOINTS
-     * @example
-     *     if (window.width >= CMS.BREAKPOINTS.mobile) { ... };
-     */
-    BREAKPOINTS: {
-        mobile: 420
     }
 };
 
@@ -137,8 +126,6 @@ var CMS = {
                         } else if (url) {
                             // on_close can also provide a url, reload to the new destination
                             that.reloadBrowser(url);
-                        } else {
-                            that.reloadBrowser();
                         }
                     }
                 });
@@ -232,6 +219,7 @@ var CMS = {
                         CMS.API.locked = false;
                         // determine if logged in or not
                         settings = (data) ? JSON.parse(data) : CMS.config.settings;
+                        // istanbul ignore else
                         if (CMS.API.Toolbar) {
                             CMS.API.Toolbar.hideLoader();
                         }
@@ -283,6 +271,7 @@ var CMS = {
                         CMS.API.locked = false;
                         // determine if logged in or not
                         settings = (data) ? JSON.parse(data) : CMS.config.settings;
+                        // istanbul ignore else
                         if (CMS.API.Toolbar) {
                             CMS.API.Toolbar.hideLoader();
                         }
@@ -431,6 +420,7 @@ var CMS = {
                 previous = opts.leading === false ? 0 : $.now();
                 timeout = null;
                 result = func.apply(context, args);
+                // istanbul ignore else
                 if (!timeout) {
                     context = args = null;
                 }
@@ -451,6 +441,7 @@ var CMS = {
                     }
                     previous = now;
                     result = func.apply(context, args);
+                    // istanbul ignore else
                     if (!timeout) {
                         context = args = null;
                     }
