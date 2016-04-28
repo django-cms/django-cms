@@ -41,8 +41,8 @@ var CMS = window.CMS || {};
             this._setupUI();
             this._events();
 
-            // cancel if pagtree is not available
-            if (!$.isEmptyObject(this.options)) {
+            // cancel if pagetree is not available
+            if (!$.isEmptyObject(opts)) {
                 this._setup();
             }
         },
