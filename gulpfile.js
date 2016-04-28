@@ -143,6 +143,7 @@ var INTEGRATION_TESTS = [
         'pagetree',
         'disableToolbar',
         'dragndrop',
+        'copy-apphook-page',
         'history',
         'revertLive',
         'narrowScreen'
