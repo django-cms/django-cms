@@ -168,13 +168,12 @@ class CreateCMSPageForm(BaseCMSPageForm):
         placeholders = page.get_placeholders()
 
         if slot:
-            for ph in placeholders:
-                if ph.slot == slot and not ph.is_static and ph.is_editable:
-                    return ph
-        else:
-            for ph in placeholders:
-                if not ph.is_static and ph.is_editable:
-                    return ph
+            placeholders = placeholders.filter(slot=slot)
+
+        for ph in placeholders:
+            if not ph.is_static and ph.is_editable:
+                return ph
+
         return None
 
     def clean(self):
