@@ -249,12 +249,4 @@ describe('CMS.PageTree', function () {
             expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col .js-cms-tree-item-paste');
         });
     });
-
-    describe('showMessage()', function () {
-        it('does not do anything if message was not provided');
-        it('shows message');
-        it('replaces existing message if one is already shown');
-        it('can show error message');
-        it('can provide a "reload" link');
-    });
 });
