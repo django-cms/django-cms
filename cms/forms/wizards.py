@@ -114,7 +114,7 @@ class BaseCMSPageForm(forms.Form):
         self.instance = instance
         super(BaseCMSPageForm, self).__init__(*args, **kwargs)
 
-        if self.page:
+        if getattr(self, 'page', None):
             site = self.page.site_id
         else:
             site = Site.objects.get_current()
@@ -158,15 +158,23 @@ class CreateCMSPageForm(BaseCMSPageForm):
                 create_title(language, title, page)
 
     @staticmethod
-    def get_first_placeholder(page):
+    def get_placeholder(page, slot=None):
         """
-        Returns the first editable, non-static placeholder or None.
+        Returns the named placeholder or the first editable, non-static
+        placeholder or None.
         """
-        for placeholder in page.get_placeholders():
-            if not placeholder.is_static and placeholder.is_editable:
-                return placeholder
-        else:
-            return None
+        placeholders = page.get_placeholders()
+
+        if slot:
+            for ph in placeholders:
+                if ph.slot == slot and not ph.is_static and ph.is_editable:
+                    return ph
+
+        for ph in placeholders:
+            if not ph.is_static and ph.is_editable:
+                return ph
+
+        return None
 
     def clean(self):
         """
@@ -271,17 +279,20 @@ class CreateCMSPageForm(BaseCMSPageForm):
             content = self.cleaned_data.get('content')
             plugin_type = get_cms_setting('WIZARD_CONTENT_PLUGIN')
             plugin_body = get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY')
+            slot = get_cms_setting('WIZARD_CONTENT_PLACEHOLDER')
+
             if plugin_type in plugin_pool.plugins and plugin_body:
                 if content and permissions.has_plugin_permission(
                         self.user, plugin_type, "add"):
-                    placeholder = self.get_first_placeholder(page)
+                    placeholder = self.get_placeholder(page, slot=slot)
                     if placeholder:
-                        add_plugin(**{
+                        opts = {
                             'placeholder': placeholder,
                             'plugin_type': plugin_type,
                             'language': self.language_code,
                             plugin_body: content,
-                        })
+                        }
+                        add_plugin(**opts)
 
         if is_installed('reversion'):
             from cms.utils.helpers import make_revision_with_plugins

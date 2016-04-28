@@ -67,6 +67,7 @@ DEFAULTS = {
     'WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
+    'WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
 }
 
 
