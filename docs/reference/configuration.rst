@@ -1065,11 +1065,11 @@ CMS_WIZARD_CONTENT_PLACEHOLDER
 default
     None
 
-When set the CMS page wizards will target the specified placeholder when
+When set to an editable, non-static placeholder that is available on the page
+template, the CMS page wizards will target the specified placeholder when
 adding any content supplied in the wizards' "Content" field. If this is left
-unset, or, the specified placeholder (by slot name) is not editable, is a
-static placeholder or is simply not found, then the content will target the
-first suitable placeholder found on the page's template.
+unset, then the content will target the first suitable placeholder found on
+the page's template.
 
 .. setting:: CMS_WIZARD_CONTENT_PLUGIN
 
