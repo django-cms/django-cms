@@ -249,4 +249,91 @@ describe('CMS.PageTree', function () {
             expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col .js-cms-tree-item-paste');
         });
     });
+
+    describe('_getNodeId()', function () {
+        var pagetree;
+        var node;
+        var rootNode;
+
+        beforeEach(function (done) {
+            $(function () {
+                node = $('<div class="jstree-grid-cell jsgrid_j125_col test"></div>');
+                rootNode = $('<div class="root node"></div>');
+                pagetree = new CMS.PageTree();
+                pagetree.ui.container.append(node);
+                pagetree.ui.container.append(rootNode);
+                done();
+            });
+        });
+
+        it('finds the id of the of the closest pagetree node', function () {
+            expect(pagetree._getNodeId(node)).toEqual('j125');
+        });
+
+        it('handles root node', function () {
+            expect(pagetree._getNodeId(rootNode)).toEqual('#');
+        });
+    });
+
+    describe('_paste()', function () {
+        var pagetree;
+
+        beforeEach(function (done) {
+            $(function () {
+                pagetree = new CMS.PageTree();
+                spyOn(pagetree, '_getNodeId').and.returnValues('FROM', 'TO');
+                spyOn(pagetree, '_disablePaste');
+                done();
+            });
+        });
+
+        it('disables pasting', function () {
+            pagetree._paste({ currentTarget: 'MOCK' });
+            expect(pagetree._disablePaste).toHaveBeenCalledTimes(1);
+        });
+
+        it('triggers cut event if necessary', function () {
+            spyOn($.fn, 'jstree');
+            pagetree.clipboard.type = 'cut';
+            pagetree._paste({ currentTarget: 'MOCK' });
+            expect($.fn.jstree).toHaveBeenCalledTimes(2);
+            expect($.fn.jstree).toHaveBeenCalledWith('cut', 'FROM');
+            expect($.fn.jstree).toHaveBeenCalledWith('paste', 'TO', 'last');
+        });
+
+        it('triggers copy event if necessary', function () {
+            spyOn($.fn, 'jstree');
+            pagetree.clipboard.type = 'copy';
+            pagetree._paste({ currentTarget: 'MOCK' });
+            expect($.fn.jstree).toHaveBeenCalledTimes(2);
+            expect($.fn.jstree).toHaveBeenCalledWith('copy', 'FROM');
+            expect($.fn.jstree).toHaveBeenCalledWith('paste', 'TO', 'last');
+        });
+
+        it('triggers paste event with specific state', function () {
+            spyOn($.fn, 'jstree').and.callFake(function (type) {
+                if (type === 'paste') {
+                    expect(pagetree.clipboard.isPasting).toEqual(true);
+                }
+            });
+
+            pagetree._paste({ currentTarget: 'MOCK' });
+        });
+
+        it('unsets the clipboard', function () {
+            spyOn($.fn, 'jstree');
+            pagetree.clipboard = {
+                id: 1,
+                type: 2,
+                origin: 3
+            };
+            pagetree._paste({ currentTarget: 'MOCK' });
+            expect(pagetree.clipboard).toEqual({
+                id: null,
+                type: null,
+                origin: null,
+                isPasting: false
+            });
+        });
+    });
 });

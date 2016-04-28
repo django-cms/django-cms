@@ -590,7 +590,7 @@ var CMS = window.CMS || {};
          * @param {jQuery} el jQuery node form where to search
          * @return {String} jsTree node element id
          */
-        _getNodeId: function _getElement(el) {
+        _getNodeId: function _getNodeId(el) {
             var cls = el.closest('.jstree-grid-cell').attr('class');
 
             // if it's not a cell, assume it's the root node
