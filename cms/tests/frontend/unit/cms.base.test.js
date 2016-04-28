@@ -256,7 +256,7 @@ describe('cms.base.js', function () {
                 expect(win.parent.location.reload).toHaveBeenCalled();
             });
 
-            it('calls itself if there is no url and response matches current location', function () {
+            it('does not call itself if there is no url and response matches current location', function () {
                 var win = createFakeWindow();
                 win = $.extend(true, {}, win, win.parent);
                 win.parent = false;
@@ -281,10 +281,10 @@ describe('cms.base.js', function () {
                     }
                 }));
 
-                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
-                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual([]);
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(1);
+                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual([false, false, true]);
                 expect(win.CMS.API.locked).toEqual(false);
-                expect(win.location.reload).toHaveBeenCalled();
+                expect(win.location.reload).not.toHaveBeenCalled();
             });
 
             it('uses correct timeout', function () {

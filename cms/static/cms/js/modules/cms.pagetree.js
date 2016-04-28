@@ -678,7 +678,7 @@ var CMS = window.CMS || {};
                             model: 'cms.page',
                             pk: parent.CMS.config.request.page_id
                         };
-                        CMS.API.Helpers.reloadBrowser(false, false, true, data);
+                        CMS.API.Helpers.reloadBrowser('REFRESH_PAGE', false, true, data);
                     } else {
                         // otherwise simply reload the page
                         that._reloadHelper();
