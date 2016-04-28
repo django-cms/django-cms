@@ -200,7 +200,7 @@ if __name__ == '__main__':
         ],
         INSTALLED_APPS=INSTALLED_APPS,
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
-        INTERNAL_IPS = ['127.0.0.1'],
+        INTERNAL_IPS=['127.0.0.1'],
         AUTHENTICATION_BACKENDS=(
             'django.contrib.auth.backends.ModelBackend',
             'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',

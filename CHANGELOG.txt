@@ -11,9 +11,17 @@
   respective animations.
 * Added unit tests for CMS JavaScript files
 * Added frontend integration tests (written with Casper JS)
+* Removed frontend integration tests (written with Selenium)
 * Provides the ability to declare cache expiration periods on a per-plugin basis
 * Improve compatibility with Django 1.9 esp. relating to the handling of
   `related_name`s of model fields in plugins.
+* Minor UI improvements
+* Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
+  the toolbar will appear for authorized users. If left unset, retains the
+  existing behavior of allowing toolbar for authorized users at any IP address.
+* Sideframe is no longer resizable, opens to 90% of the screen or 100% on
+  small screens.
+* Removed some unnecessary reloads happening after closing sideframe.
 
 === 3.2.3 (2016-03-09) ===
 

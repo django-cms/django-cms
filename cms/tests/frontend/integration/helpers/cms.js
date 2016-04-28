@@ -1,8 +1,9 @@
 /* global document, localStorage */
 'use strict';
-var globals = require('../settings/globals');
 
-module.exports = function (casperjs) {
+module.exports = function (casperjs, settings) {
+    var globals = typeof settings === 'undefined' ? require('../settings/globals') : settings;
+
     return {
         /**
          * Logs in with the given parameters
@@ -31,7 +32,6 @@ module.exports = function (casperjs) {
         /**
          * removes a page by name, or the first encountered one
          *
-         * @public
          * @param {Object} opts
          * @param {String} [opts.title] Name of the page to delete
          */
@@ -39,7 +39,7 @@ module.exports = function (casperjs) {
             var that = this;
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.cms-pagetree [href*="delete"]')
+                    .waitUntilVisible('.js-cms-pagetree-options')
                     .then(that.expandPageTree())
                     .then(function () {
                         var pageId;
@@ -47,11 +47,16 @@ module.exports = function (casperjs) {
                             pageId = that.getPageId(opts.title);
                         }
 
-                        if (pageId) {
-                            this.click('.cms-pagetree [href*="delete"][href*="' + pageId + '"]');
-                        } else {
-                            this.click('.cms-pagetree [href*="delete"]'); // first one
-                        }
+                        var data = pageId ? '[data-id="' + pageId + '"]' : '';
+                        var href = pageId ? '[href*="' + pageId + '"]' : '';
+
+                        return this.then(function () {
+                                this.click('.js-cms-pagetree-options' + data);
+                            })
+                            .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                            .then(function () {
+                                this.click('.cms-pagetree-jstree [href*="delete"]' + href);
+                            });
                     })
                     .waitForUrl(/delete/)
                     .waitUntilVisible('input[type=submit]')
@@ -64,21 +69,61 @@ module.exports = function (casperjs) {
         },
 
         /**
-        * Adds the page. Optionally added page can be nested into
-        * a parent with given title (first in a list of equal titles taken).
-        *
-        * @public
-        * @param {Object} opts
-        * @param {String} opts.title name of the page
-        * @param {String} [opts.title] name of the parent page
-        */
+         * Opens dropdown and triggers copying a page
+         *
+         * @public
+         * @param {Object} opts
+         * @param {Number|String} opts.page page id
+         */
+        triggerCopyPage: function (opts) {
+            return function () {
+                return this.then(function () {
+                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                    })
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                    .then(function () {
+                        this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"]');
+                    })
+                    .wait(100);
+            };
+        },
+
+        /**
+         * Opens dropdown and triggers cutting a page
+         *
+         * @public
+         * @param {Object} opts
+         * @param {Number|String} opts.page page id
+         */
+        triggerCutPage: function (opts) {
+            return function () {
+                return this.then(function () {
+                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                    })
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                    .then(function () {
+                        this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"] ~ .js-cms-tree-item-cut');
+                    })
+                    .wait(100);
+            };
+        },
+
+        /**
+         * Adds the page. Optionally added page can be nested into
+         * a parent with given title (first in a list of equal titles taken).
+         *
+         * @public
+         * @param {Object} opts
+         * @param {String} opts.title name of the page
+         * @param {String} [opts.title] name of the parent page
+         */
         addPage: function (opts) {
             var that = this;
 
             if (opts.parent) {
                 return function () {
                     return this.wait(1000).thenOpen(globals.adminPagesUrl)
-                        .waitUntilVisible('.cms-pagetree')
+                        .waitUntilVisible('.cms-pagetree-jstree')
                         .then(that.waitUntilAllAjaxCallsFinish())
                         .then(that.expandPageTree())
                         .then(function () {
@@ -121,6 +166,95 @@ module.exports = function (casperjs) {
         },
 
         /**
+         * @function _modifyPageAdvancedSettings
+         * @private
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {Object} opts.fields { fieldName: value, ... }
+         */
+        _modifyPageAdvancedSettings: function _modifyPageAdvancedSettings(opts) {
+            var that = this;
+            return function () {
+                return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.cms-pagetree-jstree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .then(function () {
+                        var pageId = that.getPageId(opts.page);
+                        this.thenOpen(globals.adminPagesUrl + pageId + '/advanced-settings/');
+                    })
+                    .waitForSelector('#page_form', function () {
+                        this.fill('#page_form', opts.fields, true);
+                    })
+                    .waitForUrl(/page/)
+                    .waitUntilVisible('.success')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .wait(1000);
+            };
+        },
+
+        /**
+         * @function addApphookToPage
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} opts.apphook app name
+         */
+        addApphookToPage: function addApphookToPage(opts) {
+            return this._modifyPageAdvancedSettings({
+                page: opts.page,
+                fields: {
+                    application_urls: opts.apphook
+                }
+            });
+        },
+
+        /**
+         * @function setPageTemplate
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} opts.tempalte template file name (e.g. simple.html)
+         */
+        setPageTemplate: function setPageTemplate(opts) {
+            return this._modifyPageAdvancedSettings({
+                page: opts.page,
+                fields: {
+                    template: opts.template
+                }
+            });
+        },
+
+        /**
+         * @function publishPage
+         * @param {Object} opts options
+         * @param {String} opts.page page name (will take first one in the tree)
+         * @param {String} [opts.language='en'] language to publish
+         */
+        publishPage: function publishPage(opts) {
+            var that = this;
+            var language = typeof opts.language !== 'undefined' ? opts.language : 'en';
+
+            return function () {
+                var pageId;
+                return this.wait(1000).thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.cms-pagetree-jstree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .then(function () {
+                        pageId = that.getPageId(opts.page);
+                        this.click('.cms-tree-item-lang a[href*="' + pageId + '/' + language + '/preview/"] span');
+                    })
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu', function () {
+                        this.click('.cms-pagetree-dropdown-menu-open a[href*="/' + language + '/publish/"]');
+                    })
+                    .waitForResource(/publish/)
+                    .waitUntilVisible('.cms-pagetree-jstree')
+                    .then(that.waitUntilAllAjaxCallsFinish())
+                    .then(that.expandPageTree())
+                    .wait(1000);
+            };
+        },
+
+        /**
          * Adds the plugin. If the parent is not specified, plugin
          * is added to the first placeholder on the page.
          *
@@ -143,9 +277,7 @@ module.exports = function (casperjs) {
 
             return function () {
                 return this.then(that.waitUntilAllAjaxCallsFinish()).thenOpen(globals.editUrl)
-                    .waitForSelector('.cms-toolbar-expanded', function () {
-                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-                    })
+                    .then(that.switchTo('structure'))
                     // only add to placeholder if no parent specified
                     .thenBypassIf(opts.parent, 1)
                     .waitUntilVisible('.cms-structure', function () {
@@ -213,7 +345,7 @@ module.exports = function (casperjs) {
                         }
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
-                    }).waitForResource(/edit-plugin/).then(that.waitUntilAllAjaxCallsFinish());
+                    }).waitForUrl(/.*/).then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -234,18 +366,18 @@ module.exports = function (casperjs) {
          * @param {String} view 'structure' or 'content'
          */
         switchTo: function (view) {
-            var url;
+            var pos;
             if (view === 'structure') {
-                url = 'build';
+                pos = 'first';
             } else if (view === 'content') {
-                url = 'edit';
+                pos = 'last';
             } else {
                 throw new Error('Invalid arguments passed to cms.switchTo, should be either "structure" or "content"');
             }
             return function () {
                 return this.waitForSelector('.cms-toolbar-expanded')
                     .then(function () {
-                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
+                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn:' + pos + '-child');
                     });
             };
         },
@@ -367,7 +499,7 @@ module.exports = function (casperjs) {
                             var amount = 0;
 
                             try {
-                                amount = $.active;
+                                amount = CMS.$.active;
                             } catch (e) {}
 
                             return amount;
@@ -376,6 +508,81 @@ module.exports = function (casperjs) {
                         return (remainingAjaxRequests === 0);
                     }).wait(200);
             };
+        },
+
+        /**
+         * @function createJSTreeXPathFromTree
+         * @param {Object[]} tree tree object, see example
+         * @param {Object} [opts]
+         * @param {Object} [opts.topLevel=true] is it the top level?
+         * @example tree
+         *
+         *     [
+         *         {
+         *             name: 'Homepage'
+         *             children: [
+         *                 {
+         *                     name: 'Nested'
+         *                 }
+         *             ]
+         *         },
+         *         {
+         *             name: 'Sibling'
+         *         }
+         *     ]
+         */
+        createJSTreeXPathFromTree: function createJSTreeXPathFromTree(tree, opts) {
+            var xPath = '';
+            var topLevel = opts && typeof opts.topLevel !== 'undefined' ? topLevel : true;
+
+            tree.forEach(function (node, index) {
+                if (index === 0) {
+                    if (topLevel) {
+                        xPath += '//';
+                    } else {
+                        xPath += './';
+                    }
+                    xPath += 'li[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name +
+                        '")]${children}]';
+                } else {
+                    xPath += '/following-sibling::li' +
+                        '[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name + '")]${children}]';
+                }
+
+                if (node.children) {
+                    xPath = xPath.replace(
+                        '${children}',
+                        '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                        '[' + createJSTreeXPathFromTree(node.children, { topLevel: false }) + ']'
+                    );
+                } else {
+                    xPath = xPath.replace('${children}', '');
+                }
+            });
+
+            return xPath;
+        },
+
+        /**
+         * @function getPasteHelpersXPath
+         * @public
+         * @param {Object} opts
+         * @param {Boolean} visible get visible or hidden helpers
+         * @param {String|Number} [pageId] optional id of the page to filter helpers
+         */
+        getPasteHelpersXPath: function getPasteHelpersXPath(opts) {
+            var xpath = '//*[self::div or self::span][contains(@class, "cms-tree-item-helpers")]';
+            if (opts && opts.visible) {
+                xpath += '[not(contains(@class, "cms-hidden"))]';
+            } else {
+                xpath += '[contains(@class, "cms-hidden")]';
+            }
+            xpath += '[./a[contains(text(), "Paste")]';
+            if (opts && opts.pageId) {
+                xpath += '[contains(@data-id, "' + opts.pageId + '")]';
+            }
+            xpath += ']';
+            return xpath;
         }
     };
 };

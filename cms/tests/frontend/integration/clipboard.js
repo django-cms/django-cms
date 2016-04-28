@@ -439,9 +439,10 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
 
             this.mouse.down('.cms-clipboard-containers .cms-draggable');
             this.mouse.move(column.left + column.width / 2, column.top + column.height);
+            this.mouse.move(column.left + column.width / 2 + 30, column.top + column.height);
         }).then(function () {
             test.assertExists('.cms-draggable-disallowed', 'Red line indicates impossibility of a drop');
-            this.mouse.up(column.left + column.width / 2, column.top + column.height);
+            this.mouse.up(column.left + column.width / 2  + 30, column.top + column.height);
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Pasting plugin was not successful');
         })
 

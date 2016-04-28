@@ -124,6 +124,8 @@ It accepts the following options
   if set, copied content will be appended to the original one;
 * ``--site``: specify a SITE_ID to operate on sites different from the current one;
 * ``--verbosity``: set for more verbose output.
+* ``--skip-content``: if set, content is not copied, and the command will only
+  create titles in the given language.
 
 Example::
 

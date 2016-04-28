@@ -41,20 +41,8 @@ casper.test.begin('Sideframe', function (test) {
         .wait(300, function () {
             test.assertEvalEquals(function () {
                 return $('.cms-sideframe').width();
-            }, 1280 * 0.8, 'Sideframe opens with default width');
+            }, 1280 * 0.9, 'Sideframe opens with default width');
         })
-        .then(function () {
-            this.mouse.down('.cms-sideframe-resize');
-            this.mouse.move(400, 200);
-        })
-        .then(function () {
-            this.mouse.up(400, 200);
-            test.assertEvalEquals(function () {
-                return $('.cms-sideframe').width();
-            }, 400, 'Sideframe can be resized');
-        })
-        // have to wait after resize for the changes being saved (default is 600ms)
-        .wait(700)
         .then(function () {
             this.reload();
         })
@@ -62,9 +50,7 @@ casper.test.begin('Sideframe', function (test) {
         .waitUntilVisible('.cms-sideframe')
         .wait(300)
         .then(function () {
-            test.assertEvalEquals(function () {
-                return $('.cms-sideframe').width();
-            }, 400, 'Sideframe width is remembered after reload');
+            test.assertVisible('.cms-sideframe', 'Sideframe is open after reload');
         })
         .then(function () {
             this.click('.cms-sideframe .cms-icon-close');
@@ -73,6 +59,7 @@ casper.test.begin('Sideframe', function (test) {
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertNotVisible('.cms-sideframe-frame', 'The sideframe has been closed');
         })
+        .viewport(1280, 1024)
         .run(function () {
             test.done();
         });

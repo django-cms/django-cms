@@ -12,12 +12,17 @@ from django.template.defaultfilters import title
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, force_text
 
+from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
-from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
+from cms.constants import (
+    EXPIRE_NOW,
+    MAX_EXPIRATION_TTL,
+    PUBLISHER_STATE_DIRTY,
+)
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 
@@ -398,6 +403,31 @@ class Placeholder(models.Model):
                 return EXPIRE_NOW
 
         return min_ttl
+
+    def mark_as_dirty(self, language, clear_cache=True):
+        """
+        Utility method to mark the attached object of this placeholder
+        (if any) as dirty.
+        This allows us to know when the content in this placeholder
+        has been changed.
+        """
+        from cms.models import Page, StaticPlaceholder, Title
+
+        if clear_cache:
+            clear_placeholder_cache(self, language)
+
+        # Find the attached model for this placeholder
+        # This can be a static placeholder, page or none.
+        attached_model = self._get_attached_model()
+
+        if attached_model is Page:
+            Title.objects.filter(
+                page=self.page,
+                language=language,
+            ).update(publisher_state=PUBLISHER_STATE_DIRTY)
+
+        elif attached_model is StaticPlaceholder:
+            StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
 
 
 reversion_register(Placeholder)
