@@ -219,7 +219,13 @@ var CMS = window.CMS || {};
 
             this.ui.tree.on('after_open.jstree', function (e, el) {
                 that._storeNodeId(el.node.data.id);
-                that._updatePasteHelpersState();
+
+                // `after_open` event can be triggered when pasting
+                // is in progress (meaning we are pasting into a leaf node
+                // in this case we do not need to update helpers state
+                if (this.clipboard && !this.clipboard.isPasting) {
+                    that._updatePasteHelpersState();
+                }
             });
 
             this.ui.document.on('keydown.pagetree.alt-mode', function (e) {
@@ -401,10 +407,12 @@ var CMS = window.CMS || {};
                 this.ui.tree.jstree('copy', copyFromId);
             }
 
+            this.clipboard.isPasting = true;
             this.ui.tree.jstree('paste', copyToId, 'last');
             this.clipboard.id = null;
             this.clipboard.type = null;
             this.clipboard.origin = null;
+            this.clipboard.isPasting = false;
         },
 
         /**
