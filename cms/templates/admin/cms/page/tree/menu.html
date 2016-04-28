@@ -41,9 +41,6 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
-                    <a href="#" data-id="{{ page.pk }}"><span class="cms-icon cms-icon-alias"></span> {% filter escapejs %}{% trans "Paste" %}{% endfilter %}</a>
-                </div>
             </div>
         </div>
     '
@@ -62,7 +59,6 @@
     '
     {% for lang in site_languages %}
     data-col{{ lang|lower|cut:'-' }}='
-
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
                 <div class="cms-tree-item-inner cms-pagetree-dropdown js-cms-pagetree-dropdown">
@@ -204,6 +200,12 @@
                                     </a>
                                 </li>
                             {% endif %}
+                            <li>
+                                <a href="#" data-id="{{ page.pk }}" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
+                                    <span class="cms-icon cms-icon-alias"></span>
+                                    <span>{% filter escapejs %}{% trans "Paste" %}{% endfilter %}</span>
+                                </a>
+                            </li>
                             {% if has_delete_permission %}
                                 <li>
                                     <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}" title="{% filter escapejs %}{% trans 'Delete' %}{% endfilter %}">
