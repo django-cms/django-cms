@@ -111,7 +111,7 @@ See it at work
 
 Visit your Polls page on your site, and you'll see a new *Polls* item in the toolbar.
 
-It gives you quick access to the list of Polls in the Admin, and gives you a shortcut for
+It gives you quick access to the list of Polls in the Admin, and gives you a short-cut for
 creating a new Poll.
 
 There's a lot more to django CMS toolbar classes than this - see

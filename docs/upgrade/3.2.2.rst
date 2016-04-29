@@ -13,7 +13,7 @@ Improvements
 
 - Substantial "under-the-hood" improvements to the page tree resulting in
   significant reduction of page-tree reloads and generally cleaner code
-- Update jsTree version to 3.2.1 with slight adaptions to the page tree
+- Update jsTree version to 3.2.1 with slight adaptations to the page tree
 - Improve the display and usability of the language menu, especially in cases
   where there are many languages
 - Documentation improvements
