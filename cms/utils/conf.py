@@ -64,10 +64,10 @@ DEFAULTS = {
     'APP_NAME': None,
     'TOOLBAR_HIDE': False,
     'UNESCAPED_RENDER_MODEL_TAGS': True,
-    'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
-    'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
-    'WIZARD_CONTENT_PLUGIN_BODY': 'body',
-    'WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
+    'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
+    'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
+    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
+    'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
 }
 
 
@@ -265,11 +265,25 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
 }
 
+# To be removed in v3.5.0
+DEPRECATED_WIZARD_SETTINGS = {
+    'PAGE_WIZARD_DEFAULT_TEMPLATE': 'WIZARD_DEFAULT_TEMPLATE',
+    'PAGE_WIZARD_CONTENT_PLUGIN': 'WIZARD_CONTENT_PLUGIN',
+    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'WIZARD_CONTENT_PLUGIN_BODY',
+    'PAGE_WIZARD_CONTENT_PLACEHOLDER': 'WIZARD_CONTENT_PLACEHOLDER',
+}
+
 
 def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
     else:
+        # To be removed in v3.5.0
+        if name in DEPRECATED_WIZARD_SETTINGS:
+            new_setting = 'CMS_%s' % name
+            old_setting = 'CMS_%s' % DEPRECATED_WIZARD_SETTINGS[name]
+            return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
+
         return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
 
 

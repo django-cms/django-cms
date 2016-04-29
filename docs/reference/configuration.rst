@@ -1046,21 +1046,21 @@ Example::
 
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
-.. setting:: WIZARD_DEFAULT_TEMPLATE
+.. setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 
-WIZARD_DEFAULT_TEMPLATE
-=======================
+CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+================================
 
 default
     ``TEMPLATE_INHERITANCE_MAGIC``
 
-This is the path of the template used to create pages in the wizard. It must be one
-of the templates in :setting:`CMS_TEMPLATES`.
+This is the path of the template used to create pages in the wizard. It must be
+one of the templates in :setting:`CMS_TEMPLATES`.
 
-.. setting:: CMS_WIZARD_CONTENT_PLACEHOLDER
+.. setting:: CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 
-CMS_WIZARD_CONTENT_PLACEHOLDER
-==============================
+CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+===================================
 
 default
     None
@@ -1071,29 +1071,28 @@ adding any content supplied in the wizards' "Content" field. If this is left
 unset, then the content will target the first suitable placeholder found on
 the page's template.
 
-.. setting:: CMS_WIZARD_CONTENT_PLUGIN
+.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN
 
-CMS_WIZARD_CONTENT_PLUGIN
-=========================
+CMS_PAGE_WIZARD_CONTENT_PLUGIN
+==============================
 
 default
     ``TextPlugin``
 
-This is the name of the plugin created in the Page Wizard when the "Content" field is
-filled in.
-There should be no need to change it, unless you **don't** use
-``djangocms-text-ckeditor`` in your project.
+This is the name of the plugin created in the Page Wizard when the "Content"
+field is filled in. There should be no need to change it, unless you
+**don't** use ``djangocms-text-ckeditor`` in your project.
 
-.. setting:: CMS_WIZARD_CONTENT_PLUGIN_BODY
+.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
-CMS_WIZARD_CONTENT_PLUGIN_BODY
-==============================
+CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+===================================
 
 default
     ``body``
 
-This is the name of the body field in the plugin created in the Page Wizard when the
-"Content" field is filled in.
-There should be no need to change it, unless you **don't** use
-``djangocms-text-ckeditor`` in your project **and** your custom plugin defined in
-:setting:`CMS_WIZARD_CONTENT_PLUGIN` have a body field **different** than ``body``.
+This is the name of the body field in the plugin created in the Page Wizard
+when the "Content" field is filled in. There should be no need to change it,
+unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
+your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
+body field **different** than ``body``.
