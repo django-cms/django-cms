@@ -25,8 +25,19 @@
     a:hover,
     a:active,
     a:focus {
+        // to override admin styles
         color: $white !important;
         background: $color-primary;
+    }
+    .cms-pagetree-dropdown-item-disabled {
+        opacity: 0.2;
+        color: $gray-darker;
+        cursor: default;
+        &:hover,
+        &:focus {
+            background: none !important;
+            color: $gray-darker !important;
+        }
     }
     &.cms-pagetree-dropdown-menu-condensed {
         a,

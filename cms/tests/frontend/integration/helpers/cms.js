@@ -109,6 +109,26 @@ module.exports = function (casperjs, settings) {
         },
 
         /**
+         * Opens dropdown and triggers pasting a page
+         *
+         * @public
+         * @param {Object} opts
+         * @param {Number|String} opts.page page id
+         */
+        triggerPastePage: function (opts) {
+            return function () {
+                return this.then(function () {
+                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                    })
+                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                    .then(function () {
+                        this.mouse.click('.js-cms-tree-item-paste[data-id="' + opts.page + '"]');
+                    })
+                    .wait(100);
+            };
+        },
+
+        /**
          * Adds the page. Optionally added page can be nested into
          * a parent with given title (first in a list of equal titles taken).
          *
@@ -571,17 +591,16 @@ module.exports = function (casperjs, settings) {
          * @param {String|Number} [pageId] optional id of the page to filter helpers
          */
         getPasteHelpersXPath: function getPasteHelpersXPath(opts) {
-            var xpath = '//*[self::div or self::span][contains(@class, "cms-tree-item-helpers")]';
+            var xpath = '//a[contains(@class, "js-cms-tree-item-paste")]';
             if (opts && opts.visible) {
-                xpath += '[not(contains(@class, "cms-hidden"))]';
+                xpath += '[not(contains(@class, "cms-pagetree-dropdown-item-disabled"))]';
             } else {
-                xpath += '[contains(@class, "cms-hidden")]';
+                xpath += '[contains(@class, "cms-pagetree-dropdown-item-disabled")]';
             }
-            xpath += '[./a[contains(text(), "Paste")]';
+            xpath += '[./span[contains(text(), "Paste")]]';
             if (opts && opts.pageId) {
                 xpath += '[contains(@data-id, "' + opts.pageId + '")]';
             }
-            xpath += ']';
             return xpath;
         }
     };
