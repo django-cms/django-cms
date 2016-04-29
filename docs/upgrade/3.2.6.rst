@@ -20,7 +20,7 @@ Deprecation of Old-Style Page Wizard Settings
 =============================================
 
 In this release, we introduce a new naming scheme for the Page Wizard settings
-that better reflects that they effect the CMS' Page Wizards, rather than all
+that better reflects that they effect the CMS's Page Wizards, rather than all
 wizards. This will also allow future settings for different wizards with a
 smaller chance of confusion or naming-collision.
 
@@ -39,5 +39,5 @@ them as follows at their earliest convenience. ::
     CMS_WIZARD_CONTENT_PLACEHOLDER => CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 
 The cms will accept both-schemes until 3.5.0 when support for the old scheme
-will be dropped. During this transition period, the cms will favor the new-style
+will be dropped. During this transition period, the CMS will favor the new-style
 naming if both schemes are used in a project's settings.
