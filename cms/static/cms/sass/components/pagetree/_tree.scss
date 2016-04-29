@@ -46,6 +46,36 @@
     .cms-hover-tooltip {
         z-index: auto;
     }
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+    .cms-btn.cms-icon {
+        display: inline-block;
+        box-sizing: border-box;
+        width: $pagetree-cell-inner-height + 7;
+        height: $pagetree-cell-inner-height + 5;
+        position: relative;
+        &:before {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-top: -8px;
+            margin-left: -8px;
+        }
+    }
+    .cms-btn.cms-btn-no-border {
+        border: none !important;
+    }
+    .cms-pagetree-dropdown-menu-open .cms-btn {
+        @extend .cms-btn-active;
+    }
 }
 
 //###########################################################
@@ -271,7 +301,16 @@
     padding: $pagetree-section-padding-condensed;
 }
 .cms-pagetree-section-nav {
-    float: right;
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    margin-top: -($pagetree-cell-inner-height + 6px) / 2;
+
+    .cms-pagetree-dropdown-menu {
+        right: 40px;
+        top: -4px;
+        width: 205px;
+    }
 }
 
 .cms-pagetree-dropdown-separator {
@@ -576,6 +615,11 @@
         overflow: visible;
     }
 
+    .jstree-grid-column {
+        // fixes layout bug in Safari
+        vertical-align: top;
+    }
+
     // disable highlight on iOS devices
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -703,26 +747,6 @@
             background: none;
         }
     }
-    .cms-btn {
-        display: inline-block;
-        box-sizing: border-box;
-        width: $pagetree-cell-inner-height + 7;
-        height: $pagetree-cell-inner-height + 5;
-        position: relative;
-        &:before {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-top: -8px;
-            margin-left: -8px;
-        }
-    }
-    .cms-btn.cms-btn-no-border {
-        border: none !important;
-    }
-    .cms-pagetree-dropdown-menu-open .cms-btn {
-        @extend .cms-btn-active;
-    }
     .jstree-grid-cell-regular {
         text-align: center;
         padding: $pagetree-cell-padding;
@@ -755,17 +779,6 @@
             margin-left: $pagetree-icon-offset;
         }
     }
-
-    .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        margin: -1px;
-        padding: 0;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        border: 0;
-    }
 }
 
 //###########################################################
@@ -797,16 +810,6 @@
         color: $color-success;
         @extend %icon;
         @include icon(check);
-    }
-}
-
-.cms-tree-item-helpers a {
-    position: relative;
-    font-size: $font-size-normal;
-    .cms-icon {
-        position: relative;
-        top: 1px;
-        font-size: $font-size-small;
     }
 }
 

@@ -48,7 +48,7 @@
             margin-bottom: 0 !important;
         }
         .submit-row {
-            margin: $padding-normal -$padding-large 0;
+            margin: 0 (-$padding-large);
             padding: $padding-large $padding-large 0;
             input {
                 margin-left: 0;

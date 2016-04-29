@@ -525,7 +525,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
                             visible: true
@@ -553,7 +553,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 // then try to paste into itself
                 .then(function () {
-                    this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: secondPageId
+                    }));
                 })
                 .waitUntilVisible('.cms-dialog', function () {
                     test.assertVisible('.cms-dialog', 'Dialog shows up');
@@ -602,8 +604,10 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
-                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Homepage') + '"]');
+                .then(function () {
+                    this.then(cms.triggerPastePage({
+                        page: cms.getPageId('Homepage')
+                    }));
                 })
                 .waitUntilVisible('.cms-dialog', function () {
                     test.assertVisible('.cms-dialog', 'Dialog shows up');
@@ -676,9 +680,11 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to homepage
-                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Homepage') + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: cms.getPageId('Homepage')
+                    }));
                 })
                 .waitUntilVisible('.cms-dialog', function () {
                     this.click('.cms-dialog .default.submit');
@@ -741,9 +747,11 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to root
-                    this.click('.cms-tree-item-helpers a[href="#root"]');
+                    this.then(cms.triggerPastePage({
+                        page: '#root'
+                    }));
                 })
                 .waitUntilVisible('.cms-dialog', function () {
                     this.click('.cms-dialog .default.submit');
@@ -826,10 +834,12 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to top level "second" page
                     var pages = cms._getPageIds('Second');
-                    this.click('.cms-tree-item-helpers a[data-id="' + pages[pages.length - 2] + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: pages[pages.length - 2]
+                    }));
                 })
                 .waitUntilVisible('.cms-dialog', function () {
                     this.click('.cms-dialog .default.submit');
@@ -943,9 +953,11 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to the Direct child of Homepage
-                    this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: secondPageId
+                    }));
                 })
                 .waitUntilVisible('.error', function () {
                     test.assertSelectorHasText(
@@ -1002,7 +1014,7 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
                     this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
                             visible: true
@@ -1092,7 +1104,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                     this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     test.assertDoesntExist('.cms-dialog', 'Dialog does not show up');
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -1112,7 +1124,9 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                         'Tree stays the same'
                     );
 
-                    this.click('.cms-tree-item-helpers a[href="#root"]');
+                    this.then(cms.triggerPastePage({
+                        page: '#root'
+                    }));
                 })
                 .then(function () {
                     test.assertElementCount(
@@ -1179,7 +1193,9 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                     this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
                 .then(function () {
-                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Top sibling') + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: cms.getPageId('Top sibling')
+                    }));
                 })
 
                 .waitForResource(/move-page/)
