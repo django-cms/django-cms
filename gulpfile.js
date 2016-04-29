@@ -143,6 +143,7 @@ var INTEGRATION_TESTS = [
         'pagetree',
         'disableToolbar',
         'dragndrop',
+        'copy-apphook-page',
         'history',
         'revertLive',
         'narrowScreen'
@@ -268,7 +269,7 @@ var integrationTests = {
                 gutil.log('Server: ', data.toString().slice(0, -1));
             });
 
-            var sleep = spawn('sleep', ['60']);
+            var sleep = spawn('sleep', ['90']);
 
             sleep.on('close', function () {
                 resolve(server.pid);

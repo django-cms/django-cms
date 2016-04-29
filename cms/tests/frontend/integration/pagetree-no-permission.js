@@ -47,7 +47,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
                             visible: true
@@ -75,7 +75,9 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 // then try to paste into itself
                 .then(function () {
-                    this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: secondPageId
+                    }));
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
@@ -103,9 +105,11 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to homepage
-                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Homepage') + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: cms.getPageId('Homepage')
+                    }));
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
@@ -167,9 +171,11 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to root
-                    this.click('.cms-tree-item-helpers a[href="#root"]');
+                    this.then(cms.triggerPastePage({
+                        page: '#root'
+                    }));
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
@@ -249,10 +255,12 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to top level "second" page
                     var pages = cms._getPageIds('Second');
-                    this.click('.cms-tree-item-helpers a[data-id="' + pages[pages.length - 2] + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: pages[pages.length - 2]
+                    }));
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
@@ -365,9 +373,11 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
                 })
                 // wait until paste buttons show up
-                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                .then(function () {
                     // click on "Paste" to the Direct child of Homepage
-                    this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
+                    this.then(cms.triggerPastePage({
+                        page: secondPageId
+                    }));
                 })
                 .waitUntilVisible('.error', function () {
                     test.assertSelectorHasText(

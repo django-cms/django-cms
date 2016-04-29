@@ -76,7 +76,9 @@ class TreePublishRow(Tag):
             else:
                 cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
                 text = _("no content")
-        return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_text(text)))
+        return mark_safe(
+            '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
+            'data-cms-tooltip="%s"></span>' % (cls, force_text(text)))
 
 
 register.tag(TreePublishRow)

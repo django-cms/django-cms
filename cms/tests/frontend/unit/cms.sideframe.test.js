@@ -32,32 +32,28 @@ describe('CMS.Sideframe', function () {
             expect(Object.keys(sideframe.ui)).toContain('window');
             expect(Object.keys(sideframe.ui)).toContain('dimmer');
             expect(Object.keys(sideframe.ui)).toContain('close');
-            expect(Object.keys(sideframe.ui)).toContain('resize');
             expect(Object.keys(sideframe.ui)).toContain('frame');
             expect(Object.keys(sideframe.ui)).toContain('shim');
             expect(Object.keys(sideframe.ui)).toContain('historyBack');
             expect(Object.keys(sideframe.ui)).toContain('historyForward');
-            expect(Object.keys(sideframe.ui).length).toEqual(10);
+            expect(Object.keys(sideframe.ui).length).toEqual(9);
         });
 
         it('has options', function () {
             expect(sideframe.options).toEqual({
                 onClose: false,
-                sideframeDuration: 300,
-                sideframeWidth: 0.8
+                sideframeDuration: 300
             });
 
             sideframe = new CMS.Sideframe({
                 onClose: 'something',
                 sideframeDuration: 310,
-                sideframeWidth: 0.9,
                 something: 'else'
             });
 
             expect(sideframe.options).toEqual({
                 onClose: 'something',
                 sideframeDuration: 310,
-                sideframeWidth: 0.9,
                 something: 'else'
             });
         });
@@ -186,55 +182,14 @@ describe('CMS.Sideframe', function () {
         it('animates the sideframe to correct width', function () {
             spyOn($.fn, 'animate');
             sideframe.ui.body = $('<div></div>', {
-                width: CMS.BREAKPOINTS.mobile + 10
+                width: '9000px'
             });
 
             sideframe.open({ url: url, animate: true });
             expect($.fn.animate).toHaveBeenCalledWith({
-                width: '80%',
+                width: '90%',
                 overflow: 'visible'
             }, 300);
-        });
-
-        it('animates the sideframe to correct width when on mobile', function () {
-            spyOn($.fn, 'animate');
-            sideframe.ui.body = $('<div></div>', {
-                width: CMS.BREAKPOINTS.mobile - 10
-            });
-
-            sideframe.open({ url: url, animate: true });
-            expect($.fn.animate).toHaveBeenCalledWith({
-                width: window.innerWidth,
-                overflow: 'visible'
-            }, 300);
-        });
-
-        it('animates the sideframe to correct width when there was already saved width', function () {
-            spyOn($.fn, 'animate');
-            sideframe.ui.body = $('<div></div>', {
-                width: CMS.BREAKPOINTS.mobile + 10
-            });
-            CMS.settings.sideframe.position = 200;
-
-            sideframe.open({ url: url, animate: true });
-            expect($.fn.animate).toHaveBeenCalledWith({
-                width: 200,
-                overflow: 'visible'
-            }, 300);
-        });
-
-        it('does not animate sideframe if sideframe was already open', function () {
-            // only works if there was a stored width,
-            // because otherwise it's '80%'
-            CMS.settings.sideframe.position = 200;
-            // has to do this as well since PhantomJS is always 400px wide
-            sideframe.ui.body = $('<div></div>', {
-                width: CMS.BREAKPOINTS.mobile + 10
-            });
-            sideframe.open({ url: url, animate: false });
-            spyOn($.fn, 'animate');
-            sideframe.open({ url: url, animate: true });
-            expect($.fn.animate).not.toHaveBeenCalled();
         });
 
         it('opens the toolbar', function () {
@@ -414,8 +369,7 @@ describe('CMS.Sideframe', function () {
             sideframe.close();
             expect(CMS.settings.sideframe).toEqual({
                 url: null,
-                hidden: false,
-                width: 0.8
+                hidden: false
             });
             expect(sideframe.setSettings).toHaveBeenCalled();
         });
@@ -503,7 +457,6 @@ describe('CMS.Sideframe', function () {
             $(function () {
                 sideframe = new CMS.Sideframe();
                 spyOn(sideframe, 'close');
-                spyOn(sideframe, '_startResize');
                 spyOn(sideframe, '_goToHistory');
                 done();
             });
@@ -524,8 +477,6 @@ describe('CMS.Sideframe', function () {
 
         it('attaches new events', function () {
             expect(sideframe.ui.close).not.toHandle(sideframe.click);
-            expect(sideframe.ui.resize).not.toHandle(sideframe.pointerDown.split(' ')[0]);
-            expect(sideframe.ui.resize).not.toHandle(sideframe.pointerDown.split(' ')[1]);
             expect(sideframe.ui.dimmer).not.toHandle(sideframe.click);
             expect(sideframe.ui.historyBack).not.toHandle(sideframe.click);
             expect(sideframe.ui.historyForward).not.toHandle(sideframe.click);
@@ -533,8 +484,6 @@ describe('CMS.Sideframe', function () {
             sideframe._events();
 
             expect(sideframe.ui.close).toHandle(sideframe.click);
-            expect(sideframe.ui.resize).toHandle(sideframe.pointerDown.split(' ')[0]);
-            expect(sideframe.ui.resize).toHandle(sideframe.pointerDown.split(' ')[1]);
             expect(sideframe.ui.dimmer).toHandle(sideframe.click);
             expect(sideframe.ui.historyBack).toHandle(sideframe.click);
             expect(sideframe.ui.historyForward).toHandle(sideframe.click);
@@ -543,7 +492,6 @@ describe('CMS.Sideframe', function () {
         it('removes old events', function () {
             var spy = jasmine.createSpy();
             sideframe.ui.close.on(sideframe.click, spy);
-            sideframe.ui.resize.on(sideframe.pointerDown, spy);
             sideframe.ui.dimmer.on(sideframe.click, spy);
             sideframe.ui.historyBack.on(sideframe.click, spy);
             sideframe.ui.historyForward.on(sideframe.click, spy);
@@ -551,7 +499,6 @@ describe('CMS.Sideframe', function () {
             sideframe._events();
 
             sideframe.ui.close.trigger(sideframe.click);
-            sideframe.ui.resize.trigger(sideframe.pointerDown.split(' ')[0]);
             sideframe.ui.dimmer.trigger(sideframe.click);
             sideframe.ui.historyBack.trigger(sideframe.click);
             sideframe.ui.historyForward.trigger(sideframe.click);
@@ -564,12 +511,6 @@ describe('CMS.Sideframe', function () {
 
             sideframe.ui.close.trigger(sideframe.click);
             expect(sideframe.close).toHaveBeenCalledTimes(1);
-
-            sideframe.ui.resize.trigger(sideframe.pointerDown.split(' ')[0]);
-            expect(sideframe._startResize).toHaveBeenCalledTimes(1);
-
-            sideframe.ui.resize.trigger(sideframe.pointerDown.split(' ')[1]);
-            expect(sideframe._startResize).toHaveBeenCalledTimes(2);
 
             sideframe.ui.dimmer.trigger(sideframe.click);
             expect(sideframe.close).toHaveBeenCalledTimes(2);
@@ -691,176 +632,6 @@ describe('CMS.Sideframe', function () {
                 });
                 done();
             });
-        });
-    });
-
-    describe('._startResize() / ._stopResize()', function () {
-        var sideframe;
-        beforeEach(function (done) {
-            fixture.load('sideframe.html');
-            CMS.config = {
-                request: {}
-            };
-            CMS.settings = {
-                sideframe: {}
-            };
-            CMS.API.Messages = {
-                open: jasmine.createSpy()
-            };
-            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
-            spyOn(CMS.Sideframe.prototype, '_content');
-            CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
-                _lock: jasmine.createSpy()
-            };
-            $(function () {
-                sideframe = new CMS.Sideframe();
-                spyOn(sideframe, 'close');
-                spyOn(sideframe, 'setSettings');
-                spyOn(sideframe, '_stopResize').and.callThrough();
-                jasmine.clock().install();
-                done();
-            });
-        });
-
-        afterEach(function () {
-            sideframe.ui.body.off();
-            jasmine.clock().uninstall();
-            fixture.cleanup();
-        });
-
-        it('attaches event handlers', function () {
-            expect(sideframe.ui.body).not.toHandle(sideframe.pointerUp.split(' ')[0]);
-            expect(sideframe.ui.body).not.toHandle(sideframe.pointerUp.split(' ')[1]);
-            expect(sideframe.ui.body).not.toHandle(sideframe.pointerMove);
-
-            sideframe._startResize();
-
-            expect(sideframe.ui.body).toHandle(sideframe.pointerUp.split(' ')[0]);
-            expect(sideframe.ui.body).toHandle(sideframe.pointerUp.split(' ')[1]);
-            expect(sideframe.ui.body).toHandle(sideframe.pointerMove);
-        });
-
-        it('adds data-touch-action attribute to body', function () {
-            sideframe.ui.body.removeAttr('data-touch-action');
-            expect(sideframe.ui.body).not.toHaveAttr('data-touch-action');
-            sideframe._startResize();
-            expect(sideframe.ui.body).toHaveAttr('data-touch-action', 'none');
-        });
-
-        it('brings shim forward', function () {
-            expect(sideframe.ui.shim.css('z-index')).toEqual('5');
-            sideframe._startResize();
-            expect(sideframe.ui.shim.css('z-index')).toEqual('20');
-        });
-
-
-        [
-            {
-                windowWidth: 800,
-                eventClientX: 100,
-                expectedSideframeWidth: 320
-            },
-            {
-                windowWidth: 800,
-                eventClientX: 770,
-                expectedSideframeWidth: 770
-            },
-            {
-                windowWidth: 800,
-                eventClientX: 771,
-                expectedSideframeWidth: 770
-            },
-            {
-                windowWidth: 800,
-                eventClientX: 769,
-                expectedSideframeWidth: 769
-            },
-            {
-                windowWidth: 800,
-                eventClientX: 321,
-                expectedSideframeWidth: 321
-            }
-        ].forEach(function (testCase, index) {
-            it('resizes sideframe correctly ' + index, function (done) {
-                sideframe.ui.window = $('<div></div>').css('width', testCase.windowWidth);
-                sideframe._startResize();
-
-                sideframe.ui.body.on(sideframe.pointerMove, function () {
-                    expect(CMS.settings.sideframe.position).toEqual(testCase.expectedSideframeWidth);
-                    done();
-                });
-                sideframe.ui.body.trigger($.Event(sideframe.pointerMove, {
-                    originalEvent: {
-                        clientX: testCase.eventClientX
-                    }
-                }));
-            });
-        });
-
-
-        it('saves current size 600ms after moving stops', function () {
-            sideframe._startResize();
-
-            sideframe.ui.body.trigger($.Event(sideframe.pointerMove, {
-                originalEvent: {
-                    clientX: 350
-                }
-            }));
-
-            jasmine.clock().tick(599);
-
-            expect(sideframe.setSettings).not.toHaveBeenCalled();
-
-            sideframe.ui.body.trigger($.Event(sideframe.pointerMove, {
-                originalEvent: {
-                    clientX: 360
-                }
-            }));
-
-            jasmine.clock().tick(599);
-
-            expect(sideframe.setSettings).not.toHaveBeenCalled();
-
-            jasmine.clock().tick(1);
-
-            expect(sideframe.setSettings).toHaveBeenCalledWith({
-                sideframe: {
-                    position: 360
-                }
-            });
-        });
-
-        it('attaches event handler for stopping resizing', function () {
-            sideframe._startResize();
-
-            sideframe.ui.body.trigger(sideframe.pointerUp.split(' ')[0]);
-            expect(sideframe._stopResize).toHaveBeenCalledTimes(1);
-
-            sideframe._startResize();
-            sideframe.ui.body.trigger(sideframe.pointerUp.split(' ')[1]);
-            expect(sideframe._stopResize).toHaveBeenCalledTimes(2);
-        });
-        // Stop resize
-        it('moves shim back', function () {
-            sideframe._startResize();
-            expect(sideframe.ui.shim.css('z-index')).toEqual('20');
-            sideframe._stopResize();
-            expect(sideframe.ui.shim.css('z-index')).toEqual('1');
-        });
-        it('removes event handlers from body', function () {
-            sideframe._startResize();
-            sideframe._stopResize();
-            expect(sideframe.ui.body).not.toHandle(sideframe.pointerUp.split(' ')[0]);
-            expect(sideframe.ui.body).not.toHandle(sideframe.pointerUp.split(' ')[1]);
-            expect(sideframe.ui.body).not.toHandle(sideframe.pointerMove);
-        });
-        it('removes attributes from body', function () {
-            sideframe._startResize();
-            sideframe._stopResize();
-            expect(sideframe.ui.body).not.toHaveAttr('data-touch-action');
         });
     });
 

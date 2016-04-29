@@ -1878,6 +1878,17 @@ describe('CMS.Modal', function () {
             });
         });
 
+        it('removes cms-loader class when iframe is loaded', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            expect(modal.ui.modalBody).toHaveClass('cms-loader');
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
+                done();
+            });
+        });
+
         it('does not reload the page if not required', function (done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'

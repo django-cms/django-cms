@@ -136,7 +136,23 @@
     <div class="cms-pagetree cms-pagetree-section">
         <h2>{% trans "Main Navigation" %}</h2>
         <div class="cms-pagetree-section-nav">
-            {# <span class="cms-icon cms-icon-menu"></span> #}
+            <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
+                <a href="#root" data-id="#root" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                    <span class="sr-only">{% trans "Options" %}</span>
+                </a>
+
+                <div class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
+                    <ul class="cms-pagetree-dropdown-menu-inner">
+                        <li><span class="label">{% trans "Pick an action" %}</span></li>
+                        <li>
+                            <a href="#" data-id="#root" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
+                                <span class="cms-icon cms-icon-alias"></span>
+                                <span>{% trans "Paste" %}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -174,7 +190,7 @@
                     "key": "",
                     "width": "100%"
                 }, {
-                    "title": "<span class=\"cms-tree-item-helpers cms-hidden\"><a href=\"#root\" class=\"cms-tree-right\"><span class=\"cms-icon cms-icon-alias\"></span>{% trans "Paste" %}</a></span>&nbsp;",
+                    "title": "&nbsp;",
                     "key": "view",
                     "cls": "jstree-grid-cell-regular-options"
                 }, {

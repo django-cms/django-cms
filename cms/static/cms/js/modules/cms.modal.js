@@ -898,6 +898,7 @@ var CMS = window.CMS || {};
 
                 // inject css class
                 body.addClass('cms-admin cms-admin-modal');
+                that.ui.modalBody.removeClass('cms-loader');
 
                 // determine if we should close the modal or reload
                 if (messages.length && that.enforceReload) {

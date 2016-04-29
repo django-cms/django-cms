@@ -181,7 +181,7 @@ virtualenv yet, create and activate it first::
 
 Then install minimum required dependencies::
 
-    pip install test_requirements/django-1.8.txt
+    pip install -r test_requirements/django-1.8.txt
     pip install -e .
 
 Now you'll be able to run a tests with this command::
