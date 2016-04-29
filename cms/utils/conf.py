@@ -67,6 +67,7 @@ DEFAULTS = {
     'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'WIZARD_CONTENT_PLUGIN_BODY': 'body',
+    'WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
 }
 
 

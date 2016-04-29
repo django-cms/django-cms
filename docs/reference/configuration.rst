@@ -1057,6 +1057,20 @@ default
 This is the path of the template used to create pages in the wizard. It must be one
 of the templates in :setting:`CMS_TEMPLATES`.
 
+.. setting:: CMS_WIZARD_CONTENT_PLACEHOLDER
+
+CMS_WIZARD_CONTENT_PLACEHOLDER
+==============================
+
+default
+    None
+
+When set to an editable, non-static placeholder that is available on the page
+template, the CMS page wizards will target the specified placeholder when
+adding any content supplied in the wizards' "Content" field. If this is left
+unset, then the content will target the first suitable placeholder found on
+the page's template.
+
 .. setting:: CMS_WIZARD_CONTENT_PLUGIN
 
 CMS_WIZARD_CONTENT_PLUGIN
