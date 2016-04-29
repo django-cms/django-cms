@@ -29,6 +29,12 @@
         z-index: z(toolbar, left);
         padding-left: $toolbar-left-space;
     }
+    .cms-toolbar-center {
+        position: absolute;
+        top: 0;
+        left: 450px;
+        z-index: 10;
+    }
     .cms-toolbar-right {
         position: absolute;
         right: 0;

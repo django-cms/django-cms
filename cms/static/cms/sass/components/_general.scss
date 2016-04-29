@@ -17,3 +17,14 @@
         overflow: hidden !important;
     }
 }
+
+.locked {
+	font-size: 16px !important;
+	font-weight: bold !important;
+	background-color: red !important;
+	height: 46px !important;
+	padding: 13px !important;
+	-moz-box-shadow: inset 0 0 5px #000000;
+	-webkit-box-shadow: inset 0 0 5px #000000;
+	box-shadow: inset 0 0 5px #000000;
+}
