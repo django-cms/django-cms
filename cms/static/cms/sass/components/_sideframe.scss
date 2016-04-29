@@ -11,7 +11,7 @@
     bottom: 0;
     z-index: z(sideframe, base);
 
-    @media (max-width: $screen-tablet - 1px) {
+    @media (max-width: $screen-tablet) {
         width: 100% !important;
     }
 }
