@@ -16,8 +16,8 @@ Bug Fixes
 * Deprecates the old-style wizard-related settings
 
 
-Dropped support for Old-Style Page Wizard Settings
-==================================================
+Deprecation of Old-Style Page Wizard Settings
+=============================================
 
 In this release, we introduce a new naming scheme for the Page Wizard settings
 that better reflects that they effect the CMS' Page Wizards, rather than all
