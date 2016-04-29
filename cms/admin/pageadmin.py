@@ -45,7 +45,8 @@ from cms.constants import (
     PUBLISHER_STATE_PENDING,
     REVISION_INITIAL_COMMENT,
 )
-from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
+from cms.models import (Page, PageEditLock, Title, CMSPlugin, PagePermission, GlobalPagePermission,
+                        StaticPlaceholder)
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.plugin_pool import plugin_pool
 from cms.toolbar_pool import toolbar_pool
@@ -429,6 +430,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # to determine whether a given object exists.
             obj = None
         else:
+            PageEditLock.objects.get_or_create(page=obj, defaults={'user': request.user})
             context = {
                 'page': obj,
                 'CMS_PERMISSION': get_cms_setting('PERMISSION'),
@@ -1189,6 +1191,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 if not published:
                     all_published = False
         if page:
+            try:
+                PageEditLock.objects.get(page=page).delete()
+            except PageEditLock.DoesNotExist:
+                pass
+
             if all_published:
                 if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                     messages.warning(request, _("Page not published! A parent page is not published yet."))
@@ -1656,3 +1663,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
 
 admin.site.register(Page, PageAdmin)
+
+
+class PageEditLockAdmin(admin.ModelAdmin):
+    list_display = ['object_link', 'user', 'created']
+
+admin.site.register(PageEditLock, PageEditLockAdmin)

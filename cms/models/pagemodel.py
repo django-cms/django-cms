@@ -3,6 +3,7 @@ from logging import getLogger
 from os.path import join
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -1534,3 +1535,30 @@ def _reversion():
 
 
 _reversion()
+
+
+@python_2_unicode_compatible
+class PageEditLock(models.Model):
+    """A PageEditLock exists if the accociated page is edited."""
+
+    page = models.OneToOneField(Page)
+    user = models.ForeignKey(User, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Page Edit Lock'
+        verbose_name_plural = 'Page Edit Locks'
+
+    def __str__(self):
+        return "PageEditLock '{}'".format(self.page)
+
+    def object_link(self):
+        url = '/'.join([self.page._meta.app_label,
+                        self.page._meta.model_name,
+                        '%s' % self.page.id])
+        title = self.page.get_title()
+        return '<a href="/de/admin/{}">{}</a>'.format(url, title)
+
+    object_link.allow_tags = True
+    object_link.short_description = "Link to the modified page"

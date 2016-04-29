@@ -33,7 +33,13 @@
             </ul>
             {% endif %}
         </div>
-
+        <div class="cms-toolbar-center">
+            {% if page_is_locked %}
+                <div class="cms-toolbar-item locked">
+                    This page is locked by {{ current_editor }}
+                </div>
+            {% endif %}
+        </div>
         <div class="cms-toolbar-right">
             {% for item in request.toolbar.get_right_items %}
                 {{ item.render }}
