@@ -9,11 +9,12 @@ from django.utils.translation import ugettext as _
 
 from cms.api import create_page, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
+from cms.utils.conf import get_cms_setting
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
-from cms.forms.wizards import CreateCMSPageForm
 
 
 class WizardForm(forms.Form):
@@ -183,15 +184,12 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         self.assertSequencesEqual(entries, wizards)
 
 
-from cms.utils.conf import get_cms_setting
-
-
 class TestPageWizard(WizardTestMixin, CMSTestCase):
 
     def test_wizard_content_placeholder_setting(self):
         """
         Tests that the PageWizard respects the
-        CMS_WIZARD_CONTENT_PLACEHOLDER setting.
+        CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER setting.
         """
         templates = get_cms_setting('TEMPLATES')
         # NOTE, there are 4 placeholders on this template, defined in this
@@ -201,8 +199,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         settings = {
             'CMS_TEMPLATES': templates,
-            'CMS_WIZARD_DEFAULT_TEMPLATE': 'page_wizard.html',
-            'CMS_WIZARD_CONTENT_PLACEHOLDER': 'sub-content',
+            'CMS_PAGE_WIZARD_DEFAULT_TEMPLATE': 'page_wizard.html',
+            'CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER': 'sub-content',
         }
 
         with override_settings(**settings):
@@ -246,8 +244,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         settings = {
             'CMS_TEMPLATES': templates,
-            'CMS_WIZARD_DEFAULT_TEMPLATE': 'page_wizard.html',
-            'CMS_WIZARD_CONTENT_PLACEHOLDER': 'footer',  # This is a bad setting.
+            'CMS_PAGE_WIZARD_DEFAULT_TEMPLATE': 'page_wizard.html',
+            # This is a bad setting.
+            'CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER': 'footer',
         }
 
         with override_settings(**settings):
@@ -273,3 +272,23 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 url = page.get_absolute_url('en')
                 response = self.client.get(url)
                 self.assertNotContains(response, content, status_code=200)
+
+
+# This entire test class can be removed in 3.5.0
+class TestWizardSettings(CMSTestCase):
+    def test_old_wizard_setting(self):
+        value = 'obscure-named-placeholder'
+        with override_settings(CMS_WIZARD_CONTENT_PLACEHOLDER=value):
+            self.assertEqual(get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER'), value)
+
+    def test_new_wizard_setting(self):
+        value = 'obscure-named-placeholder'
+        with override_settings(CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER=value):
+            self.assertEqual(get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER'), value)
+
+    def test_new_wizard_setting_are_preferred(self):
+        old_value = 'obscure-named-placeholder-old'
+        new_value = 'obscure-named-placeholder-new'
+        with override_settings(CMS_WIZARD_CONTENT_PLACEHOLDER=old_value,
+                               CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER=new_value):
+            self.assertEqual(get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER'), new_value)

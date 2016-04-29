@@ -243,7 +243,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
         page = create_page(
             title=self.cleaned_data['title'],
             slug=self.cleaned_data['slug'],
-            template=get_cms_setting('WIZARD_DEFAULT_TEMPLATE'),
+            template=get_cms_setting('PAGE_WIZARD_DEFAULT_TEMPLATE'),
             language=self.language_code,
             created_by=smart_text(self.user),
             parent=parent,
@@ -277,9 +277,9 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             # If the user provided content, then use that instead.
             content = self.cleaned_data.get('content')
-            plugin_type = get_cms_setting('WIZARD_CONTENT_PLUGIN')
-            plugin_body = get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY')
-            slot = get_cms_setting('WIZARD_CONTENT_PLACEHOLDER')
+            plugin_type = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN')
+            plugin_body = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN_BODY')
+            slot = get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER')
 
             if plugin_type in plugin_pool.plugins and plugin_body:
                 if content and permissions.has_plugin_permission(
