@@ -25,8 +25,6 @@ $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
 $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transparent 50%, rgba($white, .8) 50%, rgba($white, .8) 75%, transparent 75%, transparent;
 
-$screen-tablet: 768px;
-
 //##############################################################################
 // BASE Variables
 $font-size-small: 12px;
@@ -45,7 +43,7 @@ $padding-normal: 10px;
 $padding-large: 20px;
 
 $screen-mobile: 320px;
-$screen-tablet: 720px;
+$screen-tablet: 768px;
 $screen-desktop: 1024px;
 
 //##############################################################################
