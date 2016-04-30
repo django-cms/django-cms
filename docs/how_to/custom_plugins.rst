@@ -819,7 +819,7 @@ Plugin data migrations
 ======================
 
 Due to the migration from Django MPTT to django-treebeard in version 3.1, the plugin model is
-different between the two versions. Schema migration are not affected as the migration systems
+different between the two versions. Schema migrations are not affected as the migration systems
 (both South and Django) detects the different bases.
 
 Data migration are a different story, though.
