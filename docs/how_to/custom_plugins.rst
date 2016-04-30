@@ -194,7 +194,7 @@ is ``True`` (the default):
   plugin with.
 
 In addition to those attributes, you can also override the :ref:`render` method
-which determines the template context variables that are used render your
+which determines the template context variables that are used to render your
 plugin. By default, this method only adds ``instance`` and ``placeholder``
 objects to your context, but plugins can override this to include any context
 that is required.
