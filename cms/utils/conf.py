@@ -265,8 +265,8 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
 }
 
-# To be removed in v3.5.0
-DEPRECATED_WIZARD_SETTINGS = {
+DEPRECATED_CMS_SETTINGS = {
+    # Old CMS_WIZARD_* settings to be removed in v3.5.0
     'PAGE_WIZARD_DEFAULT_TEMPLATE': 'WIZARD_DEFAULT_TEMPLATE',
     'PAGE_WIZARD_CONTENT_PLUGIN': 'WIZARD_CONTENT_PLUGIN',
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'WIZARD_CONTENT_PLUGIN_BODY',
@@ -278,10 +278,9 @@ def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
     else:
-        # To be removed in v3.5.0
-        if name in DEPRECATED_WIZARD_SETTINGS:
+        if name in DEPRECATED_CMS_SETTINGS:
             new_setting = 'CMS_%s' % name
-            old_setting = 'CMS_%s' % DEPRECATED_WIZARD_SETTINGS[name]
+            old_setting = 'CMS_%s' % DEPRECATED_CMS_SETTINGS[name]
             return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
 
         return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
