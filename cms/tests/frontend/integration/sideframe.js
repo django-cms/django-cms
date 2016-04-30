@@ -41,7 +41,7 @@ casper.test.begin('Sideframe', function (test) {
         .wait(300, function () {
             test.assertEvalEquals(function () {
                 return $('.cms-sideframe').width();
-            }, 1280 * 0.9, 'Sideframe opens with default width');
+            }, 1280 * 0.95, 'Sideframe opens with default width');
         })
         .then(function () {
             this.reload();
