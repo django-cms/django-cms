@@ -29,6 +29,7 @@ from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
+from django.http import QueryDict
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
@@ -496,6 +497,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         # can be published if required
         obj.save()
         return super(PageAdmin, self).response_change(request, obj)
+
+    def get_preserved_filters(self, request):
+        """
+        A hackish way to make django add language to the "Save" page redirect
+        """
+        preserved_filters_encoded = super(PageAdmin, self).get_preserved_filters(request)
+        preserved_filters = QueryDict(preserved_filters_encoded).copy()
+        preserved_filters.update({
+            'language': request.GET.get('language')
+        })
+        return preserved_filters.urlencode()
 
     def has_add_permission(self, request):
         """
