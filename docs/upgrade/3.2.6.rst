@@ -39,5 +39,5 @@ them as follows at their earliest convenience. ::
     CMS_WIZARD_CONTENT_PLACEHOLDER => CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 
 The CMS will accept both-schemes until 3.5.0 when support for the old scheme
-will be dropped. During this transition period, the CMS will favor the new-style
+will be dropped. During this transition period, the CMS prefers the new-style
 naming if both schemes are used in a project's settings.
