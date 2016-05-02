@@ -78,7 +78,7 @@
                                 </li>
                                 <li>
                                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
-                                        <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
+                                        <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Preview this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
                                         <span>{% filter escapejs %}{% trans "Preview" %}{% endfilter %}</span>
                                     </a>
                                 </li>
@@ -127,7 +127,7 @@
             <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
                     {% if has_change_permission %}
-                        <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
+                        <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                     {% endif %}
                         {% if page.in_navigation %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
