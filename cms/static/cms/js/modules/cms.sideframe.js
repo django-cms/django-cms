@@ -295,7 +295,7 @@ var CMS = window.CMS || {};
          */
         _show: function _show(animate) {
             var that = this;
-            var width = '90%';
+            var width = '95%';
 
             this.ui.sideframe.show();
 

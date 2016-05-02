@@ -187,7 +187,7 @@ describe('CMS.Sideframe', function () {
 
             sideframe.open({ url: url, animate: true });
             expect($.fn.animate).toHaveBeenCalledWith({
-                width: '90%',
+                width: '95%',
                 overflow: 'visible'
             }, 300);
         });
