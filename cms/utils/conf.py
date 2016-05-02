@@ -278,13 +278,11 @@ DEPRECATED_CMS_SETTINGS = {
 def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
-    else:
-        if name in DEPRECATED_CMS_SETTINGS:
-            new_setting = 'CMS_%s' % name
-            old_setting = 'CMS_%s' % DEPRECATED_CMS_SETTINGS[name]
-            return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
-
-        return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+    elif name in DEPRECATED_CMS_SETTINGS:
+        new_setting = 'CMS_%s' % name
+        old_setting = 'CMS_%s' % DEPRECATED_CMS_SETTINGS[name]
+        return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
+    return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
 
 
 def get_site_id(site):
