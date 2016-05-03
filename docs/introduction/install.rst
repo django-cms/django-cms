@@ -8,7 +8,8 @@ We'll get started by setting up our environment.
 Requirements
 ************
 
-django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+django CMS requires Django version 1.6.9 or later, 1.7, 1.8 or 1.9, and
+Python 2.6, 2.7, 3.3, 3.4 or 3.5.
 
 ************************
 Your working environment
@@ -17,6 +18,9 @@ Your working environment
 We're going to assume that you have a reasonably recent version of virtualenv
 installed and that you have some basic familiarity with it.
 
+Please check that you have installed the
+`required binary libraries <http://djangocms-installer.readthedocs.org/en/latest/libraries.html>`_
+before proceeding.
 
 Create and activate a virtual env
 =================================
