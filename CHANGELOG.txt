@@ -20,6 +20,7 @@
 * Sideframe is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
 * Removed some unnecessary reloads happening after closing sideframe.
+* Added the UI for previewing a pagetree in specific language
 
 
 === 3.2.3 (2016-03-09) ===
