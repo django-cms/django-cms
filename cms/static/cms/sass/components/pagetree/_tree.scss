@@ -311,7 +311,7 @@
 
     .cms-pagetree-dropdown-menu {
         right: 50%;
-        margin-right: -18px !important;
+        margin-right: -$pagetree-header-height / 2 - 1px !important;
     }
 }
 
