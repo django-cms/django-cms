@@ -129,11 +129,17 @@
     display: table;
     width: 100%;
     table-layout: fixed;
+    @media (max-width: $pagetree-mobile) {
+        display: block;
+    }
 }
 .cms-pagetree-header-cell {
     display: table-cell;
     white-space: nowrap;
     vertical-align: middle;
+    @media (max-width: $pagetree-mobile) {
+        display: block;
+    }
 }
 .cms-pagetree-header-cell-fluid {
     width: 100%;
@@ -143,6 +149,16 @@
     position: relative;
     .cms-pagetree-header-filter-active & {
         position: static;
+    }
+
+    @media (max-width: $pagetree-mobile) {
+        width: 100% !important;
+    }
+}
+.cms-pagetree-header-body {
+    @media (max-width: $pagetree-mobile) {
+        text-align: right;
+        padding-top: 10px;
     }
 }
 .cms-pagetree-search-container {
@@ -162,7 +178,9 @@
     margin: 5px 0 10px;
     box-shadow: none;
     background: none;
-    // transition: all 0.2s;
+    @media (max-width: $pagetree-mobile) {
+        position: relative;
+    }
     .cms-pagetree-header-search-btn {
         display: table-cell;
         vertical-align: middle;
