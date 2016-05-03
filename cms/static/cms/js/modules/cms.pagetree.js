@@ -360,6 +360,7 @@ var PageTree = new Class({
         // make sure ajax post requests are working
         this._setAjaxPost('.js-cms-tree-item-menu a');
         this._setAjaxPost('.js-cms-tree-lang-trigger');
+        this._setAjaxPost('.js-cms-tree-item-set-home a');
 
         this._setupPageView();
         that._setupStickyHeader();
