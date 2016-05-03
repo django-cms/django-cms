@@ -3,6 +3,7 @@
 - Adds CMS_WIZARD_CONTENT_PLACEHOLDER setting
 - Renames the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
 - Deprecates the old-style wizard-related settings
+- CMS handles uninstalled apphooks better
 
 === 3.2.5 (2016-04-27) ===
 

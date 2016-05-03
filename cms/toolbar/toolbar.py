@@ -82,7 +82,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 except (TypeError, AttributeError):
                     # no decorator
                     self.app_name = decorator.__module__
-            except Resolver404:
+            except (Resolver404, AttributeError):
                 self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
         parts = self.app_name.split('.')
