@@ -443,7 +443,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         .wait(2000)
         .withFrame(0, function () {
             casper.waitUntilVisible('.cms-pagetree-jstree', function () {
-                pageId = cms.getPageId('Homepage');
+                pageId = cms.getPageId('Startseite');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.published',
                     'Page was published in German because it does have a title and slug'
@@ -461,7 +461,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         .wait(2000)
         .withFrame(0, function () {
             casper.waitUntilVisible('.cms-pagetree-jstree').then(cms.waitUntilAllAjaxCallsFinish()).then(function () {
-                pageId = cms.getPageId('Homepage');
+                pageId = cms.getPageId('Startseite');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished',
                     'Page in German was unpublished'
@@ -485,14 +485,14 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         .wait(2000)
         .withFrame(0, function () {
             casper.waitUntilVisible('.cms-pagetree-jstree').then(cms.waitUntilAllAjaxCallsFinish()).then(function () {
-                pageId = cms.getPageId('Homepage');
+                pageId = cms.getPageId('Startseite');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.unpublished',
                     'Page in English was unpublished'
                 );
             });
         })
-        .then(cms.removePage({ title: 'Homepage' }))
+        .then(cms.removePage())
         .run(function () {
             test.done();
         });
