@@ -19,7 +19,7 @@ Create a content-creation wizard
 
 Creating a CMS content creation wizard for your own module is fairly easy.
 
-To begin, create a folder in the root level of your module called
+To begin, create a file in the root level of your module called
 ``cms_wizards.py``. In this file, import Wizard as follows::
 
     from cms.wizards.wizard_base import Wizard
@@ -27,14 +27,6 @@ To begin, create a folder in the root level of your module called
 
 Then, simply subclass Wizard, instantiate it, then register it. If you were to
 do this for ``MyApp``, it might look like this::
-
-    # my_apps/forms.py
-
-    from django import forms
-
-    class MyAppWizardForm(forms.ModelForm):
-        model = MyApp
-        exclude = []
 
 
     # my_apps/cms_wizards.py
@@ -56,6 +48,17 @@ do this for ``MyApp``, it might look like this::
     )
 
     wizard_pool.register(my_app_wizard)
+
+And you need a form::
+
+    # my_apps/forms.py
+
+    from django import forms
+
+    class MyAppWizardForm(forms.ModelForm):
+        model = MyApp
+        exclude = []
+
 
 That's it!
 

@@ -7,6 +7,9 @@ Using django CMS
           from you - join us on the #django-cms IRC channel on `freenode`_ or
           the `django-cms-developers`_ email list.
 
+          If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+          <https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 The **Using django CMS** documentation is divided into two parts.
 
 First, there's a :ref:`tutorial <user-tutorial>` that takes you step-by-step

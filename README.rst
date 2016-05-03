@@ -103,6 +103,9 @@ Getting Help
 Please head over to our IRC channel, #django-cms, on irc.freenode.net or write
 to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 ******************
 Commercial support
 ******************
