@@ -822,7 +822,7 @@ Due to the migration from Django MPTT to django-treebeard in version 3.1, the pl
 different between the two versions. Schema migrations are not affected as the migration systems
 (both South and Django) detects the different bases.
 
-Data migration are a different story, though.
+Data migrations are a different story, though.
 
 If your data migration does something like:
 
