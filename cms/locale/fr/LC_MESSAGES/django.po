@@ -13,7 +13,7 @@
 # charettes <charette.s@gmail.com>, 2011-2012
 # Chary titouan <>, 2011
 # chrisglass <tribaal@gmail.com>, 2011
-# Christophe kryskool <christophe.chauvet@gmail.com>, 2013
+# Christophe CHAUVET <christophe.chauvet@gmail.com>, 2013
 # Dylann CORDEL <cordel.d@free.fr>, 2014-2015
 # Freddy L. <freddy.limpens@gmail.com>, 2014
 # Gabriel Le Breton <lebreton.gabriel@gmail.com>, 2015

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+    <div class="header">{% placeholder "header" %}</div>
+    <div class="content">{% placeholder "content" %}</div>
+    <div class="sub-content">{% placeholder "sub-content" %}</div>
+    <div class="footer">{% static_placeholder "footer" %}</div>
+{% endblock content %}

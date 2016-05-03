@@ -8,6 +8,7 @@ same app be used in different locations in the page tree. This also provides
 the building blocks needed to have some extra configuration in the database to
 control some aspects of each instance of the app.
 
+We'll illustrate this example with a new application.
 
 Basic concepts
 ##############

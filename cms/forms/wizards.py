@@ -94,6 +94,8 @@ class PageTypeSelect(forms.widgets.Select):
 
 
 class BaseCMSPageForm(forms.Form):
+    page = None
+
     title = forms.CharField(
         label=_(u'Title'), max_length=255,
         help_text=_(u"Provide a title for the new page."))
@@ -158,15 +160,21 @@ class CreateCMSPageForm(BaseCMSPageForm):
                 create_title(language, title, page)
 
     @staticmethod
-    def get_first_placeholder(page):
+    def get_placeholder(page, slot=None):
         """
-        Returns the first editable, non-static placeholder or None.
+        Returns the named placeholder or, if no «slot» provided, the first
+        editable, non-static placeholder or None.
         """
-        for placeholder in page.get_placeholders():
-            if not placeholder.is_static and placeholder.is_editable:
-                return placeholder
-        else:
-            return None
+        placeholders = page.get_placeholders()
+
+        if slot:
+            placeholders = placeholders.filter(slot=slot)
+
+        for ph in placeholders:
+            if not ph.is_static and ph.is_editable:
+                return ph
+
+        return None
 
     def clean(self):
         """
@@ -235,7 +243,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
         page = create_page(
             title=self.cleaned_data['title'],
             slug=self.cleaned_data['slug'],
-            template=get_cms_setting('WIZARD_DEFAULT_TEMPLATE'),
+            template=get_cms_setting('PAGE_WIZARD_DEFAULT_TEMPLATE'),
             language=self.language_code,
             created_by=smart_text(self.user),
             parent=parent,
@@ -269,19 +277,22 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             # If the user provided content, then use that instead.
             content = self.cleaned_data.get('content')
-            plugin_type = get_cms_setting('WIZARD_CONTENT_PLUGIN')
-            plugin_body = get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY')
+            plugin_type = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN')
+            plugin_body = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN_BODY')
+            slot = get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER')
+
             if plugin_type in plugin_pool.plugins and plugin_body:
                 if content and permissions.has_plugin_permission(
                         self.user, plugin_type, "add"):
-                    placeholder = self.get_first_placeholder(page)
+                    placeholder = self.get_placeholder(page, slot=slot)
                     if placeholder:
-                        add_plugin(**{
+                        opts = {
                             'placeholder': placeholder,
                             'plugin_type': plugin_type,
                             'language': self.language_code,
                             plugin_body: content,
-                        })
+                        }
+                        add_plugin(**opts)
 
         if is_installed('reversion'):
             from cms.utils.helpers import make_revision_with_plugins
