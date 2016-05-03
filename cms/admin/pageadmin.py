@@ -504,9 +504,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         preserved_filters_encoded = super(PageAdmin, self).get_preserved_filters(request)
         preserved_filters = QueryDict(preserved_filters_encoded).copy()
-        preserved_filters.update({
-            'language': request.GET.get('language')
-        })
+        lang = request.GET.get('language')
+
+        if lang:
+            preserved_filters.update({
+                'language': lang
+            })
+
         return preserved_filters.urlencode()
 
     def has_add_permission(self, request):
