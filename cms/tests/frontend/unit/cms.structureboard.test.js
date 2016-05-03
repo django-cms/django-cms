@@ -397,7 +397,6 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('triggers `resize` event on the window', function () {
-
             board.show();
             var spy = jasmine.createSpy();
             $(window).on('resize', spy);
