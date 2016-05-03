@@ -500,7 +500,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def get_preserved_filters(self, request):
         """
-        A hackish way to make django add language to the "Save" page redirect
+        This override is in place to preserve the "language" get parameter in
+        the "Save" page redirect
         """
         preserved_filters_encoded = super(PageAdmin, self).get_preserved_filters(request)
         preserved_filters = QueryDict(preserved_filters_encoded).copy()
