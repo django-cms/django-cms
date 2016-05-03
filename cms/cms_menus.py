@@ -129,7 +129,8 @@ def page_to_node(page, home, cut):
         app_name = page.get_application_urls(fallback=False)
         if app_name:  # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
-            extenders += app.menus
+            if app:
+                extenders += app.menus
     exts = []
     for ext in extenders:
         if hasattr(ext, "get_instances"):

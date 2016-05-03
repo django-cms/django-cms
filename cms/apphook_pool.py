@@ -2,6 +2,7 @@
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext as _
 
 from cms.app_base import CMSApp
 from cms.exceptions import AppAlreadyRegistered
@@ -100,7 +101,8 @@ class ApphookPool(object):
                 if app_name in app.urls:
                     return app
 
-        raise ImproperlyConfigured('No registered apphook %r found' % app_name)
+        warnings.warn(_('No registered apphook "%r" found') % app_name)
+        return None
 
 
 apphook_pool = ApphookPool()
