@@ -57,7 +57,7 @@
         line-height: 1.5;
         text-align: left;
         text-transform: uppercase;
-        padding: 5px $pagetree-dropdown-padding-horizontal;
+        padding: 7px $pagetree-dropdown-padding-horizontal 5px;
         border-bottom: 1px solid $gray-lighter;
         margin-bottom: 4px;
     }
@@ -82,6 +82,9 @@
     p + p {
         margin-top: -2px;
         padding-top: 0 !important;
+    }
+    p:last-child {
+        padding-bottom: 7px !important;
     }
 
     .cms-icon {
@@ -108,7 +111,7 @@
 
     .cms-pagetree-dropdown-menu-inner {
         margin: 0;
-        padding: 4px 0 !important;
+        padding: 0 !important;
         border-radius: $border-radius-normal;
         background-color: $white;
     }
@@ -127,7 +130,7 @@
 
 .cms-pagetree-dropdown-menu-arrow-right-top {
     &:before {
-        top: 18px;
+        top: 16px;
     }
 }
 .cms-pagetree-dropdown-menu-arrow-right-bottom {
