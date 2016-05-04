@@ -54,7 +54,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Determies positions/sizes of elements
+         * Determines positions/sizes of elements
          *
          * @method _saveSizes
          * @private
@@ -77,7 +77,7 @@ var CMS = window.CMS || {};
         _isInSideframe: function () {
             var win = CMS.API.Helpers._getWindow();
 
-            if (win && win.parent !== win) {
+            if (win && win.parent && win.parent !== win) {
                 return true;
             }
 
@@ -91,18 +91,26 @@ var CMS = window.CMS || {};
          * @private
          */
         _events: function _events() {
+            this.ui.window.on(
+                [this.resize, this.scroll].join(' '),
+                this._handleResizeOrScroll.bind(this)
+            );
+        },
+
+        /**
+         * @method _handleResizeOrScroll
+         * @private
+         */
+        _handleResizeOrScroll: function _handleResizeOrScroll() {
             var that = this;
+            var scrollTop = that.ui.window.scrollTop();
+            var scrollLeft = that.ui.window.scrollLeft();
 
-            that.ui.window.on([that.resize, that.scroll].join(' '), function () {
-                var scrollTop = that.ui.window.scrollTop();
-                var scrollLeft = that.ui.window.scrollLeft();
-
-                if (that._shouldStick(scrollTop)) {
-                    that._stickHeader(scrollTop, scrollLeft);
-                } else {
-                    that._unstickHeader();
-                }
-            });
+            if (that._shouldStick(scrollTop)) {
+                that._stickHeader(scrollTop, scrollLeft);
+            } else {
+                that._unstickHeader();
+            }
         },
 
         /**
