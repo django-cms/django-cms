@@ -659,6 +659,10 @@ var CMS = window.CMS || {};
             });
         },
 
+        /**
+         * @method _setupStickyHeader
+         * @private
+         */
         _setupStickyHeader: function _setupStickyHeader() {
             var that = this;
             that.ui.tree.on('ready.jstree', function () {
