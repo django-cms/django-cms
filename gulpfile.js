@@ -79,6 +79,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
         PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
         PROJECT_PATH.js + '/modules/cms.pagetree.dropdown.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.stickyheader.js',
         PROJECT_PATH.js + '/modules/cms.pagetree.js'
     ],
     'bundle.toolbar.min.js': [
@@ -497,6 +498,7 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
             .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
     });
 });
+
 gulp.task('bundle', Object.keys(JS_BUNDLES).map(function (bundleName) {
     return 'bundle:' + bundleName;
 }));
