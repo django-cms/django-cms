@@ -707,6 +707,10 @@
         border-bottom: 1px solid $gray-lighter;
         background: $white;
     }
+    .jstree-grid-header-fixed {
+        position: fixed;
+        z-index: z("pagetree", "fixed-headers");
+    }
     // ensure first line is not centered
     .jstree-grid-column-0 .jstree-grid-header {
         text-align: left !important;
