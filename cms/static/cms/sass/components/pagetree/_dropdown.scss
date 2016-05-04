@@ -29,6 +29,14 @@
         color: $white !important;
         background: $color-primary;
     }
+    li:first-child > a {
+        border-top-left-radius: $border-radius-normal;
+        border-top-right-radius: $border-radius-normal;
+    }
+    li:last-child > a {
+        border-bottom-left-radius: $border-radius-normal;
+        border-bottom-right-radius: $border-radius-normal;
+    }
     .cms-pagetree-dropdown-item-disabled {
         opacity: 0.2;
         color: $gray-darker;
