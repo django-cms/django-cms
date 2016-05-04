@@ -74,9 +74,6 @@
                         <div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top js-cms-pagetree-dropdown-menu">
                             <ul class="cms-pagetree-dropdown-menu-inner">
                                 <li>
-                                    <span class="label">{% filter escapejs %}{% trans "Pick an action:" %}{% endfilter %}</span>
-                                </li>
-                                <li>
                                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
                                         <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Preview this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
                                         <span>{% filter escapejs %}{% trans "Preview" %}{% endfilter %}</span>
@@ -181,7 +178,6 @@
 
                     <div class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
                         <ul class="cms-pagetree-dropdown-menu-inner">
-                            <li><span class="label">{% filter escapejs %}{% trans "Pick an action" %}{% endfilter %}</span></li>
                             {% if has_change_permission %}
                                 <li class="js-cms-tree-item-copy"
                                     data-id="{{ page.pk }}"
