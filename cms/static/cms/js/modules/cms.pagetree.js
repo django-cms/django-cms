@@ -715,6 +715,7 @@ var CMS = window.CMS || {};
             var filterContainer = this.ui.container.find('.js-cms-pagetree-header-filter-container');
             var filterClose = filterContainer.find('.js-cms-pagetree-header-search-close');
             var filterClass = 'cms-pagetree-header-filter-active';
+            var pageTreeHeader = $('.cms-pagetree-header');
 
             var visibleForm = this.ui.container.find('.js-cms-pagetree-header-search');
             var hiddenForm = this.ui.container.find('.js-cms-pagetree-header-search-copy form');
@@ -726,7 +727,7 @@ var CMS = window.CMS || {};
             // add active class when focusing the search field
             searchField.on('focus', function (e) {
                 e.stopImmediatePropagation();
-                searchContainer.addClass(filterClass);
+                pageTreeHeader.addClass(filterClass);
             });
             searchField.on('blur', function (e) {
                 e.stopImmediatePropagation();
@@ -734,7 +735,7 @@ var CMS = window.CMS || {};
                 // between enlarging and shrinking
                 setTimeout(function () {
                     if (!filterActive) {
-                        searchContainer.removeClass(filterClass);
+                        pageTreeHeader.removeClass(filterClass);
                     }
                 }, timeout);
                 that.ui.document.off(click);
@@ -746,7 +747,7 @@ var CMS = window.CMS || {};
                 e.stopImmediatePropagation();
                 if (!filterActive) {
                     filterContainer.show();
-                    searchContainer.addClass(filterClass);
+                    pageTreeHeader.addClass(filterClass);
                     that.ui.document.on(click, function () {
                         filterActive = true;
                         filterTrigger.trigger(click);
@@ -754,7 +755,7 @@ var CMS = window.CMS || {};
                     filterActive = true;
                 } else {
                     filterContainer.hide();
-                    searchContainer.removeClass(filterClass);
+                    pageTreeHeader.removeClass(filterClass);
                     that.ui.document.off(click);
                     filterActive = false;
                 }
