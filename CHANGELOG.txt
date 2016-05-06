@@ -21,6 +21,7 @@
   small screens.
 * Removed some unnecessary reloads happening after closing sideframe.
 * CMS handles uninstalled apphooks better
+* Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
 
 === 3.2.4 (unreleased) ==
 
