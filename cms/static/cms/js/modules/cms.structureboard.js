@@ -362,9 +362,12 @@ var CMS = window.CMS || {};
             // would be same as screen height, which is likely incorrect,
             // so triggering resize on window would force user scripts
             // to recalculate whatever is required there
-            var evt = document.createEvent('UIEvents');
-            evt.initUIEvent('resize', true, false, window, 0);
-            window.dispatchEvent(evt);
+            // istanbul ignore catch
+            try {
+                var evt = document.createEvent('UIEvents');
+                evt.initUIEvent('resize', true, false, window, 0);
+                window.dispatchEvent(evt);
+            } catch (e) {}
         },
 
         /**
