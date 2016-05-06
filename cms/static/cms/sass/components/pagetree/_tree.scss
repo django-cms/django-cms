@@ -364,7 +364,7 @@
 
     .cms-pagetree-dropdown-menu {
         right: 40px;
-        top: -4px;
+        top: -2px;
         width: 205px;
     }
 }
@@ -435,12 +435,12 @@
 
 .cms-tree-item-lang .cms-pagetree-dropdown-menu {
     right: 32px;
-    top: -8px;
+    top: -5px;
     width: 180px;
 }
 .cms-tree-item-button .cms-pagetree-dropdown-menu {
     right: 40px;
-    top: -4px;
+    top: -2px;
     width: 205px;
 }
 .cms-tree-item-button .cms-hover-tooltip {
@@ -706,6 +706,10 @@
         padding: $pagetree-jstree-header-padding;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
+    }
+    .jstree-grid-header-fixed {
+        position: fixed;
+        z-index: z("pagetree", "fixed-headers");
     }
     // ensure first line is not centered
     .jstree-grid-column-0 .jstree-grid-header {

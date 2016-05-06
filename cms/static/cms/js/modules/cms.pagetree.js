@@ -352,6 +352,7 @@ var CMS = window.CMS || {};
             this._setAjaxPost('.js-cms-tree-lang-trigger');
 
             this._setupPageView();
+            that._setupStickyHeader();
         },
 
         /**
@@ -654,6 +655,19 @@ var CMS = window.CMS || {};
                         url: null,
                         hidden: true
                     }
+                });
+            });
+        },
+
+        /**
+         * @method _setupStickyHeader
+         * @private
+         */
+        _setupStickyHeader: function _setupStickyHeader() {
+            var that = this;
+            that.ui.tree.on('ready.jstree', function () {
+                that.header = new CMS.PageTreeStickyHeader({
+                    container: that.ui.container
                 });
             });
         },
