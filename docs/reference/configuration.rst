@@ -1037,24 +1037,6 @@ This should be an integer preferably taken from the Page object e.g.
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
 
-
-.. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
-
-CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
-=================================
-
-default:
-    ``True``
-
-The new structure board operates by default in "simple" mode. The older mode used absolute
-positioning. Setting this attribute to ``False`` will allow the absolute positioning used in
-versions prior to 3.2. This setting will be removed in 3.3.
-
-
-Example::
-
-    CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
-
 .. setting:: WIZARD_DEFAULT_TEMPLATE
 
 WIZARD_DEFAULT_TEMPLATE

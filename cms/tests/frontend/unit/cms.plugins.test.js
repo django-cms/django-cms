@@ -801,6 +801,7 @@ describe('CMS.Plugin', function () {
                         return [];
                     }
                 };
+                spyOn(CMS.Plugin.prototype, '_setPosition');
 
                 clipboardPlugin = new CMS.Plugin('cms-plugin-3', {
                     type: 'plugin',
@@ -868,7 +869,9 @@ describe('CMS.Plugin', function () {
 
         it('triggers correct events on a child list where the plugin was just moved', function (done) {
             plugin.ui.draggables.on('cms.update', function () {
-                done();
+                setTimeout(function () {
+                    done();
+                }, 10);
             });
             plugin.pastePlugin();
         });
