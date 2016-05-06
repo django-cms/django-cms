@@ -174,7 +174,7 @@
                 "filtered": {% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %},
                 "site": {{ cl.current_site.pk }},
                 "lang": {
-                    "code": "{{ LANGUAGE_CODE|lower }}",
+                    "code": "{{ preview_language|lower }}",
                     "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
                     "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
                     "error": "{% filter escapejs %}{% trans "Error:" %}{% endfilter %}",
@@ -197,7 +197,7 @@
                     "title": "{{ _('View')|escapejs }}",
                     "key": "preview"
                 }, {% for lang in site_languages %}{
-                    "title": "{{ lang|upper }}",
+                    "title": "<a href=\"{% url 'admin:cms_page_changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
                     "key": "{{ lang }}"
                 }, {% endfor %} {
                     "title": "{{ _('Menu')|escapejs }}",

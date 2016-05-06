@@ -906,3 +906,16 @@
         right: 0;
     }
 }
+
+.cms-pagetree-header-lang {
+    &,
+    &:link,
+    &:active,
+    &:hover,
+    &:focus {
+        color: $gray-darkest !important;
+    }
+    &.active {
+        font-weight: bold;
+    }
+}

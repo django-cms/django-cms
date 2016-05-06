@@ -839,7 +839,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
         })
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
 
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
@@ -1448,7 +1448,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
         })
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
 
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
