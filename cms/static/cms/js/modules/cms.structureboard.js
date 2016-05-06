@@ -118,18 +118,12 @@ var CMS = window.CMS || {};
             }
 
             // setup toolbar mode
-            // FIXME this setTimeout is needed because
-            // plugins are initialized after all the scripts are processed
-            // which should be fixed btw. _resizeBoard wants plugins to be initialized,
-            // otherwise throws errors
-            setTimeout(function () {
-                if (CMS.settings.mode === 'structure') {
-                    that.show(true);
-                } else {
-                    // triggering hide here to switch proper classnames on switcher
-                    that.hide(true);
-                }
-            }, 0);
+            if (CMS.settings.mode === 'structure') {
+                that.show(true);
+            } else {
+                // triggering hide here to switch proper classnames on switcher
+                that.hide(true);
+            }
 
             // check if modes should be visible
             if (this.ui.placeholders.length) {
