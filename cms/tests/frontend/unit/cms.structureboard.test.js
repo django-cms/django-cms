@@ -1,5 +1,7 @@
 'use strict';
 
+/* globals window */
+
 describe('CMS.StructureBoard', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
@@ -396,9 +398,11 @@ describe('CMS.StructureBoard', function () {
 
         it('triggers `resize` event on the window', function () {
             board.show();
-            spyOn($.fn, 'trigger');
+            var spy = jasmine.createSpy();
+            $(window).on('resize', spy);
             board.hide();
-            expect($.fn.trigger).toHaveBeenCalledWith('resize');
+            expect(spy).toHaveBeenCalledTimes(1);
+            $(window).off('resize', spy);
         });
 
         it('resizes the structureboard if type of structureboard is dynamic', function () {
