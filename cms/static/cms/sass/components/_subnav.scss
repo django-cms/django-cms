@@ -137,11 +137,11 @@
         }
         &:first-child a:hover,
         &:first-child a:focus {
-            border-radius: $border-radius-base $border-radius-base 0 0;
+            border-radius: $border-radius-normal $border-radius-normal 0 0;
         }
         &:last-child a:hover,
         &:last-child a:focus {
-            border-radius: 0 0 $border-radius-base $border-radius-base;
+            border-radius: 0 0 $border-radius-normal $border-radius-normal;
         }
     }
     .cms-submenu-item-paste-tooltip {
