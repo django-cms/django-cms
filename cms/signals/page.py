@@ -93,9 +93,14 @@ def update_home(instance, **kwargs):
         qs = Page.objects.drafts().filter(site=instance.site_id)
     else:
         qs = Page.objects.public().filter(site=instance.site_id)
+
     try:
+        # This selects the first, published root page as the candidate to be
+        # set as home.
         home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
     except NoHomeFound:
+        # If no candidate available, consider the current instance, which is
+        # indeed eligible for being set as home.
         if instance.publisher_is_draft and instance.title_set.filter(published=True, publisher_public__published=True).exists():  # noqa
             return
         home_pk = instance.pk
@@ -103,21 +108,15 @@ def update_home(instance, **kwargs):
     # Reset `is_home` for any old home that is not our new, target home
     for old_home in qs.filter(is_home=True).exclude(pk=home_pk):
         if instance.pk == old_home.pk:
-            # This isn't redundant, it resets `is_home` on the working object
-            # which may still be in-use by the signal-handlers.
             instance.is_home = False
         old_home.is_home = False
-        old_home._publisher_keep_state = True
-        old_home._home_checked = True
         old_home.save()
+        old_home._publisher_keep_state = True
 
     # Set `is_home` for our new, target home.
     new_home = qs.get(pk=home_pk)
-    new_home.is_home = True
     if instance.pk == new_home.pk:
-        # This isn't redundant, it sets `is_home` on the working object
-        # which may still be in-use by the signal-handlers.
         instance.is_home = True
-    new_home._publisher_keep_state = True
-    new_home._home_checked = True
+    new_home.is_home = True
     new_home.save()
+    new_home._publisher_keep_state = True
