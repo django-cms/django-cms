@@ -218,9 +218,16 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if has_change_permission %}
+                            {% if has_change_permission and page.is_potential_home %}
                                 <li class="js-cms-tree-item-set-home">
                                     <a href="{% url 'admin:cms_page_set_home' page.id %}" title="{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}">
+                                        <span class="cms-icon cms-icon-home"></span>
+                                        <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="#" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
                                         <span class="cms-icon cms-icon-home"></span>
                                         <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
                                     </a>
