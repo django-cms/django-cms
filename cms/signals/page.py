@@ -87,20 +87,13 @@ def update_home(instance, **kwargs):
         # Already checked. Bail.
         return
 
-    print('Update_home is considering page: {0} ({1})'.format(instance, instance.pk))
-
     if instance.publisher_is_draft:
         qs = Page.objects.drafts().filter(site=instance.site_id)
     else:
         qs = Page.objects.public().filter(site=instance.site_id)
 
     current_home = qs.filter(is_home=True).first()
-    print('Current home is page: {0} ({1})'.format(current_home, getattr(current_home, 'pk', '--')))
     if not current_home or not current_home.is_potential_home():
-        if not current_home:
-            print('    No current home...')
-        else:
-            print('    Current home is no longer viable...')
         try:
             # This selects the first, published root page as the candidate to be
             # set as home.
@@ -118,5 +111,3 @@ def update_home(instance, **kwargs):
             new_home._publisher_keep_state = True
             if new_home.pk == instance.pk:
                 instance.is_home = True
-    else:
-        print('    All good...')
