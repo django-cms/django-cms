@@ -75,48 +75,48 @@ def post_moved_page(instance, **kwargs):
 
 def update_home(instance, **kwargs):
     """
-    Updates the is_home flag of page instances after they are saved or moved.
+    Updates the is_home flag of page instances after when there are changes to the page tree that
+    renders the current home no longer eligible to be home.
 
     :param instance: Page instance
     :param kwargs:
     :return:
     """
+
     if getattr(instance, '_home_checked', False):
         # Already checked. Bail.
         return
 
-    if instance.parent_id and (not getattr(instance, 'old_page', False) or instance.old_page.parent_id):
-        # This page is not, nor was a root page. Bail.
-        return
+    print('Update_home is considering page: {0} ({1})'.format(instance, instance.pk))
 
     if instance.publisher_is_draft:
         qs = Page.objects.drafts().filter(site=instance.site_id)
     else:
         qs = Page.objects.public().filter(site=instance.site_id)
 
-    try:
-        # This selects the first, published root page as the candidate to be
-        # set as home.
-        home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
-    except NoHomeFound:
-        # If no candidate available, consider the current instance, which is
-        # indeed eligible for being set as home.
-        if instance.publisher_is_draft and instance.title_set.filter(published=True, publisher_public__published=True).exists():  # noqa
+    current_home = qs.filter(is_home=True).first()
+    print('Current home is page: {0} ({1})'.format(current_home, getattr(current_home, 'pk', '--')))
+    if not current_home or not current_home.is_potential_home():
+        if not current_home:
+            print('    No current home...')
+        else:
+            print('    Current home is no longer viable...')
+        try:
+            # This selects the first, published root page as the candidate to be
+            # set as home.
+            new_home = qs.filter(title_set__published=True).get_home(instance.site_id)
+        except NoHomeFound:
             return
-        home_pk = instance.pk
+        else:
+            new_home.set_home(no_signals=False)
 
-    # Reset `is_home` for any old home that is not our new, target home
-    for old_home in qs.filter(is_home=True).exclude(pk=home_pk):
-        if instance.pk == old_home.pk:
-            instance.is_home = False
-        old_home.is_home = False
-        old_home.save()
-        old_home._publisher_keep_state = True
+            if current_home:
+                current_home._publisher_keep_state = True
+                if current_home.pk == instance.pk:
+                    instance.is_home = False
 
-    # Set `is_home` for our new, target home.
-    new_home = qs.get(pk=home_pk)
-    if instance.pk == new_home.pk:
-        instance.is_home = True
-    new_home.is_home = True
-    new_home.save()
-    new_home._publisher_keep_state = True
+            new_home._publisher_keep_state = True
+            if new_home.pk == instance.pk:
+                instance.is_home = True
+    else:
+        print('    All good...')
