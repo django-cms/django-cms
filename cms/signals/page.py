@@ -83,33 +83,42 @@ def update_home(instance, **kwargs):
     :return:
     """
     if getattr(instance, '_home_checked', False):
+        # Already checked. Bail.
         return
-    if not instance.parent_id or (getattr(instance, 'old_page', False) and not instance.old_page.parent_id):
-        if instance.publisher_is_draft:
-            qs = Page.objects.drafts()
-        else:
-            qs = Page.objects.public()
-        try:
-            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
-        except NoHomeFound:
-            if instance.publisher_is_draft and instance.title_set.filter(published=True,
-                                                                         publisher_public__published=True).count():
-                return
-            home_pk = instance.pk
-        for page in qs.filter(site=instance.site_id, is_home=True).exclude(pk=home_pk):
-            if instance.pk == page.pk:
-                instance.is_home = False
-            page.is_home = False
-            page._publisher_keep_state = True
-            page._home_checked = True
-            page.save()
-        try:
-            page = qs.get(pk=home_pk, site=instance.site_id)
-        except Page.DoesNotExist:
+
+    if instance.parent_id and (not getattr(instance, 'old_page', False) or instance.old_page.parent_id):
+        # This page is not, nor was a root page. Bail.
+        return
+
+    if instance.publisher_is_draft:
+        qs = Page.objects.drafts().filter(site=instance.site_id)
+    else:
+        qs = Page.objects.public().filter(site=instance.site_id)
+    try:
+        home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
+    except NoHomeFound:
+        if instance.publisher_is_draft and instance.title_set.filter(published=True, publisher_public__published=True).exists():  # noqa
             return
-        page.is_home = True
-        if instance.pk == home_pk:
-            instance.is_home = True
-        page._publisher_keep_state = True
-        page._home_checked = True
-        page.save()
+        home_pk = instance.pk
+
+    # Reset `is_home` for any old home that is not our new, target home
+    for old_home in qs.filter(is_home=True).exclude(pk=home_pk):
+        if instance.pk == old_home.pk:
+            # This isn't redundant, it resets `is_home` on the working object
+            # which may still be in-use by the signal-handlers.
+            instance.is_home = False
+        old_home.is_home = False
+        old_home._publisher_keep_state = True
+        old_home._home_checked = True
+        old_home.save()
+
+    # Set `is_home` for our new, target home.
+    new_home = qs.get(pk=home_pk)
+    new_home.is_home = True
+    if instance.pk == new_home.pk:
+        # This isn't redundant, it sets `is_home` on the working object
+        # which may still be in-use by the signal-handlers.
+        instance.is_home = True
+    new_home._publisher_keep_state = True
+    new_home._home_checked = True
+    new_home.save()
