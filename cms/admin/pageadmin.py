@@ -1022,12 +1022,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseForbidden(
                 force_text(_("You do not have permission to set 'home'")))
         try:
-            page.set_home(no_signals=True)
-        except Exception as exception:
-            print("Exception: '{0}'.".format(exception))
+            home_set = page.set_home()
+        except Exception:
             return HttpResponseBadRequest(
                 force_text(_("An error occurred setting page to be home.")))
-        return HttpResponse(force_text(_("The page was set to be home")))
+        if not home_set:
+            return HttpResponseBadRequest(force_text(_("The page is not eligible to be home.")))
+        return HttpResponse('ok')
 
     @require_POST
     @transaction.atomic

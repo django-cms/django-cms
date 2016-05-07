@@ -170,15 +170,30 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         state = self.get_publisher_state(language)
         return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
 
+    def is_potential_home(self):
+        """
+        Encapsulates logic for determining if this page is eligible to be set
+        as `is_home`. This is a public method so that it can be accessed in the
+        admin for determining whether to enable the "Set as home" menu item.
+        :return: Boolean
+        """
+        if not self.parent_id and self.title_set.filter(published=True).exists():
+            return True
+        return False
+
     def set_home(self, no_signals=False):
-        if not self.parent_id or (getattr(self, 'old_page', False) and not self.old_page.parent_id):
-            Page.objects.filter(
-                is_home=True,
-                publisher_is_draft=self.publisher_is_draft,
-            ).exclude(pk=self.pk).update(is_home=False)
+        if self.is_potential_home():
+            qs = Page.objects.filter(publisher_is_draft=self.publisher_is_draft)
+
+            # Unset is_home on other page(s) of this publisher type (public/draft)
+            for old_home in qs.filter(is_home=True).exclude(pk=self.pk):
+                old_home.is_home = False
+                old_home.save(no_signals=no_signals)
 
             self.is_home = True
             self.save(no_signals=no_signals)
+            return True
+        return False
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
