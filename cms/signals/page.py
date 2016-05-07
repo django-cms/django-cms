@@ -71,7 +71,6 @@ def post_delete_page(instance, **kwargs):
 
 def post_moved_page(instance, **kwargs):
     update_title_paths(instance, **kwargs)
-    update_home(instance, **kwargs)
 
 
 def update_home(instance, **kwargs):
