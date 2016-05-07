@@ -170,6 +170,16 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         state = self.get_publisher_state(language)
         return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
 
+    def set_home(self, no_signals=False):
+        if not self.parent_id or (getattr(self, 'old_page', False) and not self.old_page.parent_id):
+            Page.objects.filter(
+                is_home=True,
+                publisher_is_draft=self.publisher_is_draft,
+            ).exclude(pk=self.pk).update(is_home=False)
+
+            self.is_home = True
+            self.save(no_signals=no_signals)
+
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
             language = get_language()

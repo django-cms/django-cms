@@ -131,6 +131,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/change-template/$', self.change_template),
+            pat(r'^([0-9]+)/set-home/$', self.set_home),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -1012,6 +1013,21 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(force_text(_("The template was successfully changed")))
+
+    @require_POST
+    @create_revision()
+    def set_home(self, request, object_id):
+        page = get_object_or_404(self.model, pk=object_id)
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(
+                force_text(_("You do not have permission to set 'home'")))
+        try:
+            page.set_home(no_signals=True)
+        except Exception as exception:
+            print("Exception: '{0}'.".format(exception))
+            return HttpResponseBadRequest(
+                force_text(_("An error occurred setting page to be home.")))
+        return HttpResponse(force_text(_("The page was set to be home")))
 
     @require_POST
     @transaction.atomic
