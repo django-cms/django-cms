@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import operator
-import re
 import warnings
 
 from django.conf import settings
@@ -43,36 +42,43 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
 
     Resulting value will be the last from:
 
-    CMS_PLACEHOLDER_CONF['*'] (global)
+    CMS_PLACEHOLDER_CONF[None] (global)
     CMS_PLACEHOLDER_CONF['template'] (if template is given)
     CMS_PLACEHOLDER_CONF['placeholder']
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
-    # Ideas: 
+    # Ideas:
     # 1)using real regex as keys
     # 2)turn the setting in an orderedict
     # 3)handling dictionary and list both
 
-    # Use regex or normal string (in this case exact match)
-    # compatibility with old structure
-    # convert all to orderedict
+    # Use function set in PLACEHOLDER_CONF_KEYS_PARSER to match configuration
+    # keys with the generated list of keys
+
+    def _match_placeholder_conf(conf_key, key):
+        return force_text(conf_key) == force_text(key)
 
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
+        parser = get_cms_setting('PLACEHOLDER_CONF_KEYS_PARSER')
+        if parser == 'default':
+            parser_function = _match_placeholder_conf
+        else:
+            parser_function = parser
         # 1st level
         if template:
-            keys.append("%s %s" % (template, placeholder))
+            keys.append(force_text('%s %s' % (template, placeholder)))
         # 2nd level
-        keys.append(str(placeholder))
+        keys.append(force_text(placeholder))
         # 3rd level
         if template:
-            keys.append(str(template))
+            keys.append(force_text(template))
         # 4th level
-        keys.append('*')
+        keys.append(None)
         for key in keys:
-            for regex, conf in iteritems(placeholder_conf):
-                if key == regex:
+            for conf_key, conf in iteritems(placeholder_conf):
+                if parser_function(conf_key, key):
                     if not conf:
                         continue
                     value = conf.get(setting)
@@ -83,27 +89,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
                         if ' ' in inherit:
                             inherit = inherit.split(' ')
                         else:
-                            inherit = (None, inherit,)
-                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                        if value is not None:
-                            return value
-        # turn placeholder confs keys into real regular expressions
-        for key in keys:
-            # turn them in real regex string
-            for regex, conf in iteritems(placeholder_conf):
-                compiled_regex = re.compile(regex)
-                if compiled_regex.match(key):
-                    if not conf:
-                        continue
-                    value = conf.get(setting)
-                    if value is not None:
-                        return value
-                    inherit = conf.get('inherit')
-                    if inherit:
-                        if ' ' in inherit:
-                            inherit = inherit.split(' ')
-                        else:
-                            inherit = (None, inherit,)
+                            inherit = (None, inherit)
                         value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
                         if value is not None:
                             return value

@@ -72,6 +72,7 @@ DEFAULTS = {
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
+    'PLACEHOLDER_CONF_KEYS_PARSER': 'default'
 }
 
 
