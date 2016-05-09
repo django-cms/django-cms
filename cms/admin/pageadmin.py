@@ -3,7 +3,7 @@ import copy
 from functools import wraps
 import json
 import sys
-
+import warnings
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -1023,7 +1023,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 force_text(_("You do not have permission to set 'home'")))
         try:
             home_set = page.set_home()
-        except Exception:
+        except Exception as e:
+            warnings.warn('Exception in pageadmin.set_home(): {0}'.format(e))
             return HttpResponseBadRequest(
                 force_text(_("An error occurred setting page to be home.")))
         if not home_set:

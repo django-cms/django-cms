@@ -28,7 +28,7 @@ def post_save_page(instance, **kwargs):
             instance.rescan_placeholders()
         except TemplateDoesNotExist as e:
             warnings.warn('Exception occurred: %s template does not exists' % e)
-        update_home(instance)
+        update_home(instance, **kwargs)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
         pages = [instance] + list(instance.get_descendants())
         for page in pages:
@@ -50,6 +50,7 @@ def post_save_page(instance, **kwargs):
                 pass
         elif not instance.publisher_is_draft:
             apphook_post_page_checker(instance)
+    update_title_paths(instance)
 
 
 def pre_delete_page(instance, **kwargs):
@@ -87,27 +88,28 @@ def update_home(instance, **kwargs):
         # Already checked. Bail.
         return
 
-    if instance.publisher_is_draft:
-        qs = Page.objects.drafts().filter(site=instance.site_id)
-    else:
-        qs = Page.objects.public().filter(site=instance.site_id)
+    instance._home_checked = True
 
+    qs = Page.objects.filter(publisher_is_draft=instance.publisher_is_draft, site=instance.site_id)
     current_home = qs.filter(is_home=True).first()
-    if not current_home or not current_home.is_potential_home():
-        try:
-            # This selects the first, published root page as the candidate to be
-            # set as home.
-            new_home = qs.filter(title_set__published=True).get_home(instance.site_id)
-        except NoHomeFound:
-            return
-        else:
-            new_home.set_home(no_signals=False)
+    if current_home and current_home.is_potential_home():
+        return
 
-            if current_home:
-                current_home._publisher_keep_state = True
-                if current_home.pk == instance.pk:
-                    instance.is_home = False
+    # Need to find a new home
+    try:
+        # This selects the first, published root page as the candidate to be
+        # set as home.
+        new_home = qs.filter(title_set__published=True).get_home(instance.site_id)
+    except NoHomeFound:
+        # No eligible candidates, bail.
+        return
 
-            new_home._publisher_keep_state = True
-            if new_home.pk == instance.pk:
-                instance.is_home = True
+    new_home.set_home()
+
+    if current_home and current_home.pk == instance.pk:
+        instance._publisher_keep_state = True
+        instance.is_home = False
+
+    if new_home.pk == instance.pk:
+        instance._publisher_keep_state = True
+        instance.is_home = True
