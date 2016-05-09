@@ -1748,18 +1748,18 @@ class AdminPageTreeTests(AdminTestsBase):
 
         # Move Beta to the root as node #1 (positions are 0-indexed)
         data = {
-            'id': gamma.pk,
+            'id': beta.pk,
             'position': 1,
         }
 
         with self.login_user_context(admin_user):
             request = self.get_request(post_data=data)
-            response = page_admin.move_page(request, page_id=gamma.pk)
+            response = page_admin.move_page(request, page_id=beta.pk)
             data = json.loads(response.content)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(alpha.reload().get_descendants().count(), 0)
         self.assertEqual(beta.reload().get_descendants().count(), 2)
         self.assertEqual(gamma.reload().get_descendants().count(), 1)
 
