@@ -1698,7 +1698,7 @@ class AdminPageTreeTests(AdminTestsBase):
         with self.login_user_context(admin_user):
             request = self.get_request(post_data=data)
             response = page_admin.move_page(request, page_id=beta.pk)
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
@@ -1714,7 +1714,7 @@ class AdminPageTreeTests(AdminTestsBase):
         with self.login_user_context(admin_user):
             request = self.get_request(post_data=data)
             response = page_admin.move_page(request, page_id=gamma.pk)
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
@@ -1731,7 +1731,7 @@ class AdminPageTreeTests(AdminTestsBase):
         with self.login_user_context(admin_user):
             request = self.get_request(post_data=data)
             response = page_admin.move_page(request, page_id=delta.pk)
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
@@ -1755,7 +1755,7 @@ class AdminPageTreeTests(AdminTestsBase):
         with self.login_user_context(admin_user):
             request = self.get_request(post_data=data)
             response = page_admin.move_page(request, page_id=beta.pk)
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
