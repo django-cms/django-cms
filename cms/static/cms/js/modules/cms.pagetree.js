@@ -289,7 +289,7 @@ var PageTree = new Class({
                     var instance = that.ui.tree.jstree(true);
 
                     instance._hide_grid(instance.get_node(obj.parent));
-                    if (obj.parent === '#') {
+                    if (obj.parent === '#' || obj.node && obj.node.data && obj.node.data.isHome) {
                         instance.refresh();
                     } else {
                         // have to refresh parent, because refresh only

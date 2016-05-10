@@ -12,6 +12,7 @@
     {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
     data-slug="{{ page.get_slug }}"
+    data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-colview='
         <div class="cms-tree-col">
             <div class="cms-tree-item-wrapper">
