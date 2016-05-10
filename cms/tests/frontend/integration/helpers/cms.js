@@ -298,6 +298,7 @@ module.exports = function (casperjs, settings) {
             return function () {
                 return this.then(that.waitUntilAllAjaxCallsFinish()).thenOpen(globals.editUrl)
                     .then(that.switchTo('structure'))
+                    .wait(100)
                     // only add to placeholder if no parent specified
                     .thenBypassIf(opts.parent, 1)
                     .waitUntilVisible('.cms-structure', function () {
