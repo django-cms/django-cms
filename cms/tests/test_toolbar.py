@@ -586,8 +586,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         # Starting point: [] (empty)
         # Add a couple of "normal" menus
-        menu1 = toolbar.get_or_create_menu("menu1", "Menu1", side=toolbar.RIGHT)
-        menu2 = toolbar.get_or_create_menu("menu2", "Menu2", side=toolbar.RIGHT)
+        toolbar.get_or_create_menu("menu1", "Menu1", side=toolbar.RIGHT)
+        toolbar.get_or_create_menu("menu2", "Menu2", side=toolbar.RIGHT)
         menu3 = toolbar.get_or_create_menu("menu3", "Menu3", side=toolbar.RIGHT, position=-1)
         menu4 = toolbar.get_or_create_menu("menu4", "Menu4", side=toolbar.RIGHT, position=-2)
         self.assertEqual(toolbar.get_right_items().index(menu3), 3)
