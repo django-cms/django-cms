@@ -200,7 +200,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         admin for determining whether to enable the "Set as home" menu item.
         :return: Boolean
         """
-        if not self.parent_id and self.title_set.filter(published=True).exists():
+        if not self.parent_id and self.title_set.exists():
             return True
         return False
 
@@ -216,7 +216,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 publisher_is_draft=self.publisher_is_draft,
             )
             for old_home in affected_pages:
-                Page.objects.filter(pk=old_home.id).exclude(pk=self.pk).update(is_home=False)
+                if old_home.id == self.id:
+                    continue
+                Page.objects.filter(pk=old_home.id).update(is_home=False)
                 _update_title_paths(old_home, exclude=[self, ])
 
             # Set is_home on this page
