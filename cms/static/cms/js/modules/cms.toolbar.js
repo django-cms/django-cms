@@ -86,7 +86,7 @@ var CMS = window.CMS || {};
             var that = this;
             setTimeout(function () {
                 that._initialStates();
-            }, 200);
+            }, 0);
 
             // set a state to determine if we need to reinitialize this._events();
             this.ui.toolbar.data('ready', true);
