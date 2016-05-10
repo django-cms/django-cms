@@ -700,6 +700,13 @@ var PageTree = new Class({
 
         this.ui.container.on(this.click, trigger, function (e) {
             e.preventDefault();
+
+            var element = $(this);
+
+            if (element.closest('.cms-pagetree-dropdown-item-disabled').length) {
+                return;
+            }
+
             $.ajax({
                 method: 'post',
                 url: $(this).attr('href')
