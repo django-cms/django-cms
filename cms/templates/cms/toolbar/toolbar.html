@@ -1,12 +1,12 @@
-{% load i18n l10n %}
+{% load i18n l10n cache %}
 
 {% language request.toolbar.toolbar_language %}
+{% cache 900 'cms-toolbar-static-part-1' user.is_authenticated debug request.toolbar.toolbar_language %}
 <div id="cms-top"
      class="cms cms-reset
      {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
      {% if debug %} cms-toolbar-debug{% endif %}"
      dir="ltr" data-touch-action="none">
-
     {# debug, tooltip #}
     <div class="cms-debug-bar"></div>
     <div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
@@ -16,21 +16,21 @@
     <div class="cms-toolbar">
         <div class="cms-toolbar-left">
             {% include "cms/toolbar/items/logo.html" %}
-
+    {% endcache %}
             {% if not user.is_authenticated %}
-            {% include "cms/toolbar/items/login.html" %}
+                {% include "cms/toolbar/items/login.html" %}
             {% else %}
-            <ul class="cms-toolbar-item cms-toolbar-item-navigation">
-                {% for item in request.toolbar.get_left_items %}
-                    {{ item.render }}
-                {% endfor %}
-                <li class="cms-toolbar-more">
-                    <a href="#">
-                        <span>{% trans "More" %}...<span class="cms-icon cms-icon-arrow"></span></span>
-                    </a>
-                    <ul data-touch-action="pan-y"></ul>
-                </li>
-            </ul>
+                <ul class="cms-toolbar-item cms-toolbar-item-navigation">
+                    {% for item in request.toolbar.get_left_items %}
+                        {{ item.render }}
+                    {% endfor %}
+                    <li class="cms-toolbar-more">
+                        <a href="#">
+                            <span>{% trans "More" %}...<span class="cms-icon cms-icon-arrow"></span></span>
+                        </a>
+                        <ul data-touch-action="pan-y"></ul>
+                    </li>
+                </ul>
             {% endif %}
         </div>
 
@@ -38,6 +38,7 @@
             {% for item in request.toolbar.get_right_items %}
                 {{ item.render }}
             {% endfor %}
+    {% cache 900 'cms-toolbar-static-part-2-with-sideframe' request.toolbar.toolbar_language %}
         </div>
     </div>
     <div class="cms-toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
@@ -50,7 +51,6 @@
     </div>
     {# end: messages #}
 
-    {# start: sidebar #}
     <div class="cms-sideframe">
         <div class="cms-sideframe-frame"></div>
         <div class="cms-sideframe-shim"></div>
@@ -62,34 +62,34 @@
             <span class="cms-icon cms-icon-arrow cms-icon-arrow-forward cms-icon-disabled" title="{% trans 'Click to go forward' %}"></span>
         </div>
     </div>
-    {# end: sidebar #}
+    {% endcache %}
 
     {# start: addons #}
     {{ addons }}
     {# end: addons #}
 
-    {# start: modal #}
-    <div class="cms-modal" data-touch-action="none">
-        <div class="cms-modal-head" data-touch-action="none">
-            <span class="cms-modal-title" data-touch-action="none">
-                <span class="cms-modal-title-prefix"></span>
-                <span class="cms-modal-title-suffix"></span>
-            </span>
-            <span class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
-            <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
-            <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
+    {% cache 600 'cms-modal' %}
+        <div class="cms-modal" data-touch-action="none">
+            <div class="cms-modal-head" data-touch-action="none">
+                <span class="cms-modal-title" data-touch-action="none">
+                    <span class="cms-modal-title-prefix"></span>
+                    <span class="cms-modal-title-suffix"></span>
+                </span>
+                <span class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
+                <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
+                <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
+            </div>
+            <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
+            <div class="cms-modal-body">
+                <div class="cms-modal-shim"></div>
+                <div class="cms-modal-frame"></div>
+            </div>
+            <div class="cms-modal-foot">
+                <div class="cms-modal-buttons"></div>
+                <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
+            </div>
         </div>
-        <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
-        <div class="cms-modal-body">
-            <div class="cms-modal-shim"></div>
-            <div class="cms-modal-frame"></div>
-        </div>
-        <div class="cms-modal-foot">
-            <div class="cms-modal-buttons"></div>
-            <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
-        </div>
-    </div>
-    {# end: modal #}
+    {% endcache %}
 
     {# start: structure #}
     <div class="cms-structure">
@@ -114,13 +114,15 @@
     </div>
     {# end: structure #}
 
-    {% if request.toolbar.redirect_url %}
-    <div class="cms-screenblock">
-        <div class="cms-screenblock-inner">
-            <h1>{% trans "This page has no preview!" %}</h1>
-            <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
-        </div>
-    </div>
-    {% endif %}
+    {% cache 900 'cms-screenblock' request.toolbar.redirect_url %}
+        {% if request.toolbar.redirect_url %}
+            <div class="cms-screenblock">
+                <div class="cms-screenblock-inner">
+                    <h1>{% trans "This page has no preview!" %}</h1>
+                    <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
+                </div>
+            </div>
+        {% endif %}
+    {% endcache %}
 </div>
 {% endlanguage %}
