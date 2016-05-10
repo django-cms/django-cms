@@ -991,15 +991,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Special case: If «target» is not provided, it means to let the
             # page become a new root node.
             try:
-                tb_target = Page.get_root_nodes().filter(
-                    publisher_is_draft=True, site=site)[position]
+                tb_target = Page.get_draft_root_node(position=position, site=site)
                 if page.is_sibling_of(tb_target) and page.path < tb_target.path:
                     tb_position = "right"
                 else:
                     tb_position = "left"
             except IndexError:
                 # Move page to become the last root node.
-                tb_target = Page.get_last_root_node()
+                tb_target = Page.get_draft_root_node(site=site)
                 tb_position = "right"
         else:
             try:
@@ -1132,12 +1131,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Special case: If «target» is not provided, it means to create the
             # new page as a root node.
             try:
-                tb_target = Page.get_root_nodes().filter(
-                    publisher_is_draft=True, site=site)[position]
+                tb_target = Page.get_draft_root_node(position=position, site=site)
                 tb_position = "left"
             except IndexError:
                 # New page to become the last root node.
-                tb_target = Page.get_last_root_node()
+                tb_target = Page.get_draft_root_node(site=site)
                 tb_position = "right"
         else:
             try:
