@@ -318,6 +318,7 @@ var CMS = window.CMS || {};
 
                 btn.find('.cms-btn-publish').on(that.click, function (e) {
                     e.preventDefault();
+                    that.showLoader();
                     // send post request to prevent xss attacks
                     $.ajax({
                         'type': 'post',
@@ -331,8 +332,10 @@ var CMS = window.CMS || {};
                                 [CMS.settings.edit_off + '=true']
                             );
                             CMS.API.Helpers.reloadBrowser(url);
+                            that.hideLoader();
                         },
                         'error': function (request) {
+                            that.hideLoader();
                             throw new Error(request);
                         }
                     });
