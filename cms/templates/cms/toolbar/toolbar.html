@@ -1,4 +1,4 @@
-{% load i18n l10n cache %}
+{% load i18n l10n cache cms_tags %}
 
 {% language request.toolbar.toolbar_language %}
 {% cache request.toolbar.template_fragment_cache_duration 'cms-toolbar-static-part-1' user.is_authenticated debug request.toolbar.toolbar_language %}
@@ -8,7 +8,7 @@
      {% if debug %} cms-toolbar-debug{% endif %}"
      dir="ltr" data-touch-action="none">
 
-    <script type="text/cms-template">{% extra_menu_items %}</script>
+    <script type="text/cms-template">{% plugin_child_classes %}</script>
     {# debug, tooltip #}
     <div class="cms-debug-bar"></div>
     <div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
