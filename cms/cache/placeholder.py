@@ -19,6 +19,7 @@ check for cache hits without re-computing placeholder.get_vary_cache_on().
 """
 
 import hashlib
+import time
 
 from django.utils.timezone import now
 
@@ -30,9 +31,10 @@ def _get_placeholder_cache_version_key(placeholder, lang):
     """
     Returns the version key for the given «placeholder» and «lang».
 
-    Invalidating this (via clear_placeholder_cache) will effectively make all
-    "sub-caches" relating to this (placeholder x lang) inaccessible.
-    Sub-caches include caches per TZ, per VARY header
+    Invalidating this (via clear_placeholder_cache by replacing the stored
+    value with a new value) will effectively make all "sub-caches" relating to
+    this (placeholder x lang) inaccessible. Sub-caches include caches per TZ
+    and per VARY header.
     """
     # TODO: Should we also add the site ID to the key?
     prefix = get_cms_setting('CACHE_PREFIX')
@@ -52,7 +54,7 @@ def _get_placeholder_cache_version_key(placeholder, lang):
 def _get_placeholder_cache_version(placeholder, lang):
     """
     Gets the (placeholder x lang)'s current version and vary-on header-names
-    list, if present, otherwise resets to (1, []).
+    list, if present, otherwise resets to («timestamp», []).
     """
     from django.core.cache import cache
 
@@ -61,7 +63,7 @@ def _get_placeholder_cache_version(placeholder, lang):
     if cached:
         version, vary_on_list = cached
     else:
-        version = 1
+        version = int(time.time())
         vary_on_list = list()
         _set_placeholder_cache_version(placeholder, lang, version, vary_on_list)
     return version, vary_on_list
@@ -172,8 +174,7 @@ def clear_placeholder_cache(placeholder, lang):
     We don't need to re-store the vary_on_list, because the cache is now
     effectively empty.
     """
-    version, _ = _get_placeholder_cache_version(placeholder, lang)
-    version += 1
+    version = int(time.time())
     _set_placeholder_cache_version(placeholder, lang, version, list())
 
 
