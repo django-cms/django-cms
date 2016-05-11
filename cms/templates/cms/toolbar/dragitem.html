@@ -1,7 +1,6 @@
 {% load i18n l10n cms_tags cache %}
 
 {% with allow_children=plugin.get_plugin_instance.1.allow_children disable_child_plugins=plugin.get_plugin_instance.1.disable_child_plugins %}
-{% cache request.toolbar.template_fragment_cache_duration 'cms-plugin-structure-1' plugin.pk plugin.get_plugin_instance.1.allow_children plugin.get_plugin_instance.1.disable_child_plugins allow_children clipboard plugin.child_plugin_instances request.toolbar.toolbar_language disabled_child plugin.get_short_description|force_escape %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
     {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
@@ -10,7 +9,6 @@
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
-            {% cache request.toolbar.template_fragment_cache_duration 'cms-add-plugin-to-plugin' allow_children %}
             <div class="cms-submenu-btn cms-submenu-add cms-btn
                 {% if not allow_children %} cms-btn-disabled{% endif %}">
                 {% if not allow_children %}
@@ -23,14 +21,12 @@
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
             </div>
             <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
-            {% endcache %}
         {% else %}
             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
                 data-cms-tooltip="{% trans "This plugin cannot be moved or edited outside of its parent" %}">
                 <span class="cms-icon cms-icon-lock"></span>
             </div>
         {% endif %}
-        {% cache request.toolbar.template_fragment_cache_duration 'cms-plugin-dropdown' %}
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
                 <div class="cms-submenu-item"><a data-cms-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
@@ -42,7 +38,6 @@
                     <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "This plugin cannot have nested plugins." %}"></span>
                 </div>
                 <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="delete" href="#">{% trans "Delete" %}</a></div>
-        {% endcache %}
                 {% extra_menu_items plugin %}
             </div>
         </div>
@@ -60,7 +55,6 @@
 
     <div class="cms-collapsable-container cms-hidden
         {% if allow_children %} cms-draggables{% endif %}">
-{% endcache %}
         {% if plugin.child_plugin_instances %}
             {% for child in plugin.child_plugin_instances %}
                 {# workaround because include tag does not allow recursive includes #}
