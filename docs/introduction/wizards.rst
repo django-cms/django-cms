@@ -7,13 +7,19 @@ applications. It opens up a simple dialog box with the basic fields required to 
 
 django CMS uses it for creating Pages, but you can add your own models to it.
 
+
+*****************
+Create the wizard
+*****************
+
+A wizard is created by a ``PollWizard`` class and a ``ModelForm``.
+
 In the ``polls_cms_integration`` application, add a ``cms_wizards.py`` file, containing::
 
     from cms.wizards.wizard_base import Wizard
     from cms.wizards.wizard_pool import wizard_pool
 
     from polls_cms_integration.forms import PollWizardForm
-    from polls.models import Poll
 
 
     class PollWizard(Wizard):
@@ -21,7 +27,7 @@ In the ``polls_cms_integration`` application, add a ``cms_wizards.py`` file, con
 
     poll_wizard = PollWizard(
         title="Poll",
-        weight=200,  # determines the ordering of wizards in the Create dialog
+        weight=200,             # determines the ordering of wizards in the Create dialog
         form=PollWizardForm,
         description="Create a new Poll",
     )
@@ -29,7 +35,7 @@ In the ``polls_cms_integration`` application, add a ``cms_wizards.py`` file, con
     wizard_pool.register(poll_wizard)
 
 
-A wizard needs a form, so create a ``forms.py`` too::
+We also need to create a ``forms.py`` with the ``ModelForm`` subclass::
 
     from django import forms
 
@@ -41,7 +47,11 @@ A wizard needs a form, so create a ``forms.py`` too::
             model = Poll
             exclude = []
 
-Refresh the Polls page, hit the **Create** button in the toolbar - and the wizard dialog will open,
+
+.. note:: Don't forget to restart the runserver to have your new wizard recognised.
+
+
+Refresh any page, hit the **Create** button in the toolbar - and the wizard dialog will open,
 offering you a new wizard for creating Polls.
 
 .. note::

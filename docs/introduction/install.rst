@@ -22,8 +22,8 @@ Please check that you have installed the
 `required binary libraries <http://djangocms-installer.readthedocs.org/en/latest/libraries.html>`_
 before proceeding.
 
-Create and activate a virtual env
-=================================
+Create and activate a virtual environment
+=========================================
 
 ::
 
@@ -33,6 +33,7 @@ Create and activate a virtual env
 Note that if you're using Windows, to activate the virtualenv you'll need::
 
     env\Scripts\activate
+
 
 Use the django CMS installer
 ============================
@@ -109,8 +110,10 @@ indicated with an asterisk *****).
 
 Create a Django admin user when invited.
 
-Start up the runserver
-======================
+
+*********************
+Start up the new site
+*********************
 
 ::
 
