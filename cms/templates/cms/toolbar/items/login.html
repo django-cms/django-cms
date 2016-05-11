@@ -4,7 +4,7 @@
 <form action="{% url 'pages-root' %}{% if request.path != logout_url %}?next={{ request.path }}&amp;{{ cms_edit_on }}&amp;cms-toolbar-login=1{% endif %}"
     class="cms-toolbar-item cms-form-login" method="post">
     {% csrf_token %}
-    <label{% if request.toolbar.login_form.username.errors %} class="cms-error"{% endif %}>
+    <label{% if request.toolbar.login_form.username.errors or request.toolbar.login_form.non_field_errors or cms_toolbar_login_error %} class="cms-error"{% endif %}>
         <span>{% trans request.toolbar.login_form.username.label %}</span>
         {{ request.toolbar.login_form.username }}
     </label>
