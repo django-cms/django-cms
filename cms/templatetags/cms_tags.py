@@ -395,35 +395,45 @@ class PluginChildClasses(InclusionTag):
     template = "cms/toolbar/dragitem_menu.html"
     name = "plugin_child_classes"
     options = Options(
-        Argument('obj')
+        Argument('obj', required=False, default=None),
     )
 
     def get_context(self, context, obj):
         # Prepend frontedit toolbar output if applicable
         request = context['request']
-        page = request.current_page
-        child_plugin_classes = []
+        parent = None
+
         if isinstance(obj, CMSPlugin):
             slot = context['slot']
-            plugin = obj
-            plugin_class = plugin.get_plugin_class()
+            page = getattr(request, 'current_page', None)
+            plugin_class = obj.get_plugin_class()
+
             if plugin_class.allow_children:
-                instance, plugin = plugin.get_plugin_instance()
+                parent = plugin_class
+                instance, plugin = obj.get_plugin_instance()
                 plugin.cms_plugin_instance = instance
-                childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
-                # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-                child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
-        elif isinstance(obj, PlaceholderModel):
-            placeholder = obj
-            page = placeholder.page if placeholder else None
-            if not page:
-                page = getattr(request, 'current_page', None)
-            if placeholder:
-                slot = placeholder.slot
+                plugins = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
             else:
-                slot = None
+                plugins = []
+        elif isinstance(obj, PlaceholderModel):
+            page = obj.page or getattr(request, 'current_page', None)
+            slot = obj.slot
+            plugins = plugin_pool.get_all_plugins(slot, page)
+        else:
+            slot = None
+            page = None
+            plugins = plugin_pool.get_all_plugins()
+
+        if plugins:
             # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-            child_plugin_classes = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
+            child_plugin_classes = get_toolbar_plugin_struct(
+                plugins,
+                slot=slot,
+                page=page,
+                parent=parent,
+            )
+        else:
+            child_plugin_classes = []
         return {'plugin_classes': child_plugin_classes}
 
 

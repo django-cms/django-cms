@@ -69,7 +69,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     return default
 
 
-def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
+def get_toolbar_plugin_struct(plugins_list, slot=None, page=None, parent=None):
     """
     Return the list of plugins to render in the toolbar.
     The dictionary contains the label, the classname and the module for the
@@ -84,18 +84,22 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
     :return: list of dictionaries
     """
     template = None
+
     if page:
         template = page.template
+
     main_list = []
+
     for plugin in plugins_list:
-        allowed_parents = plugin().get_parent_classes(slot, page)
-        if parent:
-            ## skip to the next if this plugin is not allowed to be a child
-            ## of the parent
-            if allowed_parents and parent.__name__ not in allowed_parents:
-                continue
-        else:
-            if allowed_parents:
+        if slot or page:
+            allowed_parents = plugin().get_parent_classes(slot, page)
+
+            if parent:
+                # skip to the next if this plugin is not allowed to be a child
+                # of the parent
+                if allowed_parents and parent.__name__ not in allowed_parents:
+                    continue
+            elif allowed_parents:
                 continue
         modules = get_placeholder_conf("plugin_modules", slot, template, default={})
         names = get_placeholder_conf("plugin_labels", slot, template, default={})
