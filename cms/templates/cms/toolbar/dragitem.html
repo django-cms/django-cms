@@ -57,8 +57,7 @@
         {% if allow_children %} cms-draggables{% endif %}">
         {% if plugin.child_plugin_instances %}
             {% for child in plugin.child_plugin_instances %}
-                {# workaround because include tag does not allow recursive includes #}
-                {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=disable_child_plugins %}{% endwith %}
+                {% include request.toolbar.drag_item_template with plugin=child disabled_child=disable_child_plugins %}
             {% endfor %}
         {% endif %}
     </div>
