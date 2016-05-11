@@ -1,7 +1,7 @@
 {% load i18n l10n cache %}
 
 {% language request.toolbar.toolbar_language %}
-{% cache 900 'cms-toolbar-static-part-1' user.is_authenticated debug request.toolbar.toolbar_language %}
+{% cache request.toolbar.template_fragment_cache_duration 'cms-toolbar-static-part-1' user.is_authenticated debug request.toolbar.toolbar_language %}
 <div id="cms-top"
      class="cms cms-reset
      {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
@@ -38,7 +38,7 @@
             {% for item in request.toolbar.get_right_items %}
                 {{ item.render }}
             {% endfor %}
-    {% cache 900 'cms-toolbar-static-part-2-with-sideframe' request.toolbar.toolbar_language %}
+    {% cache request.toolbar.template_fragment_cache_duration 'cms-toolbar-static-part-2-with-sideframe' request.toolbar.toolbar_language %}
         </div>
     </div>
     <div class="cms-toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
@@ -68,7 +68,7 @@
     {{ addons }}
     {# end: addons #}
 
-    {% cache 600 'cms-modal' %}
+    {% cache request.toolbar.template_fragment_cache_duration 'cms-modal' request.toolbar.toolbar_language %}
         <div class="cms-modal" data-touch-action="none">
             <div class="cms-modal-head" data-touch-action="none">
                 <span class="cms-modal-title" data-touch-action="none">
@@ -98,7 +98,6 @@
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
                 {% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
-                {# <div class="cms-dragitem cms-dragitem-1888"> #}
                 <div class="cms-draggables cms-draggables-root">
                     <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
                     {% with placeholder.slot as slot %}
@@ -107,14 +106,13 @@
                     {% endfor %}
                     {% endwith %}
                 </div>
-                {# </div> #}
             </div>
             {% endfor %}
         </div>
     </div>
     {# end: structure #}
 
-    {% cache 900 'cms-screenblock' request.toolbar.redirect_url %}
+    {% cache request.toolbar.template_fragment_cache_duration 'cms-screenblock' request.toolbar.redirect_url request.toolbar.toolbar_language %}
         {% if request.toolbar.redirect_url %}
             <div class="cms-screenblock">
                 <div class="cms-screenblock-inner">

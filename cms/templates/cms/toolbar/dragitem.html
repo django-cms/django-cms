@@ -1,7 +1,7 @@
 {% load i18n l10n cms_tags cache %}
 
 {% with allow_children=plugin.get_plugin_instance.1.allow_children disable_child_plugins=plugin.get_plugin_instance.1.disable_child_plugins %}
-{% cache 600 'cms-plugin-structure-1' plugin.pk plugin.get_plugin_instance.1.allow_children plugin.get_plugin_instance.1.disable_child_plugins allow_children clipboard plugin.child_plugin_instances request.toolbar.toolbar_language disabled_child plugin.get_short_description|force_escape %}
+{% cache request.toolbar.template_fragment_cache_duration 'cms-plugin-structure-1' plugin.pk plugin.get_plugin_instance.1.allow_children plugin.get_plugin_instance.1.disable_child_plugins allow_children clipboard plugin.child_plugin_instances request.toolbar.toolbar_language disabled_child plugin.get_short_description|force_escape %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
     {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
@@ -10,7 +10,7 @@
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
-            {% cache 900 'cms-add-plugin-to-plugin' allow_children %}
+            {% cache request.toolbar.template_fragment_cache_duration 'cms-add-plugin-to-plugin' allow_children %}
             <div class="cms-submenu-btn cms-submenu-add cms-btn
                 {% if not allow_children %} cms-btn-disabled{% endif %}">
                 {% if not allow_children %}
@@ -30,7 +30,7 @@
                 <span class="cms-icon cms-icon-lock"></span>
             </div>
         {% endif %}
-        {% cache 900 'cms-plugin-dropdown' %}
+        {% cache request.toolbar.template_fragment_cache_duration 'cms-plugin-dropdown' %}
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
                 <div class="cms-submenu-item"><a data-cms-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>

@@ -78,6 +78,7 @@ def get_cache_durations():
         'menus': 60 * 60,
         'content': 60,
         'permissions': 60 * 60,
+        'templates': 60 * 10,
     })
 
 

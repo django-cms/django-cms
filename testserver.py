@@ -44,6 +44,7 @@ HELPER_SETTINGS = dict(
         'menus': 0,
         'content': 0,
         'permissions': 0,
+        'templates': 60 * 10,
     },
     CMS_TOOLBAR_URL__EDIT_ON=cms_toolbar_edit_on,
     # required for integration tests
