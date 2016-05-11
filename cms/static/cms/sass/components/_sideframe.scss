@@ -54,20 +54,28 @@
     height: 100%;
     background: transparent;
 }
-.cms-sideframe-close,
-.cms-sideframe-history {
+
+.cms-sideframe-controls {
     position: absolute;
     top: $sideframe-buttons-position-top + $sideframe-buttons-offset;
     right: $sideframe-buttons-position-right;
     z-index: z(sideframe, buttons);
+    box-shadow: $toolbar-shadow;
+    background-color: $white;
+    border-radius: $border-radius-base;
+    border: 1px solid $gray-lighter;
+}
+.cms-sideframe-close,
+.cms-sideframe-history {
+    display: inline-block;
+    position: relative;
     cursor: pointer;
+    vertical-align: top;
     font-size: $sideframe-button-icon-size;
-    color: $gray-light;
+    color: $gray-darker;
     text-align: center;
     width: $sideframe-button-area-size;
     height: $sideframe-button-area-size;
-    background: $gray-lightest;
-    box-shadow: 0 0 3px $gray-lightest;
 
     span {
         position: absolute;
@@ -83,8 +91,8 @@
 }
 
 .cms-sideframe-history {
-    right: $sideframe-button-area-size + $sideframe-buttons-position-right;
-    width: $sideframe-button-area-size * 2;
+    width: $sideframe-button-area-size * 2 + 1px;
+    border-right: 1px solid $gray-lighter;
 
     .cms-icon {
         float: left;
@@ -102,9 +110,6 @@
     .cms-icon-disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        &:hover {
-            color: $gray-light;
-        }
     }
 }
 
