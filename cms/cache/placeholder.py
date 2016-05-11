@@ -73,13 +73,10 @@ def _set_placeholder_cache_version(placeholder, lang, version, vary_on_list=None
     """
     from django.core.cache import cache
 
+    if not duration or version < 1:
+        return
+
     key = _get_placeholder_cache_version_key(placeholder, lang)
-
-    # version is required and required to be >= 1
-    assert(version >= 1)
-
-    if duration is None:
-        duration = get_cms_setting('CACHE_DURATIONS')['content']
 
     if vary_on_list is None:
         vary_on_list = list()
