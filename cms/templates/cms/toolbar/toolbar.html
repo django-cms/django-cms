@@ -1,7 +1,6 @@
 {% load i18n l10n cache cms_tags %}
 
 {% language request.toolbar.toolbar_language %}
-{% cache request.toolbar.template_fragment_cache_duration 'cms-toolbar-static-part-1' user.is_authenticated debug request.toolbar.toolbar_language %}
 <div id="cms-top"
      class="cms cms-reset
      {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
@@ -18,7 +17,6 @@
     <div class="cms-toolbar">
         <div class="cms-toolbar-left">
             {% include "cms/toolbar/items/logo.html" %}
-    {% endcache %}
             {% if not user.is_authenticated %}
                 {% include "cms/toolbar/items/login.html" %}
             {% else %}
@@ -40,7 +38,6 @@
             {% for item in request.toolbar.get_right_items %}
                 {{ item.render }}
             {% endfor %}
-    {% cache request.toolbar.template_fragment_cache_duration 'cms-toolbar-static-part-2-with-sideframe' request.toolbar.toolbar_language %}
         </div>
     </div>
     <div class="cms-toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
@@ -68,34 +65,31 @@
             </div>
         {% endspaceless %}
     </div>
-    {% endcache %}
 
     {# start: addons #}
     {{ addons }}
     {# end: addons #}
 
-    {% cache request.toolbar.template_fragment_cache_duration 'cms-modal' request.toolbar.toolbar_language %}
-        <div class="cms-modal" data-touch-action="none">
-            <div class="cms-modal-head" data-touch-action="none">
-                <span class="cms-modal-title" data-touch-action="none">
-                    <span class="cms-modal-title-prefix"></span>
-                    <span class="cms-modal-title-suffix"></span>
-                </span>
-                <span class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
-                <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
-                <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
-            </div>
-            <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
-            <div class="cms-modal-body">
-                <div class="cms-modal-shim"></div>
-                <div class="cms-modal-frame"></div>
-            </div>
-            <div class="cms-modal-foot">
-                <div class="cms-modal-buttons"></div>
-                <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
-            </div>
+    <div class="cms-modal" data-touch-action="none">
+        <div class="cms-modal-head" data-touch-action="none">
+            <span class="cms-modal-title" data-touch-action="none">
+                <span class="cms-modal-title-prefix"></span>
+                <span class="cms-modal-title-suffix"></span>
+            </span>
+            <span class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
+            <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
+            <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
         </div>
-    {% endcache %}
+        <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
+        <div class="cms-modal-body">
+            <div class="cms-modal-shim"></div>
+            <div class="cms-modal-frame"></div>
+        </div>
+        <div class="cms-modal-foot">
+            <div class="cms-modal-buttons"></div>
+            <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
+        </div>
+    </div>
 
     {# start: structure #}
     <div class="cms-structure">
@@ -106,11 +100,9 @@
 
                 <div class="cms-draggables cms-draggables-root">
                     <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
-                    {% with placeholder.slot as slot %}
                     {% for plugin in placeholder.get_cached_plugins %}
-                        {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+                        {% include "cms/toolbar/dragitem.html" with plugin=plugin slot=slot %}
                     {% endfor %}
-                    {% endwith %}
                 </div>
             </div>
             {% endfor %}
@@ -118,15 +110,13 @@
     </div>
     {# end: structure #}
 
-    {% cache request.toolbar.template_fragment_cache_duration 'cms-screenblock' request.toolbar.redirect_url request.toolbar.toolbar_language %}
-        {% if request.toolbar.redirect_url %}
-            <div class="cms-screenblock">
-                <div class="cms-screenblock-inner">
-                    <h1>{% trans "This page has no preview!" %}</h1>
-                    <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
-                </div>
+    {% if request.toolbar.redirect_url %}
+        <div class="cms-screenblock">
+            <div class="cms-screenblock-inner">
+                <h1>{% trans "This page has no preview!" %}</h1>
+                <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
             </div>
-        {% endif %}
-    {% endcache %}
+        </div>
+    {% endif %}
 </div>
 {% endlanguage %}
