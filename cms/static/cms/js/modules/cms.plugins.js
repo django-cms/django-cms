@@ -41,7 +41,6 @@ var CMS = window.CMS || {};
             plugin_language: '',
             plugin_parent: null,
             plugin_order: null,
-            plugin_breadcrumb: [],
             plugin_restriction: [],
             plugin_parent_restriction: [],
             urls: {
@@ -169,7 +168,7 @@ var CMS = window.CMS || {};
                 that.editPlugin(
                     that.options.urls.edit_plugin,
                     that.options.plugin_name,
-                    that.options.plugin_breadcrumb
+                    that._getPluginBreadcrumbs()
                 );
             });
 
@@ -975,7 +974,7 @@ var CMS = window.CMS || {};
                         that.editPlugin(
                             that.options.urls.edit_plugin,
                             that.options.plugin_name,
-                            that.options.plugin_breadcrumb
+                            that._getPluginBreadcrumbs()
                         );
                         break;
                     case 'copy-lang':
@@ -1002,7 +1001,7 @@ var CMS = window.CMS || {};
                         that.deletePlugin(
                             that.options.urls.delete_plugin,
                             that.options.plugin_name,
-                            that.options.plugin_breadcrumb
+                            that._getPluginBreadcrumbs()
                         );
                         break;
                     default:
@@ -1353,6 +1352,46 @@ var CMS = window.CMS || {};
             });
             // make sure structurboard gets updated after success
             this.ui.window.trigger('resize.sideframe');
+        },
+
+        /**
+         * @method _getPluginBreadcrumbs
+         * @private
+         */
+        _getPluginBreadcrumbs: function _lazyGetPluginBreadcrumbs() {
+            var breadcrumbs = [];
+
+            breadcrumbs.unshift({
+                title: this.options.plugin_name,
+                url: this.options.urls.edit_plugin
+            });
+
+            var findParentPlugin = function (id) {
+                return $.grep(CMS._plugins || [], function (pluginOptions) {
+                    return pluginOptions[0] === 'cms-plugin-' + id;
+                })[0];
+            };
+
+            if (this.options.plugin_parent && this.options.plugin_parent !== 'None') {
+                var id = this.options.plugin_parent;
+                var data;
+
+                while (id !== 'None') {
+                    data = findParentPlugin(id);
+
+                    breadcrumbs.unshift({
+                        title: data[1].plugin_name,
+                        url: data[1].urls.edit_plugin
+                    });
+                    id = data[1].plugin_parent;
+                }
+            }
+
+            this._getPluginBreadcrumbs = function _getPluginBreadcrumbs() {
+                return breadcrumbs;
+            };
+
+            return breadcrumbs;
         }
     });
 
