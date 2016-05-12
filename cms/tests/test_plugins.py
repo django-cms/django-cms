@@ -1150,44 +1150,23 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin_list = plugin_pool.get_all_plugins(placeholder=placeholder, page=page)
             self.assertFalse(ParentRequiredPlugin in plugin_list)
 
-    def test_plugin_parent_classes(self):
-        """
-        Assert that a plugin with a list of parent classes only appears in the
-        toolbar plugin struct for those given parent Plugins
-        """
-        ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                   dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
+    def test_plugin_toolbar_struct(self):
+        # Tests that the output of the plugin toolbar structure.
         GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
-        KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {'render_plugin':False})
 
-        with register_plugins(ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin):
+        with register_plugins(GenericParentPlugin):
             page = api.create_page("page", "nav_playground.html", "en", published=True)
             placeholder = page.placeholders.get(slot='body')
 
             from cms.utils.placeholder import get_toolbar_plugin_struct
-            toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
-                                                        placeholder.slot,
-                                                        page,
-                                                        parent=GenericParentPlugin)
             expected_struct = {'module': u'Generic',
                            'name': u'Parent Classes Plugin',
                            'value': 'ParentClassesPlugin'}
 
-            self.assertTrue(expected_struct in toolbar_struct)
-
-            toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
+            toolbar_struct = get_toolbar_plugin_struct([GenericParentPlugin],
                                                         placeholder.slot,
-                                                        page,
-                                                        parent=KidnapperPlugin)
+                                                        page,)
             self.assertFalse(expected_struct in toolbar_struct)
-
-            toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin, GenericParentPlugin],
-                                                        placeholder.slot,
-                                                        page)
-            expected_struct = {'module': u'Generic',
-                                'name': u'Generic Parent Plugin',
-                                'value': 'GenericParentPlugin'}
-            self.assertTrue(expected_struct in toolbar_struct)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
