@@ -441,20 +441,41 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return fieldsets
 
-    def get_child_classes(self, slot, page):
+    @classmethod
+    def get_child_class_overrides(cls, slot, page):
+        """
+        Returns a list of plugin types that are allowed
+        as children of this plugin.
+        """
         from cms.utils.placeholder import get_placeholder_conf
 
         template = page and page.get_template() or None
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
-        child_classes = ph_conf.get(self.__class__.__name__, self.child_classes)
+        return ph_conf.get(cls.__name__, cls.child_classes)
+
+    @classmethod
+    def get_child_plugin_candidates(cls, slot, page):
+        """
+        Returns a list of all plugin classes
+        that will be considered when fetching
+        all available child classes for this plugin.
+        """
+        # By adding this as a separate method,
+        # we allow other plugins to affect the list of child plugin candidates.
+        # Useful in cases like djangocms-text-ckeditor where only text only
+        # plugins are allowed.
+        from cms.plugin_pool import plugin_pool
+        return plugin_pool.get_all_plugins(slot, page)
+
+    def get_child_classes(self, slot, page):
+        child_classes = self.get_child_class_overrides(slot, page)
 
         if child_classes:
             return child_classes
 
-        from cms.plugin_pool import plugin_pool
-        installed_plugins = plugin_pool.get_all_plugins(slot, page)
+        installed_plugins = self.get_child_plugin_candidates(slot, page)
 
         child_classes = []
         plugin_type = self.__class__.__name__
