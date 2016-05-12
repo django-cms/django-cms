@@ -1372,19 +1372,17 @@ var CMS = window.CMS || {};
                 })[0];
             };
 
-            if (this.options.plugin_parent && this.options.plugin_parent !== 'None') {
-                var id = this.options.plugin_parent;
-                var data;
+            var id = this.options.plugin_parent;
+            var data;
 
-                while (id !== 'None') {
-                    data = findParentPlugin(id);
+            while (id && id !== 'None') {
+                data = findParentPlugin(id);
 
-                    breadcrumbs.unshift({
-                        title: data[1].plugin_name,
-                        url: data[1].urls.edit_plugin
-                    });
-                    id = data[1].plugin_parent;
-                }
+                breadcrumbs.unshift({
+                    title: data[1].plugin_name,
+                    url: data[1].urls.edit_plugin
+                });
+                id = data[1].plugin_parent;
             }
 
             this._getPluginBreadcrumbs = function _getPluginBreadcrumbs() {
