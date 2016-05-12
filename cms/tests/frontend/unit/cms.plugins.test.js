@@ -19,6 +19,20 @@ describe('CMS.Plugin', function () {
         expect(CMS.Plugin.prototype.editPluginPostAjax).toEqual(jasmine.any(Function));
     });
 
+    beforeEach(function (done) {
+        $(function () {
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+
+            spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (value) {
+                CMS.settings = $.extend(true, {}, CMS.settings, value);
+            });
+            done();
+        });
+    });
+
     describe('instance', function () {
         var plugin1;
         var plugin2;
@@ -140,7 +154,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -160,7 +173,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -180,7 +192,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -200,7 +211,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -887,7 +897,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: ['RandomPlugin'],
                 urls: {
@@ -1527,10 +1536,10 @@ describe('CMS.Plugin', function () {
             var link = nav.find('a');
             link.attr('data-rel', 'edit');
             spyOn(plugin, 'editPlugin');
+            spyOn(plugin, '_getPluginBreadcrumbs').and.returnValue('MockBreadcrumb');
             plugin.options = {
                 urls: { edit_plugin: 'edit_plugin_url' },
-                plugin_name: 'MockPlugin',
-                plugin_breadcrumb: 'MockBreadcrumb'
+                plugin_name: 'MockPlugin'
             };
             plugin._setupActions(nav);
             link.trigger(plugin.click);
@@ -1609,11 +1618,11 @@ describe('CMS.Plugin', function () {
             var link = nav.find('a');
             link.attr('data-rel', 'delete');
             spyOn(plugin, 'deletePlugin');
+            spyOn(plugin, '_getPluginBreadcrumbs').and.returnValue('Breadcrumb');
             plugin._setupActions(nav);
             plugin.options = {
                 urls: { delete_plugin: 'DELETE_URL' },
-                plugin_name: 'MockPlugin',
-                plugin_breadcrumb: 'Breadcrumb'
+                plugin_name: 'MockPlugin'
             };
             link.trigger(plugin.click);
 
@@ -1799,6 +1808,153 @@ describe('CMS.Plugin', function () {
             expect(items.filter(':visible').length).toEqual(15);
             expect(titles.filter(':visible').length).toEqual(1);
             expect(titles.filter(':visible').text()).toMatch(/Bootstrap/);
+        });
+    });
+
+    describe('_getPluginBreadcrumbs()', function () {
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            $(function () {
+                CMS.config = {
+                    csrf: 'CSRF_TOKEN',
+                    lang: {}
+                };
+                CMS.settings = {
+                    dragbars: [],
+                    states: []
+                };
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('returns own breadcrumb if plugin has no parents', function () {
+            expect(plugin._getPluginBreadcrumbs()).toEqual([{
+                url: '/en/admin/cms/page/edit-plugin/1/',
+                title: 'Test Text Plugin'
+            }]);
+        });
+
+        // although this shouldn't happen
+        it('returns own breadcrumb if plugin has a parent but it does not exist in the registry', function () {
+            CMS._plugins = null;
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([{
+                url: '/en/admin/cms/page/edit-plugin/1/',
+                title: 'Test Text Plugin'
+            }]);
+        });
+
+        it('returns array of breadcrumbs if plugin has parent', function () {
+            CMS._plugins = [
+                ['cms-placeholder-140', {}],
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 'None',
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+        });
+
+        it('returns array of breadcrumbs if plugin has multiple parents', function () {
+            CMS._plugins = [
+                ['cms-placeholder-140', {}],
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 130,
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }],
+                ['cms-plugin-130', {
+                    plugin_name: 'Parent Parent plugin',
+                    urls: {
+                        edit_plugin: 'parent-parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-parent-edit-url',
+                    title: 'Parent Parent plugin'
+                },
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+        });
+
+        it('is lazy', function () {
+            spyOn($, 'grep').and.callThrough();
+            CMS._plugins = [
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 'None',
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+
+            expect($.grep).toHaveBeenCalledTimes(1);
+
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+
+
+            expect($.grep).toHaveBeenCalledTimes(1);
         });
     });
 });

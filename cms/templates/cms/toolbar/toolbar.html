@@ -7,7 +7,6 @@
      {% if debug %} cms-toolbar-debug{% endif %}"
      dir="ltr" data-touch-action="none">
 
-    <script type="text/cms-template">{% plugin_child_classes %}</script>
     {# debug, tooltip #}
     <div class="cms-debug-bar"></div>
     <div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
@@ -119,4 +118,5 @@
         </div>
     {% endif %}
 </div>
+<script id="cms-plugin-child-classes" type="text/cms-template">{% plugin_child_classes %}</script>
 {% endlanguage %}
