@@ -63,7 +63,7 @@ def _get_placeholder_cache_version(placeholder, lang):
     if cached:
         version, vary_on_list = cached
     else:
-        version = int(time.time())
+        version = int(time.time() * 1000000)
         vary_on_list = list()
         _set_placeholder_cache_version(placeholder, lang, version, vary_on_list)
     return version, vary_on_list
@@ -75,10 +75,10 @@ def _set_placeholder_cache_version(placeholder, lang, version, vary_on_list=None
     """
     from django.core.cache import cache
 
-    if not duration or version < 1:
-        return
-
     key = _get_placeholder_cache_version_key(placeholder, lang)
+
+    if not duration or version < 1:
+        cache.delete(key)
 
     if vary_on_list is None:
         vary_on_list = list()
@@ -174,7 +174,10 @@ def clear_placeholder_cache(placeholder, lang):
     We don't need to re-store the vary_on_list, because the cache is now
     effectively empty.
     """
-    version = int(time.time())
+    current_version, _ = _get_placeholder_cache_version(placeholder, lang)
+    version = int(time.time() * 1000000)
+    if current_version >= version:
+        version = current_version + 1
     _set_placeholder_cache_version(placeholder, lang, version, list())
 
 

@@ -12,6 +12,7 @@ from cms.cache import _get_cache_version, invalidate_cms_page_cache
 from cms.cache.placeholder import (
     _get_placeholder_cache_version_key,
     _get_placeholder_cache_version,
+    _set_placeholder_cache_version,
     _get_placeholder_cache_key,
     set_placeholder_cache,
     get_placeholder_cache,
@@ -634,12 +635,10 @@ class PlaceholderCacheTestCase(CMSTestCase):
         )
 
     def test_set_clear_get_placeholder_cache_version(self):
-        initial, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en')
-
+        initial, _ = _get_placeholder_cache_version(self.placeholder, 'en')
         clear_placeholder_cache(self.placeholder, 'en')
-
-        version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en')
-        self.assertEqual(version, initial + 1)
+        version, _ = _get_placeholder_cache_version(self.placeholder, 'en')
+        self.assertGreater(version, initial)
 
     def test_get_placeholder_cache_key(self):
         version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en')
@@ -651,8 +650,8 @@ class PlaceholderCacheTestCase(CMSTestCase):
             version=version,
             cc='_',
         )
-        actual_key = _get_placeholder_cache_key(
-            self.placeholder, 'en', self.en_request)
+        _set_placeholder_cache_version(self.placeholder, 'en', version, vary_on_list=vary_on_list, duration=1)
+        actual_key = _get_placeholder_cache_key(self.placeholder, 'en', self.en_request)
         self.assertEqual(actual_key, desired_key)
 
         en_key = _get_placeholder_cache_key(self.placeholder, 'en', self.en_request)
