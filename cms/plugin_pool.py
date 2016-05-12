@@ -159,7 +159,7 @@ class PluginPool(object):
             return
         self.patched = True
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=False):
+    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
@@ -172,9 +172,10 @@ class PluginPool(object):
             template,
         ) or ()
 
-        if include_page_only:
-            # Filters out any plugin not marked as page only
-            plugins = (plugin for plugin in plugins if plugin.page_only)
+        if not include_page_only:
+            # Filters out any plugin marked as page only because
+            # the include_page_only flag has been set to False
+            plugins = (plugin for plugin in plugins if not plugin.page_only)
 
         if allowed_plugins:
             plugins = (plugin for plugin in plugins if plugin.__name__ in allowed_plugins)
