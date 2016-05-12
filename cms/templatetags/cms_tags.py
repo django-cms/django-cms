@@ -35,8 +35,7 @@ from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 from cms import __version__
 from cms.cache.page import get_page_url_cache, set_page_url_cache
-from cms.cache.placeholder import (get_placeholder_page_cache, set_placeholder_page_cache,
-                                   get_placeholder_cache)
+from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
@@ -184,11 +183,12 @@ def _get_placeholder(current_page, page, context, name):
     placeholders = page.rescan_placeholders().values()
     fetch_placeholders = []
     request = context['request']
+    site_id = get_site_id(getattr(page, 'site_id', None))
     if not get_cms_setting('PLACEHOLDER_CACHE') or (hasattr(request, 'toolbar') and request.toolbar.edit_mode):
         fetch_placeholders = placeholders
     else:
         for placeholder in placeholders:
-            cached_value = get_placeholder_cache(placeholder, get_language(), request)
+            cached_value = get_placeholder_cache(placeholder, get_language(), site_id, request)
             if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 placeholder.content_cache = cached_value['content']
@@ -224,7 +224,8 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):
-                cached_value = get_placeholder_cache(placeholder, get_language(), request)
+                site_id = get_site_id(getattr(page, 'site_id', None))
+                cached_value = get_placeholder_cache(placeholder, get_language(), site_id, request)
                 if cached_value is not None:
                     restore_sekizai_context(context, cached_value['sekizai'])
                     return mark_safe(cached_value['content'])
@@ -568,11 +569,6 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     if lang is None:
         lang = get_language_from_request(request)
 
-    if cache_result:
-        cached_value = get_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name)
-        if cached_value:
-            restore_sekizai_context(context, cached_value['sekizai'])
-            return {'content': mark_safe(cached_value['content'])}
     page = _get_page_by_untyped_arg(page_lookup, request, site_id)
     if not page:
         return {'content': ''}
@@ -582,14 +578,18 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         if settings.DEBUG:
             raise
         return {'content': ''}
+
+    if cache_result:
+        cached_value = get_placeholder_cache(placeholder, lang, site_id, request)
+        if cached_value:
+            restore_sekizai_context(context, cached_value['sekizai'])
+            return {'content': mark_safe(cached_value['content'])}
     watcher = Watcher(context)
     content = render_placeholder(placeholder, context, placeholder_name, lang=lang,
                                  use_cache=cache_result)
     changes = watcher.get_changes()
     if cache_result:
-        set_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name,
-                                   {'content': content, 'sekizai': changes})
-
+        set_placeholder_cache(placeholder, lang, site_id, {'content': content, 'sekizai': changes}, request)
     if content:
         return {'content': mark_safe(content)}
     return {'content': ''}

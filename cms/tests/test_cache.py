@@ -624,47 +624,50 @@ class PlaceholderCacheTestCase(CMSTestCase):
         cache.clear()
 
     def test_get_placeholder_cache_version_key(self):
-        cache_version_key = '{prefix}|placeholder_cache_version|id:{id}|lang:{lang}'.format(
+        cache_version_key = '{prefix}|placeholder_cache_version|id:{id}|lang:{lang}|site:{site}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
+            site=1,
         )
         self.assertEqual(
-            _get_placeholder_cache_version_key(self.placeholder, 'en'),
+            _get_placeholder_cache_version_key(self.placeholder, 'en', 1),
             cache_version_key
         )
 
     def test_set_clear_get_placeholder_cache_version(self):
-        initial, _ = _get_placeholder_cache_version(self.placeholder, 'en')
-        clear_placeholder_cache(self.placeholder, 'en')
-        version, _ = _get_placeholder_cache_version(self.placeholder, 'en')
+        initial, _ = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        clear_placeholder_cache(self.placeholder, 'en', 1)
+        version, _ = _get_placeholder_cache_version(self.placeholder, 'en', 1)
         self.assertGreater(version, initial)
 
     def test_get_placeholder_cache_key(self):
-        version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en')
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|tz:{tz}|v:{version}|country-code:{cc}'.format(
+        version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
+            site=1,
             tz=get_timezone_name(),
             version=version,
             cc='_',
         )
-        _set_placeholder_cache_version(self.placeholder, 'en', version, vary_on_list=vary_on_list, duration=1)
-        actual_key = _get_placeholder_cache_key(self.placeholder, 'en', self.en_request)
+        _set_placeholder_cache_version(self.placeholder, 'en', 1, version, vary_on_list=vary_on_list, duration=1)
+        actual_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_request)
         self.assertEqual(actual_key, desired_key)
 
-        en_key = _get_placeholder_cache_key(self.placeholder, 'en', self.en_request)
-        de_key = _get_placeholder_cache_key(self.placeholder, 'de', self.de_request)
+        en_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_request)
+        de_key = _get_placeholder_cache_key(self.placeholder, 'de', 1, self.de_request)
         self.assertNotEqual(en_key, de_key)
 
-        en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', self.en_us_request)
+        en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_us_request)
         self.assertNotEqual(en_key, en_us_key)
 
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|tz:{tz}|v:{version}|country-code:{cc}'.format(
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
+            site=1,
             tz=get_timezone_name(),
             version=version,
             cc='US',
@@ -688,20 +691,20 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
         self.assertNotEqual(en_content, de_content)
 
-        set_placeholder_cache(self.placeholder, 'en', en_content, self.en_request)
-        cached_en_content = get_placeholder_cache(self.placeholder, 'en', self.en_request)
+        set_placeholder_cache(self.placeholder, 'en', 1, en_content, self.en_request)
+        cached_en_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_request)
         self.assertEqual(cached_en_content, en_content)
 
-        set_placeholder_cache(self.placeholder, 'de', de_content, self.de_request)
-        cached_de_content = get_placeholder_cache(self.placeholder, 'de', self.de_request)
+        set_placeholder_cache(self.placeholder, 'de', 1, de_content, self.de_request)
+        cached_de_content = get_placeholder_cache(self.placeholder, 'de', 1, self.de_request)
         self.assertNotEqual(cached_en_content, cached_de_content)
 
-        set_placeholder_cache(self.placeholder, 'en', en_us_content, self.en_us_request)
-        cached_en_us_content = get_placeholder_cache(self.placeholder, 'en', self.en_us_request)
+        set_placeholder_cache(self.placeholder, 'en', 1, en_us_content, self.en_us_request)
+        cached_en_us_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_us_request)
         self.assertNotEqual(cached_en_content, cached_en_us_content)
 
-        set_placeholder_cache(self.placeholder, 'en', en_uk_content, self.en_uk_request)
-        cached_en_uk_content = get_placeholder_cache(self.placeholder, 'en', self.en_uk_request)
+        set_placeholder_cache(self.placeholder, 'en', 1, en_uk_content, self.en_uk_request)
+        cached_en_uk_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_uk_request)
         self.assertNotEqual(cached_en_us_content, cached_en_uk_content)
 
     def test_set_get_placeholder_cache_with_long_prefix(self):
@@ -716,14 +719,14 @@ class PlaceholderCacheTestCase(CMSTestCase):
             en_crazy_request.META['HTTP_COUNTRY_CODE'] = 'US' * 40  # 80 chars
             en_crazy_context = Context({'request': en_crazy_request})
             en_crazy_content = self.placeholder.render(en_crazy_context, 350, lang='en')
-            set_placeholder_cache(self.placeholder, 'en', en_crazy_content, en_crazy_request)
+            set_placeholder_cache(self.placeholder, 'en', 1, en_crazy_content, en_crazy_request)
 
             # Prove that it is hashed...
-            crazy_cache_key = _get_placeholder_cache_key(self.placeholder, 'en', en_crazy_request)
+            crazy_cache_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, en_crazy_request)
             key_length = len(crazy_cache_key)
             # 213 = 180 (prefix length) + 1 (separator) + 32 (md5 hash)
             self.assertTrue('render_placeholder' not in crazy_cache_key and key_length == 213)
 
             # Prove it still works as expected
-            cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', en_crazy_request)
+            cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', 1, en_crazy_request)
             self.assertEqual(en_crazy_content, cached_en_crazy_content)

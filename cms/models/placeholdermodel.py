@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _, force_text
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
+from cms.utils import get_site_id
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
@@ -415,7 +416,7 @@ class Placeholder(models.Model):
         from cms.models import Page, StaticPlaceholder, Title
 
         if clear_cache:
-            clear_placeholder_cache(self, language)
+            clear_placeholder_cache(self, language, get_site_id(getattr(self.page, 'site_id', None)))
 
         # Find the attached model for this placeholder
         # This can be a static placeholder, page or none.
