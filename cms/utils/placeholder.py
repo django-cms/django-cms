@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.six import iteritems
 
 from sekizai.helpers import get_varname, is_variable_extend_node
 
@@ -40,32 +41,59 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
 
-    If a template is given, it will try
-    CMS_PLACEHOLDER_CONF['template placeholder'] and
-    CMS_PLACEHOLDER_CONF['placeholder'], if no template is given only the latter
-    is checked.
+    Resulting value will be the last from:
+
+    CMS_PLACEHOLDER_CONF[None] (global)
+    CMS_PLACEHOLDER_CONF['template'] (if template is given)
+    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
+    # Ideas:
+    # 1)using real regex as keys
+    # 2)turn the setting in an orderedict
+    # 3)handling dictionary and list both
+
+    # Use function set in PLACEHOLDER_CONF_KEYS_PARSER to match configuration
+    # keys with the generated list of keys
+
+    def _match_placeholder_conf(conf_key, key):
+        return force_text(conf_key) == force_text(key)
+
     if placeholder:
         keys = []
+        placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
+        parser = get_cms_setting('PLACEHOLDER_CONF_KEYS_PARSER')
+        if parser == 'default':
+            parser_function = _match_placeholder_conf
+        else:
+            parser_function = parser
+        # 1st level
         if template:
-            keys.append("%s %s" % (template, placeholder))
-        keys.append(placeholder)
+            keys.append(force_text('%s %s' % (template, placeholder)))
+        # 2nd level
+        keys.append(force_text(placeholder))
+        # 3rd level
+        if template:
+            keys.append(force_text(template))
+        # 4th level
+        keys.append(None)
         for key in keys:
-            conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
-            if not conf:
-                continue
-            value = conf.get(setting)
-            if value is not None:
-                return value
-            inherit = conf.get('inherit')
-            if inherit:
-                if ' ' in inherit:
-                    inherit = inherit.split(' ')
-                else:
-                    inherit = (None, inherit,)
-                value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                if value is not None:
-                    return value
+            for conf_key, conf in iteritems(placeholder_conf):
+                if parser_function(conf_key, key):
+                    if not conf:
+                        continue
+                    value = conf.get(setting)
+                    if value is not None:
+                        return value
+                    inherit = conf.get('inherit')
+                    if inherit:
+                        if ' ' in inherit:
+                            inherit = inherit.split(' ')
+                        else:
+                            inherit = (None, inherit)
+                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                        if value is not None:
+                            return value
     return default
 
 

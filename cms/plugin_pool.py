@@ -172,10 +172,20 @@ class PluginPool(object):
             placeholder,
             template,
         ) or ()
+        excluded_plugins = get_placeholder_conf(
+            'excluded plugins',
+            placeholder,
+            template,
+        ) or ()
+        allowed_plugins = list(set(allowed_plugins) - set(excluded_plugins))
         for plugin in plugins:
             include_plugin = False
+            exclude_plugin = False
+            plugin_name = plugin.__name__
             if placeholder and not plugin.get_require_parent(placeholder, page):
-                include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
+                include_plugin = not allowed_plugins and setting_key == "plugins" or plugin_name in allowed_plugins
+                exclude_plugin = excluded_plugins and plugin_name in excluded_plugins
+                include_plugin = include_plugin and not exclude_plugin
             if plugin.page_only and not include_page_only:
                 include_plugin = False
             if include_plugin:
