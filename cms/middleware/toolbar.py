@@ -11,7 +11,6 @@ from django.template.loader import render_to_string
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
-from cms.utils.placeholder import get_toolbar_plugin_struct
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
 from menus.menu_pool import menu_pool
 
@@ -19,26 +18,13 @@ get_request_ip = get_request_ip_resolver()
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
-    from cms.plugin_pool import plugin_pool
-
     original_context.push()
-    child_plugin_classes = []
-    plugin_class = instance.get_plugin_class()
-    if plugin_class.allow_children:
-        inst, plugin = instance.get_plugin_instance()
-        page = original_context['request'].current_page
-        plugin.cms_plugin_instance = inst
-        children = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(placeholder, page)]
-        # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-        child_plugin_classes = get_toolbar_plugin_struct(children, placeholder.slot, placeholder.page,
-                                                         parent=plugin_class)
     instance.placeholder = placeholder
     request = original_context['request']
     with force_language(request.toolbar.toolbar_language):
         data = {
             'instance': instance,
             'rendered_content': rendered_content,
-            'child_plugin_classes': child_plugin_classes,
         }
         # TODO: Remove js_compat once get_action_urls is refactored.
         data.update(instance.get_action_urls(js_compat=False))
