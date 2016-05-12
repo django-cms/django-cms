@@ -252,16 +252,21 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         plugin_data = self.validate_add_request(request)
 
-        class Form(form_class):
+        # Setting attributes on the form class is perfectly fine.
+        # The form class is created by modelform factory every time
+        # this get_form() method is called.
+        # Subclassing is not advisable because Django does metaclass
+        # magic and some attributes get lost. Ticket #5273
 
-            def __init__(self, *args, **kwargs):
-                super(Form, self).__init__(*args, **kwargs)
-                self.instance.language = plugin_data['plugin_language']
-                self.instance.placeholder = plugin_data['placeholder_id']
-                self.instance.parent = plugin_data.get('plugin_parent', None)
-                self.instance.plugin_type = plugin_data['plugin_type']
-                self.instance.position = plugin_data['position']
-        return Form
+        # This flag allows us to know when the plugin initial attributes
+        # should be set. This currently only happens on plugin creation.
+        form_class._cms_initial_attributes = True
+        form_class._cms_plugin_language = plugin_data['plugin_language']
+        form_class._cms_plugin_placeholder = plugin_data['placeholder_id']
+        form_class._cms_plugin_parent = plugin_data.get('plugin_parent', None)
+        form_class._cms_plugin_plugin_type = plugin_data['plugin_type']
+        form_class._cms_plugin_position = plugin_data['position']
+        return form_class
 
     def validate_add_request(self, request):
         from cms.admin.forms import PluginAddValidationForm
@@ -368,6 +373,18 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         self.saved_object = obj
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
+
+    def save_form(self, request, form, change):
+        obj = super(CMSPluginBase, self).save_form(request, form, change)
+
+        if getattr(form, '_cms_initial_attributes', None):
+            # Form has the initial attribute hooks
+            obj.language = form._cms_plugin_language
+            obj.placeholder = form._cms_plugin_placeholder
+            obj.parent = form._cms_plugin_parent
+            obj.plugin_type = form._cms_plugin_plugin_type
+            obj.position = form._cms_plugin_position
+        return obj
 
     def response_add(self, request, obj, **kwargs):
         self.object_successfully_changed = True
