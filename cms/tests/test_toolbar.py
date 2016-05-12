@@ -247,10 +247,18 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response,
-                            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"')
-        self.assertContains(response,
-                            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
+        self.assertContains(
+            response,
+            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"'
+        )
+        self.assertContains(
+            response,
+            'data-on-success="REFRESH_PAGE" data-cms-icon="whatever" >Data item - not usable</a></div>'
+        )
+        self.assertContains(
+            response,
+            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"'
+        )
 
     def test_markup_toolbar_url_page(self):
         superuser = self.get_superuser()
