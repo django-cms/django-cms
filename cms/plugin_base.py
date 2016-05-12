@@ -441,7 +441,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return fieldsets
 
-    def get_child_classes(self, slot, page, installed_plugins=None):
+    def get_child_classes(self, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = page and page.get_template() or None
@@ -453,9 +453,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if child_classes:
             return child_classes
 
-        if installed_plugins is None:
-            from cms.plugin_pool import plugin_pool
-            installed_plugins = plugin_pool.get_all_plugins(slot, page)
+        from cms.plugin_pool import plugin_pool
+        installed_plugins = plugin_pool.get_all_plugins(slot, page)
 
         child_classes = []
         plugin_type = self.__class__.__name__
