@@ -852,6 +852,7 @@ var CMS = window.CMS || {};
                 }
                 isTouching = false;
             });
+
             var plugins = nav.siblings('.cms-plugin-picker');
 
             that._setupQuickSearch(plugins);
@@ -872,7 +873,7 @@ var CMS = window.CMS || {};
                 // we need to know the parent id by the time we open "add plugin" dialog
                 var pluginsCopy = plugins.clone(true, true).data(
                     'parentId', that._getId(nav.closest('.cms-draggable'))
-                );
+                ).append(that._getPluginChildClassesMarkup());
 
                 modal.open({
                     title: that.options.addPluginHelpTitle,
@@ -891,6 +892,66 @@ var CMS = window.CMS || {};
                 .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                 e.stopPropagation();
             });
+        },
+
+        /**
+         * Lazily returns available plugin/placeholder child classes markup
+         * for "Add plugin" modal
+         *
+         * FIXME currently doesn't resolve possible parent classes
+         *
+         * @method _getPluginChildClassesMarkup
+         * @return {jQuery} elements
+         * @private
+         */
+        _getPluginChildClassesMarkup: function _lazyGetPluginChildClassesMarkup() {
+            var that = this;
+            var childRestrictions = this.options.plugin_restriction;
+            if (!this._pluginChildClassesMarkup) {
+                this._pluginChildClassesMarkup = $('#cms-plugin-child-classes').html();
+            }
+            var resultElements = $(this._pluginChildClassesMarkup);
+
+            if (childRestrictions && childRestrictions.length) {
+                resultElements = resultElements.filter(function () {
+                    var item = $(this);
+
+                    return item.hasClass('cms-submenu-item-title') ||
+                        childRestrictions.indexOf(item.find('a').attr('href')) !== -1;
+                });
+
+                resultElements = resultElements.filter(function (index) {
+                    var item = $(this);
+
+                    return !item.hasClass('cms-submenu-item-title') ||
+                        item.hasClass('cms-submenu-item-title') && (
+                            !resultElements.eq(index + 1).hasClass('cms-submenu-item-title') &&
+                            resultElements.eq(index + 1).length
+                        );
+                });
+            }
+
+            this._getPluginChildClassesMarkup = function _getPluginChildClassesMarkup() {
+                resultElements.find('a').on(that.click, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // show loader and make sure scroll doesn't jump
+                    CMS.API.Toolbar.showLoader();
+
+                    var el = $(this);
+                    CMS.Plugin._hideSettingsMenu();
+
+                    that.addPlugin(
+                        el.attr('href').replace('#', ''),
+                        el.text(),
+                        el.closest('.cms-plugin-picker').data('parentId')
+                    );
+                });
+                return resultElements;
+            };
+
+            return this._getPluginChildClassesMarkup();
         },
 
         /**
