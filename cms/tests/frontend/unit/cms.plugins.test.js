@@ -1810,4 +1810,151 @@ describe('CMS.Plugin', function () {
             expect(titles.filter(':visible').text()).toMatch(/Bootstrap/);
         });
     });
+
+    describe('_getPluginBreadcrumbs()', function () {
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            $(function () {
+                CMS.config = {
+                    csrf: 'CSRF_TOKEN',
+                    lang: {}
+                };
+                CMS.settings = {
+                    dragbars: [],
+                    states: []
+                };
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('returns own breadcrumb if plugin has no parents', function () {
+            expect(plugin._getPluginBreadcrumbs()).toEqual([{
+                url: '/en/admin/cms/page/edit-plugin/1/',
+                title: 'Test Text Plugin'
+            }]);
+        });
+
+        // although this shouldn't happen
+        it('returns own breadcrumb if plugin has a parent but it does not exist in the registry', function () {
+            CMS._plugins = null;
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([{
+                url: '/en/admin/cms/page/edit-plugin/1/',
+                title: 'Test Text Plugin'
+            }]);
+        });
+
+        it('returns array of breadcrumbs if plugin has parent', function () {
+            CMS._plugins = [
+                ['cms-placeholder-140', {}],
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 'None',
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+        });
+
+        it('returns array of breadcrumbs if plugin has multiple parents', function () {
+            CMS._plugins = [
+                ['cms-placeholder-140', {}],
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 130,
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }],
+                ['cms-plugin-130', {
+                    plugin_name: 'Parent Parent plugin',
+                    urls: {
+                        edit_plugin: 'parent-parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-parent-edit-url',
+                    title: 'Parent Parent plugin'
+                },
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+        });
+
+        it('is lazy', function () {
+            spyOn($, 'grep').and.callThrough();
+            CMS._plugins = [
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 'None',
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+
+            expect($.grep).toHaveBeenCalledTimes(1);
+
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+
+
+            expect($.grep).toHaveBeenCalledTimes(1);
+        });
+    });
 });

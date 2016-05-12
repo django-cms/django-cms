@@ -1416,7 +1416,10 @@ var CMS = window.CMS || {};
         },
 
         /**
+         * Traverses the registry to find plugin parents
+         *
          * @method _getPluginBreadcrumbs
+         * @returns {Object[]} array of breadcrumbs in `{ url, title }` format
          * @private
          */
         _getPluginBreadcrumbs: function _lazyGetPluginBreadcrumbs() {
@@ -1438,6 +1441,10 @@ var CMS = window.CMS || {};
 
             while (id && id !== 'None') {
                 data = findParentPlugin(id);
+
+                if (!data) {
+                    break;
+                }
 
                 breadcrumbs.unshift({
                     title: data[1].plugin_name,
