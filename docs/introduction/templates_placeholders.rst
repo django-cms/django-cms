@@ -107,7 +107,7 @@ Rendering Menus
 In order to render the CMS's menu in your template you can use the :doc:`show_menu
 </reference/navigation>` tag.
 
-The example we use in ``mysite/templates/base.html``  is:
+The example we use in ``mysite/templates/base.html`` is:
 
 .. code-block:: html+django
 
@@ -126,4 +126,4 @@ If you chose "bootstrap" while setting up with djangocms-installer, the menu
 will already be there and ``templates/menu.html`` will already contain a
 version that uses bootstrap compatible markup.
 
-Next we'll look at django CMS plugins.
+Next we'll look at :ref:`integrating_applications`.

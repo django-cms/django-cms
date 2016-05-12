@@ -1,3 +1,5 @@
+.. _toolbar_how_to:
+
 #####################
 Extending the Toolbar
 #####################
