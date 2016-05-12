@@ -159,31 +159,29 @@ class PluginPool(object):
             return
         self.patched = True
 
-    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
+    def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=False):
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
         self.set_plugin_meta()
         plugins = sorted(self.plugins.values(), key=attrgetter('name'))
-        final_plugins = []
         template = page and page.get_template() or None
         allowed_plugins = get_placeholder_conf(
             setting_key,
             placeholder,
             template,
         ) or ()
-        for plugin in plugins:
-            include_plugin = False
-            if placeholder and not plugin.get_require_parent(placeholder, page):
-                include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
-            if plugin.page_only and not include_page_only:
-                include_plugin = False
-            if include_plugin:
-                final_plugins.append(plugin)
 
-        if final_plugins or placeholder:
-            plugins = final_plugins
+        if include_page_only:
+            # Filters out any plugin not marked as page only
+            plugins = (plugin for plugin in plugins if plugin.page_only)
 
+        if allowed_plugins:
+            plugins = (plugin for plugin in plugins if plugin.__name__ in allowed_plugins)
+
+        if placeholder:
+            # Filters out any plugin that requires a parent or has set parent classes
+            plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
         return sorted(plugins, key=attrgetter('module'))
 
     def get_text_enabled_plugins(self, placeholder, page):
