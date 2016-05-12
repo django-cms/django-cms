@@ -387,57 +387,16 @@ class RenderPluginBlock(InclusionTag):
 register.tag(RenderPluginBlock)
 
 
-class PluginChildClasses(InclusionTag):
-    """
-    Accepts a placeholder or a plugin and renders the allowed plugins for this.
-    """
+@register.inclusion_tag('cms/toolbar/dragitem_menu.html', takes_context=True)
+def render_dragitem_menu(context):
+    plugins = plugin_pool.get_all_plugins()
 
-    template = "cms/toolbar/dragitem_menu.html"
-    name = "plugin_child_classes"
-    options = Options(
-        Argument('obj', required=False, default=None),
-    )
-
-    def get_context(self, context, obj):
-        # Prepend frontedit toolbar output if applicable
-        request = context['request']
-        parent = None
-
-        if isinstance(obj, CMSPlugin):
-            slot = context['slot']
-            page = getattr(request, 'current_page', None)
-            plugin_class = obj.get_plugin_class()
-
-            if plugin_class.allow_children:
-                parent = plugin_class
-                instance, plugin = obj.get_plugin_instance()
-                plugin.cms_plugin_instance = instance
-                plugins = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
-            else:
-                plugins = []
-        elif isinstance(obj, PlaceholderModel):
-            page = obj.page or getattr(request, 'current_page', None)
-            slot = obj.slot
-            plugins = plugin_pool.get_all_plugins(slot, page)
-        else:
-            slot = None
-            page = None
-            plugins = plugin_pool.get_all_plugins()
-
-        if plugins:
-            # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-            child_plugin_classes = get_toolbar_plugin_struct(
-                plugins,
-                slot=slot,
-                page=page,
-                parent=parent,
-            )
-        else:
-            child_plugin_classes = []
-        return {'plugin_classes': child_plugin_classes}
-
-
-register.tag(PluginChildClasses)
+    if plugins:
+        # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
+        child_plugin_classes = get_toolbar_plugin_struct(plugins)
+    else:
+        child_plugin_classes = []
+    return {'plugin_classes': child_plugin_classes}
 
 
 class ExtraMenuItems(InclusionTag):
