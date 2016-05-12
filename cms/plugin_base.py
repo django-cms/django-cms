@@ -170,6 +170,16 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return context
 
     @classmethod
+    def requires_parent_plugin(cls, slot, page):
+        requires_parent = cls.get_require_parent(slot, page)
+
+        if requires_parent:
+            return True
+
+        allowed_parents = cls().get_parent_classes(slot, page) or []
+        return bool(allowed_parents)
+
+    @classmethod
     def get_require_parent(cls, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
 
@@ -431,7 +441,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return fieldsets
 
-    def get_child_classes(self, slot, page):
+    def get_child_classes(self, slot, page, installed_plugins=None):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = page and page.get_template() or None
@@ -439,11 +449,27 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
         child_classes = ph_conf.get(self.__class__.__name__, self.child_classes)
+
         if child_classes:
             return child_classes
-        from cms.plugin_pool import plugin_pool
-        installed_plugins = plugin_pool.get_all_plugins(slot, page)
-        return [cls.__name__ for cls in installed_plugins]
+
+        if installed_plugins is None:
+            from cms.plugin_pool import plugin_pool
+            installed_plugins = plugin_pool.get_all_plugins(slot, page)
+
+        child_classes = []
+        plugin_type = self.__class__.__name__
+
+        for plugin_class in installed_plugins:
+            allowed_parents = plugin_class().get_parent_classes(slot, page) or []
+
+            if not allowed_parents or plugin_type in allowed_parents:
+                # Plugin has no parent restrictions or
+                # Plugin is a configured parent
+                child_classes.append(plugin_class.__name__)
+            else:
+                continue
+        return child_classes
 
     def get_parent_classes(self, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
