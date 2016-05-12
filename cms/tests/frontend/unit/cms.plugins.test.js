@@ -19,6 +19,20 @@ describe('CMS.Plugin', function () {
         expect(CMS.Plugin.prototype.editPluginPostAjax).toEqual(jasmine.any(Function));
     });
 
+    beforeEach(function (done) {
+        $(function () {
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+
+            spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (value) {
+                CMS.settings = $.extend(true, {}, CMS.settings, value);
+            });
+            done();
+        });
+    });
+
     describe('instance', function () {
         var plugin1;
         var plugin2;
@@ -140,7 +154,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -160,7 +173,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -180,7 +192,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -200,7 +211,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
@@ -887,7 +897,6 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
                 plugin_restriction: [],
                 plugin_parent_restriction: ['RandomPlugin'],
                 urls: {
@@ -1527,10 +1536,10 @@ describe('CMS.Plugin', function () {
             var link = nav.find('a');
             link.attr('data-rel', 'edit');
             spyOn(plugin, 'editPlugin');
+            spyOn(plugin, '_getPluginBreadcrumbs').and.returnValue('MockBreadcrumb');
             plugin.options = {
                 urls: { edit_plugin: 'edit_plugin_url' },
-                plugin_name: 'MockPlugin',
-                plugin_breadcrumb: 'MockBreadcrumb'
+                plugin_name: 'MockPlugin'
             };
             plugin._setupActions(nav);
             link.trigger(plugin.click);
@@ -1609,11 +1618,11 @@ describe('CMS.Plugin', function () {
             var link = nav.find('a');
             link.attr('data-rel', 'delete');
             spyOn(plugin, 'deletePlugin');
+            spyOn(plugin, '_getPluginBreadcrumbs').and.returnValue('Breadcrumb');
             plugin._setupActions(nav);
             plugin.options = {
                 urls: { delete_plugin: 'DELETE_URL' },
-                plugin_name: 'MockPlugin',
-                plugin_breadcrumb: 'Breadcrumb'
+                plugin_name: 'MockPlugin'
             };
             link.trigger(plugin.click);
 
