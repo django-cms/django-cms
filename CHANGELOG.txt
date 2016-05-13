@@ -23,11 +23,11 @@
 * CMS handles uninstalled apphooks better
 * Added the ability to make pagetree actions work on currently picked language
 * Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
-* Introduction of the method `get_cache_expiration` on CMSPluginBase to be used
+* Introduce the method `get_cache_expiration` on CMSPluginBase to be used
   by plugins for declaring their rendered content's period of validity.
-* Introduction of the method `get_vary_cache_on` on CMSPluginBase to be used
-  by plugins for declaring ``VARY`` headers.
-* Substantial improvements to the placeholder cache
+* Introduce the method `get_vary_cache_on` on CMSPluginBase to be used by
+  plugins for declaring ``VARY`` headers.
+* Improve the placeholder cache substantially.
 
 
 === 3.2.4 (unreleased) ==

@@ -2,8 +2,9 @@
 
 """
 This module manages placeholder caching. We use a cache-versioning strategy
-with each (placeholder x lang) manages its own version. The actual cache
-includes additional keys appropriate for the placeholders get_vary_cache_on().
+in which each (placeholder x lang x site_id) manages its own version. The
+actual cache includes additional keys appropriate for the placeholders
+get_vary_cache_on().
 
 Invalidation of a placeholder's cache simply increments the version number for
 the (placeholder x lang) pair, which renders any cache entries for that

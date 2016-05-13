@@ -371,7 +371,7 @@ cms.plugin_base
     .. method:: get_vary_cache_on(request, instance, placeholder):
 
         Provides ``VARY`` header strings to be considered by the placeholder
-        and in turn the page.
+        and in turn by the page.
 
         Must return one of:
 
