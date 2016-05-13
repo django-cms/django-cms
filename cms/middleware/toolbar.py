@@ -2,11 +2,9 @@
 """
 Edit Toolbar middleware
 """
-from classytags.utils import flatten_context
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
-from django.template.loader import render_to_string
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
