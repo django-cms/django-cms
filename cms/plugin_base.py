@@ -260,12 +260,13 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         # This flag allows us to know when the plugin initial attributes
         # should be set. This currently only happens on plugin creation.
-        form_class._cms_initial_attributes = True
-        form_class._cms_plugin_language = plugin_data['plugin_language']
-        form_class._cms_plugin_placeholder = plugin_data['placeholder_id']
-        form_class._cms_plugin_parent = plugin_data.get('plugin_parent', None)
-        form_class._cms_plugin_plugin_type = plugin_data['plugin_type']
-        form_class._cms_plugin_position = plugin_data['position']
+        form_class._cms_initial_attributes = {
+            'language': plugin_data['plugin_language'],
+            'placeholder': plugin_data['placeholder_id'],
+            'parent': plugin_data.get('plugin_parent', None),
+            'plugin_type': plugin_data['plugin_type'],
+            'position': plugin_data['position'],
+        }
         return form_class
 
     def validate_add_request(self, request):
@@ -376,14 +377,12 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     def save_form(self, request, form, change):
         obj = super(CMSPluginBase, self).save_form(request, form, change)
+        initial_attributes = getattr(form, '_cms_initial_attributes', None)
 
-        if getattr(form, '_cms_initial_attributes', None):
+        if initial_attributes:
             # Form has the initial attribute hooks
-            obj.language = form._cms_plugin_language
-            obj.placeholder = form._cms_plugin_placeholder
-            obj.parent = form._cms_plugin_parent
-            obj.plugin_type = form._cms_plugin_plugin_type
-            obj.position = form._cms_plugin_position
+            for field, value in initial_attributes.items():
+                setattr(obj, field, value)
         return obj
 
     def response_add(self, request, obj, **kwargs):
