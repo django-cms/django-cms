@@ -11,7 +11,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
-from cms.appresolver import applications_page_check
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.models import CMSPlugin, Title, Page
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
