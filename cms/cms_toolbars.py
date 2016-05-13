@@ -329,10 +329,10 @@ class PageToolbar(CMSToolbar):
         is also the page it is attached to.
         :return: Boolean
         """
-        with force_language(get_language_from_request(self.request)):
-            page = applications_page_check(self.request)
-            if page:
-                return self.request.path == page.get_absolute_url()
+        page = getattr(self.request, 'current_page', False)
+        if page:
+            language = get_language_from_request(self.request)
+            return self.request.path == page.get_absolute_url(language=language)
         return False
 
     def get_on_delete_redirect_url(self):
@@ -484,6 +484,10 @@ class PageToolbar(CMSToolbar):
             refresh = self.toolbar.REFRESH_PAGE
 
             # menu for current page
+            # NOTE: disabled if the current path is "deeper" into the
+            # application's url patterns than its root. This is because
+            # when the Content Manager is at the root of the app-hook,
+            # some of the page options still make sense.
             current_page_menu = self.toolbar.get_or_create_menu(
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 

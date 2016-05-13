@@ -206,7 +206,6 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
     template = "cms/toolbar/items/menu.html"
     sub_level = True
     active = False
-    disabled = False
 
     def __init__(self, name, csrf_token, disabled=False, side=LEFT):
         ToolbarAPIMixin.__init__(self)
