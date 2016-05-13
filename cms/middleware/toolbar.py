@@ -18,9 +18,9 @@ get_request_ip = get_request_ip_resolver()
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
-    original_context.push()
-    instance.placeholder = placeholder
     toolbar = original_context['request'].toolbar
+
+    instance.placeholder = placeholder
 
     with force_language(toolbar.toolbar_language):
         data = {
@@ -29,10 +29,11 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         }
         # TODO: Remove js_compat once get_action_urls is refactored.
         data.update(instance.get_action_urls(js_compat=False))
-    original_context.update(data)
-    plugin_class = instance.get_plugin_class()
 
-    template = toolbar.get_cached_template(plugin_class.frontend_edit_template)
+    original_context.update(data)
+    template = toolbar.get_cached_template(
+        template=instance.get_plugin_class().frontend_edit_template
+    )
     output = template.render(original_context).strip()
     original_context.pop()
     return output

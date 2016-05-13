@@ -421,6 +421,7 @@ def render_dragitem_menu(context):
         child_plugin_classes = []
     return {'plugin_classes': child_plugin_classes}
 
+
 @register.simple_tag(takes_context=True)
 def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_menu.html'):
     request = context['request']
