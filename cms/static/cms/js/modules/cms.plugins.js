@@ -905,10 +905,7 @@ var CMS = window.CMS || {};
         _getPluginChildClassesMarkup: function _lazyGetPluginChildClassesMarkup() {
             var that = this;
             var childRestrictions = this.options.plugin_restriction;
-            if (!this._pluginChildClassesMarkup) {
-                this._pluginChildClassesMarkup = $('#cms-plugin-child-classes').html();
-            }
-            var resultElements = $(this._pluginChildClassesMarkup);
+            var resultElements = $($('#cms-plugin-child-classes').html());
 
             if (childRestrictions && childRestrictions.length) {
                 resultElements = resultElements.filter(function () {
