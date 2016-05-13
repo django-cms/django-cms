@@ -46,13 +46,13 @@
                             <h1 class="cms-pagetree-header-title">
                                 {% trans "Page Tree" %} <span>({{ cl.current_site.name }})</span>
                             </h1>
-                        </div>
 
-                        <div class="cms-pagetree-header-cell cms-pagetree-header-cell-search">
-                            {# INFO: show reset button when filtering is active #}
                             {% if cl.is_filtered or request.GET.q %}
-                                <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
+                                {# INFO: show reset button when filtering is active #}
+                                <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-cell cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
                             {% endif %}
+                        </div>
+                        <div class="cms-pagetree-header-cell cms-pagetree-header-cell-search">
                             {# INFO: visible search field with filtering #}
                             <form method="get" class="cms-pagetree-header-search js-cms-pagetree-header-search">
                                 <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
