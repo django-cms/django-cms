@@ -650,12 +650,12 @@ var CMS = window.CMS || {};
             var parent = win.parent ? win.parent : win;
 
             this.ui.container.on(this.click, '.js-cms-pagetree-page-view', function () {
-                parent.CMS.API.Helpers.setSettings({
+                parent.CMS.API.Helpers.setSettings($.extend(true, {}, CMS.settings, {
                     sideframe: {
                         url: null,
                         hidden: true
                     }
-                });
+                }));
             });
         },
 
