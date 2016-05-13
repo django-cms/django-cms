@@ -51,8 +51,19 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     Renders a single plugin and applies the post processors to it's rendered
     content.
     """
-    if current_app:
-        context['request'].current_app = current_app
+    request = context.get('request')
+
+    if request:
+        toolbar = getattr(request, 'toolbar', None)
+
+        if current_app:
+            request.current_app = current_app
+    else:
+        toolbar = None
+
+    if toolbar and isinstance(template, six.string_types):
+        template = toolbar.get_cached_template(template)
+
     if not processors:
         processors = []
     if isinstance(template, six.string_types):

@@ -315,7 +315,34 @@ class Placeholder(Tag):
 register.tag(Placeholder)
 
 
-class RenderPlugin(InclusionTag):
+def render_plugin(context, plugin):
+    if not plugin:
+        return ''
+
+    request = context['request']
+    toolbar = getattr(request, 'toolbar', None)
+
+    placeholder = plugin.placeholder
+
+    # Prepend frontedit toolbar output if applicable
+    if (toolbar and getattr(toolbar, "edit_mode", False) and
+            getattr(toolbar, "show_toolbar", False) and
+            placeholder.has_change_permission(request) and
+            getattr(placeholder, 'is_editable', True)):
+        from cms.middleware.toolbar import toolbar_plugin_processor
+        processors = (toolbar_plugin_processor, )
+    else:
+        processors = None
+
+    plugin_content = plugin.render_plugin(
+        context,
+        placeholder=placeholder,
+        processors=processors,
+    )
+    return plugin_content
+
+
+class RenderPlugin(Tag):
     template = 'cms/content.html'
     name = 'render_plugin'
     options = Options(
@@ -339,23 +366,19 @@ class RenderPlugin(InclusionTag):
             processors = None
         return processors
 
-    def get_context(self, context, plugin):
-
-        # Prepend frontedit toolbar output if applicable
+    def render_tag(self, context, plugin):
         if not plugin:
-            return {'content': ''}
+            return ''
 
         placeholder = plugin.placeholder
-
         processors = self.get_processors(context, plugin, placeholder)
+        plugin_content = plugin.render_plugin(
+            context,
+            placeholder=placeholder,
+            processors=processors,
+        )
+        return plugin_content
 
-        return {
-            'content': plugin.render_plugin(
-                context,
-                placeholder=placeholder,
-                processors=processors
-            )
-        }
 
 register.tag(RenderPlugin)
 
@@ -398,44 +421,43 @@ def render_dragitem_menu(context):
         child_plugin_classes = []
     return {'plugin_classes': child_plugin_classes}
 
+@register.simple_tag(takes_context=True)
+def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_menu.html'):
+    request = context['request']
+    toolbar = getattr(request, 'toolbar', None)
 
-class ExtraMenuItems(InclusionTag):
-    """
-    Accepts a placeholder or a plugin and renders the additional menu items.
-    """
+    if toolbar:
+        template = toolbar.get_cached_template(template)
+    else:
+        template = context.template.engine.get_template(template)
 
-    template = "cms/toolbar/dragitem_extra_menu.html"
-    name = "extra_menu_items"
-    options = Options(
-        Argument('obj')
-    )
+    if isinstance(obj, CMSPlugin):
+        plugin = obj
+        plugin_class_inst = plugin.get_plugin_class_instance()
+        items = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin) or []
+        plugin_classes = plugin_pool.get_all_plugins()
 
-    def get_context(self, context, obj):
-        # Prepend frontedit toolbar output if applicable
-        request = context['request']
+        for plugin_class in plugin_classes:
+            plugin_items = plugin_class().get_extra_global_plugin_menu_items(request, plugin)
+            if plugin_items:
+                items.extend(plugin_items)
+
+    elif isinstance(obj, PlaceholderModel):
         items = []
-        if isinstance(obj, CMSPlugin):
-            plugin = obj
-            plugin_class_inst = plugin.get_plugin_class_instance()
-            item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
-            if item:
-                items += item
-            plugin_classes = plugin_pool.get_all_plugins()
-            for plugin_class in plugin_classes:
-                plugin_class_inst = plugin_class()
-                item = plugin_class_inst.get_extra_global_plugin_menu_items(request, plugin)
-                if item:
-                    items += item
+        plugin_classes = plugin_pool.get_all_plugins()
 
-        elif isinstance(obj, PlaceholderModel):
-            plugin_classes = plugin_pool.get_all_plugins()
-            for plugin_class in plugin_classes:
-                plugin_class_inst = plugin_class()
-                item = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
-                if item:
-                    items += item
-        return {'items': items}
-register.tag(ExtraMenuItems)
+        for plugin_class in plugin_classes:
+            plugin_class_inst = plugin_class()
+            plugin_items = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
+
+            if plugin_items:
+                items.extend(plugin_items)
+    else:
+        items = []
+
+    if not items:
+        return ''
+    return template.render({'items': items})
 
 
 class PageAttribute(AsTag):

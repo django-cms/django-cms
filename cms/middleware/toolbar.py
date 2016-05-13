@@ -20,8 +20,9 @@ get_request_ip = get_request_ip_resolver()
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
     original_context.push()
     instance.placeholder = placeholder
-    request = original_context['request']
-    with force_language(request.toolbar.toolbar_language):
+    toolbar = original_context['request'].toolbar
+
+    with force_language(toolbar.toolbar_language):
         data = {
             'instance': instance,
             'rendered_content': rendered_content,
@@ -30,8 +31,9 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
         data.update(instance.get_action_urls(js_compat=False))
     original_context.update(data)
     plugin_class = instance.get_plugin_class()
-    template = plugin_class.frontend_edit_template
-    output = render_to_string(template, flatten_context(original_context)).strip()
+
+    template = toolbar.get_cached_template(plugin_class.frontend_edit_template)
+    output = template.render(original_context).strip()
     original_context.pop()
     return output
 
