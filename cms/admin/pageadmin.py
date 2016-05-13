@@ -411,8 +411,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context.update({
                 'title':  _("Add Page Copy"),
             })
+        elif 'target' in request.GET:
+            extra_context.update({
+                'title':  _("New sub page"),
+            })
         else:
             extra_context = self.update_language_tab_context(request, context=extra_context)
+            extra_context.update({
+                'title':  _("New page"),
+            })
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
