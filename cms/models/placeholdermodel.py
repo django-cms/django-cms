@@ -446,23 +446,25 @@ class Placeholder(models.Model):
                     yield plugin_item.get_plugin_instance()
 
         if not self.cache_placeholder or not get_cms_setting('PLUGIN_CACHE'):
-            return list()
+            return []
 
-        vary_list = list()
+        vary_list = set()
         language = get_language_from_request(request, self.page)
         for instance, plugin in inner_plugin_iterator(language):
+            if not instance:
+                continue
             vary_on = plugin.get_vary_cache_on(request, instance, self)
             if not vary_on:
                 # None, or an empty iterable
                 continue
             if isinstance(vary_on, six.string_types):
-                if vary_on.lower() not in (item.lower() for item in vary_list):
-                    vary_list.append(vary_on)
+                if vary_on.lower() not in vary_list:
+                    vary_list.add(vary_on.lower())
             else:
                 try:
                     for vary_on_item in iter(vary_on):
-                        if vary_on_item.lower() not in (item.lower() for item in vary_list):
-                            vary_list.append(vary_on_item)
+                        if vary_on_item.lower() not in vary_list:
+                            vary_list.add(vary_on_item.lower())
                 except TypeError:
                     warnings.warn(
                         'Plugin %(plugin_class)s (%(pk)d) returned '
@@ -473,6 +475,6 @@ class Placeholder(models.Model):
                             'value': force_text(vary_on),
                         })
 
-        return sorted(vary_list)
+        return sorted(list(vary_list))
 
 reversion_register(Placeholder)

@@ -65,7 +65,7 @@ def _get_placeholder_cache_version(placeholder, lang, site_id):
         version, vary_on_list = cached
     else:
         version = int(time.time() * 1000000)
-        vary_on_list = list()
+        vary_on_list = []
         _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_list)
     return version, vary_on_list
 
@@ -82,7 +82,7 @@ def _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_
         version = int(time.time() * 1000000)
 
     if vary_on_list is None:
-        vary_on_list = list()
+        vary_on_list = []
 
     cache.set(key, (version, vary_on_list), duration)
 
@@ -174,10 +174,5 @@ def clear_placeholder_cache(placeholder, lang, site_id):
     We don't need to re-store the vary_on_list, because the cache is now
     effectively empty.
     """
-
-    current_version, _ = _get_placeholder_cache_version(placeholder, lang, site_id)
     version = int(time.time() * 1000000)
-    if current_version >= version:
-        # Just in case
-        version = current_version + 1
-    _set_placeholder_cache_version(placeholder, lang, site_id, version, list())
+    _set_placeholder_cache_version(placeholder, lang, site_id, version, [])

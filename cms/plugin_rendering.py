@@ -123,7 +123,10 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
-    site_id = get_site_id(getattr(page, 'site_id', None))
+    if page:
+        site_id = page.site_id
+    else:
+        site_id = get_site_id(None)
 
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
@@ -191,7 +194,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", flatten_context(context))
     changes = watcher.get_changes()
-    if use_cache and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
+    if use_cache and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
         content = {'content': result, 'sekizai': changes}
         set_placeholder_cache(placeholder, lang, site_id, content=content, request=request)
     context.pop()

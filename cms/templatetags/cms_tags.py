@@ -183,7 +183,7 @@ def _get_placeholder(current_page, page, context, name):
     placeholders = page.rescan_placeholders().values()
     fetch_placeholders = []
     request = context['request']
-    site_id = get_site_id(getattr(page, 'site_id', None))
+    site_id = page.site_id
     if not get_cms_setting('PLACEHOLDER_CACHE') or (hasattr(request, 'toolbar') and request.toolbar.edit_mode):
         fetch_placeholders = placeholders
     else:
