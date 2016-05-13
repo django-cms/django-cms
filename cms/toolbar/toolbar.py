@@ -7,7 +7,7 @@ from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request
 from cms.utils.compat.dj import installed_apps
-from cms.utils.conf import get_cms_setting, get_cache_durations
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 
 from django import forms
@@ -55,7 +55,6 @@ class CMSToolbar(ToolbarAPIMixin):
         self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         self.disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
-        self.template_fragment_cache_duration = get_cache_durations().get('templates', 0)
         self.build_mode = None
         self.use_draft = None
         self.show_toolbar = None

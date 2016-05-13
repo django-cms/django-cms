@@ -315,33 +315,6 @@ class Placeholder(Tag):
 register.tag(Placeholder)
 
 
-def render_plugin(context, plugin):
-    if not plugin:
-        return ''
-
-    request = context['request']
-    toolbar = getattr(request, 'toolbar', None)
-
-    placeholder = plugin.placeholder
-
-    # Prepend frontedit toolbar output if applicable
-    if (toolbar and getattr(toolbar, "edit_mode", False) and
-            getattr(toolbar, "show_toolbar", False) and
-            placeholder.has_change_permission(request) and
-            getattr(placeholder, 'is_editable', True)):
-        from cms.middleware.toolbar import toolbar_plugin_processor
-        processors = (toolbar_plugin_processor, )
-    else:
-        processors = None
-
-    plugin_content = plugin.render_plugin(
-        context,
-        placeholder=placeholder,
-        processors=processors,
-    )
-    return plugin_content
-
-
 class RenderPlugin(Tag):
     template = 'cms/content.html'
     name = 'render_plugin'
