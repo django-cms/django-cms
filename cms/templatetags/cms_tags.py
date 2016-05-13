@@ -13,6 +13,7 @@ from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
+from django.template import Context
 from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
 from django.utils import six
@@ -431,7 +432,7 @@ def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_m
 
     if not items:
         return ''
-    return template.render({'items': items})
+    return template.render(Context({'items': items}))
 
 
 class PageAttribute(AsTag):
