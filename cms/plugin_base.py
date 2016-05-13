@@ -171,9 +171,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     @classmethod
     def requires_parent_plugin(cls, slot, page):
-        requires_parent = cls.get_require_parent(slot, page)
-
-        if requires_parent:
+        if cls.get_require_parent(slot, page):
             return True
 
         allowed_parents = cls().get_parent_classes(slot, page) or []
@@ -462,30 +460,45 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         that will be considered when fetching
         all available child classes for this plugin.
         """
-        # By adding this as a separate method,
-        # we allow other plugins to affect the list of child plugin candidates.
-        # Useful in cases like djangocms-text-ckeditor where only text only
-        # plugins are allowed.
+        # Adding this as a separate method,
+        # we allow other plugins to affect
+        # the list of child plugin candidates.
+        # Useful in cases like djangocms-text-ckeditor
+        # where only text only plugins are allowed.
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_all_plugins(slot, page)
 
     def get_child_classes(self, slot, page):
+        """
+        Returns a list of plugin types that can be added
+        as children to this plugin.
+        """
+        # Placeholder overrides are highest in priority
         child_classes = self.get_child_class_overrides(slot, page)
 
         if child_classes:
             return child_classes
 
+        # Get all child plugin candidates
         installed_plugins = self.get_child_plugin_candidates(slot, page)
 
         child_classes = []
         plugin_type = self.__class__.__name__
 
+        # The following will go through each
+        # child plugin candidate and check if
+        # has configured parent class restrictions.
+        # If there are restrictions then the plugin
+        # is only a valid child class if the current plugin
+        # matches one of the parent restrictions.
+        # If there are no restrictions then the plugin
+        # is a valid child class.
         for plugin_class in installed_plugins:
             allowed_parents = plugin_class().get_parent_classes(slot, page) or []
 
             if not allowed_parents or plugin_type in allowed_parents:
                 # Plugin has no parent restrictions or
-                # Plugin is a configured parent
+                # Current plugin (self) is a configured parent
                 child_classes.append(plugin_class.__name__)
             else:
                 continue

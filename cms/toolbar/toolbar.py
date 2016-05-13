@@ -343,11 +343,11 @@ class CMSToolbar(ToolbarAPIMixin):
 
     @cached_property
     def drag_item_template(self):
-        return get_template('cms/toolbar/dragitem.html')
+        return self.get_cached_template('cms/toolbar/dragitem.html')
 
     @cached_property
     def dragbar_template(self):
-        return get_template('cms/toolbar/dragbar.html')
+        return self.get_cached_template('cms/toolbar/dragbar.html')
 
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:
