@@ -65,6 +65,7 @@ describe('CMS.PageTree', function () {
                 CMS: CMS
             });
             $(function () {
+                CMS.settings = {};
                 pagetree = new CMS.PageTree();
                 pagetree.ui.container.off(pagetree.click);
                 done();
@@ -112,6 +113,28 @@ describe('CMS.PageTree', function () {
             link.trigger(pagetree.click);
             expect(spy).toHaveBeenCalledTimes(1);
             expect(spy).toHaveBeenCalledWith({
+                sideframe: {
+                    url: null,
+                    hidden: true
+                }
+            });
+        });
+
+        it('retains existing state', function () {
+            CMS.settings = {
+                whatever: 'set',
+                sideframe: {
+                    url: 'something'
+                }
+            };
+            var link = $('<span class="js-cms-pagetree-page-view"></span>');
+            link.appendTo(pagetree.ui.container);
+
+            pagetree._setupPageView();
+            link.trigger(pagetree.click);
+            expect(CMS.API.Helpers.setSettings).toHaveBeenCalledTimes(1);
+            expect(CMS.API.Helpers.setSettings).toHaveBeenCalledWith({
+                whatever: 'set',
                 sideframe: {
                     url: null,
                     hidden: true
