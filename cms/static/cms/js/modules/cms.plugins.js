@@ -926,23 +926,9 @@ var CMS = window.CMS || {};
                 });
             }
 
+            resultElements.find('a').on(that.click, that._delegate.bind(that));
+
             this._getPluginChildClassesMarkup = function _getPluginChildClassesMarkup() {
-                resultElements.find('a').on(that.click, function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // show loader and make sure scroll doesn't jump
-                    CMS.API.Toolbar.showLoader();
-
-                    var el = $(this);
-                    CMS.Plugin._hideSettingsMenu();
-
-                    that.addPlugin(
-                        el.attr('href').replace('#', ''),
-                        el.text(),
-                        el.closest('.cms-plugin-picker').data('parentId')
-                    );
-                });
                 return resultElements;
             };
 
@@ -990,7 +976,6 @@ var CMS = window.CMS || {};
          * @param {jQuery} nav dropdown trigger with the items
          */
         _setupActions: function _setupActions(nav) {
-            var that = this;
             var items = '.cms-submenu-edit, .cms-submenu-item a';
             nav.parent().find('.cms-submenu-edit').on(this.touchStart, function (e) {
                 // required on some touch devices so
@@ -998,73 +983,88 @@ var CMS = window.CMS || {};
                 // which in turn results in pep triggering pointercancel
                 e.stopPropagation();
             });
-            nav.parent().find(items).on(that.click, function (e) {
-                e.preventDefault();
-                e.stopPropagation();
+            nav.parent().find(items).on(this.click, nav, this._delegate.bind(this));
+        },
 
-                // show loader and make sure scroll doesn't jump
-                CMS.API.Toolbar.showLoader();
+        /**
+         * Handler for the "action" items
+         *
+         * @method _delegate
+         * @private
+         */
+        _delegate: function _delegate(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                var el = $(this);
-                CMS.Plugin._hideSettingsMenu(nav);
+            var nav;
+            var that = this;
 
-                // set switch for subnav entries
-                switch (el.attr('data-rel')) {
-                    case 'add':
-                        that.addPlugin(
-                            el.attr('href').replace('#', ''),
-                            el.text(),
-                            el.closest('.cms-plugin-picker').data('parentId')
-                        );
-                        break;
-                    case 'ajax_add':
-                        CMS.API.Toolbar.openAjax({
-                            url: el.attr('href'),
-                            post: JSON.stringify(el.data('post')),
-                            text: el.data('text'),
-                            callback: $.proxy(that.editPluginPostAjax, that),
-                            onSuccess: el.data('on-success')
-                        });
-                        break;
-                    case 'edit':
-                        that.editPlugin(
-                            that.options.urls.edit_plugin,
-                            that.options.plugin_name,
-                            that._getPluginBreadcrumbs()
-                        );
-                        break;
-                    case 'copy-lang':
-                        that.copyPlugin(that.options, el.attr('data-language'));
-                        break;
-                    case 'copy':
-                        if (!el.parent().hasClass('cms-submenu-item-disabled')) {
-                            that.copyPlugin();
-                        } else {
-                            CMS.API.Toolbar.hideLoader();
-                        }
-                        break;
-                    case 'cut':
-                        that.cutPlugin();
-                        break;
-                    case 'paste':
-                        if (!el.parent().hasClass('cms-submenu-item-disabled')) {
-                            that.pastePlugin();
-                        } else {
-                            CMS.API.Toolbar.hideLoader();
-                        }
-                        break;
-                    case 'delete':
-                        that.deletePlugin(
-                            that.options.urls.delete_plugin,
-                            that.options.plugin_name,
-                            that._getPluginBreadcrumbs()
-                        );
-                        break;
-                    default:
+            if (e.data && e.data.nav) {
+                nav = e.data.nav;
+            }
+
+            // show loader and make sure scroll doesn't jump
+            CMS.API.Toolbar.showLoader();
+
+            var el = $(e.target);
+            CMS.Plugin._hideSettingsMenu(nav);
+
+            // set switch for subnav entries
+            switch (el.attr('data-rel')) {
+                case 'add':
+                    that.addPlugin(
+                        el.attr('href').replace('#', ''),
+                        el.text(),
+                        el.closest('.cms-plugin-picker').data('parentId')
+                    );
+                    break;
+                case 'ajax_add':
+                    CMS.API.Toolbar.openAjax({
+                        url: el.attr('href'),
+                        post: JSON.stringify(el.data('post')),
+                        text: el.data('text'),
+                        callback: $.proxy(that.editPluginPostAjax, that),
+                        onSuccess: el.data('on-success')
+                    });
+                    break;
+                case 'edit':
+                    that.editPlugin(
+                        that.options.urls.edit_plugin,
+                        that.options.plugin_name,
+                        that._getPluginBreadcrumbs()
+                    );
+                    break;
+                case 'copy-lang':
+                    that.copyPlugin(that.options, el.attr('data-language'));
+                    break;
+                case 'copy':
+                    if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                        that.copyPlugin();
+                    } else {
                         CMS.API.Toolbar.hideLoader();
-                        CMS.API.Toolbar._delegate(el);
-                }
-            });
+                    }
+                    break;
+                case 'cut':
+                    that.cutPlugin();
+                    break;
+                case 'paste':
+                    if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                        that.pastePlugin();
+                    } else {
+                        CMS.API.Toolbar.hideLoader();
+                    }
+                    break;
+                case 'delete':
+                    that.deletePlugin(
+                        that.options.urls.delete_plugin,
+                        that.options.plugin_name,
+                        that._getPluginBreadcrumbs()
+                    );
+                    break;
+                default:
+                    CMS.API.Toolbar.hideLoader();
+                    CMS.API.Toolbar._delegate(el);
+            }
         },
 
         /**
