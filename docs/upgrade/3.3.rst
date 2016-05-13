@@ -21,6 +21,9 @@ What's new in 3.3
   `backward_incompatible_3.3`_ for details)
 * Introduction of the method `get_cache_expiration` on CMSPluginBase to be used
   by plugins for declaring their rendered content's period of validity.
+* Introduction of the method `get_vary_cache_on` on CMSPluginBase to be used
+  by plugins for declaring ``VARY`` headers.
+
 
 .. _backward_incompatible_3.3:
 

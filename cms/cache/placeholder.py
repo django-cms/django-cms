@@ -77,7 +77,7 @@ def _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_
 
     key = _get_placeholder_cache_version_key(placeholder, lang, site_id)
 
-    if version < 1:
+    if not version or version < 1:
         version = int(time.time() * 1000000)
 
     if vary_on_list is None:
