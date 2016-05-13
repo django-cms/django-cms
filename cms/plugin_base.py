@@ -258,8 +258,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # Subclassing is not advisable because Django does metaclass
         # magic and some attributes get lost. Ticket #5273
 
-        # This flag allows us to know when the plugin initial attributes
-        # should be set. This currently only happens on plugin creation.
+        # The _cms_initial_attributes acts as a hook to set
+        # certain values when the form is saved.
+        # Currently this only happens on plugin creation.
         form_class._cms_initial_attributes = {
             'language': plugin_data['plugin_language'],
             'placeholder': plugin_data['placeholder_id'],
