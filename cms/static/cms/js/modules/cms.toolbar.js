@@ -216,7 +216,9 @@ var CMS = window.CMS || {};
                         reset();
                     }
 
-                    if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
+                    var isRootNode = el.parent().hasClass(root);
+
+                    if (isRootNode && el.hasClass(hover) || el.hasClass(disabled) && !isRootNode) {
                         return false;
                     } else {
                         el.addClass(hover);
