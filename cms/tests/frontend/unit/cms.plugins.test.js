@@ -1957,4 +1957,93 @@ describe('CMS.Plugin', function () {
             expect($.grep).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe('_getPluginChildClassesMarkup()', function () {
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            fixture.load('plugin_child_classes.html');
+            $(function () {
+                CMS.config = {
+                    csrf: 'CSRF_TOKEN',
+                    lang: {}
+                };
+                CMS.settings = {
+                    dragbars: [],
+                    states: []
+                };
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('returns markup for child classes based on current plugin/placeholder restrictions', function () {
+            expect(plugin._getPluginChildClassesMarkup().length).toEqual(163);
+            expect(plugin._getPluginChildClassesMarkup()).toEqual(jasmine.any($));
+        });
+
+        it('returns markup for child classes based on current plugin/placeholder restrictions', function () {
+            plugin.options.plugin_restriction = ['Bootstrap3AlertCMSPlugin'];
+            expect(plugin._getPluginChildClassesMarkup().length).toEqual(2);
+            expect(plugin._getPluginChildClassesMarkup()).toEqual(jasmine.any($));
+            expect(plugin._getPluginChildClassesMarkup().eq(0)).toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(0)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(1)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(1)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(0)).toHaveText('Bootstrap3');
+            expect(plugin._getPluginChildClassesMarkup().eq(1)).toHaveText('Alert');
+        });
+
+        it('returns markup for child classes based on current plugin/placeholder restrictions', function () {
+            plugin.options.plugin_restriction = ['UpcomingPlugin', 'CalendarPlugin', 'TextPlugin'];
+            expect(plugin._getPluginChildClassesMarkup().length).toEqual(5);
+            expect(plugin._getPluginChildClassesMarkup()).toEqual(jasmine.any($));
+            expect(plugin._getPluginChildClassesMarkup().eq(0)).toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(0)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(1)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(1)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(2)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(2)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(3)).toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(3)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(4)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPluginChildClassesMarkup().eq(4)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPluginChildClassesMarkup().eq(0)).toHaveText('Events');
+            expect(plugin._getPluginChildClassesMarkup().eq(1)).toHaveText('Calendar');
+            expect(plugin._getPluginChildClassesMarkup().eq(2)).toHaveText('Upcoming or Past Events');
+            expect(plugin._getPluginChildClassesMarkup().eq(3)).toHaveText('Generic');
+            expect(plugin._getPluginChildClassesMarkup().eq(4)).toHaveText('Text');
+        });
+
+        it('attaches event handlers for adding these plugins', function () {
+            spyOn(CMS.Plugin.prototype, 'addPlugin');
+            expect(plugin._getPluginChildClassesMarkup().find('a')).toHandle(plugin.click);
+            plugin._getPluginChildClassesMarkup().find('a').eq(1).trigger(plugin.click);
+            expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
+        });
+
+        it('is lazy', function () {
+            plugin.options.plugin_restriction = ['Bootstrap3AlertCMSPlugin'];
+            spyOn($.fn, 'filter').and.callThrough();
+            plugin._getPluginChildClassesMarkup();
+            expect($.fn.filter).toHaveBeenCalledTimes(2);
+            plugin._getPluginChildClassesMarkup();
+            plugin._getPluginChildClassesMarkup();
+            plugin._getPluginChildClassesMarkup();
+            expect($.fn.filter).toHaveBeenCalledTimes(2);
+        });
+    });
 });
