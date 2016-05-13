@@ -77,10 +77,6 @@ def _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_
 
     key = _get_placeholder_cache_version_key(placeholder, lang, site_id)
 
-    if duration is None:
-        # If no duration is specified, we'll fallback to the CMS_CACHE_DURATIONS setting.
-        duration = get_cms_setting('CACHE_DURATIONS')['content']
-
     if version < 1:
         version = int(time.time() * 1000000)
 
@@ -153,7 +149,6 @@ def set_placeholder_cache(placeholder, lang, site_id, content, request):
       placeholder.get_cache_expiration(request, now())
     )
     cache.set(key, content, duration)
-
     # "touch" the cache-version, so that it stays as fresh as this content.
     version, vary_on_list = _get_placeholder_cache_version(placeholder, lang, site_id)
     _set_placeholder_cache_version(
@@ -174,7 +169,7 @@ def get_placeholder_cache(placeholder, lang, site_id, request):
 
 def clear_placeholder_cache(placeholder, lang, site_id):
     """
-    Invalidates all existing cache entries for this (placeholder x lang) pair.
+    Invalidates all existing cache entries for (placeholder x lang x site_id).
     We don't need to re-store the vary_on_list, because the cache is now
     effectively empty.
     """
@@ -182,5 +177,6 @@ def clear_placeholder_cache(placeholder, lang, site_id):
     current_version, _ = _get_placeholder_cache_version(placeholder, lang, site_id)
     version = int(time.time() * 1000000)
     if current_version >= version:
+        # Just in case
         version = current_version + 1
     _set_placeholder_cache_version(placeholder, lang, site_id, version, list())

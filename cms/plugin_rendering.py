@@ -144,6 +144,8 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     else:
         processors = None
         edit = False
+
+    use_cache = use_cache and not request.user.is_authenticated()
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
             cached_value = get_placeholder_cache(placeholder, lang, site_id, request)
@@ -189,8 +191,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", flatten_context(context))
     changes = watcher.get_changes()
-    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:  # noqa
-        set_placeholder_cache(placeholder, lang, site_id, content={'content': result, 'sekizai': changes}, request=request)
+    if use_cache and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
+        content = {'content': result, 'sekizai': changes}
+        set_placeholder_cache(placeholder, lang, site_id, content=content, request=request)
     context.pop()
     return result
 

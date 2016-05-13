@@ -588,7 +588,9 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     content = render_placeholder(placeholder, context, placeholder_name, lang=lang,
                                  use_cache=cache_result)
     changes = watcher.get_changes()
-    if cache_result:
+
+    edit_mode = hasattr(request, 'toolbar') and getattr(request.toolbar, 'edit_mode', False)
+    if not edit_mode and placeholder and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and cache_result:  # noqa
         set_placeholder_cache(placeholder, lang, site_id, {'content': content, 'sekizai': changes}, request)
     if content:
         return {'content': mark_safe(content)}
