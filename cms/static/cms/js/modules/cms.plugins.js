@@ -898,8 +898,6 @@ var CMS = window.CMS || {};
          * Lazily returns available plugin/placeholder child classes markup
          * for "Add plugin" modal
          *
-         * FIXME currently doesn't resolve possible parent classes
-         *
          * @method _getPluginChildClassesMarkup
          * @return {jQuery} elements
          * @private
