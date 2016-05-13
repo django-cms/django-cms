@@ -241,7 +241,7 @@ var CMS = {
         },
 
         /**
-         * Gets user settings (from JSON or the session)
+         * Gets user settings (from localStorage or the session)
          * in the same way as setSettings sets them.
          *
          * @method getSettings
