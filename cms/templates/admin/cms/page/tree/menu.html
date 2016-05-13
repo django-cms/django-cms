@@ -163,10 +163,10 @@
                 {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
                     <div class="cms-tree-item cms-tree-item-button">
                         <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                            data-cms-tooltip="{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}">
+                            data-cms-tooltip="{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}">
                             <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"
                                 class="cms-btn cms-btn-default cms-icon cms-icon-plus">
-                                <span class="sr-only">{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}</span>
+                                <span class="sr-only">{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}</span>
                             </a>
                         </div>
                     </div>
