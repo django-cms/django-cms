@@ -873,7 +873,7 @@ var CMS = window.CMS || {};
                 // we need to know the parent id by the time we open "add plugin" dialog
                 var pluginsCopy = plugins.clone(true, true).data(
                     'parentId', that._getId(nav.closest('.cms-draggable'))
-                ).append(that._getPluginChildClassesMarkup());
+                ).append(that._getPossibleChildClasses());
 
                 modal.open({
                     title: that.options.addPluginHelpTitle,
@@ -898,11 +898,11 @@ var CMS = window.CMS || {};
          * Lazily returns available plugin/placeholder child classes markup
          * for "Add plugin" modal
          *
-         * @method _getPluginChildClassesMarkup
+         * @method _getPossibleChildClasses
          * @return {jQuery} elements
          * @private
          */
-        _getPluginChildClassesMarkup: function _lazyGetPluginChildClassesMarkup() {
+        _getPossibleChildClasses: function _lazyGetPossibleChildClasses() {
             var that = this;
             var childRestrictions = this.options.plugin_restriction;
             var resultElements = $($('#cms-plugin-child-classes').html());
@@ -928,11 +928,11 @@ var CMS = window.CMS || {};
 
             resultElements.find('a').on(that.click, that._delegate.bind(that));
 
-            this._getPluginChildClassesMarkup = function _getPluginChildClassesMarkup() {
+            this._getPossibleChildClasses = function _getPossibleChildClasses() {
                 return resultElements;
             };
 
-            return this._getPluginChildClassesMarkup();
+            return this._getPossibleChildClasses();
         },
 
         /**
