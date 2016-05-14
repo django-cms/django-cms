@@ -2043,7 +2043,7 @@ describe('CMS.Plugin', function () {
             expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
         });
 
-        it('is lazy', function () {
+        it('is not lazy', function () {
             plugin.options.plugin_restriction = ['Bootstrap3AlertCMSPlugin'];
             spyOn($.fn, 'filter').and.callThrough();
             plugin._getPossibleChildClasses();
@@ -2051,7 +2051,7 @@ describe('CMS.Plugin', function () {
             plugin._getPossibleChildClasses();
             plugin._getPossibleChildClasses();
             plugin._getPossibleChildClasses();
-            expect($.fn.filter).toHaveBeenCalledTimes(2);
+            expect($.fn.filter).toHaveBeenCalledTimes(8);
         });
     });
 
