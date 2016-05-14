@@ -47,7 +47,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.placeholder import validate_placeholder_name, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
 
 DJANGO_VERSION = django.get_version()
@@ -383,18 +383,6 @@ class RenderPluginBlock(InclusionTag):
         return context
 
 register.tag(RenderPluginBlock)
-
-
-@register.inclusion_tag('cms/toolbar/dragitem_menu.html', takes_context=True)
-def render_dragitem_menu(context):
-    plugins = plugin_pool.get_all_plugins()
-
-    if plugins:
-        # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-        child_plugin_classes = get_toolbar_plugin_struct(plugins)
-    else:
-        child_plugin_classes = []
-    return {'plugin_classes': child_plugin_classes}
 
 
 @register.simple_tag(takes_context=True)

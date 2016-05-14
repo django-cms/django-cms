@@ -362,6 +362,10 @@ class CMSToolbar(ToolbarAPIMixin):
         return self.get_cached_template('cms/toolbar/dragitem.html')
 
     @cached_property
+    def drag_item_menu_template(self):
+        return self.get_cached_template('cms/toolbar/dragitem_menu.html')
+
+    @cached_property
     def dragbar_template(self):
         return self.get_cached_template('cms/toolbar/dragbar.html')
 
