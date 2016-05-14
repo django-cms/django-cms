@@ -13,6 +13,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import ChangeModel
 from cms.test_utils.util.mock import AttributeObject
+from cms.toolbar.toolbar import CMSToolbar
 from cms.views import details
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -536,8 +537,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder = Placeholder()
         placeholder.slot = 'test'
         placeholder.pk = placeholder.id = 99
-        context = SekizaiContext()
-        context['request'] = AttributeObject(
+        request = AttributeObject(
             GET={'language': 'en'},
             session={},
             path='/',
@@ -545,6 +545,11 @@ class RenderingTestCase(CMSTestCase):
             current_page=None,
             method='GET',
         )
+        request.toolbar = CMSToolbar(request)
+
+        context = SekizaiContext()
+        context['request'] = request
+
         classes = [
             "cms-placeholder-%s" % placeholder.pk,
             'cms-placeholder',
