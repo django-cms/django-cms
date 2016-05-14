@@ -17,6 +17,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
+from django.template import Template
+from django.template.loader import get_template
+from django.utils.functional import cached_property
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -38,6 +41,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
+        self._cached_templates = {}
         self.right_items = []
         self.left_items = []
         self.last_left_items = []
@@ -344,6 +348,26 @@ class CMSToolbar(ToolbarAPIMixin):
             return self._request_hook_get()
         else:
             return self._request_hook_post()
+
+    def get_cached_template(self, template):
+        if isinstance(template, Template):
+            return template
+
+        if not template in self._cached_templates:
+            self._cached_templates[template] = get_template(template)
+        return self._cached_templates[template]
+
+    @cached_property
+    def drag_item_template(self):
+        return self.get_cached_template('cms/toolbar/dragitem.html')
+
+    @cached_property
+    def drag_item_menu_template(self):
+        return self.get_cached_template('cms/toolbar/dragitem_menu.html')
+
+    @cached_property
+    def dragbar_template(self):
+        return self.get_cached_template('cms/toolbar/dragbar.html')
 
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:

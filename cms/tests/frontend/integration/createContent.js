@@ -76,7 +76,9 @@ casper.test.begin('User Add Content', function (test) {
                 });
             });
             this.then(function () {
-                this.click(xPath('//a[@data-rel="add"]/text()[normalize-space(.)="Text"]'));
+                this.click(
+                    xPath('//div[contains(@class, "cms-modal")]//a[@data-rel="add"]/text()[normalize-space(.)="Text"]')
+                );
             });
             // ensure previous content has been changed
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');

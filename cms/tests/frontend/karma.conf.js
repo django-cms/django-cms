@@ -41,6 +41,7 @@ module.exports = function (config) {
 
             // these have to be specified in order since
             // dependency loading is not handled yet
+            'cms/static/cms/js/polyfills/array.prototype.findindex.js',
             'cms/static/cms/js/libs/jquery.min.js',
             'cms/static/cms/js/libs/class.min.js',
             'cms/static/cms/js/libs/pep.js',

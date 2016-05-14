@@ -13,6 +13,7 @@ from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plug
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.django_load import iterload_objects
+from cms.utils.placeholder import get_toolbar_plugin_struct
 
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -51,8 +52,19 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     Renders a single plugin and applies the post processors to it's rendered
     content.
     """
-    if current_app:
-        context['request'].current_app = current_app
+    request = context.get('request')
+
+    if request:
+        toolbar = getattr(request, 'toolbar', None)
+
+        if current_app:
+            request.current_app = current_app
+    else:
+        toolbar = None
+
+    if toolbar and isinstance(template, six.string_types):
+        template = toolbar.get_cached_template(template)
+
     if not processors:
         processors = []
     if isinstance(template, six.string_types):
@@ -218,8 +230,11 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
         slot = None
     context.push()
 
-    # to restrict child-only plugins from draggables..
-    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)] + plugin_pool.get_system_plugins()
+    all_plugins = plugin_pool.get_all_plugins()
+    plugin_types = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
+
+    context['allowed_plugins'] = plugin_types + plugin_pool.get_system_plugins()
+    context['plugin_menu'] = get_toolbar_plugin_struct(all_plugins, slot=slot, page=page)
     context['placeholder'] = placeholder
     context['language'] = save_language
     context['page'] = page

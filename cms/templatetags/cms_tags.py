@@ -13,6 +13,7 @@ from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
+from django.template import Context
 from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
 from django.utils import six
@@ -46,7 +47,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.placeholder import validate_placeholder_name, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
 
 DJANGO_VERSION = django.get_version()
@@ -316,7 +317,7 @@ class Placeholder(Tag):
 register.tag(Placeholder)
 
 
-class RenderPlugin(InclusionTag):
+class RenderPlugin(Tag):
     template = 'cms/content.html'
     name = 'render_plugin'
     options = Options(
@@ -340,23 +341,19 @@ class RenderPlugin(InclusionTag):
             processors = None
         return processors
 
-    def get_context(self, context, plugin):
-
-        # Prepend frontedit toolbar output if applicable
+    def render_tag(self, context, plugin):
         if not plugin:
-            return {'content': ''}
+            return ''
 
         placeholder = plugin.placeholder
-
         processors = self.get_processors(context, plugin, placeholder)
+        plugin_content = plugin.render_plugin(
+            context,
+            placeholder=placeholder,
+            processors=processors,
+        )
+        return plugin_content
 
-        return {
-            'content': plugin.render_plugin(
-                context,
-                placeholder=placeholder,
-                processors=processors
-            )
-        }
 
 register.tag(RenderPlugin)
 
@@ -388,86 +385,43 @@ class RenderPluginBlock(InclusionTag):
 register.tag(RenderPluginBlock)
 
 
-class PluginChildClasses(InclusionTag):
-    """
-    Accepts a placeholder or a plugin and renders the allowed plugins for this.
-    """
+@register.simple_tag(takes_context=True)
+def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_menu.html'):
+    request = context['request']
+    toolbar = getattr(request, 'toolbar', None)
 
-    template = "cms/toolbar/dragitem_menu.html"
-    name = "plugin_child_classes"
-    options = Options(
-        Argument('obj')
-    )
+    if toolbar:
+        template = toolbar.get_cached_template(template)
+    else:
+        template = context.template.engine.get_template(template)
 
-    def get_context(self, context, obj):
-        # Prepend frontedit toolbar output if applicable
-        request = context['request']
-        page = request.current_page
-        child_plugin_classes = []
-        if isinstance(obj, CMSPlugin):
-            slot = context['slot']
-            plugin = obj
-            plugin_class = plugin.get_plugin_class()
-            if plugin_class.allow_children:
-                instance, plugin = plugin.get_plugin_instance()
-                plugin.cms_plugin_instance = instance
-                childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
-                # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-                child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
-        elif isinstance(obj, PlaceholderModel):
-            placeholder = obj
-            page = placeholder.page if placeholder else None
-            if not page:
-                page = getattr(request, 'current_page', None)
-            if placeholder:
-                slot = placeholder.slot
-            else:
-                slot = None
-            # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
-            child_plugin_classes = get_toolbar_plugin_struct(plugin_pool.get_all_plugins(slot, page), slot, page)
-        return {'plugin_classes': child_plugin_classes}
+    if isinstance(obj, CMSPlugin):
+        plugin = obj
+        plugin_class_inst = plugin.get_plugin_class_instance()
+        items = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin) or []
+        plugin_classes = plugin_pool.get_all_plugins()
 
+        for plugin_class in plugin_classes:
+            plugin_items = plugin_class().get_extra_global_plugin_menu_items(request, plugin)
+            if plugin_items:
+                items.extend(plugin_items)
 
-register.tag(PluginChildClasses)
-
-
-class ExtraMenuItems(InclusionTag):
-    """
-    Accepts a placeholder or a plugin and renders the additional menu items.
-    """
-
-    template = "cms/toolbar/dragitem_extra_menu.html"
-    name = "extra_menu_items"
-    options = Options(
-        Argument('obj')
-    )
-
-    def get_context(self, context, obj):
-        # Prepend frontedit toolbar output if applicable
-        request = context['request']
+    elif isinstance(obj, PlaceholderModel):
         items = []
-        if isinstance(obj, CMSPlugin):
-            plugin = obj
-            plugin_class_inst = plugin.get_plugin_class_instance()
-            item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
-            if item:
-                items += item
-            plugin_classes = plugin_pool.get_all_plugins()
-            for plugin_class in plugin_classes:
-                plugin_class_inst = plugin_class()
-                item = plugin_class_inst.get_extra_global_plugin_menu_items(request, plugin)
-                if item:
-                    items += item
+        plugin_classes = plugin_pool.get_all_plugins()
 
-        elif isinstance(obj, PlaceholderModel):
-            plugin_classes = plugin_pool.get_all_plugins()
-            for plugin_class in plugin_classes:
-                plugin_class_inst = plugin_class()
-                item = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
-                if item:
-                    items += item
-        return {'items': items}
-register.tag(ExtraMenuItems)
+        for plugin_class in plugin_classes:
+            plugin_class_inst = plugin_class()
+            plugin_items = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
+
+            if plugin_items:
+                items.extend(plugin_items)
+    else:
+        items = []
+
+    if not items:
+        return ''
+    return template.render(Context({'items': items}))
 
 
 class PageAttribute(AsTag):
