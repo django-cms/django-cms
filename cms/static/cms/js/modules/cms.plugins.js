@@ -917,7 +917,10 @@ var CMS = window.CMS || {};
         _getPossibleChildClasses: function _getPossibleChildClasses() {
             var that = this;
             var childRestrictions = this.options.plugin_restriction;
-            var resultElements = $($('#cms-plugin-child-classes-' + this.options.placeholder_id).html());
+            // have to check the placeholder every time, since plugin could've been
+            // moved as part of another plugin
+            var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+            var resultElements = $($('#cms-plugin-child-classes-' + placeholderId).html());
 
             if (childRestrictions && childRestrictions.length) {
                 resultElements = resultElements.filter(function () {
@@ -1435,7 +1438,9 @@ var CMS = window.CMS || {};
 
 
     /**
-     * Updates plugin data in CMS._plugins
+     * Updates plugin data in CMS._plugins.
+     * Keep in mind that it doesn't update children plugins, and you
+     * probably want that.
      *
      * @method _updateRegistry
      * @private
