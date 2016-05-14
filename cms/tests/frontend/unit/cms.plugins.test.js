@@ -154,8 +154,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
@@ -164,6 +164,8 @@ describe('CMS.Plugin', function () {
                     copy_plugin: '/en/admin/cms/page/copy-plugins/'
                 }
             });
+            expect(plugin1.options.plugin_restriction.length).toEqual(0);
+            expect(plugin1.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(plugin2.options).toEqual({
                 type: 'plugin',
@@ -173,8 +175,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
@@ -183,6 +185,8 @@ describe('CMS.Plugin', function () {
                     copy_plugin: '/en/admin/cms/page/copy-plugins/'
                 }
             });
+            expect(plugin2.options.plugin_restriction.length).toEqual(0);
+            expect(plugin2.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(placeholder1.options).toEqual({
                 type: 'placeholder',
@@ -192,8 +196,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -202,6 +206,8 @@ describe('CMS.Plugin', function () {
                     delete_plugin: ''
                 }
             });
+            expect(placeholder1.options.plugin_restriction.length).toEqual(0);
+            expect(placeholder1.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(generic.options).toEqual({
                 type: '',
@@ -211,8 +217,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -221,6 +227,8 @@ describe('CMS.Plugin', function () {
                     delete_plugin: ''
                 }
             });
+            expect(generic.options.plugin_restriction.length).toEqual(0);
+            expect(generic.options.plugin_parent_restriction.length).toEqual(0);
         });
 
         it('sets its options to the dom node', function () {
@@ -897,8 +905,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_restriction: [],
-                plugin_parent_restriction: ['RandomPlugin'],
+                plugin_restriction: jasmine.arrayContaining([]),
+                plugin_parent_restriction: jasmine.arrayContaining(['RandomPlugin']),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -1917,7 +1925,7 @@ describe('CMS.Plugin', function () {
             ]);
         });
 
-        it('is lazy', function () {
+        it('is not lazy', function () {
             spyOn($, 'grep').and.callThrough();
             CMS._plugins = [
                 ['cms-plugin-140', {
@@ -1954,7 +1962,7 @@ describe('CMS.Plugin', function () {
             ]);
 
 
-            expect($.grep).toHaveBeenCalledTimes(1);
+            expect($.grep).toHaveBeenCalledTimes(2);
         });
     });
 
