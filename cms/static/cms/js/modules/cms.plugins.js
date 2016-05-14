@@ -907,14 +907,14 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Lazily returns available plugin/placeholder child classes markup
+         * Returns available plugin/placeholder child classes markup
          * for "Add plugin" modal
          *
          * @method _getPossibleChildClasses
          * @return {jQuery} elements
          * @private
          */
-        _getPossibleChildClasses: function _lazyGetPossibleChildClasses() {
+        _getPossibleChildClasses: function _getPossibleChildClasses() {
             var that = this;
             var childRestrictions = this.options.plugin_restriction;
             var resultElements = $($('#cms-plugin-child-classes').html());
@@ -940,11 +940,7 @@ var CMS = window.CMS || {};
 
             resultElements.find('a').on(that.click, that._delegate.bind(that));
 
-            this._getPossibleChildClasses = function _getPossibleChildClasses() {
-                return resultElements;
-            };
-
-            return this._getPossibleChildClasses();
+            return resultElements;
         },
 
         /**
