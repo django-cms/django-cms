@@ -1,4 +1,4 @@
-{% load i18n l10n cms_tags cache %}
+{% load i18n l10n cms_tags %}
 
 {% with allow_children=plugin.get_plugin_instance.1.allow_children disable_child_plugins=plugin.get_plugin_instance.1.disable_child_plugins %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
