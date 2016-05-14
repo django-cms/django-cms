@@ -2054,4 +2054,55 @@ describe('CMS.Plugin', function () {
             expect($.fn.filter).toHaveBeenCalledTimes(2);
         });
     });
+
+    describe('CMS.Plugin._updateRegistry()', function () {
+        beforeEach(function () {
+            spyOn($, 'extend').and.callThrough();
+        });
+
+        it('does not do anything if the registry is empty', function () {
+            CMS.Plugin._updateRegistry({
+                pluginId: 'whatever'
+            });
+            expect($.extend).not.toHaveBeenCalled();
+        });
+
+        it('does not do anything if the plugin is not in the registry', function () {
+            CMS._plugins = [
+                ['cms-plugin-1', {}]
+            ];
+            CMS.Plugin._updateRegistry({
+                pluginId: 'whatever'
+            });
+            expect($.extend).not.toHaveBeenCalled();
+        });
+
+        it('updates given plugin with provided data', function () {
+            CMS._plugins = [
+                ['cms-plugin-1', {
+                    whatever: 1,
+                    override: 2
+                }],
+                ['cms-plugin-2', {}]
+            ];
+
+            CMS.Plugin._updateRegistry({
+                pluginId: '1',
+                update: {
+                    override: 1,
+                    something: 3
+                }
+            });
+            CMS.Plugin._updateRegistry({
+                pluginId: 2,
+                update: {
+                    something: 2
+                }
+            });
+
+            expect(CMS._plugins[1][1]).toEqual({
+                something: 2
+            });
+        });
+    });
 });
