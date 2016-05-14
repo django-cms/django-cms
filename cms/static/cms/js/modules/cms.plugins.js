@@ -917,7 +917,7 @@ var CMS = window.CMS || {};
         _getPossibleChildClasses: function _getPossibleChildClasses() {
             var that = this;
             var childRestrictions = this.options.plugin_restriction;
-            var resultElements = $($('#cms-plugin-child-classes').html());
+            var resultElements = $($('#cms-plugin-child-classes-' + this.options.placeholder_id).html());
 
             if (childRestrictions && childRestrictions.length) {
                 resultElements = resultElements.filter(function () {
