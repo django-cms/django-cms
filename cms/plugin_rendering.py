@@ -13,6 +13,7 @@ from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plug
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.django_load import iterload_objects
+from cms.utils.placeholder import get_toolbar_plugin_struct
 
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
@@ -229,9 +230,11 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
         slot = None
     context.push()
 
-    plugins = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
+    plugin_classes = plugin_pool.get_all_plugins(slot, page)
+    plugin_types = [cls.__name__ for cls in plugin_classes]
 
-    context['allowed_plugins'] = plugins + plugin_pool.get_system_plugins()
+    context['allowed_plugins'] = plugin_types + plugin_pool.get_system_plugins()
+    context['plugin_menu'] = get_toolbar_plugin_struct(plugin_classes, slot=slot, page=page)
     context['placeholder'] = placeholder
     context['language'] = save_language
     context['page'] = page
