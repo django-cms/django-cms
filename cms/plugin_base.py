@@ -227,6 +227,22 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         """
         return None
 
+    def get_vary_cache_on(self, request, instance, placeholder):
+        """
+        Provides hints to the placeholder, and in turn to the page for
+        determining VARY headers for the response.
+
+        Must return one of:
+            - None (default),
+            - String of a case-sensitive header name, or
+            - iterable of case-sensitive header names.
+
+        NOTE: This only makes sense to use with caching. If this plugin has
+        ``cache = False`` or plugin.get_cache_expiration(...) returns 0,
+        get_vary_cache_on() will have no effect.
+        """
+        return None
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         """
         We just need the popup interface here
@@ -260,16 +276,23 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         plugin_data = self.validate_add_request(request)
 
-        class Form(form_class):
+        # Setting attributes on the form class is perfectly fine.
+        # The form class is created by modelform factory every time
+        # this get_form() method is called.
+        # Subclassing is not advisable because Django does metaclass
+        # magic and some attributes get lost. Ticket #5273
 
-            def __init__(self, *args, **kwargs):
-                super(Form, self).__init__(*args, **kwargs)
-                self.instance.language = plugin_data['plugin_language']
-                self.instance.placeholder = plugin_data['placeholder_id']
-                self.instance.parent = plugin_data.get('plugin_parent', None)
-                self.instance.plugin_type = plugin_data['plugin_type']
-                self.instance.position = plugin_data['position']
-        return Form
+        # The _cms_initial_attributes acts as a hook to set
+        # certain values when the form is saved.
+        # Currently this only happens on plugin creation.
+        form_class._cms_initial_attributes = {
+            'language': plugin_data['plugin_language'],
+            'placeholder': plugin_data['placeholder_id'],
+            'parent': plugin_data.get('plugin_parent', None),
+            'plugin_type': plugin_data['plugin_type'],
+            'position': plugin_data['position'],
+        }
+        return form_class
 
     def validate_add_request(self, request):
         from cms.admin.forms import PluginAddValidationForm
@@ -376,6 +399,16 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         self.saved_object = obj
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
+
+    def save_form(self, request, form, change):
+        obj = super(CMSPluginBase, self).save_form(request, form, change)
+        initial_attributes = getattr(form, '_cms_initial_attributes', None)
+
+        if initial_attributes:
+            # Form has the initial attribute hooks
+            for field, value in initial_attributes.items():
+                setattr(obj, field, value)
+        return obj
 
     def response_add(self, request, obj, **kwargs):
         self.object_successfully_changed = True

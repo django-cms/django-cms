@@ -11,6 +11,7 @@ from django import http
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core import urlresolvers
 from django.core.cache import cache
 from django.core.exceptions import (
@@ -125,6 +126,9 @@ class PluginsTestBaseCase(CMSTestCase):
     def get_response_pk(self, response):
         return int(response.content.decode('utf8').split("/edit-plugin/")[1].split("/")[0])
 
+    def get_placeholder(self):
+        return Placeholder.objects.create(slot='test')
+
 
 class PluginsTestCase(PluginsTestBaseCase):
     def _create_text_plugin_on_page(self, page):
@@ -160,6 +164,60 @@ class PluginsTestCase(PluginsTestBaseCase):
         # now edit the plugin
         txt = self._edit_text_plugin(created_plugin_id, "Hello World")
         self.assertEqual("Hello World", txt.body)
+
+    def test_plugin_add_form_integrity(self):
+        admin.autodiscover()
+        admin_instance = admin.site._registry[ArticlePluginModel]
+        placeholder = self.get_placeholder()
+        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
+            'plugin_type': "ArticlePlugin",
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': placeholder.pk,
+        })
+        superuser = self.get_superuser()
+        plugin = plugin_pool.get_plugin('ArticlePlugin')
+
+        with self.login_user_context(superuser):
+            request = self.get_request(url)
+            PluginFormClass = plugin(
+                model=plugin.model,
+                admin_site=admin.site,
+            ).get_form(request)
+            plugin_fields = list(PluginFormClass.base_fields.keys())
+
+            OriginalFormClass = admin_instance.get_form(request)
+            original_fields = list(OriginalFormClass.base_fields.keys())
+
+            # Assert both forms have the same fields
+            self.assertEqual(plugin_fields, original_fields)
+
+            # Now assert the plugin form has the related field wrapper
+            # widget on the sections field.
+            self.assertIsInstance(
+                PluginFormClass.base_fields['sections'].widget,
+                RelatedFieldWidgetWrapper,
+            )
+
+            # Now assert the admin form has the related field wrapper
+            # widget on the sections field.
+            self.assertIsInstance(
+                OriginalFormClass.base_fields['sections'].widget,
+                RelatedFieldWidgetWrapper,
+            )
+
+            # Now assert the plugin form has the filtered select multiple
+            # widget wrapped by the related field wrapper
+            self.assertIsInstance(
+                PluginFormClass.base_fields['sections'].widget.widget,
+                FilteredSelectMultiple,
+            )
+
+            # Now assert the admin form has the filtered select multiple
+            # widget wrapped by the related field wrapper
+            self.assertIsInstance(
+                OriginalFormClass.base_fields['sections'].widget.widget,
+                FilteredSelectMultiple,
+            )
 
     def test_plugin_edit_marks_page_dirty(self):
         page_data = self.get_new_page_data()
