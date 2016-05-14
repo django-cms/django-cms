@@ -1994,6 +1994,7 @@ describe('CMS.Plugin', function () {
                         copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
+                spyOn(plugin, '_getId').and.returnValue(1);
                 done();
             });
         });
