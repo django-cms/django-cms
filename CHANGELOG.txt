@@ -13,7 +13,6 @@
 * Added frontend integration tests (written with Casper JS)
 * Removed frontend integration tests (written with Selenium)
 * Provides the ability to declare cache expiration periods on a per-plugin basis
-* Minor UI improvements
 * Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
   the toolbar will appear for authorized users. If left unset, retains the
   existing behavior of allowing toolbar for authorized users at any IP address.
@@ -21,6 +20,8 @@
   small screens.
 * Removed some unnecessary reloads happening after closing sideframe.
 * CMS handles uninstalled apphooks better
+* Minor UI improvements
+* Changed pagetree UI
 * Added the ability to make pagetree actions work on currently picked language
 * Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
 * Introduce the method `get_cache_expiration` on CMSPluginBase to be used
@@ -28,6 +29,7 @@
 * Introduce the method `get_vary_cache_on` on CMSPluginBase to be used by
   plugins for declaring ``VARY`` headers.
 * Improve the placeholder cache substantially.
+* Fixed breadcrumbs of recently moved plugin reflecting previous position in the tree
 
 
 === 3.2.4 (unreleased) ==
