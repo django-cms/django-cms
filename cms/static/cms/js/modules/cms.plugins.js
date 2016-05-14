@@ -1007,7 +1007,8 @@ var CMS = window.CMS || {};
             // show loader and make sure scroll doesn't jump
             CMS.API.Toolbar.showLoader();
 
-            var el = $(e.target);
+            var items = '.cms-submenu-edit, .cms-submenu-item a';
+            var el = $(e.target).closest(items);
             CMS.Plugin._hideSettingsMenu(nav);
 
             // set switch for subnav entries
