@@ -585,6 +585,15 @@ module.exports = function (casperjs, settings) {
         },
 
         /**
+         * @method createToolbarItemXPath
+         * @param {String} name of the item
+         */
+        createToolbarItemXPath: function createToolbarItemXPath(name) {
+            return '//*[contains(@class, "cms-toolbar-item-navigation")]/li/a[./span[contains(text(), "' +
+                name + '")]]';
+        },
+
+        /**
          * @function getPasteHelpersXPath
          * @public
          * @param {Object} opts

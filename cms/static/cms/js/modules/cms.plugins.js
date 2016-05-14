@@ -73,6 +73,7 @@ var CMS = window.CMS || {};
 
             // bind data element to the container
             this.ui.container.data('settings', this.options);
+            CMS.Plugin._initializeDragItemsStates();
 
             // determine type of plugin
             switch (this.options.type) {
@@ -1227,34 +1228,6 @@ var CMS = window.CMS || {};
                 e.stopPropagation();
                 $('.cms-plugin-' + that._getId($(this))).trigger('dblclick.cms');
             });
-
-            // only needs to be excecuted once
-            if (CMS.Toolbar.ready) {
-                return false;
-            }
-
-            // removing duplicate entries
-            var sortedArr = CMS.settings.states.sort();
-            var filteredArray = [];
-            for (var i = 0; i < sortedArr.length; i++) {
-                if (sortedArr[i] !== sortedArr[i + 1]) {
-                    filteredArray.push(sortedArr[i]);
-                }
-            }
-            CMS.settings.states = filteredArray;
-
-            // loop through the items
-            $.each(CMS.settings.states, function (index, id) {
-                var el = $('.cms-draggable-' + id);
-                // only add this class to elements which have a draggable area
-                if (el.find('.cms-draggables').length) {
-                    el.find('> .cms-collapsable-container').removeClass('cms-hidden');
-                    el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
-                }
-            });
-
-            // set global setup
-            CMS.Toolbar.ready = true;
         },
 
         /**
@@ -1440,6 +1413,36 @@ var CMS = window.CMS || {};
             }
         });
     };
+
+    /**
+     * Initializes the collapsed/expanded states of dragitems in structureboard.
+     *
+     * @method _initializeDragItemsStates
+     * @static
+     * @private
+     */
+    CMS.Plugin._initializeDragItemsStates = CMS.API.Helpers.once(function _initializeDragItemsStates() {
+        // removing duplicate entries
+        var states = CMS.settings.states || [];
+        var sortedArr = states.sort();
+        var filteredArray = [];
+        for (var i = 0; i < sortedArr.length; i++) {
+            if (sortedArr[i] !== sortedArr[i + 1]) {
+                filteredArray.push(sortedArr[i]);
+            }
+        }
+        CMS.settings.states = filteredArray;
+
+        // loop through the items
+        $.each(CMS.settings.states, function (index, id) {
+            var el = $('.cms-draggable-' + id);
+            // only add this class to elements which have a draggable area
+            if (el.find('.cms-draggables').length) {
+                el.find('> .cms-collapsable-container').removeClass('cms-hidden');
+                el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
+            }
+        });
+    });
 
     // shorthand for jQuery(document).ready();
     $(CMS.Plugin._initializeGlobalHandlers);

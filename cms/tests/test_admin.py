@@ -1675,3 +1675,97 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(foundcount, 2,
                                  "Username %s appeared %s times in response.content, expected 2 times" % (
                                      USER_NAME, foundcount))
+
+
+class AdminPageTreeTests(AdminTestsBase):
+
+    def test_move_node(self):
+        admin_user, staff = self._get_guys()
+        page_admin = self.admin_class
+
+        alpha = create_page('Alpha', 'nav_playground.html', 'en', published=True)
+        beta = create_page('Beta', 'nav_playground.html', 'en', published=True)
+        gamma = create_page('Gamma', 'nav_playground.html', 'en', published=True)
+        delta = create_page('Delta', 'nav_playground.html', 'en', published=True)
+
+        # Move Beta to be a child of Alpha
+        data = {
+            'id': beta.pk,
+            'position': 0,
+            'target': alpha.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=beta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+
+        # Move Gamma to be a child of Beta
+        data = {
+            'id': gamma.pk,
+            'position': 0,
+            'target': beta.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=gamma.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 2)
+        self.assertEqual(beta.reload().get_descendants().count(), 1)
+
+        # Move Delta to be a child of Beta
+        data = {
+            'id': delta.pk,
+            'position': 0,
+            'target': gamma.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=delta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 3)
+        self.assertEqual(beta.reload().get_descendants().count(), 2)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #           ⊢ Gamma
+        #               ⊢ Delta
+
+        # Move Beta to the root as node #1 (positions are 0-indexed)
+        data = {
+            'id': beta.pk,
+            'position': 1,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=beta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 0)
+        self.assertEqual(beta.reload().get_descendants().count(), 2)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Final structure:
+        #   <root>
+        #   ⊢ Alpha
+        #   ⊢ Beta
+        #       ⊢ Gamma
+        #           ⊢ Delta

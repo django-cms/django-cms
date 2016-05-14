@@ -11,7 +11,7 @@ from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.django_load import iterload_objects
 
 
@@ -123,6 +123,11 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
+    if page:
+        site_id = page.site_id
+    else:
+        site_id = get_site_id(None)
+
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
     # to have a valid language in this function for `get_fallback_languages` to work
     if lang:
@@ -142,9 +147,11 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     else:
         processors = None
         edit = False
+
+    use_cache = use_cache and not request.user.is_authenticated()
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
-            cached_value = get_placeholder_cache(placeholder, lang)
+            cached_value = get_placeholder_cache(placeholder, lang, site_id, request)
             if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 return mark_safe(cached_value['content'])
@@ -187,8 +194,9 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", flatten_context(context))
     changes = watcher.get_changes()
-    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
-        set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes}, request=request)
+    if use_cache and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
+        content = {'content': result, 'sekizai': changes}
+        set_placeholder_cache(placeholder, lang, site_id, content=content, request=request)
     context.pop()
     return result
 

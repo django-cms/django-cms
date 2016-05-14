@@ -347,6 +347,35 @@ context menu items that are displayed in the context menu for a given plugin
 when in structure mode, override this method in the plugin to return a list of
 :class:`cms.plugin_base.PluginMenuItem` instances.
 
+.. _get_cache_expiration:
+
+get_cache_expiration
+--------------------
+
+``get_cache_expiration(self, request, instance, placeholder)``
+
+Return a positive integer of seconds or a future, TZ-aware `datetime` to
+explicitly declare when this plugin's content should expire from caching.
+This will affect the internal cms caching, Django's caching middleware
+caching, any downstream caches and client browser caching.
+
+This method is optional. The default implementation returns ``None`` which
+will not affect the cms's normal cache expiration functions.
+
+.. _get_vary_cache_on:
+
+get_vary_cache_on
+-----------------
+
+``get_vary_cache_on(self, request, instance, placeholder)``
+
+Return an HTTP header name or a list of HTTP header names and they will
+affect the caching of the containing placeholder and ultimately the page.
+
+This method is optional. The default implementation returns ``None`` which
+will not affect HTTP ``VARY`` headers.
+
+
 ******************************************
 CMSPlugin Attributes and Methods Reference
 ******************************************

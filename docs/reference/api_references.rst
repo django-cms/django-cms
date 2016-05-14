@@ -368,6 +368,25 @@ cms.plugin_base
         :rtype: ``None`` or ``datetime`` or ``int``
 
 
+    .. method:: get_vary_cache_on(request, instance, placeholder):
+
+        Provides ``VARY`` header strings to be considered by the placeholder
+        and in turn by the page.
+
+        Must return one of:
+
+            :``None``:
+                This means that this plugin declares no headers for the cache
+                to be varied upon. (default)
+
+            :string:
+                The name of a header to vary caching upon.
+
+            :list of strings:
+                A list of strings, each corresponding to a header to vary the
+                cache upon.
+
+
     .. method:: render(context, instance, placeholder)
 
         This method returns the context to be used to render the template
