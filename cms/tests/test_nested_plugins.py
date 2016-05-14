@@ -253,8 +253,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         )
         plugin_order_v2 = list(plugin_order_v2)
 
-        self.assertSequenceEqual(plugin_order_v1, plugin_order_v2)
-
         CMSPlugin.objects.update(position=1)
         CMSPlugin.fix_tree()
 
