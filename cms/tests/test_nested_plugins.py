@@ -221,13 +221,66 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                body=u"10", target=plugin_4
         )
 
-        original_plugins = (placeholder.get_plugins().order_by('position', 'path'))
+        # What follows is an interesting scenario.
+        # Basically we get a list of plugin ids sorted
+        # by position. Then we set all the plugin
+        # positions to 1 in order to simulate a corruption
+        # in the plugin's position field.
+        # Last, we call CMSPlugin.fix_tree to repair
+        # the broken position fields and then compare
+        # The first list of plugin ids with the last one.
 
-        CMSPlugin.objects.update(position=0)
+        # The reason for the two versions to fetch the same data
+        # is because of an obscure behavior with postgres
+        # where somehow items with the same value that are
+        # sorted by that value will be returned in different
+        # order based on the orm query construction.
+        # See ticket #5291
+        plugin_order_v1 = (
+            CMSPlugin
+            .objects
+            .filter(placeholder=placeholder)
+            .order_by('position')
+            .values_list('pk', flat=True)
+        )
+        plugin_order_v1 = list(plugin_order_v1)
+
+        plugin_order_v2 = (
+            placeholder
+            .get_plugins()
+            .order_by('position')
+            .values_list('pk', flat=True)
+        )
+        plugin_order_v2 = list(plugin_order_v2)
+
+        self.assertSequenceEqual(plugin_order_v1, plugin_order_v2)
+
+        CMSPlugin.objects.update(position=1)
         CMSPlugin.fix_tree()
 
-        new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
-        self.assertSequenceEqual(original_plugins, new_plugins)
+        new_plugin_order_v1 = (
+            CMSPlugin
+            .objects
+            .filter(placeholder_id=placeholder.pk)
+            .order_by('position')
+            .values_list('pk', flat=True)
+        )
+        new_plugin_order_v1 = list(new_plugin_order_v1)
+
+        self.assertSequenceEqual(plugin_order_v1, new_plugin_order_v1)
+
+        new_plugin_order_v2 = (
+            placeholder
+            .get_plugins()
+            .order_by('position')
+            .values_list('pk', flat=True)
+        )
+        new_plugin_order_v2 = list(new_plugin_order_v2)
+
+        self.assertSequenceEqual(plugin_order_v2, new_plugin_order_v2)
+
+        # Now assert that they're both equal once more.
+        self.assertSequenceEqual(plugin_order_v1, plugin_order_v2)
 
         # Now, check to see if the correct order is restored, even if we
         # re-arrange the plugins so that their natural «pk» order is different
