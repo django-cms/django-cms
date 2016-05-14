@@ -375,7 +375,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 new_phs.append(ph)
                 # update the page copy
             if plugins:
-                copy_plugins_to(plugins, ph, no_signals=True)
+                copy_plugins_to(plugins, ph)
         target.placeholders.add(*new_phs)
 
     def _copy_attributes(self, target, clean=False):

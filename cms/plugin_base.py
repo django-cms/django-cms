@@ -219,6 +219,22 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         """
         return None
 
+    def get_vary_cache_on(self, request, instance, placeholder):
+        """
+        Provides hints to the placeholder, and in turn to the page for
+        determining VARY headers for the response.
+
+        Must return one of:
+            - None (default),
+            - String of a case-sensitive header name, or
+            - iterable of case-sensitive header names.
+
+        NOTE: This only makes sense to use with caching. If this plugin has
+        ``cache = False`` or plugin.get_cache_expiration(...) returns 0,
+        get_vary_cache_on() will have no effect.
+        """
+        return None
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         """
         We just need the popup interface here
