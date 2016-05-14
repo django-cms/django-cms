@@ -607,6 +607,17 @@ var CMS = window.CMS || {};
 
                     // TODO: show only if (response.status)
                     that._showSuccess(dragitem);
+                    CMS.Plugin._updateRegistry({
+                        pluginId: options.plugin_id,
+                        update: {
+                            plugin_parent: plugin_parent || '',
+                            placeholder_id: placeholder_id
+                        }
+                    });
+                    that._setSettings(that.options, {
+                        plugin_parent: plugin_parent || '',
+                        placeholder_id: placeholder_id
+                    });
                 },
                 error: function (jqXHR) {
                     CMS.API.locked = false;
@@ -1391,7 +1402,7 @@ var CMS = window.CMS || {};
          * @returns {Object[]} array of breadcrumbs in `{ url, title }` format
          * @private
          */
-        _getPluginBreadcrumbs: function _lazyGetPluginBreadcrumbs() {
+        _getPluginBreadcrumbs: function _getPluginBreadcrumbs() {
             var breadcrumbs = [];
 
             breadcrumbs.unshift({
@@ -1422,13 +1433,32 @@ var CMS = window.CMS || {};
                 id = data[1].plugin_parent;
             }
 
-            this._getPluginBreadcrumbs = function _getPluginBreadcrumbs() {
-                return breadcrumbs;
-            };
-
             return breadcrumbs;
         }
     });
+
+
+    /**
+     * Updates plugin data in CMS._plugins
+     *
+     * @method _updateRegistry
+     * @private
+     * @static
+     * @param {Object} opts options
+     * @param {String|Number} opts.pluginId id
+     * @param {Object} opts.update object with data to update
+     */
+    CMS.Plugin._updateRegistry = function _updateRegistry(opts) {
+        var pluginEntryIndex = (CMS._plugins || []).findIndex(function (pluginOptions) {
+            return pluginOptions[0] === 'cms-plugin-' + opts.pluginId;
+        });
+
+        if (pluginEntryIndex === -1) {
+            return;
+        }
+
+        $.extend(true, CMS._plugins[pluginEntryIndex][1], opts.update);
+    };
 
     /**
      * Hides the opened settings menu. By default looks for any open ones.
