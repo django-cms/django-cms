@@ -601,7 +601,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
 
 class PluginMenuItem(object):
-    def __init__(self, name, url, data, question=None, action='ajax'):
+    def __init__(self, name, url, data, question=None, action='ajax', attributes=None):
         """
         Creates an item in the plugin / placeholder menu
 
@@ -610,9 +610,13 @@ class PluginMenuItem(object):
         :param data: Data to be POSTed to the above URL
         :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
         :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+        :param attributes: Dictionary whose content will be addes as data-attributes to the menu item
         """
+        if not attributes:
+            attributes = {}
         self.name = name
         self.url = url
         self.data = json.dumps(data)
         self.question = question
         self.action = action
+        self.attributes = attributes
