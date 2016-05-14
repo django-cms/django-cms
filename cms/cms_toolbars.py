@@ -222,7 +222,7 @@ class BasicToolbar(CMSToolbar):
 
     def add_language_menu(self):
         if settings.USE_I18N and not self._language_menu:
-            self._language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
+            self._language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1)
             language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
             for code, name in get_language_tuple(self.current_site.pk):
                 try:
@@ -322,6 +322,18 @@ class PageToolbar(CMSToolbar):
                 from cms.views import details
                 return resolver.func != details
 
+    def in_apphook_root(self):
+        """
+        Returns True if the request is for a page handled by an apphook, but
+        is also the page it is attached to.
+        :return: Boolean
+        """
+        page = getattr(self.request, 'current_page', False)
+        if page:
+            language = get_language_from_request(self.request)
+            return self.request.path == page.get_absolute_url(language=language)
+        return False
+
     def get_on_delete_redirect_url(self):
         parent, language = self.page.parent, self.current_lang
 
@@ -341,7 +353,6 @@ class PageToolbar(CMSToolbar):
 
         self.change_admin_menu()
         self.add_page_menu()
-        self.add_history_menu()
         self.change_language_menu()
 
     def post_template_populate(self):
@@ -365,7 +376,7 @@ class PageToolbar(CMSToolbar):
                 classes.append('cms-btn-publish-active')
 
             if self.dirty_statics or (self.page and self.page.is_published(self.current_lang)):
-                title = _('Publish changes')
+                title = _('Publish page changes')
             else:
                 title = _('Publish page now')
                 classes.append('cms-publish-page')
@@ -472,10 +483,15 @@ class PageToolbar(CMSToolbar):
             refresh = self.toolbar.REFRESH_PAGE
 
             # menu for current page
-            current_page_menu = self.toolbar.get_or_create_menu(PAGE_MENU_IDENTIFIER, _('Page'), position=1)
+            # NOTE: disabled if the current path is "deeper" into the
+            # application's url patterns than its root. This is because
+            # when the Content Manager is at the root of the app-hook,
+            # some of the page options still make sense.
+            current_page_menu = self.toolbar.get_or_create_menu(
+                PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
             # page operations menu
-            add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Add Page'))
+            add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Create Page'))
             app_page_url = admin_reverse('cms_page_add')
 
             add_page_menu_modal_items = (
@@ -501,6 +517,12 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=not edit_mode,
                                              on_close=refresh)
 
+            # advanced settings
+            advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
+            advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
+            advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not edit_mode
+            current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
+
             # templates menu
             if self.toolbar.build_mode or edit_mode:
                 templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
@@ -512,14 +534,13 @@ class PageToolbar(CMSToolbar):
                     templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
                                                  on_success=refresh)
 
+            # page type
+            page_type_url = admin_reverse('cms_page_add_page_type')
+            page_type_url = add_url_parameters(page_type_url, copy_target=self.page.pk, language=self.toolbar.language)
+            current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=not edit_mode)
+
             # second break
             current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
-
-            # advanced settings
-            advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
-            advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
-            advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not edit_mode
-            current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
 
             # permissions
             if self.permissions_activated:
@@ -552,26 +573,7 @@ class PageToolbar(CMSToolbar):
 
             # fourth break
             current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
-
-            # delete
-            delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
-            on_delete_redirect_url = self.get_on_delete_redirect_url()
-            current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
-                                             disabled=not edit_mode)
-
-            # last break
-            current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
-
-            # page type
-            page_type_url = admin_reverse('cms_page_add_page_type')
-            page_type_url = add_url_parameters(page_type_url, copy_target=self.page.pk, language=self.toolbar.language)
-            current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=not edit_mode)
-
-    def add_history_menu(self):
-        if self.toolbar.edit_mode and self.page:
-            refresh = self.toolbar.REFRESH_PAGE
-            history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
-
+            history_menu = current_page_menu.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'))
             if is_installed('reversion'):
                 from cms.utils.reversion_hacks import reversion, Revision
 
@@ -599,3 +601,12 @@ class PageToolbar(CMSToolbar):
                                        disabled=not is_enabled,
                                        on_success=refresh, extra_classes=('cms-toolbar-revert',))
             history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))
+
+            # last break
+            current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
+
+            # delete
+            delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
+            on_delete_redirect_url = self.get_on_delete_redirect_url()
+            current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
+                                             disabled=not edit_mode)

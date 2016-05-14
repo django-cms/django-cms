@@ -40,6 +40,8 @@ class CMSToolbar(ToolbarAPIMixin):
         super(CMSToolbar, self).__init__()
         self.right_items = []
         self.left_items = []
+        self.last_left_items = []
+        self.last_right_items = []
         self.populated = False
         self.post_template_populated = False
         self.menus = {}
@@ -176,7 +178,7 @@ class CMSToolbar(ToolbarAPIMixin):
             return self.menus[key]
         return None
 
-    def get_or_create_menu(self, key, verbose_name=None, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name=None, disabled=False, side=LEFT, position=None):
         self.populate()
         if key in self.menus:
             menu = self.menus[key]
@@ -188,7 +190,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 self.remove_item(menu)
                 self.add_item(menu, position=position)
             return menu
-        menu = Menu(verbose_name, self.csrf_token, side=side)
+        menu = Menu(verbose_name, self.csrf_token, disabled=disabled, side=side)
         self.menus[key] = menu
         self.add_item(menu, position=position)
         return menu
@@ -260,11 +262,19 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Internal API
 
-    def _add_item(self, item, position):
+    def _add_item(self, item, position=None):
         if item.right:
-            target = self.right_items
+            if position and position < 0:
+                target = self.last_right_items
+                position = abs(position)
+            else:
+                target = self.right_items
         else:
-            target = self.left_items
+            if position and position < 0:
+                target = self.last_left_items
+                position = abs(position)
+            else:
+                target = self.left_items
         if position is not None:
             target.insert(position, item)
         else:
@@ -273,8 +283,12 @@ class CMSToolbar(ToolbarAPIMixin):
     def _remove_item(self, item):
         if item in self.right_items:
             self.right_items.remove(item)
+        elif item in self.last_right_items:
+            self.last_right_items.remove(item)
         elif item in self.left_items:
             self.left_items.remove(item)
+        elif item in self.last_left_items:
+            self.last_left_items.remove(item)
         else:
             raise KeyError("Item %r not found" % item)
 
@@ -286,11 +300,13 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def get_left_items(self):
         self.populate()
-        return self.left_items
+        items = self.left_items + list(reversed(self.last_left_items))
+        return items
 
     def get_right_items(self):
         self.populate()
-        return self.right_items
+        items = self.right_items + list(reversed(self.last_right_items))
+        return items
 
     def populate(self):
         """
