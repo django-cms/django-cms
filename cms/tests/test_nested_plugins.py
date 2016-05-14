@@ -221,64 +221,63 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                body=u"10", target=plugin_4
         )
 
-        # What follows is an interesting scenario.
-        # Basically we get a list of plugin ids sorted
-        # by position. Then we set all the plugin
-        # positions to 1 in order to simulate a corruption
-        # in the plugin's position field.
-        # Last, we call CMSPlugin.fix_tree to repair
-        # the broken position fields and then compare
-        # The first list of plugin ids with the last one.
+        # We do two comparisons here.
+        # One is to compare plugin position values
+        # per plugin instance.
+        # To do this we get a dictionary mapping plugin
+        # ids to their respective position.
+        # The second comparison is to make sure that
+        # plugins retain their position/path ordering.
 
-        # The reason for the two versions to fetch the same data
+        # The reason for the these comparisons
         # is because of an obscure behavior with postgres
         # where somehow items with the same value that are
         # sorted by that value will be returned in different
         # order based on the orm query construction.
+
+        # By comparing ids with positions, we make sure that
+        # each plugin has the correct position after the fix-tree.
         # See ticket #5291
-        plugin_order_v1 = (
+        plugins = (
             CMSPlugin
             .objects
             .filter(placeholder=placeholder)
+        )
+
+        # Maps plugin ids to positions
+        original_plugin_positions = dict(
+            plugins
             .order_by('position')
+            .values_list('pk', 'position')
+        )
+
+        # List of plugin ids sorted by position and path
+        original_plugin_ids = list(
+            plugins
+            .order_by('position', 'path')
             .values_list('pk', flat=True)
         )
-        plugin_order_v1 = list(plugin_order_v1)
 
-        plugin_order_v2 = (
-            placeholder
-            .get_plugins()
-            .order_by('position')
-            .values_list('pk', flat=True)
-        )
-        plugin_order_v2 = list(plugin_order_v2)
-
+        # We use 1 to effectively "break" the tree
+        # and as a way to test that fixing trees with
+        # equal position values retains the correct ordering.
         CMSPlugin.objects.update(position=1)
         CMSPlugin.fix_tree()
 
-        new_plugin_order_v1 = (
-            CMSPlugin
-            .objects
-            .filter(placeholder_id=placeholder.pk)
+        new_plugin_positions = dict(
+            plugins
             .order_by('position')
+            .values_list('pk', 'position')
+        )
+
+        new_plugin_ids = list(
+            plugins
+            .order_by('position', 'path')
             .values_list('pk', flat=True)
         )
-        new_plugin_order_v1 = list(new_plugin_order_v1)
 
-        self.assertSequenceEqual(plugin_order_v1, new_plugin_order_v1)
-
-        new_plugin_order_v2 = (
-            placeholder
-            .get_plugins()
-            .order_by('position')
-            .values_list('pk', flat=True)
-        )
-        new_plugin_order_v2 = list(new_plugin_order_v2)
-
-        self.assertSequenceEqual(plugin_order_v2, new_plugin_order_v2)
-
-        # Now assert that they're both equal once more.
-        self.assertSequenceEqual(plugin_order_v1, plugin_order_v2)
+        self.assertDictEqual(original_plugin_positions, new_plugin_positions)
+        self.assertSequenceEqual(original_plugin_ids, new_plugin_ids)
 
         # Now, check to see if the correct order is restored, even if we
         # re-arrange the plugins so that their natural «pk» order is different
