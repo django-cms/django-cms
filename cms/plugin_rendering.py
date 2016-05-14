@@ -230,11 +230,11 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
         slot = None
     context.push()
 
-    plugin_classes = plugin_pool.get_all_plugins(slot, page)
-    plugin_types = [cls.__name__ for cls in plugin_classes]
+    all_plugins = plugin_pool.get_all_plugins()
+    plugin_types = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
 
     context['allowed_plugins'] = plugin_types + plugin_pool.get_system_plugins()
-    context['plugin_menu'] = get_toolbar_plugin_struct(plugin_classes, slot=slot, page=page)
+    context['plugin_menu'] = get_toolbar_plugin_struct(all_plugins, slot=slot, page=page)
     context['placeholder'] = placeholder
     context['language'] = save_language
     context['page'] = page
