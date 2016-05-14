@@ -919,7 +919,7 @@ var CMS = window.CMS || {};
             var childRestrictions = this.options.plugin_restriction;
             // have to check the placeholder every time, since plugin could've been
             // moved as part of another plugin
-            var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+            var placeholderId = that._getId(that.ui.submenu.closest('.cms-dragarea'));
             var resultElements = $($('#cms-plugin-child-classes-' + placeholderId).html());
 
             if (childRestrictions && childRestrictions.length) {
