@@ -207,7 +207,7 @@ class ShowSubMenu(InclusionTag):
         except KeyError:
             return {'template': 'menu/empty.html'}
         manager = menu_pool.get_manager(request)
-        nodes = menu_pool.get_nodes(request)
+        nodes = manager.get_nodes()
         children = []
         # adjust root_level so we cut before the specified level, not after
         include_root = False
