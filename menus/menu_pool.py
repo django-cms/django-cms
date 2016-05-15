@@ -136,10 +136,9 @@ class MenuManager(object):
         final_nodes = []
         toolbar = getattr(self.request, 'toolbar', None)
         for menu_class_name in self.menus:
-            MenuClass = self.menus[menu_class_name]
+            menu = self.get_menu(menu_class_name)
 
             try:
-                menu = MenuClass(manager=self)
                 nodes = menu.get_nodes(self.request)
             except NoReverseMatch:
                 # Apps might raise NoReverseMatch if an apphook does not yet
@@ -216,6 +215,10 @@ class MenuManager(object):
         )
         return nodes
 
+    def get_menu(self, menu_name):
+        MenuClass = self.menus[menu_name]
+        return MenuClass(manager=self)
+
 
 class MenuPool(object):
 
@@ -248,7 +251,8 @@ class MenuPool(object):
         :param for_rendering: Flag that when True forces us to include
             all CMSAttachMenu subclasses, even if they're not attached.
         """
-        expanded_menus = {}
+        self.discover_menus()
+        registered_menus = {}
 
         for menu_class_name, menu_cls in self.menus.items():
             if isinstance(menu_cls, Menu):
@@ -271,22 +275,22 @@ class MenuPool(object):
                     # pointing to a class instead of an instance.
                     namespace = "{0}:{1}".format(
                         menu_class_name, instance.pk)
-                    expanded_menus[namespace] = _get_menu_class(instance)
+                    registered_menus[namespace] = _get_menu_class(instance)
 
                 if not instances and not for_rendering:
                     # The menu is a CMSAttachMenu but has no instances,
                     # normally we'd just ignore it but it's been
                     # explicitly set that we are not rendering these menus
                     # via the (for_rendering) flag.
-                    expanded_menus[menu_class_name] = menu_cls
+                    registered_menus[menu_class_name] = menu_cls
             elif hasattr(menu_cls, "get_nodes"):
                 # This is another type of Menu, cannot be expanded, but must be
                 # instantiated, none-the-less.
-                expanded_menus[menu_class_name] = menu_cls
+                registered_menus[menu_class_name] = menu_cls
             else:
                 raise ValidationError(
                     "Something was registered as a menu, but isn't.")
-        return expanded_menus
+        return registered_menus
 
     def get_registered_modifiers(self):
         return self.modifiers
@@ -317,8 +321,7 @@ class MenuPool(object):
             raise NamespaceAlreadyRegistered(
                 "[{0}] a menu with this name is already registered".format(
                     menu_cls.__name__))
-        # Note: menu_cls should still be the menu CLASS at this point. It will
-        # be instantiated in self._expand_menus().
+        # Note: menu_cls should still be the menu CLASS at this point.
         self.menus[menu_cls.__name__] = menu_cls
 
     def register_modifier(self, modifier_class):

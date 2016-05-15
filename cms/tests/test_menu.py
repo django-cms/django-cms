@@ -14,7 +14,7 @@ from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page
-from cms.cms_menus import CMSMenu, get_visible_pages
+from cms.cms_menus import get_visible_pages
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import StaticMenu, StaticMenu2
@@ -71,24 +71,26 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        menu_pool._expanded = False
         super(MenuDiscoveryTest, self).tearDown()
 
     def test_menu_types_expansion_basic(self):
         request = self.get_request('/')
 
         menu_pool.discover_menus()
-        self.assertFalse(menu_pool._expanded)
+
         for key, menu in menu_pool.menus.items():
             self.assertTrue(issubclass(menu, Menu))
         defined_menus = len(menu_pool.menus)
 
+        manager = menu_pool.get_manager(request)
+        loaded_menus = len(manager.menus)
+
         # Testing expansion after get_nodes
-        menu_pool.get_nodes(request)
-        self.assertTrue(menu_pool._expanded)
-        for key, menu in menu_pool.menus.items():
-            self.assertTrue(isinstance(menu, Menu))
-        self.assertEqual(defined_menus, len(menu_pool.menus))
+        manager.get_nodes(request)
+
+        for menu in manager.menus.values():
+            self.assertTrue(issubclass(menu, Menu))
+        self.assertEqual(defined_menus, loaded_menus)
 
     def test_menu_expanded(self):
         menu_pool.discovered = False
@@ -100,18 +102,16 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                                    published=True, apphook="SampleApp",
                                    navigation_extenders='StaticMenu')
 
-                menu_pool._expanded = False
-                self.assertFalse(menu_pool._expanded)
                 self.assertTrue(menu_pool.discovered)
-                menu_pool._expand_menus()
 
-                self.assertTrue(menu_pool._expanded)
+                menus = menu_pool.get_registered_menus()
+
                 self.assertTrue(menu_pool.discovered)
                 # Counts the number of StaticMenu (which is expanded) and StaticMenu2
-                # (which is not) and checks the keyname for the StaticMenu instances
+                # (which is not) and checks the key name for the StaticMenu instances
                 static_menus = 2
                 static_menus_2 = 1
-                for key, menu in menu_pool.menus.items():
+                for key, menu in menus.items():
                     if key.startswith('StaticMenu:'):
                         static_menus -= 1
                         self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
@@ -124,6 +124,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def test_multiple_menus(self):
         apphook_pool.discover_apps()
+
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             create_page("apphooked-page", "nav_playground.html", "en",
                         published=True, apphook="SampleApp2")
@@ -133,9 +134,6 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             create_page("apphooked-page", "nav_playground.html", "en",
                         published=True, apphook="NamespacedApp", apphook_namespace='whatever',
                         navigation_extenders='StaticMenu')
-            menu_pool._expanded = False
-            menu_pool._expand_menus()
-
             self.assertEqual(len(menu_pool.get_menus_by_attribute("cms_enabled", True)), 2)
 
 
@@ -230,14 +228,17 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
 
     def test_basic_cms_menu(self):
-        self.assertEqual(len(menu_pool.menus), 1)
+        menus = menu_pool.get_registered_menus()
+        self.assertEqual(len(menus), 1)
         with force_language("en"):
             response = self.client.get(self.get_pages_root())  # path = '/'
         self.assertEqual(response.status_code, 200)
         request = self.get_request()
 
+        manager = menu_pool.get_manager(request)
+
         # test the cms menu class
-        menu = CMSMenu()
+        menu = manager.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(self.get_all_pages()))
 
