@@ -8,6 +8,8 @@ this case, you can create a normal django CMS page without any content of its
 own, and attach the news application to the page; the news application's content
 will be delivered at the page's URL.
 
+This is just a Pullrequest Test that can be closed.
+
 To create an apphook place a ``cms_apps.py`` in your application. And in it write
 the following::
 
