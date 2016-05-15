@@ -224,7 +224,7 @@ class MenuPool(object):
         self.modifiers = []
         self.discovered = False
 
-    def __call__(self, request):
+    def get_manager(self, request):
         self.discover_menus()
         # Returns a menu pool wrapper that is bound
         # to the given request and can perform

@@ -258,11 +258,10 @@ class NavExtender(Modifier):
                                 extnode.parent_namespace = node.namespace
                                 extnode.parent = node
                                 node.children.append(extnode)
-        menus = self.manager.menus
         removed = []
 
         # find all not assigned nodes
-        for menu in menus.items():
+        for menu in self.manager.menus.items():
             if (hasattr(menu[1], 'cms_enabled')
                     and menu[1].cms_enabled and not menu[0] in exts):
                 for node in nodes:

@@ -128,7 +128,7 @@ class ShowMenu(InclusionTag):
             children = next_page.children
         else:
             # new menu... get all the data so we can save a lot of queries
-            manager = menu_pool(request)
+            manager = menu_pool.get_manager(request)
             nodes = manager.get_nodes(namespace, root_id)
             if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
@@ -206,7 +206,7 @@ class ShowSubMenu(InclusionTag):
             request = context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
-        manager = menu_pool(request)
+        manager = menu_pool.get_manager(request)
         nodes = menu_pool.get_nodes(request)
         children = []
         # adjust root_level so we cut before the specified level, not after
@@ -280,7 +280,7 @@ class ShowBreadcrumb(InclusionTag):
             only_visible = bool(only_visible)
         ancestors = []
 
-        manager = menu_pool(request)
+        manager = menu_pool.get_manager(request)
         nodes = manager.get_nodes(breadcrumb=True)
 
         # Find home
