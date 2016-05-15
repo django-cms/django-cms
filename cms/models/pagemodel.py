@@ -253,7 +253,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.save()
 
         if target_public_page:
-            moved_page = self.move(target, pos=position)
+            moved_page = self.move(target_public_page, pos=position)
         else:
             moved_page = self.move(target, pos=position)
 
