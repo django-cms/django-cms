@@ -92,7 +92,7 @@ def _get_menu_class_for_instance(menu_class, instance):
 
 class MenuManager(object):
     # The main logic behind this class is to decouple
-    # the singleton menu pool from the menu logic.
+    # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has it's
     # private instance that will always have the same attributes.
 
@@ -244,7 +244,7 @@ class MenuPool(object):
         register()
         self.discovered = True
 
-    def get_registered_menus(self, for_rendering=True):
+    def get_registered_menus(self, for_rendering=False):
         """
         Returns all registered menu classes.
 
@@ -345,13 +345,12 @@ class MenuPool(object):
         # Note that we are limiting the output to only single instances of any
         # specific menu class. This is to address issue (#4041) which has
         # cropped-up in 3.0.13/3.0.0.
-        self.discover_menus()
         # By setting for_rendering to False
         # we're limiting the output to menus
         # that are registered and have instances
         # (in case of attached menus).
         menus = self.get_registered_menus(for_rendering=False)
-        return sorted(list(set([(menu.__class__.__name__, menu.name)
+        return sorted(list(set([(menu.__name__, menu.name)
                                 for menu_class_name, menu in menus.items()
                                 if getattr(menu, name, None) == value])))
 

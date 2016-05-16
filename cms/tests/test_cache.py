@@ -89,8 +89,9 @@ class CacheTestCase(CMSTestCase):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
+
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
-            with self.assertNumQueries(FuzzyInt(7, 11)):
+            with self.assertNumQueries(FuzzyInt(7, 13)):
                 self.client.get('/en/')
 
     def test_no_cache_plugin(self):
