@@ -30,6 +30,7 @@
   plugins for declaring ``VARY`` headers.
 * Improve the placeholder cache substantially.
 * Fixed breadcrumbs of recently moved plugin reflecting previous position in the tree
+* Changed JavaScript linting from JSHint and JSCS to ESLint
 
 
 === 3.2.4 (unreleased) ==
