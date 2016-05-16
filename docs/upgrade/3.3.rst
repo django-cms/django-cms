@@ -27,6 +27,21 @@ What's new in 3.3
 
 .. _backward_incompatible_3.3:
 
+****************
+Upgrading to 3.3
+****************
+
+A database migration is required because the default value of CMSPlugin.position was set to 0 instead of null.
+
+Please make sure that your current database is consistent and in a healthy state,
+and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate
+    python manage.py cms fix-tree
+
+
 *****************************
 Backward incompatible changes
 *****************************
