@@ -74,25 +74,6 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         menu_pool.menus = self.old_menu
         super(MenuDiscoveryTest, self).tearDown()
 
-    def test_menu_types_expansion_basic(self):
-        request = self.get_request('/')
-
-        menu_pool.discover_menus()
-
-        for key, menu in menu_pool.menus.items():
-            self.assertTrue(issubclass(menu, Menu))
-        defined_menus = len(menu_pool.menus)
-
-        manager = menu_pool.get_manager(request)
-        loaded_menus = len(manager.menus)
-
-        # Testing expansion after get_nodes
-        manager.get_nodes(request)
-
-        for menu in manager.menus.values():
-            self.assertTrue(issubclass(menu, Menu))
-        self.assertEqual(defined_menus, loaded_menus)
-
     def test_menu_expanded(self):
         menu_pool.discovered = False
         menu_pool.discover_menus()
