@@ -21,7 +21,6 @@ from django.utils.translation import activate
 
 from cms import constants
 from cms.app_base import CMSApp
-from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import (PageUser, PagePermission, GlobalPagePermission,
@@ -80,6 +79,8 @@ def _verify_apphook(apphook, namespace):
     """
     Verifies the apphook given is valid and returns the normalized form (name)
     """
+    from cms.apphook_pool import apphook_pool
+
     apphook_pool.discover_apps()
     if isinstance(apphook, CMSApp):
         try:

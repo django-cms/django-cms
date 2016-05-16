@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import copy
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
+import sys
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
@@ -25,6 +26,10 @@ from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
+
+
+APP_NAME = 'SampleApp'
+APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
 
 
 class BaseMenuTest(CMSTestCase):
@@ -174,6 +179,9 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                 self.assertEqual(static_menus_2, 0)
 
     def test_multiple_menus(self):
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             apphook_pool.discovered = False
             apphook_pool.discover_apps()
