@@ -213,8 +213,6 @@ class ContextTests(CMSTestCase):
 
         page_template = "nav_playground.html"
         original_context = {'TEMPLATES': settings.TEMPLATES}
-        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'].remove("cms.context_processors.cms_settings")
         page = create_page("page", page_template, "en", published=True)
         page_2 = create_page("page-2", page_template, "en", published=True,
                              parent=page)
@@ -229,19 +227,12 @@ class ContextTests(CMSTestCase):
         cache.clear()
         menu_pool.clear()
         context._standard_context_processors = None
-        # Number of queries when context processors is not enabled
-        with self.settings(**override):
-            with self.assertNumQueries(FuzzyInt(0, 17)) as context:
-                response = self.client.get("/en/plain_view/")
-                num_queries = len(context.captured_queries)
-                self.assertFalse('CMS_TEMPLATE' in response.context)
-        cache.clear()
-        menu_pool.clear()
+
         # Number of queries when context processor is enabled
         with self.settings(**original_context):
             # no extra query is run when accessing urls managed by standard
             # django applications
-            with self.assertNumQueries(FuzzyInt(0, num_queries)):
+            with self.assertNumQueries(FuzzyInt(0, 17)):
                 response = self.client.get("/en/plain_view/")
             # One query when determining current page
             with self.assertNumQueries(FuzzyInt(0, 1)):
@@ -252,18 +243,6 @@ class ContextTests(CMSTestCase):
                 # Template is the first in the CMS_TEMPLATES list
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, get_cms_setting('TEMPLATES')[0][0])
-        cache.clear()
-        menu_pool.clear()
-
-        # Number of queries when context processors is not enabled
-        with self.settings(**override):
-            # Baseline number of queries
-            # It's clear that without the context processors
-            # the number of queries go up.
-            # This is because of the menu manager handling.
-            with self.assertNumQueries(FuzzyInt(20, 47)) as context:
-                response = self.client.get("/en/page-2/")
-                num_queries_page = len(context.captured_queries)
         cache.clear()
         menu_pool.clear()
 
