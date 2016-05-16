@@ -14,14 +14,14 @@ var apphooks_configuration = window.apphooks_configuration || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        var appHooks = $('#application_urls'),
-            selected = appHooks.find('option:selected'),
-            appNsRow = $('.form-row.application_namespace'),
-            appNs = appNsRow.find('#id_application_namespace'),
-            appCfgsRow = $('.form-row.application_configs'),
-            appCfgs = appCfgsRow.find('#application_configs'),
-            appCfgsAdd = appCfgsRow.find('#add_application_configs'),
-            original_ns = appNs.val();
+        var appHooks = $('#application_urls');
+        var selected = appHooks.find('option:selected');
+        var appNsRow = $('.form-row.application_namespace');
+        var appNs = appNsRow.find('#id_application_namespace');
+        var appCfgsRow = $('.form-row.application_configs');
+        var appCfgs = appCfgsRow.find('#application_configs');
+        var appCfgsAdd = appCfgsRow.find('#add_application_configs');
+        var original_ns = appNs.val();
 
         // Shows / hides namespace / config selection widgets depending on the user input
         appHooks.setupNamespaces = function () {
@@ -31,6 +31,7 @@ var apphooks_configuration = window.apphooks_configuration || {};
                 appCfgs.html('');
                 for (var i = 0; i < apphooks_configuration[opt.val()].length; i++) {
                     var selectedCfgs = '';
+
                     if (apphooks_configuration[opt.val()][i][0] === window.apphooks_configuration_value) {
                         selectedCfgs = 'selected="selected"';
                     }
@@ -62,8 +63,8 @@ var apphooks_configuration = window.apphooks_configuration || {};
 
         // Show it if we change to an app_hook that requires a namespace
         appHooks.on('change', function () {
-            var self = $(this),
-                opt = self.find('option:selected');
+            var self = $(this);
+            var opt = self.find('option:selected');
 
             appHooks.setupNamespaces();
 

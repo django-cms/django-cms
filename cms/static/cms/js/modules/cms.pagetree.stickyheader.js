@@ -116,7 +116,7 @@ var CMS = window.CMS || {};
         /**
          * @method _shouldStick
          * @param {Number} scrollTop position in pixels
-         * @return {Boolean} should headers stick
+         * @returns {Boolean} should headers stick
          * @private
          */
         _shouldStick: function (scrollTop) {

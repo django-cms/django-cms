@@ -60,6 +60,7 @@ var CMS = window.CMS || {};
         _setupUI: function _setupUI() {
             var container = $('.cms');
             var trigger = container.find('.cms-toolbar-more');
+
             this.ui = {
                 window: $(window),
                 toolbarLeftPart: container.find('.cms-toolbar-left'),
@@ -78,10 +79,12 @@ var CMS = window.CMS || {};
          * @private
          */
         _events: function _events() {
+            var THROTTLE_TIMEOUT = 50;
+
             this.ui.window.on(
                 [this.resize, this.load, this.orientationChange].join(' '),
                 CMS.API.Helpers.throttle(
-                    this._handleResize.bind(this), 50
+                    this._handleResize.bind(this), THROTTLE_TIMEOUT
                 )
             );
         },
@@ -94,6 +97,7 @@ var CMS = window.CMS || {};
          */
         _getWidths: function _getWidths() {
             var that = this;
+
             that.items = {
                 left: [],
                 leftTotalWidth: 0,
@@ -136,12 +140,13 @@ var CMS = window.CMS || {};
          *
          * @method _calculateAvailableWidth
          * @private
-         * @return {Number} available width in px
+         * @returns {Number} available width in px
          */
         _calculateAvailableWidth: function _calculateAvailableWidth() {
+            var PADDING = 15;
             var fullWidth = this.ui.window.width();
             var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.offset().left +
-                this.ui.logo.outerWidth(true) + 15;
+                this.ui.logo.outerWidth(true) + PADDING;
 
             return fullWidth - reduce;
         },
@@ -184,6 +189,7 @@ var CMS = window.CMS || {};
 
                 // Figure out how many nav menu items fit into the available space.
                 var newRightMostItemIndex = -1;
+
                 while (remainingWidth - this.items.left[newRightMostItemIndex + 1].width >= 0) {
                     remainingWidth -= this.items.left[newRightMostItemIndex + 1].width;
                     newRightMostItemIndex++;
@@ -203,7 +209,9 @@ var CMS = window.CMS || {};
                     remainingWidth += this.items.rightTotalWidth;
 
                     var newLeftMostItemIndex = this.items.right.length;
+
                     // istanbul ignore if: this moves items to the right one by one
+                    // eslint-disable-next-line no-constant-condition
                     if (false) {
                         // if you want to move items from the right one by one
                         while (remainingWidth - this.items.right[newLeftMostItemIndex - 1].width > 0) {

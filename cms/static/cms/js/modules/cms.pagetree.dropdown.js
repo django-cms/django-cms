@@ -81,6 +81,7 @@ var CMS = window.CMS || {};
          * @method _toggleDropdown
          * @param {jQuery} trigger trigger clicked
          * @private
+         * @returns {Boolean|void}
          */
         _toggleDropdown: function _toggleDropdown(trigger) {
             var triggers = $(this.options.triggerSelector);

@@ -44,6 +44,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var clipboard = $('.cms-clipboard');
+
             this.ui = {
                 clipboard: clipboard,
                 triggers: $('.cms-clipboard-trigger a'),
@@ -127,8 +128,9 @@ var CMS = window.CMS || {};
         clear: function (callback) {
             // post needs to be a string, it will be converted using JSON.parse
             var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
-            var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent().
-                addClass('cms-submenu-item-disabled');
+            var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent()
+                .addClass('cms-submenu-item-disabled');
+
             pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');
             pasteItems.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
 

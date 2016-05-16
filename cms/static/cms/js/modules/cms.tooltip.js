@@ -2,6 +2,8 @@
  * Copyright https://github.com/divio/django-cms
  */
 
+/* eslint-disable max-params */
+
 // #############################################################################
 // NAMESPACES
 /**
@@ -66,6 +68,7 @@ var CMS = window.CMS || {};
             this.domElem.on('touchstart.cms', function () {
                 var id = $(this).data('plugin_id');
                 var plugin = $('.cms-plugin-' + id);
+
                 // check if it is a normal plugin or a generic
                 if (plugin.length) {
                     plugin.trigger('dblclick.cms');
@@ -74,6 +77,7 @@ var CMS = window.CMS || {};
                     // template tags some generic element might be
                     // cms-plugin-cms-page-changelist-x
                     var generic = $('.cms-plugin[class*="cms-plugin-cms-"][class*="-' + id + '"]');
+
                     generic.eq(0).trigger('dblclick.cms');
                 }
             });
@@ -89,7 +93,11 @@ var CMS = window.CMS || {};
          * @param {String} id current plugin id
          */
         displayToggle: function displayToggle(isShown, e, name, id) {
-            isShown ? this.show(e, name, id) : this.hide();
+            if (isShown) {
+                this.show(e, name, id);
+            } else {
+                this.hide();
+            }
         },
 
         /**
@@ -116,8 +124,8 @@ var CMS = window.CMS || {};
                 // attaches move event
                 // this sets the correct position for the edit tooltip
                 that.position(e.originalEvent, tooltip);
-                this.body.on('mousemove.cms.tooltip', function (e) {
-                    that.position(e, tooltip);
+                this.body.on('mousemove.cms.tooltip', function (mouseMoveEvent) {
+                    that.position(mouseMoveEvent, tooltip);
                 });
             }
         },
@@ -142,6 +150,7 @@ var CMS = window.CMS || {};
          *
          * @method _pick
          * @private
+         * @returns {jQuery} tooltip element
          */
         _pick: function _pick() {
             $('.cms-tooltip-touch, .cms-tooltip').css('visibility', 'hidden').hide();
@@ -158,14 +167,15 @@ var CMS = window.CMS || {};
         position: function position(e, tooltip) {
             // so lets figure out where we are
             var offset = 20;
+            var arrowOffset = 12;
             var relX = e.pageX - $(tooltip).offsetParent().offset().left;
             var relY = e.pageY - $(tooltip).offsetParent().offset().top;
             var bound = $(tooltip).offsetParent().width();
             var pos = relX + tooltip.outerWidth(true) + offset;
 
             tooltip.css({
-                left: (pos >= bound) ? relX - tooltip.outerWidth(true) - offset : relX + offset,
-                top: relY - 12
+                left: pos >= bound ? relX - tooltip.outerWidth(true) - offset : relX + offset,
+                top: relY - arrowOffset
             });
         }
     });

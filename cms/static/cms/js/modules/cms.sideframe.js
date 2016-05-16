@@ -56,6 +56,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var sideframe = $('.cms-sideframe');
+
             this.ui = {
                 sideframe: sideframe,
                 body: $('html'),
@@ -119,6 +120,7 @@ var CMS = window.CMS || {};
          * @param {Object} opts
          * @param {String} opts.url url to render iframe
          * @param {Boolean} [opts.animate] should sideframe be animated
+         * @returns {Class} this
          */
         open: function open(opts) {
             if (!(opts && opts.url)) {
@@ -188,8 +190,9 @@ var CMS = window.CMS || {};
             var holder = this.ui.frame;
             var contents;
             var body;
-            var iOS = /iPhone|iPod|iPad/.test(navigator.userAgent);
+            var iOS = (/iPhone|iPod|iPad/).test(navigator.userAgent);
 
+            // istanbul ignore next
             /**
              * On iOS iframes do not respect the size set in css or attributes, and
              * is always matching the content. However, if you first load the page
@@ -208,12 +211,13 @@ var CMS = window.CMS || {};
              * @function forceRerenderOnIOS
              * @private
              */
-            // istanbul ignore next
             function forceRerenderOnIOS() {
                 var w = that.ui.sideframe.width();
-                that.ui.sideframe.animate({ 'width': w + 1 }, 0);
+
+                that.ui.sideframe.animate({ width: w + 1 }, 0);
                 setTimeout(function () {
-                    that.ui.sideframe.animate({ 'width': w }, 0);
+                    that.ui.sideframe.animate({ width: w }, 0);
+                    // eslint-disable-next-line no-magic-numbers
                     that.ui.shim.css('z-index', 20);
                     setTimeout(function () {
                         that.ui.shim.css('z-index', 1);
@@ -365,6 +369,7 @@ var CMS = window.CMS || {};
          */
         _hide: function _hide(opts) {
             var duration = this.options.sideframeDuration;
+
             if (opts && typeof opts.duration === 'number') {
                 duration = opts.duration;
             }

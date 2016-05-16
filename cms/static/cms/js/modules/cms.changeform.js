@@ -1,5 +1,3 @@
-//##############################################################################
-// CHANGEFORM
 /* global CMS, URLify, gettext */
 
 (function ($) {
@@ -26,6 +24,7 @@
         // always bind the title > slug generation and do the validation inside for better ux
         title.bind('keyup', function () {
             var value = title.val();
+
             // international language handling
             if (window.UNIHANDECODER) {
                 value = window.UNIHANDECODER.decode(value);
@@ -35,9 +34,8 @@
                 prefill = true;
             }
             // urlify
-            // jshint newcap: false
+            // eslint-disable-next-line
             var urlified = URLify(value, 64);
-            // jshint newcap: true
             if (prefill) {
                 slug.val(urlified);
             }
@@ -64,6 +62,7 @@
             // also make sure that we will display the confirm dialog
             // in case users switch tabs while editing plugins
             var answer = true;
+
             if (slug.length) {
                 // check if the slug has the changed attribute
                 if (slug.data('changed') || title.data('changed')) {
@@ -73,6 +72,8 @@
 
             if (changed) {
                 var question = gettext('Are you sure you want to change tabs without saving the page first?');
+
+                // eslint-disable-next-line no-alert
                 answer = confirm(question);
             }
             if (answer) {
