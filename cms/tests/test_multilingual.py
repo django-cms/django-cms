@@ -8,7 +8,6 @@ from django.http import Http404, HttpResponseRedirect, QueryDict
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page, add_plugin
-from cms.cms_menus import CMSMenu
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
 from cms.models import Title, EmptyTitle
@@ -17,6 +16,8 @@ from cms.test_utils.testcases import (CMSTestCase,
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 from cms.utils.conf import get_languages
+
+from menus.menu_pool import menu_pool
 
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -156,23 +157,29 @@ class MultilingualTestCase(CMSTestCase):
         page.publish(TESTLANG2)
         page2.publish(TESTLANG)
 
-        menu = CMSMenu()
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
 
         request_1 = self.get_request('/%s/' % TESTLANG, TESTLANG)
         request_2 = self.get_request('/%s/' % TESTLANG2, TESTLANG2)
 
+        request_1_menu_manager = menu_pool.get_manager(request_1)
+        request_2_menu_manager = menu_pool.get_manager(request_2)
+
         lang_settings[1][1]['hide_untranslated'] = False
         with self.settings(CMS_LANGUAGES=lang_settings):
-            list_1 = [node.id for node in menu.get_nodes(request_1)]
-            list_2 = [node.id for node in menu.get_nodes(request_2)]
+            request_1_nodes = request_1_menu_manager.get_menu('CMSMenu').get_nodes(request_1)
+            request_2_nodes = request_2_menu_manager.get_menu('CMSMenu').get_nodes(request_2)
+            list_1 = [node.id for node in request_1_nodes]
+            list_2 = [node.id for node in request_2_nodes]
             self.assertEqual(list_1, list_2)
             self.assertEqual(len(list_1), 2)
 
         lang_settings[1][1]['hide_untranslated'] = True
         with self.settings(CMS_LANGUAGES=lang_settings):
-            list_1 = [node.id for node in menu.get_nodes(request_1)]
-            list_2 = [node.id for node in menu.get_nodes(request_2)]
+            request_1_nodes = request_1_menu_manager.get_menu('CMSMenu').get_nodes(request_1)
+            request_2_nodes = request_2_menu_manager.get_menu('CMSMenu').get_nodes(request_2)
+            list_1 = [node.id for node in request_1_nodes]
+            list_2 = [node.id for node in request_2_nodes]
             self.assertNotEqual(list_1, list_2)
             self.assertEqual(len(list_2), 1)
             self.assertEqual(len(list_1), 2)

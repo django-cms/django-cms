@@ -190,7 +190,8 @@ class ViewPermissionTests(CMSTestCase):
 
     def assertInMenu(self, page, user):
         request = self.get_request(user, page)
-        nodes = menu_pool.get_nodes(request)
+        manager = menu_pool.get_manager(request)
+        nodes = manager.get_nodes()
         target_url = page.get_absolute_url()
         found_in_menu = False
         for node in nodes:
@@ -201,7 +202,8 @@ class ViewPermissionTests(CMSTestCase):
 
     def assertNotInMenu(self, page, user):
         request = self.get_request(user, page)
-        nodes = menu_pool.get_nodes(request)
+        manager = menu_pool.get_manager(request)
+        nodes = manager.get_nodes()
         target_url = page.get_absolute_url()
         found_in_menu = False
         for node in nodes:
@@ -286,7 +288,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         request = self.get_request()
         visible_page_ids = get_visible_pages(request, all_pages, self.site)
         self.assertEqual(len(all_pages), len(visible_page_ids))
-        nodes = menu_pool.get_nodes(request)
+        manager = menu_pool.get_manager(request)
+        nodes = manager.get_nodes()
         self.assertEqual(len(nodes), len(all_pages))
 
     def test_public_menu_anonymous_user(self):
@@ -310,7 +313,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         urls = self.get_url_dict(all_pages)
         user = AnonymousUser()
         request = self.get_request(user, urls['/en/'])
-        nodes = menu_pool.get_nodes(request)
+        manager = menu_pool.get_manager(request)
+        nodes = manager.get_nodes()
         self.assertEqual(len(nodes), 4)
         self.assertInMenu(urls["/en/"], user)
         self.assertInMenu(urls["/en/page_c/"], user)
