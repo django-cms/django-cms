@@ -164,7 +164,9 @@ def define_check(func):
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
-        if is_installed('sekizai'):
+        sekizai_installed = is_installed('sekizai')
+
+        if sekizai_installed:
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
@@ -173,6 +175,12 @@ def check_sekizai(output):
             section.success("Sekizai template context processor is installed")
         else:
             section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
+
+        if not sekizai_installed:
+            # sekizai is not installed.
+            # we can't reliable check templates
+            # because template loading won't work
+            return
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
