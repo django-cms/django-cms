@@ -231,7 +231,7 @@ class ContextTests(CMSTestCase):
         context._standard_context_processors = None
         # Number of queries when context processors is not enabled
         with self.settings(**override):
-            with self.assertNumQueries(FuzzyInt(0, 15)) as context:
+            with self.assertNumQueries(FuzzyInt(0, 17)) as context:
                 response = self.client.get("/en/plain_view/")
                 num_queries = len(context.captured_queries)
                 self.assertFalse('CMS_TEMPLATE' in response.context)
