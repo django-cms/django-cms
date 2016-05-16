@@ -62,8 +62,11 @@ class StaticMenu4(Menu):
 
     def get_nodes(self, request):
         nodes = []
-        n = NavigationNode(_('sample second page'), reverse('sample2-root'), 1)
-        nodes.append(n)
+        try:
+            n = NavigationNode(_('sample second page'), reverse('sample2-root'), 1)
+            nodes.append(n)
+        except NoReverseMatch:
+            pass
         return nodes
 
 menu_pool.register_menu(StaticMenu4)
