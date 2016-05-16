@@ -116,7 +116,7 @@ class PythonAPITests(TestCase):
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
-        menu_pool.menus = {'TestMenu': TestMenu()}
+        menu_pool.menus = {'TestMenu': TestMenu}
         self.assertRaises(AssertionError, create_page, navigation_extenders=1,
                           **self._get_default_create_page_arguments())
         menu_pool.menus = self.old_menu
@@ -135,7 +135,7 @@ class PythonAPITests(TestCase):
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
-        menu_pool.menus = {'TestMenu': TestMenu()}
+        menu_pool.menus = {'TestMenu': TestMenu}
         page = create_page(navigation_extenders='TestMenu',
                            **self._get_default_create_page_arguments())
         self.assertEqual(page.navigation_extenders, 'TestMenu')

@@ -38,7 +38,8 @@ class BaseMenuTest(CMSTestCase):
         nodes = [node1, node2, node3, node4, node5]
         tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
         request = self.get_request(path)
-        menu_pool.apply_modifiers(tree, request)
+        manager = menu_pool.get_manager(request)
+        manager.apply_modifiers(tree, request)
         return tree, nodes
 
     def setUp(self):
