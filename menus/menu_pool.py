@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import warnings
 from functools import partial
 from logging import getLogger
 
@@ -200,8 +201,7 @@ class MenuManager(object):
                 self.request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
 
-    def get_nodes(self, namespace=None, root_id=None, site_id=None,
-            breadcrumb=False):
+    def get_nodes(self, namespace=None, root_id=None, site_id=None, breadcrumb=False):
         if not site_id:
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(site_id)
@@ -356,5 +356,35 @@ class MenuPool(object):
 
     def get_nodes_by_attribute(self, nodes, name, value):
         return [node for node in nodes if node.attr.get(name, None) == value]
+
+    def apply_modifiers(self, nodes, request, namespace=None, root_id=None,
+            post_cut=False, breadcrumb=False):
+        warnings.warn('menu_pool.apply_modifiers is deprecated '
+                      'and it will be removed in version 3.4; '
+                      'please use the menu manager instead.', DeprecationWarning)
+        manager = self.get_manager(request)
+        nodes = manager.apply_modifiers(
+            nodes=nodes,
+            namespace=namespace,
+            root_id=root_id,
+            post_cut=post_cut,
+            breadcrumb=breadcrumb,
+        )
+        return nodes
+
+    def get_nodes(self, request, namespace=None, root_id=None, site_id=None,
+                  breadcrumb=False):
+        warnings.warn('menu_pool.get_nodes is deprecated '
+                      'and it will be removed in version 3.4; '
+                      'please use the menu manager instead.', DeprecationWarning)
+        manager = self.get_manager(request)
+        nodes = manager.get_nodes(
+            namespace=namespace,
+            root_id=root_id,
+            site_id=site_id,
+            breadcrumb=breadcrumb,
+        )
+        return nodes
+
 
 menu_pool = MenuPool()
