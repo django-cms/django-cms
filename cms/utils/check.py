@@ -161,10 +161,6 @@ def define_check(func):
     return func
 
 
-def get_processors():
-    return list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
-
-
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
@@ -172,7 +168,7 @@ def check_sekizai(output):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
-        processors = get_processors()
+        processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         if 'sekizai.context_processors.sekizai' in processors:
             section.success("Sekizai template context processor is installed")
         else:
@@ -238,7 +234,7 @@ def check_middlewares(output):
 @define_check
 def check_context_processors(output):
     with output.section("Context processors") as section:
-        processors = get_processors()
+        processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         required_processors = (
             'cms.context_processors.cms_settings',
         )
