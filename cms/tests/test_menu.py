@@ -17,7 +17,7 @@ from cms.api import create_page
 from cms.cms_menus import get_visible_pages
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.project.sampleapp.cms_menus import StaticMenu, StaticMenu2
+from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
 from cms.test_utils.testcases import CMSTestCase
@@ -67,12 +67,81 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         self.old_menu = menu_pool.menus
         menu_pool.menus = {}
         menu_pool.discover_menus()
+        menu_pool.register_menu(SampleAppMenu)
         menu_pool.register_menu(StaticMenu)
         menu_pool.register_menu(StaticMenu2)
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
         super(MenuDiscoveryTest, self).tearDown()
+
+    def test_menu_registered(self):
+        menu_pool.discovered = False
+        menu_pool.discover_menus()
+
+        # The following tests that get_registered_menus()
+        # returns all menus registered based on the for_rendering flag
+
+        # A list of menu classes registered regardless of whether they
+        # have instances attached or not
+        registered = menu_pool.get_registered_menus(for_rendering=False)
+
+        # A list of menu classes registered and filter out any attached menu
+        # if it does not have instances.
+        registered_for_rendering = menu_pool.get_registered_menus(for_rendering=True)
+
+        # We've registered three menus
+        self.assertEqual(len(registered), 3)
+
+        # But two of those are attached menus and shouldn't be rendered.
+        self.assertEqual(len(registered_for_rendering), 1)
+
+        # Attached both menus to separate pages
+        create_page("apphooked-page", "nav_playground.html", "en",
+                    published=True,
+                    navigation_extenders='StaticMenu')
+
+        create_page("apphooked-page", "nav_playground.html", "en",
+                    published=True,
+                    navigation_extenders='StaticMenu2')
+
+        registered = menu_pool.get_registered_menus(for_rendering=False)
+        registered_for_rendering = menu_pool.get_registered_menus(for_rendering=True)
+
+        # The count should be 3 but grows to 5 because of the two published instances.
+        # Even though we've registered three menus, the total is give because two
+        # are attached menus and each attached menu has two instances.
+        self.assertEqual(len(registered), 5)
+        self.assertEqual(len(registered_for_rendering), 5)
+
+    def test_menu_registered_in_manager(self):
+        menu_pool.discovered = False
+        menu_pool.discover_menus()
+
+        # The following tests that a menu manager calculates the registered
+        # menus on a request basis.
+
+        request_1 = self.get_request('/en/')
+        request_1_manager = menu_pool.get_manager(request_1)
+
+        registered = menu_pool.get_registered_menus(for_rendering=False)
+
+        self.assertEqual(len(registered), 3)
+        self.assertEqual(len(request_1_manager.menus), 1)
+
+        create_page("apphooked-page", "nav_playground.html", "en",
+                    published=True,
+                    navigation_extenders='StaticMenu')
+
+        create_page("apphooked-page", "nav_playground.html", "en",
+                    published=True,
+                    navigation_extenders='StaticMenu2')
+
+        request_2 = self.get_request('/en/')
+        request_2_manager = menu_pool.get_manager(request_2)
+
+        # The count should be 3 but grows to 5 because of the two published instances.
+        self.assertEqual(len(request_2_manager.menus), 5)
 
     def test_menu_expanded(self):
         menu_pool.discovered = False
@@ -105,9 +174,9 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                 self.assertEqual(static_menus_2, 0)
 
     def test_multiple_menus(self):
-        apphook_pool.discover_apps()
-
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            apphook_pool.discovered = False
+            apphook_pool.discover_apps()
             create_page("apphooked-page", "nav_playground.html", "en",
                         published=True, apphook="SampleApp2")
             create_page("apphooked-page", "nav_playground.html", "en",
@@ -563,6 +632,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
 
 class MenuTests(BaseMenuTest):
+
     def test_build_nodes_inner_for_worst_case_menu(self):
         '''
             Tests the worst case scenario
