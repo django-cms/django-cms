@@ -78,6 +78,16 @@ HELPER_SETTINGS = dict(
             'hide_untranslated': False,
         }
     },
+    CMS_PLACEHOLDER_CONF={
+        'placeholder_content_2': {
+            'plugin_modules': {
+                'Bootstrap3ButtonCMSPlugin': 'Different Grouper'
+            },
+            'plugin_labels': {
+                'Bootstrap3ButtonCMSPlugin': gettext('Add a link')
+            },
+        }
+    },
     INSTALLED_APPS=[
         'reversion',
         'djangocms_text_ckeditor',

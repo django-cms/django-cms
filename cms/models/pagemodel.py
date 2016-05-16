@@ -146,6 +146,27 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # adding new pages.
         return object.__repr__(self)
 
+    @classmethod
+    def get_draft_root_node(cls, position=None, site=None):
+        """
+        Returns the last draft root node if no position is specified.
+        If a position is specified, returns the draft root node in the
+        given position raising an IndexError if no such position exists.
+        """
+        # Only look at nodes marked as draft.
+        nodes = cls.get_root_nodes().filter(publisher_is_draft=True)
+
+        if site:
+            # Filter out any nodes not belonging to provided site.
+            nodes = nodes.filter(site=site)
+
+        if position is None:
+            # No position has been given.
+            # We default to the last root node
+            nodes = nodes.reverse()
+            position = 0
+        return nodes[position]
+
     def is_dirty(self, language):
         state = self.get_publisher_state(language)
         return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
@@ -354,7 +375,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 new_phs.append(ph)
                 # update the page copy
             if plugins:
-                copy_plugins_to(plugins, ph, no_signals=True)
+                copy_plugins_to(plugins, ph)
         target.placeholders.add(*new_phs)
 
     def _copy_attributes(self, target, clean=False):

@@ -41,7 +41,6 @@ var CMS = window.CMS || {};
             plugin_language: '',
             plugin_parent: null,
             plugin_order: null,
-            plugin_breadcrumb: [],
             plugin_restriction: [],
             plugin_parent_restriction: [],
             urls: {
@@ -73,6 +72,7 @@ var CMS = window.CMS || {};
 
             // bind data element to the container
             this.ui.container.data('settings', this.options);
+            CMS.Plugin._initializeDragItemsStates();
 
             // determine type of plugin
             switch (this.options.type) {
@@ -169,7 +169,7 @@ var CMS = window.CMS || {};
                 that.editPlugin(
                     that.options.urls.edit_plugin,
                     that.options.plugin_name,
-                    that.options.plugin_breadcrumb
+                    that._getPluginBreadcrumbs()
                 );
             });
 
@@ -607,6 +607,17 @@ var CMS = window.CMS || {};
 
                     // TODO: show only if (response.status)
                     that._showSuccess(dragitem);
+                    CMS.Plugin._updateRegistry({
+                        pluginId: options.plugin_id,
+                        update: {
+                            plugin_parent: plugin_parent || '',
+                            placeholder_id: placeholder_id
+                        }
+                    });
+                    that._setSettings(that.options, {
+                        plugin_parent: plugin_parent || '',
+                        placeholder_id: placeholder_id
+                    });
                 },
                 error: function (jqXHR) {
                     CMS.API.locked = false;
@@ -853,6 +864,7 @@ var CMS = window.CMS || {};
                 }
                 isTouching = false;
             });
+
             var plugins = nav.siblings('.cms-plugin-picker');
 
             that._setupQuickSearch(plugins);
@@ -873,7 +885,7 @@ var CMS = window.CMS || {};
                 // we need to know the parent id by the time we open "add plugin" dialog
                 var pluginsCopy = plugins.clone(true, true).data(
                     'parentId', that._getId(nav.closest('.cms-draggable'))
-                );
+                ).append(that._getPossibleChildClasses());
 
                 modal.open({
                     title: that.options.addPluginHelpTitle,
@@ -892,6 +904,46 @@ var CMS = window.CMS || {};
                 .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                 e.stopPropagation();
             });
+        },
+
+        /**
+         * Returns available plugin/placeholder child classes markup
+         * for "Add plugin" modal
+         *
+         * @method _getPossibleChildClasses
+         * @return {jQuery} elements
+         * @private
+         */
+        _getPossibleChildClasses: function _getPossibleChildClasses() {
+            var that = this;
+            var childRestrictions = this.options.plugin_restriction;
+            // have to check the placeholder every time, since plugin could've been
+            // moved as part of another plugin
+            var placeholderId = that._getId(that.ui.submenu.closest('.cms-dragarea'));
+            var resultElements = $($('#cms-plugin-child-classes-' + placeholderId).html());
+
+            if (childRestrictions && childRestrictions.length) {
+                resultElements = resultElements.filter(function () {
+                    var item = $(this);
+
+                    return item.hasClass('cms-submenu-item-title') ||
+                        childRestrictions.indexOf(item.find('a').attr('href')) !== -1;
+                });
+
+                resultElements = resultElements.filter(function (index) {
+                    var item = $(this);
+
+                    return !item.hasClass('cms-submenu-item-title') ||
+                        item.hasClass('cms-submenu-item-title') && (
+                            !resultElements.eq(index + 1).hasClass('cms-submenu-item-title') &&
+                            resultElements.eq(index + 1).length
+                        );
+                });
+            }
+
+            resultElements.find('a').on(that.click, that._delegate.bind(that));
+
+            return resultElements;
         },
 
         /**
@@ -935,7 +987,6 @@ var CMS = window.CMS || {};
          * @param {jQuery} nav dropdown trigger with the items
          */
         _setupActions: function _setupActions(nav) {
-            var that = this;
             var items = '.cms-submenu-edit, .cms-submenu-item a';
             nav.parent().find('.cms-submenu-edit').on(this.touchStart, function (e) {
                 // required on some touch devices so
@@ -943,73 +994,89 @@ var CMS = window.CMS || {};
                 // which in turn results in pep triggering pointercancel
                 e.stopPropagation();
             });
-            nav.parent().find(items).on(that.click, function (e) {
-                e.preventDefault();
-                e.stopPropagation();
+            nav.parent().find(items).on(this.click, nav, this._delegate.bind(this));
+        },
 
-                // show loader and make sure scroll doesn't jump
-                CMS.API.Toolbar.showLoader();
+        /**
+         * Handler for the "action" items
+         *
+         * @method _delegate
+         * @private
+         */
+        _delegate: function _delegate(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                var el = $(this);
-                CMS.Plugin._hideSettingsMenu(nav);
+            var nav;
+            var that = this;
 
-                // set switch for subnav entries
-                switch (el.attr('data-rel')) {
-                    case 'add':
-                        that.addPlugin(
-                            el.attr('href').replace('#', ''),
-                            el.text(),
-                            el.closest('.cms-plugin-picker').data('parentId')
-                        );
-                        break;
-                    case 'ajax_add':
-                        CMS.API.Toolbar.openAjax({
-                            url: el.attr('href'),
-                            post: JSON.stringify(el.data('post')),
-                            text: el.data('text'),
-                            callback: $.proxy(that.editPluginPostAjax, that),
-                            onSuccess: el.data('on-success')
-                        });
-                        break;
-                    case 'edit':
-                        that.editPlugin(
-                            that.options.urls.edit_plugin,
-                            that.options.plugin_name,
-                            that.options.plugin_breadcrumb
-                        );
-                        break;
-                    case 'copy-lang':
-                        that.copyPlugin(that.options, el.attr('data-language'));
-                        break;
-                    case 'copy':
-                        if (!el.parent().hasClass('cms-submenu-item-disabled')) {
-                            that.copyPlugin();
-                        } else {
-                            CMS.API.Toolbar.hideLoader();
-                        }
-                        break;
-                    case 'cut':
-                        that.cutPlugin();
-                        break;
-                    case 'paste':
-                        if (!el.parent().hasClass('cms-submenu-item-disabled')) {
-                            that.pastePlugin();
-                        } else {
-                            CMS.API.Toolbar.hideLoader();
-                        }
-                        break;
-                    case 'delete':
-                        that.deletePlugin(
-                            that.options.urls.delete_plugin,
-                            that.options.plugin_name,
-                            that.options.plugin_breadcrumb
-                        );
-                        break;
-                    default:
+            if (e.data && e.data.nav) {
+                nav = e.data.nav;
+            }
+
+            // show loader and make sure scroll doesn't jump
+            CMS.API.Toolbar.showLoader();
+
+            var items = '.cms-submenu-edit, .cms-submenu-item a';
+            var el = $(e.target).closest(items);
+            CMS.Plugin._hideSettingsMenu(nav);
+
+            // set switch for subnav entries
+            switch (el.attr('data-rel')) {
+                case 'add':
+                    that.addPlugin(
+                        el.attr('href').replace('#', ''),
+                        el.text(),
+                        el.closest('.cms-plugin-picker').data('parentId')
+                    );
+                    break;
+                case 'ajax_add':
+                    CMS.API.Toolbar.openAjax({
+                        url: el.attr('href'),
+                        post: JSON.stringify(el.data('post')),
+                        text: el.data('text'),
+                        callback: $.proxy(that.editPluginPostAjax, that),
+                        onSuccess: el.data('on-success')
+                    });
+                    break;
+                case 'edit':
+                    that.editPlugin(
+                        that.options.urls.edit_plugin,
+                        that.options.plugin_name,
+                        that._getPluginBreadcrumbs()
+                    );
+                    break;
+                case 'copy-lang':
+                    that.copyPlugin(that.options, el.attr('data-language'));
+                    break;
+                case 'copy':
+                    if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                        that.copyPlugin();
+                    } else {
                         CMS.API.Toolbar.hideLoader();
-                        CMS.API.Toolbar._delegate(el);
-                }
-            });
+                    }
+                    break;
+                case 'cut':
+                    that.cutPlugin();
+                    break;
+                case 'paste':
+                    if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                        that.pastePlugin();
+                    } else {
+                        CMS.API.Toolbar.hideLoader();
+                    }
+                    break;
+                case 'delete':
+                    that.deletePlugin(
+                        that.options.urls.delete_plugin,
+                        that.options.plugin_name,
+                        that._getPluginBreadcrumbs()
+                    );
+                    break;
+                default:
+                    CMS.API.Toolbar.hideLoader();
+                    CMS.API.Toolbar._delegate(el);
+            }
         },
 
         /**
@@ -1227,34 +1294,6 @@ var CMS = window.CMS || {};
                 e.stopPropagation();
                 $('.cms-plugin-' + that._getId($(this))).trigger('dblclick.cms');
             });
-
-            // only needs to be excecuted once
-            if (CMS.Toolbar.ready) {
-                return false;
-            }
-
-            // removing duplicate entries
-            var sortedArr = CMS.settings.states.sort();
-            var filteredArray = [];
-            for (var i = 0; i < sortedArr.length; i++) {
-                if (sortedArr[i] !== sortedArr[i + 1]) {
-                    filteredArray.push(sortedArr[i]);
-                }
-            }
-            CMS.settings.states = filteredArray;
-
-            // loop through the items
-            $.each(CMS.settings.states, function (index, id) {
-                var el = $('.cms-draggable-' + id);
-                // only add this class to elements which have a draggable area
-                if (el.find('.cms-draggables').length) {
-                    el.find('> .cms-collapsable-container').removeClass('cms-hidden');
-                    el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
-                }
-            });
-
-            // set global setup
-            CMS.Toolbar.ready = true;
         },
 
         /**
@@ -1353,8 +1392,74 @@ var CMS = window.CMS || {};
             });
             // make sure structurboard gets updated after success
             this.ui.window.trigger('resize.sideframe');
+        },
+
+        /**
+         * Traverses the registry to find plugin parents
+         *
+         * @method _getPluginBreadcrumbs
+         * @returns {Object[]} array of breadcrumbs in `{ url, title }` format
+         * @private
+         */
+        _getPluginBreadcrumbs: function _getPluginBreadcrumbs() {
+            var breadcrumbs = [];
+
+            breadcrumbs.unshift({
+                title: this.options.plugin_name,
+                url: this.options.urls.edit_plugin
+            });
+
+            var findParentPlugin = function (id) {
+                return $.grep(CMS._plugins || [], function (pluginOptions) {
+                    return pluginOptions[0] === 'cms-plugin-' + id;
+                })[0];
+            };
+
+            var id = this.options.plugin_parent;
+            var data;
+
+            while (id && id !== 'None') {
+                data = findParentPlugin(id);
+
+                if (!data) {
+                    break;
+                }
+
+                breadcrumbs.unshift({
+                    title: data[1].plugin_name,
+                    url: data[1].urls.edit_plugin
+                });
+                id = data[1].plugin_parent;
+            }
+
+            return breadcrumbs;
         }
     });
+
+
+    /**
+     * Updates plugin data in CMS._plugins.
+     * Keep in mind that it doesn't update children plugins, and you
+     * probably want that.
+     *
+     * @method _updateRegistry
+     * @private
+     * @static
+     * @param {Object} opts options
+     * @param {String|Number} opts.pluginId id
+     * @param {Object} opts.update object with data to update
+     */
+    CMS.Plugin._updateRegistry = function _updateRegistry(opts) {
+        var pluginEntryIndex = (CMS._plugins || []).findIndex(function (pluginOptions) {
+            return pluginOptions[0] === 'cms-plugin-' + opts.pluginId;
+        });
+
+        if (pluginEntryIndex === -1) {
+            return;
+        }
+
+        $.extend(true, CMS._plugins[pluginEntryIndex][1], opts.update);
+    };
 
     /**
      * Hides the opened settings menu. By default looks for any open ones.
@@ -1440,6 +1545,36 @@ var CMS = window.CMS || {};
             }
         });
     };
+
+    /**
+     * Initializes the collapsed/expanded states of dragitems in structureboard.
+     *
+     * @method _initializeDragItemsStates
+     * @static
+     * @private
+     */
+    CMS.Plugin._initializeDragItemsStates = CMS.API.Helpers.once(function _initializeDragItemsStates() {
+        // removing duplicate entries
+        var states = CMS.settings.states || [];
+        var sortedArr = states.sort();
+        var filteredArray = [];
+        for (var i = 0; i < sortedArr.length; i++) {
+            if (sortedArr[i] !== sortedArr[i + 1]) {
+                filteredArray.push(sortedArr[i]);
+            }
+        }
+        CMS.settings.states = filteredArray;
+
+        // loop through the items
+        $.each(CMS.settings.states, function (index, id) {
+            var el = $('.cms-draggable-' + id);
+            // only add this class to elements which have a draggable area
+            if (el.find('.cms-draggables').length) {
+                el.find('> .cms-collapsable-container').removeClass('cms-hidden');
+                el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
+            }
+        });
+    });
 
     // shorthand for jQuery(document).ready();
     $(CMS.Plugin._initializeGlobalHandlers);

@@ -21,6 +21,9 @@ What's new in 3.3
   `backward_incompatible_3.3`_ for details)
 * Introduction of the method `get_cache_expiration` on CMSPluginBase to be used
   by plugins for declaring their rendered content's period of validity.
+* Introduction of the method `get_vary_cache_on` on CMSPluginBase to be used
+  by plugins for declaring ``VARY`` headers.
+
 
 .. _backward_incompatible_3.3:
 
@@ -44,3 +47,16 @@ Detailed changes:
  * some commands have been rename replacing underscores with hyphens for consistency
  * all arguments are now non-positional. If you use the commands by using Django's
    ``call_command`` function you will have to adapt the command invocation to reflect this.
+
+
+Signature changes
+=================
+
+The signatures of the toolbar methods ``get_or_create_menu`` have a new kwarg
+``disabled`` *inserted* (not appended). This was done to maintain consistency with
+other, existing toolbar methods. The signatures are now:
+
+ * ``cms.toolbar.items.Menu.get_or_create_menu(key, verbose_name, disabled=False, side=LEFT, position=None)``
+ * ``cms.toolbar.toolbar.CMSToolbar.get_or_create_menu(key, verbose_name=None, disabled=False, side=LEFT, position=None)``
+
+It should only affect developers who use kwargs as positional args.

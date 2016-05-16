@@ -766,6 +766,7 @@ var CMS = window.CMS || {};
                     if (item.is('input') || item.is('button')) {
                         // we need to use native `.click()` event specifically
                         // as we are inside an iframe and magic is happening
+                        that.ui.modalBody.addClass('cms-loader');
                         item[0].click();
                     }
 
