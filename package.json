@@ -9,6 +9,7 @@
     "gulp": "3.9.0",
     "gulp-clean-css": "^2.0.6",
     "gulp-concat": "^2.6.0",
+    "gulp-eslint": "^2.0.0",
     "gulp-iconfont": "3.0.1",
     "gulp-iconfont-css": "0.0.9",
     "gulp-if": "1.2.5",

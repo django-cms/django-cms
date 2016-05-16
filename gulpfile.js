@@ -1,4 +1,4 @@
-// jshint node: true
+/* eslint strict: [2, "global"] */
 'use strict';
 
 // #####################################################################################################################
@@ -14,18 +14,17 @@ var iconfontCss = require('gulp-iconfont-css');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-clean-css');
-var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs');
+var eslint = require('gulp-eslint');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var KarmaServer = require('karma').Server;
 var child_process = require('child_process');
 var spawn = require('child_process').spawn;
 var terminate = require('terminate');
-var Promise = require('bluebird'); // jshint ignore:line
+var Promise = require('bluebird');
 var _ = require('lodash');
 
-var argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
 
 // #####################################################################################################################
 // #SETTINGS#
@@ -49,7 +48,7 @@ var PROJECT_PATTERNS = {
         PROJECT_PATH.tests + '/**/*.js',
         '!' + PROJECT_PATH.tests + '/unit/helpers/**/*.js',
         '!' + PROJECT_PATH.tests + '/coverage/**/*.js',
-        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
+        '!' + PROJECT_PATH.js + '/modules/jquery.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
@@ -157,8 +156,14 @@ var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
 
 // #####################################################################################################################
 // #TASKS#
-var cacheBuster = function (options) {
-    var version = options && options.version ? options.version : Math.random();
+/**
+ * @function cacheBuster
+ * @param {Object} opts
+ * @param {String} [opts.version]
+ * @returns {Function}
+ */
+var cacheBuster = function (opts) {
+    var version = opts && opts.version ? opts.version : Math.random();
 
     return function (css) {
         css.replaceValues(/__VERSION__/g, { fast: '__VERSION__' }, function () {
@@ -201,28 +206,19 @@ gulp.task('icons', function () {
         fontName: 'django-cms-iconfont',
         normalize: true
     }))
-    .on('glyphs', function (glyphs, options) {
-        gutil.log.bind(glyphs, options);
+    .on('glyphs', function (glyphs, opts) {
+        gutil.log.bind(glyphs, opts);
     })
     .pipe(gulp.dest(PROJECT_PATH.icons));
 });
 
 gulp.task('lint', ['lint:javascript']);
 gulp.task('lint:javascript', function () {
-    // DOCS: http://jshint.com/docs/
+    // DOCS: http://eslint.org
     return gulp.src(PROJECT_PATTERNS.js)
-        .pipe(jshint())
-        .pipe(jscs())
-        // required for jscs
-        .on('error', function (error) {
-            gutil.log('\n' + error.message);
-            if (process.env.CI) {
-                // Force the process to exit with error code
-                process.exit(1);
-            }
-        })
-        .pipe(jshint.reporter('jshint-stylish'))
-        .pipe(jshint.reporter('fail'));
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(gulpif(process.env.CI, eslint.failAfterError()));
 });
 
 gulp.task('tests', ['tests:unit', 'tests:integration']);
@@ -264,6 +260,7 @@ var integrationTests = {
             var server = spawn('python', ['testserver.py'].concat(args.split(' ')));
             gutil.log('Starting a server');
             server.stdout.on('data', function (data) {
+                // eslint-disable-next-line
                 console.log(data.toString().slice(0, -1));
             });
 
@@ -409,14 +406,16 @@ var integrationTests = {
      * @returns {String[]} array of paths to instrumented tests
      */
     createScreenshotFiles: function (tests) {
+        var instrumentedTests;
+
         if (argv && argv.screenshots) {
             child_process.execSync('casper-summoner ' + tests.join(' '));
-            tests = tests.map(function (file) {
+            instrumentedTests = tests.map(function (file) {
                 return file.replace('.js', '.summoned.js');
             });
         }
 
-        return tests;
+        return instrumentedTests;
     },
 
     /**
@@ -478,6 +477,7 @@ gulp.task('tests:integration', function (done) {
             done(0);
         })
         .catch(function (e) {
+            // eslint-disable-next-line
             console.log(e);
             done(1);
         });
