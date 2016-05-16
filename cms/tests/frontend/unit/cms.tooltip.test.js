@@ -18,6 +18,7 @@ describe('CMS.Messages', function () {
 
     describe('instance', function () {
         var tooltip;
+
         beforeEach(function (done) {
             fixture.load('tooltip.html');
             $(function () {
@@ -53,6 +54,7 @@ describe('CMS.Messages', function () {
 
     describe('.displayToggle()', function () {
         var tooltip;
+
         beforeEach(function (done) {
             fixture.load('tooltip.html');
             $(function () {
@@ -88,6 +90,7 @@ describe('CMS.Messages', function () {
 
     describe('.show()', function () {
         var tooltip;
+
         beforeEach(function (done) {
             fixture.load('tooltip.html');
             $(function () {
@@ -104,7 +107,7 @@ describe('CMS.Messages', function () {
         it('shows the tooltip', function () {
             spyOn(tooltip, 'position').and.callFake(function () {});
             tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
-            expect(tooltip.domElem).toHaveCss({ 'visibility': 'visible' });
+            expect(tooltip.domElem).toHaveCss({ visibility: 'visible' });
             expect(tooltip.domElem).toBeVisible();
             expect(tooltip.domElem.data('plugin_id')).toEqual(1);
             expect(tooltip.domElem.find('span')).toHaveText('AwesomePlugin');
@@ -127,6 +130,7 @@ describe('CMS.Messages', function () {
             expect(tooltip.position.calls.count()).toEqual(1);
             expect(tooltip.domElem).toHandle('touchstart');
             var dblclick = spyOnEvent('.cms-plugin-1', 'dblclick.cms');
+
             tooltip.domElem.trigger('touchstart');
             expect(dblclick).toHaveBeenTriggered();
         });
@@ -139,6 +143,7 @@ describe('CMS.Messages', function () {
             expect(tooltip.position.calls.count()).toEqual(1);
             expect(tooltip.domElem).toHandle('touchstart');
             var dblclick = spyOnEvent('.cms-plugin-cms-page-changelist-33', 'dblclick.cms');
+
             tooltip.domElem.trigger('touchstart');
             expect(dblclick).toHaveBeenTriggered();
         });
@@ -146,6 +151,7 @@ describe('CMS.Messages', function () {
 
     describe('.position()', function () {
         var tooltip;
+
         beforeEach(function (done) {
             fixture.load('tooltip.html');
             $(function () {
@@ -168,16 +174,18 @@ describe('CMS.Messages', function () {
             }, 'AwesomePlugin', 1);
 
             var parentOffset = tooltip.domElem.offsetParent().offset();
+
             expect(tooltip.domElem).toBeVisible();
             expect(tooltip.domElem).toHaveCss({
-                'left': (-parentOffset.left + 20 + 20) + 'px',
-                'top': (-parentOffset.top + 20 - 12) + 'px'
+                left: (-parentOffset.left + 20 + 20) + 'px',
+                top: (-parentOffset.top + 20 - 12) + 'px'
             });
         });
 
         it('position the tooltip correctly based on mouse position', function () {
             var boundary = $(window).width();
             var offset = 20;
+
             tooltip.show({
                 originalEvent: {
                     pageX: 0,
@@ -190,6 +198,7 @@ describe('CMS.Messages', function () {
 
             // left side
             var xFromLeft = [10, 20, boundary - offset - tooltipWidth - 1];
+
             xFromLeft.forEach(function (x) {
                 tooltip.position({
                     pageX: x,
@@ -197,13 +206,14 @@ describe('CMS.Messages', function () {
                 }, tooltip.domElem);
 
                 expect(tooltip.domElem).toHaveCss({
-                    'left': (-parentOffset.left + offset + x) + 'px',
-                    'top': (-parentOffset.top + 20 - 12) + 'px'
+                    left: (-parentOffset.left + offset + x) + 'px',
+                    top: (-parentOffset.top + 20 - 12) + 'px'
                 });
             });
 
             // right side
             var xFromRight = [10, 20, tooltipWidth, tooltipWidth + offset - 1, tooltipWidth + offset];
+
             xFromRight.forEach(function (x) {
                 tooltip.position({
                     pageX: boundary - x,
@@ -211,8 +221,8 @@ describe('CMS.Messages', function () {
                 }, tooltip.domElem);
 
                 expect(tooltip.domElem).toHaveCss({
-                    'left': (-parentOffset.left + (boundary - x) - tooltipWidth - offset) + 'px',
-                    'top': (-parentOffset.top + 20 - 12) + 'px'
+                    left: (-parentOffset.left + (boundary - x) - tooltipWidth - offset) + 'px',
+                    top: (-parentOffset.top + 20 - 12) + 'px'
                 });
             });
         });
@@ -220,6 +230,7 @@ describe('CMS.Messages', function () {
 
     describe('.hide()', function () {
         var tooltip;
+
         beforeEach(function (done) {
             fixture.load('tooltip.html');
             $(function () {
@@ -237,7 +248,7 @@ describe('CMS.Messages', function () {
             tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
             expect(tooltip.domElem).toBeVisible();
             tooltip.hide();
-            expect(tooltip.domElem).toHaveCss({ 'visibility': 'hidden' });
+            expect(tooltip.domElem).toHaveCss({ visibility: 'hidden' });
             expect(tooltip.domElem).not.toBeVisible();
         });
 

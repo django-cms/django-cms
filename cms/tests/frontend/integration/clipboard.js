@@ -147,8 +147,6 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
 });
 
 casper.test.begin('Copy placeholder contents from the structure board', function (test) {
-    var contentNumber;
-
     casper
         .start(globals.editUrl)
         // go to the Structure mode
@@ -442,7 +440,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
             this.mouse.move(column.left + column.width / 2 + 30, column.top + column.height);
         }).then(function () {
             test.assertExists('.cms-draggable-disallowed', 'Red line indicates impossibility of a drop');
-            this.mouse.up(column.left + column.width / 2  + 30, column.top + column.height);
+            this.mouse.up(column.left + column.width / 2 + 30, column.top + column.height);
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Pasting plugin was not successful');
         })
 

@@ -60,7 +60,7 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('has no options', function () {
-            expect(board.options).toEqual(undefined);
+            expect(board.options).not.toBeDefined();
         });
 
         it('applies correct classes to empty placeholder dragareas', function () {
@@ -607,10 +607,10 @@ describe('CMS.StructureBoard', function () {
         it('sets up keydown handler to toggle board', function () {
             expect(board.ui.doc).toHandle('keydown.cms.structureboard.switcher');
 
-            var wrongEvent = $.Event('keydown.cms.structureboard.switcher', {
+            var wrongEvent = new $.Event('keydown.cms.structureboard.switcher', {
                 keyCode: 123344534
             });
-            var correctEvent = $.Event('keydown.cms.structureboard.switcher', {
+            var correctEvent = new $.Event('keydown.cms.structureboard.switcher', {
                 keyCode: CMS.KEYS.SPACE
             });
 
@@ -660,7 +660,7 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('initializes nested sortable', function () {
-            var options = board.ui.sortables.nestedSortable('option');
+            options = board.ui.sortables.nestedSortable('option');
             expect(options).toEqual(jasmine.objectContaining({
                 items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                 placeholder: 'cms-droppable',
@@ -686,7 +686,7 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('defines how draggable helper is created', function () {
-            var options = board.ui.sortables.nestedSortable('option');
+            options = board.ui.sortables.nestedSortable('option');
             var helper = options.helper;
 
             var item = $(
@@ -816,8 +816,8 @@ describe('CMS.StructureBoard', function () {
                 board.ui.sortables.on('mouseup', spy);
                 spyOn($.ui.sortable.prototype, '_mouseStop');
 
-                var wrongEvent = $.Event('keyup.cms.interrupt', { keyCode: 1287926834 });
-                var correctEvent = $.Event('keyup.cms.interrupt', { keyCode: CMS.KEYS.ESC });
+                var wrongEvent = new $.Event('keyup.cms.interrupt', { keyCode: 1287926834 });
+                var correctEvent = new $.Event('keyup.cms.interrupt', { keyCode: CMS.KEYS.ESC });
 
                 board.state = 'mock';
                 board.ui.doc.trigger(wrongEvent);
@@ -912,7 +912,6 @@ describe('CMS.StructureBoard', function () {
             it('returns false if we moved plugin inside same container ' +
                'and the event is fired on the container', function () {
                 var textPlugin = $('.cms-draggable-1');
-                var randomPlugin = $('.cms-draggable-2');
                 var helper = options.helper(null, textPlugin);
                 var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
 
@@ -1039,7 +1038,6 @@ describe('CMS.StructureBoard', function () {
                 var textPlugin = $('.cms-draggable-1');
                 var randomPlugin = $('.cms-draggable-2');
                 var helper = options.helper(null, textPlugin);
-                var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
 
                 options.start(null, { item: textPlugin, helper: helper });
                 board.state = true;
@@ -1093,7 +1091,7 @@ describe('CMS.StructureBoard', function () {
                 $('.cms-placeholder-1').remove();
                 pluginEdit.data('settings', { plugin_parent_restriction: [] });
 
-                expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                 expect(board.state).toEqual('mock');
             });
 
@@ -1107,7 +1105,7 @@ describe('CMS.StructureBoard', function () {
                     pluginEdit.data('settings', { plugin_parent_restriction: [] });
                     placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
 
-                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                    expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                     expect(board.state).toEqual(false);
                 });
 
@@ -1120,7 +1118,7 @@ describe('CMS.StructureBoard', function () {
                     pluginEdit.data('settings', { plugin_parent_restriction: [], plugin_type: 'OnlyThisPlugin' });
                     placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
 
-                    expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
+                    expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(true);
                     expect(board.state).toEqual(true);
                 });
 

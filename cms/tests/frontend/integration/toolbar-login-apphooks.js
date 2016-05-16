@@ -92,10 +92,11 @@ casper.test.begin('User Login (via Toolbar) through apphooked object page', func
                     date_field: this.evaluate(function () {
                         var today = new Date();
                         var date = today.getDate();
+                        var month = today.getMonth() + 1;
+
                         if (date < 10) {
                             date = '0' + date;
                         }
-                        var month = today.getMonth() + 1;
                         if (month < 10) {
                             month = '0' + month;
                         }

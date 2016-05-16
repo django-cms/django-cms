@@ -609,8 +609,8 @@ describe('CMS.Sideframe', function () {
 
                 expect(body).toHandle('keydown.cms');
 
-                var wrongEvent = $.Event('keydown.cms', { keyCode: 132882173 });
-                var correctEvent = $.Event('keydown.cms', { keyCode: CMS.KEYS.ESC });
+                var wrongEvent = new $.Event('keydown.cms', { keyCode: 132882173 });
+                var correctEvent = new $.Event('keydown.cms', { keyCode: CMS.KEYS.ESC });
 
                 body.trigger(wrongEvent);
                 expect(sideframe.close).not.toHaveBeenCalled();
@@ -708,7 +708,7 @@ describe('CMS.Sideframe', function () {
 
     describe('._goToHistory()', function () {
         var sideframe;
-        var iframe;
+
         beforeEach(function (done) {
             fixture.load('sideframe.html');
             CMS.config = {
@@ -758,7 +758,7 @@ describe('CMS.Sideframe', function () {
 
     describe('._updateHistoryButtons()', function () {
         var sideframe;
-        var iframe;
+
         beforeEach(function (done) {
             fixture.load('sideframe.html');
             CMS.config = {

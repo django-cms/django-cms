@@ -47,8 +47,8 @@ casper.test.begin('New Page Creation', function (test) {
                     test.assertExists('.errornote', 'Error message shows up if no data has been entered');
 
                     this.fill('#page_form', {
-                        'title': newPageTitle,
-                        'slug': newPageTitle
+                        title: newPageTitle,
+                        slug: newPageTitle
                     }, true);
                 });
         })

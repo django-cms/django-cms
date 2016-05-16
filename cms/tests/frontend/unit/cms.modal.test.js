@@ -552,8 +552,6 @@ describe('CMS.Modal', function () {
         });
 
         it('calls correct methods', function () {
-            var spy = jasmine.createSpy();
-
             modal.ui.breadcrumb.html('<a></a>');
 
             modal._events();
@@ -942,13 +940,13 @@ describe('CMS.Modal', function () {
 
             modal._show({});
 
-            var wrongEvent = $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
+            var wrongEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
             modal.ui.body.trigger(wrongEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
             expect(modal.options.onClose).toEqual('stuff');
 
-            var correctEvent = $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
             modal.ui.body.trigger(correctEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).toHaveBeenCalled();
@@ -1111,7 +1109,7 @@ describe('CMS.Modal', function () {
         });
 
         it('adds mousemove handler that repositions the modal', function (done) {
-            var event = $.Event(modal.pointerMove, {
+            var event = new $.Event(modal.pointerMove, {
                 originalEvent: {
                     pageX: 23,
                     pageY: 28
@@ -1249,19 +1247,19 @@ describe('CMS.Modal', function () {
 
         it('does not let the modal to be resized smaller than min height or min width', function (done) {
             var events = [
-                $.Event(modal.pointerMove, {
+                new $.Event(modal.pointerMove, {
                     originalEvent: {
                         pageX: 900,
                         pageY: 900
                     }
                 }),
-                $.Event(modal.pointerMove, {
+                new $.Event(modal.pointerMove, {
                     originalEvent: {
                         pageX: 950,
                         pageY: 700
                     }
                 }),
-                $.Event(modal.pointerMove, {
+                new $.Event(modal.pointerMove, {
                     originalEvent: {
                         pageX: 999,
                         pageY: 999
@@ -1316,6 +1314,9 @@ describe('CMS.Modal', function () {
                         });
                         done();
                         break;
+                    }
+                    default: {
+                        // do nothing
                     }
                 }
                 eventsHappened++;
@@ -1493,6 +1494,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.modalButtons).toBeEmpty();
             modal._setButtons($('.buttons-test-iframe'));
             expect(modal.ui.modalButtons).not.toBeEmpty();
+            /* eslint-disable indent */
             expect(modal.ui.modalButtons.html()).toMatch(new RegExp([
                 '<div class="cms-modal-buttons-inner">',
                     '<div class="cms-modal-item-buttons">',
@@ -1512,6 +1514,7 @@ describe('CMS.Modal', function () {
                     '</div>',
                 '</div>'
             ].join('')));
+            /* eslint-enable indent */
         });
 
         it('adds handlers to the newly created buttons', function () {
@@ -1574,8 +1577,6 @@ describe('CMS.Modal', function () {
 
         it('adds submit handlers to the form', function () {
             modal._setButtons($('.buttons-test-iframe'));
-            var spy = jasmine.createSpy();
-
             var form = $('#iframe-form').on('submit', function (e) {
                 e.preventDefault();
             });
@@ -1678,12 +1679,12 @@ describe('CMS.Modal', function () {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger($.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger($.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(1);
         });
 
@@ -1691,12 +1692,12 @@ describe('CMS.Modal', function () {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger($.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger($.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
         });
 
@@ -1704,22 +1705,22 @@ describe('CMS.Modal', function () {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(1);
 
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(2);
 
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(3);
         });
 
@@ -1727,22 +1728,22 @@ describe('CMS.Modal', function () {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
         });
     });
@@ -2103,7 +2104,7 @@ describe('CMS.Modal', function () {
                 var body = $(this).contents().find('body');
                 expect(body).toHandle('keydown.cms');
 
-                body.on('keydown.cms', function (e) {
+                body.on('keydown.cms', function () {
                     if (modal.close.calls.count()) {
                         // have to wait till next frame here
                         // because Edge is too fast and it cleans up
@@ -2114,8 +2115,8 @@ describe('CMS.Modal', function () {
                     }
                 });
 
-                body.trigger($.Event('keydown', { keyCode: CMS.KEYS.SPACE }));
-                body.trigger($.Event('keydown', { keyCode: CMS.KEYS.ESC }));
+                body.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.SPACE }));
+                body.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ESC }));
             });
         });
 

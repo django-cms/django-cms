@@ -102,7 +102,7 @@ describe('CMS.Messages', function () {
             // and it's problematic to mock it up
             spyOn($.fn, 'animate').and.callFake(function (opts) {
                 expect(opts).toEqual({
-                    'top': 46
+                    top: 46
                 });
             });
 
@@ -119,7 +119,7 @@ describe('CMS.Messages', function () {
                 // it uses same value, because toolbar itself
                 // if using margin-top: 5px to move when debug is true
                 expect(opts).toEqual({
-                    'top': 46
+                    top: 46
                 });
             });
 
@@ -135,7 +135,7 @@ describe('CMS.Messages', function () {
             CMS.settings.toolbar = 'collapsed';
             spyOn($.fn, 'animate').and.callFake(function (opts) {
                 expect(opts).toEqual({
-                    'top': 0
+                    top: 0
                 });
             });
 
@@ -149,7 +149,7 @@ describe('CMS.Messages', function () {
         it('positions message correctly if direction is center', function () {
             spyOn($.fn, 'animate').and.callFake(function (opts) {
                 expect(opts).toEqual({
-                    'top': 46
+                    top: 46
                 });
             });
 
@@ -163,7 +163,7 @@ describe('CMS.Messages', function () {
         it('positions message correctly if direction is left', function (done) {
             spyOn($.fn, 'animate').and.callFake(function (opts) {
                 expect(opts).toEqual({
-                    'left': 0
+                    left: 0
                 });
             });
 
@@ -184,7 +184,7 @@ describe('CMS.Messages', function () {
         it('positions message correctly if direction is right', function (done) {
             spyOn($.fn, 'animate').and.callFake(function (opts) {
                 expect(opts).toEqual({
-                    'right': 0
+                    right: 0
                 });
             });
 

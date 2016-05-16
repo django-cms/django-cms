@@ -2,10 +2,18 @@
 
 // #############################################################################
 // Global values, used throughout the test suites
-// TODO update with actual data
+var DEFAULT_PORT = 8000;
 
+/**
+ * @function configure
+ * @param {Object} [opts] options
+ * @param {Number|String} [opts.port] port where server runs
+ * @param {String} [opts.editOn] edit mode "on" get param
+ * @param {String} [opts.editOff] options edit mode "off" get param
+ * @returns {Object} config
+ */
 function configure(opts) {
-    var port = opts && typeof opts.port !== 'undefined' ? opts.port : 8000;
+    var port = opts && typeof opts.port !== 'undefined' ? opts.port : DEFAULT_PORT;
     var editOn = opts && typeof opts.editOn !== 'undefined' ? opts.editOn : 'edit';
     var editOff = opts && typeof opts.editOff !== 'undefined' ? opts.editOff : 'edit_off';
     var config = {
@@ -15,7 +23,7 @@ function configure(opts) {
         // - remove hardcoded host, port, language values
         baseUrl: 'http://localhost:' + port + '/en/',
         editUrl: 'http://localhost:' + port + '/en/?' + editOn,
-        editOffUrl: 'http://localhost:' + port + '/en/?edit_off',
+        editOffUrl: 'http://localhost:' + port + '/en/?' + editOff,
         adminUrl: 'http://localhost:' + port + '/en/admin/login/',
         adminLogoutUrl: 'http://localhost:' + port + '/en/admin/logout/',
         adminPagesUrl: 'http://localhost:' + port + '/en/admin/cms/page/',
