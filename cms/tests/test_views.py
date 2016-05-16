@@ -229,8 +229,6 @@ class ContextTests(CMSTestCase):
 
         # Number of queries when context processor is enabled
         with self.settings(**original_context):
-            # no extra query is run when accessing urls managed by standard
-            # django applications
             with self.assertNumQueries(FuzzyInt(0, 17)):
                 response = self.client.get("/en/plain_view/")
             # One query when determining current page
@@ -247,8 +245,6 @@ class ContextTests(CMSTestCase):
 
         # Number of queries when context processors is enabled
         with self.settings(**original_context):
-            # Exactly the same number of queries are executed with and without
-            # the context_processor
             with self.assertNumQueries(FuzzyInt(13, 25)) as context:
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
