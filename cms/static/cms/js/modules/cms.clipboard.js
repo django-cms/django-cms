@@ -71,7 +71,8 @@ var CMS = window.CMS || {};
                 minHeight: MIN_HEIGHT,
                 minimizable: false,
                 maximizable: false,
-                resizable: false
+                resizable: false,
+                closeOnEsc: false
             });
 
             that.modal.on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
