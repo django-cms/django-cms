@@ -65,6 +65,9 @@
     border-radius: $border-radius-base;
     border: 1px solid $gray-lighter;
 }
+&.cms-toolbar-debug .cms-sideframe-controls {
+    top: $sideframe-buttons-position-top + $sideframe-buttons-offset + $toolbar-debug-height;
+}
 .cms-sideframe-close,
 .cms-sideframe-history {
     display: inline-block;
