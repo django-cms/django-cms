@@ -140,14 +140,14 @@ def details(request, slug):
             app = apphook_pool.get_apphook(app_urls)
             pattern_list = []
             if app:
-                for urlpatterns in get_app_urls(app.urls):
+                for urlpatterns in get_app_urls(app.get_urls(page, current_language)):
                     pattern_list += urlpatterns
                 try:
                     view, args, kwargs = resolve('/', tuple(pattern_list))
                     return view(request, *args, **kwargs)
                 except Resolver404:
                     pass
-                    # Check if the page has a redirect url defined for this language.
+    # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
     if redirect_url:
         if (is_language_prefix_patterns_used() and redirect_url[0] == "/"

@@ -30,7 +30,7 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo']
+extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.autodoc']
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
     'django': ('http://readthedocs.org/docs/django/en/latest/', None),

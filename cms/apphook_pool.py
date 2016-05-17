@@ -79,7 +79,7 @@ class ApphookPool(object):
         for app_name in self.apps:
             app = self.apps[app_name]
 
-            if app.urls:
+            if app.get_urls():
                 hooks.append((app_name, app.name))
 
         # Unfortunately, we lose the ordering since we now have a list of
@@ -98,7 +98,7 @@ class ApphookPool(object):
             # deprecated: return apphooks registered in db with urlconf name
             # instead of apphook class name
             for app in self.apps.values():
-                if app_name in app.urls:
+                if app_name in app.get_urls():
                     return app
 
         warnings.warn(_('No registered apphook "%r" found') % app_name)

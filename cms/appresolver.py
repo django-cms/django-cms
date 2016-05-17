@@ -171,7 +171,7 @@ def get_patterns_for_title(path, title):
     """
     app = apphook_pool.get_apphook(title.page.application_urls)
     url_patterns = []
-    for pattern_list in get_app_urls(app.urls):
+    for pattern_list in get_app_urls(app.get_urls(title.page, title.language)):
         if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id
