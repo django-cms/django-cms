@@ -4,6 +4,7 @@ import json
 from django.contrib.admin.sites import site
 from django.template import Context
 from django.template.base import Template
+from django.utils import six
 from django.utils.encoding import force_text
 
 from cms.api import add_plugin
@@ -194,3 +195,10 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         with self.login_user_context(self.get_superuser()):
             response = self.client.post(url, data={'name': 'Name', 'code': 'content'})
             self.assertEqual(response.status_code, 302)
+
+    def test_display_name(self):
+        without_name = StaticPlaceholder.objects.create(code='foobar', site_id=1)
+        without_code = StaticPlaceholder.objects.create(site_id=1)
+
+        self.assertEqual(without_name.get_name(), without_name.code)
+        self.assertEqual(without_code.get_name(), six.text_type(without_code.pk))
