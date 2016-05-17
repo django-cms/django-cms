@@ -3,20 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Martin Pajuste <martinpajuste@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-05 10:16-0500\n"
-"PO-Revision-Date: 2015-10-31 12:28+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
+"PO-Revision-Date: 2010-11-30 06:49+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Slovak (Slovakia) (http://www.transifex.com/divio/django-cms/language/sk_SK/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: et\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: sk_SK\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: static/cms/js/dist/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:75
