@@ -232,9 +232,9 @@ class AdvancedSettingsForm(forms.ModelForm):
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
         if 'navigation_extenders' in self.fields:
+            navigation_extenders = self.get_navigation_extenders()
             self.fields['navigation_extenders'].widget = forms.Select(
-                {}, [('', "---------")] + menu_pool.get_menus_by_attribute(
-                    "cms_enabled", True))
+                {}, [('', "---------")] + navigation_extenders)
         if 'application_urls' in self.fields:
             # Prepare a dict mapping the apps by class name ('PollApp') to
             # their app_name attribute ('polls'), if any.
@@ -282,6 +282,9 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial
+
+    def get_navigation_extenders(self):
+        return menu_pool.get_menus_by_attribute("cms_enabled", True)
 
     def _check_unique_namespace_instance(self, namespace):
         return Page.objects.filter(

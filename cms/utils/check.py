@@ -164,7 +164,9 @@ def define_check(func):
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
-        if is_installed('sekizai'):
+        sekizai_installed = is_installed('sekizai')
+
+        if sekizai_installed:
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
@@ -173,6 +175,12 @@ def check_sekizai(output):
             section.success("Sekizai template context processor is installed")
         else:
             section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
+
+        if not sekizai_installed:
+            # sekizai is not installed.
+            # we can't reliable check templates
+            # because template loading won't work
+            return
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -231,6 +239,16 @@ def check_middlewares(output):
             if middleware not in settings.MIDDLEWARE_CLASSES:
                 section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
 
+@define_check
+def check_context_processors(output):
+    with output.section("Context processors") as section:
+        processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+        required_processors = (
+            'cms.context_processors.cms_settings',
+        )
+        for processor in required_processors:
+            if processor not in processors:
+                section.error("%s context processor must be in TEMPLATES option context_processors" % processor)
 
 @define_check
 def check_deprecated_settings(output):

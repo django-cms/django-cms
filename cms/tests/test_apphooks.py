@@ -5,7 +5,8 @@ from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import clear_url_caches, reverse, resolve
+from django.core.cache import cache
+from django.core.urlresolvers import clear_url_caches, reverse, resolve, NoReverseMatch
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.timezone import now
@@ -23,12 +24,14 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
+from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
+MENU_MODULE = "cms.test_utils.project.sampleapp.cms_menus"
 
 
 class ApphooksTestCase(CMSTestCase):
@@ -63,6 +66,7 @@ class ApphooksTestCase(CMSTestCase):
             # '...',
             'cms.test_utils.project.second_cms_urls_for_apphook_tests',
             'cms.test_utils.project.urls_for_apphook_tests',
+            APP_MODULE,
             settings.ROOT_URLCONF,
         ]
 
@@ -138,7 +142,7 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
-        self.assertEqual(len(hooks), 6)
+        self.assertEqual(len(hooks), 7)
         self.assertIn(NS_APP_NAME, app_names)
         self.assertIn(APP_NAME, app_names)
         self.apphook_clear()
@@ -364,12 +368,16 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_i18n_apphook_with_explicit_current_app(self):
+        self.apphook_clear()
         titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
         public_de_title = titles[1]
         de_title = Title.objects.get(page=public_de_title.page.publisher_draft, language="de")
         de_title.slug = "de"
         de_title.save()
         de_title.page.publish('de')
+
+        self.reload_urls()
+        self.apphook_clear()
 
         page2 = create_page("page2", "nav_playground.html",
                             "en", created_by=self.superuser, published=True, parent=de_title.page.parent,
@@ -392,6 +400,7 @@ class ApphooksTestCase(CMSTestCase):
             reverse('namespaced_app_ns:current-app', current_app="instance_1")
             reverse('namespaced_app_ns:current-app', current_app="instance_2")
             reverse('namespaced_app_ns:current-app')
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_include_extra_parameters(self):
@@ -689,6 +698,97 @@ class ApphooksTestCase(CMSTestCase):
             self.assertContains(response, 'child app content', status_code=200)
 
             self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_get_apps(self):
+        """
+        Check that urlconf are dynamically loaded according to the different page the apphook is
+        attached to
+        """
+        titles = self.create_base_structure('VariableUrlsApp', ['en', 'de'])
+        titles[0].page.reverse_id = 'page1'
+        titles[0].page.save()
+
+        self.reload_urls()
+
+        # only one urlconf is configured given that only one page is created
+        with force_language('de'):
+            reverse('extra_first')
+            with self.assertRaises(NoReverseMatch):
+                reverse('sample2-root')
+
+        self.reload_urls()
+        self.apphook_clear()
+
+        page2 = create_page('page2', 'nav_playground.html',
+                            'en', created_by=self.superuser, published=True,
+                            parent=titles[0].page.parent,
+                            apphook='VariableUrlsApp', reverse_id='page2')
+        create_title('de', 'de_title', page2, slug='slug')
+        page2.publish('de')
+
+        self.reload_urls()
+
+        with force_language('de'):
+            reverse('sample2-root')
+            reverse('extra_first')
+
+        self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_get_menus(self):
+        """
+        Check that menus are dynamically loaded according to the different page the apphook is
+        attached to
+        """
+        titles = self.create_base_structure('VariableUrlsApp', ['en', 'de'])
+        titles[0].page.reverse_id = 'page1'
+        titles[0].page.save()
+
+        cache.clear()
+        self.reload_urls()
+        menu_pool.discover_menus()
+        cache.clear()
+
+        request = self.get_request('/')
+        nodes = menu_pool.get_nodes(request)
+        nodes_urls = [node.url for node in nodes]
+        self.assertTrue(reverse('sample-account') in nodes_urls)
+        self.assertFalse('/en/child_page/page2/' in nodes_urls)
+
+        self.reload_urls()
+        self.apphook_clear()
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+
+        page2 = create_page('page2', 'nav_playground.html',
+                            'en', created_by=self.superuser, published=True,
+                            parent=titles[0].page.parent,
+                            apphook='VariableUrlsApp', reverse_id='page2')
+        create_title('de', 'de_title', page2, slug='slug')
+        page2.publish('de')
+
+        cache.clear()
+        self.reload_urls()
+        if MENU_MODULE in sys.modules:
+            del sys.modules[MENU_MODULE]
+        if 'cms.cms_menus' in sys.modules:
+            del sys.modules['cms.cms_menus']
+        menu_pool.clear(all=True)
+        menu_pool.menus = {}
+        menu_pool.modifiers = []
+        menu_pool.discovered = False
+        menu_pool._expanded = False
+        menu_pool.discover_menus()
+        cache.clear()
+
+        request = self.get_request('/page2/')
+        nodes = menu_pool.get_nodes(request)
+        nodes_urls = [node.url for node in nodes]
+        self.assertTrue(reverse('sample-account') in nodes_urls)
+        self.assertTrue(reverse('sample2-root') in nodes_urls)
+
+        self.apphook_clear()
 
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):

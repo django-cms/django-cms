@@ -24,7 +24,7 @@ from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms import api
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page, publish_page
-from cms.constants import PLUGIN_MOVE_ACTION
+from cms.constants import PLUGIN_MOVE_ACTION, TEMPLATE_INHERITANCE_MAGIC
 from cms.models import UserSettings, StaticPlaceholder
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -1684,9 +1684,16 @@ class AdminPageTreeTests(AdminTestsBase):
         page_admin = self.admin_class
 
         alpha = create_page('Alpha', 'nav_playground.html', 'en', published=True)
-        beta = create_page('Beta', 'nav_playground.html', 'en', published=True)
-        gamma = create_page('Gamma', 'nav_playground.html', 'en', published=True)
-        delta = create_page('Delta', 'nav_playground.html', 'en', published=True)
+        beta = create_page('Beta', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+        gamma = create_page('Gamma', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+        delta = create_page('Delta', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #   ⊢ Beta
+        #   ⊢ Gamma
+        #   ⊢ Delta
 
         # Move Beta to be a child of Alpha
         data = {
@@ -1704,6 +1711,13 @@ class AdminPageTreeTests(AdminTestsBase):
         self.assertEqual(data['status'], 200)
         self.assertEqual(alpha.reload().get_descendants().count(), 1)
 
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Gamma
+        #   ⊢ Delta
+
         # Move Gamma to be a child of Beta
         data = {
             'id': gamma.pk,
@@ -1720,6 +1734,13 @@ class AdminPageTreeTests(AdminTestsBase):
         self.assertEqual(data['status'], 200)
         self.assertEqual(alpha.reload().get_descendants().count(), 2)
         self.assertEqual(beta.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #           ⊢ Gamma
+        #   ⊢ Delta
 
         # Move Delta to be a child of Beta
         data = {
@@ -1763,9 +1784,108 @@ class AdminPageTreeTests(AdminTestsBase):
         self.assertEqual(beta.reload().get_descendants().count(), 2)
         self.assertEqual(gamma.reload().get_descendants().count(), 1)
 
-        # Final structure:
+        # Current structure:
         #   <root>
         #   ⊢ Alpha
         #   ⊢ Beta
         #       ⊢ Gamma
         #           ⊢ Delta
+
+        # Move Beta to be a child of Alpha again
+        data = {
+            'id': beta.pk,
+            'position': 0,
+            'target': alpha.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=beta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 3)
+        self.assertEqual(beta.reload().get_descendants().count(), 2)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #           ⊢ Gamma
+        #               ⊢ Delta
+
+        # Move Gamma to the root as node #1 (positions are 0-indexed)
+        data = {
+            'id': gamma.pk,
+            'position': 1,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=gamma.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(beta.reload().get_descendants().count(), 0)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Gamma
+        #       ⊢ Delta
+
+        # Move Delta to the root as node #1 (positions are 0-indexed)
+        data = {
+            'id': delta.pk,
+            'position': 1,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=delta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(beta.reload().get_descendants().count(), 0)
+        self.assertEqual(gamma.reload().get_descendants().count(), 0)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Delta
+        #   ⊢ Gamma
+
+        # Move Gamma to be a child of Delta
+        data = {
+            'id': gamma.pk,
+            'position': 1,
+            'target': delta.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=gamma.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(beta.reload().get_descendants().count(), 0)
+        self.assertEqual(gamma.reload().get_descendants().count(), 0)
+        self.assertEqual(delta.reload().get_descendants().count(), 1)
+
+        # Final structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Delta
+        #       ⊢ Gamma

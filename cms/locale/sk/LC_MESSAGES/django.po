@@ -5,13 +5,14 @@
 # Translators:
 # Juraj Bubniak <translations@jbub.eu>, 2013
 # Juraj Hudak <juraj.hudak@solvere.sk>, 2013
+# Thomas Thomas <tparobok@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-12-18 14:19+0000\n"
-"Last-Translator: dellax <michalnebbia@gmail.com>\n"
+"PO-Revision-Date: 2016-03-29 13:53+0000\n"
+"Last-Translator: Thomas Thomas <tparobok@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/divio/django-cms/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,7 +55,7 @@ msgstr "Časť názvu, ktorá je použitá v URL"
 
 #: admin/forms.py:76
 msgid "Menu Title"
-msgstr "Názov v menu"
+msgstr "Názov menu"
 
 #: admin/forms.py:77
 msgid "Overwrite what is displayed in the menu"
@@ -83,7 +84,7 @@ msgstr "Už existuje stránka s týmto identifikátorom"
 
 #: admin/forms.py:160
 msgid "Slug must not be empty."
-msgstr "Slug nesmie byť prázdny"
+msgstr "Slug nesmie byť prázdny."
 
 #: admin/forms.py:188
 msgid "Application"
@@ -103,11 +104,11 @@ msgstr "Ponechajte toto pole prázdne, ak chcete, aby sa použila štandardná c
 
 #: admin/forms.py:196
 msgid "X Frame Options"
-msgstr ""
+msgstr "Možnosti X Frame"
 
 #: admin/forms.py:197
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "Rozhodne, či táto stránka môže byť embedovaná na iných stránkach alebo weboch"
 
 #: admin/forms.py:202
 msgid "Redirect"
@@ -123,11 +124,11 @@ msgstr "Začnite písať..."
 
 #: admin/forms.py:213
 msgid "Application configurations"
-msgstr "Konfigúrácia aplikácie"
+msgstr "Konfigurácia aplikácie"
 
 #: admin/forms.py:219
 msgid "Language independent options"
-msgstr ""
+msgstr "Jazykovo nezávislé možnosti"
 
 #: admin/forms.py:303
 msgid "A page with this reverse URL id exists already."
@@ -135,11 +136,11 @@ msgstr "Stránka s takouto hodnotou reverse URL id už existuje."
 
 #: admin/forms.py:320
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "Inštancia aplikácie, ktorá používa tieto nastavenia už existuje."
 
 #: admin/forms.py:328 admin/forms.py:339
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "Inštancia aplikácie s týmto názvom už existuje."
 
 #: admin/forms.py:395 migrations/0001_initial.py:72
 #: migrations/0001_initial.py:135 models/permissionmodels.py:65
@@ -159,7 +160,7 @@ msgstr "Právo na pridanie stránky vyžaduje taktiež právo na editáciu strá
 
 #: admin/forms.py:491
 msgid "can_view"
-msgstr ""
+msgstr "can_view"
 
 #: admin/forms.py:502
 msgid "Please select user or group first."
@@ -190,7 +191,7 @@ msgstr "Obnoviť stránky"
 
 #: admin/forms.py:544
 msgid "Notify user"
-msgstr "Notifikovať užívateľa"
+msgstr "Upozorniť užívateľa"
 
 #: admin/forms.py:546
 msgid ""
@@ -234,7 +235,7 @@ msgstr "Dátumy publikácie"
 
 #: admin/pageadmin.py:362
 msgid "Change Permissions"
-msgstr "Upraviť obmedzenia"
+msgstr "Upraviť práva"
 
 #: admin/pageadmin.py:405
 msgid "Add Page Type"
@@ -252,7 +253,7 @@ msgstr "Zásuvný modul %(plugin_name)s bol pridaný do %(placeholder)s"
 #: admin/pageadmin.py:617
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
-msgstr ""
+msgstr "Zásuvné moduly skopírované do %(placeholder)s"
 
 #: admin/pageadmin.py:628
 #, python-format
@@ -274,11 +275,11 @@ msgstr "Zásuvný modul %(plugin_name)s na pozícii %(position)s v %(placeholder
 #: admin/pageadmin.py:660
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
-msgstr ""
+msgstr "Všetky zásuvné moduly v umiestňovači \"%(name)s\" boli odstránené."
 
 #: admin/pageadmin.py:679
 msgid "You do not have permission to change pages."
-msgstr ""
+msgstr "Nemáte právo meniť stránky."
 
 #: admin/pageadmin.py:691
 msgid "Database error"
@@ -291,29 +292,29 @@ msgstr "Nemáte právo meniť túto stránku"
 
 #: admin/pageadmin.py:794 admin/pageadmin.py:813
 msgid "Page reverted but slug stays the same because of url collisions."
-msgstr ""
+msgstr "Stránka bola vrátená, ale identifikátor ostal rovnaký pre kolíziu v url."
 
 #: admin/pageadmin.py:824
 msgid "You do not have permission to change the template"
-msgstr ""
+msgstr "Nemáte právo meniť šablónu"
 
 #: admin/pageadmin.py:828
 msgid "Template not valid"
-msgstr ""
+msgstr "Šablóna nie je platná."
 
 #: admin/pageadmin.py:833
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "Šablóna zmenená na %s"
 
 #: admin/pageadmin.py:836
 msgid "The template was successfully changed"
-msgstr ""
+msgstr "Šablóna bola úspešne zmenená"
 
 #: admin/pageadmin.py:859
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
+msgstr "Chyba! Nemáte právo presunúť túto stránku. Prosím znovu načítajte stránku."
 
 #: admin/pageadmin.py:864
 msgid "Page moved"
@@ -326,12 +327,12 @@ msgstr "Jazyk musí byť medzi podporovanými jazykmi"
 
 #: admin/pageadmin.py:915 admin/placeholderadmin.py:340
 msgid "You do not have permission to copy these plugins."
-msgstr ""
+msgstr "Nemáte právo kopírovať tieto zásuvné moduly."
 
 #: admin/pageadmin.py:918
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
-msgstr ""
+msgstr "Zásuvné moduly skopírované z %(source_language)s do %(target_language)s"
 
 #: admin/pageadmin.py:972
 msgid "You do not have permission to publish this page"
@@ -339,33 +340,33 @@ msgstr "Nemáte právo na publikovanie tejto stránky"
 
 #: admin/pageadmin.py:989 admin/pageadmin.py:1001
 msgid "Page not published! A parent page is not published yet."
-msgstr ""
+msgstr "Stránka nebola zverejnená! Nadradená stránka nebola ešte zverejnená."
 
 #: admin/pageadmin.py:991
 msgid "The content was successfully published."
-msgstr ""
+msgstr "Obsah bol úspešne publikovaný."
 
 #: admin/pageadmin.py:1003
 msgid "There was a problem publishing your content"
-msgstr ""
+msgstr "Vyskytol sa problém s publikovaním vášho obsahu"
 
 #: admin/pageadmin.py:1070
 msgid "You do not have permission to unpublish this page"
-msgstr ""
+msgstr "Nemáte právo na zrušenie publikovania tejto stránky"
 
 #: admin/pageadmin.py:1072
 msgid "This page was never published"
-msgstr "Táto stránka ešte nebola publikovaná"
+msgstr "Táto stránka ešte nebola zverejnená"
 
 #: admin/pageadmin.py:1075
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr ""
+msgstr "Na %(language)s stránke \"%(page)s\" bolo úspešne zrušené publikovanie"
 
 #: admin/pageadmin.py:1107
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
-msgstr ""
+msgstr "Stránka \"%s\" bola úspešne vrátená."
 
 #: admin/pageadmin.py:1144
 #, python-format
@@ -396,15 +397,15 @@ msgstr "Typy stránok"
 
 #: admin/pageadmin.py:1358
 msgid "You do not have permission to edit this page"
-msgstr ""
+msgstr "Nemáte právo na úpravu tejto stránky"
 
 #: admin/permissionadmin.py:90
 msgid "View restriction"
-msgstr ""
+msgstr "Obmedzenie náhľadu"
 
 #: admin/permissionadmin.py:91
 msgid "View restrictions"
-msgstr ""
+msgstr "Obmedzenia náhľadu"
 
 #: admin/permissionadmin.py:148 models/permissionmodels.py:125
 msgid "Page permissions"
@@ -416,71 +417,71 @@ msgstr "Práva užívateľov a skupín"
 
 #: admin/permissionadmin.py:150
 msgid "Page permissions management"
-msgstr "Manažment práv k stránkam"
+msgstr "Správa práv k stránkam"
 
 #: admin/placeholderadmin.py:102
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "Pole %s nebolo nájdené"
 
 #: admin/placeholderadmin.py:109
 msgid "You do not have permission to edit this item"
-msgstr ""
+msgstr "Nemáte právo upraviť túto položku"
 
 #: admin/placeholderadmin.py:251
 msgid "You do not have permission to add a plugin"
-msgstr ""
+msgstr "Nemáte právo pridať zásuvný modul"
 
 #: admin/placeholderadmin.py:274
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "Jazyk zásuvného nadradeného modulu musí byť rovnaký ako hlavný jazyk!"
 
 #: admin/placeholderadmin.py:380
 msgid "Plugin not found"
-msgstr ""
+msgstr "Zásuvný modul nebol nájdený"
 
 #: admin/placeholderadmin.py:385
 msgid "You do not have permission to edit this plugin"
-msgstr ""
+msgstr "Nemáte právo na úpravu tohto zásuvného modulu"
 
 #: admin/placeholderadmin.py:491
 msgid "You have no permission to move this plugin"
-msgstr ""
+msgstr "Nemáte žiadne práva na premiestnenie tohto zásuvného modulu"
 
 #: admin/placeholderadmin.py:548
 msgid "parent must be in the same placeholder"
-msgstr ""
+msgstr "rodič musí byť v rovnakom umiestňovači"
 
 #: admin/placeholderadmin.py:551
 msgid "parent must be in the same language as plugin_language"
-msgstr ""
+msgstr "rodič musí mať nastavený rovnaký jazyk ako jazyk zásuvného modulu"
 
 #: admin/placeholderadmin.py:585 admin/placeholderadmin.py:600
 msgid "You do not have permission to delete this plugin"
-msgstr ""
+msgstr "Nemáte právo na odstránenie tohto zásuvného modulu"
 
 #: admin/placeholderadmin.py:604
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Tento %(name)s zásuvný modul \"%(obj)s\" bol úspešne odstránený."
 
 #: admin/placeholderadmin.py:610 admin/placeholderadmin.py:654
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Nemôžete odstrániť %(name)s"
 
 #: admin/placeholderadmin.py:630 admin/placeholderadmin.py:646
 msgid "You do not have permission to clear this placeholder"
-msgstr ""
+msgstr "Nemáte právo na vyprázdnenie tohto umiestňovača"
 
 #: admin/placeholderadmin.py:649
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
+msgstr "Umiestňovač \"%(obj)s\" bol úspešne vyprázdnený."
 
 #: admin/placeholderadmin.py:659
 msgid "placeholder"
-msgstr ""
+msgstr "umiestňovač"
 
 #: apps.py:9 templates/cms/toolbar/items/logo.html:2
 #: templates/cms/welcome.html:6 templates/cms/welcome.html.py:21
@@ -490,11 +491,11 @@ msgstr "django CMS"
 
 #: cms_plugins.py:17
 msgid "Placeholder"
-msgstr ""
+msgstr "Umiestňovač"
 
 #: cms_plugins.py:31
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: cms_plugins.py:56 cms_plugins.py:65
 msgid "Create Alias"
@@ -506,7 +507,7 @@ msgstr "Štruktúra"
 
 #: cms_toolbars.py:94 forms/wizards.py:84
 msgid "Content"
-msgstr "Obash"
+msgstr "Obsah"
 
 #: cms_toolbars.py:98 templates/cms/wizards/create.html:5
 #: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
@@ -515,15 +516,15 @@ msgstr "Vytvoriť"
 
 #: cms_toolbars.py:151
 msgid "Sites"
-msgstr ""
+msgstr "Weby"
 
 #: cms_toolbars.py:152
 msgid "Admin Sites"
-msgstr ""
+msgstr "Správa Webov"
 
 #: cms_toolbars.py:159
 msgid "Administration"
-msgstr ""
+msgstr "Správa"
 
 #: cms_toolbars.py:163
 msgid "User settings"
@@ -531,11 +532,11 @@ msgstr "Používateľské nastavenia"
 
 #: cms_toolbars.py:168
 msgid "Clipboard..."
-msgstr ""
+msgstr "Schránka..."
 
 #: cms_toolbars.py:171
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Vyčistiť schránku"
 
 #: cms_toolbars.py:177
 msgid "Disable toolbar"
@@ -580,12 +581,12 @@ msgstr "Vymazať %(language)s preklad"
 #: cms_toolbars.py:427
 #, python-format
 msgid "Copy all plugins from %s"
-msgstr ""
+msgstr "Kopírovať všetky zásuvné moduly z %s"
 
 #: cms_toolbars.py:428
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
-msgstr ""
+msgstr "Určite skopírovať všetky zásuvné moduly z %s?"
 
 #: cms_toolbars.py:442
 msgid "Pages"
@@ -667,11 +668,11 @@ msgstr "Vykonať znova"
 
 #: cms_toolbars.py:572
 msgid "Are you sure you want to revert to live?"
-msgstr ""
+msgstr "Určite chcete zahodiť rozpracované zmeny?"
 
 #: cms_toolbars.py:573
 msgid "Revert to live"
-msgstr ""
+msgstr "Zahodiť rozpracované zmeny"
 
 #: cms_toolbars.py:576
 msgid "View history"
@@ -707,21 +708,21 @@ msgstr "Pridať ďalšie"
 
 #: forms/wizards.py:80
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "Uveďte názov pre novú stránku."
 
 #: forms/wizards.py:85
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
-msgstr ""
+msgstr "Voliteľné. Pokiaľ uvediete, text bude automaticky pridaný do nového textového modulu."
 
 #: forms/wizards.py:178
 msgid "User does not have permission to add page."
-msgstr ""
+msgstr "Užívateľ nemá právo pridať stránku."
 
 #: migrations/0001_initial.py:26 migrations/0001_initial.py:60
 #: migrations/0001_initial.py:83 migrations/0001_initial.py:123
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: migrations/0001_initial.py:27 models/pluginmodel.py:78
 msgid "position"
@@ -734,7 +735,7 @@ msgstr "jazyk"
 
 #: migrations/0001_initial.py:29 models/pluginmodel.py:80
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
 #: migrations/0001_initial.py:30 models/pluginmodel.py:81
 #: models/titlemodels.py:30
@@ -779,7 +780,7 @@ msgstr "môže presunúť"
 #: migrations/0001_initial.py:68 migrations/0001_initial.py:131
 #: models/permissionmodels.py:76
 msgid "view restricted"
-msgstr ""
+msgstr "zobraziť obmedzenie"
 
 #: migrations/0001_initial.py:69 models/permissionmodels.py:100
 msgid "can recover pages"
@@ -826,7 +827,7 @@ msgstr "id"
 
 #: migrations/0001_initial.py:93 models/pagemodel.py:85
 msgid "attached menu"
-msgstr ""
+msgstr "pripnuté menu"
 
 #: migrations/0001_initial.py:94 models/pagemodel.py:86
 #: templates/admin/cms/page/tree/menu_item.html:89
@@ -839,7 +840,7 @@ msgstr "vyžadovať prihlásenie"
 
 #: migrations/0001_initial.py:96 models/pagemodel.py:93
 msgid "menu visibility"
-msgstr ""
+msgstr "viditeľnosť menu"
 
 #: migrations/0001_initial.py:98 models/pagemodel.py:97
 msgid "application"
@@ -847,7 +848,7 @@ msgstr "aplikácia"
 
 #: migrations/0001_initial.py:99 models/pagemodel.py:98
 msgid "application instance name"
-msgstr ""
+msgstr "názov inštancie aplikácie"
 
 #: migrations/0001_initial.py:110 models/pagemodel.py:89
 msgid "site"
@@ -866,33 +867,33 @@ msgstr "stránka"
 
 #: models/pagemodel.py:43
 msgid "for logged in users only"
-msgstr ""
+msgstr "len pre prihlásených užívateľov"
 
 #: models/pagemodel.py:44
 msgid "for anonymous users only"
-msgstr ""
+msgstr "len pre anonymných užívateľov"
 
 #: models/pagemodel.py:53
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "Prevziať z nadradenej stránky"
 
 #: models/pagemodel.py:54
 msgid "Deny"
-msgstr ""
+msgstr "Odmietnuť"
 
 #: models/pagemodel.py:55
 msgid "Only this website"
-msgstr ""
+msgstr "Len tento web"
 
 #: models/pagemodel.py:56
 msgid "Allow"
-msgstr ""
+msgstr "Povoliť"
 
 #: models/pagemodel.py:72
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "Aby bola stránka publikovaná treba zmeniť stav na  \"publikované\"."
+msgstr "Aby bola stránka publikovaná treba zmeniť stav na  \"Publikované\"."
 
 #: models/pagemodel.py:74
 msgid "When to expire the page. Leave empty to never expire."
@@ -906,11 +907,11 @@ msgstr "Nie všetci predkovia budú zobrazení v navigácii"
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
+msgstr "Jedinečný identifikátor, ktorý je použitý s page_url templatetag pre odkazovanie do tejto stránky"
 
 #: models/pagemodel.py:87
 msgid "The template used to render the content."
-msgstr "Šablóna, ktorý sa použije na zobrazenie obsahu."
+msgstr "Šablóna, ktora sa použije na zobrazenie obsahu."
 
 #: models/pagemodel.py:89
 msgid "The site the page is accessible at."
@@ -918,7 +919,7 @@ msgstr "Stránka je dostupná na."
 
 #: models/pagemodel.py:95
 msgid "limit when this page is visible in the menu"
-msgstr ""
+msgstr "obmedzuje zobrazenie tejto stránky v menu"
 
 #: models/pagemodel.py:131
 msgid "pages"
@@ -926,7 +927,7 @@ msgstr "stránky"
 
 #: models/pagemodel.py:887
 msgid "Empty"
-msgstr ""
+msgstr "Prázdne"
 
 #: models/pagemodel.py:1013
 msgid "default"
@@ -958,7 +959,7 @@ msgstr "na úrovni stránky"
 
 #: models/permissionmodels.py:76
 msgid "frontend view restriction"
-msgstr ""
+msgstr "obmedzenie frontend view"
 
 #: models/permissionmodels.py:100
 msgid "can recover any deleted page"
@@ -1006,65 +1007,65 @@ msgstr "šírka"
 
 #: models/pluginmodel.py:125
 msgid "<Empty>"
-msgstr ""
+msgstr "<Prázdny>"
 
 #: models/settingmodels.py:12
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "Jazyk administračného rozhrania a panelu nástrojov"
 
 #: models/settingmodels.py:16
 msgid "user setting"
-msgstr ""
+msgstr "užívateľské nastavenie"
 
 #: models/settingmodels.py:17
 msgid "user settings"
-msgstr ""
+msgstr "užívateľské nastavenia"
 
 #: models/static_placeholder.py:27
 msgid "by template"
-msgstr ""
+msgstr "podľa šablóny"
 
 #: models/static_placeholder.py:28
 msgid "by code"
-msgstr ""
+msgstr "podľa kódu"
 
 #: models/static_placeholder.py:31
 msgid "static placeholder name"
-msgstr ""
+msgstr "názov statického umiestňovača"
 
 #: models/static_placeholder.py:32
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr ""
+msgstr "Popisný názov identifikujúci tento umiestňovač. Nie je zobrazený užívateľom."
 
 #: models/static_placeholder.py:34
 msgid "placeholder code"
-msgstr ""
+msgstr "kód umiestňovača"
 
 #: models/static_placeholder.py:35
 msgid "To render the static placeholder in templates."
-msgstr ""
+msgstr "Generuj statické umiestňovače v šablónach."
 
 #: models/static_placeholder.py:36
 msgid "placeholder content"
-msgstr ""
+msgstr "obsah umiestňovača"
 
 #: models/static_placeholder.py:40
 msgid "creation_method"
-msgstr ""
+msgstr "creation_method"
 
 #: models/static_placeholder.py:46
 msgid "static placeholder"
-msgstr ""
+msgstr "statický umiestňovač"
 
 #: models/static_placeholder.py:47
 msgid "static placeholders"
-msgstr ""
+msgstr "statické umiestňovače"
 
 #: models/static_placeholder.py:63
 msgid "A static placeholder with the same site and code already exists"
-msgstr ""
+msgstr "Statický umiestňovač s rovnakým kódom pre tento web už existuje"
 
 #: models/titlemodels.py:18 models/titlemodels.py:19 models/titlemodels.py:21
 msgid "title"
@@ -1072,7 +1073,7 @@ msgstr "názov"
 
 #: models/titlemodels.py:20
 msgid "overwrite the title (html title tag)"
-msgstr "Prepísať title tag v html kóde"
+msgstr "Prepísať titulok (html title tag)"
 
 #: models/titlemodels.py:22
 msgid "overwrite the title in the menu"
@@ -1084,7 +1085,7 @@ msgstr "popis"
 
 #: models/titlemodels.py:24
 msgid "The text displayed in search engines."
-msgstr ""
+msgstr "Text zobrazený vo vyhľadávačoch"
 
 #: models/titlemodels.py:25
 msgid "slug"
@@ -1096,7 +1097,7 @@ msgstr "Cesta"
 
 #: models/titlemodels.py:27
 msgid "has url overwrite"
-msgstr ""
+msgstr "má URL prepis"
 
 #: models/titlemodels.py:28
 msgid "redirect"
@@ -1112,22 +1113,22 @@ msgstr "Pokročilé nastavenia"
 
 #: plugin_base.py:98
 msgid "Generic"
-msgstr ""
+msgstr "Generic"
 
 #: plugin_base.py:289
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "Nie sú k dispozícii žiadne ďalšie nastavenia pre tento zásuvný modul. Prosím, stlačte tlačidlo Uložiť."
 
 #: south_migrations/0071_mptt_to_mp.py:54
 #, python-format
 msgid "Path Overflow from: '%s'"
-msgstr ""
+msgstr "Cesta preteká z: '%s'"
 
 #: south_migrations/0071_mptt_to_mp.py:104
 msgid ""
 "The new node is too deep in the tree, try increasing the path.max_length "
 "property and UPDATE your database"
-msgstr ""
+msgstr "Nový uzol je vnorený príliš hlboko v strome, skúste zväčšiť nastavenia path.max_length a AKTUALIZUJTE vašu databázu"
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:90
@@ -1146,7 +1147,7 @@ msgstr "Prihlásiť sa do <a href=\"%(login_url)s\">administrácie</a>."
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
-msgstr ""
+msgstr "Prihlasovacie URL: %(login_url)s"
 
 #: templates/admin/cms/mail/page_user_change.html:7
 #: templates/admin/cms/mail/page_user_change.txt:5
@@ -1186,12 +1187,12 @@ msgstr[2] "Prosím, opravte chyby uvedené nižšie."
 
 #: templates/admin/cms/page/change_form.html:78
 msgid "All permissions"
-msgstr "Všetky nastavenia práv"
+msgstr "Všetky oprávnenia"
 
 #: templates/admin/cms/page/change_form.html:79
 #: templates/admin/cms/page/tree/base.html:76
 msgid "Loading..."
-msgstr "Nahrávanie..."
+msgstr "Načítavanie..."
 
 #: templates/admin/cms/page/change_form.html:91
 #: templates/admin/cms/page/plugin/submit_line.html:9
@@ -1251,7 +1252,7 @@ msgstr "Môže presunúť"
 
 #: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
-msgstr ""
+msgstr "Môže prezerať"
 
 #: templates/admin/cms/page/permissions.html:22
 #: templates/admin/cms/page/permissions.html:23
@@ -1272,7 +1273,7 @@ msgstr "Stránka nededí žiadne práva."
 
 #: templates/admin/cms/page/plugin/error_form.html:4
 msgid "Edit model"
-msgstr ""
+msgstr "Upraviť model"
 
 #: templates/admin/cms/page/plugin/submit_line.html:7
 #: templates/admin/cms/page/submit_row.html:14
@@ -1295,7 +1296,7 @@ msgstr "Zoznam stránok"
 #: templates/admin/cms/page/tree/base.html:12
 #: templates/admin/cms/page/tree/base.html:106
 msgid "Search"
-msgstr ""
+msgstr "Hľadať"
 
 #: templates/admin/cms/page/tree/base.html:50
 msgid "Successfully moved"
@@ -1303,15 +1304,15 @@ msgstr "Úspešne presunuté"
 
 #: templates/admin/cms/page/tree/base.html:51
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "Zmeny vo vnútri stromu môžu vyžadovať znovu načítanie stránky"
 
 #: templates/admin/cms/page/tree/base.html:52
 msgid "An error occured. Please reload the page"
-msgstr ""
+msgstr "Nastala chyba. Prosím znovu načítajte stránku."
 
 #: templates/admin/cms/page/tree/base.html:53
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "Naozaj chcete § túto stránku?"
 
 #: templates/admin/cms/page/tree/base.html:69
 #, python-format
@@ -1338,11 +1339,11 @@ msgstr[2] ""
 #: templates/admin/cms/page/tree/base.html:108
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s celkovo"
 
 #: templates/admin/cms/page/tree/base.html:108
 msgid "Show all"
-msgstr ""
+msgstr "Zobraziť všetko"
 
 #: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
@@ -1366,7 +1367,7 @@ msgstr "Zobraziť"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: templates/admin/cms/page/tree/base_header.html:13
 msgid "Actions"
@@ -1374,13 +1375,13 @@ msgstr "Akcie"
 
 #: templates/admin/cms/page/tree/base_header.html:14
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: templates/admin/cms/page/tree/base_header.html:28
 msgid ""
 "<em>There is no page around yet.</em><br /><a href=\"add/\" "
 "class=\"addlink\">Add page</a> now."
-msgstr ""
+msgstr "<em>Zatiaľ tu nie je žiadna stránka. </em><br /><a href=\"add/\" class=\"addlink\">Pridajte stránku</a> teraz."
 
 #: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Copy options"
@@ -1393,7 +1394,7 @@ msgstr "Vyberte možnosti kopírovania"
 #: templates/admin/cms/page/tree/copy_premissions.html:20
 #: templates/cms/toolbar/toolbar.html:48 templates/cms/toolbar/toolbar.html:81
 msgid "Close"
-msgstr ""
+msgstr "Zavrieť"
 
 #: templates/admin/cms/page/tree/menu_item.html:18
 msgid "insert above"
@@ -1418,7 +1419,7 @@ msgstr "domov"
 #: templates/admin/cms/page/tree/menu_item.html:26
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "Aplikácia: %(apphook)s"
 
 #: templates/admin/cms/page/tree/menu_item.html:33
 #, python-format
@@ -1427,7 +1428,7 @@ msgstr "Upraviť túto stránku v jazyku %(language)s "
 
 #: templates/admin/cms/page/tree/menu_item.html:36
 msgid "Pick an action:"
-msgstr ""
+msgstr "Vyberte akciu:"
 
 #: templates/admin/cms/page/tree/menu_item.html:37
 msgid "Publish"
@@ -1439,19 +1440,19 @@ msgstr "Odpublikovať"
 
 #: templates/admin/cms/page/tree/menu_item.html:46
 msgid "in menu"
-msgstr ""
+msgstr "v menu"
 
 #: templates/admin/cms/page/tree/menu_item.html:46
 msgid "not in menu"
-msgstr ""
+msgstr "nie je v menu"
 
 #: templates/admin/cms/page/tree/menu_item.html:54
 msgid "Page settings (SHIFT-click for advanced settings)"
-msgstr "Nastavenia stránky (SHIFT klik pre pokročilé nastavenia)"
+msgstr "Nastavenia stránky (SHIFT+klik pre pokročilé nastavenia)"
 
 #: templates/admin/cms/page/tree/menu_item.html:54
 msgid "page settings"
-msgstr ""
+msgstr "nastavenia stránky"
 
 #: templates/admin/cms/page/tree/menu_item.html:56
 #: templates/cms/toolbar/dragitem.html:30
@@ -1487,7 +1488,7 @@ msgstr "vymazať"
 
 #: templates/admin/cms/page/tree/menu_item.html:74
 msgid "info"
-msgstr ""
+msgstr "info"
 
 #: templates/admin/cms/page/tree/menu_item.html:76
 msgid "Information"
@@ -1495,7 +1496,7 @@ msgstr "Informácie"
 
 #: templates/admin/cms/page/tree/menu_item.html:84
 msgid "is restricted"
-msgstr "je obmedzené?"
+msgstr "je obmedzené"
 
 #: templates/admin/cms/page/tree/menu_item.html:86
 msgid "last change by"
@@ -1503,11 +1504,11 @@ msgstr "naposledy upravil"
 
 #: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
-msgstr ""
+msgstr "Schránka"
 
 #: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:14
 msgid "Add plugin"
-msgstr ""
+msgstr "Pridať plugin"
 
 #: templates/cms/toolbar/dragbar.html:11
 msgid "Copy all"
@@ -1515,7 +1516,7 @@ msgstr "Kopírovať všetko"
 
 #: templates/cms/toolbar/dragbar.html:13
 msgid "Copy from"
-msgstr ""
+msgstr "Kopírovať z"
 
 #: templates/cms/toolbar/dragbar.html:15
 #: templates/cms/toolbar/dragitem.html:32
@@ -1533,7 +1534,7 @@ msgstr "Filtrovať pluginy..."
 
 #: templates/cms/toolbar/dragbar.html:28
 msgid "This is a static placeholder"
-msgstr ""
+msgstr "Toto je statický umiestňovač"
 
 #: templates/cms/toolbar/dragbar.html:30
 msgid "Expand all"
@@ -1545,7 +1546,7 @@ msgstr "Zbaliť všetko"
 
 #: templates/cms/toolbar/dragitem.html:12
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Nie je možné pridať pluginy do tohto pluginu."
 
 #: templates/cms/toolbar/dragitem.html:18
 #: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
@@ -1555,23 +1556,23 @@ msgstr "Upraviť"
 
 #: templates/cms/toolbar/dragitem.html:22
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Tento plugin nie je možné presunúť alebo upraviť mimo jeho rodiča."
 
 #: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Schránka je prázdna."
 
 #: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "Tento plugin neumožňuje vnárať pluginy tohto typu."
 
 #: templates/cms/toolbar/dragitem.html:35
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "Tento plugin nemôže mať vnorené pluginy."
 
 #: templates/cms/toolbar/dragitem_menu.html:5
 msgid "Available plugins"
-msgstr "Dostupné zásuvné moduly"
+msgstr "Dostupné pluginy"
 
 #: templates/cms/toolbar/items/live_draft.html:6
 msgid "View published"
@@ -1583,11 +1584,11 @@ msgstr "Prihlásiť"
 
 #: templates/cms/toolbar/placeholder.html:14
 msgid "Add plugin to placeholder"
-msgstr ""
+msgstr "Pridať plugin do umiestňovača"
 
 #: templates/cms/toolbar/plugin.html:21
 msgid "Add plugin to"
-msgstr ""
+msgstr "Pridať plugin do"
 
 #: templates/cms/toolbar/toolbar.html:12
 msgid "Double-click to edit"
@@ -1595,48 +1596,48 @@ msgstr "Dvoj-klik pre úpravu"
 
 #: templates/cms/toolbar/toolbar.html:13
 msgid "Tap to edit"
-msgstr ""
+msgstr "Ťuknite pre editáciu"
 
 #: templates/cms/toolbar/toolbar.html:29
 msgid "More"
-msgstr ""
+msgstr "Viac"
 
 #: templates/cms/toolbar/toolbar.html:43
 msgid "Toggle toolbar"
-msgstr ""
+msgstr "Prepnúť zobrazenie panelu nástrojov"
 
 #: templates/cms/toolbar/toolbar.html:62
 msgid "Click to go back"
-msgstr ""
+msgstr "Kliknite pre krok späť"
 
 #: templates/cms/toolbar/toolbar.html:63
 msgid "Click to go forward"
-msgstr ""
+msgstr "Kliknite pre krok vpred"
 
 #: templates/cms/toolbar/toolbar.html:79
 msgid "Minimize"
-msgstr ""
+msgstr "Minimalizovať"
 
 #: templates/cms/toolbar/toolbar.html:80
 msgid "Maximize"
-msgstr ""
+msgstr "Maximalizovať"
 
 #: templates/cms/toolbar/toolbar.html:104
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "Presuňte plugin sem"
 
 #: templates/cms/toolbar/toolbar.html:121
 msgid "This page has no preview!"
-msgstr ""
+msgstr "Táto stránka nemá náhľad!"
 
 #: templates/cms/toolbar/toolbar.html:122
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "Presmerováva na:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
 #, python-format
 msgid "Development version using django CMS %(cms_version)s"
-msgstr ""
+msgstr "Vývojová verzia používa django CMS %(cms_version)s"
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
 msgid "Cancel"
@@ -1644,11 +1645,11 @@ msgstr "Zrušiť"
 
 #: templates/cms/toolbar/toolbar_javascript.html:34
 msgid "The following error occured:"
-msgstr ""
+msgstr "Došlo k nasledujúcej chybe:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Action successfull... reloading."
-msgstr ""
+msgstr "Akcia bola úspešná... opätovné načítanie."
 
 #: templates/cms/toolbar/toolbar_javascript.html:36
 msgid "Are you sure you want to delete this plugin?"
@@ -1657,36 +1658,36 @@ msgstr "Ste si istí, že chcete zmazať tento zásuvný modul?"
 #: templates/cms/toolbar/toolbar_javascript.html:37
 #, python-brace-format
 msgid "({1}) plugin is empty. Remove it?"
-msgstr ""
+msgstr "({1}) plugin je prázdny. Mám ho odstrániť?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:38
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "Ste si istý, že chcete publikovať túto stránku?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:39
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Plugin bude pridaný sem"
 
 #: templates/cms/toolbar/toolbar_javascript.html:57
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr ""
+msgstr "<strong>Prihlásenie bolo neúspešné.</strong> Prosím skontrolujte vaše meno a heslo a skúste to znovu."
 
 #: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "This page has unpublished changes."
-msgstr ""
+msgstr "Táto stránka obsahuje neuverejnené zmeny."
 
 #: templates/cms/welcome.html:18
 msgid "Installation successful!"
-msgstr ""
+msgstr "Inštalácia prebehla úspešne!"
 
 #: templates/cms/welcome.html:29
 msgid "Add your first page"
-msgstr ""
+msgstr "Pridajte svoju prvú stránku"
 
 #: templates/cms/welcome.html:31
 msgid "Please log in"
-msgstr ""
+msgstr "Prihláste sa prosím"
 
 #: templates/cms/welcome.html:35
 #, python-format
@@ -1694,7 +1695,7 @@ msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr ""
+msgstr "\n                    Vitajte v django CMS verzii <strong>%(cms_version)s</strong>.\n                "
 
 #: templates/cms/welcome.html:42
 #, python-format
@@ -1702,7 +1703,7 @@ msgid ""
 "\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr ""
+msgstr "\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Pridajte prvú stránku</a> aby ste pokračovali ďalej.\n                    "
 
 #: templates/cms/welcome.html:46
 #, python-format
@@ -1711,7 +1712,7 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr ""
+msgstr "\n                        Zdá sa, že máte zakázany JavaScript. Prosím\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">pridajte stránku</a> ručne.\n                    "
 
 #: templates/cms/welcome.html:55
 msgid "Installation Notes"
@@ -1772,7 +1773,7 @@ msgstr ""
 
 #: templatetags/cms_admin.py:79
 msgid "no content"
-msgstr ""
+msgstr "žiadny obsah"
 
 #: templatetags/cms_admin.py:168 templatetags/cms_admin.py:174
 #, python-format

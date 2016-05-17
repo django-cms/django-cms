@@ -17,16 +17,37 @@ the following::
 
     class MyApphook(CMSApp):
         name = _("My Apphook")
-        urls = ["myapp.urls"]
+        _urls = ["myapp.urls"]
 
     apphook_pool.register(MyApphook)
+
+.. versionchanged:: 3.3
+    ``CMSApp.urls`` has been replaced by ``CMSApp._urls``; previous attribute is
+    now deprecated and will be removed in version 3.5
+
+.. versionchanged:: 3.3
+    ``CMSApp.menus`` has been replaced by ``CMSApp._menus``; previous attribute is
+    now deprecated and will be removed in version 3.5
+
+.. versionadded:: 3.3
+    ``CMSApp.get_urls`` accepts page, language and generic keyword arguments:
+    you can customize this function to return different list of urlconfs
+    according to the given arguments.
+
+    If you customize this method, you **must** return a non empty list of
+    urls even if all the arguments are ``None``.
+
+.. versionadded:: 3.3
+    ``CMSApp.get_menus`` accepts page, language and generic keyword arguments:
+    you can customize this function to return different list of menu classes
+    according to the given arguments.
 
 .. note:: Up to version 3.1 the module was named ``cms_app.py``, please
           update your existing modules to the new naming convention.
           Support for the old name will be removed in version 3.4.
 
 
-Replace ``myapp.urls`` with the path to your applications ``urls.py``. Now edit
+Replace ``myapp._urls`` with the path to your applications ``urls.py``. Now edit
 a page and open the advanced settings tab. Select your new apphook under
 "Application". Save the page.
 
@@ -92,8 +113,8 @@ in your app add it to your apphook like this::
 
     class MyApphook(CMSApp):
         name = _("My Apphook")
-        urls = ["myapp.urls"]
-        menus = [MyAppMenu]
+        _menus = [MyAppMenu]
+        _urls = ["myapp.urls"]
 
     apphook_pool.register(MyApphook)
 
@@ -190,8 +211,8 @@ hook like this::
 
     class MyNamespacedApphook(CMSApp):
         name = _("My Namespaced Apphook")
-        urls = ["myapp.urls"]
         app_name = "myapp_namespace"
+        _urls = ["myapp.urls"]
 
     apphook_pool.register(MyNamespacedApphook)
 
@@ -275,7 +296,7 @@ To disable this behaviour set ``permissions = False`` on your apphook::
 
     class SampleApp(CMSApp):
         name = _("Sample App")
-        urls = ["project.sampleapp.urls"]
+        _urls = ["project.sampleapp.urls"]
         permissions = False
 
 
@@ -298,7 +319,7 @@ with CMS permission decorator, then use ``exclude_permissions`` property of the 
 
     class SampleApp(CMSApp):
         name = _("Sample App")
-        urls = ["project.sampleapp.urls"]
+        _urls = ["project.sampleapp.urls"]
         permissions = True
         exclude_permissions = ["some_nested_app"]
 
@@ -309,7 +330,7 @@ will look like this::
 
     class OscarApp(CMSApp):
         name = _("Oscar")
-        urls = application.urls[0]
+        _urls = application.urls[0]
         exclude_permissions = ['dashboard']
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
