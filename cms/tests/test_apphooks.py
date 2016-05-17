@@ -786,7 +786,7 @@ class ApphooksTestCase(CMSTestCase):
         nodes = menu_pool.get_nodes(request)
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
-        self.assertTrue(reverse('sample2-root') in nodes_urls)
+        self.assertTrue('/fresh/' in nodes_urls)
 
         self.apphook_clear()
 
