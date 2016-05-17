@@ -60,7 +60,7 @@ So open your ``cms_apps.py`` and add::
 
 for importing ``PollsMenu`` and::
 
-    menus = [PollsMenu]
+    _menus = [PollsMenu]
 
 to the ``PollsApp`` class.
 

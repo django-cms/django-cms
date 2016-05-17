@@ -247,10 +247,18 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response,
-                            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"')
-        self.assertContains(response,
-                            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
+        self.assertContains(
+            response,
+            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"'
+        )
+        self.assertContains(
+            response,
+            'data-on-success="REFRESH_PAGE" data-cms-icon="whatever" >Data item - not usable</a></div>'
+        )
+        self.assertContains(
+            response,
+            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"'
+        )
 
     def test_markup_toolbar_url_page(self):
         superuser = self.get_superuser()
@@ -417,7 +425,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        self.assertEqual(len(items), 8)
+        self.assertEqual(len(items), 7)
 
     def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -431,7 +439,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
+        self.assertEqual(len(items), 5)
 
         # adding back structure mode permission
         permission = Permission.objects.get(codename='use_structure')
@@ -443,7 +451,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit mode + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 7)
+        self.assertEqual(len(items), 6)
 
     def test_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -458,7 +466,7 @@ class ToolbarTests(ToolbarTestBase):
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 4, items)
+        self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 12, admin_items)
 
@@ -475,13 +483,13 @@ class ToolbarTests(ToolbarTestBase):
         en_toolbar.populate()
         en_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
 
     def test_double_menus(self):
         """
@@ -568,6 +576,30 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(menu1, menu2)
         self.assertEqual(menu1.name, 'Test')
         self.assertEqual(len(toolbar.get_right_items()), 1)
+
+    def test_negative_position_left(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        request = self.get_page_request(page, self.get_staff(), '/')
+        toolbar = CMSToolbar(request)
+        # Starting point: [Menu:Example, Menu:Page, Menu:Language]
+        # Example @ 1, Page @ 2, Language @ -1
+        menu1 = toolbar.get_or_create_menu("menu1", "Menu1", side=toolbar.LEFT, position=-2)
+        menu2 = toolbar.get_or_create_menu("menu2", "Menu2", side=toolbar.LEFT, position=-3)
+        self.assertEqual(toolbar.get_left_items().index(menu1), 3)
+        self.assertEqual(toolbar.get_left_items().index(menu2), 2)
+
+    def test_negative_position_right(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        request = self.get_page_request(page, self.get_staff(), '/')
+        toolbar = CMSToolbar(request)
+        # Starting point: [] (empty)
+        # Add a couple of "normal" menus
+        toolbar.get_or_create_menu("menu1", "Menu1", side=toolbar.RIGHT)
+        toolbar.get_or_create_menu("menu2", "Menu2", side=toolbar.RIGHT)
+        menu3 = toolbar.get_or_create_menu("menu3", "Menu3", side=toolbar.RIGHT, position=-1)
+        menu4 = toolbar.get_or_create_menu("menu4", "Menu4", side=toolbar.RIGHT, position=-2)
+        self.assertEqual(toolbar.get_right_items().index(menu3), 3)
+        self.assertEqual(toolbar.get_right_items().index(menu4), 2)
 
     def test_page_create_redirect(self):
         superuser = self.get_superuser()

@@ -14,10 +14,6 @@
     box-shadow: $toolbar-shadow;
     backface-visibility: hidden;
 
-    &.cms-toolbar-non-sticky {
-        position: absolute;
-    }
-
     .cms-toolbar-expanded & {
         margin-top: 0;
     }
@@ -52,6 +48,17 @@
         float: left;
     }
 }
+
+@at-root .cms-toolbar-non-sticky {
+    position: static !important;
+    .cms .cms-toolbar {
+        position: absolute;
+    }
+    .cms.cms-toolbar-debug .cms-toolbar {
+        margin-top: -$toolbar-debug-height !important;
+    }
+}
+
 
 //###########################################################
 // #TOOLBAR/debug#
@@ -187,6 +194,7 @@
         a {
             cursor: default !important;
             opacity: 0.2;
+            &,
             &:hover,
             &:active,
             &:focus {

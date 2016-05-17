@@ -41,6 +41,7 @@ module.exports = function (config) {
 
             // these have to be specified in order since
             // dependency loading is not handled yet
+            'cms/static/cms/js/polyfills/array.prototype.findindex.js',
             'cms/static/cms/js/libs/jquery.min.js',
             'cms/static/cms/js/libs/class.min.js',
             'cms/static/cms/js/libs/pep.js',
@@ -60,8 +61,9 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.navigation.js',
             'cms/static/cms/js/modules/cms.toolbar.js',
             'cms/static/cms/js/modules/cms.tooltip.js',
-            'cms/static/cms/js/modules/cms.pagetree.js',
             'cms/static/cms/js/modules/cms.pagetree.dropdown.js',
+            'cms/static/cms/js/modules/cms.pagetree.stickyheader.js',
+            'cms/static/cms/js/modules/cms.pagetree.js',
 
             // test helpers
             'cms/tests/frontend/unit/helpers/mock-ajax.js',

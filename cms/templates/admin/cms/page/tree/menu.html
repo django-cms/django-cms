@@ -74,11 +74,8 @@
                         <div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top js-cms-pagetree-dropdown-menu">
                             <ul class="cms-pagetree-dropdown-menu-inner">
                                 <li>
-                                    <span class="label">{% filter escapejs %}{% trans "Pick an action:" %}{% endfilter %}</span>
-                                </li>
-                                <li>
                                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
-                                        <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
+                                        <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Preview this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
                                         <span>{% filter escapejs %}{% trans "Preview" %}{% endfilter %}</span>
                                     </a>
                                 </li>
@@ -127,7 +124,7 @@
             <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
                     {% if has_change_permission %}
-                        <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
+                        <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                     {% endif %}
                         {% if page.in_navigation %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
@@ -166,10 +163,10 @@
                 {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
                     <div class="cms-tree-item cms-tree-item-button">
                         <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                            data-cms-tooltip="{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}">
+                            data-cms-tooltip="{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}">
                             <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"
                                 class="cms-btn cms-btn-default cms-icon cms-icon-plus">
-                                <span class="sr-only">{% filter escapejs %}{% trans 'Add Child' %}{% endfilter %}</span>
+                                <span class="sr-only">{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}</span>
                             </a>
                         </div>
                     </div>
@@ -181,7 +178,6 @@
 
                     <div class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
                         <ul class="cms-pagetree-dropdown-menu-inner">
-                            <li><span class="label">{% filter escapejs %}{% trans "Pick an action" %}{% endfilter %}</span></li>
                             {% if has_change_permission %}
                                 <li class="js-cms-tree-item-copy"
                                     data-id="{{ page.pk }}"
@@ -260,7 +256,7 @@
     '
     >
 
-    {% language preview_language %}
+    {% language LANGUAGE_CODE %}
         {{ page.get_admin_tree_title }}
     {% endlanguage %}
 

@@ -817,6 +817,14 @@ class PublishingTests(TestCase):
         # Assert "first child" is no longer in pending state
         # and instead is in published state.
         self.assertEqual(child_1_1.get_publisher_state('en', force_reload=True), PUBLISHER_STATE_DEFAULT)
+
+        draft_tree_path = child_1_1.path[:4]
+        live_tree_path = child_1_1.publisher_public.path[:4]
+
+        # Make sure the draft and live child nodes are on separate trees
+        self.assertNotEqual(draft_tree_path, live_tree_path)
+
+        # However they should share the same branch path
         self.assertEqual(child_1_1.path[4:], child_1_1.publisher_public.path[4:])
         self.assertEqual(child_1_1.depth, child_1_1.publisher_public.depth)
 

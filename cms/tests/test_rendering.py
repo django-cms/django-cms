@@ -6,13 +6,14 @@ from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
-from cms.cache.placeholder import get_placeholder_cache, get_placeholder_page_cache
+from cms.cache.placeholder import get_placeholder_cache
 from cms.models import Page, Placeholder, CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import ChangeModel
 from cms.test_utils.util.mock import AttributeObject
+from cms.toolbar.toolbar import CMSToolbar
 from cms.views import details
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -323,14 +324,14 @@ class RenderingTestCase(CMSTestCase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-
+        request = self.get_request('/')
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
 
-        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en', 1, request)
         self.render(template, self.test_page, {'ex1': ex1})
-        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en', 1, request)
 
         self.assertEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_after)
@@ -343,14 +344,14 @@ class RenderingTestCase(CMSTestCase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-
+        request = self.get_request('/')
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
 
-        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en', 1, request)
         self.render(template, self.test_page, {'ex1': ex1})
-        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en')
+        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en', 1, request)
 
         self.assertNotEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_before)
@@ -405,10 +406,11 @@ class RenderingTestCase(CMSTestCase):
         Tests that {% show_uncached_placeholder %} does not populate cache.
         """
         template = '{% load cms_tags %}<h1>{% show_uncached_placeholder "sub" test_page %}</h1>'
-
-        cache_value_before = get_placeholder_page_cache(self.test_page, 'en', self.test_page.site_id, 'sub')
+        placeholder = self.test_page.placeholders.get(slot='sub')
+        request = self.get_request(self.test_page)
+        cache_value_before = get_placeholder_cache(placeholder, 'en', 1, request)
         output = self.render(template, self.test_page, {'test_page': self.test_page})
-        cache_value_after = get_placeholder_page_cache(self.test_page, 'en', self.test_page.site_id, 'sub')
+        cache_value_after = get_placeholder_cache(placeholder, 'en', 1, request)
 
         self.assertEqual(output, '<h1>%s</h1>' % self.test_data['text_sub'])
         self.assertEqual(cache_value_before, cache_value_after)
@@ -535,8 +537,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder = Placeholder()
         placeholder.slot = 'test'
         placeholder.pk = placeholder.id = 99
-        context = SekizaiContext()
-        context['request'] = AttributeObject(
+        request = AttributeObject(
             GET={'language': 'en'},
             session={},
             path='/',
@@ -544,6 +545,11 @@ class RenderingTestCase(CMSTestCase):
             current_page=None,
             method='GET',
         )
+        request.toolbar = CMSToolbar(request)
+
+        context = SekizaiContext()
+        context['request'] = request
+
         classes = [
             "cms-placeholder-%s" % placeholder.pk,
             'cms-placeholder',

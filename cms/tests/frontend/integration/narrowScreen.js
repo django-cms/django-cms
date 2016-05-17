@@ -66,7 +66,7 @@ casper.test.begin('Toolbar menu is collapsed on narrow screens (768, 1024)', fun
         .waitUntilVisible('.cms-toolbar-item-navigation-hover', function () {
             test.assertEvalEquals(function () {
                 return CMS.$('.cms-toolbar-item-navigation-hover > ul > li > a:visible').length;
-            }, 4, 'Only top level menu items are in the More dropdown');
+            }, 3, 'Only top level menu items are in the More dropdown');
         })
         .run(function () {
             test.done();

@@ -86,7 +86,7 @@ var CMS = window.CMS || {};
             var that = this;
             setTimeout(function () {
                 that._initialStates();
-            }, 200);
+            }, 0);
 
             // set a state to determine if we need to reinitialize this._events();
             this.ui.toolbar.data('ready', true);
@@ -216,7 +216,9 @@ var CMS = window.CMS || {};
                         reset();
                     }
 
-                    if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
+                    var isRootNode = el.parent().hasClass(root);
+
+                    if (isRootNode && el.hasClass(hover) || el.hasClass(disabled) && !isRootNode) {
                         return false;
                     } else {
                         el.addClass(hover);
@@ -318,6 +320,7 @@ var CMS = window.CMS || {};
 
                 btn.find('.cms-btn-publish').on(that.click, function (e) {
                     e.preventDefault();
+                    that.showLoader();
                     // send post request to prevent xss attacks
                     $.ajax({
                         'type': 'post',
@@ -331,8 +334,10 @@ var CMS = window.CMS || {};
                                 [CMS.settings.edit_off + '=true']
                             );
                             CMS.API.Helpers.reloadBrowser(url);
+                            that.hideLoader();
                         },
                         'error': function (request) {
+                            that.hideLoader();
                             throw new Error(request);
                         }
                     });
@@ -766,10 +771,9 @@ var CMS = window.CMS || {};
         _stickToolbar: function _stickToolbar() {
             this._position.stickyTop = 0;
             this._position.isSticky = true;
-            this.ui.toolbar.removeClass('cms-toolbar-non-sticky');
+            this.ui.body.removeClass('cms-toolbar-non-sticky');
             this.ui.toolbar.css({
-                'top': 0,
-                'margin-top': ''
+                'top': 0
             });
         },
 
@@ -781,19 +785,14 @@ var CMS = window.CMS || {};
          * @private
          */
         _unstickToolbar: function _unstickToolbar() {
-            var htmlMargin = parseInt($('html').css('margin-top'), 10);
-
             this._position.stickyTop = this._position.top;
-            this.ui.toolbar.addClass('cms-toolbar-non-sticky');
+            this.ui.body.addClass('cms-toolbar-non-sticky');
             // have to do the !important because of "debug" toolbar
             this.ui.toolbar[0].style.setProperty(
                 'top',
                 (this._position.stickyTop + (CMS.config.debug ? 5 : -5)) + 'px',
                 'important'
             );
-            this.ui.toolbar.css({
-                'margin-top': -(htmlMargin + ((CMS.config.debug ? 5 : 0)))
-            });
             this._position.isSticky = false;
         }
     });

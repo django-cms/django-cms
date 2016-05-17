@@ -11,7 +11,7 @@
     {% endfor %}
     <div class="cms-clipboard-containers cms-dragarea cms-draggables">
         {% for plugin in clipboard_plugins %}
-            {% with clipboard="true" %}{% include "cms/toolbar/dragitem.html" with plugin=plugin %}{% endwith %}
+            {% with clipboard="true" %}{% include request.toolbar.drag_item_template with plugin=plugin %}{% endwith %}
         {% endfor %}
     </div>
 </div>

@@ -16,13 +16,70 @@ by major code cleanup to remove compatibility shims.
 What's new in 3.3
 *****************
 
+* Removed support for Django 1.6, 1.7 and python 2.6
 * Set the default value of CMSPlugin.position to 0 instead of null
-* Management commands has been completely refactored for better consistency (see
-  `backward_incompatible_3.3`_ for details)
-* Introduction of the method `get_cache_expiration` on CMSPluginBase to be used
+* Refactor language menu to allow for better integration with many languages
+* Management commands has been completely refactored for better consistency
+* Fix "failed to load resource" for favicon on welcome screen
+* ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding``
+  and ``cms-toolbar-collapsing`` classes are added at the beginning of their
+  respective animations.
+* Added unit tests for CMS JavaScript files
+* Added frontend integration tests (written with Casper JS)
+* Removed frontend integration tests (written with Selenium)
+* Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
+  the toolbar will appear for authorized users. If left unset, retains the
+  existing behavior of allowing toolbar for authorized users at any IP address.
+* Side-frame is no longer resizable, opens to 90% of the screen or 100% on
+  small screens.
+* Removed some unnecessary reloads happening after closing sideframe.
+* CMS handles uninstalled apphooks better
+* Minor UI improvements
+* Changed pagetree UI
+* Added the ability to make pagetree actions work on currently picked language
+* Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
+* Introduce the method ``get_cache_expiration`` on CMSPluginBase to be used
   by plugins for declaring their rendered content's period of validity.
+* Introduce the method ``get_vary_cache_on`` on CMSPluginBase to be used by
+  plugins for declaring ``VARY`` headers.
+* Improve the placeholder cache substantially.
+* Fixed breadcrumbs of recently moved plugin reflecting previous position in
+  the tree
+* Refactored plugin adding logic to no longer create the plugin
+  before the user submits the form.
+* The fix-tree command now sorts by position and path when rebuilding positions.
+* Speed up plugin moving to no longer save all plugins inside the placeholder.
+* Fixed several regressions and tree corrptions on page moving.
+* Added new class method on CMSPlugin ``requires_parent_plugin``
+* ``get_child_classes`` now will correctly calculate child classes when not
+  configured in the placeholder.
+* Removed internal ``ExtraMenuItems`` tag.
+* Removed internal ``PluginChildClasses`` tag.
+* Modified RenderPlugin tag to no longer render the ``content.html`` template
+  and instead just return the results.
+* ``Toolbar()`` main class now has a ``get_cached_template`` method that's
+  used to reuse loaded templates per request. It works like Django's cached
+  template loader but on a request basis.
+* Use a method to get CMSApp.urls, to allow passing a page object to it.
+
 
 .. _backward_incompatible_3.3:
+
+****************
+Upgrading to 3.3
+****************
+
+A database migration is required because the default value of CMSPlugin.position was set to 0 instead of null.
+
+Please make sure that your current database is consistent and in a healthy state,
+and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate
+    python manage.py cms fix-tree
+
 
 *****************************
 Backward incompatible changes
@@ -44,3 +101,16 @@ Detailed changes:
  * some commands have been rename replacing underscores with hyphens for consistency
  * all arguments are now non-positional. If you use the commands by using Django's
    ``call_command`` function you will have to adapt the command invocation to reflect this.
+
+
+Signature changes
+=================
+
+The signatures of the toolbar methods ``get_or_create_menu`` have a new kwarg
+``disabled`` *inserted* (not appended). This was done to maintain consistency with
+other, existing toolbar methods. The signatures are now:
+
+ * ``cms.toolbar.items.Menu.get_or_create_menu(key, verbose_name, disabled=False, side=LEFT, position=None)``
+ * ``cms.toolbar.toolbar.CMSToolbar.get_or_create_menu(key, verbose_name=None, disabled=False, side=LEFT, position=None)``
+
+It should only affect developers who use kwargs as positional args.

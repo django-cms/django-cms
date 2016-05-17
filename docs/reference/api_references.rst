@@ -63,7 +63,7 @@ Functions and constants
 .. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False)
 
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
-    creates a :class:`cms.models.titlemodel.Title` instance for the specified
+    creates a :class:`cms.models.titlemodels.Title` instance for the specified
     language.
 
     :param string title: Title of the page
@@ -100,7 +100,7 @@ Functions and constants
 
 .. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None, with_revision=False)
 
-    Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
+    Creates a :class:`cms.models.titlemodels.Title` instance and returns it.
 
     :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
     :param string title: Title of the page
@@ -247,6 +247,18 @@ cms.constants
 
     Constant of 31536000 or 365 days in seconds used for cache control headers
 
+************
+cms.app_base
+************
+
+.. module:: cms.app_base
+
+.. autoclass:: CMSApp
+    :members:
+    :private-members:
+
+    .. autoattribute:: CMSApp._urls
+    .. autoattribute:: CMSApp._menus
 
 ***************
 cms.plugin_base
@@ -368,6 +380,25 @@ cms.plugin_base
         :rtype: ``None`` or ``datetime`` or ``int``
 
 
+    .. method:: get_vary_cache_on(request, instance, placeholder):
+
+        Provides ``VARY`` header strings to be considered by the placeholder
+        and in turn by the page.
+
+        Must return one of:
+
+            :``None``:
+                This means that this plugin declares no headers for the cache
+                to be varied upon. (default)
+
+            :string:
+                The name of a header to vary caching upon.
+
+            :list of strings:
+                A list of strings, each corresponding to a header to vary the
+                cache upon.
+
+
     .. method:: render(context, instance, placeholder)
 
         This method returns the context to be used to render the template
@@ -387,6 +418,19 @@ cms.plugin_base
         :param placeholder: Name of the placeholder the plugin is in.
         :rtype: ``dict``
 
+
+.. class:: PluginMenuItem
+
+    .. method:: __init___(name, url, data, question=None, action='ajax', attributes=None)
+
+        Creates an item in the plugin / placeholder menu
+
+        :param name: Item name (label)
+        :param url: URL the item points to. This URL will be called using POST
+        :param data: Data to be POSTed to the above URL
+        :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
+        :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+        :param attributes: Dictionary whose content will be addes as data-attributes to the menu item
 
 .. _toolbar-api-reference:
 

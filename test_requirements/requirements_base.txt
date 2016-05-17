@@ -9,6 +9,7 @@ dj-database-url
 djangocms-admin-style>=1.0
 django-sekizai>=0.9
 django-classy-tags>=0.7.2
+https://github.com/divio/djangocms-text-ckeditor/archive/develop.zip
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
@@ -23,7 +24,7 @@ https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec7600
 iptools
 sphinx
 sphinxcontrib-spelling
-pyflakes
+pyflakes==1.1.0
 pyenchant
 # required to run the server for integration tests
 djangocms-helper

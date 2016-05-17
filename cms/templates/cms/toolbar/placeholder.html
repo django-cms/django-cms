@@ -20,5 +20,8 @@ CMS._plugins.push(['cms-placeholder-{{ placeholder.pk|unlocalize }}', {
     }
 }]);
 </script>
+<script id="cms-plugin-child-classes-{{ placeholder.pk|unlocalize }}" type="text/cms-template">
+    {% include request.toolbar.drag_item_menu_template %}
+</script>
 {% endlanguage %}
 {% endaddtoblock %}

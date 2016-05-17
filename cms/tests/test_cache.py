@@ -3,11 +3,21 @@
 import time
 
 from django.conf import settings
+from django.template import Context
 
 from sekizai.context import SekizaiContext
 
-from cms.api import add_plugin, create_page
+from cms.api import add_plugin, create_page, create_title
 from cms.cache import _get_cache_version, invalidate_cms_page_cache
+from cms.cache.placeholder import (
+    _get_placeholder_cache_version_key,
+    _get_placeholder_cache_version,
+    _set_placeholder_cache_version,
+    _get_placeholder_cache_key,
+    set_placeholder_cache,
+    get_placeholder_cache,
+    clear_placeholder_cache,
+)
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
@@ -20,11 +30,13 @@ from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
     SekizaiPlugin,
     TimeDeltaCacheExpirationPlugin,
     TTLCacheExpirationPlugin,
+    VaryCacheOnPlugin,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting
+from cms.utils.helpers import get_timezone_name
 
 
 class CacheTestCase(CMSTestCase):
@@ -77,8 +89,9 @@ class CacheTestCase(CMSTestCase):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
+
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
-            with self.assertNumQueries(FuzzyInt(7, 11)):
+            with self.assertNumQueries(FuzzyInt(7, 13)):
                 self.client.get('/en/')
 
     def test_no_cache_plugin(self):
@@ -432,8 +445,7 @@ class CacheTestCase(CMSTestCase):
             #
             with self.settings(CMS_PAGE_CACHE=False):
 
-
-                # Test that the page is initially uncached
+                # Test that the page is initially un-cached
                 with self.assertNumQueries(FuzzyInt(1, 20)):
                     response = self.client.get('/en/')
                 self.assertEqual(response.status_code, 200)
@@ -573,3 +585,149 @@ class CacheTestCase(CMSTestCase):
         # plugin text has changed, so the placeholder rendering
         text = render_placeholder(ph1, context)
         self.assertEqual(text, "Other text")
+
+
+class PlaceholderCacheTestCase(CMSTestCase):
+    def setUp(self):
+        from django.core.cache import cache
+        super(PlaceholderCacheTestCase, self).setUp()
+        cache.clear()
+
+        self.page = create_page(
+            'en test page', 'nav_playground.html', 'en', published=True)
+        # Now create and publish as 'de' title
+        create_title('de', "de test page", self.page)
+        self.page.publish('de')
+
+        self.placeholder = self.page.placeholders.filter(slot="body")[0]
+        plugin_pool.register_plugin(VaryCacheOnPlugin)
+        add_plugin(self.placeholder, 'TextPlugin', 'en', body='English')
+        add_plugin(self.placeholder, 'TextPlugin', 'de', body='Deutsch')
+        add_plugin(self.placeholder, 'VaryCacheOnPlugin', 'en')
+        add_plugin(self.placeholder, 'VaryCacheOnPlugin', 'de')
+
+        self.en_request = self.get_request('/en/')
+        self.en_request.current_page = Page.objects.get(pk=self.page.pk)
+
+        self.en_us_request = self.get_request('/en/')
+        self.en_us_request.META['HTTP_COUNTRY_CODE'] = 'US'
+
+        self.en_uk_request = self.get_request('/en/')
+        self.en_uk_request.META['HTTP_COUNTRY_CODE'] = 'UK'
+
+        self.de_request = self.get_request('/de/')
+        self.de_request.current_page = Page.objects.get(pk=self.page.pk)
+
+    def tearDown(self):
+        from django.core.cache import cache
+        super(PlaceholderCacheTestCase, self).tearDown()
+        plugin_pool.unregister_plugin(VaryCacheOnPlugin)
+        cache.clear()
+
+    def test_get_placeholder_cache_version_key(self):
+        cache_version_key = '{prefix}|placeholder_cache_version|id:{id}|lang:{lang}|site:{site}'.format(
+            prefix=get_cms_setting('CACHE_PREFIX'),
+            id=self.placeholder.pk,
+            lang='en',
+            site=1,
+        )
+        self.assertEqual(
+            _get_placeholder_cache_version_key(self.placeholder, 'en', 1),
+            cache_version_key
+        )
+
+    def test_set_clear_get_placeholder_cache_version(self):
+        initial, _ = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        clear_placeholder_cache(self.placeholder, 'en', 1)
+        version, _ = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        self.assertGreater(version, initial)
+
+    def test_get_placeholder_cache_key(self):
+        version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+            prefix=get_cms_setting('CACHE_PREFIX'),
+            id=self.placeholder.pk,
+            lang='en',
+            site=1,
+            tz=get_timezone_name(),
+            version=version,
+            cc='_',
+        )
+        _set_placeholder_cache_version(self.placeholder, 'en', 1, version, vary_on_list=vary_on_list, duration=1)
+        actual_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_request)
+        self.assertEqual(actual_key, desired_key)
+
+        en_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_request)
+        de_key = _get_placeholder_cache_key(self.placeholder, 'de', 1, self.de_request)
+        self.assertNotEqual(en_key, de_key)
+
+        en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_us_request)
+        self.assertNotEqual(en_key, en_us_key)
+
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+            prefix=get_cms_setting('CACHE_PREFIX'),
+            id=self.placeholder.pk,
+            lang='en',
+            site=1,
+            tz=get_timezone_name(),
+            version=version,
+            cc='US',
+        )
+        self.assertEqual(en_us_key, desired_key)
+
+    def test_set_get_placeholder_cache(self):
+        # Test with a super-long prefix
+        en_context = Context({'request': self.en_request})
+        en_us_context = Context({'request': self.en_us_request})
+        en_uk_context = Context({'request': self.en_uk_request})
+
+        en_content = self.placeholder.render(en_context, 350, lang='en')
+        en_us_content = self.placeholder.render(en_us_context, 350, lang='en')
+        en_uk_content = self.placeholder.render(en_uk_context, 350, lang='en')
+
+        del self.placeholder._plugins_cache
+
+        de_context = Context({'request': self.de_request})
+        de_content = self.placeholder.render(de_context, 350, lang='de')
+
+        self.assertNotEqual(en_content, de_content)
+
+        set_placeholder_cache(self.placeholder, 'en', 1, en_content, self.en_request)
+        cached_en_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_request)
+        self.assertEqual(cached_en_content, en_content)
+
+        set_placeholder_cache(self.placeholder, 'de', 1, de_content, self.de_request)
+        cached_de_content = get_placeholder_cache(self.placeholder, 'de', 1, self.de_request)
+        self.assertNotEqual(cached_en_content, cached_de_content)
+
+        set_placeholder_cache(self.placeholder, 'en', 1, en_us_content, self.en_us_request)
+        cached_en_us_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_us_request)
+        self.assertNotEqual(cached_en_content, cached_en_us_content)
+
+        set_placeholder_cache(self.placeholder, 'en', 1, en_uk_content, self.en_uk_request)
+        cached_en_uk_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_uk_request)
+        self.assertNotEqual(cached_en_us_content, cached_en_uk_content)
+
+    def test_set_get_placeholder_cache_with_long_prefix(self):
+        """
+        This is for testing that everything continues to work even when the
+        cache-keys are hashed.
+        """
+        # Use an absurdly long cache prefix to get us in the right neighborhood...
+        with self.settings(CMS_CACHE_PREFIX="super_lengthy_prefix" * 9):  # 180 chars
+            en_crazy_request = self.get_request('/en/')
+            # Use a ridiculously long "country code" (80 chars), already we're at 260 chars.
+            en_crazy_request.META['HTTP_COUNTRY_CODE'] = 'US' * 40  # 80 chars
+            en_crazy_context = Context({'request': en_crazy_request})
+            en_crazy_content = self.placeholder.render(en_crazy_context, 350, lang='en')
+            set_placeholder_cache(self.placeholder, 'en', 1, en_crazy_content, en_crazy_request)
+
+            # Prove that it is hashed...
+            crazy_cache_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, en_crazy_request)
+            key_length = len(crazy_cache_key)
+            # 213 = 180 (prefix length) + 1 (separator) + 32 (md5 hash)
+            self.assertTrue('render_placeholder' not in crazy_cache_key and key_length == 213)
+
+            # Prove it still works as expected
+            cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', 1, en_crazy_request)
+            self.assertEqual(en_crazy_content, cached_en_crazy_content)

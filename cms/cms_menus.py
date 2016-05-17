@@ -79,17 +79,18 @@ def get_visible_pages(request, pages, site=None):
     return [page.pk for page in pages]
 
 
-def page_to_node(page, home, cut):
+def page_to_node(manager, page, home, cut):
     """
     Transform a CMS page into a navigation node.
 
+    :param manager: MenuManager instance bound to the request
     :param page: the page you wish to transform
     :param home: a reference to the "home" page (the page with path="0001")
     :param cut: Should we cut page from its parent pages? This means the node will not
          have a parent anymore.
     """
     # Theses are simple to port over, since they are not calculated.
-    # Other attributes will be added conditionnally later.
+    # Other attributes will be added conditionally later.
     attr = {
         'is_page': True,
         'soft_root': page.soft_root,
@@ -116,9 +117,9 @@ def page_to_node(page, home, cut):
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
-        if page.navigation_extenders in menu_pool.menus:
+        if page.navigation_extenders in manager.menus:
             extenders.append(page.navigation_extenders)
-        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in menu_pool.menus:
+        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in manager.menus:
             extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     lang = get_language()
@@ -129,7 +130,8 @@ def page_to_node(page, home, cut):
         app_name = page.get_application_urls(fallback=False)
         if app_name:  # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
-            extenders += app.menus
+            if app:
+                extenders += app.get_menus(page, lang)
     exts = []
     for ext in extenders:
         if hasattr(ext, "get_instances"):
@@ -159,6 +161,7 @@ def page_to_node(page, home, cut):
 
 
 class CMSMenu(Menu):
+
     def get_nodes(self, request):
         page_queryset = get_page_queryset(request)
         site = current_site(request)
@@ -215,9 +218,11 @@ class CMSMenu(Menu):
             page = ids[title.page_id]
             page.title_cache[title.language] = title
 
+        manager = self.manager
+
         for page in actual_pages:
             if page.title_cache:
-                nodes.append(page_to_node(page, home, home_cut))
+                nodes.append(page_to_node(manager, page, home, home_cut))
         return nodes
 
 
@@ -225,6 +230,7 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
+
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
@@ -253,8 +259,9 @@ class NavExtender(Modifier):
                                 extnode.parent = node
                                 node.children.append(extnode)
         removed = []
+
         # find all not assigned nodes
-        for menu in menu_pool.menus.items():
+        for menu in self.manager.menus.items():
             if (hasattr(menu[1], 'cms_enabled')
                     and menu[1].cms_enabled and not menu[0] in exts):
                 for node in nodes:

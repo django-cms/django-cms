@@ -38,29 +38,28 @@
                     <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "This plugin cannot have nested plugins." %}"></span>
                 </div>
                 <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="delete" href="#">{% trans "Delete" %}</a></div>
-                {% extra_menu_items plugin %}
+                {% render_extra_menu_items plugin %}
             </div>
         </div>
         {% if not clipboard %}
             <div class="cms-plugin-picker" data-touch-action="pan-y">
                 <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
-                {% plugin_child_classes plugin %}
+                {# plugin child classes here #}
             </div>
         {% endif %}
 
         {% if clipboard %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
         <span class="cms-dragitem-text" title="{{ plugin.plugin_type }} ID: {{ plugin.pk }}"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
+    {% endlanguage %}
     </div>
 
     <div class="cms-collapsable-container cms-hidden
         {% if allow_children %} cms-draggables{% endif %}">
         {% if plugin.child_plugin_instances %}
             {% for child in plugin.child_plugin_instances %}
-                {# workaround because include tag does not allow recursive includes #}
-                {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=disable_child_plugins %}{% endwith %}
+                {% include request.toolbar.drag_item_template with plugin=child disabled_child=disable_child_plugins %}
             {% endfor %}
         {% endif %}
     </div>
-    {% endlanguage %}
 </div>
 {% endwith %}

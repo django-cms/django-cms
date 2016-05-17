@@ -170,6 +170,14 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return context
 
     @classmethod
+    def requires_parent_plugin(cls, slot, page):
+        if cls.get_require_parent(slot, page):
+            return True
+
+        allowed_parents = cls().get_parent_classes(slot, page) or []
+        return bool(allowed_parents)
+
+    @classmethod
     def get_require_parent(cls, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
 
@@ -219,6 +227,22 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         """
         return None
 
+    def get_vary_cache_on(self, request, instance, placeholder):
+        """
+        Provides hints to the placeholder, and in turn to the page for
+        determining VARY headers for the response.
+
+        Must return one of:
+            - None (default),
+            - String of a case-sensitive header name, or
+            - iterable of case-sensitive header names.
+
+        NOTE: This only makes sense to use with caching. If this plugin has
+        ``cache = False`` or plugin.get_cache_expiration(...) returns 0,
+        get_vary_cache_on() will have no effect.
+        """
+        return None
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         """
         We just need the popup interface here
@@ -252,16 +276,23 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         plugin_data = self.validate_add_request(request)
 
-        class Form(form_class):
+        # Setting attributes on the form class is perfectly fine.
+        # The form class is created by modelform factory every time
+        # this get_form() method is called.
+        # Subclassing is not advisable because Django does metaclass
+        # magic and some attributes get lost. Ticket #5273
 
-            def __init__(self, *args, **kwargs):
-                super(Form, self).__init__(*args, **kwargs)
-                self.instance.language = plugin_data['plugin_language']
-                self.instance.placeholder = plugin_data['placeholder_id']
-                self.instance.parent = plugin_data.get('plugin_parent', None)
-                self.instance.plugin_type = plugin_data['plugin_type']
-                self.instance.position = plugin_data['position']
-        return Form
+        # The _cms_initial_attributes acts as a hook to set
+        # certain values when the form is saved.
+        # Currently this only happens on plugin creation.
+        form_class._cms_initial_attributes = {
+            'language': plugin_data['plugin_language'],
+            'placeholder': plugin_data['placeholder_id'],
+            'parent': plugin_data.get('plugin_parent', None),
+            'plugin_type': plugin_data['plugin_type'],
+            'position': plugin_data['position'],
+        }
+        return form_class
 
     def validate_add_request(self, request):
         from cms.admin.forms import PluginAddValidationForm
@@ -369,6 +400,16 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 
+    def save_form(self, request, form, change):
+        obj = super(CMSPluginBase, self).save_form(request, form, change)
+        initial_attributes = getattr(form, '_cms_initial_attributes', None)
+
+        if initial_attributes:
+            # Form has the initial attribute hooks
+            for field, value in initial_attributes.items():
+                setattr(obj, field, value)
+        return obj
+
     def response_add(self, request, obj, **kwargs):
         self.object_successfully_changed = True
         # Normally we would add the user message to say the object
@@ -431,19 +472,70 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return fieldsets
 
-    def get_child_classes(self, slot, page):
+    @classmethod
+    def get_child_class_overrides(cls, slot, page):
+        """
+        Returns a list of plugin types that are allowed
+        as children of this plugin.
+        """
         from cms.utils.placeholder import get_placeholder_conf
 
         template = page and page.get_template() or None
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
-        child_classes = ph_conf.get(self.__class__.__name__, self.child_classes)
+        return ph_conf.get(cls.__name__, cls.child_classes)
+
+    @classmethod
+    def get_child_plugin_candidates(cls, slot, page):
+        """
+        Returns a list of all plugin classes
+        that will be considered when fetching
+        all available child classes for this plugin.
+        """
+        # Adding this as a separate method,
+        # we allow other plugins to affect
+        # the list of child plugin candidates.
+        # Useful in cases like djangocms-text-ckeditor
+        # where only text only plugins are allowed.
+        from cms.plugin_pool import plugin_pool
+        return plugin_pool.get_all_plugins(slot, page)
+
+    def get_child_classes(self, slot, page):
+        """
+        Returns a list of plugin types that can be added
+        as children to this plugin.
+        """
+        # Placeholder overrides are highest in priority
+        child_classes = self.get_child_class_overrides(slot, page)
+
         if child_classes:
             return child_classes
-        from cms.plugin_pool import plugin_pool
-        installed_plugins = plugin_pool.get_all_plugins(slot, page)
-        return [cls.__name__ for cls in installed_plugins]
+
+        # Get all child plugin candidates
+        installed_plugins = self.get_child_plugin_candidates(slot, page)
+
+        child_classes = []
+        plugin_type = self.__class__.__name__
+
+        # The following will go through each
+        # child plugin candidate and check if
+        # has configured parent class restrictions.
+        # If there are restrictions then the plugin
+        # is only a valid child class if the current plugin
+        # matches one of the parent restrictions.
+        # If there are no restrictions then the plugin
+        # is a valid child class.
+        for plugin_class in installed_plugins:
+            allowed_parents = plugin_class().get_parent_classes(slot, page) or []
+
+            if not allowed_parents or plugin_type in allowed_parents:
+                # Plugin has no parent restrictions or
+                # Current plugin (self) is a configured parent
+                child_classes.append(plugin_class.__name__)
+            else:
+                continue
+        return child_classes
 
     def get_parent_classes(self, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
@@ -509,7 +601,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
 
 class PluginMenuItem(object):
-    def __init__(self, name, url, data, question=None, action='ajax'):
+    def __init__(self, name, url, data, question=None, action='ajax', attributes=None):
         """
         Creates an item in the plugin / placeholder menu
 
@@ -518,9 +610,13 @@ class PluginMenuItem(object):
         :param data: Data to be POSTed to the above URL
         :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
         :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+        :param attributes: Dictionary whose content will be addes as data-attributes to the menu item
         """
+        if not attributes:
+            attributes = {}
         self.name = name
         self.url = url
         self.data = json.dumps(data)
         self.question = question
         self.action = action
+        self.attributes = attributes

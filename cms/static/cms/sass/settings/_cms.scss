@@ -101,6 +101,7 @@ $z-layers: (
         "header":       auto,
         "tree":         auto,
         "section":      auto,
+        "fixed-headers": 2,
         "container":    1,
     ),
     // parent dependant, but should be higher than quicksearch, but

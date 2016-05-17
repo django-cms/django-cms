@@ -136,13 +136,13 @@ casper.test.begin('PageType can be created and used', function (test) {
             test.assertUrlMatch(/page_types\/two-column-layout/, 'Page Type created');
         })
         .thenOpen(globals.editUrl)
-        // create new page through Page > Add Page > New Page
+        // create new page through Page > Create Page > New Page
         .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
-        // expand "Templates" menu item
+        // expand "Page" menu item
         .wait(10, function () {
-            var position = this.getElementBounds(xPath('//a[.//span[text()[contains(.,"Add Page")]]]'));
+            var position = this.getElementBounds(xPath('//a[.//span[text()[contains(.,"Create Page")]]]'));
             // simulating mouseenter event
             this.mouse.move(position.left + 1, position.top - 1);
             this.mouse.move(position.left + 1, position.top + 1);

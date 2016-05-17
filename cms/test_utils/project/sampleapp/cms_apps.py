@@ -1,5 +1,5 @@
 from cms.app_base import CMSApp
-from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu3
+from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu3, StaticMenu4
 from cms.apphook_pool import apphook_pool
 from django.utils.translation import ugettext_lazy as _
 
@@ -56,3 +56,23 @@ class ChildApp(CMSApp):
     urls = ["cms.test_utils.project.sampleapp.urls_childapp"]
 
 apphook_pool.register(ChildApp)
+
+
+class VariableUrlsApp(CMSApp):
+    name = _("Variable urls-menus App")
+
+    def get_menus(self, page=None, language=None, **kwargs):
+        if page and page.reverse_id == 'page1':
+            return [SampleAppMenu]
+
+        else:
+            return [StaticMenu4]
+
+    def get_urls(self, page=None, language=None, **kwargs):
+        if page and page.reverse_id == 'page1':
+            return ["cms.test_utils.project.sampleapp.urls"]
+
+        else:
+            return ["cms.test_utils.project.sampleapp.urls2"]
+
+apphook_pool.register(VariableUrlsApp)

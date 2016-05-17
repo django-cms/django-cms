@@ -29,6 +29,7 @@ from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
+from django.http import QueryDict
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
@@ -410,8 +411,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context.update({
                 'title':  _("Add Page Copy"),
             })
+        elif 'target' in request.GET:
+            extra_context.update({
+                'title':  _("New sub page"),
+            })
         else:
             extra_context = self.update_language_tab_context(request, context=extra_context)
+            extra_context.update({
+                'title':  _("New page"),
+            })
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
@@ -496,6 +504,22 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         # can be published if required
         obj.save()
         return super(PageAdmin, self).response_change(request, obj)
+
+    def get_preserved_filters(self, request):
+        """
+        This override is in place to preserve the "language" get parameter in
+        the "Save" page redirect
+        """
+        preserved_filters_encoded = super(PageAdmin, self).get_preserved_filters(request)
+        preserved_filters = QueryDict(preserved_filters_encoded).copy()
+        lang = request.GET.get('language')
+
+        if lang:
+            preserved_filters.update({
+                'language': lang
+            })
+
+        return preserved_filters.urlencode()
 
     def has_add_permission(self, request):
         """
@@ -986,15 +1010,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Special case: If «target» is not provided, it means to let the
             # page become a new root node.
             try:
-                tb_target = Page.get_root_nodes().filter(
-                    publisher_is_draft=True, site=site)[position]
+                tb_target = Page.get_draft_root_node(position=position, site=site)
                 if page.is_sibling_of(tb_target) and page.path < tb_target.path:
                     tb_position = "right"
                 else:
                     tb_position = "left"
             except IndexError:
                 # Move page to become the last root node.
-                tb_target = Page.get_last_root_node()
+                tb_target = Page.get_draft_root_node(site=site)
                 tb_position = "right"
         else:
             try:
@@ -1127,12 +1150,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Special case: If «target» is not provided, it means to create the
             # new page as a root node.
             try:
-                tb_target = Page.get_root_nodes().filter(
-                    publisher_is_draft=True, site=site)[position]
+                tb_target = Page.get_draft_root_node(position=position, site=site)
                 tb_position = "left"
             except IndexError:
                 # New page to become the last root node.
-                tb_target = Page.get_last_root_node()
+                tb_target = Page.get_draft_root_node(site=site)
                 tb_position = "right"
         else:
             try:

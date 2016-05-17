@@ -357,7 +357,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                 order = CMSPlugin.objects.filter(
                         placeholder_id=placeholder.pk, language=language,
                         parent_id__isnull=True
-                    ).order_by('position').values_list('pk', flat=True)
+                    ).order_by('position', 'path').values_list('pk', flat=True)
                 reorder_plugins(placeholder, None, language, order)
 
                 for plugin in CMSPlugin.objects.filter(
@@ -365,7 +365,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                         language=language).order_by('depth', 'path'):
                     order = CMSPlugin.objects.filter(
                             parent_id=plugin.pk
-                        ).order_by('position').values_list('pk', flat=True)
+                        ).order_by('position', 'path').values_list('pk', flat=True)
                     reorder_plugins(placeholder, plugin.pk, language, order)
 
     def post_copy(self, old_instance, new_old_ziplist):

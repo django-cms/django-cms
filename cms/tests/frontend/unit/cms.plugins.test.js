@@ -19,6 +19,20 @@ describe('CMS.Plugin', function () {
         expect(CMS.Plugin.prototype.editPluginPostAjax).toEqual(jasmine.any(Function));
     });
 
+    beforeEach(function (done) {
+        $(function () {
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+
+            spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (value) {
+                CMS.settings = $.extend(true, {}, CMS.settings, value);
+            });
+            done();
+        });
+    });
+
     describe('instance', function () {
         var plugin1;
         var plugin2;
@@ -140,9 +154,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
@@ -151,6 +164,8 @@ describe('CMS.Plugin', function () {
                     copy_plugin: '/en/admin/cms/page/copy-plugins/'
                 }
             });
+            expect(plugin1.options.plugin_restriction.length).toEqual(0);
+            expect(plugin1.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(plugin2.options).toEqual({
                 type: 'plugin',
@@ -160,9 +175,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '/en/admin/cms/page/add-plugin/',
                     edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
@@ -171,6 +185,8 @@ describe('CMS.Plugin', function () {
                     copy_plugin: '/en/admin/cms/page/copy-plugins/'
                 }
             });
+            expect(plugin2.options.plugin_restriction.length).toEqual(0);
+            expect(plugin2.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(placeholder1.options).toEqual({
                 type: 'placeholder',
@@ -180,9 +196,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -191,6 +206,8 @@ describe('CMS.Plugin', function () {
                     delete_plugin: ''
                 }
             });
+            expect(placeholder1.options.plugin_restriction.length).toEqual(0);
+            expect(placeholder1.options.plugin_parent_restriction.length).toEqual(0);
 
             expect(generic.options).toEqual({
                 type: '',
@@ -200,9 +217,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
-                plugin_restriction: [],
-                plugin_parent_restriction: [],
+                plugin_restriction: jasmine.any(Array),
+                plugin_parent_restriction: jasmine.any(Array),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -211,6 +227,8 @@ describe('CMS.Plugin', function () {
                     delete_plugin: ''
                 }
             });
+            expect(generic.options.plugin_restriction.length).toEqual(0);
+            expect(generic.options.plugin_parent_restriction.length).toEqual(0);
         });
 
         it('sets its options to the dom node', function () {
@@ -801,6 +819,7 @@ describe('CMS.Plugin', function () {
                         return [];
                     }
                 };
+                spyOn(CMS.Plugin.prototype, '_setPosition');
 
                 clipboardPlugin = new CMS.Plugin('cms-plugin-3', {
                     type: 'plugin',
@@ -868,7 +887,9 @@ describe('CMS.Plugin', function () {
 
         it('triggers correct events on a child list where the plugin was just moved', function (done) {
             plugin.ui.draggables.on('cms.update', function () {
-                done();
+                setTimeout(function () {
+                    done();
+                }, 10);
             });
             plugin.pastePlugin();
         });
@@ -884,9 +905,8 @@ describe('CMS.Plugin', function () {
                 plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
-                plugin_breadcrumb: [],
-                plugin_restriction: [],
-                plugin_parent_restriction: ['RandomPlugin'],
+                plugin_restriction: jasmine.arrayContaining([]),
+                plugin_parent_restriction: jasmine.arrayContaining(['RandomPlugin']),
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -1524,10 +1544,10 @@ describe('CMS.Plugin', function () {
             var link = nav.find('a');
             link.attr('data-rel', 'edit');
             spyOn(plugin, 'editPlugin');
+            spyOn(plugin, '_getPluginBreadcrumbs').and.returnValue('MockBreadcrumb');
             plugin.options = {
                 urls: { edit_plugin: 'edit_plugin_url' },
-                plugin_name: 'MockPlugin',
-                plugin_breadcrumb: 'MockBreadcrumb'
+                plugin_name: 'MockPlugin'
             };
             plugin._setupActions(nav);
             link.trigger(plugin.click);
@@ -1606,11 +1626,11 @@ describe('CMS.Plugin', function () {
             var link = nav.find('a');
             link.attr('data-rel', 'delete');
             spyOn(plugin, 'deletePlugin');
+            spyOn(plugin, '_getPluginBreadcrumbs').and.returnValue('Breadcrumb');
             plugin._setupActions(nav);
             plugin.options = {
                 urls: { delete_plugin: 'DELETE_URL' },
-                plugin_name: 'MockPlugin',
-                plugin_breadcrumb: 'Breadcrumb'
+                plugin_name: 'MockPlugin'
             };
             link.trigger(plugin.click);
 
@@ -1796,6 +1816,294 @@ describe('CMS.Plugin', function () {
             expect(items.filter(':visible').length).toEqual(15);
             expect(titles.filter(':visible').length).toEqual(1);
             expect(titles.filter(':visible').text()).toMatch(/Bootstrap/);
+        });
+    });
+
+    describe('_getPluginBreadcrumbs()', function () {
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            $(function () {
+                CMS.config = {
+                    csrf: 'CSRF_TOKEN',
+                    lang: {}
+                };
+                CMS.settings = {
+                    dragbars: [],
+                    states: []
+                };
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('returns own breadcrumb if plugin has no parents', function () {
+            expect(plugin._getPluginBreadcrumbs()).toEqual([{
+                url: '/en/admin/cms/page/edit-plugin/1/',
+                title: 'Test Text Plugin'
+            }]);
+        });
+
+        // although this shouldn't happen
+        it('returns own breadcrumb if plugin has a parent but it does not exist in the registry', function () {
+            CMS._plugins = null;
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([{
+                url: '/en/admin/cms/page/edit-plugin/1/',
+                title: 'Test Text Plugin'
+            }]);
+        });
+
+        it('returns array of breadcrumbs if plugin has parent', function () {
+            CMS._plugins = [
+                ['cms-placeholder-140', {}],
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 'None',
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+        });
+
+        it('returns array of breadcrumbs if plugin has multiple parents', function () {
+            CMS._plugins = [
+                ['cms-placeholder-140', {}],
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 130,
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }],
+                ['cms-plugin-130', {
+                    plugin_name: 'Parent Parent plugin',
+                    urls: {
+                        edit_plugin: 'parent-parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-parent-edit-url',
+                    title: 'Parent Parent plugin'
+                },
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+        });
+
+        it('is not lazy', function () {
+            spyOn($, 'grep').and.callThrough();
+            CMS._plugins = [
+                ['cms-plugin-140', {
+                    plugin_name: 'Parent plugin',
+                    plugin_parent: 'None',
+                    urls: {
+                        edit_plugin: 'parent-edit-url'
+                    }
+                }]
+            ];
+            plugin.options.plugin_parent = 140;
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+
+            expect($.grep).toHaveBeenCalledTimes(1);
+
+            expect(plugin._getPluginBreadcrumbs()).toEqual([
+                {
+                    url: 'parent-edit-url',
+                    title: 'Parent plugin'
+                },
+                {
+                    url: '/en/admin/cms/page/edit-plugin/1/',
+                    title: 'Test Text Plugin'
+                }
+            ]);
+
+
+            expect($.grep).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe('_getPossibleChildClasses()', function () {
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            fixture.load('plugin_child_classes.html');
+            $(function () {
+                CMS.config = {
+                    csrf: 'CSRF_TOKEN',
+                    lang: {}
+                };
+                CMS.settings = {
+                    dragbars: [],
+                    states: []
+                };
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                spyOn(plugin, '_getId').and.returnValue(1);
+                done();
+            });
+        });
+
+        it('returns markup for child classes based on current plugin/placeholder restrictions', function () {
+            expect(plugin._getPossibleChildClasses().length).toEqual(163);
+            expect(plugin._getPossibleChildClasses()).toEqual(jasmine.any($));
+        });
+
+        it('returns markup for child classes based on current plugin/placeholder restrictions', function () {
+            plugin.options.plugin_restriction = ['Bootstrap3AlertCMSPlugin'];
+            expect(plugin._getPossibleChildClasses().length).toEqual(2);
+            expect(plugin._getPossibleChildClasses()).toEqual(jasmine.any($));
+            expect(plugin._getPossibleChildClasses().eq(0)).toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(0)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(1)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(1)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(0)).toHaveText('Bootstrap3');
+            expect(plugin._getPossibleChildClasses().eq(1)).toHaveText('Alert');
+        });
+
+        it('returns markup for child classes based on current plugin/placeholder restrictions', function () {
+            plugin.options.plugin_restriction = ['UpcomingPlugin', 'CalendarPlugin', 'TextPlugin'];
+            expect(plugin._getPossibleChildClasses().length).toEqual(5);
+            expect(plugin._getPossibleChildClasses()).toEqual(jasmine.any($));
+            expect(plugin._getPossibleChildClasses().eq(0)).toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(0)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(1)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(1)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(2)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(2)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(3)).toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(3)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(4)).not.toHaveClass('cms-submenu-item-title');
+            expect(plugin._getPossibleChildClasses().eq(4)).toHaveClass('cms-submenu-item');
+            expect(plugin._getPossibleChildClasses().eq(0)).toHaveText('Events');
+            expect(plugin._getPossibleChildClasses().eq(1)).toHaveText('Calendar');
+            expect(plugin._getPossibleChildClasses().eq(2)).toHaveText('Upcoming or Past Events');
+            expect(plugin._getPossibleChildClasses().eq(3)).toHaveText('Generic');
+            expect(plugin._getPossibleChildClasses().eq(4)).toHaveText('Text');
+        });
+
+        it('attaches event handlers for adding these plugins', function () {
+            spyOn(CMS.Plugin.prototype, 'addPlugin');
+            expect(plugin._getPossibleChildClasses().find('a')).toHandle(plugin.click);
+            plugin._getPossibleChildClasses().find('a').eq(1).trigger(plugin.click);
+            expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
+        });
+
+        it('is not lazy', function () {
+            plugin.options.plugin_restriction = ['Bootstrap3AlertCMSPlugin'];
+            spyOn($.fn, 'filter').and.callThrough();
+            plugin._getPossibleChildClasses();
+            expect($.fn.filter).toHaveBeenCalledTimes(2);
+            plugin._getPossibleChildClasses();
+            plugin._getPossibleChildClasses();
+            plugin._getPossibleChildClasses();
+            expect($.fn.filter).toHaveBeenCalledTimes(8);
+        });
+    });
+
+    describe('CMS.Plugin._updateRegistry()', function () {
+        beforeEach(function () {
+            spyOn($, 'extend').and.callThrough();
+        });
+
+        it('does not do anything if the registry is empty', function () {
+            CMS.Plugin._updateRegistry({
+                pluginId: 'whatever'
+            });
+            expect($.extend).not.toHaveBeenCalled();
+        });
+
+        it('does not do anything if the plugin is not in the registry', function () {
+            CMS._plugins = [
+                ['cms-plugin-1', {}]
+            ];
+            CMS.Plugin._updateRegistry({
+                pluginId: 'whatever'
+            });
+            expect($.extend).not.toHaveBeenCalled();
+        });
+
+        it('updates given plugin with provided data', function () {
+            CMS._plugins = [
+                ['cms-plugin-1', {
+                    whatever: 1,
+                    override: 2
+                }],
+                ['cms-plugin-2', {}]
+            ];
+
+            CMS.Plugin._updateRegistry({
+                pluginId: '1',
+                update: {
+                    override: 1,
+                    something: 3
+                }
+            });
+            CMS.Plugin._updateRegistry({
+                pluginId: 2,
+                update: {
+                    something: 2
+                }
+            });
+
+            expect(CMS._plugins[1][1]).toEqual({
+                something: 2
+            });
         });
     });
 });

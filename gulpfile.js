@@ -66,7 +66,7 @@ var PROJECT_PATTERNS = {
  */
 var JS_BUNDLES = {
     'bundle.admin.base.min.js': [
-        PROJECT_PATH.js + '/polyfills/bind.js',
+        PROJECT_PATH.js + '/polyfills/function.prototype.bind.js',
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/libs/class.min.js',
@@ -79,10 +79,12 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
         PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
         PROJECT_PATH.js + '/modules/cms.pagetree.dropdown.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.stickyheader.js',
         PROJECT_PATH.js + '/modules/cms.pagetree.js'
     ],
     'bundle.toolbar.min.js': [
-        PROJECT_PATH.js + '/polyfills/bind.js',
+        PROJECT_PATH.js + '/polyfills/function.prototype.bind.js',
+        PROJECT_PATH.js + '/polyfills/array.prototype.findindex.js',
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
@@ -158,11 +160,11 @@ var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
 var cacheBuster = function (options) {
     var version = options && options.version ? options.version : Math.random();
 
-    return function (css, opts) {
-        css.replaceValues(/__VERSION__/g, { fast: '__VERSION__' }, function(string) {
+    return function (css) {
+        css.replaceValues(/__VERSION__/g, { fast: '__VERSION__' }, function () {
             return version;
         });
-    }
+    };
 };
 
 gulp.task('sass', function () {
@@ -497,6 +499,7 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
             .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
     });
 });
+
 gulp.task('bundle', Object.keys(JS_BUNDLES).map(function (bundleName) {
     return 'bundle:' + bundleName;
 }));

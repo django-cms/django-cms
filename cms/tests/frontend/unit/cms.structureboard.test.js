@@ -1,5 +1,7 @@
 'use strict';
 
+/* globals window */
+
 describe('CMS.StructureBoard', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
@@ -70,25 +72,21 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('initially shows or hides board based on settings', function () {
-            spyOn(board, 'show');
-            spyOn(board, 'hide');
+            spyOn(CMS.StructureBoard.prototype, 'show');
+            spyOn(CMS.StructureBoard.prototype, 'hide');
 
             expect(CMS.settings.mode).toEqual('edit');
-            expect(board.show).not.toHaveBeenCalled();
-            expect(board.hide).not.toHaveBeenCalled();
-            jasmine.clock().tick();
+            board = new CMS.StructureBoard();
             expect(board.show).not.toHaveBeenCalled();
             expect(board.hide).toHaveBeenCalled();
         });
 
         it('initially shows or hides board based on settings 2', function () {
-            spyOn(board, 'show');
-            spyOn(board, 'hide');
+            spyOn(CMS.StructureBoard.prototype, 'show');
+            spyOn(CMS.StructureBoard.prototype, 'hide');
 
             CMS.settings.mode = 'structure';
-            expect(board.show).not.toHaveBeenCalled();
-            expect(board.hide).not.toHaveBeenCalled();
-            jasmine.clock().tick();
+            board = new CMS.StructureBoard();
             expect(board.show).toHaveBeenCalled();
             expect(board.hide).not.toHaveBeenCalled();
         });
@@ -153,8 +151,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
-                mode: 'edit',
-                simpleStructureBoard: true
+                mode: 'edit'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -237,29 +234,6 @@ describe('CMS.StructureBoard', function () {
             expect(board.ui.dragareas.attr('style')).toMatch(/opacity: 1/);
         });
 
-        it('applies correct classes based on type of structureboard 1', function () {
-            expect(board.ui.content).not.toHaveClass('cms-structure-content-simple');
-            expect(board.ui.dragareas).not.toHaveClass('cms-dragarea-simple');
-            expect(board.ui.container).not.toHaveClass('cms-structure-dynamic');
-            board.show();
-            expect(board.ui.content).toHaveClass('cms-structure-content-simple');
-            expect(board.ui.container).not.toHaveClass('cms-structure-dynamic');
-            expect(board.ui.dragareas).toHaveClass('cms-dragarea-simple');
-        });
-
-        it('applies correct classes based on type of structureboard 2', function () {
-            spyOn(board, '_resizeBoard').and.callFake($.noop);
-            CMS.config.simpleStructureBoard = false;
-            expect(board.ui.content).not.toHaveClass('cms-structure-content-simple');
-            expect(board.ui.dragareas).not.toHaveClass('cms-dragarea-simple');
-            expect(board.ui.container).not.toHaveClass('cms-structure-dynamic');
-            board.show();
-            expect(board.ui.content).not.toHaveClass('cms-structure-content-simple');
-            expect(board.ui.container).toHaveClass('cms-structure-dynamic');
-            expect(board.ui.dragareas).not.toHaveClass('cms-dragarea-simple');
-            CMS.config.simpleStructureBoard = true;
-        });
-
         it('reorders static placeholders to be last', function () {
             expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:first'));
             board.show();
@@ -275,8 +249,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
-                mode: 'edit',
-                simpleStructureBoard: true
+                mode: 'edit'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -396,23 +369,11 @@ describe('CMS.StructureBoard', function () {
 
         it('triggers `resize` event on the window', function () {
             board.show();
-            spyOn($.fn, 'trigger');
+            var spy = jasmine.createSpy();
+            $(window).on('resize', spy);
             board.hide();
-            expect($.fn.trigger).toHaveBeenCalledWith('resize');
-        });
-
-        it('resizes the structureboard if type of structureboard is dynamic', function () {
-            board.show();
-            CMS.config.simpleStructureBoard = false;
-            // faking document height
-            board.ui.doc = {
-                outerHeight: function () {
-                    return 329;
-                }
-            };
-            expect(board.ui.container.height()).not.toEqual(329);
-            board.hide();
-            expect(board.ui.container.height()).toEqual(329);
+            expect(spy).toHaveBeenCalledTimes(1);
+            $(window).off('resize', spy);
         });
     });
 
@@ -424,8 +385,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
-                mode: 'edit',
-                simpleStructureBoard: true
+                mode: 'edit'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -521,8 +481,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
-                mode: 'edit',
-                simpleStructureBoard: true
+                mode: 'edit'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -573,8 +532,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
-                mode: 'edit',
-                simpleStructureBoard: true
+                mode: 'edit'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -686,8 +644,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'structure'
             };
             CMS.config = {
-                mode: 'structure',
-                simpleStructureBoard: true
+                mode: 'structure'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -1133,6 +1090,7 @@ describe('CMS.StructureBoard', function () {
                 var pluginEdit = $('.cms-plugin-1');
                 var placeholder = $('.cms-draggables').eq(0);
                 placeholder.parent().addClass('cms-draggable-disabled');
+                $('.cms-placeholder-1').remove();
                 pluginEdit.data('settings', { plugin_parent_restriction: [] });
 
                 expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);

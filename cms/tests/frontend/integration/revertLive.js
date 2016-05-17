@@ -81,7 +81,7 @@ casper.test.begin('Revert History', function (test) {
             this.click('.cms-btn-switch-save');
         })
         .waitForUrl(/edit_off/)
-        .waitWhileVisible('.cms-toolbar-expanded')
+        .wait(100)
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExist('.cms-btn-switch-edit', 'Not in Edit mode');
         })

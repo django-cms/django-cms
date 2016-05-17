@@ -1,11 +1,6 @@
 //##############################################################################
 // STRUCTURE
 
-.cms-structure-dynamic {
-    position: absolute;
-    overflow: hidden;
-}
-
 .cms-droppable {
     position: relative;
     z-index: z(structure, content, droppable);
@@ -47,9 +42,11 @@
     background: $structure-bgcolor;
 
     .cms-structure-content {
-        position: absolute;
+        position: relative;
+        overflow-y: scroll;
         top: 0;
         left: 0;
+        padding: ($toolbar-height + 40px) 5%;
         z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
@@ -57,14 +54,20 @@
         transform: translateZ(0);
 
         -webkit-overflow-scrolling: touch;
+
+        @media (max-width: 480px) {
+            padding-right: 0;
+            padding-left: 0;
+        }
     }
 
     //###########################################################
     // #DRAGAREA#
     // basically a cms placeholder representation
     .cms-dragarea {
-        position: absolute;
-        margin: 0 0 $structure-dragarea-space;
+        position: static;
+        max-width: $structure-max-width;
+        margin: $structure-dragarea-margin-vertical auto;
         padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
     }
 
@@ -73,23 +76,6 @@
             position: relative;
             top: 2px;
         }
-    }
-
-    // subclasses for the simple structure borad without absolute positioning
-    .cms-structure-content-simple {
-        position: relative;
-        overflow-y: scroll;
-        height: 100%;
-        padding: ($toolbar-height + 40px) 5%;
-        @media (max-width: 480px) {
-            padding-right: 0;
-            padding-left: 0;
-        }
-    }
-    .cms-dragarea-simple {
-        position: static;
-        max-width: $structure-max-width;
-        margin: $structure-dragarea-margin-vertical auto;
     }
 
     //###########################################################

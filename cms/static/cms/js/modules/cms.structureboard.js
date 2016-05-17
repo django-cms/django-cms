@@ -118,18 +118,12 @@ var CMS = window.CMS || {};
             }
 
             // setup toolbar mode
-            // FIXME this setTimeout is needed because
-            // plugins are initialized after all the scripts are processed
-            // which should be fixed btw. _resizeBoard wants plugins to be initialized,
-            // otherwise throws errors
-            setTimeout(function () {
-                if (CMS.settings.mode === 'structure') {
-                    that.show(true);
-                } else {
-                    // triggering hide here to switch proper classnames on switcher
-                    that.hide(true);
-                }
-            }, 0);
+            if (CMS.settings.mode === 'structure') {
+                that.show(true);
+            } else {
+                // triggering hide here to switch proper classnames on switcher
+                that.hide(true);
+            }
 
             // check if modes should be visible
             if (this.ui.placeholders.length) {
@@ -319,8 +313,6 @@ var CMS = window.CMS || {};
          * @private
          */
         _showBoard: function () {
-            var that = this;
-
             // show container
             this.ui.container.show();
             this.ui.dragareas.css('opacity', 1);
@@ -329,26 +321,17 @@ var CMS = window.CMS || {};
             this.ui.placeholders.show();
 
             // attach event
-            if (CMS.config.simpleStructureBoard) {
-                var content = this.ui.content;
-                var areas = content.find('.cms-dragarea');
-                // set correct css attributes for the new mode
-                content.addClass('cms-structure-content-simple');
-                areas.addClass('cms-dragarea-simple');
-                // lets reorder placeholders
-                areas.each(function (index, item) {
-                    if ($(item).hasClass('cms-dragarea-static')) {
-                        content.append(item);
-                    }
-                });
-                // now lets get the first instance and add some padding
-                areas.filter('.cms-dragarea-static').eq(0).css('margin-top', '50px');
-            } else {
-                this.ui.container.addClass('cms-structure-dynamic');
-                this.ui.window.on('resize.sideframe', function () {
-                    that._resizeBoard();
-                }).trigger('resize.sideframe');
-            }
+            var content = this.ui.content;
+            var areas = content.find('.cms-dragarea');
+
+            // lets reorder placeholders
+            areas.each(function (index, item) {
+                if ($(item).hasClass('cms-dragarea-static')) {
+                    content.append(item);
+                }
+            });
+            // now lets get the first instance and add some padding
+            areas.filter('.cms-dragarea-static').eq(0).css('margin-top', '50px');
         },
 
         /**
@@ -376,54 +359,12 @@ var CMS = window.CMS || {};
             // would be same as screen height, which is likely incorrect,
             // so triggering resize on window would force user scripts
             // to recalculate whatever is required there
-            this.ui.window.trigger('resize');
-
-            if (!CMS.config.simpleStructureBoard) {
-                this.ui.container.height(this.ui.doc.outerHeight());
-            }
-        },
-
-        /**
-         * Resizes the placeholder to fit their placement
-         * and the structure board.
-         *
-         * @method _resizeBoard
-         * @private
-         * @deprecated as of CMS 3.2
-         */
-        _resizeBoard: /* istanbul ignore next */ function () {
-            // calculate placeholder position
-            var id = null;
-            var area = null;
-            var min = null;
-            var areaParentOffset = null;
-            var that = this;
-
-            // have to delay since height changes when toggling modes
-            setTimeout(function () {
-                that.ui.container.height(that.ui.doc.outerHeight());
-            }, 0);
-
-            // start calculating
-            this.ui.placeholders.each(function (index, item) {
-                item = $(item);
-                id = item.data('settings').placeholder_id;
-                area = $('.cms-dragarea-' + id);
-                // to calculate the correct offset, we need to set the
-                // placeholders correct heights and than set the according position
-                item.height(area.outerHeight(true));
-                // set min width
-                min = (item.width()) ? 0 : 150;
-                // as area is "css positioned" and jquery offset function is relative to the
-                // document (not the first relative/absolute parent) we need to substract
-                // first relative/absolute parent offset.
-                areaParentOffset = $(area).offsetParent().offset();
-                area.css({
-                    top: item.offset().top - areaParentOffset.top - 5,
-                    left: item.offset().left - areaParentOffset.left - min,
-                    width: item.width() + min
-                });
-            });
+            // istanbul ignore catch
+            try {
+                var evt = document.createEvent('UIEvents');
+                evt.initUIEvent('resize', true, false, window, 0);
+                window.dispatchEvent(evt);
+            } catch (e) {}
         },
 
         /**
