@@ -42,8 +42,8 @@
 .cms-pagetree-root.filtered {
     min-height: auto;
     // important is to fight with admin-style
-    box-shadow: $pagetree-box-shadow !important;
     padding: 0 !important;
+    box-shadow: $pagetree-box-shadow !important;
 }
 .cms-pagetree {
     border: $pagetree-border;
@@ -122,8 +122,8 @@
     line-height: $pagetree-header-height;
     height: $pagetree-header-height;
     h1 {
-        margin: 0 !important;
         line-height: $pagetree-header-height;
+        margin: 0 !important;
         span {
             font-weight: normal;
         }
