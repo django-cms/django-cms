@@ -12,11 +12,10 @@
 * Added unit tests for CMS JavaScript files
 * Added frontend integration tests (written with Casper JS)
 * Removed frontend integration tests (written with Selenium)
-* Provides the ability to declare cache expiration periods on a per-plugin basis
 * Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
   the toolbar will appear for authorized users. If left unset, retains the
   existing behavior of allowing toolbar for authorized users at any IP address.
-* Sideframe is no longer resizable, opens to 90% of the screen or 100% on
+* Side-frame is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
 * Removed some unnecessary reloads happening after closing sideframe.
 * CMS handles uninstalled apphooks better
