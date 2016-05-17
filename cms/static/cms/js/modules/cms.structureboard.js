@@ -496,6 +496,16 @@ var CMS = window.CMS || {};
                     // getting restriction array
                     var bounds = [];
                     var immediateParentType;
+
+                    if (placeholder && placeholder.closest('.cms-clipboard-containers').length) {
+                        return false;
+                    }
+
+                    // if parent has class disabled, dissalow drop
+                    if (placeholder && placeholder.parent().hasClass('cms-draggable-disabled')) {
+                        return false;
+                    }
+
                     // save original state events
                     var original = $('.cms-plugin-' + that.getId(originalItem));
                     // cancel if item has no settings
@@ -527,11 +537,6 @@ var CMS = window.CMS || {};
                     if (plugin.length) {
                         bounds = plugin.data('settings').plugin_restriction;
                         immediateParentType = plugin.data('settings').plugin_type;
-                    }
-
-                    // if parent has class disabled, dissalow drop
-                    if (placeholder.parent().hasClass('cms-draggable-disabled')) {
-                        return false;
                     }
 
                     // if restrictions is still empty, proceed

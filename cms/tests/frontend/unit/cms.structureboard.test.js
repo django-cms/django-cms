@@ -1097,6 +1097,19 @@ describe('CMS.StructureBoard', function () {
                 expect(board.state).toEqual('mock');
             });
 
+            it('returns false if parent is a clipboard', function () {
+                board.state = 'mock';
+                var pluginStructure = $('.cms-draggable-1');
+                var pluginEdit = $('.cms-plugin-1');
+                var placeholder = $('.cms-draggables').eq(0);
+                placeholder.parent().addClass('cms-clipboard-containers');
+                $('.cms-placeholder-1').remove();
+                pluginEdit.data('settings', { plugin_parent_restriction: [] });
+
+                expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                expect(board.state).toEqual('mock');
+            });
+
             describe('bounds of a place we put current plugin in', function () {
                 it('uses placeholder bounds', function () {
                     board.state = 'mock';
