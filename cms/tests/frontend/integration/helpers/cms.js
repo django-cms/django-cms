@@ -580,7 +580,7 @@ module.exports = function (casperjs, settings) {
          */
         createJSTreeXPathFromTree: function createJSTreeXPathFromTree(tree, opts) {
             var xPath = '';
-            var topLevel = opts && typeof opts.topLevel === 'undefined' ? true : opts.topLevel;
+            var topLevel = opts && typeof opts.topLevel === 'undefined' || !opts ? true : opts.topLevel;
 
             tree.forEach(function (node, index) {
                 if (index === 0) {
