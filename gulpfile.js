@@ -229,6 +229,7 @@ gulp.task('tests:unit', function (done) {
         configFile: PROJECT_PATH.tests + '/karma.conf.js',
         singleRun: true
     }, done);
+
     server.start();
 });
 
@@ -236,6 +237,7 @@ gulp.task('tests:unit:watch', function () {
     var server = new KarmaServer({
         configFile: PROJECT_PATH.tests + '/karma.conf.js'
     });
+
     server.start();
 });
 
@@ -258,6 +260,7 @@ var integrationTests = {
                 return;
             }
             var server = spawn('python', ['testserver.py'].concat(args.split(' ')));
+
             gutil.log('Starting a server');
             server.stdout.on('data', function (data) {
                 // eslint-disable-next-line
@@ -349,6 +352,7 @@ var integrationTests = {
         }];
 
         var fileNames;
+
         if (argv && argv.tests) {
             fileNames = argv.tests.split(',');
             gutil.log('Running tests for ' + fileNames.join(', '));
@@ -406,7 +410,7 @@ var integrationTests = {
      * @returns {String[]} array of paths to instrumented tests
      */
     createScreenshotFiles: function (tests) {
-        var instrumentedTests;
+        var instrumentedTests = tests;
 
         if (argv && argv.screenshots) {
             child_process.execSync('casper-summoner ' + tests.join(' '));
@@ -464,6 +468,7 @@ gulp.task('tests:integration', function (done) {
                                     reject('Failure');
                                 }
                             };
+
                             if (serverPid) {
                                 terminate(serverPid, finish);
                             } else {
@@ -509,6 +514,7 @@ gulp.task('watch', function () {
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
     Object.keys(JS_BUNDLES).forEach(function (bundleName) {
         var bundleFiles = JS_BUNDLES[bundleName];
+
         gulp.watch(bundleFiles, ['bundle:' + bundleName]);
     });
 });

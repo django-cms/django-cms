@@ -364,7 +364,7 @@ var CMS = {
 
             newUrl = newUrl.replace(/&/g, '&amp;');
 
-            return url;
+            return newUrl;
         },
 
         /**
