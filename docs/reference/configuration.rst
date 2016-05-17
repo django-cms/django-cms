@@ -1037,10 +1037,6 @@ This should be an integer preferably taken from the Page object e.g.
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
 
-<<<<<<< HEAD
-.. setting:: WIZARD_DEFAULT_TEMPLATE
-=======
-
 .. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
 
 CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
@@ -1058,8 +1054,8 @@ Example::
 
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
+
 .. setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
->>>>>>> 2983679... Renames CMS_WIZARD* to CMS_PAGE_WIZARD*
 
 CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 ================================
