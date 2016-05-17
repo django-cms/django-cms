@@ -48,10 +48,20 @@
 * Use a method to get CMSApp.urls, to allow passing a page object to it.
 
 
-=== 3.2.4 (unreleased) ==
+=== 3.2.6 (unreleased) ===
+
+- Adds CMS_WIZARD_CONTENT_PLACEHOLDER setting
+- Renames the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+- Deprecates the old-style wizard-related settings
+
+
+=== 3.2.5 (2016-04-27) ===
 
 - Fixed regression when page couldn't be copied if CMS_PERMISSION was False
 - CMS handles uninstalled apphooks better
+
+
+=== 3.2.4 (unreleased) ===
 
 
 === 3.2.3 (2016-03-09) ===
