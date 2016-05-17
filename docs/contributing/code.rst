@@ -78,7 +78,7 @@ examples, or ask.
 JS Linting
 ----------
 
-JavaScript is linted using `ESLint <http://eslint.org`_. In order to run the
+JavaScript is linted using `ESLint <http://eslint.org>`_. In order to run the
 linter you need to do this:
 
 .. code-block:: sh
