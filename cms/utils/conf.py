@@ -31,6 +31,7 @@ def default(name):
 
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
+    'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
     'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,

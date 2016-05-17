@@ -2,7 +2,6 @@
 from logging import getLogger
 from os.path import join
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -42,15 +41,15 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     )
     TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
-    X_FRAME_OPTIONS_INHERIT = 0
-    X_FRAME_OPTIONS_DENY = 1
-    X_FRAME_OPTIONS_SAMEORIGIN = 2
-    X_FRAME_OPTIONS_ALLOW = 3
+    X_FRAME_OPTIONS_INHERIT = constants.X_FRAME_OPTIONS_INHERIT
+    X_FRAME_OPTIONS_DENY = constants.X_FRAME_OPTIONS_DENY
+    X_FRAME_OPTIONS_SAMEORIGIN = constants.X_FRAME_OPTIONS_SAMEORIGIN
+    X_FRAME_OPTIONS_ALLOW = constants.X_FRAME_OPTIONS_ALLOW
     X_FRAME_OPTIONS_CHOICES = (
-        (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-        (X_FRAME_OPTIONS_DENY, _('Deny')),
-        (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-        (X_FRAME_OPTIONS_ALLOW, _('Allow'))
+        (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+        (constants.X_FRAME_OPTIONS_DENY, _('Deny')),
+        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+        (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
@@ -109,7 +108,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
-        default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
+        default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
     )
 
     # Managers

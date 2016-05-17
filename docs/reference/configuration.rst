@@ -1027,10 +1027,10 @@ CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
 
 default
-    ``Page.X_FRAME_OPTIONS_INHERIT``
+    ``constants.X_FRAME_OPTIONS_INHERIT``
 
 This setting is the default value for a Page's X Frame Options setting.
-This should be an integer preferably taken from the Page object e.g.
+This should be an integer preferably taken from the ``cms.constants`` e.g.
 
 - X_FRAME_OPTIONS_INHERIT
 - X_FRAME_OPTIONS_ALLOW
