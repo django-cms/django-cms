@@ -420,11 +420,6 @@ var CMS = window.CMS || {};
                 });
             }
 
-            // if there is a screenblock, do some resize magic
-            if (this.ui.screenBlock.length) {
-                this._screenBlock();
-            }
-
             // add toolbar ready class to body and fire event
             this.ui.body.addClass('cms-ready');
             this.ui.document.trigger('cms-ready');
