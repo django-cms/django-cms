@@ -46,6 +46,8 @@
   used to reuse loaded templates per request. It works like Django's cached
   template loader but on a request basis.
 * Use a method to get CMSApp.urls, to allow passing a page object to it.
+* Fixed a bug when it was possible to drag plugin into clipboard
+* Fixed a bug where clearing clipboard was closing any open modal
 
 
 === 3.2.6 (unreleased) ===
