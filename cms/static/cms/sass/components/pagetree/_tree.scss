@@ -119,9 +119,12 @@
     width: 100%;
     line-height: $pagetree-header-height;
     height: $pagetree-header-height;
-    margin: 0 !important;
-    span {
-        font-weight: normal;
+    h1 {
+        margin: 0 !important;
+        line-height: $pagetree-header-height;
+        span {
+            font-weight: normal;
+        }
     }
 }
 
