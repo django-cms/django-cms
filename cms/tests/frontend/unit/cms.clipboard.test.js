@@ -85,6 +85,7 @@ describe('CMS.Clipboard', function () {
                 callback();
             });
             spyOn(clipboard.modal, 'close');
+            spyOn(clipboard, '_isClipboardModalOpen').and.returnValue(true);
             expect(clipboard.ui.triggerRemove).toHandle('click.cms.clipboard');
             expect(clipboard.ui.triggers.parent()).not.toHaveClass('cms-toolbar-item-navigation-disabled');
             expect(clipboard.ui.triggerRemove.parent()).not.toHaveClass('cms-toolbar-item-navigation-disabled');
@@ -93,6 +94,25 @@ describe('CMS.Clipboard', function () {
             clipboard.ui.triggerRemove.trigger('click');
             expect(clipboard.clear).toHaveBeenCalled();
             expect(clipboard.modal.close).toHaveBeenCalled();
+            expect(clipboard.ui.triggers.parent()).toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect(clipboard.ui.triggerRemove.parent()).toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect(click).toHaveBeenTriggered();
+        });
+
+        it('sets up events to clear the clipboard (enabled) 2', function () {
+            spyOn(clipboard, 'clear').and.callFake(function (callback) {
+                callback();
+            });
+            spyOn(clipboard.modal, 'close');
+            spyOn(clipboard, '_isClipboardModalOpen').and.returnValue(false);
+            expect(clipboard.ui.triggerRemove).toHandle('click.cms.clipboard');
+            expect(clipboard.ui.triggers.parent()).not.toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect(clipboard.ui.triggerRemove.parent()).not.toHaveClass('cms-toolbar-item-navigation-disabled');
+            var click = spyOnEvent(clipboard.ui.document, 'click.cms.toolbar');
+
+            clipboard.ui.triggerRemove.trigger('click');
+            expect(clipboard.clear).toHaveBeenCalled();
+            expect(clipboard.modal.close).not.toHaveBeenCalled();
             expect(clipboard.ui.triggers.parent()).toHaveClass('cms-toolbar-item-navigation-disabled');
             expect(clipboard.ui.triggerRemove.parent()).toHaveClass('cms-toolbar-item-navigation-disabled');
             expect(click).toHaveBeenTriggered();
@@ -247,6 +267,41 @@ describe('CMS.Clipboard', function () {
                     });
                 });
             });
+        });
+    });
+
+    describe('_isClipboardModalOpen()', function () {
+        var clipboard;
+        beforeEach(function (done) {
+            fixture.load('clipboard.html');
+            CMS.API.Toolbar = {
+                openAjax: jasmine.createSpy()
+            };
+            CMS.config = {
+                csrf: 'test_csrf',
+                clipboard: {
+                    url: 'clear-clipboard'
+                }
+            };
+            $(function () {
+                $('<div class="cms-modal"><div class="cms-modal-body"></div></div>').prependTo(fixture.el);
+                clipboard = new CMS.Clipboard();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            $('.cms-modal').remove();
+            fixture.cleanup();
+        });
+
+        it('returns true if modal is open', function () {
+            clipboard.modal.ui.modalBody.append('<div class="cms-clipboard-containers"></div>');
+            expect(clipboard._isClipboardModalOpen()).toEqual(true);
+        });
+
+        it('returns false if modal is closed', function () {
+            expect(clipboard._isClipboardModalOpen()).toEqual(false);
         });
     });
 });

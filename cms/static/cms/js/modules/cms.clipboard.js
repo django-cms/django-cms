@@ -109,12 +109,24 @@ var CMS = window.CMS || {};
                 }
                 that.clear(function () {
                     // remove element on success
-                    that.modal.close();
+                    if (that._isClipboardModalOpen()) {
+                        that.modal.close();
+                    }
+
                     that.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
                     that.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
                     that.ui.document.trigger('click.cms.toolbar');
                 });
             });
+        },
+
+        /**
+         * @method _isClipboardModalOpen
+         * @private
+         * @returns {Boolean}
+         */
+        _isClipboardModalOpen: function _isClipboardModalOpen() {
+            return !!this.modal.ui.modalBody.find('.cms-clipboard-containers').length;
         },
 
         /**
