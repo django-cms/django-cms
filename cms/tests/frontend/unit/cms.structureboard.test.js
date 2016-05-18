@@ -1092,7 +1092,7 @@ describe('CMS.StructureBoard', function () {
                 $('.cms-placeholder-1').remove();
                 pluginEdit.data('settings', { plugin_parent_restriction: [] });
 
-                expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
+                expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                 expect(board.state).toEqual('mock');
             });
 

@@ -964,13 +964,13 @@ describe('CMS.Modal', function () {
 
             modal._show({});
 
-            var wrongEvent = $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
+            var wrongEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
             modal.ui.body.trigger(wrongEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
             expect(modal.options.onClose).toEqual('stuff');
 
-            var correctEvent = $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
             modal.ui.body.trigger(correctEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
