@@ -313,18 +313,6 @@ describe('CMS.StructureBoard', function () {
             expect(board.ui.toolbarModeLinks.eq(1)).toHaveClass('cms-btn-active');
         });
 
-        it('hides the clipboard', function () {
-            board.show();
-            board.ui.container.append(
-                '<div class="cms-clipboard" style="display: block; width: 10px; height: 10px;">'
-            );
-
-            expect($('.cms-clipboard')).toBeVisible();
-            board.hide();
-            expect($('.cms-clipboard')).not.toBeVisible();
-            expect($('.cms-clipboard').attr('style')).toMatch(/display: none/);
-        });
-
         it('remembers the state', function () {
             board.show();
             expect(CMS.settings.mode).toEqual('structure');
