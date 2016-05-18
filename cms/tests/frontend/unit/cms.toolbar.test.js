@@ -49,9 +49,8 @@ describe('CMS.Toolbar', function () {
             expect(Object.keys(toolbar.ui)).toContain('navigations');
             expect(Object.keys(toolbar.ui)).toContain('buttons');
             expect(Object.keys(toolbar.ui)).toContain('messages');
-            expect(Object.keys(toolbar.ui)).toContain('screenBlock');
             expect(Object.keys(toolbar.ui)).toContain('structureBoard');
-            expect(Object.keys(toolbar.ui).length).toEqual(11);
+            expect(Object.keys(toolbar.ui).length).toEqual(10);
         });
 
         it('has options', function () {
@@ -882,37 +881,6 @@ describe('CMS.Toolbar', function () {
                 clearInterval(i);
             }
             fixture.cleanup();
-        });
-
-        it('creates resize handler to resize the blocker element', function () {
-            expect(toolbar.ui.window).not.toHandle(toolbar.resize + '.screenblock');
-            toolbar._screenBlock();
-            expect($.fn.css).toHaveBeenCalledWith({
-                width: 0,
-                height: 0
-            });
-            toolbar.ui.window.css({
-                width: 200,
-                height: 200
-            });
-
-            $.fn.css.calls.reset();
-            toolbar.ui.window.trigger(toolbar.resize);
-            expect($.fn.css).toHaveBeenCalledWith({
-                width: 200,
-                height: 200
-            });
-            expect(toolbar.ui.window).toHandle(toolbar.resize + '.screenblock');
-        });
-        it('sets the interval to trigger resize', function () {
-            jasmine.clock().install();
-            toolbar._screenBlock();
-            expect($.fn.css).toHaveBeenCalledTimes(1);
-            jasmine.clock().tick(20);
-            expect($.fn.css).toHaveBeenCalledTimes(2);
-            jasmine.clock().tick(20);
-            expect($.fn.css).toHaveBeenCalledTimes(3);
-            jasmine.clock().uninstall();
         });
     });
 

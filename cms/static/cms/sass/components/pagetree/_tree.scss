@@ -41,7 +41,9 @@
 // general container around the jstree or elements
 .cms-pagetree-root.filtered {
     min-height: auto;
-    box-shadow: $pagetree-box-shadow;
+    // important is to fight with admin-style
+    padding: 0 !important;
+    box-shadow: $pagetree-box-shadow !important;
 }
 .cms-pagetree {
     border: $pagetree-border;
@@ -119,9 +121,12 @@
     width: 100%;
     line-height: $pagetree-header-height;
     height: $pagetree-header-height;
-    margin: 0 !important;
-    span {
-        font-weight: normal;
+    h1 {
+        line-height: $pagetree-header-height;
+        margin: 0 !important;
+        span {
+            font-weight: normal;
+        }
     }
 }
 
