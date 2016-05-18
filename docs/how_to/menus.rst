@@ -2,7 +2,7 @@
 Customising navigation menus
 ############################
 
-In this document we discuss three different way of customising the navigation
+In this document we discuss three different ways of customising the navigation
 menus of django CMS sites.
 
 1. :ref:`integration_menus`: Statically extend the menu entries
