@@ -5,6 +5,8 @@
 * Fixed a bug when clicking inside sideframe didn't close toolbar dropdowns
 * Fixed a bug where saving errors wouldn't be shown in the modal window.
 * Fixed a misleading message when modal iframe contents couldn't be accessed.
+* Added a workaround for a bug when plugins couldn't be deleted in Firefox
+  with 1Password extension installed
 
 
 === 3.3.0 (2016-05-26) ===

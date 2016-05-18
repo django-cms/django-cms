@@ -1655,6 +1655,28 @@ describe('CMS.Modal', function () {
             expect($.fn.hide).toHaveBeenCalledTimes(1);
         });
 
+        it('submits the form vs clicking on button if there is only one submit button', function () {
+            $('.buttons-test-iframe').find('input, a').remove();
+
+            modal._setButtons($('.buttons-test-iframe'));
+
+            var clickSpy = jasmine.createSpy();
+            var submitSpy = jasmine.createSpy();
+
+            $('.buttons-test-iframe').find('button').on('click', function (e) {
+                e.preventDefault();
+                clickSpy();
+            });
+            $('#iframe-form').on('submit', function (e) {
+                e.preventDefault();
+                submitSpy();
+            });
+
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(0) a').trigger(modal.click);
+            expect(clickSpy).not.toHaveBeenCalled();
+            expect(submitSpy).toHaveBeenCalledTimes(1);
+        });
+
         it('adds submit handlers to the form', function () {
             modal._setButtons($('.buttons-test-iframe'));
             var form = $('#iframe-form').on('submit', function (e) {
