@@ -1,0 +1,43 @@
+.. _upgrade-to-3.2.6:
+
+###################
+3.2.6 release notes
+###################
+
+*******************
+What's new in 3.2.6
+*******************
+
+Bug Fixes
+=========
+
+* Adds CMS_WIZARD_CONTENT_PLACEHOLDER setting
+* Renames the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+* Deprecates the old-style wizard-related settings
+
+
+Deprecation of Old-Style Page Wizard Settings
+=============================================
+
+In this release, we introduce a new naming scheme for the Page Wizard settings
+that better reflects that they effect the CMS's Page Wizards, rather than all
+wizards. This will also allow future settings for different wizards with a
+smaller chance of confusion or naming-collision.
+
+This release simultaneously deprecates the old naming scheme for these settings.
+Support for the old naming scheme will be dropped in version 3.5.0.
+
+Action Required
+---------------
+
+Developers using any of the following settings in their projects should rename
+them as follows at their earliest convenience. ::
+
+    CMS_WIZARD_DEFAULT_TEMPLATE => CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+    CMS_WIZARD_CONTENT_PLUGIN => CMS_PAGE_WIZARD_CONTENT_PLUGIN
+    CMS_WIZARD_CONTENT_PLUGIN_BODY => CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+    CMS_WIZARD_CONTENT_PLACEHOLDER => CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+
+The CMS will accept both-schemes until 3.5.0 when support for the old scheme
+will be dropped. During this transition period, the CMS will favor the new-style
+naming if both schemes are used in a project's settings.

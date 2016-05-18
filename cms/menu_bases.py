@@ -32,7 +32,7 @@ class CMSAttachMenu(Menu):
         apps = []
         for key, _ in apphook_pool.get_apphooks():
             app = apphook_pool.get_apphook(key)
-            if cls in app.menus:
+            if cls in app.get_menus():
                 apps.append(app)
         return apps
 

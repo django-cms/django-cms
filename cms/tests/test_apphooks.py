@@ -744,7 +744,6 @@ class ApphooksTestCase(CMSTestCase):
         titles = self.create_base_structure('VariableUrlsApp', ['en', 'de'])
         titles[0].page.reverse_id = 'page1'
         titles[0].page.save()
-
         cache.clear()
         self.reload_urls()
         menu_pool.discover_menus()
@@ -758,35 +757,23 @@ class ApphooksTestCase(CMSTestCase):
 
         self.reload_urls()
         self.apphook_clear()
-        if APP_MODULE in sys.modules:
-            del sys.modules[APP_MODULE]
-
-        page2 = create_page('page2', 'nav_playground.html',
-                            'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.parent,
-                            apphook='VariableUrlsApp', reverse_id='page2')
-        create_title('de', 'de_title', page2, slug='slug')
-        page2.publish('de')
 
         cache.clear()
         self.reload_urls()
-        if MENU_MODULE in sys.modules:
-            del sys.modules[MENU_MODULE]
-        if 'cms.cms_menus' in sys.modules:
-            del sys.modules['cms.cms_menus']
-        menu_pool.clear(all=True)
-        menu_pool.menus = {}
-        menu_pool.modifiers = []
-        menu_pool.discovered = False
-        menu_pool._expanded = False
-        menu_pool.discover_menus()
-        cache.clear()
 
+        page2 = create_page('page2', 'nav_playground.html',
+                            'en', created_by=self.superuser, published=True,
+                            parent=titles[0].page.get_draft_object().parent,
+                            in_navigation=True,
+                            apphook='VariableUrlsApp', reverse_id='page2')
+        create_title('de', 'de_title', page2, slug='slug')
+        page2.publish('de')
         request = self.get_request('/page2/')
         nodes = menu_pool.get_nodes(request)
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
         self.assertTrue(reverse('sample2-root') in nodes_urls)
+        self.assertTrue('/static/fresh/' in nodes_urls)
 
         self.apphook_clear()
 
