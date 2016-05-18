@@ -43,9 +43,11 @@
                 <div class="cms-pagetree-header-cell cms-pagetree-header-cell-fluid">
                     <div class="cms-pagetree-header-row cms-pagetree-search-container">
                         <div class="cms-pagetree-header-cell">
-                            <h1 class="cms-pagetree-header-title">
-                                {% trans "Page Tree" %} <span>({{ cl.current_site.name }})</span>
-                            </h1>
+                            <div class="cms-pagetree-header-title">
+                                <h1>
+                                    {% trans "Page Tree" %} <span>({{ cl.current_site.name }})</span>
+                                </h1>
+                            </div>
 
                             {% if cl.is_filtered or request.GET.q %}
                                 {# INFO: show reset button when filtering is active #}

@@ -94,6 +94,20 @@ describe('CMS.PageTreeStickyHeader', function () {
             sticky._saveSizes();
             expect(sticky.toolbarHeight).toEqual(250);
         });
+
+        it('saves toolbar height if in sideframe and debug is on', function () {
+            spyOn(sticky, '_isInSideframe').and.returnValue(true);
+            CMS.API.Helpers._getWindow.and.returnValue({
+                parent: {
+                    CMS: CMS
+                }
+            });
+            $('<div class="cms-toolbar" style="height: 250px"></div>').prependTo(sticky.ui.container);
+            $('<div class="cms-debug-bar" style="height: 50px"></div>').prependTo(sticky.ui.container);
+            expect(sticky.toolbarHeight).toEqual(null);
+            sticky._saveSizes();
+            expect(sticky.toolbarHeight).toEqual(300);
+        });
     });
 
     describe('_isInSideframe()', function () {
