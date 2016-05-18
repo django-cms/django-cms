@@ -3,7 +3,7 @@
 
 {# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
-{% block bodyclass %}change-list cms-pagetree-wrapper{% endblock %}
+{% block bodyclass %}{{ block.super }} change-list cms-pagetree-wrapper{% endblock %}
 {% block coltype %}flex{% endblock %}
 {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 {% block pagination %}{% endblock %}
