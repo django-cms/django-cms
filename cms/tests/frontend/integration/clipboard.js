@@ -94,6 +94,7 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
 
             this.mouse.down('.cms-clipboard-containers .cms-draggable');
             this.mouse.move(placeholder.left + placeholder.width / 2, placeholder.top + placeholder.height * 0);
+            this.mouse.move(placeholder.left + placeholder.width / 2 + 1, placeholder.top + placeholder.height * 0);
         }).then(function () {
             this.mouse.up('.cms-dragarea:nth-child(2) .cms-draggables');
             // check before reload

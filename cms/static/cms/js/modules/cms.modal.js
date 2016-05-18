@@ -30,6 +30,7 @@ var CMS = window.CMS || {};
 
         options: {
             onClose: false,
+            closeOnEsc: true,
             minHeight: 400,
             minWidth: 800,
             modalDuration: 200,
@@ -374,7 +375,7 @@ var CMS = window.CMS || {};
 
             // add esc close event
             this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
-                if (e.keyCode === CMS.KEYS.ESC) {
+                if (e.keyCode === CMS.KEYS.ESC && that.options.closeOnEsc) {
                     that._cancelHandler();
                 }
             });
@@ -981,7 +982,7 @@ var CMS = window.CMS || {};
 
                     // attach close event
                     body.on('keydown.cms', function (e) {
-                        if (e.keyCode === CMS.KEYS.ESC) {
+                        if (e.keyCode === CMS.KEYS.ESC && that.options.closeOnEsc) {
                             that._cancelHandler();
                         }
                     });
