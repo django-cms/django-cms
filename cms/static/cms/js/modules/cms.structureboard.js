@@ -249,9 +249,6 @@ var CMS = window.CMS || {};
             this.ui.html.removeClass('cms-structure-mode-structure')
                 .addClass('cms-structure-mode-content');
 
-            // hide clipboard if in edit mode
-            this.ui.container.find('.cms-clipboard').hide();
-
             CMS.settings.mode = 'edit';
             if (!init) {
                 CMS.settings = this.setSettings(CMS.settings);
