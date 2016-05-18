@@ -667,12 +667,12 @@ describe('CMS.Plugin', function () {
             expect(request.url).toEqual('/en/admin/cms/page/move-plugin/');
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
-                placeholder_id: ['clipboardId'],
-                plugin_id: ['1'],
-                plugin_language: ['en'],
-                plugin_parent: [''],
+                'placeholder_id': ['clipboardId'],
+                'plugin_id': ['1'],
+                'plugin_language': ['en'],
+                'plugin_parent': [''],
                 'plugin_order[]': ['1'],
-                csrfmiddlewaretoken: ['CSRF_TOKEN']
+                'csrfmiddlewaretoken': ['CSRF_TOKEN']
             });
             CMS.API.locked = false;
         });
@@ -995,12 +995,12 @@ describe('CMS.Plugin', function () {
             expect(request.url).toEqual('/en/admin/cms/page/move-plugin/');
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
-                placeholder_id: ['1'],
-                plugin_id: ['1'],
-                plugin_parent: [''],
+                'placeholder_id': ['1'],
+                'plugin_id': ['1'],
+                'plugin_parent': [''],
                 'plugin_order[]': ['3', '2', '1'],
-                plugin_language: ['en'],
-                csrfmiddlewaretoken: ['CSRF_TOKEN']
+                'plugin_language': ['en'],
+                'csrfmiddlewaretoken': ['CSRF_TOKEN']
             });
             CMS.API.locked = false;
         });
@@ -1703,20 +1703,19 @@ describe('CMS.Plugin', function () {
 
         it('binds traversing keydown events', function () {
             $(fixture.el).append('<div class="cms-modal-markup"></div>');
-            var picker = plugin.ui.dragitem.find('.cms-plugin-picker').show().appendTo('.cms-modal-markup');
+            plugin.ui.dragitem.find('.cms-plugin-picker').show().appendTo('.cms-modal-markup');
             plugin._setupKeyboardTraversing();
-            var anchors = picker.find('.cms-submenu-item:visible a');
 
-            var down = $.Event(plugin.keyDown + '.traverse', {
+            var down = new $.Event(plugin.keyDown + '.traverse', {
                 keyCode: CMS.KEYS.DOWN
             });
-            var down1 = $.Event(plugin.keyDown + '.traverse', {
+            var down1 = new $.Event(plugin.keyDown + '.traverse', {
                 keyCode: CMS.KEYS.TAB
             });
-            var up = $.Event(plugin.keyDown + '.traverse', {
+            var up = new $.Event(plugin.keyDown + '.traverse', {
                 keyCode: CMS.KEYS.UP
             });
-            var up1 = $.Event(plugin.keyDown + '.traverse', {
+            var up1 = new $.Event(plugin.keyDown + '.traverse', {
                 keyCode: CMS.KEYS.TAB,
                 shiftKey: true
             });

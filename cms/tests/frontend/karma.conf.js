@@ -4,7 +4,6 @@
  * http://github.com/aldryn/aldryn-boilerplate-bootstrap3
  */
 
-/* jshint node: true */
 'use strict';
 
 var baseConf = require('./base.conf');
@@ -15,6 +14,7 @@ module.exports = function (config) {
     var files = ['*'];
     if (argv && argv.tests) {
         files = argv.tests.split(',');
+        // eslint-disable-next-line
         console.log('Running tests for ' + files.join(', '));
     }
 
@@ -24,7 +24,7 @@ module.exports = function (config) {
     };
 
     var browsers = {
-        'PhantomJS': 'used for local testing'
+        PhantomJS: 'used for local testing'
     };
 
     var settings = {
@@ -153,10 +153,10 @@ module.exports = function (config) {
 
         // Browsers to run on Sauce Labs
         // Check out https://saucelabs.com/platforms for all browser/OS combos
-        browsers = baseConf.sauceLabsBrowsers.reduce(function (browsers, capability) {
-            browsers[JSON.stringify(capability)] = capability;
-            browsers[JSON.stringify(capability)].base = 'SauceLabs';
-            return browsers;
+        browsers = baseConf.sauceLabsBrowsers.reduce(function (browsersMap, capability) {
+            browsersMap[JSON.stringify(capability)] = capability;
+            browsersMap[JSON.stringify(capability)].base = 'SauceLabs';
+            return browsersMap;
         }, {});
 
         settings.browsers = Object.keys(browsers);

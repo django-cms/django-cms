@@ -3,15 +3,12 @@
  * Multiple helpers used across all CMS features
  */
 
-//##############################################################################
-// COMPATIBILITY
-
 // ensuring django namespace is set correctly
 window.django = window.django || undefined;
 
 // ensuring jQuery namespace is set correctly
 // istanbul ignore next
-window.jQuery = (window.django && window.django.jQuery) ? window.django.jQuery : window.jQuery || undefined;
+window.jQuery = window.django && window.django.jQuery ? window.django.jQuery : window.jQuery || undefined;
 
 // ensuring Class namespace is set correctly
 // istanbul ignore next
@@ -22,8 +19,8 @@ window.Class = window.Class || undefined;
  * @module CMS
  */
 var CMS = {
-    $: (typeof window.jQuery === 'function') ? window.jQuery :/* istanbul ignore next */ undefined,
-    Class: (typeof window.Class === 'function') ? window.Class :/* istanbul ignore next */ undefined,
+    $: typeof window.jQuery === 'function' ? window.jQuery :/* istanbul ignore next */ undefined,
+    Class: typeof window.Class === 'function' ? window.Class :/* istanbul ignore next */ undefined,
     /**
      * @module CMS
      * @submodule CMS.API
@@ -52,7 +49,6 @@ var CMS = {
     }
 };
 
-//##############################################################################
 // CMS.API
 (function ($) {
     'use strict';
@@ -60,7 +56,7 @@ var CMS = {
      * @function _ns
      * @private
      * @param {String} events space separated event names to be namespaces
-     * @return {String} string containing space separated namespaced event names
+     * @returns {String} string containing space separated namespaced event names
      */
     var _ns = function nameSpaceEvent(events) {
         return events.split(/\s+/g).map(function (eventName) {
@@ -91,12 +87,14 @@ var CMS = {
          * @param {Object} [data] optional data to be passed instead of one provided by request config
          * @param {String} [data.model=CMS.config.request.model]
          * @param {String|Number} [data.pk=CMS.config.request.pk]
+         * @returns {Boolean|void}
          */
+        // eslint-disable-next-line max-params
         reloadBrowser: function (url, timeout, ajax, data) {
             var that = this;
             // is there a parent window?
             var win = this._getWindow();
-            var parent = (win.parent) ? win.parent : win;
+            var parent = win.parent ? win.parent : win;
 
             // if there is an ajax reload, prioritize
             if (ajax) {
@@ -155,13 +153,15 @@ var CMS = {
          */
         preventSubmit: function () {
             var forms = $('.cms-toolbar').find('form');
+            var SUBMITTED_OPACITY = 0.5;
+
             forms.submit(function () {
                 // show loader
                 CMS.API.Toolbar.showLoader();
                 // we cannot use disabled as the name action will be ignored
                 $('input[type="submit"]').on('click', function (e) {
                     e.preventDefault();
-                }).css('opacity', 0.5);
+                }).css('opacity', SUBMITTED_OPACITY);
             });
         },
 
@@ -186,11 +186,13 @@ var CMS = {
          * previous setSettings calls.
          *
          * @method setSettings
-         * @param settings
+         * @param {Object} newSettings
+         * @returns {Object}
          */
-        setSettings: function (settings) {
+        setSettings: function (newSettings) {
             // merge settings
-            settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
+            var settings = JSON.stringify($.extend({}, CMS.config.settings, newSettings));
+
             // set loader
             if (CMS.API.Toolbar) {
                 CMS.API.Toolbar.showLoader();
@@ -218,7 +220,7 @@ var CMS = {
                     success: function (data) {
                         CMS.API.locked = false;
                         // determine if logged in or not
-                        settings = (data) ? JSON.parse(data) : CMS.config.settings;
+                        settings = data ? JSON.parse(data) : CMS.config.settings;
                         // istanbul ignore else
                         if (CMS.API.Toolbar) {
                             CMS.API.Toolbar.hideLoader();
@@ -245,9 +247,11 @@ var CMS = {
          * in the same way as setSettings sets them.
          *
          * @method getSettings
+         * @returns {Object}
          */
         getSettings: function () {
             var settings;
+
             // set loader
             if (CMS.API.Toolbar) {
                 CMS.API.Toolbar.showLoader();
@@ -270,7 +274,7 @@ var CMS = {
                     success: function (data) {
                         CMS.API.locked = false;
                         // determine if logged in or not
-                        settings = (data) ? JSON.parse(data) : CMS.config.settings;
+                        settings = data ? JSON.parse(data) : CMS.config.settings;
                         // istanbul ignore else
                         if (CMS.API.Toolbar) {
                             CMS.API.Toolbar.hideLoader();
@@ -303,6 +307,7 @@ var CMS = {
          * @method makeURL
          * @param {String} url original url
          * @param {String[]} [params] array of `param=value` strings to update the url
+         * @returns {String}
          */
         makeURL: function makeURL(url, params) {
             var arr = [];
@@ -355,10 +360,11 @@ var CMS = {
                 tmp += '&' + key + '=' + values[index];
             });
             tmp = tmp.replace('&', '?');
-            url = origin + tmp;
-            url = url.replace(/&/g, '&amp;');
+            var newUrl = origin + tmp;
 
-            return url;
+            newUrl = newUrl.replace(/&/g, '&amp;');
+
+            return newUrl;
         },
 
         /**
@@ -372,8 +378,9 @@ var CMS = {
          * @param {Number} wait time in ms to wait
          * @param {Object} [opts]
          * @param {Boolean} [opts.immediate] trigger func immediately?
-         * @return {Function}
+         * @returns {Function}
          */
+        /* eslint-disable */
         debounce: function debounce(func, wait, opts) {
             var timeout;
             return function () {
@@ -407,7 +414,7 @@ var CMS = {
          * @param {Object} [opts]
          * @param {Boolean} [opts.leading=true] execute on the leading edge
          * @param {Boolean} [opts.trailing=true] execute on the trailing edge
-         * @return {Function}
+         * @returns {Function}
          */
         throttle: function throttle(func, wait, opts) {
             var context, args, result;
@@ -451,6 +458,7 @@ var CMS = {
                 return result;
             };
         },
+        /* eslint-enable */
 
         /**
          * Browsers allow to "Prevent this page form creating additional
@@ -459,14 +467,15 @@ var CMS = {
          *
          * @method secureConfirm
          * @param {String} message to be displayed
-         * @return {Boolean}
+         * @returns {Boolean}
          */
         secureConfirm: function secureConfirm(message) {
             var start = Number(new Date());
-            var result = confirm(message);
+            var result = confirm(message); // eslint-disable-line
             var end = Number(new Date());
+            var MINIMUM_DELAY = 10;
 
-            return (end < (start + 10) || result === true);
+            return end < (start + MINIMUM_DELAY) || result === true;
         },
 
         /**
@@ -479,6 +488,7 @@ var CMS = {
          */
         _isStorageSupported: (function localStorageCheck() {
             var mod = 'modernizr';
+
             try {
                 localStorage.setItem(mod, mod);
                 localStorage.removeItem(mod);
@@ -487,7 +497,7 @@ var CMS = {
                 // istanbul ignore next
                 return false;
             }
-        }()),
+        })(),
 
         /**
          * Adds an event listener to the "CMS".
@@ -495,6 +505,7 @@ var CMS = {
          * @method addEventListener
          * @param {String} eventName string containing space separated event names
          * @param {Function} fn callback to run when the event happens
+         * @returns {jQuery}
          */
         addEventListener: function addEventListener(eventName, fn) {
             return CMS._eventRoot.on(_ns(eventName), fn);
@@ -506,6 +517,7 @@ var CMS = {
          * @method removeEventListener
          * @param {String} eventName string containing space separated event names
          * @param {Function} [fn] specific callback to be removed
+         * @returns {jQuery}
          */
         removeEventListener: function removeEventListener(eventName, fn) {
             return CMS._eventRoot.off(_ns(eventName), fn);
@@ -519,7 +531,8 @@ var CMS = {
          * @returns {$.Event} event that was just triggered
          */
         dispatchEvent: function dispatchEvent(eventName, payload) {
-            var event = $.Event(_ns(eventName));
+            var event = new $.Event(_ns(eventName));
+
             CMS._eventRoot.trigger(event, [payload]);
             return event;
         },
@@ -530,7 +543,7 @@ var CMS = {
          *
          * @method once
          * @param {Function} fn function to be executed only once
-         * @return {Function}
+         * @returns {Function}
          */
         once: function once(fn) {
             var result;
@@ -538,7 +551,7 @@ var CMS = {
 
             return function () {
                 if (didRunOnce) {
-                    fn = undefined;
+                    fn = undefined; // eslint-disable-line
                 } else {
                     didRunOnce = true;
                     result = fn.apply(this, arguments);

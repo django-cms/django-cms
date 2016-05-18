@@ -28,6 +28,7 @@ var CMS = window.CMS || {};
                 // set active element when making a choice
                 var form = $('form');
                 var choices = $('.choice');
+
                 choices.on('click', function (e) {
                     choices.removeClass('active')
                         .eq(choices.index(e.currentTarget))

@@ -30,6 +30,7 @@ var CMS = window.CMS || {};
 
         options: {
             onClose: false,
+            closeOnEsc: true,
             minHeight: 400,
             minWidth: 800,
             modalDuration: 200,
@@ -69,6 +70,11 @@ var CMS = window.CMS || {};
             var that = this;
             var bus = $({});
 
+            /**
+             * @function proxy
+             * @param {String} name of the method
+             * @returns {Function}
+             */
             function proxy(name) {
                 return function () {
                     bus[name].apply(bus, arguments);
@@ -90,6 +96,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var modal = $('.cms-modal');
+
             this.ui = {
                 modal: modal,
                 body: $('html'),
@@ -120,18 +127,18 @@ var CMS = window.CMS || {};
             var that = this;
 
             // modal behaviours
-            this.ui.minimizeButton.
-                off(this.click + ' ' + this.touchEnd)
+            this.ui.minimizeButton
+                .off(this.click + ' ' + this.touchEnd)
                 .on(this.click + ' ' + this.touchEnd, function (e) {
-                e.preventDefault();
-                that.minimize();
-            });
+                    e.preventDefault();
+                    that.minimize();
+                });
             this.ui.maximizeButton
                 .off(this.click + ' ' + this.touchEnd)
                 .on(this.click + ' ' + this.touchEnd, function (e) {
-                e.preventDefault();
-                that.maximize();
-            });
+                    e.preventDefault();
+                    that.maximize();
+                });
 
             this.ui.title.off(this.pointerDown).on(this.pointerDown, function (e) {
                 e.preventDefault();
@@ -149,9 +156,9 @@ var CMS = window.CMS || {};
             this.ui.closeAndCancel
                 .off(this.click + ' ' + this.touchEnd)
                 .on(this.click + ' ' + this.touchEnd, function (e) {
-                e.preventDefault();
-                that._cancelHandler();
-            });
+                    e.preventDefault();
+                    that._cancelHandler();
+                });
 
             // elements within the window
             this.ui.breadcrumb.off(this.click, 'a').on(this.click, 'a', function (e) {
@@ -173,6 +180,7 @@ var CMS = window.CMS || {};
          * @param {String} [opts.url] url to render iframe, takes precedence over `opts.html`
          * @param {Number} [opts.width] sets the width of the modal
          * @param {Number} [opts.height] sets the height of the modal
+         * @returns {Class} this
          */
         open: function open(opts) {
             // setup internals
@@ -252,7 +260,9 @@ var CMS = window.CMS || {};
          * @param {Object} [opts]
          * @param {Number} [opts.width] desired width of the modal
          * @param {Number} [opts.height] desired height of the modal
+         * @returns {Object}
          */
+        // eslint-disable-next-line complexity
         _calculateNewPosition: function (opts) {
             // lets set the modal width and height to the size of the browser
             var widthOffset = 300; // adds margin left and right
@@ -281,8 +291,8 @@ var CMS = window.CMS || {};
                 currentTop = screenHeight / 2;
             }
 
-            currentTop = parseInt(currentTop);
-            currentLeft = parseInt(currentLeft);
+            currentTop = parseInt(currentTop, 10);
+            currentLeft = parseInt(currentLeft, 10);
 
             // if new width/height go out of the screen - reset position to center of screen
             if ((width / 2 + currentLeft > screenWidth) || (height / 2 + currentTop > screenHeight) ||
@@ -365,7 +375,7 @@ var CMS = window.CMS || {};
 
             // add esc close event
             this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
-                if (e.keyCode === CMS.KEYS.ESC) {
+                if (e.keyCode === CMS.KEYS.ESC && that.options.closeOnEsc) {
                     that._cancelHandler();
                 }
             });
@@ -378,6 +388,7 @@ var CMS = window.CMS || {};
          * Closes the current instance.
          *
          * @method close
+         * @returns {Boolean|void}
          */
         close: function close() {
             var event = CMS.API.Helpers.dispatchEvent('modal-close', { instance: this });
@@ -439,8 +450,11 @@ var CMS = window.CMS || {};
          * Minimizes the modal onto the toolbar.
          *
          * @method minimize
+         * @returns {Boolean|void}
          */
         minimize: function minimize() {
+            var MINIMIZED_OFFSET = 50;
+
             // cancel action if maximized
             if (this.maximized) {
                 return false;
@@ -458,7 +472,7 @@ var CMS = window.CMS || {};
                 // minimize
                 this.ui.body.addClass('cms-modal-minimized');
                 this.ui.modal.css({
-                    'left': this.ui.toolbarLeftPart.outerWidth(true) + 50
+                    left: this.ui.toolbarLeftPart.outerWidth(true) + MINIMIZED_OFFSET
                 });
 
                 this.minimized = true;
@@ -475,6 +489,7 @@ var CMS = window.CMS || {};
          * Maximizes the window according to the browser size.
          *
          * @method maximize
+         * @returns {Boolean|void}
          */
         maximize: function maximize() {
             // cancel action when minimized
@@ -509,6 +524,7 @@ var CMS = window.CMS || {};
          * @method _startMove
          * @private
          * @param {Object} pointerEvent passes starting event
+         * @returns {Boolean|void}
          */
         _startMove: function _startMove(pointerEvent) {
             // cancel if maximized or minimized
@@ -533,8 +549,8 @@ var CMS = window.CMS || {};
                 top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
 
                 that.ui.modal.css({
-                    'left': left,
-                    'top': top
+                    left: left,
+                    top: top
                 });
             }).attr('data-touch-action', 'none');
         },
@@ -558,6 +574,7 @@ var CMS = window.CMS || {};
          * @method _startResize
          * @private
          * @param {Object} pointerEvent passes starting event
+         * @returns {Boolean|void}
          */
         _startResize: function _startResize(pointerEvent) {
             // cancel if in fullscreen
@@ -627,6 +644,7 @@ var CMS = window.CMS || {};
          * @method _setBreadcrumb
          * @private
          * @param {Object[]} breadcrumbs renderes breadcrumb on modal
+         * @returns {Boolean|void}
          */
         _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
             var crumb = '';
@@ -646,7 +664,8 @@ var CMS = window.CMS || {};
             // load breadcrumbs
             $.each(breadcrumbs, function (index, item) {
                 // check if the item is the last one
-                var last = (index >= breadcrumbs.length - 1) ? 'active' : '';
+                var last = index >= breadcrumbs.length - 1 ? 'active' : '';
+
                 // render breadcrumbs
                 crumb += template
                     .replace('{1}', item.url)
@@ -674,14 +693,15 @@ var CMS = window.CMS || {};
             var row;
             var tmp;
 
-            // istanbul ignore else
-            if (!djangoSuit) {
-                row = iframe.contents().find('.submit-row:eq(0)');
-            } else {
+            // istanbul ignore if
+            if (djangoSuit) {
                 row = iframe.contents().find('.save-box:eq(0)');
+            } else {
+                row = iframe.contents().find('.submit-row:eq(0)');
             }
             var form = iframe.contents().find('form');
-            //avoids conflict between the browser's form validation and Django's validation
+
+            // avoids conflict between the browser's form validation and Django's validation
             form.on('submit', function () {
                 // default submit button was clicked
                 // meaning, if you have save - it should close the iframe,
@@ -693,6 +713,7 @@ var CMS = window.CMS || {};
                 }
             });
             var buttons = row.find('input, a, button');
+
             // these are the buttons _inside_ the iframe
             // we need to listen to this click event to support submitting
             // a form by pressing enter inside of a field
@@ -716,8 +737,9 @@ var CMS = window.CMS || {};
             }
 
             // loop over input buttons
-            buttons.each(function (index, item) {
-                item = $(item);
+            buttons.each(function (index, btn) {
+                var item = $(btn);
+
                 item.attr('data-rel', '_' + index);
 
                 // cancel if item is a hidden input
@@ -754,12 +776,14 @@ var CMS = window.CMS || {};
 
                     // trigger only when blue action buttons are triggered
                     if (item.hasClass('default') || item.hasClass('deletelink')) {
-                        if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
+                        // hide iframe when using buttons other than submit
+                        if (item.hasClass('default')) {
+                            // submit button uses the form's submit event
+                            that.hideFrame = true;
+                        } else {
                             that.ui.modal.find('.cms-modal-frame iframe').hide();
                             // page has been saved or deleted, run checkup
                             that.saved = true;
-                        } else { // submit button uses the form's submit event
-                            that.hideFrame = true;
                         }
                     }
 
@@ -839,6 +863,7 @@ var CMS = window.CMS || {};
             that.ui.modalBody.addClass('cms-loader');
 
             // attach load event for iframe to prevent flicker effects
+            // eslint-disable-next-line complexity
             iframe.on('load', function () {
                 var messages;
                 var messageList;
@@ -871,6 +896,7 @@ var CMS = window.CMS || {};
                         // setTimeout is required to battle CKEditor initialisation
                         setTimeout(function () {
                             var editor = iframe[0].contentWindow.CMS.CKEditor.editor;
+
                             if (editor) {
                                 editor.on('loaded', function (e) {
                                     CMS.Modal._setupCtrlEnterSave(
@@ -878,7 +904,7 @@ var CMS = window.CMS || {};
                                     );
                                 });
                             }
-                        }, 100);
+                        }, 100); // eslint-disable-line
                     });
                 }
 
@@ -956,14 +982,14 @@ var CMS = window.CMS || {};
 
                     // attach close event
                     body.on('keydown.cms', function (e) {
-                        if (e.keyCode === CMS.KEYS.ESC) {
+                        if (e.keyCode === CMS.KEYS.ESC && that.options.closeOnEsc) {
                             that._cancelHandler();
                         }
                     });
 
                     // figure out if .object-tools is available
                     if (contents.find('.object-tools').length) {
-                        contents.find('#content').css('padding-top', 38);
+                        contents.find('#content').css('padding-top', 38); // eslint-disable-line
                     }
                 }
             });
@@ -978,6 +1004,7 @@ var CMS = window.CMS || {};
          * @method _changeIframe
          * @private
          * @param {jQuery} el originated element
+         * @returns {Boolean|void}
          */
         _changeIframe: function _changeIframe(el) {
             if (el.hasClass('active')) {
@@ -985,14 +1012,12 @@ var CMS = window.CMS || {};
             }
 
             var parents = el.parent().find('a');
+
             parents.removeClass('active');
-
             el.addClass('active');
-
             this._loadIframe({
                 url: el.attr('href')
             });
-
             this.ui.titlePrefix.text(el.text());
         },
 
@@ -1040,11 +1065,11 @@ var CMS = window.CMS || {};
      * @method _setupCtrlEnterSave
      * @private
      * @static
-     * @param {HTMLElement} document document element (iframe or parent window);
+     * @param {HTMLElement} doc document element (iframe or parent window);
      */
     CMS.Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
         var cmdPressed = false;
-        var mac = (navigator.platform.toLowerCase().indexOf('mac') + 1);
+        var mac = navigator.platform.toLowerCase().indexOf('mac') + 1;
 
         $(doc).on('keydown.cms.submit', function (e) {
             if (e.ctrlKey && e.keyCode === CMS.KEYS.ENTER && !mac) {

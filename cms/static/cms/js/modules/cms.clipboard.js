@@ -44,6 +44,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var clipboard = $('.cms-clipboard');
+
             this.ui = {
                 clipboard: clipboard,
                 triggers: $('.cms-clipboard-trigger a'),
@@ -71,7 +72,8 @@ var CMS = window.CMS || {};
                 minHeight: MIN_HEIGHT,
                 minimizable: false,
                 maximizable: false,
-                resizable: false
+                resizable: false,
+                closeOnEsc: false
             });
 
             that.modal.on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
@@ -108,12 +110,24 @@ var CMS = window.CMS || {};
                 }
                 that.clear(function () {
                     // remove element on success
-                    that.modal.close();
+                    if (that._isClipboardModalOpen()) {
+                        that.modal.close();
+                    }
+
                     that.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
                     that.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
                     that.ui.document.trigger('click.cms.toolbar');
                 });
             });
+        },
+
+        /**
+         * @method _isClipboardModalOpen
+         * @private
+         * @returns {Boolean}
+         */
+        _isClipboardModalOpen: function _isClipboardModalOpen() {
+            return !!this.modal.ui.modalBody.find('.cms-clipboard-containers').length;
         },
 
         /**
@@ -127,8 +141,9 @@ var CMS = window.CMS || {};
         clear: function (callback) {
             // post needs to be a string, it will be converted using JSON.parse
             var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
-            var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent().
-                addClass('cms-submenu-item-disabled');
+            var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent()
+                .addClass('cms-submenu-item-disabled');
+
             pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');
             pasteItems.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
 

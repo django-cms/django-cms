@@ -94,6 +94,7 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
 
             this.mouse.down('.cms-clipboard-containers .cms-draggable');
             this.mouse.move(placeholder.left + placeholder.width / 2, placeholder.top + placeholder.height * 0);
+            this.mouse.move(placeholder.left + placeholder.width / 2 + 1, placeholder.top + placeholder.height * 0);
         }).then(function () {
             this.mouse.up('.cms-dragarea:nth-child(2) .cms-draggables');
             // check before reload
@@ -147,8 +148,6 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
 });
 
 casper.test.begin('Copy placeholder contents from the structure board', function (test) {
-    var contentNumber;
-
     casper
         .start(globals.editUrl)
         // go to the Structure mode
@@ -442,7 +441,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
             this.mouse.move(column.left + column.width / 2 + 30, column.top + column.height);
         }).then(function () {
             test.assertExists('.cms-draggable-disallowed', 'Red line indicates impossibility of a drop');
-            this.mouse.up(column.left + column.width / 2  + 30, column.top + column.height);
+            this.mouse.up(column.left + column.width / 2 + 30, column.top + column.height);
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Pasting plugin was not successful');
         })
 

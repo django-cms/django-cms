@@ -118,12 +118,12 @@ casper.test.begin('Can switch mode by triggering space', function (test) {
             // triggers space
             this.sendKeys('html', casper.page.event.key.Space);
             // checks if we are not in structure mode anymore
-            test.assertNotVisible('.cms-structure',  'switch via space worked');
+            test.assertNotVisible('.cms-structure', 'switch via space worked');
         })
         .then(function () {
             // triggers space again
             this.sendKeys('html', casper.page.event.key.Space);
-            test.assertVisible('.cms-structure',  'switch via space worked');
+            test.assertVisible('.cms-structure', 'switch via space worked');
         })
         .run(function () {
             test.done();

@@ -126,6 +126,7 @@ casper.test.begin('Publishing dates', function (test) {
 
                     // adding one minute to the publish time
                     var timestamp = new Date(year, month, day, hours, minutes, seconds);
+
                     timestamp.setMinutes(timestamp.getMinutes() + 1);
                     minutes = timestamp.getMinutes();
                     if (minutes < 10) {

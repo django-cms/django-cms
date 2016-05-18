@@ -1,9 +1,10 @@
+'use strict';
+
 var globals = require('./settings/globals').configure({
     editOn: 'test-edit'
 });
 var casperjs = require('casper');
 var cms = require('./helpers/cms')(casperjs, globals);
-var xPath = casperjs.selectXPath;
 
 casper.test.setUp(function (done) {
     casper.start()

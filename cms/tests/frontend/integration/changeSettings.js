@@ -40,7 +40,7 @@ casper.test.begin('Change Settings', function (test) {
 
                     // selects German language
                     this.fill ('#usersettings_form', {
-                        'language': 'de'
+                        language: 'de'
                     }, true);
                 });
         })
@@ -63,7 +63,7 @@ casper.test.begin('Change Settings', function (test) {
 
                     // changes back to english
                     this.fill ('#usersettings_form', {
-                        'language': 'en'
+                        language: 'en'
                     }, true);
                 });
         })

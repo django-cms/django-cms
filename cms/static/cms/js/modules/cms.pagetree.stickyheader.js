@@ -65,6 +65,7 @@ var CMS = window.CMS || {};
             if (this._isInSideframe()) {
                 this.toolbarHeight = CMS.API.Helpers._getWindow().parent.CMS.$('.cms-toolbar').height();
                 var debug = CMS.API.Helpers._getWindow().parent.CMS.$('.cms-debug-bar');
+
                 if (debug.length) {
                     this.toolbarHeight += debug.outerHeight();
                 }
@@ -120,7 +121,7 @@ var CMS = window.CMS || {};
         /**
          * @method _shouldStick
          * @param {Number} scrollTop position in pixels
-         * @return {Boolean} should headers stick
+         * @returns {Boolean} should headers stick
          * @private
          */
         _shouldStick: function (scrollTop) {

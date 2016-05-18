@@ -112,6 +112,7 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
 
 casper.test.begin('Page advanced settings are accessible from modal and can be edited', function (test) {
     var random = randomString();
+
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible

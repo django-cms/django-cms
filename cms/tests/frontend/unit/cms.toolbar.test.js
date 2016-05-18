@@ -88,7 +88,7 @@ describe('CMS.Toolbar', function () {
             expect(toolbar.ui.toolbar.data('ready')).toEqual(true);
 
             toolbar.ui.toolbar.data('ready', false);
-            var toolbar1 = new CMS.Toolbar();
+            new CMS.Toolbar();
             expect(toolbar.ui.toolbar.data('ready')).toEqual(true);
         });
     });
@@ -226,6 +226,7 @@ describe('CMS.Toolbar', function () {
         it('turns the disclosure triangle into correct position', function (done) {
             // have to cleanup here because previous test `animate` call isn't finished yet
             toolbar.ui.body.removeClass('cms-toolbar-collapsing');
+            // eslint-disable-next-line max-params
             spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
                 expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
                 expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
@@ -277,6 +278,7 @@ describe('CMS.Toolbar', function () {
         });
 
         it('does not close toolbar if it is locked', function () {
+            // eslint-disable-next-line max-params
             spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
                 callback();
             });
@@ -290,7 +292,7 @@ describe('CMS.Toolbar', function () {
             expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
 
             toolbar._lock(false);
-            expect(toolbar._hide()).toEqual(undefined);
+            expect(toolbar._hide()).not.toBeDefined();
             toolbar.close();
             expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
             expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
@@ -343,6 +345,7 @@ describe('CMS.Toolbar', function () {
         });
 
         it('turns the disclosure triangle into correct position', function (done) {
+            // eslint-disable-next-line max-params
             spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
                 expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
                 callback();
@@ -351,6 +354,7 @@ describe('CMS.Toolbar', function () {
 
             toolbar.open();
 
+            // eslint-disable-next-line max-params
             $.fn.animate.and.callFake(function (opts, timeout, easing, callback) {
                 expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
                 expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
@@ -727,12 +731,12 @@ describe('CMS.Toolbar', function () {
             var emptyLink = $(toolbar.ui.navigations[0]).find('a').eq(0);
             var pagesLink = $(toolbar.ui.navigations[0]).find('a').eq(1);
 
-            emptyLink.trigger($.Event('keydown', { keyCode: CMS.KEYS.CTRL }));
+            emptyLink.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CTRL }));
             emptyLink.trigger('click');
             expect(toolbar._delegate).not.toHaveBeenCalled();
             expect(fakeWindow.open).not.toHaveBeenCalled();
 
-            emptyLink.trigger($.Event('keydown', { keyCode: CMS.KEYS.CTRL }));
+            emptyLink.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CTRL }));
             pagesLink.trigger('click');
             expect(toolbar._delegate).not.toHaveBeenCalledTimes(1);
             expect(fakeWindow.open).toHaveBeenCalledWith(jasmine.stringMatching('cms/page'), '_blank');
@@ -742,7 +746,6 @@ describe('CMS.Toolbar', function () {
 
         it('attaches event handlers to navigation menu lists', function () {
             var firstMenuItem = $(toolbar.ui.navigations.find('> li')[0]);
-            var secondMenuItem = $(toolbar.ui.navigations.find('> li')[1]);
             toolbar.ui.structureBoard = $('<div></div>');
 
             expect(toolbar.ui.document).not.toHandle(toolbar.click);
@@ -796,7 +799,6 @@ describe('CMS.Toolbar', function () {
 
         it('closes the menu item if it is open', function () {
             var firstMenuItem = $(toolbar.ui.navigations.find('> li')[0]);
-            var secondMenuItem = $(toolbar.ui.navigations.find('> li')[1]);
 
             firstMenuItem.trigger('click');
             expect(firstMenuItem).toHaveClass('cms-toolbar-item-navigation-hover');
@@ -809,8 +811,6 @@ describe('CMS.Toolbar', function () {
             var menuItem = $(toolbar.ui.navigations.find('> li')[1]);
             var subMenu = menuItem.find('> ul');
             var childrenSubMenuItem = subMenu.find('> li').eq(0);
-            var disabledSubMenuItem = subMenu.find('> li').eq(1);
-            var normalSubMenuItem = subMenu.find('> li').eq(2);
 
             spyOn($.fn, 'show').and.callThrough();
 

@@ -78,8 +78,8 @@ examples, or ask.
 JS Linting
 ----------
 
-JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
-<http://jscs.info>`_. In order to run the linters you need to do this:
+JavaScript is linted using `ESLint <http://eslint.org>`_. In order to run the
+linter you need to do this:
 
 .. code-block:: sh
 

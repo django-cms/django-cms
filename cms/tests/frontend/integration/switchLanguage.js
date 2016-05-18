@@ -58,8 +58,8 @@ casper.test.begin('Switch language', function (test) {
         .waitUntilVisible('.cms-modal-open')
         .withFrame(0, function () {
             this.fill('#page_form', {
-                'title': randomText,
-                'slug': randomText
+                title: randomText,
+                slug: randomText
             });
         })
         // submit Change pane modal

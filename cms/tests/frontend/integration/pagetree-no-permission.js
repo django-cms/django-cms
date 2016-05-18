@@ -29,6 +29,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
         // switch to sideframe
         .withFrame(0, function () {
             var secondPageId;
+
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -258,6 +259,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .then(function () {
                     // click on "Paste" to top level "second" page
                     var pages = cms._getPageIds('Second');
+
                     this.then(cms.triggerPastePage({
                         page: pages[pages.length - 2]
                     }));

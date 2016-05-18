@@ -1,5 +1,6 @@
 // #############################################################################
 // Init all settings and event handlers on suite start
+'use strict';
 
 require('./../casperjs.conf').init();
 

@@ -26,6 +26,7 @@ var CMS = window.CMS || {};
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
             var opts = $('.js-cms-pagetree').data('json');
+
             this.options = $.extend(true, {}, this.options, opts, options);
 
             // states and events
@@ -55,6 +56,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var pagetree = $('.cms-pagetree');
+
             this.ui = {
                 container: pagetree,
                 document: $(document),
@@ -83,6 +85,7 @@ var CMS = window.CMS || {};
             CMS.API.Helpers.csrf(this.options.csrf);
 
             // setup column headings
+            // eslint-disable-next-line no-shadow
             $.each(this.options.columns, function (index, obj) {
                 if (obj.key === '') {
                     // the first row is already populated, to avoid overwrites
@@ -102,9 +105,9 @@ var CMS = window.CMS || {};
                             // e.g. zh-hans, zh-cn etc
                             if (node.data) {
                                 return node.data['col' + obj.key.replace('-', '')];
-                            } else {
-                                return '';
                             }
+
+                            return '';
                         },
                         width: obj.width || '1%',
                         wideCellClass: obj.cls
@@ -120,10 +123,10 @@ var CMS = window.CMS || {};
                         // '#' is rendered if its the root node, there we only
                         // care about `obj.openNodes`, in the following case
                         // we are requesting a specific node
-                        if (node.id !== '#') {
-                            obj.pageId = that._storeNodeId(node.data.id);
-                        } else {
+                        if (node.id === '#') {
                             obj.pageId = null;
+                        } else {
+                            obj.pageId = that._storeNodeId(node.data.id);
                         }
 
                         // we need to store the opened items inside the localstorage
@@ -145,6 +148,7 @@ var CMS = window.CMS || {};
                     // disable open/close animations
                     animation: 0,
                     // core setting to allow actions
+                    // eslint-disable-next-line max-params
                     check_callback: function (operation, node, node_parent, node_position, more) {
                         if ((operation === 'move_node' || operation === 'copy_node') && more && more.pos) {
                             if (more.pos === 'i') {
@@ -155,7 +159,7 @@ var CMS = window.CMS || {};
                         }
 
                         // cancel dragging when filtering is active by setting `false`
-                        return (that.options.filtered) ? false : true;
+                        return !that.options.filtered;
                     },
                     // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                     data: data,
@@ -168,6 +172,7 @@ var CMS = window.CMS || {};
                     error: function (error) {
                         // ignore warnings about dragging parent into child
                         var errorData = JSON.parse(error.data);
+
                         if (error.error === 'check' && errorData && errorData.chk === 'move_node') {
                             return;
                         }
@@ -180,7 +185,7 @@ var CMS = window.CMS || {};
                     multiple: false
                 },
                 // activate drag and drop plugin
-                plugins : ['dnd', 'search', 'grid'],
+                plugins: ['dnd', 'search', 'grid'],
                 // https://www.jstree.com/api/#/?f=$.jstree.defaults.dnd
                 dnd: {
                     inside_pos: 'last',
@@ -188,7 +193,7 @@ var CMS = window.CMS || {};
                     drag_selection: false,
                     // disable dragging if filtered
                     is_draggable: function () {
-                        return (that.options.filtered) ? false : true;
+                        return !that.options.filtered;
                     },
                     // disable CMD/CTRL copy
                     copy: false
@@ -250,8 +255,8 @@ var CMS = window.CMS || {};
                 data.data.nodes.forEach(function (nodeId) {
                     var descendantIds = that._getDescendantsIds(nodeId);
 
-                    [nodeId].concat(descendantIds).forEach(function (node) {
-                        $('.jsgrid_' + node + '_col').addClass('jstree-is-dragging');
+                    [nodeId].concat(descendantIds).forEach(function (id) {
+                        $('.jsgrid_' + id + '_col').addClass('jstree-is-dragging');
                     });
                 });
 
@@ -263,12 +268,13 @@ var CMS = window.CMS || {};
             this.ui.document.on('dnd_stop.vakata', function (e, data) {
                 var element = $(data.element);
                 var node = element.parent();
+
                 node.removeClass('jstree-is-dragging');
                 data.data.nodes.forEach(function (nodeId) {
                     var descendantIds = that._getDescendantsIds(nodeId);
 
-                    [nodeId].concat(descendantIds).forEach(function (node) {
-                        $('.jsgrid_' + node + '_col').removeClass('jstree-is-dragging');
+                    [nodeId].concat(descendantIds).forEach(function (id) {
+                        $('.jsgrid_' + id + '_col').removeClass('jstree-is-dragging');
                     });
                 });
             });
@@ -335,6 +341,7 @@ var CMS = window.CMS || {};
             this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function (e) {
                 e.preventDefault();
                 var el = $(this);
+
                 // prevent if parent is active
                 if (el.parent().hasClass('active')) {
                     return false;
@@ -359,10 +366,11 @@ var CMS = window.CMS || {};
          * Helper to process the cut and copy events.
          *
          * @method _cutOrCopy
-         * @param {Object} [opts]
-         * @param {Number} [opts.type] either 'cut' or 'copy'
-         * @param {Number} [opts.element] originated trigger element
+         * @param {Object} [obj]
+         * @param {Number} [obj.type] either 'cut' or 'copy'
+         * @param {Number} [obj.element] originated trigger element
          * @private
+         * @returns {Boolean|void}
          */
         _cutOrCopy: function _cutOrCopy(obj) {
             // prevent actions if you try to copy a page with an apphook
@@ -372,6 +380,7 @@ var CMS = window.CMS || {};
             }
 
             var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
+
             // resets if we click again
             if (this.clipboard.type === obj.type && jsTreeId === this.clipboard.id) {
                 this.clipboard.type = null;
@@ -390,8 +399,8 @@ var CMS = window.CMS || {};
          * Helper to process the paste event.
          *
          * @method _paste
+         * @param {$.Event} event click event
          * @private
-         * @return {Object} event originated event handler
          */
         _paste: function _paste(event) {
             // hide helpers after we picked one
@@ -419,7 +428,7 @@ var CMS = window.CMS || {};
          *
          * @method _getStoredNodeIds
          * @private
-         * @return {Array} list of ids
+         * @returns {Array} list of ids
          */
         _getStoredNodeIds: function _getStoredNodeIds() {
             return CMS.settings.pagetree || [];
@@ -431,7 +440,7 @@ var CMS = window.CMS || {};
          * @method _storeNodeId
          * @private
          * @param {String} id to be stored
-         * @return {String} id that has been stored
+         * @returns {String} id that has been stored
          */
         _storeNodeId: function _storeNodeId(id) {
             var number = id;
@@ -454,7 +463,7 @@ var CMS = window.CMS || {};
          * @method _removeNodeId
          * @private
          * @param {String} id to be stored
-         * @return {String} id that has been removed
+         * @returns {String} id that has been removed
          */
         _removeNodeId: function _removeNodeId(id) {
             var number = id;
@@ -476,15 +485,16 @@ var CMS = window.CMS || {};
          * Moves a node after drag & drop.
          *
          * @method _moveNode
-         * @param {Object} [opts]
-         * @param {Number} [opts.id] current element id for url matching
-         * @param {Number} [opts.target] target sibling or parent
-         * @param {Number} [opts.position] either `left`, `right` or `last-child`
+         * @param {Object} [obj]
+         * @param {Number} [obj.id] current element id for url matching
+         * @param {Number} [obj.target] target sibling or parent
+         * @param {Number} [obj.position] either `left`, `right` or `last-child`
          * @returns {$.Deferred} ajax request object
          * @private
          */
         _moveNode: function _moveNode(obj) {
             var that = this;
+
             obj.site = that.options.site;
 
             return $.ajax({
@@ -502,8 +512,7 @@ var CMS = window.CMS || {};
          * Copies a node into the selected node.
          *
          * @method _copyNode
-         * @param {String} copyFromId element to be cut
-         * @param {String} copyToId destination to inject
+         * @param {Object} obj page obj
          * @private
          */
         _copyNode: function _copyNode(obj) {
@@ -566,9 +575,11 @@ var CMS = window.CMS || {};
          * @method _saveCopiedNode
          * @private
          * @param {Object} data node position information
+         * @returns {$.Deferred}
          */
         _saveCopiedNode: function _saveCopiedNode(data) {
             var that = this;
+
             // send the real ajax request for copying the plugin
             return $.ajax({
                 method: 'post',
@@ -587,13 +598,13 @@ var CMS = window.CMS || {};
          * @method _getElement
          * @private
          * @param {jQuery} el jQuery node form where to search
-         * @return {String} jsTree node element id
+         * @returns {String} jsTree node element id
          */
         _getNodeId: function _getNodeId(el) {
             var cls = el.closest('.jstree-grid-cell').attr('class');
 
             // if it's not a cell, assume it's the root node
-            return (cls) ? cls.replace(/.*jsgrid_(.+?)_col.*/, '$1') : '#';
+            return cls ? cls.replace(/.*jsgrid_(.+?)_col.*/, '$1') : '#';
         },
 
         /**
@@ -602,7 +613,7 @@ var CMS = window.CMS || {};
          * @method _getNodePosition
          * @private
          * @param {Object} obj jstree move object
-         * @return {Object} evaluated object with params
+         * @returns {Object} evaluated object with params
          */
         _getNodePosition: function _getNodePosition(obj) {
             var data = {};
@@ -665,6 +676,7 @@ var CMS = window.CMS || {};
          */
         _setupStickyHeader: function _setupStickyHeader() {
             var that = this;
+
             that.ui.tree.on('ready.jstree', function () {
                 that.header = new CMS.PageTreeStickyHeader({
                     container: that.ui.container
@@ -688,7 +700,10 @@ var CMS = window.CMS || {};
                     method: 'post',
                     url: $(this).attr('href')
                 }).done(function () {
-                    if (window.self !== window.top) {
+                    if (window.self === window.top) {
+                        // simply reload the page
+                        that._reloadHelper();
+                    } else {
                         // if we're in the sideframe we have to actually
                         // check if we are publishing a page we're currently in
                         // because if the slug did change we would need to
@@ -697,16 +712,14 @@ var CMS = window.CMS || {};
                         // the model and pk are empty and reloadBrowser doesn't really
                         // do anything - so here we specifically force the data
                         // to be the data about the page and not the model
-                        var parent = (window.parent ? window.parent : window);
+                        var parent = window.parent ? window.parent : window;
                         var data = {
                             // FIXME shouldn't be hardcoded
                             model: 'cms.page',
                             pk: parent.CMS.config.request.page_id
                         };
+
                         CMS.API.Helpers.reloadBrowser('REFRESH_PAGE', false, true, data);
-                    } else {
-                        // otherwise simply reload the page
-                        that._reloadHelper();
                     }
                 }).fail(function (error) {
                     that.showError(error.statusText);
@@ -759,7 +772,12 @@ var CMS = window.CMS || {};
             filterTrigger.add(filterClose).on(click, function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                if (!filterActive) {
+                if (filterActive) {
+                    filterContainer.hide();
+                    pageTreeHeader.removeClass(filterClass);
+                    that.ui.document.off(click);
+                    filterActive = false;
+                } else {
                     filterContainer.show();
                     pageTreeHeader.addClass(filterClass);
                     that.ui.document.on(click, function () {
@@ -767,11 +785,6 @@ var CMS = window.CMS || {};
                         filterTrigger.trigger(click);
                     });
                     filterActive = true;
-                } else {
-                    filterContainer.hide();
-                    pageTreeHeader.removeClass(filterClass);
-                    that.ui.document.off(click);
-                    filterActive = false;
                 }
             });
 
@@ -792,7 +805,7 @@ var CMS = window.CMS || {};
          * @private
          */
         _enablePaste: function _enablePaste(selector) {
-            var sel = typeof selector !== 'undefined' ? selector : this.options.pasteSelector;
+            var sel = typeof selector === 'undefined' ? this.options.pasteSelector : selector;
 
             // helpers are generated on the fly, so we need to reference
             // them every single time
@@ -807,7 +820,7 @@ var CMS = window.CMS || {};
          * @private
          */
         _disablePaste: function _disablePaste(selector) {
-            var sel = typeof selector !== 'undefined' ? selector : this.options.pasteSelector;
+            var sel = typeof selector === 'undefined' ? this.options.pasteSelector : selector;
 
             // helpers are generated on the fly, so we need to reference
             // them every single time
@@ -852,6 +865,7 @@ var CMS = window.CMS || {};
          */
         _showSuccess: function _showSuccess(id) {
             var element = this.ui.tree.find('li[data-id="' + id + '"]');
+
             element.addClass('cms-tree-node-success');
             setTimeout(function () {
                 element.removeClass('cms-tree-node-success');
@@ -869,10 +883,10 @@ var CMS = window.CMS || {};
          * @private
          */
         _reloadHelper: function _reloadHelper() {
-            if (window.self !== window.top) {
-                window.location.reload();
-            } else {
+            if (window.self === window.top) {
                 CMS.API.Helpers.reloadBrowser();
+            } else {
+                window.location.reload();
             }
         },
 
@@ -895,7 +909,11 @@ var CMS = window.CMS || {};
                 '</ul>';
             var msg = tpl.replace('{msg}', '<strong>' + this.options.lang.error + '</strong> ' + message);
 
-            messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
+            if (messages.length) {
+                messages.replaceWith(msg);
+            } else {
+                breadcrumb.after(msg);
+            }
         },
 
         /**

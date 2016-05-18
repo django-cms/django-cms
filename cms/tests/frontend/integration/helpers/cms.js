@@ -11,11 +11,12 @@ module.exports = function (casperjs, settings) {
          * @param {Object} [credentials=globals.credentials]
          * @param {String} credentials.username
          * @param {String} credentials.password
+         * @returns {Function}
          */
         login: function (credentials) {
             return function () {
                 return this.thenOpen(globals.adminUrl).then(function () {
-                    this.fill('#login-form', credentials ||  globals.credentials, true);
+                    this.fill('#login-form', credentials || globals.credentials, true);
                 }).waitForResource(/login/).thenEvaluate(function () {
                     localStorage.clear();
                 });
@@ -34,15 +35,18 @@ module.exports = function (casperjs, settings) {
          *
          * @param {Object} opts
          * @param {String} [opts.title] Name of the page to delete
+         * @returns {Function}
          */
         removePage: function (opts) {
             var that = this;
+
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
                     .waitUntilVisible('.js-cms-pagetree-options')
                     .then(that.expandPageTree())
                     .then(function () {
                         var pageId;
+
                         if (opts && opts.title) {
                             pageId = that.getPageId(opts.title);
                         }
@@ -51,12 +55,12 @@ module.exports = function (casperjs, settings) {
                         var href = pageId ? '[href*="' + pageId + '"]' : '';
 
                         return this.then(function () {
-                                this.click('.js-cms-pagetree-options' + data);
-                            })
-                            .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
-                            .then(function () {
-                                this.click('.cms-pagetree-jstree [href*="delete"]' + href);
-                            });
+                            this.click('.js-cms-pagetree-options' + data);
+                        })
+                        .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                        .then(function () {
+                            this.click('.cms-pagetree-jstree [href*="delete"]' + href);
+                        });
                     })
                     .waitForUrl(/delete/)
                     .waitUntilVisible('input[type=submit]')
@@ -74,17 +78,18 @@ module.exports = function (casperjs, settings) {
          * @public
          * @param {Object} opts
          * @param {Number|String} opts.page page id
+         * @returns {Function}
          */
         triggerCopyPage: function (opts) {
             return function () {
                 return this.then(function () {
-                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
-                    })
-                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
-                    .then(function () {
-                        this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"]');
-                    })
-                    .wait(100);
+                    this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                })
+                .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                .then(function () {
+                    this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"]');
+                })
+                .wait(100);
             };
         },
 
@@ -94,17 +99,18 @@ module.exports = function (casperjs, settings) {
          * @public
          * @param {Object} opts
          * @param {Number|String} opts.page page id
+         * @returns {Function}
          */
         triggerCutPage: function (opts) {
             return function () {
                 return this.then(function () {
-                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
-                    })
-                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
-                    .then(function () {
-                        this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"] ~ .js-cms-tree-item-cut');
-                    })
-                    .wait(100);
+                    this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                })
+                .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                .then(function () {
+                    this.mouse.click('.js-cms-tree-item-copy[data-id="' + opts.page + '"] ~ .js-cms-tree-item-cut');
+                })
+                .wait(100);
             };
         },
 
@@ -114,17 +120,18 @@ module.exports = function (casperjs, settings) {
          * @public
          * @param {Object} opts
          * @param {Number|String} opts.page page id
+         * @returns {Function}
          */
         triggerPastePage: function (opts) {
             return function () {
                 return this.then(function () {
-                        this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
-                    })
-                    .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
-                    .then(function () {
-                        this.mouse.click('.js-cms-tree-item-paste[data-id="' + opts.page + '"]');
-                    })
-                    .wait(100);
+                    this.click('.js-cms-pagetree-options[data-id="' + opts.page + '"]');
+                })
+                .waitUntilVisible('.cms-pagetree-dropdown-menu-open')
+                .then(function () {
+                    this.mouse.click('.js-cms-tree-item-paste[data-id="' + opts.page + '"]');
+                })
+                .wait(100);
             };
         },
 
@@ -136,6 +143,7 @@ module.exports = function (casperjs, settings) {
          * @param {Object} opts
          * @param {String} opts.title name of the page
          * @param {String} [opts.title] name of the parent page
+         * @returns {Function}
          */
         addPage: function (opts) {
             var that = this;
@@ -148,6 +156,7 @@ module.exports = function (casperjs, settings) {
                         .then(that.expandPageTree())
                         .then(function () {
                             var pageId = that.getPageId(opts.parent);
+
                             // add nested page
                             this.click('a[href*="/admin/cms/page/add/?target=' + pageId + '"]');
                         })
@@ -191,9 +200,11 @@ module.exports = function (casperjs, settings) {
          * @param {Object} opts options
          * @param {String} opts.page page name (will take first one in the tree)
          * @param {Object} opts.fields { fieldName: value, ... }
+         * @returns {Function}
          */
         _modifyPageAdvancedSettings: function _modifyPageAdvancedSettings(opts) {
             var that = this;
+
             return function () {
                 return this.wait(1000).thenOpen(globals.adminPagesUrl)
                     .waitUntilVisible('.cms-pagetree-jstree')
@@ -201,6 +212,7 @@ module.exports = function (casperjs, settings) {
                     .then(that.expandPageTree())
                     .then(function () {
                         var pageId = that.getPageId(opts.page);
+
                         this.thenOpen(globals.adminPagesUrl + pageId + '/advanced-settings/');
                     })
                     .waitForSelector('#page_form', function () {
@@ -218,6 +230,7 @@ module.exports = function (casperjs, settings) {
          * @param {Object} opts options
          * @param {String} opts.page page name (will take first one in the tree)
          * @param {String} opts.apphook app name
+         * @returns {Function}
          */
         addApphookToPage: function addApphookToPage(opts) {
             return this._modifyPageAdvancedSettings({
@@ -233,6 +246,7 @@ module.exports = function (casperjs, settings) {
          * @param {Object} opts options
          * @param {String} opts.page page name (will take first one in the tree)
          * @param {String} opts.tempalte template file name (e.g. simple.html)
+         * @returns {Function}
          */
         setPageTemplate: function setPageTemplate(opts) {
             return this._modifyPageAdvancedSettings({
@@ -248,13 +262,15 @@ module.exports = function (casperjs, settings) {
          * @param {Object} opts options
          * @param {String} opts.page page name (will take first one in the tree)
          * @param {String} [opts.language='en'] language to publish
+         * @returns {Function}
          */
         publishPage: function publishPage(opts) {
             var that = this;
-            var language = typeof opts.language !== 'undefined' ? opts.language : 'en';
+            var language = typeof opts.language === 'undefined' ? 'en' : opts.language;
 
             return function () {
                 var pageId;
+
                 return this.wait(1000).thenOpen(globals.adminPagesUrl)
                     .waitUntilVisible('.cms-pagetree-jstree')
                     .then(that.waitUntilAllAjaxCallsFinish())
@@ -290,6 +306,7 @@ module.exports = function (casperjs, settings) {
          *             id_body: 'Some text'
          *         }
          *     });
+         * @returns {Function}
          */
         addPlugin: function (opts) {
             var xPath = casperjs.selectXPath;
@@ -344,10 +361,10 @@ module.exports = function (casperjs, settings) {
                                     return;
                                 }
 
-                                content = JSON.parse(content);
+                                var parsedContent = JSON.parse(content);
 
-                                Object.keys(content).forEach(function (key) {
-                                    document.querySelector('#' + key).value = content[key];
+                                Object.keys(parsedContent).forEach(function (key) {
+                                    document.querySelector('#' + key).value = parsedContent[key];
                                 });
                             }, JSON.stringify(opts.content));
                         });
@@ -385,9 +402,11 @@ module.exports = function (casperjs, settings) {
          *
          * @function switchTo
          * @param {String} view 'structure' or 'content'
+         * @returns {Function}
          */
         switchTo: function (view) {
             var pos;
+
             if (view === 'structure') {
                 pos = 'first';
             } else if (view === 'content') {
@@ -408,6 +427,7 @@ module.exports = function (casperjs, settings) {
          *
          * @function expandPlaceholderPlugins
          * @param {String} selector placeholder selector
+         * @returns {Function}
          */
         expandPlaceholderPlugins: function (selector) {
             return function () {
@@ -431,6 +451,7 @@ module.exports = function (casperjs, settings) {
          * Opens the sideframe. Toolbar has to be there.
          *
          * @function openSideframe
+         * @returns {Function}
          */
         openSideframe: function () {
             return function () {
@@ -452,9 +473,11 @@ module.exports = function (casperjs, settings) {
          * Recursively expands the page tree to operate on page nodes.
          *
          * @function expandPageTree
+         * @returns {Function}
          */
         expandPageTree: function () {
             var that = this;
+
             return function () {
                 return this.then(function () {
                     if (this.visible('.jstree-closed')) {
@@ -464,10 +487,10 @@ module.exports = function (casperjs, settings) {
                         return casper
                             .then(that.waitUntilAllAjaxCallsFinish())
                             .then(that.expandPageTree());
-                    } else {
-                        return casper.wait(1000)
-                            .then(that.waitUntilAllAjaxCallsFinish());
                     }
+
+                    return casper.wait(1000)
+                        .then(that.waitUntilAllAjaxCallsFinish());
                 });
             };
         },
@@ -477,7 +500,7 @@ module.exports = function (casperjs, settings) {
          *
          * @function getPageId
          * @param {String} title page title
-         * @return {String|Boolean} page id as a string or false if couldn't be found
+         * @returns {String|Boolean} page id as a string or false if couldn't be found
          */
         getPageId: function (title) {
             return this._getPageIds(title)[0];
@@ -490,15 +513,16 @@ module.exports = function (casperjs, settings) {
          * @function _getPageIds
          * @private
          * @param {String} title page title
-         * @return {String[]|Boolean} page ids as an array of strings or false if couldn't be found
+         * @returns {String[]|Boolean} page ids as an array of strings or false if couldn't be found
          */
         _getPageIds: function (title) {
             // important to pass single param, because casper acts
             // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
-            return casper.evaluate(function (title) {
+            return casper.evaluate(function (anchorTitle) {
                 return CMS.$('.jstree-anchor').map(function () {
                     var anchor = $(this);
-                    if (anchor.text().trim() === title) {
+
+                    if (anchor.text().trim() === anchorTitle) {
                         return anchor.parent().data('id');
                     }
                 }).toArray();
@@ -511,6 +535,7 @@ module.exports = function (casperjs, settings) {
          * jQuery requests.
          *
          * @function waitUntilAllAjaxCallsFinish
+         * @returns {Function}
          */
         waitUntilAllAjaxCallsFinish: function () {
             return function () {
@@ -526,7 +551,7 @@ module.exports = function (casperjs, settings) {
                             return amount;
                         });
 
-                        return (remainingAjaxRequests === 0);
+                        return remainingAjaxRequests === 0;
                     }).wait(200);
             };
         },
@@ -551,10 +576,11 @@ module.exports = function (casperjs, settings) {
          *             name: 'Sibling'
          *         }
          *     ]
+         * @returns {String}
          */
         createJSTreeXPathFromTree: function createJSTreeXPathFromTree(tree, opts) {
             var xPath = '';
-            var topLevel = opts && typeof opts.topLevel !== 'undefined' ? topLevel : true;
+            var topLevel = opts && typeof opts.topLevel === 'undefined' || !opts ? true : opts.topLevel;
 
             tree.forEach(function (node, index) {
                 if (index === 0) {
@@ -587,6 +613,7 @@ module.exports = function (casperjs, settings) {
         /**
          * @method createToolbarItemXPath
          * @param {String} name of the item
+         * @returns {String}
          */
         createToolbarItemXPath: function createToolbarItemXPath(name) {
             return '//*[contains(@class, "cms-toolbar-item-navigation")]/li/a[./span[contains(text(), "' +
@@ -599,9 +626,11 @@ module.exports = function (casperjs, settings) {
          * @param {Object} opts
          * @param {Boolean} visible get visible or hidden helpers
          * @param {String|Number} [pageId] optional id of the page to filter helpers
+         * @returns {String}
          */
         getPasteHelpersXPath: function getPasteHelpersXPath(opts) {
             var xpath = '//a[contains(@class, "js-cms-tree-item-paste")]';
+
             if (opts && opts.visible) {
                 xpath += '[not(contains(@class, "cms-pagetree-dropdown-item-disabled"))]';
             } else {

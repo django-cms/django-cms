@@ -46,6 +46,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var container = $('.cms');
+
             this.ui = {
                 container: container,
                 body: $('html'),
@@ -58,7 +59,7 @@ var CMS = window.CMS || {};
          * Opens a message window underneath the toolbar.
          *
          * @method open
-         * @param opts
+         * @param {Object} opts
          * @param {String|HTMLNode} opts.message message to be displayed
          * @param {String} [opts.dir='center'] direction to be displayed `center` `left` or `right`
          * @param {Number} [opts.delay=this.options.messageDelay] delay until message is closed, 0 leaves it open
@@ -115,7 +116,7 @@ var CMS = window.CMS || {};
                         'right': 'auto',
                         'margin-left': 0
                     });
-                    this.ui.messages.animate({ 'left': 0 });
+                    this.ui.messages.animate({ left: 0 });
                     break;
                 case 'right':
                     this.ui.messages.css({
@@ -124,7 +125,7 @@ var CMS = window.CMS || {};
                         'left': 'auto',
                         'margin-left': 0
                     });
-                    this.ui.messages.animate({ 'right': 0 });
+                    this.ui.messages.animate({ right: 0 });
                     break;
                 default:
                     this.ui.messages.css({
@@ -132,7 +133,7 @@ var CMS = window.CMS || {};
                         'right': 'auto',
                         'margin-left': -(width / 2)
                     });
-                    this.ui.messages.animate({ 'top': top });
+                    this.ui.messages.animate({ top: top });
             }
 
             // cancel autohide if delay is <= 0

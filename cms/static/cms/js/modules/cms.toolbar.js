@@ -15,6 +15,10 @@ var CMS = window.CMS || {};
 (function ($) {
     'use strict';
 
+    var SECOND = 1000;
+    var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
+    var DEBUG_BAR_HEIGHT = 5; // TODO has to be fixed
+
     /**
      * The toolbar is the generic element which holds various components
      * together and provides several commonly used API methods such as
@@ -84,6 +88,7 @@ var CMS = window.CMS || {};
             // CMS.API is not ready. This is a workaround until a proper fix
             // will be released in 3.x
             var that = this;
+
             setTimeout(function () {
                 that._initialStates();
             }, 0);
@@ -100,6 +105,7 @@ var CMS = window.CMS || {};
          */
         _setupUI: function _setupUI() {
             var container = $('.cms');
+
             this.ui = {
                 container: container,
                 body: $('html'),
@@ -122,6 +128,7 @@ var CMS = window.CMS || {};
          */
         _events: function _events() {
             var that = this;
+            var LONG_MENUS_THROTTLE = 10;
 
             // attach event to the trigger handler
             this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
@@ -144,7 +151,10 @@ var CMS = window.CMS || {};
                 var open = false;
                 var cmdPressed = false;
 
-                // removes classes and events
+                /**
+                 * Resets all the hover state classes and events
+                 * @function reset
+                 */
                 function reset() {
                     open = false;
                     cmdPressed = false;
@@ -161,6 +171,7 @@ var CMS = window.CMS || {};
                 // remove events from first level
                 navigation.find('a').on(that.click + ' ' + that.key, function (e) {
                     var el = $(this);
+
                     // we need to restore the default behaviour once a user
                     // presses ctrl/cmd and clicks on the entry. In this
                     // case a new tab should open. First we determine if
@@ -219,10 +230,10 @@ var CMS = window.CMS || {};
 
                     if (isRootNode && el.hasClass(hover) || el.hasClass(disabled) && !isRootNode) {
                         return false;
-                    } else {
-                        el.addClass(hover);
-                        that._handleLongMenus();
                     }
+
+                    el.addClass(hover);
+                    that._handleLongMenus();
 
                     // activate hover selection
                     if (!isTouchingTopLevelMenu) {
@@ -243,7 +254,7 @@ var CMS = window.CMS || {};
                     that.ui.document.on(that.click, reset);
                     that.ui.structureBoard.on(that.click, reset);
                     that.ui.toolbar.on(that.click, reset);
-                    that.ui.window.on(that.resize + '.menu.reset', CMS.API.Helpers.throttle(reset, 1000));
+                    that.ui.window.on(that.resize + '.menu.reset', CMS.API.Helpers.throttle(reset, SECOND));
                     // update states
                     open = true;
                 });
@@ -322,20 +333,21 @@ var CMS = window.CMS || {};
                     that.showLoader();
                     // send post request to prevent xss attacks
                     $.ajax({
-                        'type': 'post',
-                        'url': $(this).prop('href'),
-                        'data': {
-                            'csrfmiddlewaretoken': CMS.config.csrf
+                        type: 'post',
+                        url: $(this).prop('href'),
+                        data: {
+                            csrfmiddlewaretoken: CMS.config.csrf
                         },
-                        'success': function () {
+                        success: function () {
                             var url = CMS.API.Helpers.makeURL(
                                 CMS.API.Helpers._getWindow().location.href.split('?')[0],
                                 [CMS.settings.edit_off + '=true']
                             );
+
                             CMS.API.Helpers.reloadBrowser(url);
                             that.hideLoader();
                         },
-                        'error': function (request) {
+                        error: function (request) {
                             that.hideLoader();
                             throw new Error(request);
                         }
@@ -345,7 +357,7 @@ var CMS = window.CMS || {};
             });
             this.ui.window.on(
                 [this.resize, this.scroll].join(' '),
-                CMS.API.Helpers.throttle($.proxy(this._handleLongMenus, this), 10)
+                CMS.API.Helpers.throttle($.proxy(this._handleLongMenus, this), LONG_MENUS_THROTTLE)
             );
         },
 
@@ -358,6 +370,7 @@ var CMS = window.CMS || {};
          * @private
          * @deprecated this method is deprecated now, it will be removed in > 3.2
          */
+        // eslint-disable-next-line complexity
         _initialStates: function _initialStates() {
             var publishBtn = $('.cms-btn-publish').parent();
 
@@ -413,6 +426,7 @@ var CMS = window.CMS || {};
             // open sideframe if it was previously opened
             if (CMS.settings.sideframe && CMS.settings.sideframe.url) {
                 var sideframe = new CMS.Sideframe();
+
                 sideframe.open({
                     url: CMS.settings.sideframe.url,
                     animate: false
@@ -465,7 +479,7 @@ var CMS = window.CMS || {};
             var that = this;
             var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
             var debugHeight = $('.cms-debug-bar').height() || 0;
-            var toolbarHeight = $('.cms-toolbar').height() + 10;
+            var toolbarHeight = $('.cms-toolbar').height() + TOOLBAR_OFFSCREEN_OFFSET;
 
             this.ui.toolbar.css({
                 'transition': 'margin-top ' + speed + 'ms',
@@ -474,12 +488,14 @@ var CMS = window.CMS || {};
             this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
             this.ui.body.addClass('cms-toolbar-expanding');
             // animate html
-            this.ui.body.animate({ 'margin-top': toolbarHeight - 10 + debugHeight }, speed, 'linear', function () {
+            this.ui.body.animate({
+                'margin-top': toolbarHeight - TOOLBAR_OFFSCREEN_OFFSET + debugHeight
+            }, speed, 'linear', function () {
                 that.ui.body.removeClass('cms-toolbar-expanding');
                 that.ui.body.addClass('cms-toolbar-expanded');
             });
             // set messages top to toolbar height
-            this.ui.messages.css('top', toolbarHeight - 10);
+            this.ui.messages.css('top', toolbarHeight - TOOLBAR_OFFSCREEN_OFFSET);
         },
 
         /**
@@ -500,10 +516,11 @@ var CMS = window.CMS || {};
          *
          * @method _hide
          * @private
+         * @returns {Boolean|void}
          */
         _hide: function _hide() {
             var speed = this.options.toolbarDuration;
-            var toolbarHeight = $('.cms-toolbar').height() + 10;
+            var toolbarHeight = $('.cms-toolbar').height() + TOOLBAR_OFFSCREEN_OFFSET;
             var that = this;
 
             this.ui.toolbar.css('transition', 'margin-top ' + speed + 'ms');
@@ -516,7 +533,9 @@ var CMS = window.CMS || {};
             this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
             this.ui.body.addClass('cms-toolbar-collapsing');
             // animate html
-            this.ui.body.animate({ 'margin-top': (CMS.config.debug) ? 5 : 0 }, speed, 'linear', function () {
+            this.ui.body.animate({
+                'margin-top': CMS.config.debug ? DEBUG_BAR_HEIGHT : 0
+            }, speed, 'linear', function () {
                 that.ui.body.removeClass('cms-toolbar-expanded cms-toolbar-collapsing');
             });
             // set messages top to 0
@@ -533,7 +552,7 @@ var CMS = window.CMS || {};
          * @param {String} [opts.text] message to be displayed
          * @param {Function} [opts.callback] custom callback instead of reload
          * @param {String} [opts.onSuccess] reload and display custom message
-         * @return {Boolean|jQuery.Deferred} either false or a promise
+         * @returns {Boolean|jQuery.Deferred} either false or a promise
          */
         openAjax: function (opts) {
             var that = this;
@@ -543,7 +562,7 @@ var CMS = window.CMS || {};
             var text = opts.text || '';
             var callback = opts.callback;
             var onSuccess = opts.onSuccess;
-            var question = (text) ? CMS.API.Helpers.secureConfirm(text) : true;
+            var question = text ? CMS.API.Helpers.secureConfirm(text) : true;
 
             // cancel if question has been denied
             if (!question) {
@@ -603,10 +622,12 @@ var CMS = window.CMS || {};
          * @method _delegate
          * @param {jQuery} el trigger element
          * @private
+         * @returns {Boolean|void}
          */
         _delegate: function _delegate(el) {
             // save local vars
             var target = el.data('rel');
+
             if (el.hasClass('cms-btn-disabled')) {
                 return false;
             }
@@ -616,6 +637,7 @@ var CMS = window.CMS || {};
                     var modal = new CMS.Modal({
                         onClose: el.data('on-close')
                     });
+
                     modal.open({
                         url: el.attr('href'),
                         title: el.data('name')
@@ -630,6 +652,7 @@ var CMS = window.CMS || {};
                     var sideframe = new CMS.Sideframe({
                         onClose: el.data('on-close')
                     });
+
                     sideframe.open({
                         url: el.attr('href'),
                         animate: true
@@ -659,6 +682,7 @@ var CMS = window.CMS || {};
             if (lock) {
                 this.lockToolbar = true;
                 // make button look disabled
+                // eslint-disable-next-line
                 this.ui.toolbarTrigger.css('opacity', 0.2);
             } else {
                 this.lockToolbar = false;
@@ -680,6 +704,7 @@ var CMS = window.CMS || {};
 
             // bind message event
             var debug = this.ui.container.find('.cms-debug-bar');
+
             debug.on(this.mouseEnter + ' ' + this.mouseLeave, function (e) {
                 clearTimeout(timer);
 
@@ -701,6 +726,7 @@ var CMS = window.CMS || {};
          */
         _handleLongMenus: function _handleLongMenus() {
             var openMenus = $('.cms-toolbar-item-navigation-hover > ul');
+
             if (!openMenus.length) {
                 this._stickToolbar();
                 return;
@@ -739,7 +765,7 @@ var CMS = window.CMS || {};
             this._position.isSticky = true;
             this.ui.body.removeClass('cms-toolbar-non-sticky');
             this.ui.toolbar.css({
-                'top': 0
+                top: 0
             });
         },
 
@@ -756,7 +782,7 @@ var CMS = window.CMS || {};
             // have to do the !important because of "debug" toolbar
             this.ui.toolbar[0].style.setProperty(
                 'top',
-                (this._position.stickyTop + (CMS.config.debug ? 5 : -5)) + 'px',
+                (this._position.stickyTop + (CMS.config.debug ? DEBUG_BAR_HEIGHT : -DEBUG_BAR_HEIGHT)) + 'px',
                 'important'
             );
             this._position.isSticky = false;

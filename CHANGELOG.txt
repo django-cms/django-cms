@@ -43,6 +43,9 @@
 * Added a ``get_cached_template`` method to the ``Toolbar()`` main class to reuse loaded templates per request. It
   works like Django's cached template loader, but on a request basis.
 * Added a new method ``get_urls()`` on the appbase class to get CMSApp.urls, to allow passing a page object to it.
+* Changed JavaScript linting from JSHint and JSCS to ESLint
+* Fixed a bug when it was possible to drag plugin into clipboard
+* Fixed a bug where clearing clipboard was closing any open modal
 
 
 === 3.2.6 (unreleased) ===

@@ -1,5 +1,3 @@
-//##############################################################################
-// STRUCTUREBOARD
 /**
  * @module CMS
  */
@@ -11,11 +9,16 @@ var CMS = window.CMS || {};
 
     var placeholders;
 
-    // TODO make these static methods on CMS.StructureBoard
+    /**
+     * TODO make these static methods on CMS.StructureBoard
+     * @function actualizeEmptyPlaceholders
+     * @private
+     */
     function actualizeEmptyPlaceholders() {
         placeholders.each(function () {
             var placeholder = $(this);
             var copyAll = placeholder.find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+
             if (placeholder
                 .find('> .cms-draggables')
                 .children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
@@ -29,6 +32,11 @@ var CMS = window.CMS || {};
         });
     }
 
+    /**
+     * @function actualizePluginsCollapsibleStatus
+     * @private
+     * @param {jQuery} els lists of plugins (.cms-draggables)
+     */
     function actualizePluginsCollapsibleStatus(els) {
         els.each(function () {
             var childList = $(this);
@@ -79,6 +87,7 @@ var CMS = window.CMS || {};
         _setupUI: function setupUI() {
             var container = $('.cms-structure');
             var toolbar = $('.cms-toolbar');
+
             this.ui = {
                 container: container,
                 content: $('.cms-structure-content'),
@@ -104,9 +113,11 @@ var CMS = window.CMS || {};
          *
          * @method _setup
          * @private
+         * @returns {Boolean|void}
          */
         _setup: function () {
             var that = this;
+
             // cancel if there are no dragareas
             if (!this.ui.dragareas.length) {
                 return false;
@@ -172,6 +183,7 @@ var CMS = window.CMS || {};
                 that.ui.doc.on('keydown.cms.structureboard.switcher', function (e) {
                     // check if we have an important focus
                     var haveFocusedField = document.activeElement !== document.body;
+
                     if (e.keyCode === CMS.KEYS.SPACE && !haveFocusedField) {
                         e.preventDefault();
                         if (CMS.settings.mode === 'structure') {
@@ -190,6 +202,7 @@ var CMS = window.CMS || {};
          * @method show
          * @public
          * @param {Boolean} init true if this is first initialization
+         * @returns {Boolean|void}
          */
         show: function (init) {
             // cancel show if live modus is active
@@ -203,6 +216,7 @@ var CMS = window.CMS || {};
             // the toolbar positioning
             var width = this.ui.toolbar.width();
             var scrollBarWidth = this.ui.window[0].innerWidth - width;
+
             if (scrollBarWidth) {
                 this.ui.toolbar.css('right', scrollBarWidth);
                 this.ui.toolbarTrigger.css('right', scrollBarWidth);
@@ -210,6 +224,7 @@ var CMS = window.CMS || {};
 
             // set active item
             var modes = this.ui.toolbarModeLinks;
+
             modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
             this.ui.html.removeClass('cms-structure-mode-content')
                 .addClass('cms-structure-mode-structure');
@@ -232,6 +247,7 @@ var CMS = window.CMS || {};
          *
          * @method hide
          * @param {Boolean} init true if this is first initialization
+         * @returns {Boolean|void}
          */
         hide: function (init) {
             // cancel show if live modus is active
@@ -245,6 +261,7 @@ var CMS = window.CMS || {};
 
             // set active item
             var modes = this.ui.toolbarModeLinks;
+
             modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
             this.ui.html.removeClass('cms-structure-mode-structure')
                 .addClass('cms-structure-mode-content');
@@ -264,7 +281,7 @@ var CMS = window.CMS || {};
          *
          * @method getId
          * @param {jQuery} el element to get id from
-         * @return {String}
+         * @returns {String}
          */
         getId: function (el) {
             // cancel if no element is defined
@@ -294,12 +311,13 @@ var CMS = window.CMS || {};
          * Gets the ids of the list of  elements.
          *
          * @method getIds
-         * @param {jQuery} el elements to get id from
-         * @return {String[]}
+         * @param {jQuery} els elements to get id from
+         * @returns {String[]}
          */
         getIds: function (els) {
             var that = this;
             var array = [];
+
             els.each(function () {
                 array.push(that.getId($(this)));
             });
@@ -362,6 +380,7 @@ var CMS = window.CMS || {};
             // istanbul ignore catch
             try {
                 var evt = document.createEvent('UIEvents');
+
                 evt.initUIEvent('resize', true, false, window, 0);
                 window.dispatchEvent(evt);
             } catch (e) {}
@@ -387,6 +406,7 @@ var CMS = window.CMS || {};
                 // cloning huge structure is a performance loss compared to cloning just a dragitem
                 helper: function createHelper(e, item) {
                     var clone = item.find('> .cms-dragitem').clone();
+
                     clone.wrap('<div class="' + item[0].className + '"></div>');
                     return clone.parent();
                 },
@@ -404,6 +424,7 @@ var CMS = window.CMS || {};
                 disableNestingClass: 'cms-draggable-disabled',
                 errorClass: 'cms-draggable-disallowed',
                 scrollSpeed: 15,
+                // eslint-disable-next-line no-magic-numbers
                 scrollSensitivity: that.ui.window.height() * 0.2,
                 start: function (e, ui) {
                     that.ui.content.attr('data-touch-action', 'none');
@@ -418,6 +439,7 @@ var CMS = window.CMS || {};
                     // as long as we don't create them on the fly
                     that.ui.sortables.each(function () {
                         var element = $(this);
+
                         if (element.children().length === 0) {
                             element.removeClass('cms-hidden');
                         }
@@ -431,8 +453,8 @@ var CMS = window.CMS || {};
                     }
 
                     // attach escape event to cancel dragging
-                    that.ui.doc.on('keyup.cms.interrupt', function (e, cancel) {
-                        if (e.keyCode === CMS.KEYS.ESC && that.dragging || cancel) {
+                    that.ui.doc.on('keyup.cms.interrupt', function (event, cancel) {
+                        if (event.keyCode === CMS.KEYS.ESC && that.dragging || cancel) {
                             that.state = false;
                             $.ui.sortable.prototype._mouseStop();
                             that.ui.sortables.trigger('mouseup');
@@ -454,14 +476,15 @@ var CMS = window.CMS || {};
                     }
 
                     var newPluginContainer = ui.item.closest('.cms-draggables');
-                    if (!originalPluginContainer.is(newPluginContainer)) {
-                        actualizePluginsCollapsibleStatus(newPluginContainer.add(originalPluginContainer));
-                    } else {
+
+                    if (originalPluginContainer.is(newPluginContainer)) {
                         // if we moved inside same container,
                         // but event is fired on a parent, discard update
                         if (!newPluginContainer.is(this)) {
                             return false;
                         }
+                    } else {
+                        actualizePluginsCollapsibleStatus(newPluginContainer.add(originalPluginContainer));
                     }
 
                     // we pass the id to the updater which checks within the backend the correct place
@@ -478,6 +501,7 @@ var CMS = window.CMS || {};
                     // reset placeholder without entries
                     that.ui.sortables.each(function () {
                         var element = $(this);
+
                         if (element.children().length === 0) {
                             element.addClass('cms-hidden');
                         }
@@ -485,6 +509,7 @@ var CMS = window.CMS || {};
 
                     actualizeEmptyPlaceholders();
                 },
+                // eslint-disable-next-line complexity
                 isAllowed: function (placeholder, placeholderParent, originalItem) {
                     // cancel if action is executed
                     if (CMS.API.locked) {
@@ -493,8 +518,19 @@ var CMS = window.CMS || {};
                     // getting restriction array
                     var bounds = [];
                     var immediateParentType;
+
+                    if (placeholder && placeholder.closest('.cms-clipboard-containers').length) {
+                        return false;
+                    }
+
+                    // if parent has class disabled, dissalow drop
+                    if (placeholder && placeholder.parent().hasClass('cms-draggable-disabled')) {
+                        return false;
+                    }
+
                     // save original state events
                     var original = $('.cms-plugin-' + that.getId(originalItem));
+
                     // cancel if item has no settings
                     if (original.length === 0 || !original.data('settings')) {
                         return false;
@@ -508,6 +544,7 @@ var CMS = window.CMS || {};
                     var holderId = that.getId(placeholder.closest('.cms-dragarea'));
                     var holder = $('.cms-placeholder-' + holderId);
                     var plugin;
+
                     if (placeholderParent && placeholderParent.length) {
                         // placeholderParent is always latest, it maybe that
                         // isAllowed is called _before_ placeholder is moved to a child plugin
@@ -526,17 +563,12 @@ var CMS = window.CMS || {};
                         immediateParentType = plugin.data('settings').plugin_type;
                     }
 
-                    // if parent has class disabled, dissalow drop
-                    if (placeholder.parent().hasClass('cms-draggable-disabled')) {
-                        return false;
-                    }
-
                     // if restrictions is still empty, proceed
-                    that.state = (!bounds.length || $.inArray(type, bounds) !== -1) ? true : false;
+                    that.state = !(bounds.length && $.inArray(type, bounds) === -1);
 
                     // check if we have a parent restriction
                     if (parent_bounds.length) {
-                        that.state = ($.inArray(immediateParentType, parent_bounds) !== -1) ? true : false;
+                        that.state = $.inArray(immediateParentType, parent_bounds) !== -1;
                     }
 
                     return that.state;

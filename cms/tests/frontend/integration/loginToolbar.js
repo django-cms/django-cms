@@ -22,9 +22,9 @@ casper.test.tearDown(function (done) {
 });
 
 [
-    [320,  480],  // mobile vertical
-    [480,  320],  // mobile horizontal
-    [768,  1024], // tablet vertical
+    [320, 480],  // mobile vertical
+    [480, 320],  // mobile horizontal
+    [768, 1024], // tablet vertical
     [1024, 768],  // tablet horizontal
     [1280, 1024]  // standard - it's important that the last one resets
 ].forEach(function (dimensions) {
