@@ -38,8 +38,8 @@ class BaseMenuTest(CMSTestCase):
         nodes = [node1, node2, node3, node4, node5]
         tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
         request = self.get_request(path)
-        manager = menu_pool.get_manager(request)
-        manager.apply_modifiers(tree, request)
+        renderer = menu_pool.get_renderer(request)
+        renderer.apply_modifiers(tree, request)
         return tree, nodes
 
     def setUp(self):
@@ -114,20 +114,20 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         self.assertEqual(len(registered), 5)
         self.assertEqual(len(registered_for_rendering), 5)
 
-    def test_menu_registered_in_manager(self):
+    def test_menu_registered_in_renderer(self):
         menu_pool.discovered = False
         menu_pool.discover_menus()
 
-        # The following tests that a menu manager calculates the registered
+        # The following tests that a menu renderer calculates the registered
         # menus on a request basis.
 
         request_1 = self.get_request('/en/')
-        request_1_manager = menu_pool.get_manager(request_1)
+        request_1_renderer = menu_pool.get_renderer(request_1)
 
         registered = menu_pool.get_registered_menus(for_rendering=False)
 
         self.assertEqual(len(registered), 3)
-        self.assertEqual(len(request_1_manager.menus), 1)
+        self.assertEqual(len(request_1_renderer.menus), 1)
 
         create_page("apphooked-page", "nav_playground.html", "en",
                     published=True,
@@ -138,10 +138,10 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                     navigation_extenders='StaticMenu2')
 
         request_2 = self.get_request('/en/')
-        request_2_manager = menu_pool.get_manager(request_2)
+        request_2_renderer = menu_pool.get_renderer(request_2)
 
         # The count should be 3 but grows to 5 because of the two published instances.
-        self.assertEqual(len(request_2_manager.menus), 5)
+        self.assertEqual(len(request_2_renderer.menus), 5)
 
     def test_menu_expanded(self):
         menu_pool.discovered = False
@@ -287,10 +287,10 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(response.status_code, 200)
         request = self.get_request()
 
-        manager = menu_pool.get_manager(request)
+        renderer = menu_pool.get_renderer(request)
 
         # test the cms menu class
-        menu = manager.get_menu('CMSMenu')
+        menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(self.get_all_pages()))
 

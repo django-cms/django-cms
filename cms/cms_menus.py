@@ -79,11 +79,11 @@ def get_visible_pages(request, pages, site=None):
     return [page.pk for page in pages]
 
 
-def page_to_node(manager, page, home, cut):
+def page_to_node(renderer, page, home, cut):
     """
     Transform a CMS page into a navigation node.
 
-    :param manager: MenuManager instance bound to the request
+    :param renderer: MenuRenderer instance bound to the request
     :param page: the page you wish to transform
     :param home: a reference to the "home" page (the page with path="0001")
     :param cut: Should we cut page from its parent pages? This means the node will not
@@ -117,9 +117,9 @@ def page_to_node(manager, page, home, cut):
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
-        if page.navigation_extenders in manager.menus:
+        if page.navigation_extenders in renderer.menus:
             extenders.append(page.navigation_extenders)
-        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in manager.menus:
+        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in renderer.menus:
             extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     lang = get_language()
@@ -218,11 +218,11 @@ class CMSMenu(Menu):
             page = ids[title.page_id]
             page.title_cache[title.language] = title
 
-        manager = self.manager
+        renderer = self.renderer
 
         for page in actual_pages:
             if page.title_cache:
-                nodes.append(page_to_node(manager, page, home, home_cut))
+                nodes.append(page_to_node(renderer, page, home, home_cut))
         return nodes
 
 
@@ -261,7 +261,7 @@ class NavExtender(Modifier):
         removed = []
 
         # find all not assigned nodes
-        for menu in self.manager.menus.items():
+        for menu in self.renderer.menus.items():
             if (hasattr(menu[1], 'cms_enabled')
                     and menu[1].cms_enabled and not menu[0] in exts):
                 for node in nodes:
