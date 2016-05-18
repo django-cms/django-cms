@@ -62,11 +62,13 @@ DEFAULTS = {
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
     'TOOLBAR_HIDE': False,
-    'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
-    'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
-    'WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
+    'UNESCAPED_RENDER_MODEL_TAGS': True,
+    'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
+    'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
+    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
+    'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
 }
 
 
@@ -264,12 +266,23 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
 }
 
+DEPRECATED_CMS_SETTINGS = {
+    # Old CMS_WIZARD_* settings to be removed in v3.5.0
+    'PAGE_WIZARD_DEFAULT_TEMPLATE': 'WIZARD_DEFAULT_TEMPLATE',
+    'PAGE_WIZARD_CONTENT_PLUGIN': 'WIZARD_CONTENT_PLUGIN',
+    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'WIZARD_CONTENT_PLUGIN_BODY',
+    'PAGE_WIZARD_CONTENT_PLACEHOLDER': 'WIZARD_CONTENT_PLACEHOLDER',
+}
+
 
 def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
-    else:
-        return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+    elif name in DEPRECATED_CMS_SETTINGS:
+        new_setting = 'CMS_%s' % name
+        old_setting = 'CMS_%s' % DEPRECATED_CMS_SETTINGS[name]
+        return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
+    return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
 
 
 def get_site_id(site):
