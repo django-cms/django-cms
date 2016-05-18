@@ -91,7 +91,7 @@ def _get_menu_class_for_instance(menu_class, instance):
     return meta_class(class_name, (menu_class,), attrs)
 
 
-class MenuManager(object):
+class MenuRenderer(object):
     # The main logic behind this class is to decouple
     # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has it's
@@ -100,7 +100,7 @@ class MenuManager(object):
     def __init__(self, pool, request):
         self.pool = pool
         # It's important this happens on init
-        # because we need to make sure that a menu manager
+        # because we need to make sure that a menu renderer
         # points to the same registered menus as long as the
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
@@ -196,7 +196,7 @@ class MenuManager(object):
         # We can do this because unlike menu classes,
         # modifiers can't change on a request basis.
         for cls in self.pool.get_registered_modifiers():
-            inst = cls(manager=self)
+            inst = cls(renderer=self)
             nodes = inst.modify(
                 self.request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
@@ -217,7 +217,7 @@ class MenuManager(object):
 
     def get_menu(self, menu_name):
         MenuClass = self.menus[menu_name]
-        return MenuClass(manager=self)
+        return MenuClass(renderer=self)
 
 
 class MenuPool(object):
@@ -227,12 +227,12 @@ class MenuPool(object):
         self.modifiers = []
         self.discovered = False
 
-    def get_manager(self, request):
+    def get_renderer(self, request):
         self.discover_menus()
         # Returns a menu pool wrapper that is bound
         # to the given request and can perform
         # operations based on the given request.
-        return MenuManager(pool=self, request=request)
+        return MenuRenderer(pool=self, request=request)
 
     def discover_menus(self):
         if self.discovered:
@@ -361,9 +361,9 @@ class MenuPool(object):
             post_cut=False, breadcrumb=False):
         warnings.warn('menu_pool.apply_modifiers is deprecated '
                       'and it will be removed in version 3.4; '
-                      'please use the menu manager instead.', DeprecationWarning)
-        manager = self.get_manager(request)
-        nodes = manager.apply_modifiers(
+                      'please use the menu renderer instead.', DeprecationWarning)
+        renderer = self.get_renderer(request)
+        nodes = renderer.apply_modifiers(
             nodes=nodes,
             namespace=namespace,
             root_id=root_id,
@@ -376,9 +376,9 @@ class MenuPool(object):
                   breadcrumb=False):
         warnings.warn('menu_pool.get_nodes is deprecated '
                       'and it will be removed in version 3.4; '
-                      'please use the menu manager instead.', DeprecationWarning)
-        manager = self.get_manager(request)
-        nodes = manager.get_nodes(
+                      'please use the menu renderer instead.', DeprecationWarning)
+        renderer = self.get_renderer(request)
+        nodes = renderer.get_nodes(
             namespace=namespace,
             root_id=root_id,
             site_id=site_id,
