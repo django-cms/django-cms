@@ -65,6 +65,7 @@ var CMS = window.CMS || {};
             if (this._isInSideframe()) {
                 this.toolbarHeight = CMS.API.Helpers._getWindow().parent.CMS.$('.cms-toolbar').height();
                 var debug = CMS.API.Helpers._getWindow().parent.CMS.$('.cms-debug-bar');
+
                 if (debug.length) {
                     this.toolbarHeight += debug.outerHeight();
                 }
