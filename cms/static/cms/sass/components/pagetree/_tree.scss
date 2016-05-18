@@ -4,6 +4,13 @@
 // INFO: please note that all related styles to the pagetree itself are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
+.cms-admin-sideframe:not(.djangocms-admin-style) {
+    margin-top: $toolbar-height;
+    &.cms-debug {
+        margin-top: $toolbar-height + $toolbar-debug-height;
+    }
+}
+
 // HELPERS
 .cms-btn-toolbar {
     display: inline-block;
@@ -95,7 +102,6 @@
     z-index: z(pagetree, header);
     min-height: $pagetree-header-height;
     padding: $pagetree-header-padding;
-    margin: -40px 0 0 0;
     box-shadow: none;
     border-bottom: none;
     background: $pagetree-header-background;
@@ -111,8 +117,11 @@
     + .module {
         padding-top: 0 !important;
     }
+    .djangocms-admin-style & {
+        margin: -40px 0 0 0;
+    }
 }
-.cms-admin-sideframe .cms-pagetree-header {
+.djangocms-admin-style.cms-admin-sideframe .cms-pagetree-header {
     margin-top: -25px;
 }
 
@@ -180,7 +189,6 @@
     left: 0;
     right: 0;
     padding: 0;
-    margin: 5px 0 10px;
     box-shadow: none;
     background: none;
     @media (max-width: $pagetree-mobile) {
@@ -197,6 +205,7 @@
         border: none !important;
         background: $color-primary !important;
         height: 36px;
+        border-radius: $border-radius-base;
 
         &:hover {
             background: darken($color-primary, 5%) !important;
@@ -213,6 +222,13 @@
         width: 100%;
         vertical-align: middle;
         input {
+            width: 100%;
+            box-sizing: border-box;
+            width: 100%;
+            display: inline-block;
+            height: 36px;
+            padding: 6px;
+            line-height: 24px;
             padding-right: 35px !important;
             transition: width $speed-base;
         }
@@ -222,6 +238,10 @@
         left: 0;
         right: 0;
         top: 0;
+    }
+
+    .djangocms-admin-style & {
+        margin: 5px 0 10px;
     }
 }
 .cms-pagetree-header-filter-trigger {
@@ -327,7 +347,7 @@
 }
 
 // BREADCRUMB
-.cms-pagetree-breadcrumbs {
+.djangocms-admin-style .cms-pagetree-breadcrumbs {
     margin-bottom: -30px !important;
     border: none !important;
 }
@@ -352,6 +372,8 @@
     h2 {
         float: left;
         font-weight: bold;
+        color: $gray-darkest;
+        background: none;
     }
     .cms-pagetree-container + & {
         margin-top: -1px;
@@ -414,7 +436,6 @@
 
 }
 .cms-tree-item-wrapper {
-    float: right;
     display: table-row;
     min-width: $pagetree-cell-inner-height;
     .cms-tree-item {
@@ -953,7 +974,7 @@
 }
 
 
-.cms-pagetree-wrapper.cms-admin-sideframe {
+.djangocms-admin-style.cms-pagetree-wrapper.cms-admin-sideframe {
     .messagelist + #content {
         margin-top: 117px !important;
     }
