@@ -64,9 +64,10 @@ class VariableUrlsApp(CMSApp):
     def get_menus(self, page=None, language=None, **kwargs):
         if page and page.reverse_id == 'page1':
             return [SampleAppMenu]
-
-        else:
+        elif page and page.reverse_id == 'page2':
             return [StaticMenu4]
+        else:
+            return [StaticMenu4, SampleAppMenu]
 
     def get_urls(self, page=None, language=None, **kwargs):
         if page and page.reverse_id == 'page1':

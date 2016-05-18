@@ -110,7 +110,6 @@ var CMS = window.CMS || {};
                 navigations: container.find('.cms-toolbar-item-navigation'),
                 buttons: container.find('.cms-toolbar-item-buttons'),
                 messages: container.find('.cms-messages'),
-                screenBlock: container.find('.cms-screenblock'),
                 structureBoard: container.find('.cms-structure')
             };
         },
@@ -420,11 +419,6 @@ var CMS = window.CMS || {};
                 });
             }
 
-            // if there is a screenblock, do some resize magic
-            if (this.ui.screenBlock.length) {
-                this._screenBlock();
-            }
-
             // add toolbar ready class to body and fire event
             this.ui.body.addClass('cms-ready');
             this.ui.document.trigger('cms-ready');
@@ -697,34 +691,6 @@ var CMS = window.CMS || {};
                     }, timeout);
                 }
             });
-        },
-
-        /**
-         * This shows a dark screen with a note "This page is a redirect"
-         * on a page where the settings have been modified to redirect to
-         * another page.
-         *
-         * @method _screenBlock
-         * @private
-         */
-        _screenBlock: function _screenBlock() {
-            var that = this;
-            var interval = 20;
-            var blocker = this.ui.screenBlock;
-            var sideframe = $('.cms-sideframe');
-
-            // automatically resize screenblock window according to given attributes
-            that.ui.window.on(that.resize + '.screenblock', function () {
-                blocker.css({
-                    'width': that.ui.window.width() - sideframe.width(),
-                    'height': that.ui.window.height()
-                });
-            }).trigger(that.resize + '.screenblock');
-
-            // set update interval
-            setInterval(function () {
-                that.ui.window.trigger(that.resize + '.screenblock');
-            }, interval);
         },
 
         /**
