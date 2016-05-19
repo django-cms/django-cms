@@ -587,15 +587,16 @@ describe('CMS.Sideframe', function () {
             });
         });
 
+
         it('adds click handlers to pass through from iframe body', function (done) {
             sideframe._content(url);
             sideframe.ui.frame.find('iframe').on('load', function () {
-                var body = $(this.contentDocument.body);
+                var doc = $(this.contentDocument);
                 var spy = jasmine.createSpy();
 
-                expect(body).toHandle(sideframe.click);
-                $(document).on(sideframe.click, spy);
-                body.trigger(sideframe.click);
+                expect(doc).toHandle('click.cms');
+                $(document).on('click.cms.toolbar', spy);
+                doc.trigger(sideframe.click);
                 expect(spy).toHaveBeenCalled();
 
                 done();
