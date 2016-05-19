@@ -495,6 +495,7 @@ class PageToolbar(CMSToolbar):
             app_page_url = admin_reverse('cms_page_add')
 
             new_page_params = {'edit': 1, 'position': 'last-child'}
+
             if self.page.parent_id:
                 new_page_params['target'] = self.page.parent_id
 
