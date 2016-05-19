@@ -43,7 +43,7 @@ casper.test.begin('Sideframe', function (test) {
             }, 1280 * 0.95, 'Sideframe opens with default width');
         })
         // changes viewport to mobile
-        .then(function() {
+        .then(function () {
             this.viewport(767, 1024);
         })
         // checks current mobile width to be equal with sideframe width
@@ -53,7 +53,7 @@ casper.test.begin('Sideframe', function (test) {
             }, 767, 'Sideframe is fullwidth with on mobile');
         })
         // changes back to default width
-        .then(function() {
+        .then(function () {
             this.viewport(1280, 1024);
         })
         .then(function () {

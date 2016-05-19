@@ -218,7 +218,7 @@ gulp.task('lint:javascript', function () {
     return gulp.src(PROJECT_PATTERNS.js)
         .pipe(eslint())
         .pipe(eslint.format())
-        .pipe(gulpif(process.env.CI, eslint.failAfterError()));
+        .pipe(eslint.failAfterError());
 });
 
 gulp.task('tests', ['tests:unit', 'tests:integration']);
