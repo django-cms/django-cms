@@ -1464,6 +1464,7 @@ class AdminFormsTests(AdminTestsBase):
         curren_site = Site.objects.get_current()
         create_page('Page 1', 'nav_playground.html', 'en', reverse_id=dupe_id)
         page2 = create_page('Page 2', 'nav_playground.html', 'en')
+
         # Assemble a bunch of data to test the page form
         page2_data = {
             'language': 'en',
@@ -1471,7 +1472,11 @@ class AdminFormsTests(AdminTestsBase):
             'reverse_id': dupe_id,
             'template': 'col_two.html',
         }
-        form = AdvancedSettingsForm(data=page2_data, files=None)
+        form = AdvancedSettingsForm(
+            data=page2_data,
+            instance=page2,
+            files=None,
+        )
         self.assertFalse(form.is_valid())
 
         # reverse_id is the only item that is in __all__ as every other field
@@ -1486,7 +1491,12 @@ class AdminFormsTests(AdminTestsBase):
                          form.errors['reverse_id'])
         page2_data['reverse_id'] = ""
 
-        form = AdvancedSettingsForm(data=page2_data, files=None)
+        form = AdvancedSettingsForm(
+            data=page2_data,
+            instance=page2,
+            files=None,
+        )
+
         self.assertTrue(form.is_valid())
         admin_user = self._get_guys(admin_only=True)
         # reset some of page2_data so we can use cms.api.create_page
