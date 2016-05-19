@@ -65,7 +65,6 @@ casper.test.begin('Sideframe', function (test) {
         .then(function () {
             test.assertVisible('.cms-sideframe', 'Sideframe is open after reload');
         })
-
         .then(function () {
             this.click('.cms-sideframe .cms-icon-close');
         })
