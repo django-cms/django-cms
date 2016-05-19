@@ -25,9 +25,9 @@ language of your pages - then you may need to use a ``TitleExtension``.
 On the other hand if the extension you'd like to create is the same for all of the different
 languages of the page, then you may be fine using a ``PageExtension``.
 
-******************************
+***************************
 Implement a basic extension
-******************************
+***************************
 
 Three basic steps are required:
 
@@ -161,21 +161,25 @@ Here's a simple version for our example::
                 # cycle through the title list
                 for title_extension, url in urls:
                     # adds toolbar items
-                    sub_menu.add_modal_item('icon for title %s' % self._page().get_title(),
+                    sub_menu.add_modal_item('icon for title %s' % self._get_page().get_title(),
                                             url=url, disabled=not self.toolbar.edit_mode)
 
     Otherwise, the implementation is similar.
 
 
-*******************
+****************
 Using extensions
-*******************
+****************
 
 In templates
-=============================
+============
 
 To access a page extension in page templates you can simply access the
 appropriate related_name field that is now available on the Page object.
+
+
+Page extensions
+---------------
 
 As per the normal related_name naming mechanism, the appropriate field to
 access is the same as your ``PageExtension`` model name, but lowercased. Assuming
@@ -201,8 +205,17 @@ relationship available, hence the use of the ``{% if ... %}...{% endif %}``
 above.
 
 
+Title extensions
+----------------
+
+In order to access to a title extension within a template, get the ``Title`` object using
+``request.current_page.get_title_obj``, for example:
+
+    {{ request.current_page.get_title_obj.your_title_extension }}
+
+
 With menus
-===========================
+==========
 
 Like most other Page attributes, extensions are not represented in the menu ``NavigationNodes``,
 and therefore menu templates will not have access to them by default.

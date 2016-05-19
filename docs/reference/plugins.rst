@@ -321,7 +321,7 @@ get_extra_placeholder_menu_items
 Extends the context menu for all placeholders. To add one or more custom context
 menu items that are displayed in the context menu for all placeholders when in
 structure mode, override this method in a related plugin to return a list of
-``cms.plugin_base.PluginMenuItem`` instances.
+:class:`cms.plugin_base.PluginMenuItem` instances.
 
 .. _get_extra_global_plugin_menu_items:
 
@@ -333,7 +333,7 @@ get_extra_global_plugin_menu_items
 Extends the context menu for all plugins. To add one or more custom context menu
 items that are displayed in the context menu for all plugins when in structure
 mode, override this method in a related plugin to return a list of
-``cms.plugin_base.PluginMenuItem`` instances.
+:class:`cms.plugin_base.PluginMenuItem` instances.
 
 .. _get_extra_local_plugin_menu_items:
 
@@ -345,7 +345,36 @@ get_extra_local_plugin_menu_items
 Extends the context menu for a specific plugin. To add one or more custom
 context menu items that are displayed in the context menu for a given plugin
 when in structure mode, override this method in the plugin to return a list of
-``cms.plugin_base.PluginMenuItem`` instances.
+:class:`cms.plugin_base.PluginMenuItem` instances.
+
+.. _get_cache_expiration:
+
+get_cache_expiration
+--------------------
+
+``get_cache_expiration(self, request, instance, placeholder)``
+
+Return a positive integer of seconds or a future, TZ-aware `datetime` to
+explicitly declare when this plugin's content should expire from caching.
+This will affect the internal cms caching, Django's caching middleware
+caching, any downstream caches and client browser caching.
+
+This method is optional. The default implementation returns ``None`` which
+will not affect the cms's normal cache expiration functions.
+
+.. _get_vary_cache_on:
+
+get_vary_cache_on
+-----------------
+
+``get_vary_cache_on(self, request, instance, placeholder)``
+
+Return an HTTP header name or a list of HTTP header names and they will
+affect the caching of the containing placeholder and ultimately the page.
+
+This method is optional. The default implementation returns ``None`` which
+will not affect HTTP ``VARY`` headers.
+
 
 ******************************************
 CMSPlugin Attributes and Methods Reference
@@ -441,11 +470,46 @@ Example::
 
 See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
 
+
+get_add_url
+-----------
+
+Returns the URL to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_edit_url
+------------
+
+Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_move_url
+------------
+
+Returns the URL to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_delete_url
+--------------
+
+Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_copy_url
+------------
+
+Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+
 add_url
 -------
 
 Returns the URL to call to add a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_add_url`` method instead.
 
 Default: None (``cms_page_add_plugin`` view is used)
 
@@ -453,7 +517,10 @@ edit_url
 --------
 
 Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_edit_url`` method instead.
 
 Default: None (``cms_page_edit_plugin`` view is used)
 
@@ -461,7 +528,10 @@ move_url
 --------
 
 Returns the URL to call to move a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_move_url`` method instead.
 
 Default: None (``cms_page_move_plugin`` view is used)
 
@@ -469,7 +539,10 @@ delete_url
 ----------
 
 Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_delete_url`` method instead.
 
 Default: None (``cms_page_delete_plugin`` view is used)
 
@@ -477,6 +550,9 @@ copy_url
 --------
 
 Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_copy_url`` method instead.
 
 Default: None (``cms_page_copy_plugins`` view is used)

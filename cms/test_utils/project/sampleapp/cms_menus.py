@@ -51,6 +51,20 @@ class StaticMenu2(StaticMenu):
     name = _("Static Menu2")
 menu_pool.register_menu(StaticMenu2)
 
+
 class StaticMenu3(StaticMenu):
     name = _("Static Menu3")
 menu_pool.register_menu(StaticMenu3)
+
+
+class StaticMenu4(CMSAttachMenu):
+    name = _("Static Menu4")
+
+    def get_nodes(self, request):
+        nodes = list()
+        nodes.append(NavigationNode('static fresh', '/static/fresh/', 'static fresh'))
+        nodes.append(NavigationNode('sample2-root', reverse('sample2-root'), 'sample2-root'))
+        return nodes
+
+menu_pool.register_menu(StaticMenu4)
+

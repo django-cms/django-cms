@@ -37,6 +37,9 @@ var CMS = window.CMS || {};
              *
              * @private
              * @method _setup
+             * @param {Object} options
+             * @param {String} options.id
+             * @param {String} options.url
              */
             _setup: function _setup(options) {
                 $('#' + options.id).select2({

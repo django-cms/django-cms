@@ -36,12 +36,13 @@ class AliasPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         from cms.utils.plugins import downcast_plugins, build_plugin_tree
+        request = context.get('request', None)
         context['instance'] = instance
         context['placeholder'] = placeholder
         if instance.plugin_id:
             plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
             plugins = [instance.plugin] + list(plugins)
-            plugins = downcast_plugins(plugins)
+            plugins = downcast_plugins(plugins, request=request)
             plugins[0].parent_id = None
             plugins = build_plugin_tree(plugins)
             context['plugins'] = plugins

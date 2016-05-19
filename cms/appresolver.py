@@ -1,31 +1,19 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
-from django.db import OperationalError, ProgrammingError
-
-from cms.utils.compat import DJANGO_1_8
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Python < 2.7
-    from django.utils.datastructures import SortedDict as OrderedDict
-try:
-    from importlib import import_module
-except ImportError:
-    # Python < 2.7
-    from django.utils.importlib import import_module
+from collections import OrderedDict
+from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
                                       RegexURLPattern)
+from django.db import OperationalError, ProgrammingError
 from django.utils import six
 from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.i18n import get_language_list
 
 APP_RESOLVERS = []
@@ -183,7 +171,7 @@ def get_patterns_for_title(path, title):
     """
     app = apphook_pool.get_apphook(title.page.application_urls)
     url_patterns = []
-    for pattern_list in get_app_urls(app.urls):
+    for pattern_list in get_app_urls(app.get_urls(title.page, title.language)):
         if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id

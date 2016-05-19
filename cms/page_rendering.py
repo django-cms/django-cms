@@ -2,14 +2,12 @@
 from django.conf import settings
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import Http404
-from django.template import RequestContext
 from django.template.response import TemplateResponse
 
 from cms import __version__
 from cms.cache.page import set_page_cache
 from cms.models import Page
 from cms.utils import get_template_from_request
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 
 
@@ -19,10 +17,7 @@ def render_page(request, page, current_language, slug):
     """
     template_name = get_template_from_request(request, page, no_current_page=True)
     # fill the context
-    if DJANGO_1_7:
-        context = RequestContext(request)
-    else:
-        context = {}
+    context = {}
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
@@ -57,10 +52,7 @@ def render_page(request, page, current_language, slug):
 
 
 def _handle_no_page(request, slug):
-    if DJANGO_1_7:
-        context = RequestContext(request)
-    else:
-        context = {}
+    context = {}
     context['cms_version'] = __version__
     context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
 

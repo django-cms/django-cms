@@ -10,6 +10,10 @@
     width: 0;
     bottom: 0;
     z-index: z(sideframe, base);
+
+    @media (max-width: $screen-tablet) {
+        width: 100% !important;
+    }
 }
 
 .cms-sideframe-frame {
@@ -38,17 +42,6 @@
     }
 }
 
-.cms-sideframe-resize {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: z(sideframe, resize);
-    width: $sideframe-resize-width;
-    height: 100%;
-    cursor: col-resize;
-    background: transparent;
-    box-shadow: $sideframe-box-shadow;
-}
 // when resizing the sideframe shime get's z-index between frame
 // and resize in order for mouse events not to trigger on iframe, same as
 // with modal
@@ -61,20 +54,31 @@
     height: 100%;
     background: transparent;
 }
-.cms-sideframe-close,
-.cms-sideframe-history {
+
+.cms-sideframe-controls {
     position: absolute;
     top: $sideframe-buttons-position-top + $sideframe-buttons-offset;
     right: $sideframe-buttons-position-right;
     z-index: z(sideframe, buttons);
+    box-shadow: $toolbar-shadow;
+    background-color: $white;
+    border-radius: $border-radius-base;
+    border: 1px solid $gray-lighter;
+}
+&.cms-toolbar-debug .cms-sideframe-controls {
+    top: $sideframe-buttons-position-top + $sideframe-buttons-offset + $toolbar-debug-height;
+}
+.cms-sideframe-close,
+.cms-sideframe-history {
+    display: inline-block;
+    position: relative;
     cursor: pointer;
+    vertical-align: top;
     font-size: $sideframe-button-icon-size;
-    color: $gray-light;
+    color: $gray-darker;
     text-align: center;
     width: $sideframe-button-area-size;
     height: $sideframe-button-area-size;
-    background: $gray-lightest;
-    box-shadow: 0 0 3px $gray-lightest;
 
     span {
         position: absolute;
@@ -90,8 +94,8 @@
 }
 
 .cms-sideframe-history {
-    right: $sideframe-button-area-size + $sideframe-buttons-position-right;
-    width: $sideframe-button-area-size * 2;
+    width: $sideframe-button-area-size * 2 + 1px;
+    border-right: 1px solid $gray-lighter;
 
     .cms-icon {
         float: left;
@@ -109,9 +113,6 @@
     .cms-icon-disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        &:hover {
-            color: $gray-light;
-        }
     }
 }
 

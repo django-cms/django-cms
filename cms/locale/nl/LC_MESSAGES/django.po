@@ -12,8 +12,8 @@
 # Jacques de Hooge <>, 2012
 # Jonas Obrist <me@ojii.ch>, 2011
 # kurdy <transifex.net@kurdyenviolien.nl>, 2013
-# leonderijke <leon@cmsworks.nl>, 2012
-# leonderijke <leon@cmsworks.nl>, 2012
+# leonderijke <inactive+leonderijke@transifex.com>, 2012
+# leonderijke <inactive+leonderijke@transifex.com>, 2012
 # Maarten Draijer <maarten@madra.nl>, 2013
 # Maarten Draijer <maarten@madra.nl>, 2013
 # René Mulder <rene@ytec.nl>, 2014-2015

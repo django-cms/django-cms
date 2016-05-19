@@ -18,15 +18,12 @@ classes are loaded, but requires that you specify them all manually.
 
 The other is to provide ``cms_toolbars.py`` files in your apps, which will be
 automatically loaded as long ``CMS_TOOLBARS`` is not set (or set to ``None``).
-We'll work with this second method, and build up the functionality step-by-step.
+We'll work with this second method.
 
 
-***********************
-Create the toolbar menu
-***********************
-
-We create the menu using a :class:`CMSApp
-<cms.toolbar_base.CMSToolbar>` sub-class, and populate it in the ``populate()`` method.
+******************
+Create the toolbar
+******************
 
 Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application:
 
@@ -36,109 +33,86 @@ Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application:
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar_base import CMSToolbar
     from cms.utils.urlutils import admin_reverse
+    from polls.models import Poll
 
 
-    class PollToolbar(CMSToolbar):
-
-        def populate(self):
-
-            # create the menu
-            menu = self.toolbar.get_or_create_menu(
-                'polls-application',        # give your menu an internal identifier
-                _('Polls')                  # provide a name for the menu
-            )
-
-    toolbar_pool.register(PollToolbar)
-
-.. note:: Don't forget to restart the runserver to have your new toolbar item recognised.
-
-If you refresh a page on your site, you'll see the new *Polls* menu. It's empty however - now we need to add something
-to it.
-
-
-Add menu items
-==============
-
-Let's add two items, commands for:
-
-* a list of Polls, that will appear in the sideframe
-* a new Poll
-
-We need to edit the ``populate()`` method, as follows:
-
-
-.. code-block:: python
-   :emphasize-lines: 9-12, 14-17
-
-    def populate(self):
-
-        # create the menu
-        menu = self.toolbar.get_or_create_menu(
-            'polls-application',        # give your menu an internal identifier
-            _('Polls')                  # provide a name for the menu
-        )
-
-        menu.add_sideframe_item(
-            name=_('Poll list'),
-            url=admin_reverse('polls_poll_changelist'),
-        )
-
-        menu.add_modal_item(
-            name=_('Add new poll'),
-            url=admin_reverse('polls_poll_add'),
-        )
-
-In each case, the method specifies how we're going to display the resource that opens next (``add_sideframe_item()`` or
-``add_modal_item()``). We also provide the ``name``, and the admin ``url`` that we want to make use of. The URL is
-actually derived automatically by Django, from the Polls' application admin views.
-
-Refresh the page, and explore the new menu items you have created.
-
-Control when the menu appears
-=============================
-
-
-At the moment, the menu appears whatever page we're looking at - but perhaps it would make more sense to have it
-displayed only when we're actually looking on a page that is related to Polls.
-
-So, in the ``populate()`` method we should check whether the current request is being handled by this application, using the ``is_current_app`` attribute of ``CMSToolbar`` (and exit without doing anything if not).
-
-There's one complication: the application that would qualify as ``is_current_app`` - Polls/CMS Integration - *isn't*
-the same application that handles the request - Polls. So, we will also need to inform the ``PollToolbar`` that
-Polls *also* counts as "this application", by explicitly providing a ``supported_apps`` attribute.
-
-That will look like this:
-
-.. code-block:: python
-   :emphasize-lines: 2-4, 6-8
-
+    @toolbar_pool.register
     class PollToolbar(CMSToolbar):
         supported_apps = (
             'polls',
+            'polls_cms_integration',
         )
+        watch_models = [Poll,]
 
         def populate(self):
             if not self.is_current_app:
                 return
 
-            # create the menu
-            menu = self.toolbar.get_or_create_menu(
-                'polls-application',        # give your menu an internal identifier
-                _('Polls')                  # provide a name for the menu
+            menu = self.toolbar.get_or_create_menu('poll-app', _('Polls'))
+
+            menu.add_sideframe_item(
+                name=_('Poll list'),
+                url=admin_reverse('polls_poll_changelist'),
             )
 
-            [...]
+            menu.add_modal_item(
+                name=_('Add new poll'),
+                url=admin_reverse('polls_poll_add'),
+            )
 
-And now, the menu for Polls will only appear on the pages where it should.
+.. note:: Don't forget to restart the runserver to have your new toolbar item recognised.
 
 
-************
-There's more
-************
+What this all means
+===================
 
-There is quite a bit more we can do with menus. For example, you could check whether:
+Right now you don't need to know exactly what this does, but once you've got it working here's
+a quick run-down what the code above does:
 
-* we're looking at a Poll instance
-* we have admin permissions to edit Polls
+* defines a ``CMSToolbar`` sub-class
+* registers the toolbar class with ``@toolbar_pool.register``
+* defines a ``populate()`` method that adds an item to the menu
 
-and on that basis, add a menu item to *Edit this Poll*. However, that's beyond the scope of this basic introduction, but you'll find more guidance and examples in :ref:`toolbar_how_to`.
+The ``populate()`` method:
+
+* checks whether we're in a page belonging to this application
+* if so, it creates a menu if one's not already there
+* adds a menu item to list all polls in the overlay
+* adds a menu item to add a new poll as a modal window
+
+Your ``cms_toolbars.py`` file should contain classes that extend ``cms.toolbar_base.CMSToolbar``
+and are registered using ``cms.toolbar_pool.toolbar_pool.register()``. The register function can be
+used as a decorator, as in the example above.
+
+``CMSToolbar`` instances will have these attributes:
+
+* ``toolbar``: the toolbar object
+* ``request`` the current request
+* ``is_current_app`` a flag indicating whether the current request is handled
+  by the same app as the function is in (use ``supported_apps`` to add more
+  apps that should be considered the "active app")
+* ``app_path`` the name of the app used for the current request
+* ``watch_models`` which allow the frontend editor to redirect the user to the model instance
+  ``get_absolute_url`` whenever an instance is created or saved through the frontend editor
+  (see :ref:`url_changes` for details)
+
+``CMSToolbar`` sub-classes must implement a ``populate`` method. The ``populate``
+method will only be called if the current user is a staff user.
+``supported_apps`` is a list of app names that should be considered as
+``is_current_app``. Usually you don't need to set ``supported_apps``, but in
+our case we need it so ``is_current_app`` can be detected properly (because the
+views for the poll app are in ``polls`` and our ``cms_toolbars.py`` is in the
+``polls_cms_integration`` app).
+
+
+**************
+See it at work
+**************
+
+Visit your Polls page on your site, and you'll see a new *Polls* item in the toolbar.
+
+It gives you quick access to the list of Polls in the Admin, and gives you a shortcut for
+creating a new Poll.
+
+There's a lot more to django CMS toolbar classes than this - see
+:doc:`/how_to/toolbar` for more.

@@ -607,7 +607,7 @@ default
 
 Must be set to the version number (eg ``'1.0.0'``) you want to use. Together
 with :setting:`CMS_UNIHANDECODE_HOST` this setting is used to build the full
-URLs for the JavaScript files. URLs are built like this:
+URLs for the javascript files. URLs are built like this:
 ``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
 
 
@@ -688,38 +688,6 @@ The path to the media root of the cms media files.
 
 .. setting:: CMS_MEDIA_URL
 
-
-CMS_UNESCAPED_RENDER_MODEL_TAGS
-===============================
-
-default
-    True
-
-.. warning::
-    In this version of django CMS, this setting has a default value of
-    ``True`` to provide behaviour consistent with previous releases.
-    However, all developers are encouraged to set this value to ``False`` to
-    help prevent a range of security vulnerabilities stemming from
-    HTML, JavaScript, and CSS Code Injection.
-
-.. important::
-    This setting is deprecated and will be removed in a near-future release.
-    Developers are encouraged to carefully consider the source of any content
-    displayed by the ``render_model`` template tag and only add the optional
-    template filter ``safe`` on model fields that are known to be cleansed of
-    any malicious strings.
-
-    When this setting is removed, the ``render_model`` template tag will no
-    longer automatically mark as "safe" their output. Any content that is
-    intended to be displayed as rendered markup will require the ``safe``
-    filter applied when displaying with the ``render_model`` tag.
-
-This setting affects how certain template tags display model-based content. In
-particular, the template tag: :ttag:`render_model`.
-
-.. :setting:: CMS_UNESCAPED_RENDER_MODEL_TAGS
-
-
 CMS_MEDIA_URL
 =============
 
@@ -748,6 +716,47 @@ user under which Django will be running.
 *****************
 Advanced Settings
 *****************
+
+.. setting:: CMS_INTERNAL_IPS
+
+CMS_INTERNAL_IPS
+================
+
+default
+    settings.INTERNAL_IPS
+
+By default ``CMS_INTERNAL_IPS`` takes the same value as the Django setting
+``INTERNAL_IPS`` which has a default value of an empty list.
+
+If left as an empty list (or anything Falsey, really), this setting does not
+add any restrictions to the toolbar. However, if set, the toolbar will only
+appear for client IP addresses that are in this list.
+
+This setting may also be set to an `IpRangeList` from the external package
+``iptools``. This package allows convenient syntax for defining complex IP
+address ranges.
+
+The client IP address is obtained via the :setting:`CMS_REQUEST_IP_RESOLVER`
+in the ``cms.middleware.toolbar.ToolbarMiddleware`` middleware.
+
+
+.. setting:: CMS_REQUEST_IP_RESOLVER
+
+CMS_REQUEST_IP_RESOLVER
+=======================
+
+default
+    'cms.utils.request_ip_resolvers.default_request_ip_resolver'
+
+This setting is used system-wide to provide a consistent and plug-able means
+of extracting a client IP address from the HTTP request. The default
+implementation should work for most project architectures, but if not, the
+administrator can provide their own method to handle the project's
+specific circumstances.
+
+The supplied method should accept a single argument `request` and return an
+IP address String.
+
 
 .. setting:: CMS_PERMISSION
 
@@ -1018,16 +1027,15 @@ CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
 
 default
-    ``Page.X_FRAME_OPTIONS_INHERIT``
+    ``constants.X_FRAME_OPTIONS_INHERIT``
 
 This setting is the default value for a Page's X Frame Options setting.
-This should be an integer preferably taken from the Page object e.g.
+This should be an integer preferably taken from the ``cms.constants`` e.g.
 
 - X_FRAME_OPTIONS_INHERIT
 - X_FRAME_OPTIONS_ALLOW
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
-
 
 .. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
 
@@ -1045,6 +1053,7 @@ versions prior to 3.2. This setting will be removed in 3.3.
 Example::
 
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
+
 
 .. setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 

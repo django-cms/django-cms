@@ -42,9 +42,9 @@ The basic workflow for a code contribution will typically run as follows:
 #. Install its dependencies::
 
     cd django-cms
-    pip install -r test_requirements/django-1.7.txt
+    pip install -r test_requirements/django-X.Y.txt
 
-   Replace ``1.7`` with whichever version of Django you want to work with.
+   Replace ``X.Y`` with whichever version of Django you want to work with.
 
 #. Create a new branch for your work::
 

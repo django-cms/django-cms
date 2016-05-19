@@ -52,32 +52,6 @@ You might consider using `django-filer`_ with `django filer CMS plugin`_ and its
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django filer CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
-.. :module:: djangocms_flash
-
-.. :class:: djangocms_flash.cms_plugins.FlashPlugin
-
-*****
-Flash
-*****
-
-Available on `GitHub (divio/djangocms-flash) <http://github.com/divio/djangocms-flash>`_
-and on `PyPi (djangocms-flash) <https://pypi.python.org/pypi/djangocms-flash>`_.
-
-Allows you to upload and display a Flash SWF file on your page.
-
-Please install it using ``pip`` or similar and be sure you have the following in the
-:setting:`django:INSTALLED_APPS` setting in your project's ``settings.py`` file::
-
-    INSTALLED_APPS = (
-        # ...
-        'djangocms_flash',
-        # ...
-    )
-
-.. :module:: djangocms_googlemap
-
-.. :class:: djangocms_googlemap.cms_plugins.GoogleMapPlugin
-
 *********
 GoogleMap
 *********

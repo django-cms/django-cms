@@ -81,7 +81,7 @@ Please read :ref:`cms-delete-orphaned-plugins-command` before using.
 .. _cms-moderator-upgrade:
 
 Added a check command
-======================
+=====================
 
 Added a management command to check your configuration and environment.
 

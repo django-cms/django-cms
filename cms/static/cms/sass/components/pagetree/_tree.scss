@@ -1,0 +1,1005 @@
+//##############################################################################
+// PAGETREE
+
+// INFO: please note that all related styles to the pagetree itself are
+// handled through theming after the "PAGETREE THEME" section in this file.
+
+.cms-admin-sideframe:not(.djangocms-admin-style) {
+    margin-top: $toolbar-height;
+    &.cms-debug {
+        margin-top: $toolbar-height + $toolbar-debug-height;
+    }
+}
+
+// HELPERS
+.cms-btn-toolbar {
+    display: inline-block;
+    line-height: $toolbar-button-height + 2px;
+    height: $toolbar-button-height + 2px;
+    font-size: $toolbar-button-font-size;
+    padding: 0 $toolbar-button-padding-horizontal + 10px;
+}
+
+.cms-hidden,
+.hidden {
+    display: none !important;
+}
+.cms-clear {
+    clear: both;
+    overflow: hidden;
+}
+.cms-clear-mobile {
+    clear: both;
+    overflow: hidden;
+    @media (min-width: $pagetree-mobile) {
+        display: none;
+    }
+}
+
+// we need to add this to get drag & drop to work on internet explorer,
+// more specifically on a microsoft surface
+.jstree li {
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
+//###########################################################
+// CONTAINER
+// general container around the jstree or elements
+.cms-pagetree-root.filtered {
+    min-height: auto;
+    // important is to fight with admin-style
+    padding: 0 !important;
+    box-shadow: $pagetree-box-shadow !important;
+}
+.cms-pagetree {
+    border: $pagetree-border;
+    // box-shadow: $pagetree-box-shadow;
+
+    .cms-hover-tooltip {
+        z-index: auto;
+    }
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+    .cms-btn.cms-icon {
+        display: inline-block;
+        box-sizing: border-box;
+        width: $pagetree-cell-inner-height + 7;
+        height: $pagetree-cell-inner-height + 5;
+        position: relative;
+        &:before {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-top: -8px;
+            margin-left: -8px;
+        }
+    }
+    .cms-btn.cms-btn-no-border {
+        border: none !important;
+    }
+    .cms-pagetree-dropdown-menu-open .cms-btn {
+        @extend .cms-btn-active;
+    }
+}
+
+//###########################################################
+// HEADER
+// handles top header area styles
+.cms-pagetree-header {
+    position: relative;
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: z(pagetree, header);
+    min-height: $pagetree-header-height;
+    padding: $pagetree-header-padding;
+    box-shadow: none;
+    border-bottom: none;
+    background: $pagetree-header-background;
+    &:before {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background-color: $white;
+    }
+    + .module {
+        padding-top: 0 !important;
+    }
+    .djangocms-admin-style & {
+        margin: -40px 0 0 0;
+    }
+}
+.djangocms-admin-style.cms-admin-sideframe .cms-pagetree-header {
+    margin-top: -25px;
+}
+
+.cms-pagetree-header-title {
+    display: table-cell;
+    width: 100%;
+    line-height: $pagetree-header-height;
+    height: $pagetree-header-height;
+    h1 {
+        line-height: $pagetree-header-height;
+        margin: 0 !important;
+        span {
+            font-weight: normal;
+        }
+    }
+}
+
+.cms-pagetree-header-row {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    @media (max-width: $pagetree-mobile) {
+        display: block;
+    }
+}
+.cms-pagetree-header-cell {
+    display: table-cell;
+    white-space: nowrap;
+    vertical-align: middle;
+    @media (max-width: $pagetree-mobile) {
+        display: block;
+    }
+}
+.cms-pagetree-header-cell-fluid {
+    width: 100%;
+}
+.cms-pagetree-header-cell-search {
+    width: $pagetree-header-search-width !important;
+    position: relative;
+    .cms-pagetree-header-filter-active & {
+        position: static;
+    }
+
+    @media (max-width: $pagetree-mobile) {
+        width: 100% !important;
+    }
+}
+.cms-pagetree-header-body {
+    @media (max-width: $pagetree-mobile) {
+        text-align: right;
+        padding-top: 10px;
+    }
+}
+.cms-pagetree-search-container {
+    .cms-pagetree-header-filter-active & {
+        position: relative;
+    }
+}
+// SEARCH
+.cms-pagetree-header-search {
+    position: absolute;
+    top: 0;
+    display: table;
+    width: 100%;
+    left: 0;
+    right: 0;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+    @media (max-width: $pagetree-mobile) {
+        position: relative;
+    }
+    .cms-pagetree-header-search-btn {
+        display: table-cell;
+        vertical-align: middle;
+        position: relative;
+        outline: none;
+        color: $white !important;
+        padding: 8px 10px !important;
+        border: none !important;
+        background: $color-primary !important;
+        height: 36px;
+        border-radius: $border-radius-base;
+
+        &:hover {
+            background: darken($color-primary, 5%) !important;
+        }
+        &:active,
+        &:focus {
+            color: $white !important;
+            background: darken($color-primary, 15%) !important;
+        }
+    }
+    .cms-pagetree-header-filter {
+        position: relative;
+        display: table-cell;
+        width: 100%;
+        padding-right: 5px;
+        vertical-align: middle;
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            width: 100%;
+            display: inline-block;
+            height: 36px;
+            padding: 6px;
+            line-height: 24px;
+            padding-right: 35px !important;
+            transition: width $speed-base;
+        }
+    }
+
+    .cms-pagetree-header-filter-active & {
+        left: 0;
+        right: 0;
+        top: 0;
+    }
+
+    .djangocms-admin-style & {
+        margin: 5px 0 10px;
+    }
+}
+.cms-pagetree-header-filter-trigger {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    cursor: pointer;
+    padding: 10px;
+    transform: rotate(270deg);
+    &:hover .cms-icon,
+    &:active .cms-icon,
+    &:focus .cms-icon {
+        color: $color-primary;
+    }
+    .cms-icon {
+        font-size: 11px;
+        color: $gray;
+    }
+}
+.cms-pagetree-header-filter-container {
+    display: none;
+    overflow: auto;
+    position: absolute;
+    left: 0;
+    top: 38px;
+    width: 100%;
+    padding: 5px 20px 15px;
+    max-height: $pagetree-header-filter-height;
+    box-shadow: $pagetree-box-shadow;
+    box-sizing: border-box;
+    border-radius: $border-radius-base;
+    background: $white;
+    z-index: z(pagetree, dropdown);
+    h3 {
+        color: $gray;
+        font-size: 14px;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 10px 0 0 0;
+    }
+    ul,
+    li {
+        list-style-type: none;
+        padding: 2px 0;
+        margin: 0;
+    }
+    // color states
+    li a {
+        color: $gray-light;
+    }
+    .selected a {
+        color: $color-primary;
+        font-weight: bold;
+    }
+}
+.cms-pagetree-header-search-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px;
+    &:hover .cms-icon,
+    &:active .cms-icon,
+    &:focus .cms-icon {
+        color: $color-primary;
+    }
+    .cms-icon {
+        font-size: 12px;
+        color: $gray;
+    }
+}
+.cms-pagetree-header-search-reset {
+    font-size: 90%;
+    padding: 0 $pagetree-header-space;
+}
+
+// DROPDOWN
+.cms-pagetree-sites-list {
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: $pagetree-header-space;
+    margin-right: $pagetree-header-space;
+
+    .cms-pagetree-dropdown-trigger {
+        display: inline-block;
+        color: $gray !important;
+        padding: 10px;
+        height: 16px;
+    }
+
+    .cms-pagetree-dropdown-menu {
+        right: 50%;
+        margin-right: -$pagetree-header-height / 2 - 1px !important;
+    }
+}
+
+.cms-pagetree-header-create {
+    display: inline-block;
+    vertical-align: top;
+    height: 36px !important;
+    box-sizing: border-box;
+}
+
+// BREADCRUMB
+.djangocms-admin-style .cms-pagetree-breadcrumbs {
+    margin-bottom: -30px !important;
+    border: none !important;
+}
+
+//###########################################################
+// SECTION
+// separates different navigations
+.cms-pagetree-section {
+    position: relative;
+    z-index: z(pagetree, section);
+    min-height: $pagetree-section-height;
+    padding: $pagetree-section-padding;
+    box-shadow: none;
+    border-bottom: none;
+    background: $white;
+    h2,
+    p {
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+    h2 {
+        float: left;
+        font-weight: bold;
+        color: $gray-darkest;
+        background: none;
+    }
+    .cms-pagetree-container + & {
+        margin-top: -1px;
+    }
+}
+.cms-pagetree-section-condensed {
+    padding: $pagetree-section-padding-condensed;
+}
+.cms-pagetree-section-nav {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    margin-top: -($pagetree-cell-inner-height + 6px) / 2;
+
+    .cms-pagetree-dropdown-menu {
+        right: 40px;
+        top: -2px;
+        width: 205px;
+    }
+}
+
+.cms-pagetree-dropdown-separator {
+    padding: 0;
+    margin: 4px 1px !important;
+    line-height: 1;
+    height: 1px;
+    background: $gray-lighter;
+}
+
+//##############################################################################
+// JSTREE
+.cms-pagetree-container {
+    // overflow: auto;
+    position: relative;
+    z-index: z(pagetree, tree);
+    border: 1px solid $gray-lighter;
+    border-bottom: none;
+}
+
+.cms-tree-col {
+    height: $pagetree-cell-inner-height;
+    min-width: $pagetree-cell-inner-height;
+    display: block;
+}
+.cms-tree-col-padding-sm {
+    margin-top: -3px;
+    margin-left: -4px;
+    margin-right: -4px;
+    height: $pagetree-cell-inner-height + 6px;
+}
+
+.cms-tree-item {
+    display: table;
+    width: 100%;
+    text-align: center;
+    height: $pagetree-cell-inner-height;
+    & + .cms-tree-item {
+        padding-left: 4px;
+    }
+
+}
+.cms-tree-item-wrapper {
+    display: table-row;
+    min-width: $pagetree-cell-inner-height;
+    .cms-tree-item {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+        min-width: $pagetree-cell-inner-height;
+    }
+    .cms-tree-item-inner {
+        display: block;
+    }
+}
+.cms-tree-item-inner {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.cms-tree-reload {
+    float: right;
+}
+
+.cms-tree-item-lang .cms-pagetree-dropdown-menu {
+    right: 32px;
+    top: -5px;
+    width: 180px;
+}
+.cms-tree-item-button .cms-pagetree-dropdown-menu {
+    right: 40px;
+    top: -2px;
+    width: 205px;
+}
+.cms-tree-item-button .cms-hover-tooltip {
+    &:before,
+    &:after {
+        bottom: $pagetree-cell-inner-height / 2 + 7px;
+    }
+}
+.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil {
+    @include icon(cogs);
+}
+
+//###########################################################
+// ICONS
+// used for the sitemap and apphook icons
+.cms-tree-item-icons {
+    position: relative;
+
+    .cms-icon {
+        display: block;
+    }
+
+    span:before {
+        color: $gray-light;
+    }
+
+    &-dark span:before {
+        color: $gray-darker;
+    }
+}
+
+//###########################################################
+// PREVIEW
+// shows preview eye icon
+.cms-tree-item-preview {
+    position: relative;
+
+    a {
+        @extend %icon;
+        @include icon(eye);
+        font-size: $pagetree-icon-size;
+        line-height: $pagetree-icon-size;
+        height: $pagetree-icon-size;
+        display: block;
+
+        &:before {
+            display: block;
+            color: $gray-darker;
+        }
+        &:hover:before {
+            color: $black;
+        }
+    }
+
+    // active state for current selected page
+    &-active a:before {
+        color: $black;
+    }
+}
+
+//###########################################################
+// LANGUAGE
+// shows language bubbles
+.cms-tree-item-lang {
+    // required for tooltip
+    position: relative;
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-lang-size;
+    }
+}
+
+//###########################################################
+// LANGUAGE
+// shows language bubbles
+.cms-tree-item-menu {
+    position: relative;
+
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-icon-size - 4;
+    }
+
+    .cms-icon {
+        display: block;
+    }
+
+    .cms-icon:before {
+        display: block;
+        font-size: $pagetree-icon-size - 4;
+        color: $gray-darker;
+    }
+    .cms-icon-check-square:before {
+        color: $color-success;
+    }
+}
+
+//###########################################################
+// INFO
+// icon used at the end to display additional help
+.cms-tree-item-info {
+    position: relative;
+
+    .cms-tree-item-inner > a {
+        display: block;
+        height: $pagetree-icon-size - 2px;
+    }
+
+    .cms-icon {
+        display: block;
+    }
+    .cms-icon:before {
+        display: block;
+        font-size: $pagetree-icon-size - 2px;
+    }
+
+    p {
+        color: $gray-darkest;
+        padding: 0;
+        margin: 0;
+    }
+    strong {
+        color: $gray-light;
+        font-weight: normal;
+    }
+    a {
+        display: inline-block;
+        line-height: 1;
+    }
+}
+
+//###########################################################
+// SEARCH & FILTERING
+// searchform or filtering
+.cms-tree-search {
+    float: left;
+    margin-right: 5px;
+    label {
+        display: none !important;
+    }
+    select {
+        position: relative;
+        top: 2px;
+        width: $pagetree-search-width !important;
+    }
+    // need to overwrite djangocms-admin-theme
+    #toolbar form#changelist-search input[type="submit"] {
+        margin-left: 0 !important;
+    }
+    #toolbar form#changelist-search #searchbar {
+        width: $pagetree-search-width !important;
+    }
+}
+.cms-tree-filters {
+    float: right;
+    .js-cms-tree-filter-trigger {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding-right: 20px;
+        line-height: 30px;
+        width: 175px;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    h2 {
+        display: none;
+    }
+}
+
+//###########################################################
+// OTHER
+
+// searchform or filtering
+.cms-pagetree-empty {
+    padding: $pagetree-header-padding;
+    border-top: none;
+    .addlink {
+        padding-left: 0;
+    }
+}
+
+//##############################################################################
+// PAGETREE THEME
+
+// this level is required to make sure djangocms-admin-style or django-admin
+// are not interfering (increasing specificity). This section only defines
+// resets added through inline styles
+.jstree-django-cms {
+    // parent and children ul
+    .jstree-container-ul,
+    .jstree-children,
+    // children and childrens children li
+    .jstree-leaf,
+    .jstree-node  {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .jstree-is-dragging {
+        opacity: 0.1 !important;
+        + .jstree-grid-cell {
+            height: $pagetree-cell-height + 1;
+            border-top: 1px solid $gray-lighter;
+            margin-top: -1px;
+        }
+    }
+
+    // grid settings and resets added by `jstree.grid.js`
+    .jstree-grid-header,
+    .jstree-grid-separator {
+        padding: 0;
+        margin: 0;
+        // there are inline styles set to this part
+        margin-left: 0 !important;
+        border: none;
+        background: none;
+    }
+    &.jstree-grid-cell {
+        padding: 0;
+    }
+
+    // tooltips are hidden if overflow is prevented
+    .jstree-grid-column,
+    .jstree-grid-cell {
+        box-sizing: border-box;
+        overflow: visible;
+    }
+
+    .jstree-grid-column {
+        // fixes layout bug in Safari
+        vertical-align: top;
+    }
+
+    // disable highlight on iOS devices
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+// wrapper added by jstree
+.jstree-grid-wrapper {
+    box-sizing: border-box;
+    overflow: visible !important;
+    width: 100% !important;
+}
+
+//###########################################################
+// DJANGO-CMS THEME
+
+// general wrapper
+.jstree-grid-wrapper {
+    background: $gray-lightest;
+}
+
+// specificity required for admin styles and jstree resets
+.jstree-django-cms {
+    .jstree {
+    }
+    // header column
+    .jstree-grid-header {
+        font-size: $font-size-small;
+        color: $gray;
+        text-align: center;
+        padding: $pagetree-jstree-header-padding;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
+    }
+    .jstree-grid-header-fixed {
+        position: fixed;
+        z-index: z("pagetree", "fixed-headers");
+    }
+    // ensure first line is not centered
+    .jstree-grid-column-0 .jstree-grid-header {
+        text-align: left !important;
+    }
+
+    //###########################################################
+    // styles for nesting elements
+    .jstree-children {
+        margin-left: $pagetree-nesting-padding;
+    }
+    .jstree-container-ul {
+        margin-left: -1px;
+    }
+    .jstree-ocl {
+        float: left;
+        position: relative;
+        left: $pagetree-nesting-padding;
+        font-size: 12px;
+        color: $gray-light;
+        padding: 18px 10px 10px 0;
+        @extend %icon;
+        &:before {
+            // can only apply transforms to non-inline elements
+            display: inline-block;
+        }
+    }
+    .jstree-open > .jstree-ocl,
+    .jstree-closed > .jstree-ocl {
+        cursor: pointer;
+    }
+    .jstree-open > .jstree-ocl {
+        @include icon(arrow-right);
+        &:before {
+            transform: rotate(90deg);
+        }
+    }
+    .jstree-closed > .jstree-ocl {
+        @include icon(arrow-right);
+    }
+    .jstree-loading > .jstree-ocl {
+        @include icon(loader);
+        &:before {
+            animation: cms-spin 2s infinite linear;
+        }
+    }
+
+    //###########################################################
+    // background color and paddings for nodes
+    // first row styling
+    .jstree-anchor {
+        box-sizing: border-box;
+        display: block;
+        cursor: move;
+        outline: none;
+        color: $gray;
+        // we need to add one pixel in to negate the negative margin
+        // value to get the borders to work visually
+        height: $pagetree-cell-height + 1;
+        padding: $pagetree-anchor-padding;
+        margin-top: -1px;
+        border: 1px solid $gray-lighter;
+        border-right: none;
+        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+        image-rendering: pixelated;
+
+        &:hover {
+            color: $gray !important;
+        }
+    }
+    .jstree-open,
+    .jstree-closed,
+    .jstree-loading {
+        > .jstree-anchor {
+            padding: $pagetree-anchor-padding-with-icon;
+        }
+    }
+
+    .cms-tree-node-filtered .jstree-anchor {
+        cursor: default;
+    }
+    // style cells afterwards
+    .jstree-grid-cell {
+        height: $pagetree-cell-height;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
+        > span {
+            display: block;
+        }
+        // don't apply these styles for the first column
+        &.jstree-django-cms {
+            height: auto;
+            border: none;
+            background: none;
+        }
+    }
+    .jstree-grid-cell-regular {
+        text-align: center;
+        padding: $pagetree-cell-padding;
+        border-left: 1px solid $gray-lighter;
+    }
+    .jstree-grid-cell-regular-options {
+        border-left: none;
+        text-align: right;
+    }
+    // hover states
+    .jstree-hovered,
+    .jstree-clicked {
+        background-color: lighten($gray-lightest, 3%);
+    }
+
+    // special case for paste header
+    .jstree-grid-column-1 .jstree-grid-header {
+        text-align: right;
+        a {
+            font-size: $font-size-small;
+            top: 0;
+        }
+        span {
+            line-height: 1;
+        }
+        // special icon for pasting
+        .cms-icon {
+            font-size: $font-size-small;
+            padding-right: $pagetree-icon-offset;
+            margin-left: $pagetree-icon-offset;
+        }
+    }
+}
+
+//###########################################################
+// initial loading display of the tree
+.jstree.jstree-loading {
+    .jstree-container-ul {
+        margin: 0;
+    }
+    .jstree-anchor {
+        padding-top: 13px;
+        padding-left: 15px;
+        border: none;
+        background: none;
+    }
+
+    .jstree-loading > .jstree-ocl {
+        display: none;
+    }
+}
+
+//###########################################################
+// success animation and paste functionality
+// this should only be attached to the root
+.cms-tree-node-success {
+    > .jstree-anchor .jstree-themeicon {
+        content: "";
+        position: relative;
+        top: 4px;
+        color: $color-success;
+        @extend %icon;
+        @include icon(check);
+    }
+}
+
+//###########################################################
+// drag & drop item
+#jstree-dnd {
+    box-sizing: border-box;
+    display: block;
+    min-width: 300px;
+    height: $pagetree-cell-height;
+    padding: $pagetree-anchor-padding !important;
+    margin-left: -$pagetree-marker-size + 1;
+    background: $color-primary url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+    color: $white;
+    // copy icon triggered when pressing `CMD`
+    .jstree-copy {
+        color: $white;
+        padding: 0 5px 2px;
+        margin-left: 5px;
+        border-radius: $border-radius-base;
+        background: $gray-light;
+    }
+    // error color displayed if we can/cannot move it
+    .jstree-ok,
+    .jstree-er {
+        position: absolute;
+        top: 0;
+        left: -5px;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(white, 0.6);
+    }
+    .jstree-ok {
+        display: none;
+    }
+
+}
+.is-stacked {
+    #jstree-dnd  {
+        box-shadow: 1px 1px 1px rgba($black, 0.2), 4px 4px 0 0 $color-primary;
+    }
+    .jstree-er {
+        box-shadow: 4px 4px 0 0 rgba(white, 0.6);
+    }
+}
+
+#jstree-marker {
+    position: absolute;
+    right: 3%;
+    z-index: z("pagetree", "drag-marker");
+    margin: -$pagetree-marker-size 0 0 0;
+    border-right: 0;
+    border-top: $pagetree-marker-size solid transparent;
+    border-bottom: $pagetree-marker-size solid transparent;
+    border-left: $pagetree-marker-size solid $color-primary;
+    height: 0;
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        height: 3px;
+        top: -1px;
+        left: -2px;
+        right: 0;
+        background-color: $color-primary;
+    }
+    &.jstree-marker-child {
+        border: 2px solid $color-primary;
+        height: 46px;
+        margin: -24px 0 0 0;
+        background-color: rgba($color-primary, 0.1);
+        box-sizing: border-box;
+
+        &:after {
+            display: none;
+        }
+    }
+}
+
+
+.djangocms-admin-style.cms-pagetree-wrapper.cms-admin-sideframe {
+    .messagelist + #content {
+        margin-top: 117px !important;
+    }
+    #container .breadcrumbs {
+        left: 20px;
+    }
+    #container .breadcrumbs + .messagelist + #content,
+    #container .breadcrumbs + #content {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    #jstree-marker {
+        right: 0;
+    }
+}
+
+.cms-pagetree-header-lang {
+    &,
+    &:link,
+    &:active,
+    &:hover,
+    &:focus {
+        color: $gray-darkest !important;
+    }
+    &.active {
+        font-weight: bold;
+    }
+}

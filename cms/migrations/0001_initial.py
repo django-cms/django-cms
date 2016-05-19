@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
                 ('publisher_is_draft', models.BooleanField(db_index=True, default=True, editable=False)),
                 ('languages', models.CharField(max_length=255, null=True, blank=True, editable=False)),
                 ('revision_id', models.PositiveIntegerField(default=0, editable=False)),
-                ('xframe_options', models.IntegerField(default=0, choices=Page.X_FRAME_OPTIONS_CHOICES)),
+                ('xframe_options', models.IntegerField(default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'), choices=Page.X_FRAME_OPTIONS_CHOICES)),
                 ('parent', models.ForeignKey(null=True, to='cms.Page', related_name='children', blank=True)),
                 ('publisher_public', models.OneToOneField(null=True, to='cms.Page', related_name='publisher_draft', editable=False)),
                 ('site', models.ForeignKey(to='sites.Site', verbose_name=_('site'), related_name='djangocms_pages', help_text='The site the page is accessible at.')),

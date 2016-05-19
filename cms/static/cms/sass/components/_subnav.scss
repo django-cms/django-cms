@@ -79,9 +79,6 @@
 .cms-submenu-dropdown-bottom {
     bottom: $structure-dragbar-height + $structure-dragarea-space;
 }
-.cms-submenu-dropdown-children {
-    right: $submenu-icon-area-size * 2 + $submenu-right * 3;
-}
 
 // TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
 .cms-submenu-dropdown-settings {
@@ -101,7 +98,7 @@
             display: block;
             font-size: $submenu-item-font-size;
             text-align: left;
-            padding: 0px $submenu-item-padding-horizontal;
+            padding: 0 $submenu-item-padding-horizontal;
             line-height: $dropdown-item-height;
             min-height: $dropdown-item-height;
             padding-left: $dropdown-item-icon-space;
@@ -140,11 +137,11 @@
         }
         &:first-child a:hover,
         &:first-child a:focus {
-            border-radius: $border-radius-base $border-radius-base 0 0;
+            border-radius: $border-radius-normal $border-radius-normal 0 0;
         }
         &:last-child a:hover,
         &:last-child a:focus {
-            border-radius: 0 0 $border-radius-base $border-radius-base;
+            border-radius: 0 0 $border-radius-normal $border-radius-normal;
         }
     }
     .cms-submenu-item-paste-tooltip {

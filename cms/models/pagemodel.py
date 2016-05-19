@@ -2,7 +2,6 @@
 from logging import getLogger
 from os.path import join
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -42,15 +41,15 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     )
     TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
-    X_FRAME_OPTIONS_INHERIT = 0
-    X_FRAME_OPTIONS_DENY = 1
-    X_FRAME_OPTIONS_SAMEORIGIN = 2
-    X_FRAME_OPTIONS_ALLOW = 3
+    X_FRAME_OPTIONS_INHERIT = constants.X_FRAME_OPTIONS_INHERIT
+    X_FRAME_OPTIONS_DENY = constants.X_FRAME_OPTIONS_DENY
+    X_FRAME_OPTIONS_SAMEORIGIN = constants.X_FRAME_OPTIONS_SAMEORIGIN
+    X_FRAME_OPTIONS_ALLOW = constants.X_FRAME_OPTIONS_ALLOW
     X_FRAME_OPTIONS_CHOICES = (
-        (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-        (X_FRAME_OPTIONS_DENY, _('Deny')),
-        (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-        (X_FRAME_OPTIONS_ALLOW, _('Allow'))
+        (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+        (constants.X_FRAME_OPTIONS_DENY, _('Deny')),
+        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+        (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
@@ -109,7 +108,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
-        default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
+        default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
     )
 
     # Managers
@@ -211,36 +210,51 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         as it remains the same regardless of the page position in the tree
         """
         assert self.publisher_is_draft
+        assert target.publisher_is_draft
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
         is_inherited_template = (
             self.template == constants.TEMPLATE_INHERITANCE_MAGIC)
+        target_public_page = None
 
-        # make sure move_page does not break when using INHERIT template
-        # and moving to a top level position
-        if (position in ('left', 'right') and not target.parent and
-                is_inherited_template):
-            self.template = self.get_template()
-            if target.publisher_public_id and position == 'right':
-                public = target.publisher_public
-                target_root = target.get_root()
-                if target_root.get_next_sibling():
-                    if target_root.get_next_sibling() == public.get_root():
-                        target = public
-                    else:
-                        logger.warning('tree may need rebuilding: '
-                                       'run `manage.py cms fix-tree`')
-                else:
-                    # target's root is last 'root' node, switch to 'left'
-                    position = 'left'
+        if position in ('left', 'right') and not target.parent:
+            # make sure move_page does not break the tree
+            # when moving to a top level position.
+
+            if position == 'right' and target.publisher_public_id:
+                # The correct path order for pages at the root level
+                # is that any left sibling page has a path
+                # lower than the path of the current page.
+                # This rule applies to both draft and live pages
+                # so this condition will make sure to add the
+                # current page to the right of the target live page.
+                target_public_page = Page.objects.get(pk=target.publisher_public_id)
+                draft_root = target.get_root()
+                public_root = target_public_page.get_root()
+
+                # With this assert we can detect tree corruptions.
+                # It's important to raise this!
+                assert draft_root.get_next_sibling() == public_root
+
+            if is_inherited_template:
+                # The following code resolves the inherited template
+                # and sets it on the moved page.
+                # This is because the page is being moved to a root
+                # position and so can't inherit from anything.
+                self.template = self.get_template()
+
         if position == 'first-child' or position == 'last-child':
             self.parent_id = target.pk
         else:
             self.parent_id = target.parent_id
 
         self.save()
-        moved_page = self.move(target, pos=position)
+
+        if target_public_page:
+            moved_page = self.move(target_public_page, pos=position)
+        else:
+            moved_page = self.move(target, pos=position)
 
         # fire signal
         import cms.signals as cms_signals
@@ -251,6 +265,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         # Make sure to update the slug and path of the target page.
         page_utils.check_title_slugs(target)
+
+        if target_public_page:
+             page_utils.check_title_slugs(target)
 
         if moved_page.publisher_public_id:
             # Ensure we have up to date mptt properties
@@ -375,7 +392,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 new_phs.append(ph)
                 # update the page copy
             if plugins:
-                copy_plugins_to(plugins, ph, no_signals=True)
+                copy_plugins_to(plugins, ph)
         target.placeholders.add(*new_phs)
 
     def _copy_attributes(self, target, clean=False):
@@ -1365,9 +1382,24 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                             public_parent != obj.parent or \
                             public_prev_sib != prev_public_sibling:
                 if public_prev_sib:
+                    # We've got a sibling on the left side (previous)
                     obj.parent_id = public_prev_sib.parent_id
                     obj.save()
-                    obj = obj.move(public_prev_sib, pos="right")
+
+                    if obj.parent_id:
+                        # The draft page (self) has been moved under
+                        # another page.
+                        # So move the live page (obj) to be a sibling
+                        # of the public closest sibling (public_prev_sib).
+                        obj = obj.move(public_prev_sib, pos="right")
+                    else:
+                        # The draft page (self) has been moved to the root
+                        # so move the public page (obj) to be a sibling
+                        # of the draft page (self).
+                        # This keeps the tree paths consistent by making sure
+                        # the public page (obj) has a greater path than
+                        # the draft page.
+                        obj = obj.move(self, pos="right")
                 elif public_parent:
                     # move as a first child to parent
                     obj.parent_id = public_parent.pk

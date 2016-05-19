@@ -21,7 +21,7 @@ Current and previous core designers:
 * Matthias Nüesch
 
 
-Contributors (based on gitlog) (475 authors):
+Contributors (based on gitlog, 483 unique authors):
 
 * A. Bram Neijt
 * aaloy
@@ -156,6 +156,7 @@ Contributors (based on gitlog) (475 authors):
 * Egor V. Nazarkin
 * Ekrem SEREN
 * Elias Probst
+* Eraldo Energy
 * Eric Amador
 * Eric Eldredge
 * Eric Robitaille
@@ -183,6 +184,7 @@ Contributors (based on gitlog) (475 authors):
 * GaretJax
 * genti94
 * gentleShark
+* Gentian Mazrekaj
 * Geoffrey Fairchild
 * Geoffrey Hing
 * George Marshall
@@ -250,6 +252,7 @@ Contributors (based on gitlog) (475 authors):
 * kblomqvist
 * Kegan Holtzhausen
 * Keryn Knight
+* Kevin Burton
 * Kevin Richardson
 * Kim Thoenen
 * kochin
@@ -301,6 +304,7 @@ Contributors (based on gitlog) (475 authors):
 * mathijs
 * Matt Chisholm
 * Matteo Rosati
+* Matthias Cavigelli
 * Mattia Larentis
 * Max Shkurygin
 * Maxim Bodyansky
@@ -341,6 +345,7 @@ Contributors (based on gitlog) (475 authors):
 * padelt
 * Pankrat
 * Paolo Leggio
+* Paolo Romolini
 * Pascal Mouret
 * pascal.beyeler
 * Patrick Arminio
@@ -355,6 +360,7 @@ Contributors (based on gitlog) (475 authors):
 * Pavel Puchkin
 * pbgc
 * pcicman
+* Pawel Markowski
 * Pedro Gracia
 * Pete Loggie
 * Peter Farrell
@@ -398,6 +404,7 @@ Contributors (based on gitlog) (475 authors):
 * Roman Kozlovskiy
 * root
 * rtpm
+* Ruslan Malogulko
 * Russ Ferriday
 * SachaMPS
 * Sam Manzi
@@ -447,6 +454,7 @@ Contributors (based on gitlog) (475 authors):
 * Tanel Külaots
 * tdelam
 * tehfink
+* Thomas Meitz
 * Thomas Parslow
 * Thomas Remmert
 * Thomas Woolford

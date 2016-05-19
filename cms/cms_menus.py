@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.functional import SimpleLazyObject
 from django.utils.translation import get_language
 
 from cms import constants
@@ -39,14 +40,8 @@ def get_visible_page_objects(request, pages, site=None):
     if has_global_page_permission(request, site, can_view=True):
         return pages
 
-    def has_global_perm():
-        if has_global_perm.cache < 0:
-            if request.user.has_perm('cms.view_page'):
-                has_global_perm.cache = 1
-            else:
-                has_global_perm.cache = 0
-        return bool(has_global_perm.cache)
-    has_global_perm.cache = -1
+    has_global_perm = SimpleLazyObject(lambda: request.user.has_perm('cms.view_page'))
+    user_groups = SimpleLazyObject(lambda: set(request.user.groups.values_list('pk', flat=True)))
 
     def has_permission_membership(page_id):
         """
@@ -54,17 +49,9 @@ def get_visible_page_objects(request, pages, site=None):
         """
         user_pk = request.user.pk
         for perm in restricted_pages[page_id]:
-            if perm.user_id == user_pk:
-                return True
-            if not perm.group_id:
-                continue
-            if has_permission_membership.user_groups is None:
-                has_permission_membership.user_groups = request.user.groups.all().values_list(
-                    'pk', flat=True)
-            if perm.group_id in has_permission_membership.user_groups:
+            if perm.user_id == user_pk or perm.group_id in user_groups:
                 return True
         return False
-    has_permission_membership.user_groups = None
 
     visible_pages = []
     for page in pages:
@@ -78,9 +65,7 @@ def get_visible_page_objects(request, pages, site=None):
         elif is_auth_user:
             # setting based handling of unrestricted pages
             # check group and user memberships to restricted pages
-            if is_restricted and has_permission_membership(page_id):
-                to_add = True
-            elif has_global_perm():
+            if is_restricted and has_permission_membership(page_id) or has_global_perm:
                 to_add = True
         if to_add:
             visible_pages.append(page)
@@ -94,17 +79,18 @@ def get_visible_pages(request, pages, site=None):
     return [page.pk for page in pages]
 
 
-def page_to_node(page, home, cut):
+def page_to_node(renderer, page, home, cut):
     """
     Transform a CMS page into a navigation node.
 
+    :param renderer: MenuRenderer instance bound to the request
     :param page: the page you wish to transform
     :param home: a reference to the "home" page (the page with path="0001")
     :param cut: Should we cut page from its parent pages? This means the node will not
          have a parent anymore.
     """
     # Theses are simple to port over, since they are not calculated.
-    # Other attributes will be added conditionnally later.
+    # Other attributes will be added conditionally later.
     attr = {
         'is_page': True,
         'soft_root': page.soft_root,
@@ -131,9 +117,9 @@ def page_to_node(page, home, cut):
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
-        if page.navigation_extenders in menu_pool.menus:
+        if page.navigation_extenders in renderer.menus:
             extenders.append(page.navigation_extenders)
-        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in menu_pool.menus:
+        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in renderer.menus:
             extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     lang = get_language()
@@ -145,7 +131,7 @@ def page_to_node(page, home, cut):
         if app_name:  # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
             if app:
-                extenders += app.menus
+                extenders += app.get_menus(page, lang)
     exts = []
     for ext in extenders:
         if hasattr(ext, "get_instances"):
@@ -175,6 +161,7 @@ def page_to_node(page, home, cut):
 
 
 class CMSMenu(Menu):
+
     def get_nodes(self, request):
         page_queryset = get_page_queryset(request)
         site = current_site(request)
@@ -200,7 +187,7 @@ class CMSMenu(Menu):
         actual_pages = []
 
         # cache view perms
-        visible_pages = get_visible_pages(request, pages, site)
+        visible_pages = set(get_visible_pages(request, pages, site))
         for page in pages:
             # Pages are ordered by path, therefore the first page is the root
             # of the page tree (a.k.a "home")
@@ -231,9 +218,11 @@ class CMSMenu(Menu):
             page = ids[title.page_id]
             page.title_cache[title.language] = title
 
+        renderer = self.renderer
+
         for page in actual_pages:
             if page.title_cache:
-                nodes.append(page_to_node(page, home, home_cut))
+                nodes.append(page_to_node(renderer, page, home, home_cut))
         return nodes
 
 
@@ -241,6 +230,7 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
+
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
@@ -269,8 +259,9 @@ class NavExtender(Modifier):
                                 extnode.parent = node
                                 node.children.append(extnode)
         removed = []
+
         # find all not assigned nodes
-        for menu in menu_pool.menus.items():
+        for menu in self.renderer.menus.items():
             if (hasattr(menu[1], 'cms_enabled')
                     and menu[1].cms_enabled and not menu[0] in exts):
                 for node in nodes:

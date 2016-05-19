@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import datetime
 import os.path
+from unittest import skipIf
 
 from django.conf import settings
 from django.core.cache import cache
@@ -30,13 +30,11 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
-from cms.test_utils.compat import skipIf
-from cms.test_utils.testcases import (CMSTestCase, ClearURLs, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADVANCED_CHANGE,
                                       URL_CMS_PAGE_MOVE)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import installed_apps
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
@@ -55,9 +53,6 @@ class PageMigrationTestCase(CMSTestCase):
         Test correct content type is set for Page object
         """
         from django.contrib.contenttypes.models import ContentType
-        if DJANGO_1_7:
-            # obsolete test for an old bug, can be dropped at any time
-            self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
         self.assertEqual(ContentType.objects.filter(model='page', app_label='cms').count(), 1)
 
 
@@ -528,7 +523,7 @@ class PagesTestCase(CMSTestCase):
             page.save()
             page.publish('en')
             req.current_page = page
-            req.REQUEST = {}
+            req.GET = {}
             self.assertEqual(t.render(template.Context({"request": req})), "Hello I am a page")
 
     def test_page_obj_change_data_from_template_tags(self):
@@ -557,7 +552,7 @@ class PagesTestCase(CMSTestCase):
             page.publish('en')
             after_change = tz_now()
             req.current_page = page
-            req.REQUEST = {}
+            req.GET = {}
 
             actual_result = t.render(template.Context({"request": req}))
             desired_result = "{0} changed on {1}".format(
@@ -1315,7 +1310,9 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
     def test_plugin_loading_queries(self):
-        with self.settings(CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'),)):
+        with self.settings(
+                CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
+        ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
             placeholders = list(page.placeholders.all())
             for i, placeholder in enumerate(placeholders):
@@ -1547,7 +1544,7 @@ class PageAdminTest(PageAdminTestBase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.noadmin_urls')
-class NoAdminPageTests(ClearURLs, CMSTestCase):
+class NoAdminPageTests(CMSTestCase):
 
     def test_get_page_from_request_fakeadmin_nopage(self):
         noadmin_apps = [app for app in installed_apps() if app != 'django.contrib.admin']

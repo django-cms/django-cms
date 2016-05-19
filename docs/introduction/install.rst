@@ -8,8 +8,7 @@ We'll get started by setting up our environment.
 Requirements
 ************
 
-django CMS requires Django version 1.6.9 or later, 1.7, 1.8 or 1.9, and
-Python 2.6, 2.7, 3.3, 3.4 or 3.5.
+django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
 
 ************************
 Your working environment
@@ -18,12 +17,9 @@ Your working environment
 We're going to assume that you have a reasonably recent version of virtualenv
 installed and that you have some basic familiarity with it.
 
-Please check that you have installed the
-`required binary libraries <http://djangocms-installer.readthedocs.org/en/latest/libraries.html>`_
-before proceeding.
 
-Create and activate a virtual environment
-=========================================
+Create and activate a virtual env
+=================================
 
 ::
 
@@ -33,7 +29,6 @@ Create and activate a virtual environment
 Note that if you're using Windows, to activate the virtualenv you'll need::
 
     env\Scripts\activate
-
 
 Use the django CMS installer
 ============================
@@ -86,14 +81,6 @@ For the purposes of this tutorial, it's recommended that you answer the
 installer's questions as follows (where we suggest something different from the default, it's
 indicated with an asterisk *****).
 
-.. warning:: Django security support
-
-    Django 1.6 support is provided as an interim measure only. In accordance with the `Django
-    Project's security policies <https://docs.djangoproject.com/en/dev/internals/security/>`_, 1.6
-    no longer receives security updates from the Django Project team. Projects running on Django
-    1.6 have known vulnerabilities, so don't choose to install this version unless you have a
-    particular need to.
-
 * Database configuration (in URL format): ``sqlite://localhost/project.db``
 * django CMS version: ``stable``
 * Django version: ``stable``
@@ -110,10 +97,8 @@ indicated with an asterisk *****).
 
 Create a Django admin user when invited.
 
-
-*********************
-Start up the new site
-*********************
+Start up the runserver
+======================
 
 ::
 

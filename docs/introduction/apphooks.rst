@@ -1,5 +1,3 @@
-.. apphooks_introduction:
-
 ########
 Apphooks
 ########
@@ -23,14 +21,15 @@ This is the most basic example of an apphook for a django CMS application:
 
 .. code-block:: python
 
-    from django.utils.translation import ugettext_lazy as _
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
+    from django.utils.translation import ugettext_lazy as _
 
     class PollsApphook(CMSApp):
-        name = _("Polls Application")   # give your application a name
-        urls = ["polls.urls"]           # link it to URL configuration(s)
-        app_name = "polls"              # set the default application namespace
+        name = _("Polls Application")   # give your application a name (required)
+        app_name = "polls"
+        _urls = ["polls.urls"]           # link your app to url configuration(s)
+
 
     apphook_pool.register(PollsApphook)  # register the application
 
@@ -51,16 +50,18 @@ Create and save a new page, then publish it.
 
 .. note:: Your apphook won't work until the page has been published.
 
-In its *Advanced settings*, choose "Polls Application" from the *Application* menu. Leave the *Application instance
-name* on the provided default (``polls``), and save once more.
+In its *Advanced settings*, choose "Polls Application" from the *Application* menu, and save once
+more.
 
 .. image:: /introduction/images/select-application.png
    :alt: select the 'Polls' application
    :width: 400
    :align: center
 
-Refresh the page, and you'll find that the Polls application, along with any polls you have created, is now available
+Refresh the page, and you'll find that the Polls application is now available
 directly from the new django CMS page.
 
 You can now remove the mention of the Polls application (``url(r'^polls/', include('polls.urls',
 namespace='polls'))``) from your project's ``urls.py`` - it's no longer even required there.
+
+Next, we're going to install a django-CMS-compatible third-party application.

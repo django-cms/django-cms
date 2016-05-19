@@ -31,6 +31,7 @@ def default(name):
 
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
+    'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
     'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
@@ -63,6 +64,8 @@ DEFAULTS = {
     'ADMIN_NAMESPACE': 'admin',
     'APP_NAME': None,
     'TOOLBAR_HIDE': False,
+    'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
+    'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
     'UNESCAPED_RENDER_MODEL_TAGS': True,
     'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',

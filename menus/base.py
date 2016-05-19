@@ -5,7 +5,9 @@ from django.utils.encoding import smart_str
 class Menu(object):
     namespace = None
 
-    def __init__(self):
+    def __init__(self, renderer):
+        self.renderer = renderer
+
         if not self.namespace:
             self.namespace = self.__class__.__name__
 
@@ -17,6 +19,9 @@ class Menu(object):
 
 
 class Modifier(object):
+
+    def __init__(self, renderer):
+        self.renderer = renderer
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         pass

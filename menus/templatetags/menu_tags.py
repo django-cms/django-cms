@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
@@ -130,7 +128,12 @@ class ShowMenu(InclusionTag):
             children = next_page.children
         else:
             # new menu... get all the data so we can save a lot of queries
-            nodes = menu_pool.get_nodes(request, namespace, root_id)
+            menu_renderer = context.get('cms_menu_renderer')
+
+            if not menu_renderer:
+                menu_renderer = menu_pool.get_renderer(request)
+
+            nodes = menu_renderer.get_nodes(namespace, root_id)
             if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
@@ -144,7 +147,7 @@ class ShowMenu(InclusionTag):
                 else:
                     nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
-            children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
+            children = menu_renderer.apply_modifiers(children, namespace, root_id, post_cut=True)
 
         try:
             context['children'] = children
@@ -207,7 +210,13 @@ class ShowSubMenu(InclusionTag):
             request = context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
-        nodes = menu_pool.get_nodes(request)
+
+        menu_renderer = context.get('cms_menu_renderer')
+
+        if not menu_renderer:
+            menu_renderer = menu_pool.get_renderer(request)
+
+        nodes = menu_renderer.get_nodes()
         children = []
         # adjust root_level so we cut before the specified level, not after
         include_root = False
@@ -233,9 +242,9 @@ class ShowSubMenu(InclusionTag):
                         # if root_level was 0 we need to give the menu the entire tree
                     # not just the children
                 if include_root:
-                    children = menu_pool.apply_modifiers([node], request, post_cut=True)
+                    children = menu_renderer.apply_modifiers([node], post_cut=True)
                 else:
-                    children = menu_pool.apply_modifiers(children, request, post_cut=True)
+                    children = menu_renderer.apply_modifiers(children, post_cut=True)
         context['children'] = children
         context['template'] = template
         context['from_level'] = 0
@@ -279,7 +288,13 @@ class ShowBreadcrumb(InclusionTag):
         except:
             only_visible = bool(only_visible)
         ancestors = []
-        nodes = menu_pool.get_nodes(request, breadcrumb=True)
+
+        menu_renderer = context.get('cms_menu_renderer')
+
+        if not menu_renderer:
+            menu_renderer = menu_pool.get_renderer(request)
+
+        nodes = menu_renderer.get_nodes(breadcrumb=True)
 
         # Find home
         home = None

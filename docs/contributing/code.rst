@@ -78,8 +78,8 @@ examples, or ask.
 JS Linting
 ----------
 
-JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
-<http://jscs.info>`_. In order to run the linters you need to do this:
+JavaScript is linted using `ESLint <http://eslint.org>`_. In order to run the
+linter you need to do this:
 
 .. code-block:: sh
 
@@ -87,15 +87,6 @@ JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
 
 Or you can also run the watcher by just running ``gulp``.
 
-
-JS Bundling
------------
-
-JavaScript files are split up for easier development, but in the end they are
-bundled together and minified to decrease amount of requests made and improve
-performance. In order to do that we use ``gulp`` task runner, where ``bundle``
-command is available. Configuration and list of dependencies for each bundle are
-stored inside the ``gulpfile.js``.
 
 Process
 =======
@@ -132,7 +123,9 @@ Frontend
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
-    1. `Node <https://nodejs.org/>`_ (will install npm as well).
+    1. `Node <https://nodejs.org/>`_ version 0.12.7 (will install npm as well).
+       We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
+       the correct version of Node.
     2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
     3. Local dependencies ``npm install``
 
@@ -157,7 +150,7 @@ on change::
 By default, source maps are not included in the compiled files. In order to turn
 them on while developing just add the ``--debug`` option::
 
-	gulp --debug
+    gulp --debug
 
 Icons
 =====
@@ -182,13 +175,22 @@ into the font. When using *Adobe Illustrator* please mind the
 `following settings <images/svg_settings.png>`_.
 
 
+JS Bundling
+===========
+
+JavaScript files are split up for easier development, but in the end they are
+bundled together and minified to decrease amount of requests made and improve
+performance. In order to do that we use ``gulp`` task runner, where ``bundle``
+command is available. Configuration and list of dependencies for each bundle are
+stored inside the ``gulpfile.js``.
+
 
 .. _fork: http://github.com/divio/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
-.. _Aldryn Boilerplate : http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
+.. _Aldryn Boilerplate: http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
-.. _GitHub : http://www.github.com
-.. _GitHub help : http://help.github.com
-.. _freenode : http://freenode.net/
-.. _pull request : http://help.github.com/send-pull-requests/
-.. _git : http://git-scm.com/
+.. _GitHub: http://www.github.com
+.. _GitHub help: http://help.github.com
+.. _freenode: http://freenode.net/
+.. _pull request: http://help.github.com/send-pull-requests/
+.. _git: http://git-scm.com/

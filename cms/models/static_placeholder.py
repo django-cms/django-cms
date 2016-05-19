@@ -5,6 +5,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models.fields import PlaceholderField
@@ -49,7 +50,11 @@ class StaticPlaceholder(models.Model):
         unique_together = (('code', 'site'),)
 
     def __str__(self):
-        return self.name
+        return self.get_name()
+
+    def get_name(self):
+        return self.name or self.code or six.text_type(self.pk)
+    get_name.short_description = _(u'static placeholder name')
 
     def clean(self):
         # TODO: check for clashes if the random code is already taken

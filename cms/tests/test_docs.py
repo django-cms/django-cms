@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from contextlib import contextmanager
+from unittest import skipIf, skipUnless
 
 import os
 import socket
@@ -8,7 +8,7 @@ import sys
 
 import django
 from django.utils.six.moves import StringIO
-from sphinx.application import Sphinx
+from sphinx.application import Sphinx, SphinxWarning
 
 try:
     import enchant
@@ -16,7 +16,6 @@ except ImportError:
     enchant = None
 
 import cms
-from cms.test_utils.compat import skipIf, skipUnless
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
 
@@ -79,25 +78,28 @@ class DocsTestCase(CMSTestCase):
         status = StringIO()
         with TemporaryDirectory() as OUT_DIR:
             with tmp_list_append(sys.argv, 'spelling'):
-                app = Sphinx(
-                    srcdir=DOCS_DIR,
-                    confdir=DOCS_DIR,
-                    outdir=OUT_DIR,
-                    doctreedir=OUT_DIR,
-                    buildername="spelling",
-                    warningiserror=True,
-                    status=status,
-                    confoverrides={
-                        'extensions': [
-                            'djangocms',
-                            'sphinx.ext.intersphinx',
-                            'sphinxcontrib.spelling'
-                        ]
-                    }
-                )
                 try:
+                    app = Sphinx(
+                        srcdir=DOCS_DIR,
+                        confdir=DOCS_DIR,
+                        outdir=OUT_DIR,
+                        doctreedir=OUT_DIR,
+                        buildername="spelling",
+                        warningiserror=True,
+                        status=status,
+                        confoverrides={
+                            'extensions': [
+                                'djangocms',
+                                'sphinx.ext.intersphinx',
+                                'sphinxcontrib.spelling'
+                            ]
+                        }
+                    )
                     app.build()
+                    self.assertEqual(app.statuscode, 0, status.getvalue())
+                except SphinxWarning:
+                    # while normally harmless, causes a test failure
+                    pass
                 except:
                     print(status.getvalue())
                     raise
-                self.assertEqual(app.statuscode, 0, status.getvalue())

@@ -87,10 +87,10 @@ class AliasTestCase(CMSTestCase):
         class FakeRequest(object):
             current_page = page_en
             user = self.get_superuser()
-            REQUEST = {'language': 'en'}
+            GET = {'language': 'en'}
             META = {"CSRF_COOKIE_USED": True}
         request = FakeRequest()
-        template = Template('{% load cms_tags %}{% extra_menu_items placeholder %}')
+        template = Template('{% load cms_tags %}{% render_extra_menu_items placeholder %}')
         context = Context({'request': request})
         context['placeholder'] = ph_en
         output = template.render(context)
