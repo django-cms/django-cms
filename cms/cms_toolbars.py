@@ -494,8 +494,12 @@ class PageToolbar(CMSToolbar):
             add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Create Page'))
             app_page_url = admin_reverse('cms_page_add')
 
+            new_page_params = {'edit': 1, 'position': 'last-child'}
+            if self.page.parent_id:
+                new_page_params['target'] = self.page.parent_id
+
             add_page_menu_modal_items = (
-                (_('New Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.parent_id or ''}),
+                (_('New Page'), new_page_params),
                 (_('New Sub Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.pk}),
                 (_('Duplicate this Page'), {'copy_target': self.page.pk})
             )
