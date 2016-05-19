@@ -1,5 +1,4 @@
 'use strict';
-
 // #############################################################################
 // Admin panel opened in sideframe
 
@@ -42,6 +41,20 @@ casper.test.begin('Sideframe', function (test) {
             test.assertEvalEquals(function () {
                 return $('.cms-sideframe').width();
             }, 1280 * 0.95, 'Sideframe opens with default width');
+        })
+        // changes viewport to mobile
+        .then(function() {
+            this.viewport(767, 1024);
+        })
+        // checks current mobile width to be equal with sideframe width
+        .wait(300, function () {
+            test.assertEvalEquals(function () {
+                return $('.cms-sideframe').width();
+            }, 767, 'Sideframe is fullwidth with on mobile');
+        })
+        // changes back to default width
+        .then(function() {
+            this.viewport(1280, 1024);
         })
         .then(function () {
             this.reload();
