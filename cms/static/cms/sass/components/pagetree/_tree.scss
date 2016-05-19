@@ -201,7 +201,6 @@
         outline: none;
         color: $white !important;
         padding: 8px 10px !important;
-        margin-left: 5px;
         border: none !important;
         background: $color-primary !important;
         height: 36px;
@@ -220,6 +219,7 @@
         position: relative;
         display: table-cell;
         width: 100%;
+        padding-right: 5px;
         vertical-align: middle;
         input {
             width: 100%;
@@ -246,7 +246,7 @@
 }
 .cms-pagetree-header-filter-trigger {
     position: absolute;
-    right: 0;
+    right: 5px;
     top: 0;
     cursor: pointer;
     padding: 10px;
