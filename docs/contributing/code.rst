@@ -88,15 +88,6 @@ linter you need to do this:
 Or you can also run the watcher by just running ``gulp``.
 
 
-JS Bundling
------------
-
-JavaScript files are split up for easier development, but in the end they are
-bundled together and minified to decrease amount of requests made and improve
-performance. In order to do that we use ``gulp`` task runner, where ``bundle``
-command is available. Configuration and list of dependencies for each bundle are
-stored inside the ``gulpfile.js``.
-
 Process
 =======
 
@@ -132,7 +123,9 @@ Frontend
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
-    1. `Node <https://nodejs.org/>`_ (will install npm as well).
+    1. `Node <https://nodejs.org/>`_ version 0.12.7 (will install npm as well).
+       We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
+       the correct version of Node.
     2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
     3. Local dependencies ``npm install``
 
@@ -181,6 +174,15 @@ or creating additional icons. It is named *svgz* so it doesn't get compiled
 into the font. When using *Adobe Illustrator* please mind the
 `following settings <images/svg_settings.png>`_.
 
+
+JS Bundling
+===========
+
+JavaScript files are split up for easier development, but in the end they are
+bundled together and minified to decrease amount of requests made and improve
+performance. In order to do that we use ``gulp`` task runner, where ``bundle``
+command is available. Configuration and list of dependencies for each bundle are
+stored inside the ``gulpfile.js``.
 
 
 .. _fork: http://github.com/divio/django-cms
