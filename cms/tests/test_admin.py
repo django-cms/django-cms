@@ -1454,8 +1454,6 @@ class AdminFormsTests(AdminTestsBase):
         form = PageForm(data=new_page_data, files=None, instance=page3)
         self.assertFalse(form.is_valid())
 
-
-
     def test_reverse_id_error_location(self):
         ''' Test moving the reverse_id validation error to a field specific one '''
 
@@ -1513,6 +1511,68 @@ class AdminFormsTests(AdminTestsBase):
             # collapsing these, so that the error is visible.
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
+
+    def test_advanced_settings_endpoint(self):
+        admin_user = self.get_superuser()
+        site = Site.objects.get_current()
+        page = create_page('Page 1', 'nav_playground.html', 'en')
+        page_data = {
+            'language': 'en',
+            'site': site.pk,
+            'template': 'col_two.html',
+        }
+        path = admin_reverse('cms_page_advanced', args=(page.pk,))
+
+        with self.login_user_context(admin_user):
+            en_path = path + u"?language=en"
+            redirect_path = admin_reverse('cms_page_changelist') + '?language=en'
+            response = self.client.post(en_path, page_data)
+            self.assertRedirects(response, redirect_path)
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+
+        # Now switch it up by adding german as the current language
+        # Note that german has not been created as page translation.
+        page_data['language'] = 'de'
+        page_data['template'] = 'nav_playground.html'
+
+        with self.login_user_context(admin_user):
+            de_path = path + u"?language=de"
+            redirect_path = admin_reverse('cms_page_change', args=(page.pk,)) + '?language=de'
+            response = self.client.post(de_path, page_data)
+            # Assert user is redirected to basic settings.
+            self.assertRedirects(response, redirect_path)
+            # Make sure no change was made
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+
+        de_translation = create_title('de', title='Page 1', page=page.reload())
+        de_translation.slug = ''
+        de_translation.save()
+
+        # Now try again but slug is set to empty string.
+        page_data['language'] = 'de'
+        page_data['template'] = 'nav_playground.html'
+
+        with self.login_user_context(admin_user):
+            de_path = path + u"?language=de"
+            response = self.client.post(de_path, page_data)
+            # Assert user is not redirected because there was a form error
+            self.assertEqual(response.status_code, 200)
+            # Make sure no change was made
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+
+        de_translation.slug = 'someslug'
+        de_translation.save()
+
+        # Now try again but with the title having a slug.
+        page_data['language'] = 'de'
+        page_data['template'] = 'nav_playground.html'
+
+        with self.login_user_context(admin_user):
+            en_path = path + u"?language=de"
+            redirect_path = admin_reverse('cms_page_changelist') + '?language=de'
+            response = self.client.post(en_path, page_data)
+            self.assertRedirects(response, redirect_path)
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'nav_playground.html')
 
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")

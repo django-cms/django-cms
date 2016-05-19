@@ -1160,6 +1160,66 @@ class PagesTestCase(CMSTestCase):
             self.assertFalse(form.is_valid())
             self.assertTrue('overwrite_url' in form.errors)
 
+    def test_advanced_settings_form(self):
+        site = Site.objects.get_current()
+        page = create_page('Page 1', 'nav_playground.html', 'en')
+
+        # First we provide fully valid conditions to make sure
+        # the form is working.
+        page_data = {
+            'language': 'en',
+            'site': site.pk,
+            'template': 'col_two.html',
+        }
+
+        form = AdvancedSettingsForm(
+            data=page_data,
+            instance=page,
+            files=None,
+        )
+        self.assertTrue(form.is_valid())
+
+        # Now switch it up by adding german as the current language
+        # Note that german has not been created as page translation.
+        page_data['language'] = 'de'
+
+        form = AdvancedSettingsForm(
+            data=page_data,
+            instance=page,
+            files=None,
+        )
+        no_translation_error = (u"Please create the German page translation "
+                                u"before editing it's advanced settings.")
+        self.assertFalse(form.is_valid())
+        self.assertIn('__all__', form.errors)
+        self.assertEqual(1, len(form.errors['__all__']))
+        # Make sure we get the correct error when the given language
+        # is not an existing page translation.
+        self.assertEqual([no_translation_error],
+                         form.errors['__all__'])
+
+        de_translation = create_title('de', title='Page 1', page=page)
+        de_translation.slug = ''
+        de_translation.save()
+
+        # First make sure the title has no slug
+        self.assertEqual(de_translation.slug, '')
+
+        form = AdvancedSettingsForm(
+            data=page_data,
+            instance=page,
+            files=None,
+        )
+        no_translation_error = (u"Please set the German slug before "
+                                u"editing it's advanced settings.")
+        self.assertFalse(form.is_valid())
+        self.assertIn('__all__', form.errors)
+        self.assertEqual(1, len(form.errors['__all__']))
+        # Make sure we get the correct error when the given language
+        # is not an existing page translation.
+        self.assertEqual([no_translation_error],
+                         form.errors['__all__'])
+
     def test_page_urls(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
