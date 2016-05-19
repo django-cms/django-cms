@@ -347,9 +347,12 @@ var CMS = window.CMS || {};
                             CMS.API.Helpers.reloadBrowser(url);
                             that.hideLoader();
                         },
-                        error: function (request) {
+                        error: function (jqXHR) {
                             that.hideLoader();
-                            throw new Error(request);
+                            CMS.API.Messages.open({
+                                message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 });
