@@ -20,7 +20,7 @@ from cms.models import (CMSPlugin, Page, PagePermission, PageUser, ACCESS_PAGE, 
                         Placeholder, EmptyTitle, GlobalPagePermission)
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_list, get_language_tuple
+from cms.utils.i18n import get_language_list, get_language_object, get_language_tuple
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import is_valid_url
@@ -114,22 +114,27 @@ class PageForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = self.cleaned_data
-        slug = cleaned_data.get('slug', '')
 
-        page = self.instance
-        lang = cleaned_data.get('language', None)
-        # No language, can not go further, but validation failed already
-        if not lang:
+        if self._errors:
+            # Form already has errors, best to let those be
+            # addressed first.
             return cleaned_data
+
+        slug = cleaned_data['slug']
+        lang = cleaned_data['language']
         parent = cleaned_data.get('parent', None)
         site = self.cleaned_data.get('site', Site.objects.get_current())
+
+        page = self.instance
+
         if parent and parent.site != site:
             raise ValidationError("Site doesn't match the parent's page site")
 
         if site and not is_valid_page_slug(page, parent, lang, slug, site):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
-        if self.instance and page.title_set.count():
+
+        if page and page.title_set.count():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
@@ -154,6 +159,7 @@ class PageForm(forms.ModelForm):
 
     def clean_slug(self):
         slug = slugify(self.cleaned_data['slug'])
+
         if not slug:
             raise ValidationError(_("Slug must not be empty."))
         return slug
@@ -294,6 +300,36 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(AdvancedSettingsForm, self).clean()
+        language = cleaned_data.get('language')
+
+        if not language:
+            # Fail fast if no language is provided
+            return cleaned_data
+
+        # Language has been validated already
+        # so we know it exists.
+        language_name = get_language_object(
+            language,
+            site_id=cleaned_data['site'].pk
+        )['name']
+
+        try:
+            title = self.instance.title_set.get(language=language)
+        except Title.DoesNotExist:
+            # This covers all cases where users try to edit
+            # page advanced settings without creating the page title.
+            message = _("Please create the %(language)s page "
+                        "translation before editing it's advanced settings.")
+            raise ValidationError(message % {'language': language_name})
+
+        if not title.slug:
+            # This covers all cases where users try to edit
+            # page advanced settings without setting a title slug
+            # for page titles that already exist.
+            message = _("Please set the %(language)s slug "
+                        "before editing it's advanced settings.")
+            raise ValidationError(message % {'language': language_name})
+
         if 'reverse_id' in self.fields:
             id = cleaned_data['reverse_id']
             site_id = cleaned_data['site']

@@ -350,6 +350,20 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def advanced(self, request, object_id):
         page = get_object_or_404(self.model, pk=object_id)
+        # always returns a valid language
+        language = get_language_from_request(request, current_page=page)
+        language_obj = get_language_object(language, site_id=page.site_id)
+
+        if not page.title_set.filter(language=language):
+            # Can't edit advanced settings for a page translation (title)
+            # that does not exist.
+            message = _("Please create the %(language)s page "
+                        "translation before editing it's advanced settings.")
+            message = message % {'language': language_obj['name']}
+            self.message_user(request, message, level=messages.ERROR)
+            path = admin_reverse('cms_page_change', args=(quote(object_id),))
+            return HttpResponseRedirect("%s?language=%s" % (path, language))
+
         if not page.has_advanced_settings_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
@@ -463,15 +477,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
 
-    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
-        # add context variables
+    def get_filled_languages(self, obj):
         filled_languages = []
+
         if obj:
             filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
         allowed_languages = [lang[0] for lang in self._get_site_languages(obj)]
-        context.update({
-            'filled_languages': [lang for lang in filled_languages if lang in allowed_languages],
-        })
+        return [lang for lang in filled_languages if lang in allowed_languages]
+
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        context['filled_languages'] = self.get_filled_languages(obj)
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
     def _get_site_languages(self, obj=None):
