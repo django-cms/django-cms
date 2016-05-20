@@ -4,7 +4,7 @@
 {% for module in module_list %}
     <div class="cms-submenu-item cms-submenu-item-title"><span>{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Available plugins" %}{% endif %}</span></div>
     {% for p in module.list %}
-        {% if p.value != 'AliasPlugin' %}
+        {% if p.value != 'AliasPlugin' and p.value != 'PlaceholderPlugin' %}
             <div class="cms-submenu-item"><a data-rel="add" href="{{ p.value }}">{{ p.name }}</a></div>
         {% endif %}
     {% endfor %}
