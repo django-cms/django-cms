@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ali Alamshahi <Alamshahi@yahoo.com>, 2015
+# ali alamshahi <Alamshahi@yahoo.com>, 2015
 # Alireza Savand <alireza.savand@gmail.com>, 2012
 # Aryan Baghi <aryan@baghi.id.ir>, 2014
 # Aryan Baghi <aryan@baghi.id.ir>, 2014

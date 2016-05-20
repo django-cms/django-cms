@@ -17,52 +17,59 @@ What's new in 3.3
 *****************
 
 * Removed support for Django 1.6, 1.7 and python 2.6
-* Set the default value of CMSPlugin.position to 0 instead of null
-* Refactor language menu to allow for better integration with many languages
-* Management commands has been completely refactored for better consistency
-* Fix "failed to load resource" for favicon on welcome screen
-* ``cms-toolbar-expanded`` class is only added now when toolbar is fully
-  expanded and not at the beginning of the animation. ``cms-toolbar-expanding``
-  and ``cms-toolbar-collapsing`` classes are added at the beginning of their
-  respective animations.
+* Changed the default value of CMSPlugin.position to 0 instead of null
+* Refactored the language menu to allow for better integration with many languages
+* Refactored management commands completely for better consistency
+* Fixed "failed to load resource" for favicon on welcome screen
+* Changed behaviour of toolbar CSS classes: ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding`` and ``cms-toolbar-collapsing`` classes
+  are added at the beginning of their respective animations.
 * Added unit tests for CMS JavaScript files
 * Added frontend integration tests (written with Casper JS)
 * Removed frontend integration tests (written with Selenium)
-* Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
+* Added the ability to declare cache expiration periods on a per-plugin basis
+* Improved UI of page tree
+* Improved UI in various minor ways
+* Added a new setting CMS_INTERNAL_IPS for defining a set of IP addresses for which
   the toolbar will appear for authorized users. If left unset, retains the
   existing behavior of allowing toolbar for authorized users at any IP address.
-* Side-frame is no longer resizable, opens to 90% of the screen or 100% on
+* Changed behaviour of sideframe; is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
-* Removed some unnecessary reloads happening after closing sideframe.
-* CMS handles uninstalled apphooks better
-* Minor UI improvements
-* Changed pagetree UI
+* Removed some unnecessary reloads after closing sideframe.
 * Added the ability to make pagetree actions work on currently picked language
 * Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
-* Introduce the method ``get_cache_expiration`` on CMSPluginBase to be used
+* Introduced the method ``get_cache_expiration`` on CMSPluginBase to be used
   by plugins for declaring their rendered content's period of validity.
-* Introduce the method ``get_vary_cache_on`` on CMSPluginBase to be used by
-  plugins for declaring ``VARY`` headers.
-* Improve the placeholder cache substantially.
+* Introduced the method ``get_vary_cache_on`` on CMSPluginBase to be used
+  by plugins for declaring ``VARY`` headers.
+* Improved performance of plugin moving; no longer saves all plugins inside the placeholder.
 * Fixed breadcrumbs of recently moved plugin reflecting previous position in
   the tree
-* Refactored plugin adding logic to no longer create the plugin
-  before the user submits the form.
-* The fix-tree command now sorts by position and path when rebuilding positions.
-* Speed up plugin moving to no longer save all plugins inside the placeholder.
-* Fixed several regressions and tree corrptions on page moving.
+* Refactored plugin adding logic to no longer create the plugin before the user submits the form.
+* Improved the behaviour of the placeholder cache
+* Improved fix-tree command to sort by position and path when rebuilding positions.
+* Fixed several regressions and tree corruptions on page move.
 * Added new class method on CMSPlugin ``requires_parent_plugin``
-* ``get_child_classes`` now will correctly calculate child classes when not
+* Fixed behaviour of ``get_child_classes``; now correctly calculates child classes when not
   configured in the placeholder.
 * Removed internal ``ExtraMenuItems`` tag.
 * Removed internal ``PluginChildClasses`` tag.
-* Modified RenderPlugin tag to no longer render the ``content.html`` template
-  and instead just return the results.
-* ``Toolbar()`` main class now has a ``get_cached_template`` method that's
-  used to reuse loaded templates per request. It works like Django's cached
-  template loader but on a request basis.
-* Use a method to get CMSApp.urls, to allow passing a page object to it.
-
+* Modified RenderPlugin tag; no longer renders the ``content.html`` template
+  and instead just returns the results.
+* Added a ``get_cached_template`` method to the ``Toolbar()`` main class to reuse loaded templates per request. It
+  works like Django's cached template loader, but on a request basis.
+* Added a new method ``get_urls()`` on the appbase class to get CMSApp.urls, to allow passing a page object to it.
+* Changed JavaScript linting from JSHint and JSCS to ESLint
+* Fixed a bug when it was possible to drag plugin into clipboard
+* Fixed a bug where clearing clipboard was closing any open modal
+* Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
+* Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+* Deprecated the old-style wizard-related settings
+* Improved documentation further
+* Improved handling of uninstalled apphooks
+* Fixed toolbar placement when foundation is installed
+* Fixed an issue which could lead to an apphook without a slug
+* Fixed numerous frontend issues
 
 .. _backward_incompatible_3.3:
 
@@ -79,6 +86,33 @@ Then run::
 
     python manage.py migrate
     python manage.py cms fix-tree
+
+
+Deprecation of Old-Style Page Wizard Settings
+=============================================
+
+In this release, we introduce a new naming scheme for the Page Wizard settings
+that better reflects that they effect the CMS's Page Wizards, rather than all
+wizards. This will also allow future settings for different wizards with a
+smaller chance of confusion or naming-collision.
+
+This release simultaneously deprecates the old naming scheme for these settings.
+Support for the old naming scheme will be dropped in version 3.5.0.
+
+Action Required
+---------------
+
+Developers using any of the following settings in their projects should rename
+them as follows at their earliest convenience. ::
+
+    CMS_WIZARD_DEFAULT_TEMPLATE => CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+    CMS_WIZARD_CONTENT_PLUGIN => CMS_PAGE_WIZARD_CONTENT_PLUGIN
+    CMS_WIZARD_CONTENT_PLUGIN_BODY => CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+    CMS_WIZARD_CONTENT_PLACEHOLDER => CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+
+The CMS will accept both-schemes until 3.5.0 when support for the old scheme
+will be dropped. During this transition period, the CMS prefers the new-style
+naming if both schemes are used in a project's settings.
 
 
 *****************************
