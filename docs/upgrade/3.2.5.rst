@@ -60,9 +60,6 @@ DjangoCMS Text CKEditor
 
 Action required
 ---------------
-<<<<<<< HEAD
 
-=======
->>>>>>> ec83de9... Clean-up 3.2.5 release
 CMS 3.2.1 is not compatible with djangocms-text-ckeditor < 2.8.1.
 If you're using djangocms-text-ckeditor, please upgrade to 2.8.1 or later.
