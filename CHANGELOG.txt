@@ -1,3 +1,13 @@
+=== 3.3.0.rc2 (2016-05-19) ===
+
+* Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
+* Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+* Deprecated the old-style wizard-related settings
+* Fixed an issue which could lead to an apphook without a slug
+* Fixed numerous frontend issues
+* Improved documentation further
+
+
 === 3.3.0.rc1 (2016-05-16) ===
 
 * Removed support for Django 1.6, 1.7 and python 2.6
@@ -22,9 +32,9 @@
 * Removed some unnecessary reloads after closing sideframe.
 * Added the ability to make pagetree actions work on currently picked language
 * Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
-* Introduced the method `get_cache_expiration` on CMSPluginBase to be used
+* Introduced the method ``get_cache_expiration`` on CMSPluginBase to be used
   by plugins for declaring their rendered content's period of validity.
-* Introduced the method `get_vary_cache_on` on CMSPluginBase to be used
+* Introduced the method ``get_vary_cache_on`` on CMSPluginBase to be used
   by plugins for declaring ``VARY`` headers.
 * Improved performance of plugin moving; no longer saves all plugins inside the placeholder.
 * Fixed breadcrumbs of recently moved plugin reflecting previous position in
@@ -46,13 +56,6 @@
 * Changed JavaScript linting from JSHint and JSCS to ESLint
 * Fixed a bug when it was possible to drag plugin into clipboard
 * Fixed a bug where clearing clipboard was closing any open modal
-
-
-=== 3.2.6 (unreleased) ===
-
-- Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
-- Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
-- Deprecated the old-style wizard-related settings
 
 
 === 3.2.5 (2016-04-27) ===
