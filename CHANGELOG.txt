@@ -46,22 +46,34 @@
 * Changed JavaScript linting from JSHint and JSCS to ESLint
 * Fixed a bug when it was possible to drag plugin into clipboard
 * Fixed a bug where clearing clipboard was closing any open modal
-
-
-=== 3.2.6 (unreleased) ===
-
-- Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
-- Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
-- Deprecated the old-style wizard-related settings
+* Adds CMS_WIZARD_CONTENT_PLACEHOLDER setting
+* Renames the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+* Deprecates the old-style wizard-related settings
+* CMS handles uninstalled apphooks better
+* Fix toolbar placement when foundation is installed
 
 
 === 3.2.5 (2016-04-27) ===
 
 - Fixed regression when page couldn't be copied if CMS_PERMISSION was False
 - Improved handling of uninstalled apphooks
+- Fix packaging problem with the wheel distribution
 
 
-=== 3.2.4 (unreleased) ===
+=== 3.2.4 (2016-04-26) ===
+
+- Fix cache settings
+- Fix user lookup for view restrictions/page permissions when using raw id field
+- Fixed regression when page couldn't be copied if CMS_PERMISSION was False
+- Fixes an issue relating to uninstalling a namespaced application
+- Adds "Can change page" permission
+- Fixes a number of page-tree issues the could lead data corruption under
+  certain conditions
+- Addresses security vulnerabilities in the `render_model` template tag that
+  could lead to escalation of privileges or other security issues.
+- Addresses a security vulnerability in the cms' usage of the messages framework
+- Fixes security vulnerabilities in custom FormFields that could lead to
+  escalation of privileges or other security issues.
 
 
 === 3.2.3 (2016-03-09) ===
@@ -288,6 +300,8 @@
 
 === 3.0.17 (unreleased) ===
 
+- Addresses security vulnerabilities in the `render_model` template tag that could
+  lead to escalation of privileges or other security issues.
 - Fix ExtensionToolbar when language is removed but titles still exists…
 - Fix PageSelectWidget JS syntax
 - Fix cache settings

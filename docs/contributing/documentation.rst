@@ -30,9 +30,9 @@ Except for the tiniest of change, we recommend that you test them before
 submitting.
 
 
-##########################
+**************************
 Building the documentation
-##########################
+**************************
 
 Follow the same steps above to fork and clone the project locally. Next, ``cd`` into the
 ``django-cms/docs`` and install the requirements::

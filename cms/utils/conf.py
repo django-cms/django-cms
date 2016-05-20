@@ -62,6 +62,7 @@ DEFAULTS = {
     'TOOLBAR_URL__BUILD': 'build',
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
+    'APP_NAME': None,
     'TOOLBAR_HIDE': False,
     'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',

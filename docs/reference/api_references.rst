@@ -566,7 +566,7 @@ cms.toolbar.toolbar
 
     .. attribute:: watch_models
 
-        A list of model this toolbar works on; used for redirection after editing
+        A list of models this toolbar works on; used for redirection after editing
         (:ref:`url_changes`).
 
     .. method:: add_item(item, position=None)

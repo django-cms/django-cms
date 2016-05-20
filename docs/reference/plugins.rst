@@ -266,10 +266,10 @@ Although it is optional, authors of "text enabled" plugins should consider
 overriding this function as well.
 
 This function accepts the ``instance`` as a parameter and returns a string to be
-used as the alt text for the plugin's icon which will appear as a tooltip in
+used as the ``alt`` text for the plugin's icon which will appear as a tooltip in
 most browsers.  This is useful, because if the same plugin is used multiple
 times within the same text plugin, they will typically all render with the
-same icon rendering them visually identical to one another. This alt text and
+same icon rendering them visually identical to one another. This ``alt`` text and
 related tooltip will help the operator distinguish one from the others.
 
 By default :meth:`icon_alt` will return a string of the form: "[plugin type] -

@@ -10,8 +10,9 @@
 #
 # Please keep the two sections below separate.
 
-#### entries that need to be checked for various different reasons ####
-
+#### entries that need to be checked for various different reasons        ####
+#### for example because different operating systems' dictionaries differ ####
+alt
 api
 dev
 fallback
@@ -23,6 +24,7 @@ rc
 regexps
 src
 url
+vs
 
 #### accepted entries ####
 
@@ -187,6 +189,7 @@ structureboard
 stylesheets
 Sylvain
 templating
+templatetags
 timgraham
 Todo
 tomwardill
