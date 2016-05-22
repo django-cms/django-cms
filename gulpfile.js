@@ -18,6 +18,7 @@ var eslint = require('gulp-eslint');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var KarmaServer = require('karma').Server;
+var path = require('path');
 var integrationTests = require('./cms/tests/frontend/integration/helpers/gulp');
 
 var argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
@@ -244,7 +245,9 @@ gulp.task('tests:integration', integrationTests({
     argv: argv,
     dbPath: 'testdb.sqlite',
     serverCommand: 'testserver.py',
-    logger: gutil.log.bind(gutil)
+    logger: gutil.log.bind(gutil),
+    pathToPhantom: path.join(__dirname, 'node_modules/.bin/phantomjs'),
+    pathToCasper: path.join(__dirname, 'node_modules/.bin/casperjs')
 }));
 
 Object.keys(JS_BUNDLES).forEach(function (bundleName) {

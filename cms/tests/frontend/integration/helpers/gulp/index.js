@@ -11,6 +11,8 @@ module.exports = function (options) {
     var INTEGRATION_TESTS = options.tests;
     var argv = options.argv || {};
     var logger = options.logger;
+    var pathToPhantom = options.pathToPhantom || path.join(__dirname, '..', 'node_modules/.bin/phantomjs');
+    var pathToCasper = options.pathToCasper || path.join(__dirname, '..', 'node_modules/.bin/casperjs');
 
     var integrationTests = {
         /**
@@ -160,7 +162,7 @@ module.exports = function (options) {
         runTests: function (tests) {
             return new Promise(function (resolve) {
                 var casperChild = spawn(
-                    path.join(__dirname, '..', 'node_modules/.bin/casperjs'),
+                    pathToCasper,
                     ['test', '--web-security=no'].concat(tests)
                 );
 
@@ -211,7 +213,7 @@ module.exports = function (options) {
     };
 
     return function (done) {
-        process.env.PHANTOMJS_EXECUTABLE = path.join(__dirname, '..', 'node_modules/.bin/phantomjs');
+        process.env.PHANTOMJS_EXECUTABLE = pathToPhantom;
 
         integrationTests
             .prepareFiles()

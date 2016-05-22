@@ -1,3 +1,5 @@
+'use strict';
+
 var settings = require('./../helpers/cms').settings;
 
 module.exports = settings;

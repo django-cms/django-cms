@@ -1,6 +1,6 @@
 {
   "name": "djangocms-casper-helpers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Helpers for writing CasperJS integration tests",
   "main": "cms.js",
   "scripts": {
