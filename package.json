@@ -3,9 +3,8 @@
   "private": true,
   "devDependencies": {
     "autoprefixer": "^6.3.6",
-    "bluebird": "^3.3.4",
     "browserslist-saucelabs": "^0.2.3",
-    "casperjs": "^1.1.0-beta5",
+    "djangocms-casper-helpers": "^1.0.4",
     "gulp": "3.9.0",
     "gulp-clean-css": "^2.0.6",
     "gulp-concat": "^2.6.0",
@@ -28,10 +27,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-phantomjs-shim": "^1.1.2",
     "karma-sauce-launcher": "^0.3.0",
-    "lodash": "^4.8.2",
     "minimist": "1.1.1",
-    "phantomjs-prebuilt": "^2.1.7",
-    "shelljs": "^0.6.0",
-    "terminate": "^1.0.8"
+    "phantomjs-prebuilt": "^2.1.7"
   }
 }

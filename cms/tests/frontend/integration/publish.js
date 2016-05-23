@@ -4,8 +4,9 @@
 // #############################################################################
 // Publishing a page with a publish date
 
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 var SECOND_PAGE_TITLE = 'Second'; // we rely on slug being "/second"
 

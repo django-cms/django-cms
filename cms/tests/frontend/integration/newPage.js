@@ -3,9 +3,11 @@
 // #############################################################################
 // Users managed via the admin panel
 
-var globals = require('./settings/globals');
-var randomString = require('./helpers/randomString').randomString;
-var cms = require('./helpers/cms')();
+
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var randomString = helpers.randomString;
+var cms = helpers();
 
 var newPageTitle = randomString({ length: 50, withWhitespaces: false });
 

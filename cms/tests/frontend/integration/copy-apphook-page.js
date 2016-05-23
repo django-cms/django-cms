@@ -3,9 +3,10 @@
 // #############################################################################
 // add a test for creating apphook and trying to copy a page with an apphook
 
-var globals = require('./settings/globals');
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers(casperjs);
 
 casper.test.setUp(function (done) {
     casper.start()
