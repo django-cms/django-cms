@@ -294,6 +294,10 @@ class CreateCMSPageForm(BaseCMSPageForm):
                         }
                         add_plugin(**opts)
 
+        # is it home? publish it right away
+        if not self.page and page.is_home:
+            page.publish(self.language_code)
+
         if is_installed('reversion'):
             from cms.utils.helpers import make_revision_with_plugins
             from cms.constants import REVISION_INITIAL_COMMENT

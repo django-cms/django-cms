@@ -186,6 +186,27 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
 
+    def test_wizard_first_page_published(self):
+        superuser = self.get_superuser()
+        data = {
+            'title': 'page 1',
+            'slug': 'page_1',
+            'page_type': None,
+        }
+        form = CreateCMSPageForm(data=data)
+        form.page = None
+        form.language_code = 'en'
+        form.user = superuser
+        self.assertTrue(form.is_valid())
+        page = form.save()
+
+        self.assertTrue(page.is_published('en'))
+
+        with self.login_user_context(superuser):
+            url = page.get_absolute_url('en')
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
     def test_wizard_content_placeholder_setting(self):
         """
         Tests that the PageWizard respects the
