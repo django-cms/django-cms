@@ -281,7 +281,10 @@ def check_plugin_instances(output):
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
-            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
+            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if "
+                                 "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
+                                 "the 'manage.py cms delete-orphaned-plugins' command. \nThis will alter your "
+                                 "database; read the documentation before using it.")
 
 
 @define_check
