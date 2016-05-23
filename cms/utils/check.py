@@ -170,11 +170,13 @@ def check_sekizai(output):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
-        processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+        processors = list(
+            chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         if 'sekizai.context_processors.sekizai' in processors:
             section.success("Sekizai template context processor is installed")
         else:
-            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
+            section.error("Sekizai template context processor is not installed, could not find "
+                          "'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
 
         if not sekizai_installed:
             # sekizai is not installed.
@@ -203,21 +205,26 @@ def check_i18n(output):
         else:
             section.warn("Old style (tuple based) CMS_LANGUAGES, please switch to the new (dictionary based) style")
         if getattr(settings, 'LANGUAGE_CODE', '').find('_') > -1:
-            section.warn("LANGUAGE_CODE must contain a valid language code, not a locale (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % getattr(settings, 'LANGUAGE_CODE', ''))
+            section.warn("LANGUAGE_CODE must contain a valid language code, not a locale (e.g.: 'en-us' instead of "
+                         "'en_US'): '%s' provided" % getattr(settings, 'LANGUAGE_CODE', ''))
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
-                section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
+                section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of "
+                             "'en_US'): '%s' provided" % lang[0])
         if settings.SITE_ID == hash(settings.SITE_ID):
             for site, items in get_cms_setting('LANGUAGES').items():
                 if type(site) == int:
                     for lang in items:
                         if lang['code'].find('_') > -1:
-                            section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
+                            section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: "
+                                         "'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
         else:
             section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
-        for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
+        for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES',
+                           'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
-                section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+                section.warn("Deprecated setting %s found. This setting is now handled in the new style "
+                             "CMS_LANGUAGES and can be removed" % deprecated)
 
 
 @define_check
@@ -242,7 +249,8 @@ def check_middlewares(output):
 @define_check
 def check_context_processors(output):
     with output.section("Context processors") as section:
-        processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+        processors = list(
+            chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         required_processors = (
             'cms.context_processors.cms_settings',
         )
@@ -256,7 +264,8 @@ def check_deprecated_settings(output):
         found = False
         for deprecated in ['CMS_FLAT_URLS', 'CMS_MODERATOR']:
             if hasattr(settings, deprecated):
-                section.warn("Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
+                section.warn(
+                    "Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
                 found = True
         if not found:
             section.skip("No deprecated settings found")
@@ -276,12 +285,16 @@ def check_plugin_instances(output):
                 section.error("%s has instances but is no longer installed" % plugin_type["type"] )
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
+                section.error(
+                    "%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
-            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
+            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if "
+                                 "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
+                                 "the 'manage.py cms delete-orphaned-plugins' command. \nThis will alter your "
+                                 "database; read the documentation before using it.")
 
 
 @define_check
@@ -326,12 +339,14 @@ def check_copy_relations(output):
                 continue
             for rel in extension._meta.many_to_many:
                 if DJANGO_1_8:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                    section.warn('%s has a many-to-many relation to %s,\n    '
+                                 'but no "copy_relations" method defined.' % (
                         c_to_s(extension),
                         c_to_s(rel.related.model),
                     ))
                 else:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                    section.warn('%s has a many-to-many relation to %s,\n    '
+                                 'but no "copy_relations" method defined.' % (
                         c_to_s(extension),
                         c_to_s(rel.remote_field.model),
                     ))
@@ -345,7 +360,10 @@ def check_copy_relations(output):
         if not section.warnings:
             section.finish_success('All plugins and page/title extensions have "copy_relations" method if needed.')
         else:
-            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins/extensions.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations or https://django-cms.readthedocs.org/en/latest/extending_cms/extending_page_title.html#handling-relations.')
+            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\n'
+                                   'This might lead to data loss when publishing or copying plugins/extensions.\n'
+                                   'See https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
+                                   'https://django-cms.readthedocs.org/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
 
 
 def _load_all_templates(directory):
@@ -417,7 +435,8 @@ def check(output):
         if output.errors:
             output.write_stderr_line(output.colorize('Please check the errors above', opts=['bold'], fg='red'))
         elif output.warnings:
-            output.write_stderr_line(output.colorize('Installation okay, but please check warnings above', opts=['bold'], fg='yellow'))
+            output.write_stderr_line(output.colorize('Installation okay, but please check warnings above',
+                                                     opts=['bold'], fg='yellow'))
         else:
             output.write_line(output.colorize('Installation okay', opts=['bold'], fg='green'))
     return output.successful
