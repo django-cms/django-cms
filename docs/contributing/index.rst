@@ -71,11 +71,16 @@ Security issues
         or in any other public forum until we have had a chance to deal with it.
 
 
-*************************
-Release schedule & policy
-*************************
+.. _development_policies:
 
-The roadmap <https://github.com/divio/django-cms/wiki/Roadmap>`_ can be found on our GitHub wiki
+********************
+Development policies
+********************
+
+Release schedule & policy
+=========================
+
+The `roadmap <https://github.com/divio/django-cms/wiki/Roadmap>`_ can be found on our GitHub wiki
 page.
 
 We are planning releases according to **key principles and aims**. Issues within milestones are
@@ -89,18 +94,131 @@ versions are maintained through the community. Divio provides long term support 
 `commercial support <http://divio.ch/en/commercial-support/>`_.
 
 
-*************
+.. _branch_policy:
+
 Branch policy
-*************
+=============
 
-* **master**: this is the current stable release, the version released on PyPI.
-* **support/3.2.x**: this will be our *next stable release*; this is the most
-  appropriate branch for fixes and patches that will go into the next **master**
-* **develop**: this will be *django CMS 3.3*; this is the most appropriate
-  branch for more substantial features that will need team co-ordination
+.. versionchanged:: 3.3
 
-If in doubt, ask on the #django-cms IRC channel on `freenode`_ or the
+We maintain a number of branches on `our GitHub repository <https://github.com/divio/django-cms>`_.
+
+the latest (highest-numbered) ``release/x.y.z``
+    This is the branch that will become the next release on PyPI.
+
+    **Fixes and backwards-compatible improvements** (i.e. most pull requests) will be made against
+    this branch.
+
+``develop``
+    This is the branch that will become the next release that increments the ``x`` or ``y`` of the latest
+    ``release/x.y.z``.
+
+    This branch is for **new features and backwards-incompatible changes**. By their nature, these will require more
+    substantial team co-ordination.
+
+Older ``release/x.y.z`` branches
+     These represent the final point of development (the highest ``y`` of older versions). Releases in the full set of
+     older versions have been tagged (use Git Tags to retrieve them).
+
+     These branches will only rarely be patched, with security fixes representing the main reason for a patch.
+
+Commits in ``release/x.y.z`` will be merged forward into ``develop`` periodically by the core developers.
+
+If in doubt about which branch to work from, ask on the #django-cms IRC channel on `freenode`_ or the
 `django-cms-developers`_ email list!
+
+
+.. _commit_policy:
+
+Commit policy
+=============
+
+.. versionadded:: 3.3
+
+Commit messages
+---------------
+
+Commit messages and their subject lines should be written in the past tense, not present tense, for example:
+
+    Updated contribution policies.
+
+    * Updated branch policy to clarify purpose of develop/release branches
+    * Added commit policy.
+    * Added changelog policy.
+
+Keep lines short, and within 72 characters as far as possible.
+
+
+Squashing commits
+-----------------
+
+In order to make our Git history more useful, and to make life easier for the core developers, please rebase and
+squash your commit history into a single commit representing a single coherent piece of work.
+
+For example, we don't really need or want a commit history, for what ought to be a single commit, that looks like
+(newest last)::
+
+    2dceb83 Updated contribution policies.
+    ffe5f2c Fixed spelling mistake in contribution policies.
+    29168da Fixed typo.
+    85d925c Updated commit policy based on feedback.
+
+The bottom three commits are just noise. They don't represent development of the code base. The four commits
+should be squashed into a single, meaningful, commit::
+
+    85d925c Updated commit policy based on feedback.
+
+
+How to squash commits
+^^^^^^^^^^^^^^^^^^^^^
+
+In this example above, you'd use ``git rebase -i HEAD~4`` (the ``4`` refers to the number of commits being squashed -
+adjust it as required).
+
+This will open a ``git-rebase-todo`` file (showing commits with the newest last)::
+
+    pick 2dceb83 Updated contribution policies.
+    pick ffe5f2c Fixed spelling mistake in contribution policies.
+    pick 29168da Fixed typo.
+    pick 85d925c Updated commit policy based on feedback.
+
+"Fixup" the last three commits, using ``f`` so that they are squashed into the first, and their commit messages
+discarded::
+
+    pick 2dceb83 Updated contribution policies.
+    f ffe5f2c Fixed spelling mistake in contribution policies.
+    f 29168da Fixed typo.
+    f 85d925c Updated commit policy based on feedback.
+
+Save - and this will leave you with a single commit containing all of the changes::
+
+    85d925c Updated commit policy based on feedback.
+
+Ask for help if you run into trouble!
+
+
+.. _changelog_policy:
+
+Changelog policy
+================
+
+.. versionadded:: 3.3
+
+**Every new feature, bugfix or other change of substance** must be represented in the `CHANGELOG
+<https://github.com/divio/django-cms/blob/develop/CHANGELOG.txt>`_. This includes documentation, but **doesn't** extend
+to things like reformatting code, tidying-up, correcting typos and so on.
+
+Each line in the changelog should begin with a verb in the past tense, for example::
+
+    * Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
+    * Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+    * Deprecated the old-style wizard-related settings
+    * Improved handling of uninstalled apphooks
+    * Fixed an issue which could lead to an apphook without a slug
+    * Updated contribution policies documentation
+
+New lines should be added to the top of the list.
+
 
 .. _security@django-cms.org: mailto:security@django-cms.org
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers

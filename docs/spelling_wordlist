@@ -52,6 +52,7 @@ boilerplates
 cacheable
 callables
 changelist
+Changelog
 checkboxes
 clickable
 Clickjacking
@@ -85,6 +86,7 @@ fieldset
 filenames
 fillable
 Firefox
+Fixup
 formset
 Foulis
 framebuffer
@@ -161,6 +163,7 @@ prized
 Procida
 programmatically
 queryset
+rebase
 recurses
 refactor
 runserver
