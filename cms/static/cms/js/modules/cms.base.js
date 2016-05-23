@@ -574,12 +574,12 @@ var CMS = {
         },
 
         /**
-        * Allows scrolling with touch in an element.
-        *
-        * @method allowTouchScrolling
-        * @param {jQuery} element element where we are allowing the scroll again
-        * @param {String} namespace so we don't accidentally remove events from a different handler
-        */
+         * Allows scrolling with touch in an element.
+         *
+         * @method allowTouchScrolling
+         * @param {jQuery} element element where we are allowing the scroll again
+         * @param {String} namespace so we don't accidentally remove events from a different handler
+         */
         allowTouchScrolling: function allowTouchScrolling(element, namespace) {
             element.off('touchmove.cms.preventscroll.' + namespace);
         },
