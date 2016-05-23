@@ -11,7 +11,7 @@ module.exports = function (options) {
     var INTEGRATION_TESTS = options.tests;
     var argv = options.argv || {};
     var logger = options.logger;
-    var pathToPhantom = options.pathToPhantom || path.join(__dirname, '..', 'node_modules/.bin/phantomjs');
+    var pathToPhantom = options.pathToPhantom || require('phantomjs-prebuilt').path;
     var pathToCasper = options.pathToCasper || path.join(__dirname, '..', 'node_modules/.bin/casperjs');
 
     var integrationTests = {
