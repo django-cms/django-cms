@@ -120,6 +120,14 @@ If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC
 Frontend
 ********
 
+..  important::
+
+    When we refer to the *frontend* here, we **only** mean the frontend of django CMS's admin/editor interface.
+
+    The frontend of a django CMS website, as seen by its visitors (i.e. the published site), is *wholly independent of
+    this*. django CMS places almost no restrictions at all on the frontend - if a site can be described in
+    HTML/CSS/JavaScript, it can be developed in django CMS.
+
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
@@ -132,7 +140,7 @@ django CMS you need to have the following dependencies installed:
 Styles
 ======
 
-We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
+We use `Sass <http://sass-lang.com/>`_ for our styles. The files
 are located within ``cms/static/cms/sass`` and can be compiled using the
 `libsass <http://libsass.org/>`_ implementation of Sass compiler through
 `Gulp <http://gulpjs.com/>`_.

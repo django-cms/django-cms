@@ -68,10 +68,7 @@ The basic workflow for a code contribution will typically run as follows:
 Target branches
 ===============
 
-The django CMS project will always have at least two active branches:
-
-* ``support/version.x`` which you should target if you're submitting a bug-fix for ``version.x``
-* ``develop`` for new features and bug-fixes for the next release
+See :ref:`branch_policy` for information about branch policy.
 
 
 *******************
@@ -222,6 +219,9 @@ Acceptance criteria
 Matching these criteria from the very beginning will help the core developers to be able
 to review your submission more quickly and efficiently and will increase the chances of making a
 successful pull request.
+
+Please see our :ref:`development_policies` for guidance on which branches to use, how to prepare pull requests and so
+on.
 
 Features
 --------

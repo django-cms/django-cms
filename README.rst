@@ -15,50 +15,40 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the django framework.
+Open source enterprise content management system based on the Django framework.
 
 .. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
    :target: http://demo.django-cms.org/
    :alt: Try demo with Aldryn Cloud
 
-.. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
-   It's the branch for features that will go into the next django CMS feature release.
+.. ATTENTION::
 
-   For fixes for 3.1.x releases, please work on **support/3.1.x** which contains
-   the next patch release for 3.1.x series.
+    To propose **significant new features**, open pull requests based on and made against the **develop** branch. It's
+    the branch for features that will go into the next django CMS feature release.
 
-   For fixes for 3.0.x releases, please work on **support/3.0.x** which contains
-   the next patch release for 3.0.x series.
+    To propose **fixes and backwards-compatible improvements**, please work on the latest **release** branch. This is
+    the branch that will become the next PyPI release ("the next version of django CMS").
 
-   The **master** branch is the current stable release, the one released on PyPI.
-   Changes based on **master** will not be accepted.
+    Security fixes will be backported to older branches by the core team as appropriate.
 
 
 ********
 Features
 ********
 
-* Hierarchical pages
-* Extensive support for multilingual websites
-* Multi site support
-* Draft/Published workflows
-* Undo/Redo
-* Use the content blocks (placeholders) in your own apps (models)
-* Use the content blocks (static placeholders) anywhere in your templates
-* Edit content directly in the frontend on your pages
-* Hierarchical content plugins (columns, style changes etc)
-* Navigation rendering and extending from your apps
-* SEO friendly URLs
-* Highly integrative into your own apps
+* hierarchical pages
+* extensive built-in support for multilingual websites
+* multi-site support
+* draft/publish workflows
+* version control
+* a sophisticated publishing architecture, that's also usable in your own applications
+* frontend content editing
+* a hierarchical content structure for nested plugins
+* an extensible navigation system that your own applications can hook into
+* SEO-friendly URLs
+* designed to integrate thoroughly into other applications
 
-
-You can define editable areas, called placeholders, in your templates which you fill
-with many different so called CMS content plugins.
-A list of all the plugins can be found here:
-
-`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_
-
-Should you be unable to find a suitable plugin for you needs, writing your own is very simple.
+Developing applications that integrate with and take advantage of django CMS features is easy and well-documented.
 
 More information on `our website <http://www.django-cms.org>`_.
 

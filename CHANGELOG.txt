@@ -1,3 +1,8 @@
+=== 3.3.0.rc3 (2016-05-23) ===
+
+* Added contribution policies documentation
+
+
 === 3.3.0.rc2 (2016-05-19) ===
 
 * Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
