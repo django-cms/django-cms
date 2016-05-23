@@ -295,9 +295,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
                         add_plugin(**opts)
 
         # is it home? publish it right away
-        pages_in_site = Page.objects.filter(site_id=page.site_id)
-
-        if not self.page and pages_in_site.count() == 1:
+        if not self.page and page.is_home:
             page.publish(self.language_code)
 
         if is_installed('reversion'):
