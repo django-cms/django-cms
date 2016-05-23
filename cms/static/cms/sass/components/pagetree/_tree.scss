@@ -414,9 +414,9 @@
 }
 
 .cms-tree-col {
-    height: $pagetree-cell-inner-height;
+    float: right;
     min-width: $pagetree-cell-inner-height;
-    display: block;
+    height: $pagetree-cell-inner-height;
 }
 .cms-tree-col-padding-sm {
     margin-top: -3px;

@@ -15,32 +15,40 @@
     data-colview='
         <div class="cms-tree-col">
             <div class="cms-tree-item-wrapper">
-                <div class="cms-tree-item cms-tree-item-icons">
-                    <div class="cms-tree-item-inner">
-                        {% if page.is_home %}
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% trans 'home' %}{% endfilter %}">
-                                <span class="cms-icon cms-icon-home"></span>
-                            </div>
-                        {% endif %}
-                        {% if page.soft_root %}
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% trans 'softroot' %}{% endfilter %}">
-                                <a href="{% url 'admin:cms_page_advanced' page.id %}">
-                                    <span class="cms-icon cms-icon-sitemap"></span>
-                                </a>
-                            </div>
-                        {% endif %}
-                        {% if page.application_urls %}
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endfilter %}">
-                                <a href="{% url 'admin:cms_page_advanced' page.id %}">
-                                    <span class="cms-icon cms-icon-puzzle"></span>
-                                </a>
-                            </div>
-                        {% endif %}
+                {% if page.is_home %}
+                    <div class="cms-tree-item cms-tree-item-icons">
+                        <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% filter escapejs %}{% trans 'home' %}{% endfilter %}">
+                                    <span class="cms-icon cms-icon-home"></span>
+                                </div>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
+                {% if page.soft_root %}
+                    <div class="cms-tree-item cms-tree-item-icons">
+                        <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% filter escapejs %}{% trans 'softroot' %}{% endfilter %}">
+                                    <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                                        <span class="cms-icon cms-icon-sitemap"></span>
+                                    </a>
+                                </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if page.application_urls %}
+                    <div class="cms-tree-item cms-tree-item-icons">
+                        <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% filter escapejs %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endfilter %}">
+                                    <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                                        <span class="cms-icon cms-icon-puzzle"></span>
+                                    </a>
+                                </div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     '
