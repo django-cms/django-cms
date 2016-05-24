@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-19 21:59-0400\n"
+"POT-Creation-Date: 2016-05-23 20:44-0400\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -182,7 +182,7 @@ msgstr "Please select user or group first."
 #: admin/forms.py:550 admin/forms.py:557 admin/forms.py:561
 #: templates/admin/cms/page/change_form.html:11
 #: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:720
+#: templatetags/cms_tags.py:721
 msgid "Add"
 msgstr "Add"
 
@@ -194,8 +194,8 @@ msgstr "Change"
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/menu.html:207
-#: templates/admin/cms/page/tree/menu.html:209
+#: templates/admin/cms/page/tree/menu.html:215
+#: templates/admin/cms/page/tree/menu.html:217
 #: templates/cms/toolbar/dragitem.html:40
 msgid "Delete"
 msgstr "Delete"
@@ -279,8 +279,8 @@ msgid "Add Page Copy"
 msgstr "Add Page Copy"
 
 #: admin/pageadmin.py:430 cms_wizards.py:50
-#: templates/admin/cms/page/tree/menu.html:166
-#: templates/admin/cms/page/tree/menu.html:169
+#: templates/admin/cms/page/tree/menu.html:174
+#: templates/admin/cms/page/tree/menu.html:177
 msgid "New sub page"
 msgstr "New sub page"
 
@@ -605,8 +605,8 @@ msgstr "Disable toolbar"
 msgid "Users"
 msgstr "Users"
 
-#: cms_toolbars.py:219 tests/test_toolbar.py:856 tests/test_toolbar.py:871
-#: tests/test_toolbar.py:904
+#: cms_toolbars.py:219 tests/test_toolbar.py:857 tests/test_toolbar.py:872
+#: tests/test_toolbar.py:905
 #, python-format
 msgid "Logout %s"
 msgstr "Logout %s"
@@ -688,8 +688,8 @@ msgstr "Duplicate this Page"
 msgid "Edit this Page"
 msgstr "Edit this Page"
 
-#: cms_toolbars.py:529 templates/admin/cms/page/tree/menu.html:215
-#: templates/admin/cms/page/tree/menu.html:218
+#: cms_toolbars.py:529 templates/admin/cms/page/tree/menu.html:223
+#: templates/admin/cms/page/tree/menu.html:226
 msgid "Advanced settings"
 msgstr "Advanced settings"
 
@@ -878,12 +878,12 @@ msgid "changed by"
 msgstr "changed by"
 
 #: migrations/0001_initial.py:88 models/pagemodel.py:67
-#: templates/admin/cms/page/tree/menu.html:225
+#: templates/admin/cms/page/tree/menu.html:233
 msgid "publication date"
 msgstr "publication date"
 
 #: migrations/0001_initial.py:89 models/pagemodel.py:69
-#: templates/admin/cms/page/tree/menu.html:228
+#: templates/admin/cms/page/tree/menu.html:236
 msgid "publication end date"
 msgstr "publication end date"
 
@@ -904,7 +904,7 @@ msgid "attached menu"
 msgstr "attached menu"
 
 #: migrations/0001_initial.py:94 models/pagemodel.py:82
-#: templates/admin/cms/page/tree/menu.html:242
+#: templates/admin/cms/page/tree/menu.html:250
 msgid "template"
 msgstr "template"
 
@@ -925,7 +925,7 @@ msgid "application instance name"
 msgstr "application instance name"
 
 #: migrations/0001_initial.py:110 models/pagemodel.py:85
-#: templates/admin/cms/page/tree/menu.html:248
+#: templates/admin/cms/page/tree/menu.html:256
 msgid "site"
 msgstr "site"
 
@@ -1246,8 +1246,8 @@ msgid "Home"
 msgstr "Home"
 
 #: templates/admin/cms/page/change_form.html:32
-#: templates/admin/cms/page/tree/menu.html:52
-#: templates/admin/cms/page/tree/menu.html:54
+#: templates/admin/cms/page/tree/menu.html:60
+#: templates/admin/cms/page/tree/menu.html:62
 msgid "View on site"
 msgstr "View on site"
 
@@ -1409,14 +1409,14 @@ msgid "Main Navigation"
 msgstr "in navigation"
 
 #: templates/admin/cms/page/tree/base.html:149
-#: templates/admin/cms/page/tree/menu.html:176
+#: templates/admin/cms/page/tree/menu.html:184
 #, fuzzy
 #| msgid "Actions"
 msgid "Options"
 msgstr "Actions"
 
 #: templates/admin/cms/page/tree/base.html:157
-#: templates/admin/cms/page/tree/menu.html:202
+#: templates/admin/cms/page/tree/menu.html:210
 #: templates/cms/toolbar/dragbar.html:15 templates/cms/toolbar/dragitem.html:35
 msgid "Paste"
 msgstr "Paste"
@@ -1554,84 +1554,84 @@ msgstr ""
 msgid "home"
 msgstr "home"
 
-#: templates/admin/cms/page/tree/menu.html:28
+#: templates/admin/cms/page/tree/menu.html:32
 msgid "softroot"
 msgstr "softroot"
 
-#: templates/admin/cms/page/tree/menu.html:36
+#: templates/admin/cms/page/tree/menu.html:44
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Application: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:78
+#: templates/admin/cms/page/tree/menu.html:86
 #, fuzzy, python-format
 #| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr "Edit this page in %(language)s "
 
-#: templates/admin/cms/page/tree/menu.html:79
+#: templates/admin/cms/page/tree/menu.html:87
 msgid "Preview"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu.html:89
+#: templates/admin/cms/page/tree/menu.html:97
 msgid "Publish"
 msgstr "Publish"
 
-#: templates/admin/cms/page/tree/menu.html:97
+#: templates/admin/cms/page/tree/menu.html:105
 msgid "Unpublish"
 msgstr "Unpublish"
 
-#: templates/admin/cms/page/tree/menu.html:106
+#: templates/admin/cms/page/tree/menu.html:114
 msgid "Configure"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu.html:131
+#: templates/admin/cms/page/tree/menu.html:139
 msgid "in menu"
 msgstr "in menu"
 
-#: templates/admin/cms/page/tree/menu.html:136
+#: templates/admin/cms/page/tree/menu.html:144
 msgid "not in menu"
 msgstr "not in menu"
 
-#: templates/admin/cms/page/tree/menu.html:153
-#: templates/admin/cms/page/tree/menu.html:158
+#: templates/admin/cms/page/tree/menu.html:161
+#: templates/admin/cms/page/tree/menu.html:166
 #, fuzzy
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Page settings (SHIFT-click for advanced settings)"
 
-#: templates/admin/cms/page/tree/menu.html:185
-#: templates/admin/cms/page/tree/menu.html:187
+#: templates/admin/cms/page/tree/menu.html:193
+#: templates/admin/cms/page/tree/menu.html:195
 #: templates/cms/toolbar/dragitem.html:33
 msgid "Copy"
 msgstr "Copy"
 
-#: templates/admin/cms/page/tree/menu.html:193
-#: templates/admin/cms/page/tree/menu.html:195
+#: templates/admin/cms/page/tree/menu.html:201
+#: templates/admin/cms/page/tree/menu.html:203
 #: templates/cms/toolbar/dragitem.html:32
 msgid "Cut"
 msgstr "Cut"
 
-#: templates/admin/cms/page/tree/menu.html:230
-#: templates/admin/cms/page/tree/menu.html:231
+#: templates/admin/cms/page/tree/menu.html:238
+#: templates/admin/cms/page/tree/menu.html:239
 msgid "is restricted"
 msgstr "is restricted"
 
-#: templates/admin/cms/page/tree/menu.html:230
-#: templates/admin/cms/page/tree/menu.html:233
+#: templates/admin/cms/page/tree/menu.html:238
+#: templates/admin/cms/page/tree/menu.html:241
 msgid "Yes"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu.html:230
-#: templates/admin/cms/page/tree/menu.html:235
+#: templates/admin/cms/page/tree/menu.html:238
+#: templates/admin/cms/page/tree/menu.html:243
 msgid "No"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu.html:239
+#: templates/admin/cms/page/tree/menu.html:247
 msgid "last change by"
 msgstr "last change by"
 
-#: templates/admin/cms/page/tree/menu.html:245
+#: templates/admin/cms/page/tree/menu.html:253
 msgid "meta"
 msgstr ""
 
@@ -1675,8 +1675,8 @@ msgstr "Collapse all"
 msgid "You cannot add plugins to this plugin."
 msgstr "You cannot add plugins to this plugin."
 
-#: templates/cms/toolbar/dragitem.html:21 templatetags/cms_tags.py:711
-#: templatetags/cms_tags.py:714
+#: templates/cms/toolbar/dragitem.html:21 templatetags/cms_tags.py:712
+#: templatetags/cms_tags.py:715
 msgid "Edit"
 msgstr "Edit"
 
@@ -1944,12 +1944,12 @@ msgstr "unpublished"
 msgid "no content"
 msgstr "no content"
 
-#: templatetags/cms_tags.py:106
+#: templatetags/cms_tags.py:107
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr "Page not found on %(domain)s"
 
-#: templatetags/cms_tags.py:107
+#: templatetags/cms_tags.py:108
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `"
@@ -2138,7 +2138,7 @@ msgstr "Change Category"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Thanks for spending some quality time with the Web site today."
 
-#: tests/test_templates.py:52 utils/conf.py:160
+#: tests/test_templates.py:52 utils/conf.py:161
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Inherit the template of the nearest ancestor"
 
