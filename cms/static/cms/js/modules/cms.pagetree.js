@@ -119,6 +119,7 @@ var CMS = window.CMS || {};
             if (!this.options.filtered) {
                 data = {
                     url: this.options.urls.tree,
+                    cache: false,
                     data: function (node) {
                         // '#' is rendered if its the root node, there we only
                         // care about `obj.openNodes`, in the following case
