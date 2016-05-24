@@ -1,6 +1,11 @@
 === 3.3.0.rc3 (2016-05-23) ===
 
 * Added contribution policies documentation
+* Corrected documentation in numerous places
+* Corrected an issue where someone could see and use the internal placeholder plugin in the structure board
+* Fixed a regression where the first page created was not automatically published
+* Corrected the instructions for using the ``delete-orphaned-plugins`` command
+* Re-pinned django-treebeard to >=4.0.1
 
 
 === 3.3.0.rc2 (2016-05-19) ===

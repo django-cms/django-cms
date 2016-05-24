@@ -70,6 +70,11 @@ What's new in 3.3
 * Fixed toolbar placement when foundation is installed
 * Fixed an issue which could lead to an apphook without a slug
 * Fixed numerous frontend issues
+* Added contribution policies documentation
+* Corrected an issue where someone could see and use the internal placeholder plugin in the structure board
+* Fixed a regression where the first page created was not automatically published
+* Corrected the instructions for using the ``delete-orphaned-plugins`` command
+* Re-pinned django-treebeard to >=4.0.1
 
 .. _backward_incompatible_3.3:
 
