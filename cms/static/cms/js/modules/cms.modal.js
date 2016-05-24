@@ -908,9 +908,6 @@ var CMS = window.CMS || {};
                     });
                 }
 
-                // hide loader
-                CMS.API.Toolbar.hideLoader();
-
                 // show messages in toolbar if provided
                 messageList = iframe.contents().find('.messagelist');
                 messages = messageList.find('li');
@@ -925,10 +922,15 @@ var CMS = window.CMS || {};
 
                 // inject css class
                 body.addClass('cms-admin cms-admin-modal');
+
+                // hide loaders
                 that.ui.modalBody.removeClass('cms-loader');
+                CMS.API.Toolbar.hideLoader();
 
                 // determine if we should close the modal or reload
                 if (messages.length && that.enforceReload) {
+                    that.ui.modalBody.addClass('cms-loader');
+                    CMS.API.Toolbar.showLoader();
                     that.reloadBrowser();
                 }
                 if (messages.length && that.enforceClose) {
@@ -950,6 +952,8 @@ var CMS = window.CMS || {};
                 // when the window has been changed pressing the blue or red button, we need to run a reload check
                 // also check that no delete-confirmation is required
                 if (that.saved && !contents.find('.delete-confirmation').length) {
+                    that.ui.modalBody.addClass('cms-loader');
+                    CMS.API.Toolbar.showLoader();
                     that.reloadBrowser(
                         that.options.onClose ? that.options.onClose : window.location.href,
                         false,

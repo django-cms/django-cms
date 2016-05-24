@@ -1945,6 +1945,19 @@ describe('CMS.Modal', function () {
             });
         });
 
+        it('does show loaders if reload the page if required', function (done) {
+            modal.enforceReload = true;
+            expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(2);
+                expect(modal.ui.modalBody).toHaveClass('cms-loader');
+                done();
+            });
+        });
+
         it('does not close the modal if not required', function (done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
@@ -2067,6 +2080,19 @@ describe('CMS.Modal', function () {
                     false,
                     true
                 );
+                done();
+            });
+        });
+
+        it('shows loaders when reloads browser if iframe was saved', function (done) {
+            modal.saved = true;
+            expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(2);
+                expect(modal.ui.modalBody).toHaveClass('cms-loader');
                 done();
             });
         });
