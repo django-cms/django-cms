@@ -452,7 +452,7 @@ cms.plugin_base
         :rtype: ``None`` or ``datetime`` or ``int``
 
 
-    .. method:: get_vary_cache_on(request, instance, placeholder):
+    .. method:: get_vary_cache_on(request, instance, placeholder)
 
         Provides ``VARY`` header strings to be considered by the placeholder
         and in turn by the page.
