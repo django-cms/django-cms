@@ -3,10 +3,11 @@
 // #############################################################################
 // Page control
 
-var globals = require('./settings/globals');
-var randomString = require('./helpers/randomString').randomString;
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var helpers = require('djangocms-casper-helpers');
+var randomString = helpers.randomString;
+var globals = helpers.settings;
+var cms = helpers(casperjs);
 var xPath = casperjs.selectXPath;
 
 var SECOND_PAGE_TITLE = 'Second';

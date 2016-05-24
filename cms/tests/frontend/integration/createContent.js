@@ -3,11 +3,12 @@
 // #############################################################################
 // User login via the admin panel
 
-var globals = require('./settings/globals');
-var randomString = require('./helpers/randomString').randomString;
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var randomString = helpers.randomString;
 var casperjs = require('casper');
 var xPath = casperjs.selectXPath;
-var cms = require('./helpers/cms')(casperjs);
+var cms = helpers(casperjs);
 // random text string for filtering and content purposes
 var randomText = randomString({ length: 50, withWhitespaces: false });
 

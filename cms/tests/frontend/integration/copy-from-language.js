@@ -1,10 +1,11 @@
 'use strict';
 
-var globals = require('./settings/globals').configure({
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings.configure({
     editOn: 'test-edit'
 });
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs, globals);
+var cms = helpers(casperjs, globals);
 
 casper.test.setUp(function (done) {
     casper.start()
