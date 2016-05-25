@@ -240,7 +240,7 @@ class PageAdmin(ModelAdmin):
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
 
-        if 'recover' in request.path:
+        if self._is_recovery(request):
             pk = obj.pk
             if obj.parent_id:
                 parent = Page.objects.get(pk=obj.parent_id)
@@ -256,7 +256,7 @@ class PageAdmin(ModelAdmin):
             obj.save(no_signals=True)
 
         else:
-            if 'history' in request.path:
+            if self._is_history(request):
                 old_obj = Page.objects.get(pk=obj.pk)
                 obj.level = old_obj.level
                 obj.parent_id = old_obj.parent_id
@@ -266,7 +266,7 @@ class PageAdmin(ModelAdmin):
 
         obj.save()
 
-        if 'recover' in request.path or 'history' in request.path:
+        if self._is_versioned(request):
             obj.pagemoderatorstate_set.all().delete()
             moderator.page_changed(obj, force_moderation_action=PageModeratorState.ACTION_CHANGED)
             revert_plugins(request, obj.version.pk, obj)
@@ -288,6 +288,109 @@ class PageAdmin(ModelAdmin):
             language,
         )
 
+    def _is_versioned(self, request):
+        """Check if a request is versioned.
+
+        Checks if the current admin request is one for
+        a model's history or recovery (provided by package
+        django-reversion). Returns a boolean.
+
+        Note: Assumes certain patterns about the request
+              path (see note in get_version_id for more
+              details).
+
+        """
+        return self._is_history(request) or self._is_recovery(request)
+
+    def _is_history(self, request):
+        """Check if a request is for history.
+
+        Checks if the current request is for an admin history
+        lookup. Returns a boolean.
+
+        Note: Assumes certain patterns about the request
+              path (see note in get_version_id for more
+              details).
+
+        """
+        return "history" in request.path
+
+    def _is_recovery(self, request):
+        """Check if a request is for versioned recovery.
+
+        Checks if the current request is for a recovery
+        that is controlled by the package django-reversion.
+        Returns a boolean.
+
+        Note: Assumes certain patterns about the request
+              path (see note in get_version_id for more
+              details).
+
+        """
+        return "recover" in request.path
+
+    def _get_revisioned_items(self, version_id):
+        """Get revisioned items for a version_id.
+
+        Given a version_id, will return a list of
+        revisioned objects for the specified version_id.
+
+        Returns list.
+        """
+        from reversion.models import Version
+
+        version = get_object_or_404(Version, pk=version_id)
+        revs = []
+        for related_version in version.revision.version_set.all():
+            try:
+                rev = related_version.object_version
+            except models.FieldDoesNotExist:
+                # in case the model has changed in the meantime
+                continue
+            else:
+                revs.append(rev)
+        return revs
+
+    def _get_versioned_placeholder(self, version_id, placeholder_name):
+        """Get revisioned Placeholder object instance.
+
+        Given a version_id and a placeholder_name,
+        will return a Placeholder object instance
+        matching the placeholder_name if one is found
+        in the specified version_id.
+
+        Returns Placeholder object instance, or None.
+        """
+        placeholder = None
+        revs = self._get_revisioned_items(version_id)
+        for rev in revs:
+            pobj = rev.object
+            if pobj.__class__ == Placeholder:
+                if pobj.slot == placeholder_name:
+                    placeholder = pobj
+                    break
+        return placeholder
+
+    def get_version_id(self, request):
+        """Gets a version_id if request is versioned.
+
+        Checks if the current request is for a history lookup
+        or recovery provided by the package django-reversion.
+        Returns an id if the request is a versioned request,
+        or None if not.
+
+        Note: Assumes certain patterns about the request
+              path that match those patterns provided by django
+              and the package django-reversion. Simply moved
+              this code here to make it more DRY, since its used
+              more than once, but may want to reduce the assumption
+              on the pattern check.
+        """
+        version_id = None
+        if self._is_versioned(request):
+            version_id = request.path.split("/")[-2]
+        return version_id
+
     def get_fieldsets(self, request, obj=None):
         """
         Add fieldsets of placeholders to the list of already existing
@@ -300,10 +403,20 @@ class PageAdmin(ModelAdmin):
                 fields.remove('published')
                 given_fieldsets[0][1]['fields'][2] = tuple(fields)
             placeholders_template = get_template_from_request(request, obj)
+            version_id = self.get_version_id(request)
             for placeholder_name in self.get_fieldset_placeholders(placeholders_template):
-                name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
-                name = _(name)
-                given_fieldsets += [(title(name), {'fields': [placeholder_name], 'classes': ['plugin-holder']})]
+                usable_placeholder = False
+                if version_id:
+                    placeholder = self._get_versioned_placeholder(version_id, placeholder_name)
+                    if placeholder:
+                        usable_placeholder = True
+                else:
+                    usable_placeholder = True
+                if usable_placeholder:
+                    name = placeholder_utils.get_placeholder_conf("name", placeholder_name, obj.template, placeholder_name)
+                    name = _(name)
+                    given_fieldsets += [(title(name), {'fields': [placeholder_name], 'classes': ['plugin-holder']})]
+
             advanced = given_fieldsets.pop(3)
             if obj.has_advanced_settings_permission(request):
                 given_fieldsets.append(advanced)
@@ -338,11 +451,7 @@ class PageAdmin(ModelAdmin):
                 self.exclude.remove('soft_root')
 
             form = super(PageAdmin, self).get_form(request, obj, **kwargs)
-            version_id = None
-            versioned = False
-            if "history" in request.path or 'recover' in request.path:
-                versioned = True
-                version_id = request.path.split("/")[-2]
+            version_id = self.get_version_id(request)
 
             try:
                 title_obj = obj.get_title_obj(language=language, fallback=False, version_id=version_id,
@@ -375,29 +484,13 @@ class PageAdmin(ModelAdmin):
                 plugin_list = []
                 show_copy = False
                 copy_languages = {}
-                if versioned:
-                    from reversion.models import Version
-
-                    version = get_object_or_404(Version, pk=version_id)
+                if version_id:
                     installed_plugins = plugin_pool.get_all_plugins()
                     plugin_list = []
                     actual_plugins = []
                     bases = {}
-                    revs = []
-                    for related_version in version.revision.version_set.all():
-                        try:
-                            rev = related_version.object_version
-                        except models.FieldDoesNotExist:
-                            # in case the model has changed in the meantime
-                            continue
-                        else:
-                            revs.append(rev)
-                    for rev in revs:
-                        pobj = rev.object
-                        if pobj.__class__ == Placeholder:
-                            if pobj.slot == placeholder_name:
-                                placeholder = pobj
-                                break
+                    revs = self._get_revisioned_items(version_id)
+                    placeholder = self._get_versioned_placeholder(version_id, placeholder_name)
                     for rev in revs:
                         pobj = rev.object
                         if pobj.__class__ == CMSPlugin:
@@ -425,18 +518,19 @@ class PageAdmin(ModelAdmin):
                         if (not plugin.language in copy_languages) and (plugin.language in dict_cms_languages):
                             copy_languages[plugin.language] = dict_cms_languages[plugin.language]
 
-                language = get_language_from_request(request, obj)
-                if copy_languages and len(get_language_list()) > 1:
-                    show_copy = True
-                widget = PluginEditor(attrs={
-                    'installed': installed_plugins,
-                    'list': plugin_list,
-                    'copy_languages': copy_languages.items(),
-                    'show_copy': show_copy,
-                    'language': language,
-                    'placeholder': placeholder
-                })
-                form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
+                if placeholder:
+                    language = get_language_from_request(request, obj)
+                    if copy_languages and len(get_language_list()) > 1:
+                        show_copy = True
+                    widget = PluginEditor(attrs={
+                        'installed': installed_plugins,
+                        'list': plugin_list,
+                        'copy_languages': copy_languages.items(),
+                        'show_copy': show_copy,
+                        'language': language,
+                        'placeholder': placeholder
+                    })
+                    form.base_fields[placeholder.slot] = CharField(widget=widget, required=False)
 
             if not obj.has_advanced_settings_permission(request):
                 for field in self.advanced_fields:
@@ -464,7 +558,7 @@ class PageAdmin(ModelAdmin):
             for inline in inlines:
                 if (isinstance(inline, PagePermissionInlineAdmin)
                 and not isinstance(inline, ViewRestrictionInlineAdmin)):
-                    if "recover" in request.path or "history" in request.path:
+                    if self._is_versioned(request):
                         # do not display permissions in recover mode
                         continue
                     if not obj.has_change_permissions_permission(request):
@@ -1113,7 +1207,7 @@ class PageAdmin(ModelAdmin):
         """
         Could be either a page or a parent - if it's a parent we get the page via parent.
         """
-        if 'history' in request.path or 'recover' in request.path:
+        if self._is_versioned(request):
             return HttpResponseBadRequest(str("error"))
         plugin_type = request.POST['plugin_type']
         if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
@@ -1180,7 +1274,7 @@ class PageAdmin(ModelAdmin):
     @create_revision()
     @transaction.commit_on_success
     def copy_plugins(self, request):
-        if 'history' in request.path or 'recover' in request.path:
+        if self._is_versioned(request):
             return HttpResponseBadRequest(str("error"))
         copy_from = request.POST['copy_from']
         placeholder_id = request.POST['placeholder']
@@ -1217,7 +1311,7 @@ class PageAdmin(ModelAdmin):
     @create_revision()
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
-        if not 'history' in request.path and not 'recover' in request.path:
+        if not self._is_versioned(request):
             cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
             page = cms_plugin.placeholder.page if cms_plugin.placeholder else None
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
@@ -1269,7 +1363,7 @@ class PageAdmin(ModelAdmin):
             # view, which actually doesn't exists
             request.POST['_continue'] = True
 
-        if 'reversion' in settings.INSTALLED_APPS and ('history' in request.path or 'recover' in request.path):
+        if 'reversion' in settings.INSTALLED_APPS and self._is_versioned(request):
             # in case of looking to history just render the plugin content
             context = RequestContext(request)
             return render_to_response(plugin_admin.render_template,
@@ -1343,7 +1437,7 @@ class PageAdmin(ModelAdmin):
     @xframe_options_sameorigin
     @create_revision()
     def move_plugin(self, request):
-        if 'history' in request.path:
+        if self._is_history(request):
             return HttpResponseBadRequest(str("error"))
         pos = 0
         page = None
@@ -1408,7 +1502,7 @@ class PageAdmin(ModelAdmin):
     @xframe_options_sameorigin
     @create_revision()
     def remove_plugin(self, request):
-        if 'history' in request.path:
+        if self._is_history(request):
             raise Http404()
         plugin_id = request.POST['plugin_id']
         plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
