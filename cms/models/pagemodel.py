@@ -514,6 +514,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     title.publisher_public = None
                     # create slug-copy for standard copy
                 title.published = False
+                title.path = None # if path is not empty it will cause maximum recursion depth exceeded error
                 title.slug = page_utils.get_available_slug(title)
                 title.save()
             # copy the placeholders (and plugins on those placeholders!)
