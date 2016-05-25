@@ -1,3 +1,9 @@
+=== 3.3.0.rc4 (2016-05-24) ===
+
+* Fixed regression in management commands
+* Fixed documentation typo
+
+
 === 3.3.0.rc3 (2016-05-23) ===
 
 * Added contribution policies documentation
