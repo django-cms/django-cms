@@ -1,3 +1,8 @@
+=== 3.3.0 (2016-05-26) ===
+
+* [no changes vs. rc4]
+
+
 === 3.3.0.rc4 (2016-05-24) ===
 
 * Fixed regression in management commands
