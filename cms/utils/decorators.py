@@ -21,4 +21,9 @@ def cms_perms(func):
         inner.__name__ = func.__name__
     elif hasattr(func, '__class__'):
         inner.__name__ = func.__class__.__name__
+
+    if getattr(func, 'csrf_exempt', False):
+        # view has set csrf_exempt flag
+        # so pass it down to the decorator.
+        inner.csrf_exempt = True
     return inner
