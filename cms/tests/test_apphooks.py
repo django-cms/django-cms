@@ -529,6 +529,28 @@ class ApphooksTestCase(CMSTestCase):
         self.assertIsNotNone(TestApp2)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_csrf_exempt_endpoint(self):
+        self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
+
+        client = self.client_class(enforce_csrf_checks=True)
+
+        with force_language("en"):
+            path = reverse('namespaced_app_ns:sample-exempt')
+
+        response = client.post(path)
+
+        # Assert our POST request went through
+        self.assertEqual(response.status_code, 200)
+
+        with force_language("en"):
+            path = reverse('namespaced_app_ns:sample-account')
+
+        response = client.post(path)
+
+        # Assert our POST request did not go through
+        self.assertEqual(response.status_code, 403)
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_toolbar_current_app_namespace(self):
         self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
         with force_language("en"):
