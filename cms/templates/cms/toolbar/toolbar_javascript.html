@@ -29,11 +29,12 @@ $(document).ready(function () {
             'debug': '{% filter escapejs %}{% blocktrans %}Development version using django CMS {{ cms_version }}, Django {{ django_version }}, Python {{ python_version }}{% endblocktrans %}{% endfilter %}',
             'cancel': '{% filter escapejs %}{% trans "Cancel" %}{% endfilter %}',
             'error': '<strong>{% filter escapejs %}{% trans "The following error occured:" %}{% endfilter %}</strong> ',
-            'success': '{% filter escapejs %}{% trans "Action successfull... reloading." %}{% endfilter %}',
+            'success': '{% filter escapejs %}{% trans "Action successful... reloading." %}{% endfilter %}',
             'confirm': '{% filter escapejs %}{% trans "Are you sure you want to delete this plugin?" %}{% endfilter %}',
-            'confirmEmpty': '{% filter escapejs %}{% trans "({1}) plugin is empty. Remove it?" %}{% endfilter %}',
             'publish': '{% filter escapejs %}{% trans "Are you sure you want to publish this page?" %}{% endfilter %}',
-            'addPluginPlaceholder': '{% filter escapejs %}{% trans "Plugin will be added here" %}{% endfilter %}'
+            'addPluginPlaceholder': '{% filter escapejs %}{% trans "Plugin will be added here" %}{% endfilter %}',
+            'confirmDirty': '{% filter escapejs %}{% trans "You have unsaved changes." %}{% endfilter %}',
+            'confirmDirtyESC': '{% filter escapejs %}{% trans "Are you sure you want to abandon these changes?" %}{% endfilter %}'
         },
         'urls': {
             'settings': '{% cms_admin_url "cms_usersettings_session_store" %}', // url to save settings

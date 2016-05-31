@@ -53,6 +53,7 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.base.js',
             'cms/static/cms/js/modules/jquery.transition.js',
             'cms/static/cms/js/modules/cms.messages.js',
+            'cms/static/cms/js/modules/cms.changetracker.js',
             'cms/static/cms/js/modules/cms.modal.js',
             'cms/static/cms/js/modules/cms.sideframe.js',
             'cms/static/cms/js/modules/cms.clipboard.js',
