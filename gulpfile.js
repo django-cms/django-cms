@@ -89,6 +89,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/modules/cms.base.js',
         PROJECT_PATH.js + '/modules/jquery.transition.js',
         PROJECT_PATH.js + '/modules/cms.messages.js',
+        PROJECT_PATH.js + '/modules/cms.changetracker.js',
         PROJECT_PATH.js + '/modules/cms.modal.js',
         PROJECT_PATH.js + '/modules/cms.sideframe.js',
         PROJECT_PATH.js + '/modules/cms.clipboard.js',

@@ -58,6 +58,8 @@ var CMS = window.CMS || {};
             this.minimized = false;
             this.triggerMaximized = false;
             this.saved = false;
+
+            this._beforeUnloadHandler = this._beforeUnloadHandler.bind(this);
         },
 
         /**
@@ -376,7 +378,9 @@ var CMS = window.CMS || {};
             // add esc close event
             this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
                 if (e.keyCode === CMS.KEYS.ESC && that.options.closeOnEsc) {
-                    that._cancelHandler();
+                    if (that._confirmDirtyEscCancel()) {
+                        that._cancelHandler();
+                    }
                 }
             });
 
@@ -396,6 +400,8 @@ var CMS = window.CMS || {};
             if (event.isDefaultPrevented()) {
                 return false;
             }
+
+            CMS.API.Helpers._getWindow().removeEventListener('beforeunload', this._beforeUnloadHandler);
 
             // handle refresh option
             if (this.options.onClose) {
@@ -987,7 +993,9 @@ var CMS = window.CMS || {};
                     // attach close event
                     body.on('keydown.cms', function (e) {
                         if (e.keyCode === CMS.KEYS.ESC && that.options.closeOnEsc) {
-                            that._cancelHandler();
+                            if (that._confirmDirtyEscCancel()) {
+                                that._cancelHandler();
+                            }
                         }
                     });
 
@@ -996,10 +1004,58 @@ var CMS = window.CMS || {};
                         contents.find('#content').css('padding-top', 38); // eslint-disable-line
                     }
                 }
+
+                that._attachContentPreservingHandlers(iframe);
             });
 
             // inject
             holder.html(iframe);
+        },
+
+        /**
+         * Adds handlers to prevent accidental refresh / modal close
+         * that could lead to loss of data.
+         *
+         * @method _attachContentPreservingHandlers
+         * @private
+         * @param {jQuery} iframe
+         */
+        _attachContentPreservingHandlers: function _attachContentPreservingHandlers(iframe) {
+            var that = this;
+
+            that.tracker = new CMS.ChangeTracker(iframe);
+
+            CMS.API.Helpers._getWindow().addEventListener('beforeunload', this._beforeUnloadHandler);
+        },
+
+        /**
+         * @method _beforeUnloadHandler
+         * @private
+         * @param {Event} e
+         * @returns {String|void}
+         */
+        _beforeUnloadHandler: function _beforeUnloadHandler(e) {
+            if (this.tracker.isFormChanged()) {
+                e.returnValue = CMS.config.lang.confirmDirty;
+                return e.returnValue;
+            }
+        },
+
+        /**
+         * Similar functionality as in `_attachContentPreservingHandlers` but for canceling
+         * the modal with the ESC button.
+         *
+         * @method _confirmDirtyEscCancel
+         * @private
+         * @returns {Boolean}
+         */
+        _confirmDirtyEscCancel: function _confirmDirtyEscCancel() {
+            if (this.tracker && this.tracker.isFormChanged()) {
+                return CMS.API.Helpers.secureConfirm(
+                    CMS.config.lang.confirmDirty + '\n\n' + CMS.config.lang.confirmDirtyESC
+                );
+            }
+            return true;
         },
 
         /**
