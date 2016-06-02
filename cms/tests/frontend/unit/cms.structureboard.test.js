@@ -668,6 +668,9 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('adds event handler for cms.update to actualize empty placeholders', function () {
+            if (!CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name) {
+                pending();
+            }
             expect(board.ui.sortables).toHandle('cms.update');
             // cheating here a bit
             expect(CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name).toEqual('actualizeEmptyPlaceholders');

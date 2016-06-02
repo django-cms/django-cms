@@ -436,6 +436,19 @@ describe('CMS.Modal', function () {
             CMS.API.Helpers.removeEventListener('modal-close');
         });
 
+        it('removes content preserving handlers', function () {
+            var removeEventListener = jasmine.createSpy();
+
+            spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+                removeEventListener: removeEventListener
+            });
+
+            modal.open({ html: '<div></div>' });
+            modal.close();
+            expect(removeEventListener).toHaveBeenCalledTimes(1);
+            expect(removeEventListener).toHaveBeenCalledWith('beforeunload', modal._beforeUnloadHandler);
+        });
+
         it('closes the modal', function (done) {
             modal.open({ html: '<div></div>' });
 
@@ -977,6 +990,38 @@ describe('CMS.Modal', function () {
             expect(modal.options.onClose).toEqual('stuff');
         });
 
+        it('adds an event handler to close the modal by pressing ESC if confirmed', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.body.on('keydown.cms.close', spy);
+            modal.options.onClose = 'stuff';
+            spyOn(modal, '_confirmDirtyEscCancel').and.returnValue(true);
+
+            modal._show({});
+
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            modal.ui.body.trigger(correctEvent);
+            expect(spy).not.toHaveBeenCalled();
+            expect(modal.close).toHaveBeenCalled();
+            expect(modal.options.onClose).toEqual(null);
+        });
+
+        it('adds an event handler to not close the modal by pressing ESC if not confirmed', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.body.on('keydown.cms.close', spy);
+            modal.options.onClose = 'stuff';
+            spyOn(modal, '_confirmDirtyEscCancel').and.returnValue(false);
+
+            modal._show({});
+
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            modal.ui.body.trigger(correctEvent);
+            expect(spy).not.toHaveBeenCalled();
+            expect(modal.close).not.toHaveBeenCalled();
+            expect(modal.options.onClose).toEqual('stuff');
+        });
+
         it('focuses the modal', function () {
             spyOn($.fn, 'focus');
 
@@ -1073,6 +1118,7 @@ describe('CMS.Modal', function () {
         it('triggers modal-closed event', function (done) {
             CMS.API.Helpers.addEventListener('modal-closed', function (e, opts) {
                 expect(opts.instance).toEqual(modal);
+                CMS.API.Helpers.removeEventListener('modal-closed');
                 done();
             });
             modal._hide();
@@ -2170,6 +2216,25 @@ describe('CMS.Modal', function () {
             });
         });
 
+        it('adds keydown event that does not close if not confirmed', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+            });
+            spyOn(modal, '_confirmDirtyEscCancel').and.returnValue(false);
+            modal.ui.modal.find('iframe').on('load', function () {
+                var body = $(this).contents().find('body');
+                expect(body).toHandle('keydown.cms');
+
+                body.on('keydown.cms', function () {
+                    expect(modal._confirmDirtyEscCancel).toHaveBeenCalledTimes(1);
+                    expect(modal.close).not.toHaveBeenCalled();
+                    done();
+                });
+
+                body.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ESC }));
+            });
+        });
+
         it('does not adjust content if object-tools are not available', function (done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
@@ -2189,6 +2254,149 @@ describe('CMS.Modal', function () {
             modal.ui.modal.find('iframe').on('load', function () {
                 expect($.fn.css).toHaveBeenCalledWith('padding-top', 38);
                 done();
+            });
+        });
+
+        it('attaches content preserving handlers', function (done) {
+            spyOn(modal, '_attachContentPreservingHandlers');
+
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal._attachContentPreservingHandlers).toHaveBeenCalledTimes(1);
+                expect(modal._attachContentPreservingHandlers).toHaveBeenCalledWith(this);
+                done();
+            });
+        });
+    });
+
+    describe('_attachContentPreservingHandlers', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Messages = {
+                open: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            CMS.config = {
+                lang: {
+                    confirmDirty: 'Smth changed!',
+                    confirmDirtyESC: 'Smth changed and you are pressing ESC'
+                }
+            };
+            $(function () {
+                modal = new CMS.Modal();
+                modal.ui.modal.show();
+                spyOn(modal, 'reloadBrowser');
+                spyOn(modal, '_setBreadcrumb');
+                spyOn(modal, '_setButtons');
+                spyOn(CMS.Modal, '_setupCtrlEnterSave');
+                spyOn(modal, 'close');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('creates the tracker', function () {
+            expect(modal.tracker).not.toBeDefined();
+            modal._attachContentPreservingHandlers($());
+            expect(modal.tracker).toEqual(jasmine.any(Object));
+        });
+
+        it('adds the evnet listener to the window', function () {
+            var addEventListener = jasmine.createSpy();
+            spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+                addEventListener: addEventListener
+            });
+
+            modal._attachContentPreservingHandlers($());
+            expect(addEventListener).toHaveBeenCalledTimes(1);
+            expect(addEventListener).toHaveBeenCalledWith('beforeunload', modal._beforeUnloadHandler);
+        });
+
+        describe('_beforeUnloadHandler', function () {
+            it('returns a warning if form has changed', function () {
+                modal.tracker = {
+                    isFormChanged: function () {
+                        return true;
+                    }
+                };
+
+                expect(modal._beforeUnloadHandler({})).toEqual('Smth changed!');
+            });
+
+            it('assigns return value to the event if form has changed', function () {
+                modal.tracker = {
+                    isFormChanged: function () {
+                        return true;
+                    }
+                };
+                var event = {};
+                modal._beforeUnloadHandler(event);
+                expect(event.returnValue).toEqual('Smth changed!');
+            });
+
+            it('does not do anything if form did not change', function () {
+                modal.tracker = {
+                    isFormChanged: function () {
+                        return false;
+                    }
+                };
+                expect(modal._beforeUnloadHandler({})).not.toBeDefined();
+            });
+        });
+
+        describe('_confirmDirtyEscCancel', function () {
+            beforeEach(function () {
+                spyOn(CMS.API.Helpers, 'secureConfirm');
+            });
+
+            it('returns true if there is no tracker', function () {
+                expect(modal._confirmDirtyEscCancel()).toEqual(true);
+                expect(CMS.API.Helpers.secureConfirm).not.toHaveBeenCalled();
+            });
+
+            it('returns true if there is a tracker but form did not change', function () {
+                modal.tracker = {
+                    isFormChanged: function () {
+                        return false;
+                    }
+                };
+
+                expect(modal._confirmDirtyEscCancel()).toEqual(true);
+                expect(CMS.API.Helpers.secureConfirm).not.toHaveBeenCalled();
+            });
+
+            it('returns result of the confirmation if there is a tracker and form changed', function () {
+                CMS.API.Helpers.secureConfirm.and.returnValue(true);
+
+                modal.tracker = {
+                    isFormChanged: function () {
+                        return true;
+                    }
+                };
+
+                expect(modal._confirmDirtyEscCancel()).toEqual(true);
+                expect(CMS.API.Helpers.secureConfirm).toHaveBeenCalledTimes(1);
+                expect(CMS.API.Helpers.secureConfirm).toHaveBeenCalledWith(
+                    'Smth changed!\n\nSmth changed and you are pressing ESC'
+                );
+
+                CMS.API.Helpers.secureConfirm.and.returnValue(false);
+
+                expect(modal._confirmDirtyEscCancel()).toEqual(false);
+                expect(CMS.API.Helpers.secureConfirm).toHaveBeenCalledTimes(2);
             });
         });
     });
