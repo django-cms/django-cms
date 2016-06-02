@@ -108,12 +108,12 @@ casper.test.begin('Publishing dates', function (test) {
                 .waitUntilVisible('#page_form', function () {
                     publishDate = this.evaluate(function () {
                         DateTimeShortcuts.handleCalendarQuickLink(0, 0);
-                        return $('#id_publication_date_0').val();
+                        return CMS.$('#id_publication_date_0').val();
                     });
 
                     publishTime = this.evaluate(function () {
                         DateTimeShortcuts.handleClockQuicklink(0, -1);
-                        return $('#id_publication_date_1').val();
+                        return CMS.$('#id_publication_date_1').val();
                     });
                 })
                 .then(function () {

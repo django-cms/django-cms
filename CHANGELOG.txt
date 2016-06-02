@@ -7,6 +7,8 @@
 * Fixed a misleading message when modal iframe contents couldn't be accessed.
 * Added a workaround for a bug when plugins couldn't be deleted in Firefox
   with 1Password extension installed
+* Changed CMS JavaScript bundling from simple concatenation to webpack-based.
+  Using CMS Javascript modules directly is no longer possible.
 
 
 === 3.3.0 (2016-05-26) ===

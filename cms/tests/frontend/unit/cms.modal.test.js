@@ -1,5 +1,11 @@
 /* global document */
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Modal = require('../../../static/cms/js/modules/cms.modal');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Modal = Modal;
 
 describe('CMS.Modal', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -105,6 +111,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -250,6 +257,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -330,6 +338,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             modal.close();
             fixture.cleanup();
         });
@@ -430,6 +439,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -515,6 +525,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -635,6 +646,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -877,6 +889,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -1066,6 +1079,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
             jasmine.clock().uninstall();
         });
@@ -1158,6 +1172,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             modal.ui.body.removeAttr('data-touch-action');
             modal.ui.body.off(modal.pointerMove);
             modal.ui.body.off(modal.pointerUp);
@@ -1253,6 +1268,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -1302,6 +1318,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             modal.ui.body.removeAttr('data-touch-action');
             modal.ui.body.off(modal.pointerMove);
             modal.ui.body.off(modal.pointerUp);
@@ -1447,6 +1464,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -1499,6 +1517,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -1567,6 +1586,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -1725,6 +1745,7 @@ describe('CMS.Modal', function () {
             });
         });
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -1878,6 +1899,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
@@ -2350,6 +2372,7 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
+            window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 

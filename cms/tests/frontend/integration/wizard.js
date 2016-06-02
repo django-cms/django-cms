@@ -125,7 +125,7 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
                 'The new page has been created and its title is correct'
             );
             test.assertEval(function () {
-                var selectedChild = $('.nav .selected');
+                var selectedChild = CMS.$('.nav .selected');
 
                 return selectedChild.find('> a').text() === 'Subpage' &&
                     // have to use parents, because closest li is selectedChild itself

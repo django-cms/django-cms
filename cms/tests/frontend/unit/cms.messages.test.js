@@ -1,6 +1,10 @@
-/* globals $ */
-
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Messages = require('../../../static/cms/js/modules/cms.messages');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Messages = Messages;
 
 describe('CMS.Messages', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

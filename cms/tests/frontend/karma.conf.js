@@ -7,17 +7,39 @@
 'use strict';
 
 var baseConf = require('./base.conf');
+var path = require('path');
 var argv = require('minimist')(process.argv.slice(2));
+var webpack = require('webpack');
+var webpackConfig = require('../../../webpack.config.js')({
+    PROJECT_PATH: {
+        js: path.join(__dirname, '../../../cms/static/cms/js')
+    },
+    debug: true
+});
+
+webpackConfig.module.preLoaders = [
+    {
+        test: /cms\/js\/modules\/(?!jquery)/,
+        loader: 'istanbul-instrumenter'
+    }
+];
+
+var files = ['*'];
+if (argv && argv.tests) {
+    files = argv.tests.split(',');
+    // eslint-disable-next-line
+    console.log('Running tests for ' + files.join(', '));
+}
+
+webpackConfig.plugins = [
+    new webpack.DefinePlugin({
+        __DEV__: 'false',
+        __TEST__: 'true',
+        files: JSON.stringify(files)
+    })
+];
 
 module.exports = function (config) {
-
-    var files = ['*'];
-    if (argv && argv.tests) {
-        files = argv.tests.split(',');
-        // eslint-disable-next-line
-        console.log('Running tests for ' + files.join(', '));
-    }
-
     var useSauceLabs = function () {
         var val = process.env.USE_SAUCE_LABS;
         return (val === undefined || val !== '0') && process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY;
@@ -39,40 +61,10 @@ module.exports = function (config) {
         files: [
             'cms/static/cms/css/cms.base.css',
 
-            // these have to be specified in order since
-            // dependency loading is not handled yet
-            'cms/static/cms/js/polyfills/array.prototype.findindex.js',
-            'cms/static/cms/js/libs/jquery.min.js',
-            'cms/static/cms/js/libs/class.min.js',
-            'cms/static/cms/js/libs/pep.js',
-            'cms/static/cms/js/libs/jstree/jstree.min.js',
-            'cms/static/cms/js/libs/jstree/jstree.grid.min.js',
-            'cms/static/cms/js/modules/jquery.ui.custom.js',
-            'cms/static/cms/js/modules/jquery.ui.touchpunch.js',
-            'cms/static/cms/js/modules/jquery.ui.nestedsortable.js',
-            'cms/static/cms/js/modules/cms.base.js',
-            'cms/static/cms/js/modules/jquery.transition.js',
-            'cms/static/cms/js/modules/cms.messages.js',
-            'cms/static/cms/js/modules/cms.changetracker.js',
-            'cms/static/cms/js/modules/cms.modal.js',
-            'cms/static/cms/js/modules/cms.sideframe.js',
-            'cms/static/cms/js/modules/cms.clipboard.js',
-            'cms/static/cms/js/modules/cms.plugins.js',
-            'cms/static/cms/js/modules/cms.structureboard.js',
-            'cms/static/cms/js/modules/cms.navigation.js',
-            'cms/static/cms/js/modules/cms.toolbar.js',
-            'cms/static/cms/js/modules/cms.tooltip.js',
-            'cms/static/cms/js/modules/cms.pagetree.dropdown.js',
-            'cms/static/cms/js/modules/cms.pagetree.stickyheader.js',
-            'cms/static/cms/js/modules/cms.pagetree.js',
-
-            // test helpers
-            'cms/tests/frontend/unit/helpers/mock-ajax.js',
-            'cms/tests/frontend/unit/helpers/jasmine-jquery.js',
-
             // fixtures
             'cms/tests/frontend/unit/fixtures/**/*.html',
             'cms/tests/frontend/unit/html/**/*.html',
+            'cms/tests/frontend/unit/index.js',
 
             // other static assets
             { pattern: 'cms/static/cms/**/*.gif', watched: false, included: false, served: true },
@@ -80,22 +72,20 @@ module.exports = function (config) {
             { pattern: 'cms/static/cms/**/*.woff2', watched: false, included: false, served: true },
             { pattern: 'cms/static/cms/**/*.ttf', watched: false, included: false, served: true },
             { pattern: 'cms/static/cms/**/*.eot', watched: false, included: false, served: true }
-        ].concat(
-            // tests themselves
-            files.map(function (pattern) {
-                return 'cms/tests/frontend/unit/' + pattern + '.test.js';
-            })
-        ),
+        ],
 
         // list of files to exclude
         exclude: [
-            'cms/static/cms/js/dist/*.js'
+            'cms/static/cms/js/dist/*.js',
+            'cms/static/cms/js/*.js',
+            'cms/static/cms/js/modules/jquery.*.js'
         ],
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'cms/static/cms/js/modules/cms.*': ['coverage'],
+            'cms/tests/frontend/unit/index.js': ['webpack', 'sourcemap'],
+            'cms/static/cms/js/modules/*.js': ['sourcemap'],
             'cms/tests/frontend/unit/fixtures/**/*.html': ['html2js']
         },
 
@@ -120,6 +110,15 @@ module.exports = function (config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['dots', 'coverage', 'saucelabs'].concat(process.env.CI ? ['coveralls'] : []),
+
+        webpack: {
+            cache: true,
+            devtool: 'inline-source-map',
+            debug: true,
+            resolve: webpackConfig.resolve,
+            plugins: webpackConfig.plugins,
+            module: webpackConfig.module
+        },
 
         // web server port
         port: 9876,
