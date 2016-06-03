@@ -2,6 +2,7 @@
 
 * Added a warning for users who are leaving the page or closing the plugin
   modal by pressing ESC to prevent accidental loss of content.
+* Fixed a bug when clicking inside sideframe didn't close toolbar dropdowns
 
 
 === 3.3.0 (2016-05-26) ===

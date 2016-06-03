@@ -266,8 +266,10 @@ var CMS = window.CMS || {};
 
                 // This essentially hides the toolbar dropdown when
                 // click happens inside of a sideframe iframe
-                body.on(that.click, function () {
-                    $(document).trigger(that.click);
+                contents.on(that.click, function () {
+                    // using less specific namespace event because
+                    // toolbar dropdowns closing handlers are attached to `click.cms.toolbar`
+                    $(document).trigger('click.cms');
                 });
 
                 // attach close event
