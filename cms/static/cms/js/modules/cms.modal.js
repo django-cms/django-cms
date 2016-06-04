@@ -880,11 +880,13 @@ var CMS = window.CMS || {};
 
                 // check if iframe can be accessed
                 try {
-                    iframe.contents();
+                    contents = iframe.contents();
+                    body = contents.find('body');
                 } catch (error) {
                     CMS.API.Messages.open({
-                        message: '<strong>' + error + '</strong>',
-                        error: true
+                        message: '<strong>' + CMS.config.lang.errorLoadingEditForm + '</strong>',
+                        error: true,
+                        delay: 0
                     });
                     that.close();
                     return;
@@ -914,8 +916,10 @@ var CMS = window.CMS || {};
                     });
                 }
 
+                var saveSuccess = Boolean(contents.find('.messagelist li:not(".error")').length);
+
                 // show messages in toolbar if provided
-                messageList = iframe.contents().find('.messagelist');
+                messageList = contents.find('.messagelist');
                 messages = messageList.find('li');
                 if (messages.length) {
                     CMS.API.Messages.open({
@@ -923,8 +927,6 @@ var CMS = window.CMS || {};
                     });
                 }
                 messageList.remove();
-                contents = iframe.contents();
-                body = contents.find('body');
 
                 // inject css class
                 body.addClass('cms-admin cms-admin-modal');
@@ -951,13 +953,16 @@ var CMS = window.CMS || {};
                 that._setButtons($(this));
 
                 // when an error occurs, reset the saved status so the form can be checked and validated again
-                if (iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
+                if (contents.find('.errornote').length ||
+                    contents.find('.errorlist').length ||
+                    that.saved && !saveSuccess
+                ) {
                     that.saved = false;
                 }
 
                 // when the window has been changed pressing the blue or red button, we need to run a reload check
                 // also check that no delete-confirmation is required
-                if (that.saved && !contents.find('.delete-confirmation').length) {
+                if (that.saved && saveSuccess && !contents.find('.delete-confirmation').length) {
                     that.ui.modalBody.addClass('cms-loader');
                     CMS.API.Toolbar.showLoader();
                     that.reloadBrowser(
@@ -968,12 +973,12 @@ var CMS = window.CMS || {};
                 } else {
                     iframe.show();
                     // set title of not provided
-                    innerTitle = iframe.contents().find('#content h1:eq(0)');
+                    innerTitle = contents.find('#content h1:eq(0)');
 
                     // case when there is no prefix
                     // istanbul ignore next: never happens
                     if (opts.title === undefined && that.ui.titlePrefix.text() === '') {
-                        bc = iframe.contents().find('.breadcrumbs').contents();
+                        bc = contents.find('.breadcrumbs').contents();
                         that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                     }
 

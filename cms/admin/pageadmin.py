@@ -1422,7 +1422,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'language': force_text(get_language_object(language)['name'])
             }
             self.log_change(request, titleobj, message)
-            messages.info(request, message)
+            messages.success(request, message)
 
             titleobj.delete()
             for p in saved_plugins:
