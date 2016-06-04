@@ -4,6 +4,16 @@
 describe('CMS.Modal', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
+    beforeEach(function () {
+        CMS.ChangeTracker = function () {
+            return {
+                isFormChanged: function () {
+                    return false;
+                }
+            };
+        };
+    });
+
     it('creates a Modal class', function () {
         expect(CMS.Modal).toBeDefined();
     });
@@ -1885,6 +1895,7 @@ describe('CMS.Modal', function () {
         });
 
         it('opens error message and closes the iframe if its contents cannot be accessed', function (done) {
+            CMS.config.lang.errorLoadingEditForm = 'Cannot access contents';
             spyOn($.fn, 'contents').and.callFake(function () {
                 throw new Error('Cannot access contents');
             });
@@ -1894,8 +1905,9 @@ describe('CMS.Modal', function () {
             modal.ui.modal.find('iframe').on('load', function () {
                 expect(modal.close).toHaveBeenCalled();
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                    message: '<strong>Error: Cannot access contents</strong>',
-                    error: true
+                    message: '<strong>Cannot access contents</strong>',
+                    error: true,
+                    delay: 0
                 });
                 done();
             });
@@ -2081,6 +2093,17 @@ describe('CMS.Modal', function () {
             modal.saved = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_errornote.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.saved).toEqual(false);
+                done();
+            });
+        });
+
+        it('resets the saved state if there was no success message in the frame', function (done) {
+            modal.saved = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_no_success.html'
             });
             modal.ui.modal.find('iframe').on('load', function () {
                 expect(modal.saved).toEqual(false);

@@ -34,7 +34,8 @@ $(document).ready(function () {
             'publish': '{% filter escapejs %}{% trans "Are you sure you want to publish this page?" %}{% endfilter %}',
             'addPluginPlaceholder': '{% filter escapejs %}{% trans "Plugin will be added here" %}{% endfilter %}',
             'confirmDirty': '{% filter escapejs %}{% trans "You have unsaved changes." %}{% endfilter %}',
-            'confirmDirtyESC': '{% filter escapejs %}{% trans "Are you sure you want to abandon these changes?" %}{% endfilter %}'
+            'confirmDirtyESC': '{% filter escapejs %}{% trans "Are you sure you want to abandon these changes?" %}{% endfilter %}',
+            'errorLoadingEditForm': '{% filter escapejs %}{% trans "The form could not be loaded. Please check that the server is running correctly." %}{% endfilter %}'
         },
         'urls': {
             'settings': '{% cms_admin_url "cms_usersettings_session_store" %}', // url to save settings
