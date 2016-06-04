@@ -794,10 +794,22 @@ var CMS = window.CMS || {};
                     }
 
                     if (item.is('input') || item.is('button')) {
-                        // we need to use native `.click()` event specifically
-                        // as we are inside an iframe and magic is happening
                         that.ui.modalBody.addClass('cms-loader');
-                        item[0].click();
+                        var frm = item.closest('form');
+
+                        // In Firefox with 1Password extension installed (FF 45 1password 4.5.6 at least)
+                        // the item[0].click() doesn't work, which notably breaks
+                        // deletion of the plugin. Workaround is that if the clicked button
+                        // is the only button in the form - submit a form, otherwise
+                        // click on the button
+                        if (frm.find('button, input[type="button"], input[type="submit"]').length > 1) {
+                            // we need to use native `.click()` event specifically
+                            // as we are inside an iframe and magic is happening
+                            item[0].click();
+                        } else {
+                            frm.submit();
+                        }
+
                     }
 
                 });
