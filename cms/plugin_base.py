@@ -499,7 +499,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # Useful in cases like djangocms-text-ckeditor
         # where only text only plugins are allowed.
         from cms.plugin_pool import plugin_pool
-        return plugin_pool.get_all_plugins(slot, page)
+        return plugin_pool.get_all_plugins()
 
     def get_child_classes(self, slot, page):
         """

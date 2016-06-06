@@ -1272,6 +1272,39 @@ class PluginsTestCase(PluginsTestBaseCase):
                 self.assertEqual(['TestPlugin'],
                                     plugin.get_parent_classes(placeholder.slot, page))
 
+    def test_plugin_parent_classes_from_object(self):
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+        ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
+                                    dict(render_plugin=False))
+        ChildPlugin = type('ChildPlugin', (CMSPluginBase,),
+                                    dict(parent_classes=['ParentPlugin'], render_plugin=False))
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            plugin = plugin.get_plugin_class_instance()
+            ## assert baseline
+            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            self.assertIn('ChildPlugin', child_classes)
+            self.assertIn('ParentPlugin', child_classes)
+
+    def test_plugin_require_parent_from_object(self):
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+        ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
+                                    dict(render_plugin=False))
+        ChildPlugin = type('ChildPlugin', (CMSPluginBase,),
+                                    dict(require_parent=True, render_plugin=False))
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            plugin = plugin.get_plugin_class_instance()
+            ## assert baseline
+            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            self.assertIn('ChildPlugin', child_classes)
+            self.assertIn('ParentPlugin', child_classes)
+
+
     def test_plugin_translatable_content_getter_setter(self):
         """
         Test that you can add a text plugin
