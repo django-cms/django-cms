@@ -826,6 +826,7 @@ describe('CMS.Plugin', function () {
                     }
                 };
                 spyOn(CMS.Plugin.prototype, '_setPosition');
+                spyOn(CMS.Plugin.prototype, 'movePlugin');
 
                 clipboardPlugin = new CMS.Plugin('cms-plugin-3', {
                     type: 'plugin',
@@ -884,7 +885,7 @@ describe('CMS.Plugin', function () {
         });
 
         it('triggers correct events on a freshly pasted clipboard plugin', function (done) {
-            var clipboardPluginDOM = $('.cms-clipboard .cms-plugin:first');
+            var clipboardPluginDOM = $('.cms-clipboard .cms-draggable:first');
             clipboardPluginDOM.on('cms.plugin.update', function () {
                 done();
             });
@@ -901,7 +902,6 @@ describe('CMS.Plugin', function () {
         });
 
         it('triggers movePlugin on clipboard plugin eventually', function () {
-            spyOn(clipboardPlugin, 'movePlugin');
             plugin.pastePlugin();
             expect(clipboardPlugin.movePlugin).toHaveBeenCalledWith({
                 type: 'plugin',

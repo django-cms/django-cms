@@ -158,6 +158,14 @@ var Plugin = new Class({
     _setPlugin: function () {
         var that = this;
 
+        // filling up ui object
+        this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
+        this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
+        this.ui.draggables = this.ui.draggable.find('> .cms-draggables');
+        this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
+
+        this.ui.draggable.data('settings', this.options);
+
         // adds double click to edit
         this.ui.container.add(this.ui.dragitem).on(this.doubleClick, function (e) {
             e.preventDefault();
@@ -192,13 +200,13 @@ var Plugin = new Class({
         });
 
         // adds listener for all plugin updates
-        this.ui.container.on('cms.plugins.update', function (e) {
+        this.ui.container.add(this.ui.draggable).on('cms.plugins.update', function (e) {
             e.stopPropagation();
             that.movePlugin();
         });
 
         // adds listener for copy/paste updates
-        this.ui.container.on('cms.plugin.update', function (e) {
+        this.ui.container.add(this.ui.draggable).on('cms.plugin.update', function (e) {
             e.stopPropagation();
 
             var el = $(e.delegateTarget);
@@ -220,12 +228,6 @@ var Plugin = new Class({
 
             that.movePlugin(data);
         });
-
-        // filling up ui object
-        this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
-        this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
-        this.ui.draggables = this.ui.draggable.find('> .cms-draggables');
-        this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
         // attach event to the plugin menu
         this._setSettingsMenu(this.ui.submenu);
@@ -522,7 +524,7 @@ var Plugin = new Class({
     pastePlugin: function () {
         clipboardDraggable.appendTo(this.ui.draggables);
         this.ui.draggables.trigger('cms.update');
-        clipboardPlugin.trigger('cms.plugin.update');
+        clipboardDraggable.trigger('cms.plugin.update');
     },
 
     /**
@@ -667,10 +669,12 @@ var Plugin = new Class({
     _setSettings: function _setSettings(oldSettings, newSettings) {
         var settings = $.extend(true, {}, oldSettings, newSettings);
         var plugin = $('.cms-plugin-' + settings.plugin_id);
+        var draggable = $('.cms-draggable-' + settings.plugin_id);
 
         // set new setting on instance and plugin data
         this.options = settings;
         plugin.data('settings', settings);
+        draggable.data('settings', settings);
     },
 
     /**
@@ -1334,12 +1338,6 @@ var Plugin = new Class({
                 that._toggleCollapsable(dragitem);
             }, 0)
         );
-
-        // adds double click event
-        this.ui.draggable.on(this.doubleClick, function (e) {
-            e.stopPropagation();
-            $('.cms-plugin-' + that._getId($(this))).trigger('dblclick.cms');
-        });
     },
 
     /**

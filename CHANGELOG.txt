@@ -9,6 +9,8 @@
   with 1Password extension installed
 * Changed CMS JavaScript bundling from simple concatenation to webpack-based.
   Using CMS Javascript modules directly is no longer possible.
+* Fixed an issue where plugins that have no immediate DOM representation
+  wouldn't be editable or movable.
 
 
 === 3.3.0 (2016-05-26) ===
