@@ -494,10 +494,10 @@ var StructureBoard = new Class({
 
                 // we pass the id to the updater which checks within the backend the correct place
                 var id = that.getId(ui.item);
-                var plugin = $('.cms-plugin-' + id);
+                var plugin = $('.cms-draggable-' + id);
 
                 // check if we copy/paste a plugin or not
-                if (plugin.closest('.cms-clipboard').length) {
+                if (originalPluginContainer.hasClass('cms-clipboard-containers')) {
                     plugin.trigger('cms.plugin.update');
                 } else {
                     plugin.trigger('cms.plugins.update');
@@ -534,7 +534,7 @@ var StructureBoard = new Class({
                 }
 
                 // save original state events
-                var original = $('.cms-plugin-' + that.getId(originalItem));
+                var original = $('.cms-draggable-' + that.getId(originalItem));
 
                 // cancel if item has no settings
                 if (original.length === 0 || !original.data('settings')) {
@@ -553,9 +553,9 @@ var StructureBoard = new Class({
                 if (placeholderParent && placeholderParent.length) {
                     // placeholderParent is always latest, it maybe that
                     // isAllowed is called _before_ placeholder is moved to a child plugin
-                    plugin = $('.cms-plugin-' + that.getId(placeholderParent.closest('.cms-draggable')));
+                    plugin = $('.cms-draggable-' + that.getId(placeholderParent.closest('.cms-draggable')));
                 } else {
-                    plugin = $('.cms-plugin-' + that.getId(placeholder.closest('.cms-draggable')));
+                    plugin = $('.cms-draggable-' + that.getId(placeholder.closest('.cms-draggable')));
                 }
 
                 // now set the correct bounds
