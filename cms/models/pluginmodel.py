@@ -121,7 +121,7 @@ class PluginModelBase(ModelBase):
         if not new_class._meta.abstract and not new_class._meta.proxy:
             # True if cmsplugin_ptr was explicitly defined
             # when subclassing CMSPlugin
-            explicit_rel = 'cmsplugin_ptr' not in attrs
+            explicit_rel = 'cmsplugin_ptr' in attrs
 
             for field in new_class._meta.fields:
                 if field.name != 'cmsplugin_ptr':
