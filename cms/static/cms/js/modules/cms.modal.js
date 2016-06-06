@@ -922,7 +922,14 @@ var Modal = new Class({
                 });
             }
 
-            var saveSuccess = Boolean(contents.find('.messagelist li:not(".error")').length);
+            var saveSuccess = Boolean(contents.find('.messagelist :not(".error")').length);
+
+            // in case message didn't appear, assume that admin page is actually a success
+            // istanbul ignore if
+            if (!saveSuccess) {
+                saveSuccess = Boolean(contents.find('.dashboard #content-main').length) &&
+                    !contents.find('.messagelist .error').length;
+            }
 
             // show messages in toolbar if provided
             messageList = contents.find('.messagelist');
