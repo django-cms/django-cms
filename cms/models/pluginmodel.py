@@ -70,7 +70,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
         deferred = instance.get_deferred_fields()
         # Because it's a parent link, all the data is available in the
         # instance, so populate the parent model with this data.
-        rel_model = self.field.remote_field.model
+        rel_model = self.field.rel.model
         fields = [field.attname for field in rel_model._meta.concrete_fields]
 
         # If any of the related model's fields are deferred, fallback to
@@ -99,6 +99,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
                 rel_obj = self.get_inherited_object(instance)
 
                 if not rel_obj is None:
+                    # Populate the internal relationship cache.
                     setattr(instance, self.cache_name, rel_obj)
         return super(ForwardOneToOneDescriptor, self).__get__(instance, instance_type)
 
