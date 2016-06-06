@@ -169,13 +169,13 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
             );
 
             test.assertEvalEquals(function () {
-                return $('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:first')
                     .closest('.cms-dragitem')
                     .hasClass('cms-dragitem-collapsable');
             }, true, 'First grid column has a child');
 
             test.assertEvalEquals(function () {
-                return $('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:first')
                     .closest('.cms-draggable')
                     .find('.cms-draggables')
                     .find('.cms-dragitem-text strong').text() === 'Text';
@@ -245,19 +245,19 @@ casper.test.begin('Try to move a plugin to restricted area (not allowed)', funct
             );
 
             test.assertEvalEquals(function () {
-                return $('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:first')
                     .closest('.cms-dragitem')
                     .hasClass('cms-dragitem-collapsable');
             }, false, 'First grid column has no children');
 
             test.assertEvalEquals(function () {
-                return $('.cms-dragitem-text[title*=GridColumnPlugin]:last')
+                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:last')
                     .closest('.cms-dragitem')
                     .hasClass('cms-dragitem-collapsable');
             }, false, 'Second grid column has no children');
 
             test.assertEvalEquals(function () {
-                return $('.cms-dragitem-text[title*=GridPlugin]:last')
+                return CMS.$('.cms-dragitem-text[title*=GridPlugin]:last')
                     .closest('.cms-draggable')
                     .find('.cms-draggables')
                     .children().length;

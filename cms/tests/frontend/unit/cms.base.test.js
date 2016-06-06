@@ -1,6 +1,11 @@
-/* globals jQuery, Class, $, document, window, localStorage */
-
 'use strict';
+
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var jQuery = require('jquery');
+var $ = jQuery;
+var Class = require('classjs');
+
+window.CMS = window.CMS || CMS;
 
 describe('cms.base.js', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -26,6 +31,7 @@ describe('cms.base.js', function () {
         expect(CMS.$).toEqual(jQuery);
         expect(CMS.Class).toEqual(Class);
     });
+
 
     describe('CMS.API', function () {
         it('exists', function () {

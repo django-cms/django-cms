@@ -1,4 +1,11 @@
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Toolbar = require('../../../static/cms/js/modules/cms.toolbar');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Toolbar = Toolbar;
+
 
 describe('CMS.Toolbar', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

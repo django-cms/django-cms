@@ -1,5 +1,12 @@
 /* global document */
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.PageTreeDropdowns = PageTreeDropdowns;
+
 
 describe('CMS.PageTreeDropdowns', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

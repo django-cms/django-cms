@@ -1,5 +1,12 @@
-/* global document */
 'use strict';
+
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var ChangeTracker = require('../../../static/cms/js/modules/cms.changetracker');
+var jQuery = require('jquery');
+var $ = jQuery;
+
+window.CMS = window.CMS || CMS;
+CMS.ChangeTracker = ChangeTracker;
 
 describe('CMS.ChangeTracker', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

@@ -112,7 +112,7 @@ module.exports = {
         "yoda": [2, "never", { "exceptRange": true }],
 
         // Strict Mode
-        "strict": [2, "function"],
+        "strict": 0, // not required with webpack
 
         // Variables
         "init-declarations": 0,

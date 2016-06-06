@@ -66,6 +66,4 @@
             }
         };
     });
-
-    // has to be attached to CMS
-}(CMS.$));
+}(jQuery));

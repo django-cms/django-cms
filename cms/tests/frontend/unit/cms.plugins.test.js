@@ -1,5 +1,11 @@
 /* globals window, document */
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Plugin = require('../../../static/cms/js/modules/cms.plugins');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Plugin = Plugin;
 
 describe('CMS.Plugin', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
