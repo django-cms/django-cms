@@ -1,4 +1,10 @@
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Navigation = require('../../../static/cms/js/modules/cms.navigation');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Navigation = Navigation;
 
 describe('CMS.Navigation', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

@@ -1,6 +1,12 @@
-/* globals $, window */
-
 'use strict';
+
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Tooltip = require('../../../static/cms/js/modules/cms.tooltip');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Tooltip = Tooltip;
+
 
 describe('CMS.Messages', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

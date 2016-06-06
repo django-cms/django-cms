@@ -13,10 +13,8 @@
     {# INFO: we need to add styles here instead of "extrastyle" to avoid conflicts with adminstyle #}
     <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}">
     <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.pagetree.css' %}">
-    <script src="{% static_with_version 'cms/js/modules/jquery.noconflict.pre.js' %}"></script>
     <script src="{% static_with_version 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
     <script src="{% static_with_version 'cms/js/dist/bundle.admin.pagetree.min.js' %}"></script>
-    <script src="{% static_with_version 'cms/js/modules/jquery.noconflict.post.js' %}"></script>
 {% endblock extrahead %}
 
 {% if not is_popup %}

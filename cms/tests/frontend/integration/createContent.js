@@ -69,7 +69,7 @@ casper.test.begin('User Add Content', function (test) {
             this.waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                 this.waitFor(function () {
                     return this.evaluate(function () {
-                        return $('.cms-submenu-item [data-rel="add"]:visible').length === 1;
+                        return CMS.$('.cms-submenu-item [data-rel="add"]:visible').length === 1;
                     });
                 }).then(function () {
                     test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',

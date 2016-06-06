@@ -1,5 +1,11 @@
 /* global document */
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Clipboard = require('../../../static/cms/js/modules/cms.clipboard');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Clipboard = Clipboard;
 
 describe('CMS.Clipboard', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

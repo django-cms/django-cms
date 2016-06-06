@@ -273,20 +273,20 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
             );
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item:has("[data-cms-icon=paste]")').length;
+                return CMS.$('.cms-structure .cms-submenu-item:has("[data-cms-icon=paste]")').length;
             }, 7, 'There are 7 pasting areas');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item-disabled:has("[data-cms-icon=paste]")').length;
+                return CMS.$('.cms-structure .cms-submenu-item-disabled:has("[data-cms-icon=paste]")').length;
             }, 6, '6 items do not allow pasting');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').length;
             }, 1, '1 item does allow pasting');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(0).text();
             }, 'Row', '1 item that does allow pasting is indeed a Row plugin');
@@ -395,20 +395,20 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
             );
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item:has("[data-cms-icon=paste]")').length;
+                return CMS.$('.cms-structure .cms-submenu-item:has("[data-cms-icon=paste]")').length;
             }, 7, 'There are 7 pasting areas');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item-disabled:has("[data-cms-icon=paste]")').length;
+                return CMS.$('.cms-structure .cms-submenu-item-disabled:has("[data-cms-icon=paste]")').length;
             }, 6, '6 items do not allow pasting');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').length;
             }, 1, '1 item does allow pasting');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(0).text();
             }, 'Row', '1 item that does allow pasting is indeed a Row plugin');
@@ -539,18 +539,18 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
         // check that we can't paste into a row
         .then(function () {
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').length;
             }, 2, '2 plugins do allow pasting');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(0).text();
             }, 'Column', 'First item that does allow pasting is a Col plugin');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(1).text();
             }, 'Column', 'Another item that does allow pasting is a Col plugin');
@@ -666,18 +666,18 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
         // check that we can't paste into a row
         .then(function () {
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').length;
             }, 2, '2 plugins do allow pasting');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(0).text();
             }, 'Column', 'First item that does allow pasting is a Col plugin');
 
             test.assertEvalEquals(function () {
-                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                return CMS.$('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(1).text();
             }, 'Column', 'Another item that does allow pasting is a Col plugin');

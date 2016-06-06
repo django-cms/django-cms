@@ -40,7 +40,7 @@ casper.test.begin('Sideframe', function (test) {
         // wait until animation finishes
         .wait(300, function () {
             test.assertEvalEquals(function () {
-                return $('.cms-sideframe').width();
+                return CMS.$('.cms-sideframe').width();
             }, 1280 * 0.95, 'Sideframe opens with default width');
         })
         // changes viewport to mobile
@@ -50,7 +50,7 @@ casper.test.begin('Sideframe', function (test) {
         // checks current mobile width to be equal with sideframe width
         .wait(300, function () {
             test.assertEvalEquals(function () {
-                return $('.cms-sideframe').width();
+                return CMS.$('.cms-sideframe').width();
             }, 767, 'Sideframe is fullwidth with on mobile');
         })
         // changes back to default width

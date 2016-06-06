@@ -122,10 +122,10 @@ casper.test.begin('Settings and advanced settings are accessible', function (tes
             .waitForSelector('.cms-pagetree-jstree')
             .wait(3000).then(cms.expandPageTree())
             .thenEvaluate(function () {
-                var clickEvent = new $.Event('click', { shiftKey: true });
+                var clickEvent = new CMS.$.Event('click', { shiftKey: true });
 
                 // here we cheat a bit, it works only if there's only one edit on the page
-                $('.cms-icon-pencil:visible').trigger(clickEvent);
+                CMS.$('.cms-icon-pencil:visible').trigger(clickEvent);
             })
             .waitForUrl(/advanced-settings/)
             .waitForSelector('h1')

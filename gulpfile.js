@@ -15,8 +15,7 @@ var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-clean-css');
 var eslint = require('gulp-eslint');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
+var webpack = require('webpack');
 var KarmaServer = require('karma').Server;
 var integrationTests = require('djangocms-casper-helpers/gulp');
 
@@ -40,6 +39,7 @@ var PROJECT_PATTERNS = {
     js: [
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/widgets/*.js',
+        PROJECT_PATH.js + '/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
         PROJECT_PATH.tests + '/**/*.js',
         '!' + PROJECT_PATH.tests + '/unit/helpers/**/*.js',
@@ -52,52 +52,6 @@ var PROJECT_PATTERNS = {
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'
-    ]
-};
-
-/*
- * Object keys are filenames of bundles that will be compiled
- * from array of paths that are the value.
- */
-var JS_BUNDLES = {
-    'bundle.admin.base.min.js': [
-        PROJECT_PATH.js + '/polyfills/function.prototype.bind.js',
-        PROJECT_PATH.js + '/libs/jquery.min.js',
-        PROJECT_PATH.js + '/libs/pep.js',
-        PROJECT_PATH.js + '/libs/class.min.js',
-        PROJECT_PATH.js + '/modules/cms.base.js'
-    ],
-    'bundle.admin.changeform.min.js': [
-        PROJECT_PATH.js + '/modules/cms.changeform.js'
-    ],
-    'bundle.admin.pagetree.min.js': [
-        PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
-        PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
-        PROJECT_PATH.js + '/modules/cms.pagetree.dropdown.js',
-        PROJECT_PATH.js + '/modules/cms.pagetree.stickyheader.js',
-        PROJECT_PATH.js + '/modules/cms.pagetree.js'
-    ],
-    'bundle.toolbar.min.js': [
-        PROJECT_PATH.js + '/polyfills/function.prototype.bind.js',
-        PROJECT_PATH.js + '/polyfills/array.prototype.findindex.js',
-        PROJECT_PATH.js + '/libs/jquery.min.js',
-        PROJECT_PATH.js + '/libs/class.min.js',
-        PROJECT_PATH.js + '/libs/pep.js',
-        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
-        PROJECT_PATH.js + '/modules/jquery.ui.touchpunch.js',
-        PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
-        PROJECT_PATH.js + '/modules/cms.base.js',
-        PROJECT_PATH.js + '/modules/jquery.transition.js',
-        PROJECT_PATH.js + '/modules/cms.messages.js',
-        PROJECT_PATH.js + '/modules/cms.changetracker.js',
-        PROJECT_PATH.js + '/modules/cms.modal.js',
-        PROJECT_PATH.js + '/modules/cms.sideframe.js',
-        PROJECT_PATH.js + '/modules/cms.clipboard.js',
-        PROJECT_PATH.js + '/modules/cms.plugins.js',
-        PROJECT_PATH.js + '/modules/cms.structureboard.js',
-        PROJECT_PATH.js + '/modules/cms.navigation.js',
-        PROJECT_PATH.js + '/modules/cms.toolbar.js',
-        PROJECT_PATH.js + '/modules/cms.tooltip.js'
     ]
 };
 
@@ -248,35 +202,33 @@ gulp.task('tests:integration', integrationTests({
     logger: gutil.log.bind(gutil)
 }));
 
-Object.keys(JS_BUNDLES).forEach(function (bundleName) {
-    var bundleFiles = JS_BUNDLES[bundleName];
+var webpackBundle = function (opts) {
+    var webpackOptions = opts || {};
 
-    gulp.task('bundle:' + bundleName, function () {
-        return gulp.src(bundleFiles)
-            .pipe(gulpif(options.debug, sourcemaps.init()))
-            .pipe(gulpif(!options.debug, uglify({
-                preserveComments: 'some'
-            })))
-            .pipe(concat(bundleName, {
-                newLine: '\n'
-            }))
-            .pipe(gulpif(options.debug, sourcemaps.write()))
-            .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
-    });
-});
+    webpackOptions.PROJECT_PATH = PROJECT_PATH;
+    webpackOptions.debug = options.debug;
 
-gulp.task('bundle', Object.keys(JS_BUNDLES).map(function (bundleName) {
-    return 'bundle:' + bundleName;
-}));
+    return function (done) {
+        var config = require('./webpack.config')(webpackOptions);
 
-gulp.task('watch', function () {
+        webpack(config, function (err, stats) {
+            if (err) {
+                throw new gutil.PluginError('webpack', err);
+            }
+            gutil.log('[webpack]', stats.toString({ colors: true }));
+            if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
+                done();
+            }
+        });
+    };
+};
+
+gulp.task('bundle:watch', webpackBundle({ watch: true }));
+gulp.task('bundle', webpackBundle());
+
+gulp.task('watch', ['bundle:watch'], function () {
     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
-    Object.keys(JS_BUNDLES).forEach(function (bundleName) {
-        var bundleFiles = JS_BUNDLES[bundleName];
-
-        gulp.watch(bundleFiles, ['bundle:' + bundleName]);
-    });
 });
 
-gulp.task('default', ['sass', 'lint', 'bundle', 'watch']);
+gulp.task('default', ['sass', 'lint', 'watch']);

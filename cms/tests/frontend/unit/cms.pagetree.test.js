@@ -1,4 +1,11 @@
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var PageTree = require('../../../static/cms/js/modules/cms.pagetree');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.PageTree = PageTree;
+
 
 describe('CMS.PageTree', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

@@ -1,6 +1,10 @@
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var StructureBoard = require('../../../static/cms/js/modules/cms.structureboard');
+var $ = require('jquery');
 
-/* globals window */
+window.CMS = window.CMS || CMS;
+CMS.StructureBoard = StructureBoard;
 
 describe('CMS.StructureBoard', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');

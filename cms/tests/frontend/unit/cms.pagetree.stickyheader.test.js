@@ -1,5 +1,12 @@
 /* global document, window */
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var PageTreeStickyHeader = require('../../../static/cms/js/modules/cms.pagetree.stickyheader');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.PageTreeStickyHeader = PageTreeStickyHeader;
+
 
 describe('CMS.PageTreeStickyHeader', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
