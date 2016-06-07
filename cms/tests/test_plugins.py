@@ -1797,15 +1797,17 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
                          'mti_pluginapp_testpluginalphamodel')
         self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.rel.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        # Abstract plugins are skipped bc
-        self.assertIsNone(AbstractPluginParent.cmsplugin_ptr.field.rel.related_name)
+        # Abstract plugins will have the dynamic format for related name
+        self.assertEqual(
+            AbstractPluginParent.cmsplugin_ptr.field.rel.related_name,
+            '%(app_label)s_%(class)s'
+        )
         # Concrete plugin of an abstract plugin gets its relatedname
         self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.rel.related_name,
                          'mti_pluginapp_testplugingammamodel')
-        # Child plugin -even if mixed with other models- keeps the same related name
-        # as its parent plugin
+        # Child plugin gets it's own related name
         self.assertEqual(MixedPlugin.cmsplugin_ptr.field.rel.related_name,
-                         'mti_pluginapp_testplugingammamodel')
+                         'mti_pluginapp_mixedplugin')
         # If the child plugin inherit straight from CMSPlugin, even if composed with
         # other models, gets its own related_name
         self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.rel.related_name,
