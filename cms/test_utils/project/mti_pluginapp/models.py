@@ -80,9 +80,9 @@ class NonPluginModel(models.Model):
     non_plugin = models.CharField('non plugin', blank=False, default='test non plugin', max_length=32)
 
 
-class MixedPlugin(NonPluginModel, TestPluginGammaModel):
+class MixedPlugin(AbstractPluginParent, NonPluginModel):
     """
-    Plugin which inherits from two concrete models, one of which is a plugin
+    Plugin which inherits from one abstract and one concrete model
     """
     mixed = models.CharField('mixed', blank=False, default='test plugin mixed', max_length=32)
 

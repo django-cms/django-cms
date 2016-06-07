@@ -67,11 +67,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MixedPlugin',
             fields=[
+                ('cmsplugin_ptr', models.OneToOneField(parent_link=True, auto_created=True, to='cms.CMSPlugin')),
+                ('abs', models.CharField(default=b'test plugin abs', max_length=32, verbose_name=b'abs')),
                 ('mixed', models.CharField(default=b'test plugin mixed', max_length=32, verbose_name=b'mixed')),
             ],
             options={
                 'abstract': False,
             },
-            bases=('mti_pluginapp.nonpluginmodel', 'mti_pluginapp.testplugingammamodel'),
+            bases=('cms.cmsplugin', 'mti_pluginapp.nonpluginmodel'),
         ),
     ]
