@@ -123,7 +123,6 @@ class PluginModelBase(ModelBase):
             # The current class subclasses from CMSPlugin
             # and has not defined a cmsplugin_ptr field.
             meta = attrs.get('Meta', None)
-            abstract = getattr(meta, 'abstract', False)
             proxy = getattr(meta, 'proxy', False)
 
             # True if any of the base classes defines a cmsplugin_ptr field.
