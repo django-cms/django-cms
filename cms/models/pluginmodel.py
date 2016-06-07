@@ -111,35 +111,47 @@ class PluginModelBase(ModelBase):
     """
 
     def __new__(cls, name, bases, attrs):
+        super_new = super(PluginModelBase, cls).__new__
         # remove RenderMeta from the plugin class
         attr_meta = attrs.pop('RenderMeta', None)
 
+        # Only care about subclasses of CMSPlugin
+        # (excluding CMSPlugin itself).
+        parents = [b for b in bases if isinstance(b, PluginModelBase)]
+
+        if parents and 'cmsplugin_ptr' not in attrs:
+            # The current class subclasses from CMSPlugin
+            # and has not defined a cmsplugin_ptr field.
+            meta = attrs.get('Meta', None)
+            abstract = getattr(meta, 'abstract', False)
+            proxy = getattr(meta, 'proxy', False)
+
+            # True if any of the base classes defines a cmsplugin_ptr field.
+            field_is_inherited = any(hasattr(parent, 'cmsplugin_ptr') for parent in parents)
+
+            # Skip abstract and proxied classes which are not autonomous ORM objects
+            if not abstract and not proxy and not field_is_inherited:
+                # It's important to set the field as if it was set
+                # manually in the model class.
+                # This is because Django will do a lot of operations
+                # under the hood to set the forward and reverse relations.
+                attrs['cmsplugin_ptr'] = models.OneToOneField(
+                    to='cms.CMSPlugin',
+                    name='cmsplugin_ptr',
+                    related_name='%(app_label)s_%(class)s',
+                    auto_created=True,
+                    parent_link=True,
+                )
+
         # create a new class (using the super-metaclass)
-        new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
+        new_class = super_new(cls, name, bases, attrs)
 
-        # NOTE: We skip abstract and proxied classes which are not autonomous ORM objects
-        if not new_class._meta.abstract and not new_class._meta.proxy:
-            # True if cmsplugin_ptr was explicitly defined
-            # when subclassing CMSPlugin
-            explicit_rel = 'cmsplugin_ptr' in attrs
-
-            for field in new_class._meta.fields:
-                if field.name != 'cmsplugin_ptr':
-                    continue
-
-                if not explicit_rel and field.rel.related_name is None:
-                    # Set the reverse related_name attribute to a value that
-                    # will it's unique for this app and model combination.
-                    # This is to avoid name clashes for plugins with the same
-                    # fieldnames.
-                    app_label = new_class._meta.app_label
-                    model_name = new_class._meta.concrete_model._meta.model_name
-                    related = '{0}_{1}'.format(app_label, model_name)
-                    field.rel.related_name = related
-
-                # Use our patched descriptor regardless of how the one to one
-                # relationship was defined.
-                setattr(new_class, field.name, ForwardOneToOneDescriptor(field))
+        # Skip abstract and proxied classes which are not autonomous ORM objects
+        if parents and not new_class._meta.abstract and not new_class._meta.proxy:
+            # Use our patched descriptor regardless of how the one to one
+            # relationship was defined.
+            parent_link_field = new_class._meta.get_field('cmsplugin_ptr')
+            setattr(new_class, 'cmsplugin_ptr', ForwardOneToOneDescriptor(parent_link_field))
 
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
