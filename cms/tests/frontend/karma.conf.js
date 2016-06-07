@@ -20,7 +20,10 @@ var webpackConfig = require('../../../webpack.config.js')({
 webpackConfig.module.preLoaders = [
     {
         test: /cms\/js\/modules\/(?!jquery)/,
-        loader: 'istanbul-instrumenter'
+        loader: 'istanbul-instrumenter',
+        query: {
+            noCompact: true
+        }
     }
 ];
 

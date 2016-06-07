@@ -150,6 +150,7 @@ describe('CMS.Toolbar', function () {
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
+            spyOn(CMS.Toolbar.prototype, '_initialStates');
             $(function () {
                 toolbar = new CMS.Toolbar();
                 spyOn(toolbar, 'setSettings').and.callFake(function (input) {
@@ -232,7 +233,7 @@ describe('CMS.Toolbar', function () {
 
         it('turns the disclosure triangle into correct position', function (done) {
             // have to cleanup here because previous test `animate` call isn't finished yet
-            toolbar.ui.body.removeClass('cms-toolbar-collapsing');
+            toolbar.ui.body.removeClass('cms-toolbar-collapsing cms-toolbar-expanded cms-toolbar-expanding');
             // eslint-disable-next-line max-params
             spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
                 expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');

@@ -60,12 +60,8 @@ function actualizePluginsCollapsibleStatus(els) {
  *
  * @class StructureBoard
  * @namespace CMS
- * @uses CMS.API.Helpers
  */
 var StructureBoard = new Class({
-
-    implement: [Helpers],
-
     initialize: function () {
         // elements
         this._setupUI();
@@ -237,7 +233,7 @@ var StructureBoard = new Class({
         // apply new settings
         CMS.settings.mode = 'structure';
         if (!init) {
-            CMS.settings = this.setSettings(CMS.settings);
+            CMS.settings = Helpers.setSettings(CMS.settings);
         }
 
         // ensure all elements are visible
@@ -273,7 +269,7 @@ var StructureBoard = new Class({
 
         CMS.settings.mode = 'edit';
         if (!init) {
-            CMS.settings = this.setSettings(CMS.settings);
+            CMS.settings = Helpers.setSettings(CMS.settings);
         }
 
         // hide canvas
@@ -340,9 +336,6 @@ var StructureBoard = new Class({
         this.ui.container.show();
         this.ui.dragareas.css('opacity', 1);
 
-        this.ui.plugins.not(this.ui.render_model).hide();
-        this.ui.placeholders.show();
-
         // attach event
         var content = this.ui.content;
         var areas = content.find('.cms-dragarea');
@@ -366,13 +359,6 @@ var StructureBoard = new Class({
     _hideBoard: function () {
         // hide elements
         this.ui.container.hide();
-        this.ui.plugins.show();
-        this.ui.placeholders.hide();
-
-        // detach event
-        this.ui.window.off('resize.sideframe');
-
-        this.ui.window.trigger('structureboard_hidden.sideframe');
 
         // this is sometimes required for user-side scripts to
         // render dynamic elements on the page correctly.
@@ -495,12 +481,22 @@ var StructureBoard = new Class({
                 // we pass the id to the updater which checks within the backend the correct place
                 var id = that.getId(ui.item);
                 var plugin = $('.cms-draggable-' + id);
+                var eventData = {
+                    id: id
+                };
+                var previousParentPlugin = originalPluginContainer.closest('.cms-draggable');
+
+                if (previousParentPlugin.length) {
+                    var previousParentPluginId = that.getId(previousParentPlugin);
+
+                    eventData.previousParentPluginId = previousParentPluginId;
+                }
 
                 // check if we copy/paste a plugin or not
                 if (originalPluginContainer.hasClass('cms-clipboard-containers')) {
-                    plugin.trigger('cms.plugin.update');
+                    plugin.trigger('cms.plugin.update', [eventData]);
                 } else {
-                    plugin.trigger('cms.plugins.update');
+                    plugin.trigger('cms.plugins.update', [eventData]);
                 }
 
                 // reset placeholder without entries
@@ -533,18 +529,20 @@ var StructureBoard = new Class({
                     return false;
                 }
 
+                var originalItemId = that.getId(originalItem);
                 // save original state events
-                var original = $('.cms-draggable-' + that.getId(originalItem));
+                var original = $('.cms-draggable-' + originalItemId);
 
                 // cancel if item has no settings
-                if (original.length === 0 || !original.data('settings')) {
+                if (original.length === 0 || !original.data('cms')) {
                     return false;
                 }
-                var parent_bounds = $.grep(original.data('settings').plugin_parent_restriction, function (r) {
+                var originalItemData = original.data('cms');
+                var parent_bounds = $.grep(originalItemData.plugin_parent_restriction, function (r) {
                     // special case when PlaceholderPlugin has a parent restriction named "0"
                     return r !== '0';
                 });
-                var type = original.data('settings').plugin_type;
+                var type = originalItemData.plugin_type;
                 // prepare variables for bound
                 var holderId = that.getId(placeholder.closest('.cms-dragarea'));
                 var holder = $('.cms-placeholder-' + holderId);
@@ -560,12 +558,12 @@ var StructureBoard = new Class({
 
                 // now set the correct bounds
                 if (holder.length) {
-                    bounds = holder.data('settings').plugin_restriction;
-                    immediateParentType = holder.data('settings').plugin_type;
+                    bounds = holder.data('cms').plugin_restriction;
+                    immediateParentType = holder.data('cms').plugin_type;
                 }
                 if (plugin.length) {
-                    bounds = plugin.data('settings').plugin_restriction;
-                    immediateParentType = plugin.data('settings').plugin_type;
+                    bounds = plugin.data('cms').plugin_restriction;
+                    immediateParentType = plugin.data('cms').plugin_type;
                 }
 
                 // if restrictions is still empty, proceed
@@ -580,7 +578,6 @@ var StructureBoard = new Class({
             }
         }).on('cms.update', actualizeEmptyPlaceholders);
     }
-
 });
 
 /**

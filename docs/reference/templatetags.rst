@@ -466,7 +466,7 @@ This will render to:
 .. code-block:: html+django
 
     <!-- The content of the H1 is the active area that triggers the frontend editor -->
-    <h1><div class="cms-plugin cms-plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
+    <h1><cms-plugin class="cms-plugin cms-plugin-myapp-mymodel-title-1">{{ my_model.title }}</cms-plugin></h1>
 
 **Arguments:**
 
@@ -532,13 +532,13 @@ This will render to:
 .. code-block:: html+django
 
     <!-- This whole block is the active area that triggers the frontend editor -->
-    <div class="cms-plugin cms-plugin-myapp-mymodel-1">
+    <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1"></template>
         <h1>{{ my_model.title }}</h1>
         <div class="body">
             {{ my_model.date|date:"d F Y" }}
             {{ my_model.text }}
         </div>
-    </div>
+    <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1"></template>
 
 In the block the ``my_model`` is aliased as ``instance`` and every attribute and
 method is available; also template tags and filters are available in the block.
@@ -599,10 +599,10 @@ It will render to something like:
 
     <h3>
         <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
-        <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-icon">
+        <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1 cms-render-model-icon"></template>
             <!-- The image below is the active area that triggers the frontend editor -->
             <img src="/static/cms/img/toolbar/render_model_placeholder.png">
-        </div>
+        <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1 cms-render-model-icon"></template>
     </h3>
 
 .. note::
@@ -656,10 +656,10 @@ It will render to something like:
 
     <h3>
         <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
-        <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-add">
+        <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
             <!-- The image below is the active area that triggers the frontend editor -->
             <img src="/static/cms/img/toolbar/render_model_placeholder.png">
-        </div>
+        <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
     </h3>
 
 .. note::
@@ -722,9 +722,9 @@ It will render to something like:
 
 .. code-block:: html+django
 
-    <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-add">
-      <div>New Object</div>
-    </div>
+    <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
+        <div>New Object</div>
+    <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
 
 
 .. warning::

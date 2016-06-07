@@ -68,9 +68,7 @@ $(document).ready(function () {
         'Tooltip': new CMS.Tooltip()
     });
 
-    $.each(CMS._plugins, function (index, args) {
-        new CMS.Plugin(args[0], args[1])
-    });
+    CMS.Plugin._initializeTree();
 });
 })(CMS.$);
 </script>

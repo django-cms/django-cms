@@ -7,13 +7,13 @@ var Class = require('classjs');
 var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var Modal = require('./cms.modal');
+var nextUntil = require('./nextuntil');
 
 require('../polyfills/array.prototype.findindex');
 
 var doc;
 var clipboard;
 var clipboardDraggable;
-var clipboardPlugin;
 
 /**
  * Class for handling Plugins / Placeholders or Generics.
@@ -65,21 +65,31 @@ var Plugin = new Class({
         this.touchStart = 'touchstart.cms.plugin';
         this.touchEnd = 'touchend.cms.plugin';
 
-        // bind data element to the container
-        this.ui.container.data('settings', this.options);
+        // bind data element to the container (mutating!)
+        if (!this.ui.container.data('cms')) {
+            this.ui.container.data('cms', []);
+        }
+        if (Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
+            return;
+        }
+
         Plugin._initializeDragItemsStates();
 
         // determine type of plugin
         switch (this.options.type) {
             case 'placeholder': // handler for placeholder bars
+                this.ui.container.data('cms', this.options);
                 this._setPlaceholder();
                 this._collapsables();
                 break;
             case 'plugin': // handler for all plugins
+                this.ui.container.data('cms').push(this.options);
+                Plugin.aliasPluginDuplicatesMap[this.options.plugin_id] = true;
                 this._setPlugin();
                 this._collapsables();
                 break;
             default: // handler for static content
+                this.ui.container.data('cms').push(this.options);
                 this._setGeneric();
         }
     },
@@ -94,9 +104,43 @@ var Plugin = new Class({
      */
     _setupUI: function setupUI(container) {
         var wrapper = $('.' + container);
+        var contents;
+
+        if (wrapper.length > 1) {
+            var templateStart = $('.cms-plugin-start.' + container);
+            var className = templateStart.attr('class').replace('cms-plugin-start', '');
+
+            contents = $(nextUntil(templateStart[0], container));
+
+            wrapper.filter('template').remove();
+
+            contents.each(function (index, el) {
+                if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
+                    var element = $(el);
+
+                    element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
+                    contents[index] = element.parent()[0];
+                }
+            });
+
+            // otherwise we don't really need text nodes or comment nodes
+            contents = contents.filter(function () {
+                return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
+            });
+
+            // addClass iterates
+            contents.addClass('cms-plugin ' + className);
+        } else {
+            contents = wrapper;
+        }
+
+        // in clipboard can be non-existent
+        if (!contents.length) {
+            contents = $('<div></div>');
+        }
 
         this.ui = {
-            container: wrapper,
+            container: contents,
             publish: $('.cms-btn-publish'),
             save: $('.cms-toolbar-item-switch-save-edit'),
             window: $(window),
@@ -164,10 +208,10 @@ var Plugin = new Class({
         this.ui.draggables = this.ui.draggable.find('> .cms-draggables');
         this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
-        this.ui.draggable.data('settings', this.options);
+        this.ui.draggable.data('cms', this.options);
 
         // adds double click to edit
-        this.ui.container.add(this.ui.dragitem).on(this.doubleClick, function (e) {
+        var dblClickHandler = function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -176,51 +220,55 @@ var Plugin = new Class({
                 that.options.plugin_name,
                 that._getPluginBreadcrumbs()
             );
-        });
+        };
 
-        // adds edit tooltip
-        this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
-            // required for both, click and touch
-            // otherwise propagation won't work to the nested plugin
-            e.stopPropagation();
-            if (e.type === 'touchstart') {
-                CMS.API.Tooltip._forceTouchOnce();
-            }
-            var name = that.options.plugin_name;
-            var id = that.options.plugin_id;
+        this.ui.dragitem.on(this.doubleClick, dblClickHandler);
 
-            var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
-            var placeholder = $('.cms-placeholder-' + placeholderId);
+        if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
+            this.ui.container.on(this.doubleClick, dblClickHandler);
+            this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
+                // required for both, click and touch
+                // otherwise propagation won't work to the nested plugin
+                e.stopPropagation();
+                if (e.type === 'touchstart') {
+                    CMS.API.Tooltip._forceTouchOnce();
+                }
+                var name = that.options.plugin_name;
+                var id = that.options.plugin_id;
 
-            if (placeholder.length && placeholder.data('settings')) {
-                name = placeholder.data('settings').name + ': ' + name;
-            }
+                var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+                var placeholder = $('.cms-placeholder-' + placeholderId);
 
-            CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
-        });
+                if (placeholder.length && placeholder.data('cms')) {
+                    name = placeholder.data('cms').name + ': ' + name;
+                }
+
+                CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+            });
+        }
 
         // adds listener for all plugin updates
-        this.ui.container.add(this.ui.draggable).on('cms.plugins.update', function (e) {
+        this.ui.draggable.on('cms.plugins.update', function (e, eventData) {
             e.stopPropagation();
-            that.movePlugin();
+            that.movePlugin(null, eventData);
         });
 
         // adds listener for copy/paste updates
-        this.ui.container.add(this.ui.draggable).on('cms.plugin.update', function (e) {
+        this.ui.draggable.on('cms.plugin.update', function (e, eventData) {
             e.stopPropagation();
 
             var el = $(e.delegateTarget);
-            var dragitem = $('.cms-draggable-' + el.data('settings').plugin_id);
-            var placeholder_id = that._getId(
-                dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first()
-            );
+            var dragitem = $('.cms-draggable-' + eventData.id);
+
+            // find out new placeholder id
+            var placeholder_id = that._getId(dragitem.closest('.cms-dragarea'));
 
             // if placeholder_id is empty, cancel
             if (!placeholder_id) {
                 return false;
             }
 
-            var data = el.data('settings');
+            var data = el.data('cms');
 
             data.target = placeholder_id;
             data.parent = that._getId(dragitem.parent().closest('.cms-draggable'));
@@ -273,7 +321,7 @@ var Plugin = new Class({
      * on restrictions we have. Also determines which tooltip to show.
      *
      * WARNING: this relies on clipboard plugins always being instantiated
-     * first, so they have data('settings') by the time this method is called.
+     * first, so they have data('cms') by the time this method is called.
      *
      * @method _checkIfPasteAllowed
      * @private
@@ -283,7 +331,7 @@ var Plugin = new Class({
         var pasteButton = this.ui.dropdown.find('[data-rel=paste]');
         var pasteItem = pasteButton.parent();
 
-        if (!clipboardPlugin.length) {
+        if (!clipboardDraggable.length) {
             pasteItem.addClass('cms-submenu-item-disabled');
             pasteItem.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
             return false;
@@ -297,11 +345,12 @@ var Plugin = new Class({
 
         var bounds = this.options.plugin_restriction;
 
-        if (clipboardPlugin.data('settings')) {
-            var type = clipboardPlugin.data('settings').plugin_type;
-            var parent_bounds = $.grep(clipboardPlugin.data('settings').plugin_parent_restriction, function (r) {
+        if (clipboardDraggable.data('cms')) {
+            var clipboardPluginData = clipboardDraggable.data('cms');
+            var type = clipboardPluginData.plugin_type;
+            var parent_bounds = $.grep(clipboardPluginData.plugin_parent_restriction, function (restriction) {
                 // special case when PlaceholderPlugin has a parent restriction named "0"
-                return r !== '0';
+                return restriction !== '0';
             });
             var currentPluginType = this.options.plugin_type;
 
@@ -522,9 +571,14 @@ var Plugin = new Class({
      * @method pastePlugin
      */
     pastePlugin: function () {
+        var id = this._getId(clipboardDraggable);
+        var eventData = {
+            id: id
+        };
+
         clipboardDraggable.appendTo(this.ui.draggables);
-        this.ui.draggables.trigger('cms.update');
-        clipboardDraggable.trigger('cms.plugin.update');
+        this.ui.draggables.trigger('cms.update', [eventData]);
+        clipboardDraggable.trigger('cms.plugin.update', [eventData]);
     },
 
     /**
@@ -538,9 +592,10 @@ var Plugin = new Class({
      * @param {String} [opts.plugin_parent]
      * @param {String} [opts.plugin_language]
      * @param {Boolean} [opts.move_a_copy]
+     * @param {Object} [eventData={}] optional eventData
      * @returns {Boolean|void}
      */
-    movePlugin: function (opts) {
+    movePlugin: function (opts, eventData) {
         // cancel request if already in progress
         if (CMS.API.locked) {
             return false;
@@ -554,8 +609,10 @@ var Plugin = new Class({
         var plugin = $('.cms-plugin-' + options.plugin_id);
         var dragitem = $('.cms-draggable-' + options.plugin_id);
 
+        var previousParentPluginId = typeof eventData === 'undefined' ? undefined : eventData.previousParentPluginId;
+
         // SETTING POSITION
-        this._setPosition(options.plugin_id, plugin, dragitem);
+        var requiresReload = this._setPosition(options.plugin_id, plugin, dragitem, previousParentPluginId);
 
         // SAVING POSITION
         var placeholder_id = this._getId(
@@ -605,7 +662,7 @@ var Plugin = new Class({
             data: data,
             success: function (response) {
                 // if response is reload
-                if (response.reload) {
+                if (response.reload || requiresReload) {
                     Helpers.reloadBrowser();
                 }
 
@@ -673,8 +730,18 @@ var Plugin = new Class({
 
         // set new setting on instance and plugin data
         this.options = settings;
-        plugin.data('settings', settings);
-        draggable.data('settings', settings);
+        if (plugin.length) {
+            var index = plugin.data('cms').findIndex(function (pluginData) {
+                return pluginData.plugin_id === settings.plugin_id;
+            });
+
+            plugin.each(function () {
+                $(this).data('cms')[index] = settings;
+            });
+        }
+        if (draggable.length) {
+            draggable.data('cms', settings);
+        }
     },
 
     /**
@@ -711,33 +778,156 @@ var Plugin = new Class({
      * @param {String} id
      * @param {jQuery} plugin the `.cms-plugin` element
      * @param {jQuery} dragitem the `.cms-draggable` of the plugin
+     * @returns {Boolean} requires reload?
      */
-    _setPosition: function (id, plugin, dragitem) {
+    // eslint-disable-next-line max-params
+    _setPosition: function (id, plugin, dragitem, previousParentPluginId) {
         // after we insert the plugin onto its new place, we need to figure out where to position it
         var prevItem = dragitem.prev('.cms-draggable');
         var nextItem = dragitem.next('.cms-draggable');
         var parent = dragitem.parent().closest('.cms-draggable');
         var child = $('.cms-plugin-' + this._getId(parent));
         var placeholder = dragitem.closest('.cms-dragarea');
+        var pluginId = this._getId(dragitem);
 
         // determine if there are other plugins within the same level, this makes the move easier
-        if (prevItem.length) {
-            plugin.insertAfter($('.cms-plugin-' + this._getId(prevItem)));
-        } else if (nextItem.length) {
-            plugin.insertBefore($('.cms-plugin-' + this._getId(nextItem)));
-        } else if (parent.length) {
-            // if we can't find a plugin on the same level, we need to travel higher
-            // for this we need to find the deepest child
-            while (child.children().length) {
-                child = child.children();
+        // in case "editMode" plugin DOM exists, proceed
+        if (plugin.length) {
+            this._removeOldParentsData({
+                plugin: plugin,
+                pluginId: pluginId,
+                previousParentPluginId: previousParentPluginId
+            });
+
+            // there is a dragitem in a tree right before the new place
+            if (prevItem.length) {
+                var previousItemId = this._getId(prevItem);
+                var previousPlugin = $('.cms-plugin-' + previousItemId + ':last');
+
+                if (previousPlugin.length) {
+                    plugin.insertAfter(previousPlugin);
+                    // meaning there are parent plugins with no DOM
+                    this._addNewParentsData({
+                        sibling: previousPlugin,
+                        siblingId: previousItemId,
+                        plugin: plugin
+                    });
+                    return false;
+                }
+            } else if (nextItem.length) {
+                var nextItemId = this._getId(nextItem);
+                var nextPlugin = $('.cms-plugin-' + nextItemId + ':first');
+
+                if (nextPlugin.length) {
+                    plugin.insertBefore(nextPlugin);
+                    // meaning there are parent plugins with no DOM
+                    this._addNewParentsData({
+                        sibling: nextPlugin,
+                        siblingId: nextItemId,
+                        plugin: plugin
+                    });
+                    return false;
+                }
+            } else if (parent.length && child.length) {
+                // if we can't find a plugin on the same level, we need to travel higher
+                // for this we need to find the deepest child
+
+                // TODO this is _just_ an assumtion because in reality we do not know where
+                // the children would be positioned in case the plugin contains multiple divs
+                // so instead of putting them into one of the tree paths we should just reload
+                while (child.children().length) {
+                    child = child.children();
+                }
+                child.append(plugin);
+                return false;
+            } else if (!parent.length && placeholder.length) {
+                // we also need to cover the case if we move the plugin to an empty placeholder
+                plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
+                return false;
             }
-            child.append(plugin);
-        } else if (placeholder.length) {
-            // we also need to cover the case if we move the plugin to an empty placeholder
-            plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
-        } else {
-            // if we did not found a match, reload
-            Helpers.reloadBrowser();
+        }
+
+        // if we did not found any match, require reload
+        return true;
+    },
+
+    /**
+     * If a plugin is moved to the the plugin that has no DOM representation
+     * we need to add the data about this plugin to the freshly moved node.
+     * Adds the appropriate classes and pushes data into "cms". The parent data
+     * is taken from the sibling provided. If the sibling doesn't contain multiple plugins - noop.
+     *
+     * @method _addNewParentsData
+     * @private
+     * @param {Object} options options
+     * @param {jQuery} options.sibling element
+     * @param {String|Number} options.siblingId
+     * @param {jQuery} options.plugin the plugin that has been just moved
+     */
+    _addNewParentsData: function _addNewParentsData(options) {
+        if (Plugin._isContainingMultiplePlugins(options.sibling)) {
+            // add more data to it and classes
+            // there could be one or more parents
+            var plugin = options.plugin;
+            var siblingPluginData = options.sibling.data('cms').slice(0); // clones so we don't mutate data
+            var ownIndex = siblingPluginData.findIndex(function (pluginData) {
+                return pluginData.plugin_id === options.siblingId;
+            });
+            var siblingPluginParentsData = siblingPluginData.slice(ownIndex + 1);
+
+            siblingPluginParentsData.forEach(function (pluginData) {
+                plugin.each(function () {
+                    $(this)
+                        .addClass('cms-plugin-' + pluginData.plugin_id)
+                        .data('cms').push(pluginData);
+                });
+            });
+        }
+    },
+
+    /**
+     * If we move a plugin out of a plugin that had a parent with no own DOM
+     * then the parent's data has to be removed from this plugin. If the plugin
+     * does not contain multiple plugins - noop.
+     *
+     * @method _removeOldParentsData
+     * @private
+     * @param {Object} options
+     * @param {jQuery} options.plugin element
+     * @param {String|Number} options.pluginId
+     * @param {String|Number} options.previousParentPluginId
+     */
+    _removeOldParentsData: function _removeOldParentsData(options) {
+        var plugin = options.plugin;
+        var pluginId = options.pluginId;
+        var previousParentPluginId = options.previousParentPluginId;
+
+        if (Plugin._isContainingMultiplePlugins(plugin)) {
+            var currentPluginData = plugin.data('cms').slice(0); // clone array
+            // if plugin contains multiple parents then it _has to_ have a previous parent
+            var parentIndex = currentPluginData.findIndex(function (pluginData) {
+                return pluginData.plugin_id === previousParentPluginId;
+            });
+            var ownIndex = currentPluginData.findIndex(function (pluginData) {
+                return pluginData.plugin_id === pluginId;
+            });
+
+            var newPluginData = currentPluginData.slice(pluginId, parentIndex + 1);
+            var parentPluginData = currentPluginData.slice(0, ownIndex)
+                .concat(currentPluginData.slice(parentIndex));
+
+            plugin.each(function () {
+                $(this).data('cms', newPluginData);
+            });
+
+            parentPluginData.forEach(function (pluginData) {
+                plugin.removeClass('cms-plugin-' + pluginData.plugin_id);
+            });
+
+            // if it was a last plugin in the parent we could create a dummy in place
+            // so things can still be moved to it
+            // however, if we don't do anything, next plugin moving into it will just
+            // trigger a reload, so "not now"
         }
     },
 
@@ -1312,8 +1502,13 @@ var Plugin = new Class({
         this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
         var dragitem = this.ui.draggable.find('> .cms-dragitem');
 
+        // cancel here if its not a draggable
+        if (!this.ui.draggable.length) {
+            return false;
+        }
+
         // check which button should be shown for collapsemenu
-        this.ui.container.each(function (index, item) {
+        this.ui.draggable.each(function (index, item) {
             var els = $(item).find('.cms-dragitem-collapsable');
             var open = els.filter('.cms-dragitem-expanded');
 
@@ -1321,10 +1516,6 @@ var Plugin = new Class({
                 $(item).find('.cms-dragbar-title').addClass('cms-dragbar-title-expanded');
             }
         });
-        // cancel here if its not a draggable
-        if (!this.ui.draggable.length) {
-            return false;
-        }
 
         // attach events to draggable
         // debounce here required because on some devices click is not triggered,
@@ -1563,7 +1754,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     doc = $(document);
     clipboard = $('.cms-clipboard');
     clipboardDraggable = clipboard.find('.cms-draggable:first');
-    clipboardPlugin = clipboard.find('.cms-plugin:first');
 
     doc.on('pointerup.cms.plugin', function () {
         // call it as a static method, because otherwise we trigger it the
@@ -1634,6 +1824,45 @@ Plugin._initializeDragItemsStates = Helpers.once(function _initializeDragItemsSt
         }
     });
 });
+
+/**
+ * @method _isContainingMultiplePlugins
+ * @param {jQuery} node to check
+ * @static
+ * @private
+ * @returns {Boolean}
+ */
+Plugin._isContainingMultiplePlugins = function _isContainingMultiplePlugins(node) {
+    var currentData = node.data('cms');
+
+    // istanbul ignore if
+    if (!currentData) {
+        throw new Error('Provided node is not a cms plugin.');
+    }
+
+    var pluginIds = currentData.map(function (pluginData) {
+        return pluginData.plugin_id;
+    });
+
+    if (pluginIds.length > 1) {
+        // another plugin already lives on the same node
+        // this only works because the plugins are rendered from
+        // the bottom to the top (leaf to root)
+        // meaning the deepest plugin is always first
+        return true;
+    }
+
+    return false;
+};
+
+Plugin.aliasPluginDuplicatesMap = {};
+
+// istanbul ignore next
+Plugin._initializeTree = function _initializeTree() {
+    $.each(CMS._plugins, function (index, args) {
+        new CMS.Plugin(args[0], args[1]);
+    });
+};
 
 // shorthand for jQuery(document).ready();
 $(Plugin._initializeGlobalHandlers);

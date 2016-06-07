@@ -80,11 +80,13 @@ casper.test.begin('Edit utils page content', function (test) {
         })
         // wait till the paste actually succeeds
         .waitForResource(/move\-plugin/)
-        .reload()
-        // check that number of content plugins has been indeed increased
         .then(function () {
+            this.reload();
+        })
+        // check that number of content plugins have been indeed increased
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount(
-                '.cms-structure .cms-draggables .cms-draggable',
+                '.cms-structure-content .cms-draggable',
                 contentNumber + 1,
                 'Copy plugin successful'
             );

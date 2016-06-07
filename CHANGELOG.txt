@@ -1,3 +1,12 @@
+=== 3.4.0 (unreleased) ===
+
+* Changed the way CMS plugins are rendered. The div with `cms-plugin` class is
+  no longer rendered around every CMS plugin, instead a combination of `template`
+  tags and JavaScript is used to add event handlers and plugin data directly to
+  the plugin markup. This fixes most of the rendering issues that were present
+  because of the extra markup.
+
+
 === 3.3.1 (unreleased) ===
 
 * Added a warning for users who are leaving the page or closing the plugin
