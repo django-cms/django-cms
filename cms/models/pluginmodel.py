@@ -129,8 +129,14 @@ class PluginModelBase(ModelBase):
             # True if any of the base classes defines a cmsplugin_ptr field.
             field_is_inherited = any(hasattr(parent, 'cmsplugin_ptr') for parent in parents)
 
-            # Skip abstract and proxied classes which are not autonomous ORM objects
-            if not abstract and not proxy and not field_is_inherited:
+            # Skip proxied classes which are not autonomous ORM objects
+            # We don't skip abstract classes because when a plugin
+            # inherits from an abstract class, we need to make sure the
+            # abstract class gets the correct related name, otherwise the
+            # plugin inherits the default related name and then the
+            # field_is_inherited check above will prevent us from adding
+            # the fixed related name.
+            if not proxy and not field_is_inherited:
                 # It's important to set the field as if it was set
                 # manually in the model class.
                 # This is because Django will do a lot of operations
