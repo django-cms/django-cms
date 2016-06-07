@@ -577,6 +577,33 @@ class AdminTestCase(AdminTestsBase):
         response = self.client.get(URL_CMS_PAGE_CHANGE_LANGUAGE % (1, 'en'))
         self.assertEqual(response.status_code, 404)
 
+    def test_empty_placeholder_with_nested_plugins(self):
+        # It's important that this test clears a placeholder
+        # which only has nested plugins.
+        # This allows us to catch a strange bug that happened
+        # under these conditions with the new related name handling.
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        column_wrapper = add_plugin(ph, "MultiColumnPlugin", "en")
+
+        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper, width='50%')
+        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper, width='50%')
+
+        # before cleaning the de placeholder
+        self.assertEqual(ph.get_plugins('en').count(), 3)
+
+        admin_user, staff = self._get_guys()
+
+        with self.login_user_context(admin_user):
+            url = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+            response = self.client.post(url, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+
+        # After cleaning the de placeholder, en placeholder must still have all the plugins
+        self.assertEqual(ph.get_plugins('en').count(), 0)
+
     def test_empty_placeholder_in_correct_language(self):
         """
         Test that Cleaning a placeholder only affect current language contents
