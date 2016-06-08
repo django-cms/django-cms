@@ -12,6 +12,14 @@ from django.db import models
 from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
+try:
+    # Django >= 1.8, < 1.9
+    from django.db.models.fields.related import (
+        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor
+    )
+except ImportError:
+    # Django >= 1.9
+    from django.db.models.fields.related import ForwardManyToOneDescriptor
 from django.utils import six, timezone
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
@@ -35,6 +43,67 @@ class BoundRenderMeta(object):
         self.text_enabled = getattr(meta, 'text_enabled', False)
 
 
+class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
+    """
+    Accessor to the related object on the forward side
+    of a one-to-one relation.
+
+    In the example::
+
+        class MyPlugin(CMSPlugin):
+            cmsplugin_ptr = ForeignKey(CMSPlugin, parent_link=True)
+
+    ``myplugin.cmsplugin_ptr`` is a ``ForwardOneToOneDescriptor`` instance.
+    """
+
+    # This class is necessary to backport the following Django fix
+    # https://github.com/django/django/commit/38575b007a722d6af510ea46d46393a4cda9ca29
+    # into the CMS.
+
+    def get_inherited_object(self, instance):
+        """
+        Returns an instance of the subclassed model
+        in a multi-table inheritance scenario.
+        """
+        # This is an exact copy of the code for get_object()
+        # provided in the commit above.
+        deferred = instance.get_deferred_fields()
+        # Because it's a parent link, all the data is available in the
+        # instance, so populate the parent model with this data.
+        rel_model = self.field.rel.model
+        fields = [field.attname for field in rel_model._meta.concrete_fields]
+
+        # If any of the related model's fields are deferred, fallback to
+        # fetching all fields from the related model. This avoids a query
+        # on the related model for every deferred field.
+        if not any(field in fields for field in deferred):
+            kwargs = {field: getattr(instance, field) for field in fields}
+            return rel_model(**kwargs)
+        return
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            return self
+
+        if not hasattr(instance, self.cache_name):
+            # No cached object is present on the instance.
+            val = self.field.get_local_related_value(instance)
+
+            if None not in val:
+                # Fetch the inherited object instance
+                # using values from the current instance.
+                # This avoids an extra db call because we already
+                # have the data.
+                # This can be None if a field from the base class (CMSPlugin)
+                # was deferred.
+                rel_obj = self.get_inherited_object(instance)
+
+                if not rel_obj is None:
+                    # Populate the internal relationship cache.
+                    setattr(instance, self.cache_name, rel_obj)
+        return super(ForwardOneToOneDescriptor, self).__get__(instance, instance_type)
+
+
 class PluginModelBase(ModelBase):
     """
     Metaclass for all CMSPlugin subclasses. This class should not be used for
@@ -42,11 +111,52 @@ class PluginModelBase(ModelBase):
     """
 
     def __new__(cls, name, bases, attrs):
+        super_new = super(PluginModelBase, cls).__new__
         # remove RenderMeta from the plugin class
         attr_meta = attrs.pop('RenderMeta', None)
 
+        # Only care about subclasses of CMSPlugin
+        # (excluding CMSPlugin itself).
+        parents = [b for b in bases if isinstance(b, PluginModelBase)]
+
+        if parents and 'cmsplugin_ptr' not in attrs:
+            # The current class subclasses from CMSPlugin
+            # and has not defined a cmsplugin_ptr field.
+            meta = attrs.get('Meta', None)
+            proxy = getattr(meta, 'proxy', False)
+
+            # True if any of the base classes defines a cmsplugin_ptr field.
+            field_is_inherited = any(hasattr(parent, 'cmsplugin_ptr') for parent in parents)
+
+            # Skip proxied classes which are not autonomous ORM objects
+            # We don't skip abstract classes because when a plugin
+            # inherits from an abstract class, we need to make sure the
+            # abstract class gets the correct related name, otherwise the
+            # plugin inherits the default related name and then the
+            # field_is_inherited check above will prevent us from adding
+            # the fixed related name.
+            if not proxy and not field_is_inherited:
+                # It's important to set the field as if it was set
+                # manually in the model class.
+                # This is because Django will do a lot of operations
+                # under the hood to set the forward and reverse relations.
+                attrs['cmsplugin_ptr'] = models.OneToOneField(
+                    to='cms.CMSPlugin',
+                    name='cmsplugin_ptr',
+                    related_name='%(app_label)s_%(class)s',
+                    auto_created=True,
+                    parent_link=True,
+                )
+
         # create a new class (using the super-metaclass)
-        new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
+        new_class = super_new(cls, name, bases, attrs)
+
+        # Skip abstract and proxied classes which are not autonomous ORM objects
+        if parents and not new_class._meta.abstract and not new_class._meta.proxy:
+            # Use our patched descriptor regardless of how the one to one
+            # relationship was defined.
+            parent_link_field = new_class._meta.get_field('cmsplugin_ptr')
+            setattr(new_class, 'cmsplugin_ptr', ForwardOneToOneDescriptor(parent_link_field))
 
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
