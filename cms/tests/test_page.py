@@ -1189,7 +1189,7 @@ class PagesTestCase(CMSTestCase):
             files=None,
         )
         no_translation_error = (u"Please create the German page translation "
-                                u"before editing it's advanced settings.")
+                                u"before editing its advanced settings.")
         self.assertFalse(form.is_valid())
         self.assertIn('__all__', form.errors)
         self.assertEqual(1, len(form.errors['__all__']))
@@ -1211,7 +1211,7 @@ class PagesTestCase(CMSTestCase):
             files=None,
         )
         no_translation_error = (u"Please set the German slug before "
-                                u"editing it's advanced settings.")
+                                u"editing its advanced settings.")
         self.assertFalse(form.is_valid())
         self.assertIn('__all__', form.errors)
         self.assertEqual(1, len(form.errors['__all__']))
