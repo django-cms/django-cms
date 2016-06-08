@@ -1814,3 +1814,36 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
         plugin_model = TestPluginBetaModel.objects.all()[0]
         self.assertEqual("ALPHA", plugin_model.alpha)
         self.assertEqual("BETA", plugin_model.beta)
+
+    def test_related_name(self):
+        from cms.test_utils.project.mti_pluginapp.models import (
+            TestPluginAlphaModel, TestPluginBetaModel, ProxiedAlphaPluginModel,
+            ProxiedBetaPluginModel, AbstractPluginParent, TestPluginGammaModel, MixedPlugin,
+            LessMixedPlugin, NonPluginModel
+        )
+        # the first concrete class of the following four plugins is TestPluginAlphaModel
+        self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        self.assertEqual(TestPluginBetaModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        self.assertEqual(ProxiedAlphaPluginModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        # Abstract plugins will have the dynamic format for related name
+        self.assertEqual(
+            AbstractPluginParent.cmsplugin_ptr.field.rel.related_name,
+            '%(app_label)s_%(class)s'
+        )
+        # Concrete plugin of an abstract plugin gets its relatedname
+        self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testplugingammamodel')
+        # Child plugin gets it's own related name
+        self.assertEqual(MixedPlugin.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_mixedplugin')
+        # If the child plugin inherit straight from CMSPlugin, even if composed with
+        # other models, gets its own related_name
+        self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_lessmixedplugin')
+        # Non plugins are skipped
+        self.assertFalse(hasattr(NonPluginModel, 'cmsplugin_ptr'))
