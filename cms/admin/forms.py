@@ -319,7 +319,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             # This covers all cases where users try to edit
             # page advanced settings without creating the page title.
             message = _("Please create the %(language)s page "
-                        "translation before editing it's advanced settings.")
+                        "translation before editing its advanced settings.")
             raise ValidationError(message % {'language': language_name})
 
         if not title.slug:
@@ -327,7 +327,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             # page advanced settings without setting a title slug
             # for page titles that already exist.
             message = _("Please set the %(language)s slug "
-                        "before editing it's advanced settings.")
+                        "before editing its advanced settings.")
             raise ValidationError(message % {'language': language_name})
 
         if 'reverse_id' in self.fields:
