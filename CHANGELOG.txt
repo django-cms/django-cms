@@ -11,6 +11,12 @@
   Using CMS Javascript modules directly is no longer possible.
 * Fixed an issue where plugins that have no immediate DOM representation
   wouldn't be editable or movable.
+* Fixed a regression in which plugins that defined ``parent_classes``
+  would not show up in the structure mode.
+* Introduced new logic to leverage Django's dynamic related name
+  functionality on ``CMSPlugin`` subclasses for the parent link field.
+* Backported a performance fix from Django to avoid extra queries when
+  plugins access their parent via the parent link field ``cmsplugin_ptr``.
 
 
 === 3.3.0 (2016-05-26) ===
