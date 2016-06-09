@@ -17,6 +17,9 @@
   functionality on ``CMSPlugin`` subclasses for the parent link field.
 * Backported a performance fix from Django to avoid extra queries when
   plugins access their parent via the parent link field ``cmsplugin_ptr``.
+* Fixed typo in ``AdvancedSettingsForm`` error messages.
+* Fixed long standing bug that prevented apphook endspoints from being
+  CSRF exempt.
 
 
 === 3.3.0 (2016-05-26) ===
