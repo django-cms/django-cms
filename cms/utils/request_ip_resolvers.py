@@ -22,11 +22,11 @@ def get_request_ip_resolver():
     except ImportError:
         raise ImproperlyConfigured(
             _('Unable to find the specified CMS_REQUEST_IP_RESOLVER module: '
-              '"%s".') % module)
+              '"{0}".').format(module))
     except AttributeError:
         raise ImproperlyConfigured(
             _('Unable to find the specified CMS_REQUEST_IP_RESOLVER function: '
-              '"%s" in module "%s".') % (attribute, module, ))
+              '"{0}" in module "{1}".').format(attribute, module))
     return ip_resolver
 
 

@@ -3,8 +3,9 @@
 // #############################################################################
 // User login via the CMS toolbar (on all kinds of screens)
 
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -22,9 +23,9 @@ casper.test.tearDown(function (done) {
 });
 
 [
-    [320,  480],  // mobile vertical
-    [480,  320],  // mobile horizontal
-    [768,  1024], // tablet vertical
+    [320, 480],  // mobile vertical
+    [480, 320],  // mobile horizontal
+    [768, 1024], // tablet vertical
     [1024, 768],  // tablet horizontal
     [1280, 1024]  // standard - it's important that the last one resets
 ].forEach(function (dimensions) {

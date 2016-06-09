@@ -50,6 +50,8 @@ def applications_page_check(request, current_page=None, path=None):
         except Resolver404:
             # Raised if the page is not managed by an apphook
             pass
+        except Page.DoesNotExist:
+            pass
     return None
 
 
@@ -93,12 +95,13 @@ class AppRegexURLResolver(RegexURLResolver):
                             tried.extend([pattern])
                     else:
                         if sub_match:
-                            return pattern.page_id
+                            return getattr(pattern, 'page_id', None)
                         tried.append(pattern.regex.pattern)
             raise Resolver404({'tried': tried, 'path': new_path})
 
 
-def recurse_patterns(path, pattern_list, page_id, default_args=None, nested=False):
+def recurse_patterns(path, pattern_list, page_id, default_args=None,
+                     nested=False):
     """
     Recurse over a list of to-be-hooked patterns for a given path prefix
     """
@@ -126,7 +129,6 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None, nested=Fals
                 # this is an 'include', recurse!
                 resolver = RegexURLResolver(regex, urlconf_module,
                                             pattern.default_kwargs, pattern.app_name, pattern.namespace)
-            resolver.page_id = page_id
         else:
             # Re-do the RegexURLPattern with the new regular expression
             args = pattern.default_args
@@ -134,7 +136,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None, nested=Fals
                 args.update(default_args)
             resolver = RegexURLPattern(regex, pattern.callback,
                                        args, pattern.name)
-            resolver.page_id = page_id
+        resolver.page_id = page_id
         newpatterns.append(resolver)
     return newpatterns
 
@@ -169,7 +171,7 @@ def get_patterns_for_title(path, title):
     """
     app = apphook_pool.get_apphook(title.page.application_urls)
     url_patterns = []
-    for pattern_list in get_app_urls(app.urls):
+    for pattern_list in get_app_urls(app.get_urls(title.page, title.language)):
         if path and not path.endswith('/'):
             path += '/'
         page_id = title.page.id
@@ -193,14 +195,17 @@ def _get_app_patterns():
 
     How this works:
 
-    By looking through all titles with an app hook (application_urls) we find all
-    urlconf modules we have to hook into titles.
+    By looking through all titles with an app hook (application_urls) we find
+    all urlconf modules we have to hook into titles.
 
     If we use the ML URL Middleware, we namespace those patterns with the title
     language.
 
     All 'normal' patterns from the urlconf get re-written by prefixing them with
     the title path and then included into the cms url patterns.
+
+    If the app is still configured, but is no longer installed/available, then
+    this method returns a degenerate patterns object: patterns('')
     """
     from cms.models import Title
 
@@ -219,30 +224,38 @@ def _get_app_patterns():
     hooked_applications = OrderedDict()
 
     # Loop over all titles with an application hooked to them
+    titles = (title_qs.exclude(page__application_urls=None)
+                      .exclude(page__application_urls='')
+                      .order_by('-page__path').select_related())
     # TODO: Need to be fixed for django-treebeard when forward ported to 3.1
-    for title in title_qs.exclude(page__application_urls=None).exclude(page__application_urls='').order_by('-page__path').select_related():
+    for title in titles:
         path = title.path
-        mix_id = "%s:%s:%s" % (path + "/", title.page.application_urls, title.language)
+        mix_id = "%s:%s:%s" % (
+            path + "/", title.page.application_urls, title.language)
         if mix_id in included:
             # don't add the same thing twice
             continue
         if not settings.APPEND_SLASH:
             path += '/'
+        app = apphook_pool.get_apphook(title.page.application_urls)
+        if not app:
+            continue
         if title.page_id not in hooked_applications:
             hooked_applications[title.page_id] = {}
-        app = apphook_pool.get_apphook(title.page.application_urls)
         app_ns = app.app_name, title.page.application_namespace
         with override(title.language):
-            hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title), app)
+            hooked_applications[title.page_id][title.language] = (
+                app_ns, get_patterns_for_title(path, title), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs
     app_patterns = []
     for page_id in hooked_applications.keys():
         resolver = None
         for lang in hooked_applications[page_id].keys():
-            (app_ns, inst_ns), current_patterns, app = hooked_applications[page_id][lang]
+            (app_ns, inst_ns), current_patterns, app = hooked_applications[page_id][lang]  # nopyflakes
             if not resolver:
-                resolver = AppRegexURLResolver(r'', 'app_resolver', app_name=app_ns, namespace=inst_ns)
+                resolver = AppRegexURLResolver(
+                    r'', 'app_resolver', app_name=app_ns, namespace=inst_ns)
                 resolver.page_id = page_id
             if app.permissions:
                 _set_permissions(current_patterns, app.exclude_permissions)

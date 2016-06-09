@@ -18,7 +18,7 @@ Some key settings:
 * *Slug*: The page's *slug* is used to form its URL. For example, a page *Lenses* that is a
   sub-page of *Photography* might have a URL that ends ``photography/lenses``. You can change the
   automatically-generated slug of a page if you wish to. Keep slugs short and meaningful, as they
-  are useful to human beings and search engines alike. You can
+  are useful to human beings and search engines alike.
 
 * *Menu Title*: If you have a page called *Photography: theory and practice*, you might not want
   the whole title to appear in menus - shortening it to *Photography* would make more sense.

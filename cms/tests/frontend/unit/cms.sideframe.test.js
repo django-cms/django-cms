@@ -1,6 +1,13 @@
 /* global window, document */
 'use strict';
 
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var Sideframe = require('../../../static/cms/js/modules/cms.sideframe');
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.Sideframe = Sideframe;
+
 describe('CMS.Sideframe', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
@@ -187,7 +194,7 @@ describe('CMS.Sideframe', function () {
 
             sideframe.open({ url: url, animate: true });
             expect($.fn.animate).toHaveBeenCalledWith({
-                width: '90%',
+                width: '95%',
                 overflow: 'visible'
             }, 300);
         });
@@ -587,15 +594,16 @@ describe('CMS.Sideframe', function () {
             });
         });
 
+
         it('adds click handlers to pass through from iframe body', function (done) {
             sideframe._content(url);
             sideframe.ui.frame.find('iframe').on('load', function () {
-                var body = $(this.contentDocument.body);
+                var doc = $(this.contentDocument);
                 var spy = jasmine.createSpy();
 
-                expect(body).toHandle(sideframe.click);
-                $(document).on(sideframe.click, spy);
-                body.trigger(sideframe.click);
+                expect(doc).toHandle('click.cms');
+                $(document).on('click.cms.toolbar', spy);
+                doc.trigger(sideframe.click);
                 expect(spy).toHaveBeenCalled();
 
                 done();
@@ -609,8 +617,8 @@ describe('CMS.Sideframe', function () {
 
                 expect(body).toHandle('keydown.cms');
 
-                var wrongEvent = $.Event('keydown.cms', { keyCode: 132882173 });
-                var correctEvent = $.Event('keydown.cms', { keyCode: CMS.KEYS.ESC });
+                var wrongEvent = new $.Event('keydown.cms', { keyCode: 132882173 });
+                var correctEvent = new $.Event('keydown.cms', { keyCode: CMS.KEYS.ESC });
 
                 body.trigger(wrongEvent);
                 expect(sideframe.close).not.toHaveBeenCalled();
@@ -708,7 +716,7 @@ describe('CMS.Sideframe', function () {
 
     describe('._goToHistory()', function () {
         var sideframe;
-        var iframe;
+
         beforeEach(function (done) {
             fixture.load('sideframe.html');
             CMS.config = {
@@ -758,7 +766,7 @@ describe('CMS.Sideframe', function () {
 
     describe('._updateHistoryButtons()', function () {
         var sideframe;
-        var iframe;
+
         beforeEach(function (done) {
             fixture.load('sideframe.html');
             CMS.config = {

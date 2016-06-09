@@ -3,8 +3,9 @@
 // #############################################################################
 // Change Settings behaviour
 
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -40,7 +41,7 @@ casper.test.begin('Change Settings', function (test) {
 
                     // selects German language
                     this.fill ('#usersettings_form', {
-                        'language': 'de'
+                        language: 'de'
                     }, true);
                 });
         })
@@ -63,7 +64,7 @@ casper.test.begin('Change Settings', function (test) {
 
                     // changes back to english
                     this.fill ('#usersettings_form', {
-                        'language': 'en'
+                        language: 'en'
                     }, true);
                 });
         })

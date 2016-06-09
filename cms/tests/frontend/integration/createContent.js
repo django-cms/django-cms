@@ -3,11 +3,12 @@
 // #############################################################################
 // User login via the admin panel
 
-var globals = require('./settings/globals');
-var randomString = require('./helpers/randomString').randomString;
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var randomString = helpers.randomString;
 var casperjs = require('casper');
 var xPath = casperjs.selectXPath;
-var cms = require('./helpers/cms')(casperjs);
+var cms = helpers(casperjs);
 // random text string for filtering and content purposes
 var randomText = randomString({ length: 50, withWhitespaces: false });
 
@@ -68,7 +69,7 @@ casper.test.begin('User Add Content', function (test) {
             this.waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                 this.waitFor(function () {
                     return this.evaluate(function () {
-                        return $('.cms-submenu-item [data-rel="add"]:visible').length === 1;
+                        return CMS.$('.cms-submenu-item [data-rel="add"]:visible').length === 1;
                     });
                 }).then(function () {
                     test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
@@ -76,7 +77,9 @@ casper.test.begin('User Add Content', function (test) {
                 });
             });
             this.then(function () {
-                this.click(xPath('//a[@data-rel="add"]/text()[normalize-space(.)="Text"]'));
+                this.click(
+                    xPath('//div[contains(@class, "cms-modal")]//a[@data-rel="add"]/text()[normalize-space(.)="Text"]')
+                );
             });
             // ensure previous content has been changed
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
@@ -116,12 +119,12 @@ casper.test.begin('Can switch mode by triggering space', function (test) {
             // triggers space
             this.sendKeys('html', casper.page.event.key.Space);
             // checks if we are not in structure mode anymore
-            test.assertNotVisible('.cms-structure',  'switch via space worked');
+            test.assertNotVisible('.cms-structure', 'switch via space worked');
         })
         .then(function () {
             // triggers space again
             this.sendKeys('html', casper.page.event.key.Space);
-            test.assertVisible('.cms-structure',  'switch via space worked');
+            test.assertVisible('.cms-structure', 'switch via space worked');
         })
         .run(function () {
             test.done();

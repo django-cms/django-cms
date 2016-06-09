@@ -1,10 +1,10 @@
 'use strict';
-
 // #############################################################################
 // Admin panel opened in sideframe
 
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -40,8 +40,22 @@ casper.test.begin('Sideframe', function (test) {
         // wait until animation finishes
         .wait(300, function () {
             test.assertEvalEquals(function () {
-                return $('.cms-sideframe').width();
-            }, 1280 * 0.9, 'Sideframe opens with default width');
+                return CMS.$('.cms-sideframe').width();
+            }, 1280 * 0.95, 'Sideframe opens with default width');
+        })
+        // changes viewport to mobile
+        .then(function () {
+            this.viewport(767, 1024);
+        })
+        // checks current mobile width to be equal with sideframe width
+        .wait(300, function () {
+            test.assertEvalEquals(function () {
+                return CMS.$('.cms-sideframe').width();
+            }, 767, 'Sideframe is fullwidth with on mobile');
+        })
+        // changes back to default width
+        .then(function () {
+            this.viewport(1280, 1024);
         })
         .then(function () {
             this.reload();

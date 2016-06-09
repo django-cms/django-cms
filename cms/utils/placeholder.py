@@ -14,7 +14,6 @@ from django.utils.encoding import force_text
 
 from sekizai.helpers import get_varname, is_variable_extend_node
 
-
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils import get_cms_setting
 
@@ -69,7 +68,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     return default
 
 
-def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
+def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     """
     Return the list of plugins to render in the toolbar.
     The dictionary contains the label, the classname and the module for the
@@ -77,28 +76,24 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
     Names and modules can be defined on a per-placeholder basis using
     'plugin_modules' and 'plugin_labels' attributes in CMS_PLACEHOLDER_CONF
 
-    :param plugins_list: list of plugins valid for the placeholder
+    :param plugins: list of plugins
     :param slot: placeholder slot name
     :param page: the page
-    :param parent: parent plugin class, if any
     :return: list of dictionaries
     """
     template = None
+
     if page:
         template = page.template
+
+    modules = get_placeholder_conf("plugin_modules", slot, template, default={})
+    names = get_placeholder_conf("plugin_labels", slot, template, default={})
+
     main_list = []
-    for plugin in plugins_list:
-        allowed_parents = plugin().get_parent_classes(slot, page)
-        if parent:
-            ## skip to the next if this plugin is not allowed to be a child
-            ## of the parent
-            if allowed_parents and parent.__name__ not in allowed_parents:
-                continue
-        else:
-            if allowed_parents:
-                continue
-        modules = get_placeholder_conf("plugin_modules", slot, template, default={})
-        names = get_placeholder_conf("plugin_labels", slot, template, default={})
+
+    # plugin.value points to the class name of the plugin
+    # It's added on registration. TIL.
+    for plugin in plugins:
         main_list.append({'value': plugin.value,
                           'name': force_text(names.get(plugin.value, plugin.name)),
                           'module': force_text(modules.get(plugin.value, plugin.module))})

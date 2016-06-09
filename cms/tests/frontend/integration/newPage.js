@@ -3,9 +3,11 @@
 // #############################################################################
 // Users managed via the admin panel
 
-var globals = require('./settings/globals');
-var randomString = require('./helpers/randomString').randomString;
-var cms = require('./helpers/cms')();
+
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var randomString = helpers.randomString;
+var cms = helpers();
 
 var newPageTitle = randomString({ length: 50, withWhitespaces: false });
 
@@ -47,8 +49,8 @@ casper.test.begin('New Page Creation', function (test) {
                     test.assertExists('.errornote', 'Error message shows up if no data has been entered');
 
                     this.fill('#page_form', {
-                        'title': newPageTitle,
-                        'slug': newPageTitle
+                        title: newPageTitle,
+                        slug: newPageTitle
                     }, true);
                 });
         })

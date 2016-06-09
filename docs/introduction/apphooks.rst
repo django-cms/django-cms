@@ -27,8 +27,8 @@ This is the most basic example of an apphook for a django CMS application:
 
     class PollsApphook(CMSApp):
         name = _("Polls Application")   # give your application a name (required)
-        urls = ["polls.urls"]           # link your app to url configuration(s)
         app_name = "polls"
+        _urls = ["polls.urls"]           # link your app to url configuration(s)
 
 
     apphook_pool.register(PollsApphook)  # register the application

@@ -24,7 +24,7 @@ from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
 from cms import api
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page, publish_page
-from cms.constants import PLUGIN_MOVE_ACTION
+from cms.constants import PLUGIN_MOVE_ACTION, TEMPLATE_INHERITANCE_MAGIC
 from cms.models import UserSettings, StaticPlaceholder
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -576,6 +576,33 @@ class AdminTestCase(AdminTestsBase):
 
         response = self.client.get(URL_CMS_PAGE_CHANGE_LANGUAGE % (1, 'en'))
         self.assertEqual(response.status_code, 404)
+
+    def test_empty_placeholder_with_nested_plugins(self):
+        # It's important that this test clears a placeholder
+        # which only has nested plugins.
+        # This allows us to catch a strange bug that happened
+        # under these conditions with the new related name handling.
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        column_wrapper = add_plugin(ph, "MultiColumnPlugin", "en")
+
+        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper, width='50%')
+        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper, width='50%')
+
+        # before cleaning the de placeholder
+        self.assertEqual(ph.get_plugins('en').count(), 3)
+
+        admin_user, staff = self._get_guys()
+
+        with self.login_user_context(admin_user):
+            url = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+            response = self.client.post(url, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+
+        # After cleaning the de placeholder, en placeholder must still have all the plugins
+        self.assertEqual(ph.get_plugins('en').count(), 0)
 
     def test_empty_placeholder_in_correct_language(self):
         """
@@ -1454,8 +1481,6 @@ class AdminFormsTests(AdminTestsBase):
         form = PageForm(data=new_page_data, files=None, instance=page3)
         self.assertFalse(form.is_valid())
 
-
-
     def test_reverse_id_error_location(self):
         ''' Test moving the reverse_id validation error to a field specific one '''
 
@@ -1464,6 +1489,7 @@ class AdminFormsTests(AdminTestsBase):
         curren_site = Site.objects.get_current()
         create_page('Page 1', 'nav_playground.html', 'en', reverse_id=dupe_id)
         page2 = create_page('Page 2', 'nav_playground.html', 'en')
+
         # Assemble a bunch of data to test the page form
         page2_data = {
             'language': 'en',
@@ -1471,7 +1497,11 @@ class AdminFormsTests(AdminTestsBase):
             'reverse_id': dupe_id,
             'template': 'col_two.html',
         }
-        form = AdvancedSettingsForm(data=page2_data, files=None)
+        form = AdvancedSettingsForm(
+            data=page2_data,
+            instance=page2,
+            files=None,
+        )
         self.assertFalse(form.is_valid())
 
         # reverse_id is the only item that is in __all__ as every other field
@@ -1486,7 +1516,12 @@ class AdminFormsTests(AdminTestsBase):
                          form.errors['reverse_id'])
         page2_data['reverse_id'] = ""
 
-        form = AdvancedSettingsForm(data=page2_data, files=None)
+        form = AdvancedSettingsForm(
+            data=page2_data,
+            instance=page2,
+            files=None,
+        )
+
         self.assertTrue(form.is_valid())
         admin_user = self._get_guys(admin_only=True)
         # reset some of page2_data so we can use cms.api.create_page
@@ -1503,6 +1538,68 @@ class AdminFormsTests(AdminTestsBase):
             # collapsing these, so that the error is visible.
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
             self.assertContains(resp, '<div class="form-row errors reverse_id">')
+
+    def test_advanced_settings_endpoint(self):
+        admin_user = self.get_superuser()
+        site = Site.objects.get_current()
+        page = create_page('Page 1', 'nav_playground.html', 'en')
+        page_data = {
+            'language': 'en',
+            'site': site.pk,
+            'template': 'col_two.html',
+        }
+        path = admin_reverse('cms_page_advanced', args=(page.pk,))
+
+        with self.login_user_context(admin_user):
+            en_path = path + u"?language=en"
+            redirect_path = admin_reverse('cms_page_changelist') + '?language=en'
+            response = self.client.post(en_path, page_data)
+            self.assertRedirects(response, redirect_path)
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+
+        # Now switch it up by adding german as the current language
+        # Note that german has not been created as page translation.
+        page_data['language'] = 'de'
+        page_data['template'] = 'nav_playground.html'
+
+        with self.login_user_context(admin_user):
+            de_path = path + u"?language=de"
+            redirect_path = admin_reverse('cms_page_change', args=(page.pk,)) + '?language=de'
+            response = self.client.post(de_path, page_data)
+            # Assert user is redirected to basic settings.
+            self.assertRedirects(response, redirect_path)
+            # Make sure no change was made
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+
+        de_translation = create_title('de', title='Page 1', page=page.reload())
+        de_translation.slug = ''
+        de_translation.save()
+
+        # Now try again but slug is set to empty string.
+        page_data['language'] = 'de'
+        page_data['template'] = 'nav_playground.html'
+
+        with self.login_user_context(admin_user):
+            de_path = path + u"?language=de"
+            response = self.client.post(de_path, page_data)
+            # Assert user is not redirected because there was a form error
+            self.assertEqual(response.status_code, 200)
+            # Make sure no change was made
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+
+        de_translation.slug = 'someslug'
+        de_translation.save()
+
+        # Now try again but with the title having a slug.
+        page_data['language'] = 'de'
+        page_data['template'] = 'nav_playground.html'
+
+        with self.login_user_context(admin_user):
+            en_path = path + u"?language=de"
+            redirect_path = admin_reverse('cms_page_changelist') + '?language=de'
+            response = self.client.post(en_path, page_data)
+            self.assertRedirects(response, redirect_path)
+            self.assertEqual(Page.objects.get(pk=page.pk).template, 'nav_playground.html')
 
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
@@ -1675,3 +1772,217 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(foundcount, 2,
                                  "Username %s appeared %s times in response.content, expected 2 times" % (
                                      USER_NAME, foundcount))
+
+
+class AdminPageTreeTests(AdminTestsBase):
+
+    def test_move_node(self):
+        admin_user, staff = self._get_guys()
+        page_admin = self.admin_class
+
+        alpha = create_page('Alpha', 'nav_playground.html', 'en', published=True)
+        beta = create_page('Beta', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+        gamma = create_page('Gamma', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+        delta = create_page('Delta', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #   ⊢ Beta
+        #   ⊢ Gamma
+        #   ⊢ Delta
+
+        # Move Beta to be a child of Alpha
+        data = {
+            'id': beta.pk,
+            'position': 0,
+            'target': alpha.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=beta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Gamma
+        #   ⊢ Delta
+
+        # Move Gamma to be a child of Beta
+        data = {
+            'id': gamma.pk,
+            'position': 0,
+            'target': beta.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=gamma.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 2)
+        self.assertEqual(beta.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #           ⊢ Gamma
+        #   ⊢ Delta
+
+        # Move Delta to be a child of Beta
+        data = {
+            'id': delta.pk,
+            'position': 0,
+            'target': gamma.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=delta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 3)
+        self.assertEqual(beta.reload().get_descendants().count(), 2)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #           ⊢ Gamma
+        #               ⊢ Delta
+
+        # Move Beta to the root as node #1 (positions are 0-indexed)
+        data = {
+            'id': beta.pk,
+            'position': 1,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=beta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 0)
+        self.assertEqual(beta.reload().get_descendants().count(), 2)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #   ⊢ Beta
+        #       ⊢ Gamma
+        #           ⊢ Delta
+
+        # Move Beta to be a child of Alpha again
+        data = {
+            'id': beta.pk,
+            'position': 0,
+            'target': alpha.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=beta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 3)
+        self.assertEqual(beta.reload().get_descendants().count(), 2)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #           ⊢ Gamma
+        #               ⊢ Delta
+
+        # Move Gamma to the root as node #1 (positions are 0-indexed)
+        data = {
+            'id': gamma.pk,
+            'position': 1,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=gamma.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(beta.reload().get_descendants().count(), 0)
+        self.assertEqual(gamma.reload().get_descendants().count(), 1)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Gamma
+        #       ⊢ Delta
+
+        # Move Delta to the root as node #1 (positions are 0-indexed)
+        data = {
+            'id': delta.pk,
+            'position': 1,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=delta.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(beta.reload().get_descendants().count(), 0)
+        self.assertEqual(gamma.reload().get_descendants().count(), 0)
+
+        # Current structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Delta
+        #   ⊢ Gamma
+
+        # Move Gamma to be a child of Delta
+        data = {
+            'id': gamma.pk,
+            'position': 1,
+            'target': delta.pk,
+        }
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data=data)
+            response = page_admin.move_page(request, page_id=gamma.pk)
+            data = json.loads(response.content.decode('utf8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['status'], 200)
+        self.assertEqual(alpha.reload().get_descendants().count(), 1)
+        self.assertEqual(beta.reload().get_descendants().count(), 0)
+        self.assertEqual(gamma.reload().get_descendants().count(), 0)
+        self.assertEqual(delta.reload().get_descendants().count(), 1)
+
+        # Final structure:
+        #   <root>
+        #   ⊢ Alpha
+        #       ⊢ Beta
+        #   ⊢ Delta
+        #       ⊢ Gamma

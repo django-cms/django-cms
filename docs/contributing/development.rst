@@ -97,6 +97,15 @@ Current core developers
 * Vadim Sikora https://github.com/vxsx
 
 
+Core designers
+--------------
+
+django CMS also receives important contributions from *core designers*, responsible for key aspects of its visual
+design:
+
+* Christian Bertschy
+* Matthias Nüesch
+
 Retired core developers
 =======================
 

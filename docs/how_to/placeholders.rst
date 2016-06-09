@@ -1,3 +1,5 @@
+.. _placeholders_outside_cms:
+
 ############################
 Placeholders outside the CMS
 ############################

@@ -17,6 +17,10 @@ class EmptyPlugin(CMSPluginBase):
     def get_extra_placeholder_menu_items(self, request, placeholder):
         return [
             PluginMenuItem('Extra item - not usable', '/some/url/', 'any-data'),
+            PluginMenuItem(
+                'Data item - not usable', '/random/url/', 'any-data',
+                attributes={'cms-icon': 'whatever'}
+            ),
             PluginMenuItem('Other item - not usable', '/some/other/url/', 'any-data', action='ajax_add'),
         ]
 

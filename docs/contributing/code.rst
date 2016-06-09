@@ -78,8 +78,8 @@ examples, or ask.
 JS Linting
 ----------
 
-JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
-<http://jscs.info>`_. In order to run the linters you need to do this:
+JavaScript is linted using `ESLint <http://eslint.org>`_. In order to run the
+linter you need to do this:
 
 .. code-block:: sh
 
@@ -87,15 +87,6 @@ JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
 
 Or you can also run the watcher by just running ``gulp``.
 
-
-JS Bundling
------------
-
-JavaScript files are split up for easier development, but in the end they are
-bundled together and minified to decrease amount of requests made and improve
-performance. In order to do that we use ``gulp`` task runner, where ``bundle``
-command is available. Configuration and list of dependencies for each bundle are
-stored inside the ``gulpfile.js``.
 
 Process
 =======
@@ -129,17 +120,27 @@ If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC
 Frontend
 ********
 
+..  important::
+
+    When we refer to the *frontend* here, we **only** mean the frontend of django CMS's admin/editor interface.
+
+    The frontend of a django CMS website, as seen by its visitors (i.e. the published site), is *wholly independent of
+    this*. django CMS places almost no restrictions at all on the frontend - if a site can be described in
+    HTML/CSS/JavaScript, it can be developed in django CMS.
+
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
-    1. `Node <https://nodejs.org/>`_ (will install npm as well).
+    1. `Node <https://nodejs.org/>`_ version 0.12.7 (will install npm as well).
+       We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
+       the correct version of Node.
     2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
     3. Local dependencies ``npm install``
 
 Styles
 ======
 
-We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
+We use `Sass <http://sass-lang.com/>`_ for our styles. The files
 are located within ``cms/static/cms/sass`` and can be compiled using the
 `libsass <http://libsass.org/>`_ implementation of Sass compiler through
 `Gulp <http://gulpjs.com/>`_.
@@ -181,6 +182,19 @@ or creating additional icons. It is named *svgz* so it doesn't get compiled
 into the font. When using *Adobe Illustrator* please mind the
 `following settings <images/svg_settings.png>`_.
 
+
+JS Bundling
+===========
+
+JavaScript files are split up for easier development, but in the end they are
+bundled together and minified to decrease amount of requests made and improve
+performance. In order to do that we use ``gulp`` task runner, where ``bundle``
+command is available. We use `Webpack <https://github.com/webpack/webpack>_` for
+bundling JavaScript files. Configuration for each bundle are stored inside the
+``webpack.config.js`` and their respective entry points. CMS exposes only one
+global variable, named ``CMS``. If you want to use JavaScript code provided by
+CMS in external applications, you can only use bundles distributed by CMS, not
+the source modules.
 
 
 .. _fork: http://github.com/divio/django-cms

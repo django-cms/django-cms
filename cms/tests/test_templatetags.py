@@ -309,7 +309,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
 
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(1):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
 

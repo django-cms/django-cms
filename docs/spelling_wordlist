@@ -10,8 +10,9 @@
 #
 # Please keep the two sections below separate.
 
-#### entries that need to be checked for various different reasons ####
-
+#### entries that need to be checked for various different reasons        ####
+#### for example because different operating systems' dictionaries differ ####
+alt
 api
 dev
 fallback
@@ -23,6 +24,7 @@ rc
 regexps
 src
 url
+vs
 
 #### accepted entries ####
 
@@ -51,6 +53,7 @@ cacheable
 callables
 casper
 changelist
+Changelog
 checkboxes
 clickable
 Clickjacking
@@ -85,6 +88,7 @@ fieldset
 filenames
 fillable
 Firefox
+Fixup
 formset
 Foulis
 framebuffer
@@ -161,6 +165,7 @@ prized
 Procida
 programmatically
 queryset
+rebase
 recurses
 refactor
 refactored
@@ -187,6 +192,7 @@ structureboard
 stylesheets
 Sylvain
 templating
+templatetags
 timgraham
 Todo
 tomwardill

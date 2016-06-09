@@ -3,10 +3,10 @@
 // #############################################################################
 // Users managed via the admin panel
 
-var globals = require('./settings/globals');
-var content = require('./settings/globals').content.page;
-
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var content = globals.content.page;
+var cms = helpers();
 
 casper.test.setUp(function (done) {
     casper.start()

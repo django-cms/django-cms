@@ -4,8 +4,9 @@
 // #############################################################################
 // Publishing a page with a publish date
 
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 var SECOND_PAGE_TITLE = 'Second'; // we rely on slug being "/second"
 
@@ -107,12 +108,12 @@ casper.test.begin('Publishing dates', function (test) {
                 .waitUntilVisible('#page_form', function () {
                     publishDate = this.evaluate(function () {
                         DateTimeShortcuts.handleCalendarQuickLink(0, 0);
-                        return $('#id_publication_date_0').val();
+                        return CMS.$('#id_publication_date_0').val();
                     });
 
                     publishTime = this.evaluate(function () {
                         DateTimeShortcuts.handleClockQuicklink(0, -1);
-                        return $('#id_publication_date_1').val();
+                        return CMS.$('#id_publication_date_1').val();
                     });
                 })
                 .then(function () {
@@ -126,6 +127,7 @@ casper.test.begin('Publishing dates', function (test) {
 
                     // adding one minute to the publish time
                     var timestamp = new Date(year, month, day, hours, minutes, seconds);
+
                     timestamp.setMinutes(timestamp.getMinutes() + 1);
                     minutes = timestamp.getMinutes();
                     if (minutes < 10) {

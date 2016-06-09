@@ -3,10 +3,11 @@
 // #############################################################################
 // Change Settings behaviour
 
-var globals = require('./settings/globals');
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
 var xPath = casperjs.selectXPath;
+var cms = helpers(casperjs);
 
 casper.test.setUp(function (done) {
     casper.start()

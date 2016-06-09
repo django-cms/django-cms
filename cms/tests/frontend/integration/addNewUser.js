@@ -1,10 +1,8 @@
 'use strict';
 
-// #############################################################################
-// Toolbar behaviour
-
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 var casperjs = require('casper');
 var xPath = casperjs.selectXPath;
 

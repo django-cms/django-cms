@@ -3,9 +3,13 @@
 // #############################################################################
 // Switch language via the admin panel
 
-var globals = require('./settings/globals');
-var randomString = require('./helpers/randomString').randomString;
-var cms = require('./helpers/cms')();
+var casperjs = require('casper');
+var helpers = require('djangocms-casper-helpers');
+var randomString = helpers.randomString;
+var globals = helpers.settings;
+var cms = helpers(casperjs);
+var xPath = casperjs.selectXPath;
+
 // random text string for filtering and content purposes
 var randomText = randomString({ length: 50, withWhitespaces: false });
 // No Preview Template text
@@ -30,10 +34,12 @@ casper.test.begin('Switch language', function (test) {
         .start(globals.editUrl)
         // click on language bar
         .waitForSelector('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
+            this.click(
+                xPath(cms.createToolbarItemXPath('Language'))
+            );
         })
         // select german language
-        .waitUntilVisible('.cms-toolbar-item-navigation > li:nth-child(4) > ul', function () {
+        .waitUntilVisible('.cms-toolbar-item-navigation-hover ul', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href="/de/"]');
         })
         // no page should be here (warning message instead)
@@ -44,18 +50,18 @@ casper.test.begin('Switch language', function (test) {
                 noPreviewText,
                 'This page isn\'t available'
             );
-            this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
+            this.click(xPath(cms.createToolbarItemXPath('Language')));
         })
         // add german translation
-        .waitUntilVisible('.cms-toolbar-item-navigation > li:nth-child(4) > ul', function () {
+        .waitUntilVisible('.cms-toolbar-item-navigation-hover ul', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href*="?language=de"]');
         })
         // open Change pane modal and fill with data
         .waitUntilVisible('.cms-modal-open')
         .withFrame(0, function () {
             this.fill('#page_form', {
-                'title': randomText,
-                'slug': randomText
+                title: randomText,
+                slug: randomText
             });
         })
         // submit Change pane modal
@@ -68,10 +74,10 @@ casper.test.begin('Switch language', function (test) {
         })
         // click on language bar
         .waitForSelector('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
+            this.click(xPath(cms.createToolbarItemXPath('Language')));
         })
         // delete german translation
-        .waitUntilVisible('.cms-toolbar-item-navigation > li:nth-child(4) > ul', function () {
+        .waitUntilVisible('.cms-toolbar-item-navigation-hover ul', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href*="delete-translation/?language=de"]');
         })
         // submit translation deletion

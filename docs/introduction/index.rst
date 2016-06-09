@@ -28,6 +28,7 @@ in the order presented here.
 
     install
     templates_placeholders
+    integrating_applications
     plugins
     apphooks
     toolbar
@@ -47,4 +48,3 @@ If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC
 <https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
 
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
-

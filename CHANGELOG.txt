@@ -1,25 +1,131 @@
-=== 3.3.0 (Unreleased) ===
+=== 3.3.1 (unreleased) ===
+
+* Added a warning for users who are leaving the page or closing the plugin
+  modal by pressing ESC to prevent accidental loss of content.
+* Fixed a bug when clicking inside sideframe didn't close toolbar dropdowns
+* Fixed a bug where saving errors wouldn't be shown in the modal window.
+* Fixed a misleading message when modal iframe contents couldn't be accessed.
+* Added a workaround for a bug when plugins couldn't be deleted in Firefox
+  with 1Password extension installed
+* Changed CMS JavaScript bundling from simple concatenation to webpack-based.
+  Using CMS Javascript modules directly is no longer possible.
+* Fixed an issue where plugins that have no immediate DOM representation
+  wouldn't be editable or movable.
+* Fixed a regression in which plugins that defined ``parent_classes``
+  would not show up in the structure mode.
+* Introduced new logic to leverage Django's dynamic related name
+  functionality on ``CMSPlugin`` subclasses for the parent link field.
+* Backported a performance fix from Django to avoid extra queries when
+  plugins access their parent via the parent link field ``cmsplugin_ptr``.
+* Fixed typo in ``AdvancedSettingsForm`` error messages.
+* Fixed long standing bug that prevented apphook endspoints from being
+  CSRF exempt.
+
+
+=== 3.3.0 (2016-05-26) ===
+
+* [no changes vs. rc4]
+
+
+=== 3.3.0.rc4 (2016-05-24) ===
+
+* Fixed regression in management commands
+* Fixed documentation typo
+
+
+=== 3.3.0.rc3 (2016-05-23) ===
+
+* Added contribution policies documentation
+* Corrected documentation in numerous places
+* Corrected an issue where someone could see and use the internal placeholder plugin in the structure board
+* Fixed a regression where the first page created was not automatically published
+* Corrected the instructions for using the ``delete-orphaned-plugins`` command
+* Re-pinned django-treebeard to >=4.0.1
+
+
+=== 3.3.0.rc2 (2016-05-19) ===
+
+* Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
+* Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+* Deprecated the old-style wizard-related settings
+* Improved documentation further
+* Improved handling of uninstalled apphooks
+* Fixed toolbar placement when foundation is installed
+* Fixed an issue which could lead to an apphook without a slug
+* Fixed numerous frontend issues
+
+
+=== 3.3.0.rc1 (2016-05-16) ===
 
 * Removed support for Django 1.6, 1.7 and python 2.6
-* Set the default value of CMSPlugin.position to 0 instead of null
-* Refactor language menu to allow for better integration with many languages
-* Management commands has been completely refactored for better consistency
-* Fix "failed to load resource" for favicon on welcome screen
-* ``cms-toolbar-expanded`` class is only added now when toolbar is fully
-  expanded and not at the beginning of the animation. ``cms-toolbar-expanding``
-  and ``cms-toolbar-collapsing`` classes are added at the beginning of their
-  respective animations.
+* Changed the default value of CMSPlugin.position to 0 instead of null
+* Refactored the language menu to allow for better integration with many languages
+* Refactored management commands completely for better consistency
+* Fixed "failed to load resource" for favicon on welcome screen
+* Changed behaviour of toolbar CSS classes: ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding`` and ``cms-toolbar-collapsing`` classes
+  are added at the beginning of their respective animations.
 * Added unit tests for CMS JavaScript files
 * Added frontend integration tests (written with Casper JS)
 * Removed frontend integration tests (written with Selenium)
-* Provides the ability to declare cache expiration periods on a per-plugin basis
-* Minor UI improvements
-* Adds new setting CMS_INTERNAL_IPS for defining a set of IP address for which
+* Added the ability to declare cache expiration periods on a per-plugin basis
+* Improved UI of page tree
+* Improved UI in various minor ways
+* Added a new setting CMS_INTERNAL_IPS for defining a set of IP addresses for which
   the toolbar will appear for authorized users. If left unset, retains the
   existing behavior of allowing toolbar for authorized users at any IP address.
-* Sideframe is no longer resizable, opens to 90% of the screen or 100% on
+* Changed behaviour of sideframe; is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
-* Removed some unnecessary reloads happening after closing sideframe.
+* Removed some unnecessary reloads after closing sideframe.
+* Added the ability to make pagetree actions work on currently picked language
+* Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
+* Introduced the method ``get_cache_expiration`` on CMSPluginBase to be used
+  by plugins for declaring their rendered content's period of validity.
+* Introduced the method ``get_vary_cache_on`` on CMSPluginBase to be used
+  by plugins for declaring ``VARY`` headers.
+* Improved performance of plugin moving; no longer saves all plugins inside the placeholder.
+* Fixed breadcrumbs of recently moved plugin reflecting previous position in
+  the tree
+* Refactored plugin adding logic to no longer create the plugin before the user submits the form.
+* Improved the behaviour of the placeholder cache
+* Improved fix-tree command to sort by position and path when rebuilding positions.
+* Fixed several regressions and tree corruptions on page move.
+* Added new class method on CMSPlugin ``requires_parent_plugin``
+* Fixed behaviour of ``get_child_classes``; now correctly calculates child classes when not
+  configured in the placeholder.
+* Removed internal ``ExtraMenuItems`` tag.
+* Removed internal ``PluginChildClasses`` tag.
+* Modified RenderPlugin tag; no longer renders the ``content.html`` template
+  and instead just returns the results.
+* Added a ``get_cached_template`` method to the ``Toolbar()`` main class to reuse loaded templates per request. It
+  works like Django's cached template loader, but on a request basis.
+* Added a new method ``get_urls()`` on the appbase class to get CMSApp.urls, to allow passing a page object to it.
+* Changed JavaScript linting from JSHint and JSCS to ESLint
+* Fixed a bug when it was possible to drag plugin into clipboard
+* Fixed a bug where clearing clipboard was closing any open modal
+
+
+=== 3.2.5 (2016-04-27) ===
+
+- Fixed regression when page couldn't be copied if CMS_PERMISSION was False
+- Improved handling of uninstalled apphooks
+- Fix packaging problem with the wheel distribution
+
+
+=== 3.2.4 (2016-04-26) ===
+
+- Fix cache settings
+- Fix user lookup for view restrictions/page permissions when using raw id field
+- Fixed regression when page couldn't be copied if CMS_PERMISSION was False
+- Fixes an issue relating to uninstalling a namespaced application
+- Adds "Can change page" permission
+- Fixes a number of page-tree issues the could lead data corruption under
+  certain conditions
+- Addresses security vulnerabilities in the `render_model` template tag that
+  could lead to escalation of privileges or other security issues.
+- Addresses a security vulnerability in the cms' usage of the messages framework
+- Fixes security vulnerabilities in custom FormFields that could lead to
+  escalation of privileges or other security issues.
 
 
 === 3.2.3 (2016-03-09) ===
@@ -246,6 +352,8 @@
 
 === 3.0.17 (unreleased) ===
 
+- Addresses security vulnerabilities in the `render_model` template tag that could
+  lead to escalation of privileges or other security issues.
 - Fix ExtensionToolbar when language is removed but titles still exists…
 - Fix PageSelectWidget JS syntax
 - Fix cache settings

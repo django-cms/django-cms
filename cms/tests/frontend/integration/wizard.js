@@ -3,9 +3,9 @@
 // #############################################################################
 // Wizard
 
-var globals = require('./settings/globals');
-var content = require('./settings/globals').content.page;
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -26,6 +26,7 @@ casper.test.begin('Add first page with a wizard (doubleclick)', function (test) 
         .waitUntilVisible('.cms-modal', function () {
             // switch to modal
             var framePosition = this.getElementBounds('.cms-modal-frame');
+
             casper.withFrame(0, function () {
                 this.waitUntilVisible('.cms-content-wizard', function () {
                     // doubleclick on the "new page"
@@ -34,6 +35,7 @@ casper.test.begin('Add first page with a wizard (doubleclick)', function (test) 
                         framePosition.left + choicePosition.left + choicePosition.width / 2,
                         framePosition.top + choicePosition.top + choicePosition.height / 2
                     ];
+
                     this.mouse.doubleclick.apply(this, coordinates);
                 })
                 .waitForResource(/cms_wizard\/create/)
@@ -72,7 +74,6 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
         // wait till wizard modal show up
         .waitUntilVisible('.cms-modal', function () {
             // switch to modal
-            var framePosition = this.getElementBounds('.cms-modal-frame');
             casper.withFrame(0, function () {
                 this.waitUntilVisible('.cms-content-wizard', function () {
                     test.assertSelectorHasText(
@@ -124,7 +125,8 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
                 'The new page has been created and its title is correct'
             );
             test.assertEval(function () {
-                var selectedChild = $('.nav .selected');
+                var selectedChild = CMS.$('.nav .selected');
+
                 return selectedChild.find('> a').text() === 'Subpage' &&
                     // have to use parents, because closest li is selectedChild itself
                     selectedChild.parents('li').eq(0) &&
@@ -142,7 +144,6 @@ casper.test.begin('Can go back in wizard', function (test) {
         // wait till wizard modal show up automatically (since we don't have any pages)
         .waitUntilVisible('.cms-modal', function () {
             // switch to modal
-            var framePosition = this.getElementBounds('.cms-modal-frame');
             casper.withFrame(0, function () {
                 this.waitUntilVisible('.cms-content-wizard', function () {
                     test.assertVisible('.choice', 'First step is visible');

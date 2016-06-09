@@ -1,11 +1,14 @@
 /* global window, document */
 'use strict';
 
-var globals = require('./settings/globals');
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers(casperjs);
 var xPath = casperjs.selectXPath;
+
 var createJSTreeXPathFromTree = cms.createJSTreeXPathFromTree;
+
 
 casper.test.setUp(function (done) {
     casper.start()

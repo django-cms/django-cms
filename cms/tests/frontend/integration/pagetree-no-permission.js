@@ -1,10 +1,12 @@
 /* global window */
 'use strict';
 
-var globals = require('./settings/globals');
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers(casperjs);
 var xPath = casperjs.selectXPath;
+
 var createJSTreeXPathFromTree = cms.createJSTreeXPathFromTree;
 var getPasteHelpersXPath = cms.getPasteHelpersXPath;
 
@@ -29,6 +31,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
         // switch to sideframe
         .withFrame(0, function () {
             var secondPageId;
+
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -258,6 +261,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 .then(function () {
                     // click on "Paste" to top level "second" page
                     var pages = cms._getPageIds('Second');
+
                     this.then(cms.triggerPastePage({
                         page: pages[pages.length - 2]
                     }));

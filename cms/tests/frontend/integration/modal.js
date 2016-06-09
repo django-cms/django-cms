@@ -3,9 +3,9 @@
 // #############################################################################
 // Create the first page
 
-var globals = require('./settings/globals');
-var content = require('./settings/globals').content.page;
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 var resizeButton;
 
 casper.test.setUp(function (done) {
@@ -21,6 +21,9 @@ casper.test.tearDown(function (done) {
 });
 
 casper.test.begin('Manipulate Modal', function (test) {
+    var expandModal = 30;
+    var standardModal = 724;
+
     casper
         .start(globals.editUrl)
         .waitUntilVisible('.cms-modal-open', function () {
@@ -30,11 +33,11 @@ casper.test.begin('Manipulate Modal', function (test) {
         .then(function () {
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').width();
+                return CMS.$('.cms-modal-open').width();
             }, 1280, 'Modal maximized to current width');
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').height();
+                return CMS.$('.cms-modal-open').height();
             }, 1024, 'Modal maximized to current height');
         })
         // clicks on the maximize button
@@ -51,11 +54,11 @@ casper.test.begin('Manipulate Modal', function (test) {
         .then(function () {
             // Page size is 1280x1024
             test.assertEval(function () {
-                return $('.cms-modal-open').width() < 430;
+                return CMS.$('.cms-modal-open').width() < 430;
             }, 'Window is minimized to current width');
 
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').height();
+                return CMS.$('.cms-modal-open').height();
             }, 46, 'Window is minimized to current height');
         })
         // expands the modal by clicking on the icon
@@ -66,45 +69,48 @@ casper.test.begin('Manipulate Modal', function (test) {
         .then(function () {
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').height();
+                return CMS.$('.cms-modal-open').height();
             }, 724, 'Modal opens with default height');
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').width();
+                return CMS.$('.cms-modal-open').width();
             }, 980, 'Modal opens with default width');
         })
         // Function expands
         .then(function () {
             resizeButton = this.getElementBounds('.cms-modal-resize');
             // Chose number to expand the modal with the given pixel down
-            var expandModal = 30;
-            var standardModal = 724;
+
             this.mouse.down('.cms-modal-resize');
-            this.mouse.move(resizeButton.left + resizeButton.width,
-            resizeButton.top + (resizeButton.height / 2) + expandModal / 2);
-            this.mouse.up(resizeButton.left + resizeButton.width,
-            resizeButton.top + (resizeButton.height / 2) + expandModal / 2);
+            this.mouse.move(resizeButton.left + resizeButton.width / 2,
+                resizeButton.top + (resizeButton.height / 2) + expandModal / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width / 2,
+                resizeButton.top + (resizeButton.height / 2) + expandModal / 2);
+
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').height();
+                return CMS.$('.cms-modal-open').height();
             }, standardModal + expandModal, 'Modal resized bigger');
+        })
+        .then(function () {
             resizeButton = this.getElementBounds('.cms-modal-resize');
             // Reverses the height to standard height of the modal
             this.mouse.down('.cms-modal-resize');
-            this.mouse.move(resizeButton.left + resizeButton.width,
-            resizeButton.top + (resizeButton.height / 2) - expandModal / 2);
-            this.mouse.up(resizeButton.left + resizeButton.width,
-            resizeButton.top + (resizeButton.height / 2) - expandModal / 2);
+            this.mouse.move(resizeButton.left + resizeButton.width / 2,
+                resizeButton.top + (resizeButton.height / 2) - expandModal / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width / 2,
+                resizeButton.top + (resizeButton.height / 2) - expandModal / 2);
             test.assertEvalEquals(function () {
-                return $('.cms-modal-open').height();
+                return CMS.$('.cms-modal-open').height();
             }, standardModal, 'Modal resized to standard again');
         })
         // function moves chosen element to the left
         .then(function () {
             this.click('.cms-modal-head');
-            resizeButton = this.getElementBounds('.cms-modal-head'); //
+            resizeButton = this.getElementBounds('.cms-modal-head');
             this.mouse.down('.cms-modal-head');
-            // Chose random numbe to move the modal to the left
+            // Choose random number to move the modal to the left
             var movingLeft = 50;
-            var distanceLeft  = resizeButton.left;
+            var distanceLeft = resizeButton.left;
+
             this.mouse.move(resizeButton.left + resizeButton.width / 2 - movingLeft,
             resizeButton.top + resizeButton.height / 2);
             this.mouse.up(resizeButton.left + resizeButton.width / 2 - movingLeft,
@@ -126,10 +132,11 @@ casper.test.begin('Manipulate Modal', function (test) {
             resizeButton = this.getElementBounds('.cms-modal-head'); //
             this.mouse.down('.cms-modal-head');
             // Chose random numbe to move the modal to the left
-            var distanceTop  = resizeButton.top;
-            var distanceLeft  = resizeButton.left;
+            var distanceTop = resizeButton.top;
+            var distanceLeft = resizeButton.left;
             var movingUp = 50;
             var movingLeft = 20;
+
             this.mouse.move(resizeButton.left + resizeButton.width / 2 - movingLeft,
             resizeButton.top - movingUp + resizeButton.height / 2);
             this.mouse.up(resizeButton.left + resizeButton.width / 2 - movingLeft,
@@ -143,7 +150,7 @@ casper.test.begin('Manipulate Modal', function (test) {
             resizeButton = this.getElementBounds('.cms-modal-resize');
             // Min height is 400px. 724px - 500px < 400
             var resizeUp = 500;
-            var standardModal = 724;
+
             this.mouse.down('.cms-modal-resize');
             this.mouse.move(resizeButton.left + resizeButton.width,
             resizeButton.top + (resizeButton.height / 2) - resizeUp / 2);
@@ -151,8 +158,9 @@ casper.test.begin('Manipulate Modal', function (test) {
             resizeButton.top + (resizeButton.height / 2) - resizeUp / 2);
             // takes the current modal height
             var height = this.evaluate(function () {
-                return $('.cms-modal-open').height();
+                return CMS.$('.cms-modal-open').height();
             });
+
             // checks if the current modal height didn't turn below 400
             test.assert(height !== standardModal - resizeUp, 'Modal reached min size');
             test.assert(height === 400, 'Modal reached 400px');

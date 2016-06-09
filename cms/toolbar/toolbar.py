@@ -17,6 +17,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
+from django.template import Template
+from django.template.loader import get_template
+from django.utils.functional import cached_property
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -38,8 +41,11 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
+        self._cached_templates = {}
         self.right_items = []
         self.left_items = []
+        self.last_left_items = []
+        self.last_right_items = []
         self.populated = False
         self.post_template_populated = False
         self.menus = {}
@@ -58,7 +64,6 @@ class CMSToolbar(ToolbarAPIMixin):
         self.clipboard = None
         self.language = None
         self.toolbar_language = None
-        self.simple_structure_mode = get_cms_setting('TOOLBAR_SIMPLE_STRUCTURE_MODE')
         self.show_toolbar = True
         self.init_toolbar(request)
 
@@ -79,7 +84,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 except (TypeError, AttributeError):
                     # no decorator
                     self.app_name = decorator.__module__
-            except Resolver404:
+            except (Resolver404, AttributeError):
                 self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
         parts = self.app_name.split('.')
@@ -177,7 +182,7 @@ class CMSToolbar(ToolbarAPIMixin):
             return self.menus[key]
         return None
 
-    def get_or_create_menu(self, key, verbose_name=None, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name=None, disabled=False, side=LEFT, position=None):
         self.populate()
         if key in self.menus:
             menu = self.menus[key]
@@ -189,7 +194,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 self.remove_item(menu)
                 self.add_item(menu, position=position)
             return menu
-        menu = Menu(verbose_name, self.csrf_token, side=side)
+        menu = Menu(verbose_name, self.csrf_token, disabled=disabled, side=side)
         self.menus[key] = menu
         self.add_item(menu, position=position)
         return menu
@@ -261,11 +266,19 @@ class CMSToolbar(ToolbarAPIMixin):
 
     # Internal API
 
-    def _add_item(self, item, position):
+    def _add_item(self, item, position=None):
         if item.right:
-            target = self.right_items
+            if position and position < 0:
+                target = self.last_right_items
+                position = abs(position)
+            else:
+                target = self.right_items
         else:
-            target = self.left_items
+            if position and position < 0:
+                target = self.last_left_items
+                position = abs(position)
+            else:
+                target = self.left_items
         if position is not None:
             target.insert(position, item)
         else:
@@ -274,8 +287,12 @@ class CMSToolbar(ToolbarAPIMixin):
     def _remove_item(self, item):
         if item in self.right_items:
             self.right_items.remove(item)
+        elif item in self.last_right_items:
+            self.last_right_items.remove(item)
         elif item in self.left_items:
             self.left_items.remove(item)
+        elif item in self.last_left_items:
+            self.last_left_items.remove(item)
         else:
             raise KeyError("Item %r not found" % item)
 
@@ -287,11 +304,13 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def get_left_items(self):
         self.populate()
-        return self.left_items
+        items = self.left_items + list(reversed(self.last_left_items))
+        return items
 
     def get_right_items(self):
         self.populate()
-        return self.right_items
+        items = self.right_items + list(reversed(self.last_right_items))
+        return items
 
     def populate(self):
         """
@@ -329,6 +348,26 @@ class CMSToolbar(ToolbarAPIMixin):
             return self._request_hook_get()
         else:
             return self._request_hook_post()
+
+    def get_cached_template(self, template):
+        if isinstance(template, Template):
+            return template
+
+        if not template in self._cached_templates:
+            self._cached_templates[template] = get_template(template)
+        return self._cached_templates[template]
+
+    @cached_property
+    def drag_item_template(self):
+        return self.get_cached_template('cms/toolbar/dragitem.html')
+
+    @cached_property
+    def drag_item_menu_template(self):
+        return self.get_cached_template('cms/toolbar/dragitem_menu.html')
+
+    @cached_property
+    def dragbar_template(self):
+        return self.get_cached_template('cms/toolbar/dragbar.html')
 
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:

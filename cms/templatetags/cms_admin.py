@@ -231,7 +231,8 @@ class PageSubmitRow(InclusionTag):
         basic_info = context.get('advanced_settings', False)
         advanced_settings = context.get('basic_info', False)
         language = context.get('language', '')
-        return {
+        filled_languages = context.get('filled_languages', [])
+        context = {
             # TODO check this (old code: opts.get_ordered_objects() )
             'onclick_attrib': (opts and change
                                and 'onclick="submitOrderForm();"' or ''),
@@ -244,8 +245,10 @@ class PageSubmitRow(InclusionTag):
             'advanced_settings': advanced_settings,
             'show_save': True,
             'language': language,
+            'language_is_filled': language in filled_languages,
             'object_id': context.get('object_id', None)
         }
+        return context
 
 
 register.tag(PageSubmitRow)

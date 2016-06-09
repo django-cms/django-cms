@@ -207,10 +207,11 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
     sub_level = True
     active = False
 
-    def __init__(self, name, csrf_token, side=LEFT):
+    def __init__(self, name, csrf_token, disabled=False, side=LEFT):
         ToolbarAPIMixin.__init__(self)
         BaseItem.__init__(self, side)
         self.name = name
+        self.disabled = disabled
         self.csrf_token = csrf_token
 
     def __repr__(self):
@@ -222,11 +223,16 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         return item
 
     def get_items(self):
-        return self.items
+        items = self.items
+        for item in items:
+            if hasattr(item, 'disabled'):
+                item.disabled = self.disabled or item.disabled
+        return items
 
     def get_context(self):
         return {
             'active': self.active,
+            'disabled': self.disabled,
             'items': self.get_items(),
             'title': self.name,
             'sub_level': self.sub_level
@@ -236,10 +242,10 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
 class Menu(SubMenu):
     sub_level = False
 
-    def get_or_create_menu(self, key, verbose_name, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name, disabled=False, side=LEFT, position=None):
         if key in self.menus:
             return self.menus[key]
-        menu = SubMenu(verbose_name, self.csrf_token, side=side)
+        menu = SubMenu(verbose_name, self.csrf_token, disabled=disabled, side=side)
         self.menus[key] = menu
         self.add_item(menu, position=position)
         return menu

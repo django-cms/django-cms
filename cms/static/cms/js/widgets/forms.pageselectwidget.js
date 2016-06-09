@@ -37,6 +37,8 @@ var CMS = window.CMS || {};
              *
              * @private
              * @method _setup
+             * @param {Object} options
+             * @param {String} options.name
              */
             _setup: function _setup(options) {
                 var group0 = $('#id_' + options.name + '_0');

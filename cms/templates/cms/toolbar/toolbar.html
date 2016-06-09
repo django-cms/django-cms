@@ -1,4 +1,4 @@
-{% load i18n l10n %}
+{% load i18n l10n cms_tags %}
 
 {% language request.toolbar.toolbar_language %}
 <div id="cms-top"
@@ -16,21 +16,20 @@
     <div class="cms-toolbar">
         <div class="cms-toolbar-left">
             {% include "cms/toolbar/items/logo.html" %}
-
             {% if not user.is_authenticated %}
-            {% include "cms/toolbar/items/login.html" %}
+                {% include "cms/toolbar/items/login.html" %}
             {% else %}
-            <ul class="cms-toolbar-item cms-toolbar-item-navigation">
-                {% for item in request.toolbar.get_left_items %}
-                    {{ item.render }}
-                {% endfor %}
-                <li class="cms-toolbar-more">
-                    <a href="#">
-                        <span>{% trans "More" %}...<span class="cms-icon cms-icon-arrow"></span></span>
-                    </a>
-                    <ul data-touch-action="pan-y"></ul>
-                </li>
-            </ul>
+                <ul class="cms-toolbar-item cms-toolbar-item-navigation">
+                    {% for item in request.toolbar.get_left_items %}
+                        {{ item.render }}
+                    {% endfor %}
+                    <li class="cms-toolbar-more">
+                        <a href="#">
+                            <span>{% trans "More" %}...<span class="cms-icon cms-icon-arrow"></span></span>
+                        </a>
+                        <ul data-touch-action="pan-y"></ul>
+                    </li>
+                </ul>
             {% endif %}
         </div>
 
@@ -50,25 +49,26 @@
     </div>
     {# end: messages #}
 
-    {# start: sidebar #}
     <div class="cms-sideframe">
         <div class="cms-sideframe-frame"></div>
         <div class="cms-sideframe-shim"></div>
         <div class="cms-sideframe-dimmer"></div>
         <div class="cms-sideframe-copy"></div>
-        <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
-        <div class="cms-sideframe-history">
-            <span class="cms-icon cms-icon-arrow cms-icon-arrow-back cms-icon-disabled" title="{% trans 'Click to go back' %}"></span>
-            <span class="cms-icon cms-icon-arrow cms-icon-arrow-forward cms-icon-disabled" title="{% trans 'Click to go forward' %}"></span>
-        </div>
+        {% spaceless %}
+            <div class="cms-sideframe-controls">
+                <div class="cms-sideframe-history">
+                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-back cms-icon-disabled" title="{% trans 'Click to go back' %}"></span>
+                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-forward cms-icon-disabled" title="{% trans 'Click to go forward' %}"></span>
+                </div>
+                <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
+            </div>
+        {% endspaceless %}
     </div>
-    {# end: sidebar #}
 
     {# start: addons #}
     {{ addons }}
     {# end: addons #}
 
-    {# start: modal #}
     <div class="cms-modal" data-touch-action="none">
         <div class="cms-modal-head" data-touch-action="none">
             <span class="cms-modal-title" data-touch-action="none">
@@ -89,25 +89,20 @@
             <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
         </div>
     </div>
-    {# end: modal #}
 
     {# start: structure #}
     <div class="cms-structure">
         <div class="cms-structure-content" data-touch-action="pan-y">
             {% for placeholder in request.toolbar.placeholder_list %}
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
-                {% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
+                {% include request.toolbar.dragbar_template with placeholder=placeholder language=language %}
 
-                {# <div class="cms-dragitem cms-dragitem-1888"> #}
                 <div class="cms-draggables cms-draggables-root">
                     <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
-                    {% with placeholder.slot as slot %}
                     {% for plugin in placeholder.get_cached_plugins %}
-                        {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+                        {% include request.toolbar.drag_item_template with plugin=plugin slot=slot %}
                     {% endfor %}
-                    {% endwith %}
                 </div>
-                {# </div> #}
             </div>
             {% endfor %}
         </div>
@@ -115,12 +110,12 @@
     {# end: structure #}
 
     {% if request.toolbar.redirect_url %}
-    <div class="cms-screenblock">
-        <div class="cms-screenblock-inner">
-            <h1>{% trans "This page has no preview!" %}</h1>
-            <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
+        <div class="cms-screenblock">
+            <div class="cms-screenblock-inner">
+                <h1>{% trans "This page has no preview!" %}</h1>
+                <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
+            </div>
         </div>
-    </div>
     {% endif %}
 </div>
 {% endlanguage %}

@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.utils.translation import ugettext as _
 
 from cms.plugin_base import CMSPluginBase
@@ -15,6 +16,7 @@ class ArticlePlugin(CMSPluginBase):
     name = _("Articles")
     render_template = "articles.html"
     admin_preview = False
+    filter_horizontal = ['sections']
 
     def render(self, context, instance, placeholder):
         article_qs = Article.objects.filter(section__in=instance.sections.all())
@@ -23,7 +25,9 @@ class ArticlePlugin(CMSPluginBase):
                         'placeholder': placeholder})
         return context
 
-plugin_pool.register_plugin(ArticlePlugin)
+
+class ArticlePluginAdmin(admin.ModelAdmin):
+    filter_horizontal = ['sections']
 
 
 class ArticleDynamicTemplatePlugin(CMSPluginBase):
@@ -44,9 +48,6 @@ class ArticleDynamicTemplatePlugin(CMSPluginBase):
                         'placeholder': placeholder})
         return context
 
-plugin_pool.register_plugin(ArticleDynamicTemplatePlugin)
-
-
 ###
 
 
@@ -54,11 +55,16 @@ class PluginWithFKFromModel(CMSPluginBase):
     model = PluginModelWithFKFromModel
     render_template = "articles.html"
 
-plugin_pool.register_plugin(PluginWithFKFromModel)
-
 
 class PluginWithM2MToModel(CMSPluginBase):
     model = PluginModelWithM2MToModel
     render_template = "articles.html"
 
+
+plugin_pool.register_plugin(ArticlePlugin)
+plugin_pool.register_plugin(ArticleDynamicTemplatePlugin)
 plugin_pool.register_plugin(PluginWithM2MToModel)
+plugin_pool.register_plugin(PluginWithFKFromModel)
+
+# Used to test integrity of plugin form
+admin.site.register(ArticlePluginModel, ArticlePluginAdmin)

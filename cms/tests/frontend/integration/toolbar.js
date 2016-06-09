@@ -3,8 +3,9 @@
 // #############################################################################
 // Toolbar behaviour
 
-var globals = require('./settings/globals');
-var cms = require('./helpers/cms')();
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers();
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -36,7 +37,7 @@ casper.test.begin('Toolbar Visibility', function (test) {
         })
         .wait(transitionTime, function () {
             toolbarOffset = this.evaluate(function () {
-                return parseInt($('.cms-toolbar').css('marginTop'), 10);
+                return parseInt(CMS.$('.cms-toolbar').css('marginTop'), 10);
             });
 
             test.assertTruthy(toolbarOffset < 0, 'Toolbar can be closed on trigger click');
@@ -45,7 +46,7 @@ casper.test.begin('Toolbar Visibility', function (test) {
         })
         .wait(transitionTime, function () {
             toolbarOffset = this.evaluate(function () {
-                return parseInt($('.cms-toolbar').css('marginTop'), 10);
+                return parseInt(CMS.$('.cms-toolbar').css('marginTop'), 10);
             });
 
             test.assertTruthy(toolbarOffset === 0, 'Toolbar can be opened on trigger click');

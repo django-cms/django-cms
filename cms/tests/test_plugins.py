@@ -11,6 +11,7 @@ from django import http
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core import urlresolvers
 from django.core.cache import cache
 from django.core.exceptions import (
@@ -125,6 +126,9 @@ class PluginsTestBaseCase(CMSTestCase):
     def get_response_pk(self, response):
         return int(response.content.decode('utf8').split("/edit-plugin/")[1].split("/")[0])
 
+    def get_placeholder(self):
+        return Placeholder.objects.create(slot='test')
+
 
 class PluginsTestCase(PluginsTestBaseCase):
     def _create_text_plugin_on_page(self, page):
@@ -160,6 +164,60 @@ class PluginsTestCase(PluginsTestBaseCase):
         # now edit the plugin
         txt = self._edit_text_plugin(created_plugin_id, "Hello World")
         self.assertEqual("Hello World", txt.body)
+
+    def test_plugin_add_form_integrity(self):
+        admin.autodiscover()
+        admin_instance = admin.site._registry[ArticlePluginModel]
+        placeholder = self.get_placeholder()
+        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
+            'plugin_type': "ArticlePlugin",
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': placeholder.pk,
+        })
+        superuser = self.get_superuser()
+        plugin = plugin_pool.get_plugin('ArticlePlugin')
+
+        with self.login_user_context(superuser):
+            request = self.get_request(url)
+            PluginFormClass = plugin(
+                model=plugin.model,
+                admin_site=admin.site,
+            ).get_form(request)
+            plugin_fields = list(PluginFormClass.base_fields.keys())
+
+            OriginalFormClass = admin_instance.get_form(request)
+            original_fields = list(OriginalFormClass.base_fields.keys())
+
+            # Assert both forms have the same fields
+            self.assertEqual(plugin_fields, original_fields)
+
+            # Now assert the plugin form has the related field wrapper
+            # widget on the sections field.
+            self.assertIsInstance(
+                PluginFormClass.base_fields['sections'].widget,
+                RelatedFieldWidgetWrapper,
+            )
+
+            # Now assert the admin form has the related field wrapper
+            # widget on the sections field.
+            self.assertIsInstance(
+                OriginalFormClass.base_fields['sections'].widget,
+                RelatedFieldWidgetWrapper,
+            )
+
+            # Now assert the plugin form has the filtered select multiple
+            # widget wrapped by the related field wrapper
+            self.assertIsInstance(
+                PluginFormClass.base_fields['sections'].widget.widget,
+                FilteredSelectMultiple,
+            )
+
+            # Now assert the admin form has the filtered select multiple
+            # widget wrapped by the related field wrapper
+            self.assertIsInstance(
+                OriginalFormClass.base_fields['sections'].widget.widget,
+                FilteredSelectMultiple,
+            )
 
     def test_plugin_edit_marks_page_dirty(self):
         page_data = self.get_new_page_data()
@@ -839,7 +897,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
         })
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
 
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
@@ -1150,44 +1208,23 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin_list = plugin_pool.get_all_plugins(placeholder=placeholder, page=page)
             self.assertFalse(ParentRequiredPlugin in plugin_list)
 
-    def test_plugin_parent_classes(self):
-        """
-        Assert that a plugin with a list of parent classes only appears in the
-        toolbar plugin struct for those given parent Plugins
-        """
-        ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                   dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
+    def test_plugin_toolbar_struct(self):
+        # Tests that the output of the plugin toolbar structure.
         GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
-        KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {'render_plugin':False})
 
-        with register_plugins(ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin):
+        with register_plugins(GenericParentPlugin):
             page = api.create_page("page", "nav_playground.html", "en", published=True)
             placeholder = page.placeholders.get(slot='body')
 
             from cms.utils.placeholder import get_toolbar_plugin_struct
-            toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
-                                                        placeholder.slot,
-                                                        page,
-                                                        parent=GenericParentPlugin)
             expected_struct = {'module': u'Generic',
                            'name': u'Parent Classes Plugin',
                            'value': 'ParentClassesPlugin'}
 
-            self.assertTrue(expected_struct in toolbar_struct)
-
-            toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
+            toolbar_struct = get_toolbar_plugin_struct([GenericParentPlugin],
                                                         placeholder.slot,
-                                                        page,
-                                                        parent=KidnapperPlugin)
+                                                        page,)
             self.assertFalse(expected_struct in toolbar_struct)
-
-            toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin, GenericParentPlugin],
-                                                        placeholder.slot,
-                                                        page)
-            expected_struct = {'module': u'Generic',
-                                'name': u'Generic Parent Plugin',
-                                'value': 'GenericParentPlugin'}
-            self.assertTrue(expected_struct in toolbar_struct)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
@@ -1234,6 +1271,39 @@ class PluginsTestCase(PluginsTestBaseCase):
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
                 self.assertEqual(['TestPlugin'],
                                     plugin.get_parent_classes(placeholder.slot, page))
+
+    def test_plugin_parent_classes_from_object(self):
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+        ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
+                                    dict(render_plugin=False))
+        ChildPlugin = type('ChildPlugin', (CMSPluginBase,),
+                                    dict(parent_classes=['ParentPlugin'], render_plugin=False))
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            plugin = plugin.get_plugin_class_instance()
+            ## assert baseline
+            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            self.assertIn('ChildPlugin', child_classes)
+            self.assertIn('ParentPlugin', child_classes)
+
+    def test_plugin_require_parent_from_object(self):
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
+        ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
+                                    dict(render_plugin=False))
+        ChildPlugin = type('ChildPlugin', (CMSPluginBase,),
+                                    dict(require_parent=True, render_plugin=False))
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            plugin = plugin.get_plugin_class_instance()
+            ## assert baseline
+            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            self.assertIn('ChildPlugin', child_classes)
+            self.assertIn('ParentPlugin', child_classes)
+
 
     def test_plugin_translatable_content_getter_setter(self):
         """
@@ -1448,7 +1518,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
         })
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE)
+        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
 
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
@@ -1744,3 +1814,36 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
         plugin_model = TestPluginBetaModel.objects.all()[0]
         self.assertEqual("ALPHA", plugin_model.alpha)
         self.assertEqual("BETA", plugin_model.beta)
+
+    def test_related_name(self):
+        from cms.test_utils.project.mti_pluginapp.models import (
+            TestPluginAlphaModel, TestPluginBetaModel, ProxiedAlphaPluginModel,
+            ProxiedBetaPluginModel, AbstractPluginParent, TestPluginGammaModel, MixedPlugin,
+            LessMixedPlugin, NonPluginModel
+        )
+        # the first concrete class of the following four plugins is TestPluginAlphaModel
+        self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        self.assertEqual(TestPluginBetaModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        self.assertEqual(ProxiedAlphaPluginModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testpluginalphamodel')
+        # Abstract plugins will have the dynamic format for related name
+        self.assertEqual(
+            AbstractPluginParent.cmsplugin_ptr.field.rel.related_name,
+            '%(app_label)s_%(class)s'
+        )
+        # Concrete plugin of an abstract plugin gets its relatedname
+        self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_testplugingammamodel')
+        # Child plugin gets it's own related name
+        self.assertEqual(MixedPlugin.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_mixedplugin')
+        # If the child plugin inherit straight from CMSPlugin, even if composed with
+        # other models, gets its own related_name
+        self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.rel.related_name,
+                         'mti_pluginapp_lessmixedplugin')
+        # Non plugins are skipped
+        self.assertFalse(hasattr(NonPluginModel, 'cmsplugin_ptr'))

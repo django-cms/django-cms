@@ -29,19 +29,16 @@
         }
         input[type="checkbox"] {
             position: relative;
-            top: -3px;
+            top: auto;
+            vertical-align: middle;
+            line-height: 20px;
         }
         p {
             margin: 0 $padding-large;
             margin-bottom: 0;
             padding: $padding-normal 0;
             &:after {
-                content: "";
-                position: absolute;
-                left: 0;
-                width: 100%;
-                height: 30px;
-                border-bottom: 1px solid $gray-lighter;
+                display: none;
             }
         }
         input[type="submit"] {

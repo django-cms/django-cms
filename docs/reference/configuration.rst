@@ -1027,16 +1027,15 @@ CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
 
 default
-    ``Page.X_FRAME_OPTIONS_INHERIT``
+    ``constants.X_FRAME_OPTIONS_INHERIT``
 
 This setting is the default value for a Page's X Frame Options setting.
-This should be an integer preferably taken from the Page object e.g.
+This should be an integer preferably taken from the ``cms.constants`` e.g.
 
 - X_FRAME_OPTIONS_INHERIT
 - X_FRAME_OPTIONS_ALLOW
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
-
 
 .. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
 
@@ -1055,40 +1054,54 @@ Example::
 
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
-.. setting:: WIZARD_DEFAULT_TEMPLATE
 
-WIZARD_DEFAULT_TEMPLATE
-=======================
+.. setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+
+CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+================================
 
 default
     ``TEMPLATE_INHERITANCE_MAGIC``
 
-This is the path of the template used to create pages in the wizard. It must be one
-of the templates in :setting:`CMS_TEMPLATES`.
+This is the path of the template used to create pages in the wizard. It must be
+one of the templates in :setting:`CMS_TEMPLATES`.
 
-.. setting:: CMS_WIZARD_CONTENT_PLUGIN
+.. setting:: CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 
-CMS_WIZARD_CONTENT_PLUGIN
-=========================
+CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+===================================
+
+default
+    None
+
+When set to an editable, non-static placeholder that is available on the page
+template, the CMS page wizards will target the specified placeholder when
+adding any content supplied in the wizards' "Content" field. If this is left
+unset, then the content will target the first suitable placeholder found on
+the page's template.
+
+.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN
+
+CMS_PAGE_WIZARD_CONTENT_PLUGIN
+==============================
 
 default
     ``TextPlugin``
 
-This is the name of the plugin created in the Page Wizard when the "Content" field is
-filled in.
-There should be no need to change it, unless you **don't** use
-``djangocms-text-ckeditor`` in your project.
+This is the name of the plugin created in the Page Wizard when the "Content"
+field is filled in. There should be no need to change it, unless you
+**don't** use ``djangocms-text-ckeditor`` in your project.
 
-.. setting:: CMS_WIZARD_CONTENT_PLUGIN_BODY
+.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
-CMS_WIZARD_CONTENT_PLUGIN_BODY
-==============================
+CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+===================================
 
 default
     ``body``
 
-This is the name of the body field in the plugin created in the Page Wizard when the
-"Content" field is filled in.
-There should be no need to change it, unless you **don't** use
-``djangocms-text-ckeditor`` in your project **and** your custom plugin defined in
-:setting:`CMS_WIZARD_CONTENT_PLUGIN` have a body field **different** than ``body``.
+This is the name of the body field in the plugin created in the Page Wizard
+when the "Content" field is filled in. There should be no need to change it,
+unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
+your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
+body field **different** than ``body``.

@@ -1,0 +1,65 @@
+.. _upgrade-to-3.2.5:
+
+###################
+3.2.5 release notes
+###################
+
+*******************
+What's new in 3.2.5
+*******************
+
+.. note::
+
+    This release is identical to 3.2.4, but had to be released also as 3.2.4 due
+    to a Python wheel packaging issue.
+
+Bug Fixes
+=========
+
+* Fix cache settings
+* Fix user lookup for view restrictions/page permissions when using raw id field
+* Fixed regression when page couldn't be copied if CMS_PERMISSION was False
+* Fixes an issue relating to uninstalling a namespaced application
+* Adds "Can change page" permission
+* Fixes a number of page-tree issues the could lead data corruption under
+  certain conditions
+* Addresses security vulnerabilities in the `render_model` template tag that
+  could lead to escalation of privileges or other security issues.
+* Addresses a security vulnerability in the cms' usage of the messages framework
+* Fixes security vulnerabilities in custom FormFields that could lead to
+  escalation of privileges or other security issues.
+
+.. important::
+
+    This version of django CMS introduces a new setting:
+    ``CMS_UNESCAPED_RENDER_MODEL_TAGS`` with a default value of `True`. This default
+    value allows upgrades to occur without forcing django CMS users to do
+    anything, but, please be aware that this setting continues to allow known
+    security vulnerabilities to be present. Due to this, the new setting is
+    immediately deprecated and will be removed in a near-future release.
+
+    To immediately improve the security of your project and to prepare for
+    future releases of django CMS and related addons, the project
+    administrator should carefully review each use of the ``render_model``
+    template tags provided by django CMS. He or she is encouraged to ensure
+    that all content which is rendered to a page using this template tag is
+    cleansed of any potentially harmful HTML markup, CSS styles or Javascript.
+    Once the administrator or developer is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the render_model
+    template tag if the content should be rendered without escaping. If there
+    is no need to render the content un-escaped, no further action
+    is required.
+
+    Once all template tags have been reviewed and adjusted where necessary,
+    the administrator should set ``CMS_UNESCAPED_RENDER_MODEL_TAGS = False``
+    in the project settings. At that point, the project is more secure and
+    will be ready for any future upgrades.
+
+DjangoCMS Text CKEditor
+=======================
+
+Action required
+---------------
+
+CMS 3.2.1 is not compatible with djangocms-text-ckeditor < 2.8.1.
+If you're using djangocms-text-ckeditor, please upgrade to 2.8.1 or later.

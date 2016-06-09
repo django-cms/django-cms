@@ -4,10 +4,12 @@
 // #############################################################################
 // Page tree functionality
 
-var globals = require('./settings/globals');
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers(casperjs);
 var xPath = casperjs.selectXPath;
+
 var createJSTreeXPathFromTree = cms.createJSTreeXPathFromTree;
 var getPasteHelpersXPath = cms.getPasteHelpersXPath;
 
@@ -120,10 +122,10 @@ casper.test.begin('Settings and advanced settings are accessible', function (tes
             .waitForSelector('.cms-pagetree-jstree')
             .wait(3000).then(cms.expandPageTree())
             .thenEvaluate(function () {
-                var clickEvent = $.Event('click', { shiftKey: true });
+                var clickEvent = new CMS.$.Event('click', { shiftKey: true });
 
                 // here we cheat a bit, it works only if there's only one edit on the page
-                $('.cms-icon-pencil:visible').trigger(clickEvent);
+                CMS.$('.cms-icon-pencil:visible').trigger(clickEvent);
             })
             .waitForUrl(/advanced-settings/)
             .waitForSelector('h1')
@@ -158,6 +160,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
             .wait(2000)
             .then(function () {
                 var pageId = cms.getPageId('Homepage');
+
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([{ name: 'Homepage' }])),
                     'Page was successfully added'
@@ -180,6 +183,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
             .then(cms.expandPageTree())
             .then(function () {
                 var pageId = cms.getPageId('Nested page');
+
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
                         {
@@ -212,6 +216,7 @@ casper.test.begin('Pages can be reordered', function (test) {
         // switch to sideframe
         .withFrame(0, function () {
             var drop;
+
             casper.waitUntilVisible('.cms-pagetree-jstree', cms.waitUntilAllAjaxCallsFinish()).then(function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -271,6 +276,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
         // switch to sideframe
         .withFrame(0, function () {
             var drop;
+
             casper.waitUntilVisible('.cms-pagetree-jstree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -365,6 +371,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
 
 casper.test.begin('Pages cannot be published if it does not have a title and slug', function (test) {
     var pageId;
+
     casper
         .start()
         .then(cms.addPage({ title: 'Homepage' }))
@@ -400,6 +407,7 @@ casper.test.begin('Pages cannot be published if it does not have a title and slu
 
 casper.test.begin('Pages can be published/unpublished if it does have a title and slug', function (test) {
     var pageId;
+
     casper
         .start()
         .then(cms.addPage({ title: 'Homepage' }))
@@ -507,6 +515,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
         // switch to sideframe
         .withFrame(0, function () {
             var secondPageId;
+
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -837,6 +846,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .then(function () {
                     // click on "Paste" to top level "second" page
                     var pages = cms._getPageIds('Second');
+
                     this.then(cms.triggerPastePage({
                         page: pages[pages.length - 2]
                     }));
@@ -980,6 +990,7 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
         // switch to sideframe
         .withFrame(0, function () {
             var secondPageId;
+
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .wait(1000)
                 .then(cms.expandPageTree())
@@ -1070,6 +1081,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
         // switch to sideframe
         .withFrame(0, function () {
             var secondPageId;
+
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .wait(1000)
                 .then(cms.expandPageTree())
@@ -1260,7 +1272,6 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            var secondPageId;
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .then(function () {
                     test.assertExists(
@@ -1356,8 +1367,8 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            var secondPageId;
             var drop;
+
             casper.waitUntilVisible('.cms-pagetree-jstree')
                 .wait(3000)
                 .then(cms.expandPageTree())

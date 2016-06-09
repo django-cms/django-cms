@@ -6,7 +6,7 @@
 module.exports = {
     bind: function () {
         casper.on('step.error', function (error) {
-            casper.die('assert failed: ' +  error.message);
+            casper.die('assert failed: ' + error.message);
         });
 
         casper.on('waitFor.timeout', function (timeout, error) {

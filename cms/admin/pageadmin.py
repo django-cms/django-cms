@@ -29,6 +29,7 @@ from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
+from django.http import QueryDict
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
@@ -349,6 +350,20 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def advanced(self, request, object_id):
         page = get_object_or_404(self.model, pk=object_id)
+        # always returns a valid language
+        language = get_language_from_request(request, current_page=page)
+        language_obj = get_language_object(language, site_id=page.site_id)
+
+        if not page.title_set.filter(language=language):
+            # Can't edit advanced settings for a page translation (title)
+            # that does not exist.
+            message = _("Please create the %(language)s page "
+                        "translation before editing it's advanced settings.")
+            message = message % {'language': language_obj['name']}
+            self.message_user(request, message, level=messages.ERROR)
+            path = admin_reverse('cms_page_change', args=(quote(object_id),))
+            return HttpResponseRedirect("%s?language=%s" % (path, language))
+
         if not page.has_advanced_settings_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
@@ -410,8 +425,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context.update({
                 'title':  _("Add Page Copy"),
             })
+        elif 'target' in request.GET:
+            extra_context.update({
+                'title':  _("New sub page"),
+            })
         else:
             extra_context = self.update_language_tab_context(request, context=extra_context)
+            extra_context.update({
+                'title':  _("New page"),
+            })
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
@@ -455,15 +477,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
 
-    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
-        # add context variables
+    def get_filled_languages(self, obj):
         filled_languages = []
+
         if obj:
             filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
         allowed_languages = [lang[0] for lang in self._get_site_languages(obj)]
-        context.update({
-            'filled_languages': [lang for lang in filled_languages if lang in allowed_languages],
-        })
+        return [lang for lang in filled_languages if lang in allowed_languages]
+
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        context['filled_languages'] = self.get_filled_languages(obj)
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
     def _get_site_languages(self, obj=None):
@@ -496,6 +519,22 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         # can be published if required
         obj.save()
         return super(PageAdmin, self).response_change(request, obj)
+
+    def get_preserved_filters(self, request):
+        """
+        This override is in place to preserve the "language" get parameter in
+        the "Save" page redirect
+        """
+        preserved_filters_encoded = super(PageAdmin, self).get_preserved_filters(request)
+        preserved_filters = QueryDict(preserved_filters_encoded).copy()
+        lang = request.GET.get('language')
+
+        if lang:
+            preserved_filters.update({
+                'language': lang
+            })
+
+        return preserved_filters.urlencode()
 
     def has_add_permission(self, request):
         """
@@ -986,15 +1025,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Special case: If «target» is not provided, it means to let the
             # page become a new root node.
             try:
-                tb_target = Page.get_root_nodes().filter(
-                    publisher_is_draft=True, site=site)[position]
+                tb_target = Page.get_draft_root_node(position=position, site=site)
                 if page.is_sibling_of(tb_target) and page.path < tb_target.path:
                     tb_position = "right"
                 else:
                     tb_position = "left"
             except IndexError:
                 # Move page to become the last root node.
-                tb_target = Page.get_last_root_node()
+                tb_target = Page.get_draft_root_node(site=site)
                 tb_position = "right"
         else:
             try:
@@ -1127,12 +1165,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Special case: If «target» is not provided, it means to create the
             # new page as a root node.
             try:
-                tb_target = Page.get_root_nodes().filter(
-                    publisher_is_draft=True, site=site)[position]
+                tb_target = Page.get_draft_root_node(position=position, site=site)
                 tb_position = "left"
             except IndexError:
                 # New page to become the last root node.
-                tb_target = Page.get_last_root_node()
+                tb_target = Page.get_draft_root_node(site=site)
                 tb_position = "right"
         else:
             try:
@@ -1385,7 +1422,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'language': force_text(get_language_object(language)['name'])
             }
             self.log_change(request, titleobj, message)
-            messages.info(request, message)
+            messages.success(request, message)
 
             titleobj.delete()
             for p in saved_plugins:

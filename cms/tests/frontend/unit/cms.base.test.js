@@ -1,6 +1,11 @@
-/* globals jQuery, Class, $, document, window, localStorage */
-
 'use strict';
+
+var CMS = require('../../../static/cms/js/modules/cms.base');
+var jQuery = require('jquery');
+var $ = jQuery;
+var Class = require('classjs');
+
+window.CMS = window.CMS || CMS;
 
 describe('cms.base.js', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -27,6 +32,7 @@ describe('cms.base.js', function () {
         expect(CMS.Class).toEqual(Class);
     });
 
+
     describe('CMS.API', function () {
         it('exists', function () {
             expect(CMS.API.Helpers).toEqual(jasmine.any(Object));
@@ -35,6 +41,10 @@ describe('cms.base.js', function () {
         });
 
         describe('.reloadBrowser()', function () {
+            /**
+             * @function createFakeWindow
+             * @returns {Object}
+             */
             function createFakeWindow() {
                 return {
                     parent: {
@@ -58,6 +68,10 @@ describe('cms.base.js', function () {
                     }
                 };
             }
+            /**
+             * @function createWindowSpy
+             * @param {Object} win
+             */
             function createWindowSpy(win) {
                 spyOn(CMS.API.Helpers, '_getWindow').and.callFake(function () {
                     return win;
@@ -309,9 +323,8 @@ describe('cms.base.js', function () {
         });
 
         describe('.preventSubmit()', function () {
-            var markup;
             beforeEach(function (done) {
-                markup = fixture.load('toolbar_form.html');
+                fixture.load('toolbar_form.html');
                 $(function () {
                     done();
                 });
@@ -381,7 +394,7 @@ describe('cms.base.js', function () {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: "{\"serverSetting\":true}"
+                    responseText: '{\"serverSetting\":true}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-settings-url-with-empty-response').andReturn({
@@ -393,7 +406,7 @@ describe('cms.base.js', function () {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: "{\"serverSetting\":true}"
+                    responseText: '{\"serverSetting\":true}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-broken-settings-url').andReturn({
@@ -517,7 +530,7 @@ describe('cms.base.js', function () {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: "{\"serverSetting\":true}"
+                    responseText: '{\"serverSetting\":true}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-settings-url-with-empty-response').andReturn({
@@ -529,7 +542,7 @@ describe('cms.base.js', function () {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: "{\"serverSetting\":true}"
+                    responseText: '{\"serverSetting\":true}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-broken-settings-url').andReturn({

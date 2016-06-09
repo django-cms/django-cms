@@ -4,9 +4,10 @@
 // #############################################################################
 // Edit utils page content
 
-var globals = require('./settings/globals');
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var cms = helpers(casperjs);
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -62,7 +63,7 @@ casper.test.begin('Edit utils page content', function (test) {
             }
         )
         // click on settings bar for current structure content block
-        .waitWhileVisible('.cms-structure', function () {
+        .waitWhileVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-dragarea:first-child .cms-dragbar .cms-submenu-settings');
         })
         // choose paste option inside dropdown menu
@@ -136,7 +137,7 @@ casper.test.begin('Edit utils page content', function (test) {
             }
         )
         // check if number of content plugins has been decreased (because of cut)
-        .waitWhileVisible('.cms-structure', function () {
+        .waitWhileVisible('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber - 1,

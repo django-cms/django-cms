@@ -3,9 +3,10 @@
 // #############################################################################
 // Change Settings behaviour
 
-var globals = require('./settings/globals');
 var casperjs = require('casper');
-var cms = require('./helpers/cms')(casperjs);
+var helpers = require('djangocms-casper-helpers');
+var globals = helpers.settings;
+var cms = helpers(casperjs);
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -81,7 +82,7 @@ casper.test.begin('Revert History', function (test) {
             this.click('.cms-btn-switch-save');
         })
         .waitForUrl(/edit_off/)
-        .waitWhileVisible('.cms-toolbar-expanded')
+        .wait(100)
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExist('.cms-btn-switch-edit', 'Not in Edit mode');
         })
