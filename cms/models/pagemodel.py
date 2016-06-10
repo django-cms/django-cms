@@ -426,34 +426,26 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         conflicting URLs as pages are copied unpublished.
         """
         from cms.extensions import extension_pool
-        from cms.models import Placeholder
+        from cms.models import Placeholder, Title
 
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable("copy page is not allowed for public pages")
-        pages = list(self.get_descendants(True).order_by('path'))
-        site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
-        if target:
-            target.old_pk = -1
-            if position == "first-child" or position == "last-child":
-                tree = [target]
-            elif target.parent_id:
-                tree = [target.parent]
-            else:
-                tree = []
-        else:
-            tree = []
-        if tree:
-            tree[0].old_pk = tree[0].pk
-        first = True
-        first_page = None
-        # loop over all affected pages (self is included in descendants)
-        for page in pages:
-            titles = list(page.title_set.all())
-            # get all current placeholders (->plugins)
-            placeholders = list(page.get_placeholders())
-            origin_id = page.id
+
+        titles = Title.objects.all()
+        placeholders = Placeholder.objects.all()
+        pages = self.get_descendants(True).order_by('path').iterator()
+        site_reverse_ids = (
+            Page
+            .objects
+            .filter(site=site, reverse_id__isnull=False)
+            .values_list('reverse_id', flat=True)
+        )
+        pages_by_old_pk = {}
+
+        def _do_copy(page, parent=None):
+            origin_id = page.pk
+
             # create a copy of this page by setting pk = None (=new instance)
-            page.old_pk = old_pk = page.pk
             page.pk = None
             page.path = None
             page.depth = None
@@ -461,64 +453,37 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             page.publisher_public_id = None
             page.is_home = False
             page.site = site
+
+            parent = parent or pages_by_old_pk.get(page.parent_id)
+
+            if parent:
+                page.parent = parent
+                page.parent_id = parent.pk
+            else:
+                page.parent = None
+                page.parent_id = None
+
             # only set reverse_id on standard copy
             if page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
-            if first:
-                first = False
-                if tree:
-                    page.parent = tree[0]
-                else:
-                    page.parent = None
-                page.save()
-                first_page = page
-                if target:
-                    page = page.move(target, pos=position)
-                    page.old_pk = old_pk
-            else:
-                count = 1
-                found = False
-                for prnt in tree:
-                    if tree[0].pk == self.pk and page.parent_id == self.pk and count == 1:
-                        count += 1
-                        continue
-                    elif prnt.old_pk == page.parent_id:
-                        page.parent_id = prnt.pk
-                        tree = tree[0:count]
-                        found = True
-                        break
-                    count += 1
-                if not found:
-                    page.parent = None
-                    page.parent_id = None
-                page.save()
-            tree.append(page)
-
-            # copy permissions if necessary
-            if get_cms_setting('PERMISSION') and copy_permissions:
-                from cms.models.permissionmodels import PagePermission
-
-                for permission in PagePermission.objects.filter(page__id=origin_id):
-                    permission.pk = None
-                    permission.page = page
-                    permission.save()
+            page.save()
 
             # copy titles of this page
-            draft_titles = {}
-            for title in titles:
-
+            for title in titles.filter(page=origin_id).iterator():
                 title.pk = None  # setting pk = None creates a new instance
                 title.page = page
-                if title.publisher_public_id:
-                    draft_titles[title.publisher_public_id] = title
-                    title.publisher_public = None
-                    # create slug-copy for standard copy
                 title.published = False
+                # create slug-copy for standard copy
                 title.slug = page_utils.get_available_slug(title)
+
+                if title.publisher_public_id:
+                    title.publisher_public = None
                 title.save()
+
             # copy the placeholders (and plugins on those placeholders!)
-            for ph in placeholders:
+            for ph in placeholders.filter(page=origin_id).iterator():
                 plugins = ph.get_plugins_list()
+
                 try:
                     ph = page.placeholders.get(slot=ph.slot)
                 except Placeholder.DoesNotExist:
@@ -527,10 +492,47 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     page.placeholders.add(ph)
                 if plugins:
                     copy_plugins_to(plugins, ph)
+
+            # copy permissions if necessary
+            if get_cms_setting('PERMISSION') and copy_permissions:
+                from cms.models.permissionmodels import PagePermission
+
+                permissions = PagePermission.objects.filter(page__id=origin_id)
+
+                for permission in permissions.iterator():
+                    permission.pk = None
+                    permission.page = page
+                    permission.save()
+
             extension_pool.copy_extensions(Page.objects.get(pk=origin_id), page)
+            return page
+
+        if position in ("first-child", "last-child"):
+            parent = target
+        elif target.parent_id:
+            parent = target.parent
+        else:
+            parent = None
+
+        old_page = next(pages)
+        old_page_id = old_page.pk
+
+        new_page = _do_copy(old_page, parent=parent)
+
+        if target:
+            new_page = new_page.move(target, pos=position)
+
+        pages_by_old_pk[old_page_id] = new_page
+
+        # loop over the rest of pages
+        for child_page in pages:
+            child_page_id = child_page.pk
+            new_child_page = _do_copy(child_page)
+            pages_by_old_pk[child_page_id] = new_child_page
+
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return first_page
+        return new_page
 
     def delete(self, *args, **kwargs):
         pages = [self.pk]
