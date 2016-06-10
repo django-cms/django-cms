@@ -618,7 +618,7 @@ class PagesTestCase(CMSTestCase):
             .values_list('path', flat=True)
         )
 
-        self.assertItemsEqual(expected_tree, db_tree)
+        self.assertListEqual(expected_tree, list(db_tree))
 
         superuser = self.get_superuser()
 
@@ -668,7 +668,7 @@ class PagesTestCase(CMSTestCase):
             .values_list('path', flat=True)
         )
 
-        self.assertItemsEqual(expected_tree, db_tree)
+        self.assertListEqual(expected_tree, list(db_tree))
 
     def test_copy_page_method(self):
         """
