@@ -97,8 +97,8 @@ Complete example::
                     NavigationNode(_("Log out"), reverse(logout), 2, attr={'visible_for_anonymous': False}),
                 ]
 
-.. _integration_attach_menus:
 
+.. _integration_attach_menus:
 
 ************
 Attach Menus
@@ -109,9 +109,9 @@ root. But if you want the menu to be attached to a CMS Page you can do that as
 well.
 
 Instead of extending from :class:`~menus.base.Menu` you need to extend from
-:class:`cms.menu_bases.CMSAttachMenu` and you need to define a name. We will do
-that with the example from above::
+:class:`cms.menu_bases.CMSAttachMenu` and you need to define a name.
 
+We will do that with the example from above::
 
     from menus.base import NavigationNode
     from menus.menu_pool import menu_pool
@@ -136,9 +136,9 @@ that with the example from above::
 
     menu_pool.register_menu(TestMenu)
 
-
 Now you can link this Menu to a page in the *Advanced* tab of the page
 settings under attached menu.
+
 
 .. _integration_modifiers:
 

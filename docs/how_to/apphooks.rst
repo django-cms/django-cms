@@ -1,3 +1,5 @@
+.. _apphooks_how_to:
+
 ########
 Apphooks
 ########
@@ -8,8 +10,22 @@ this case, you can create a normal django CMS page without any content of its
 own, and attach the news application to the page; the news application's content
 will be delivered at the page's URL.
 
-To create an apphook place a ``cms_apps.py`` in your application. And in it write
-the following::
+All URLs in that URL path will be passed to the attached application's URL configs.
+
+The :ref:`Tutorials <tutorials>` section contains a basic guide to :ref:`getting started with apphooks
+<apphooks_introduction>`. This document assumes more familiarity with the CMS generally.
+
+******************************
+The basics of apphook creation
+******************************
+
+To create an apphook, create a ``cms_apps.py`` file in your application.
+
+.. note:: Up to version 3.1 this module was named ``cms_app.py`` - please
+          update your existing modules to the new naming convention.
+          Support for the old name will be removed in version 3.4.
+
+The file needs to contain a :class:`CMSApp <cms.app_base.CMSApp>` sub-class. For example::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
@@ -17,270 +33,162 @@ the following::
 
     class MyApphook(CMSApp):
         name = _("My Apphook")
-        _urls = ["myapp.urls"]
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["myapp.urls"]       # replace this with the path to your application's URLs module
 
     apphook_pool.register(MyApphook)
 
 .. versionchanged:: 3.3
-    ``CMSApp.urls`` has been replaced by ``CMSApp._urls``; previous attribute is
-    now deprecated and will be removed in version 3.5
-
-.. versionchanged:: 3.3
-    ``CMSApp.menus`` has been replaced by ``CMSApp._menus``; previous attribute is
-    now deprecated and will be removed in version 3.5
-
-.. versionadded:: 3.3
-    ``CMSApp.get_urls`` accepts page, language and generic keyword arguments:
-    you can customize this function to return different list of urlconfs
-    according to the given arguments.
-
-    If you customize this method, you **must** return a non empty list of
-    urls even if all the arguments are ``None``.
-
-.. versionadded:: 3.3
-    ``CMSApp.get_menus`` accepts page, language and generic keyword arguments:
-    you can customize this function to return different list of menu classes
-    according to the given arguments.
-
-.. note:: Up to version 3.1 the module was named ``cms_app.py``, please
-          update your existing modules to the new naming convention.
-          Support for the old name will be removed in version 3.4.
+    ``CMSApp.get_urls()`` replaces ``CMSApp.urls``. ``urls`` is now deprecated and will be removed in
+    version 3.5.
 
 
-Replace ``myapp._urls`` with the path to your applications ``urls.py``. Now edit
-a page and open the advanced settings tab. Select your new apphook under
-"Application". Save the page.
+Apphooks for namespaced applications
+====================================
 
-.. warning::
+Does your application use :ref:`namespaced URLs <django:topics-http-defining-url-namespaces>`? This is good practice,
+so it should!
 
-    Whenever you add or remove an apphook, change the slug of a page containing an apphook or the
-    slug if a page which has a descendant with an apphook, the server must restart to re-load the
-    URL caches.
+In that case you will need to ensure that your apphooks include its URLs in the right namespace. Add an ``app_name``
+attribute to the class that reflects the way you'd include the applications' URLs into your project.
 
-    If you have the :ref:`ApphookReloadMiddleware` (recommended) installed, the server will
-    restart automatically. Otherwise, you will need to restart it manually.
+For example, if your application requires that your project's URLs do::
 
-    If you have the
+    url(r'^myapp/', include('myapp.urls', app_name='myapp')),
 
-    An apphook won't appear until it is published. Take note that this also
+then your ``MyApphook`` class should include::
+
+    app_name = "myapp"
+
+If you fail to this, then any templates in the application that invoke URLs using the form ``{% url 'myapp:index' %}``
+or views that call (for example) ``reverse('myapp:index')`` will throw a ``NoReverseMatch`` error.
+
+*Unless* the class that defines the apphook specifies an ``app_name``, it can be attached only to one page at a time.
+Attempting to apply it a second times will cause an error. See :ref:`multi_apphook` for more on having multiple apphook
+instances.
+
+
+Loading new and re-configured apphooks
+======================================
+
+Certain apphook-related changes require server restarts in order to be loaded.
+
+Whenever you:
+
+* add or remove an apphook
+* change the slug of a page containing an apphook or the slug of a page which has a descendant with an apphook
+
+the URL caches must be reloaded.
+
+If you have the :ref:`ApphookReloadMiddleware` installed, which is recommended, the server will do it for your by
+re-initialising the URL patterns automatically.
+
+Otherwise, you will need to restart it manually.
+
+
+****************
+Using an apphook
+****************
+
+Once your apphook has been set up and loaded, you'll now be able to select the *Application* that's hooked into that page from its *Advanced settings*.
+
+.. note::
+
+    An apphook won't actually do anything until the page it belongs to is published. Take note that this also
     means all parent pages must also be published.
 
-.. note::
+The apphook attaches all of the apphooked application's URLs to the page; its root URL will be the page's own URL, and
+any lower-level URLs will be on the same URL path.
 
-    If at some point you want to remove this apphook after deleting the
-    ``cms_apps.py`` there is a cms management command called ``uninstall apphooks`` that
-    removes the specified apphook(s) from all pages by name. eg. ``manage.py cms
-    uninstall apphooks MyApphook``. To find all names for uninstallable apphooks
-    there is a command for this as well ``manage.py cms list apphooks``.
+So, given an application with the ``urls.py``::
 
-If you attached the app to a page with the url ``/hello/world/`` and the app has
-a ``urls.py`` that looks like this::
+    from django.conf.urls import *
 
-    from django.conf.urls import url
-    from sampleapp.views import main_view, sample_view
+    urlpatterns = patterns('sampleapp.views',
+        url(r'^$', 'main_view', name='app_main'),
+        url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
+    )
 
-    urlpatterns = [
-        url(r'^$', main_view, name='app_main'),
-        url(r'^sublevel/$', sample_view, name='app_sublevel'),
-    ]
+attached to a page whose URL path is ``/hello/world/``, its views will be exposed as follows:
 
-The ``main_view`` should now be available at ``/hello/world/`` and the
-``sample_view`` has the URL ``/hello/world/sublevel/``.
+* ``main_view`` at ``/hello/world/``
+* ``sample_view`` at ``/hello/world/sublevel/``
 
 
-.. note::
+Sub-pages of an apphooked page
+==============================
 
-    CMS pages **below** the page to which the apphook is attached to, **can** be visible,
-    provided that the apphook urlconf regexps are not too greedy. From a URL resolution
-    perspective, attaching an apphook works in same way as inserting the apphook urlconf
-    in the root urlconf at the same path as the page it's attached to.
+Usually, it's simplest to leave an apphook to swallow up all the URLs below its page's URL.
 
-.. note::
+However, as long as the application's urlconf is not too greedy and doesn't conflict with the URLs of any sub-pages,
+those sub-pages can be reached. That is, although the apphooked application will have priority, any URLs it *doesn't*
+consume will be available for ordinary django CMS pages, if they exist.
 
-    All views that are attached like this must return a
-    :class:`~django.template.RequestContext` instance instead of the
-    default :class:`~django.template.Context` instance.
 
+******************
+Apphook management
+******************
+
+Uninstalling an apphook with applied instances
+==============================================
+
+If you remove an apphook class (in effect uninstalling it) from your system that still has instances applied to pages,
+django CMS tries to handle this as gracefully as possible:
+
+* Affected Pages still maintain a record of the applied apphook; if the apphook class is reinstated, it will work as
+  before.
+* The page list will show apphook indicators where appropriate.
+* The page will otherwise behave like a normal django CMS page, and display its placeholders in the usual way.
+* If you save the page's Advanced settings, the apphook will be removed.
+
+
+Management commands
+===================
+
+You can clear uninstalled apphook instances using a CMS management command ``uninstall apphooks``; for example::
+
+    manage.py cms uninstall apphooks MyApphook MyOtherApphook
+
+You can get a list of installed apphooks using the :ref:`cms-list-command`; in this case::
+
+    manage.py cms list apphooks
+
+See the :ref:`Management commands reference <management_commands>` for more information.
+
+.. _apphook_menus:
 
 *************
 Apphook menus
 *************
 
-If you want to add a menu to that page as well that may represent some views
-in your app add it to your apphook like this::
+Generally, it is recommended to allow the user to control whether a menu is attached to a page. However, an apphook can
+be made to do this automatically if required. It will behave just as if it were attached the page using its *Advanced
+settings*).
 
+Menus can be added to an apphook using the ``get_menus()`` method. On the basis of the example above::
+
+    # [...]
     from myapp.menu import MyAppMenu
 
     class MyApphook(CMSApp):
-        name = _("My Apphook")
-        _menus = [MyAppMenu]
-        _urls = ["myapp.urls"]
+        # [...]
+        def get_menus(self, page=None, language=None, **kwargs):
+            return [MyAppMenu]
 
-    apphook_pool.register(MyApphook)
-
-
-For an example if your app has a :class:`Category` model and you want this
-category model to be displayed in the menu when you attach the app to a page.
-We assume the following model::
-
-    from django.db import models
-    from django.core.urlresolvers import reverse
-    import mptt
-
-    class Category(models.Model):
-        parent = models.ForeignKey('self', blank=True, null=True)
-        name = models.CharField(max_length=20)
-
-        def __unicode__(self):
-            return self.name
-
-        def get_absolute_url(self):
-            return reverse('category_view', args=[self.pk])
-
-    try:
-        mptt.register(Category)
-    except mptt.AlreadyRegistered:
-        pass
-
-We would now create a menu out of these categories::
-
-    from menus.base import NavigationNode
-    from menus.menu_pool import menu_pool
-    from django.utils.translation import ugettext_lazy as _
-    from cms.menu_bases import CMSAttachMenu
-    from myapp.models import Category
-
-    class CategoryMenu(CMSAttachMenu):
-
-        name = _("test menu")
-
-        def get_nodes(self, request):
-            nodes = []
-            for category in Category.objects.all().order_by("tree_id", "lft"):
-                node = NavigationNode(
-                    category.name,
-                    category.get_absolute_url(),
-                    category.pk,
-                    category.parent_id
-                )
-                nodes.append(node)
-            return nodes
-
-    menu_pool.register_menu(CategoryMenu)
-
-If you add this menu now to your apphook::
-
-    from myapp.menus import CategoryMenu
-
-    class MyApphook(CMSApp):
-        name = _("My Apphook")
-        urls = ["myapp.urls"]
-        menus = [MyAppMenu, CategoryMenu]
-
-You get the static entries of :class:`MyAppMenu` and the dynamic entries of
-:class:`CategoryMenu` both attached to the same page.
-
-.. _multi_apphook:
-
-***************************************
-Attaching an application multiple times
-***************************************
-
-If you want to attach an application multiple times to different pages you have two different
-possibilities:
-
-* Give every application its own namespace in the advanced settings of a page.
-* Define an ``app_name`` attribute on the ``CMSApp`` class.
-
-The problem is that if you only define a namespace you need to have multiple templates per attached app.
-
-For example::
-
-    {% url 'my_view' %}
-
-Will not work any more when you namespace an app. You will need to do something like::
-
-    {% url 'my_namespace:my_view' %}
-
-The problem is now if you attach apps to multiple pages your namespace will change.
-The solution for this problem is **application namespaces**.
-
-If you'd like to use application namespaces to reverse the URLs related to
-your app, you can assign a value to the `app_name` attribute of your app
-hook like this::
-
-    class MyNamespacedApphook(CMSApp):
-        name = _("My Namespaced Apphook")
-        app_name = "myapp_namespace"
-        _urls = ["myapp.urls"]
-
-    apphook_pool.register(MyNamespacedApphook)
+.. versionchanged:: 3.3
+    ``CMSApp.get_menus()`` replaces ``CMSApp.menus``. The ``menus`` attribute is now deprecated and will be
+    removed in version 3.5.
 
 
-.. note::
-    If you do provide an ``app_name``, then you will need to also give the app
-    a unique namespace in the *Advanced settings* of the page. If you do not, and
-    no other instance of the app exists using it, then the 'default instance
-    namespace' will be automatically set for you. You can then either reverse
-    for the namespace(to target different apps) or the app_name (to target
-    links inside the same app).
+The menus returned in the ``get_menus()`` method need to return a list of nodes, in their ``get_nodes()`` methods. See
+:ref:`integration_attach_menus` for more on creating menu classes that generate nodes.
 
-If you use app namespace you will need to give all your view ``context`` a ``current_app``::
+You can return multiple menu classes; all will be attached to the same page::
 
-    from django.core.urlresolvers import resolve
-    from django.shortcuts import render
+    def get_menus(self, page=None, language=None, **kwargs):
+        return [MyAppMenu, CategoryMenu]
 
-    def my_view(request):
-        request.current_app = resolve(request.path_info).namespace
-        return render(request, "my_template.html")
-
-.. note::
-    You need to set the current_app explicitly in all your view contexts as Django does not allow
-    any other way of doing this.
-
-You can reverse namespaced apps similarly and it "knows" in which app instance it is:
-
-.. code-block:: html+django
-
-    {% url myapp_namespace:app_main %}
-
-If you want to access the same URL but in a different language use the language
-template tag:
-
-.. code-block:: html+django
-
-    {% load i18n %}
-    {% language "de" %}
-        {% url myapp_namespace:app_main %}
-    {% endlanguage %}
-
-
-.. note::
-
-    The official Django documentation has more details about application and
-    instance namespaces, the ``current_app`` scope and the reversing of such
-    URLs. You can look it up at https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces
-
-When using the ``reverse`` function, the ``current_app`` must be explicitly passed
-as an argument. You can do so by looking up the ``current_app`` attribute of
-the request instance::
-
-    def myviews(request):
-        current_app = resolve(request.path_info).namespace
-
-        reversed_url = reverse('myapp_namespace:app_main',
-                current_app=current_app)
-        ...
-
-Or, if you are rendering a plugin, of the context instance::
-
-    class MyPlugin(CMSPluginBase):
-        def render(self, context, instance, placeholder):
-            # ...
-            current_app = resolve(request.path_info).namespace
-            reversed_url = reverse('myapp_namespace:app_main',
-                    current_app=current_app)
-            # ...
 
 .. _apphook_permissions:
 
@@ -288,8 +196,8 @@ Or, if you are rendering a plugin, of the context instance::
 Apphook permissions
 *******************
 
-By default all apphooks have the same permissions set as the page they are assigned to.
-So if you set login required on page the attached apphook and all its urls have the same
+By default the content represented by an apphook has the same permissions set as the page it is assigned to. So if for
+example a page requires the user to be logged in, then the attached apphook and all its URLs will have the same
 requirements.
 
 To disable this behaviour set ``permissions = False`` on your apphook::
@@ -299,11 +207,7 @@ To disable this behaviour set ``permissions = False`` on your apphook::
         _urls = ["project.sampleapp.urls"]
         permissions = False
 
-
-
-If you still want some of your views to have permission checks you can enable them via a decorator:
-
-``cms.utils.decorators.cms_perms``
+If you still want some of your views to use the CMS's permission checks you can enable them via a decorator, ``cms.utils.decorators.cms_perms``
 
 Here is a simple example::
 
@@ -313,16 +217,15 @@ Here is a simple example::
     def my_view(request, **kw):
         ...
 
-
-If you have your own permission check in your app, or just don't want to wrap some nested apps
-with CMS permission decorator, then use ``exclude_permissions`` property of the apphook::
+If you have your own permission checks in your application, then use ``exclude_permissions`` property of the apphook::
 
     class SampleApp(CMSApp):
         name = _("Sample App")
-        _urls = ["project.sampleapp.urls"]
         permissions = True
         exclude_permissions = ["some_nested_app"]
 
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["project.sampleapp.urls"]
 
 For example, django-oscar_ apphook integration needs to be used with ``exclude_permissions`` of the
 dashboard app, because it uses the `customisable access function`__. So, your apphook in this case
@@ -330,11 +233,14 @@ will look like this::
 
     class OscarApp(CMSApp):
         name = _("Oscar")
-        _urls = application.urls[0]
         exclude_permissions = ['dashboard']
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return application.urls[0]
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
 .. __: https://github.com/tangentlabs/django-oscar/blob/0.7.2/oscar/apps/dashboard/nav.py#L57
+
 
 ***********************************************
 Automatically restart server on apphook changes
@@ -347,7 +253,7 @@ As mentioned above, whenever you:
 * change the slug of a page with a descendant with an apphook
 
 The CMS the server will reload its URL caches. It does this by listening for
-the signal: :obj:`cms.signals.urls_need_reloading`.
+the signal :obj:`cms.signals.urls_need_reloading`.
 
 .. warning::
 
@@ -361,3 +267,16 @@ the signal: :obj:`cms.signals.urls_need_reloading`.
 
     The signal is fired **after** a request. If you change something via an API
     you'll need a request for the signal to fire.
+
+
+**************************************
+Apphooks and placeholder template tags
+**************************************
+
+It's important to understand that while an apphooked application takes over the CMS page at that
+location completely, depending on how the application's templates extend other templates, a
+django CMS ``{% placeholder %}`` template tag may be invoked - **but will not work**.
+
+``{% static_placeholder %}`` tags on the other hand are *not* page-specific and *will* function
+normally.
+

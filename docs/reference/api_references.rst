@@ -299,12 +299,17 @@ cms.app_base
 
     .. method:: get_menus(page, language, **kwargs)
 
-            Returns the menus for the apphook instance, eventually selected according
+        .. versionadded:: 3.3
+            ``CMSApp.get_menus`` accepts page, language and generic keyword arguments:
+            you can customize this function to return different list of menu classes
+            according to the given arguments.
+
+            Returns the menus for the apphook instance, selected according
             to the given arguments.
 
-            By default it returns the menus assigned to :py:attr:`CMSApp._menus`
+            By default it returns the menus assigned to :py:attr:`CMSApp._menus`.
 
-            If no page and language si provided, this method **must** return all the
+            If no page and language are provided, this method **must** return all the
             menus used by this apphook. Example::
 
                 if page and page.reverse_id == 'page1':
@@ -320,17 +325,19 @@ cms.app_base
 
     .. method:: get_urls(page, language, **kwargs)
 
-            Returns the urlconfs for the apphook instance, eventually selected
+            .. versionadded:: 3.3
+
+            Returns the URL configurations for the apphook instance, selected
             according to the given arguments.
 
-            By default it returns the urls assigned to :py:attr:`CMSApp._urls`
+            By default it returns the URLs assigned to :attr:`CMSApp._urls`
 
-            This method **must** return a non empty list of urlconfs,
-            even if no argument is passed.
+            This method **must** return a non empty list of URL configurations,
+            even if no arguments are passed.
 
             :param page: page the apphook is attached to
             :param language: current site language
-            :return: list of urlconfs strings
+            :return: list of strings representing URL configurations
 
 ***************
 cms.plugin_base

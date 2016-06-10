@@ -1,3 +1,5 @@
+.. _apphooks_introduction:
+
 ########
 Apphooks
 ########
@@ -17,7 +19,7 @@ We do this with an **apphook**, created using a :class:`CMSApp
 Apphooks live in a file called ``cms_apps.py``, so create one in your Polls/CMS Integration
 application, i.e. in ``polls_cms_integration``.
 
-This is the most basic example of an apphook for a django CMS application:
+This is a very basic example of an apphook for a django CMS application:
 
 .. code-block:: python
 
@@ -25,13 +27,24 @@ This is the most basic example of an apphook for a django CMS application:
     from cms.apphook_pool import apphook_pool
     from django.utils.translation import ugettext_lazy as _
 
+
     class PollsApphook(CMSApp):
-        name = _("Polls Application")   # give your application a name (required)
         app_name = "polls"
-        _urls = ["polls.urls"]           # link your app to url configuration(s)
+        name = _("Polls Application")
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["polls.urls"]
 
 
     apphook_pool.register(PollsApphook)  # register the application
+
+In the ``PollsApphook`` class, we have done several key things:
+
+* The ``app_name`` attribute gives the system a way to refer to the apphook - see :ref:`multi_apphook` for details
+  on why this matters.
+* ``name`` is a human-readable name for the admin user.
+* The ``get_urls()`` method is what actually hooks the application in, returning a list of URL configurations that will
+  be made active wherever the apphook is used.
 
 **Restart the runserver**. This is necessary because we have created a new file containing Python
 code that won't be loaded until the server restarts. You only have to do this the first time the
