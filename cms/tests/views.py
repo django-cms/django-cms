@@ -178,7 +178,7 @@ class ViewTests(SettingsOverrideTestCase):
         create_title("de", "jobs", cms_page)
         cms_page.publish('de')
         response = self.client.get('/de/stevejobs/')
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
 
 
