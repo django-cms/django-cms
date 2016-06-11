@@ -123,6 +123,17 @@ def details(request, slug):
         if not found and (not hasattr(request, 'toolbar') or not request.toolbar.redirect_url):
             # There is a page object we can't find a proper language to render it
             _handle_no_page(request, slug)
+    else:
+        page_path = page.get_absolute_url(language=current_language)
+        page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
+
+        if slug and slug != page_slug and request.path[:len(page_path)] != page_path:
+            # The current language does not match it's slug.
+            #  Redirect to the current language.
+            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
+                request.toolbar.redirect_url = page_path
+            else:
+                return HttpResponseRedirect(page_path)
 
     if apphook_pool.get_apphooks():
         # There are apphooks in the pool. Let's see if there is one for the
