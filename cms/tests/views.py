@@ -9,7 +9,7 @@ from django.contrib.auth.models import Permission
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 from django.template import Variable
-from cms.api import create_page
+from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -167,6 +167,19 @@ class ViewTests(SettingsOverrideTestCase):
         with self.login_user_context(user):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
+
+    def test_incorrect_slug_for_language(self):
+        """
+        Test details view when page slug and current language don't match.
+        In this case we refer to the user's current language and the page slug we have for that language.
+        """
+        create_page("home", "nav_playground.html", "en", published=True)
+        cms_page = create_page("stevejobs", "nav_playground.html", "en", published=True)
+        create_title("de", "jobs", cms_page)
+        cms_page.publish('de')
+        response = self.client.get('/de/stevejobs/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/de/jobs/')
 
 
 class ContextTests(SettingsOverrideTestCase):
