@@ -91,7 +91,7 @@ Revision management
     will cause your database size to increase.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
-.. _Compatible Django Versions: http://django-reversion.readthedocs.org/en/latest/django-versions.html
+.. _Compatible Django Versions: https://django-reversion.readthedocs.io/en/latest/django-versions.html
 
 
 .. _installing-in-a-virtualenv-using-pip:

@@ -75,7 +75,7 @@ http://docs.django-cms.org/en/latest/introduction/index.html
 Quick Start
 ***********
 
-You can use the `django CMS installer <http://djangocms-installer.readthedocs.org>`_::
+You can use the `django CMS installer <https://djangocms-installer.readthedocs.io>`_::
 
     $ pip install --upgrade virtualenv
     $ virtualenv env

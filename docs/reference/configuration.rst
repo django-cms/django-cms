@@ -657,7 +657,7 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
                 unihandecode-1.0.0.vn.min.js
                 unihandecode-1.0.0.zh.min.js
 
-More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.org/>`_.
+More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
 
 
 **************

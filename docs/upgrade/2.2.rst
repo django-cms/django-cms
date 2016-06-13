@@ -68,7 +68,7 @@ All templates in :setting:`CMS_TEMPLATES` must at least contain the ``js`` and
 
 Please refer to the documentation on :ref:`custom-plugins-handling-media` in
 custom CMS plugins and the
-`django-sekizai documentation <http://django-sekizai.readthedocs.org/>`_ for
+`django-sekizai documentation <https://django-sekizai.readthedocs.io/>`_ for
 more information.
 
 
