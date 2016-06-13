@@ -64,4 +64,4 @@ directly from the new django CMS page.
 You can now remove the mention of the Polls application (``url(r'^polls/', include('polls.urls',
 namespace='polls'))``) from your project's ``urls.py`` - it's no longer even required there.
 
-Next, we're going to install a django-CMS-compatible third-party application.
+Later, we'll install a django-CMS-compatible :ref:`third-party application <third_party>`.

@@ -1,3 +1,5 @@
+.. _third_party:
+
 #####################################
 Integrating a third-party application
 #####################################
