@@ -362,8 +362,8 @@ def check_copy_relations(output):
         else:
             section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\n'
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
-                                   'See https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
-                                   'https://django-cms.readthedocs.org/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
+                                   'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
+                                   'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
 
 
 def _load_all_templates(directory):

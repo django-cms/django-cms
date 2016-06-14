@@ -199,7 +199,7 @@ the source modules.
 
 .. _fork: http://github.com/divio/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
-.. _Aldryn Boilerplate: http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
+.. _Aldryn Boilerplate: https://aldryn-boilerplate-bootstrap3.readthedocs.io/en/latest/guidelines/index.html
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _GitHub: http://www.github.com
 .. _GitHub help: http://help.github.com

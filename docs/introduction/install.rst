@@ -63,7 +63,7 @@ This means:
    Django Filer, a useful application for managing files and processing images. Although it's not
    required for django CMS itself, a vast number of django CMS addons use it, and nearly all django
    CMS projects have it installed. If you know you won't need it, omit the flag. See the `django
-   CMS installer documentation for more information <http://djangocms-installer.readthedocs.org>`_.
+   CMS installer documentation for more information <https://djangocms-installer.readthedocs.io>`_.
 
 
 .. warning::

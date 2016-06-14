@@ -7,7 +7,7 @@ ANY changes to this file, be it upstream fixes or changes for the cms *must* be
 documented clearly within this file with comments.
 
 For documentation on how to use the functions described in this file, please
-refer to http://django-load.readthedocs.org/en/latest/index.html.
+refer to https://django-load.readthedocs.io/en/latest/index.html.
 """
 import imp
 import traceback # changed
