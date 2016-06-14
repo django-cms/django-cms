@@ -32,6 +32,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE,URL_CMS_TRANSLATION_DELETE,
     URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PERMISSIONS,
@@ -1190,64 +1191,213 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-    def test_plugins_copy_placeholder_ref(self):
+    def test_plugins_copy_placeholder_from_page(self):
         """
-        User copies a placeholder into a clipboard. A PlaceholderReferencePlugin
-        is created. Afterwards he copies this into a placeholder and the
-        PlaceholderReferencePlugin unpacks its content. After that he clears
-        the clipboard.
+        Copies a placeholder into the clipboard from
+        a Page and pastes it into a placeholder from
+        a PlaceholderField in a generic object
         """
-        self.assertEqual(Placeholder.objects.count(), 2)
-        self._create_plugin()
-        self._create_plugin()
-        admin_user = self.get_superuser()
-        clipboard = Placeholder()
-        clipboard.save()
-        self.assertEqual(CMSPlugin.objects.count(), 2)
-        settings = UserSettings(language="fr", clipboard=clipboard, user=admin_user)
-        settings.save()
-        self.assertEqual(Placeholder.objects.count(), 3)
+        ex1 = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
 
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
-        else:
-            self.client.login(username='admin', password='admin')
+        target_placeholder = ex1.placeholder
+        source_placeholder = self._placeholder
+
+        self._create_plugin()
+        self._create_plugin()
+
+        plugin_count = CMSPlugin.objects.count
+        initial_plugin_count = plugin_count()
+
+        admin_user = self._create_user(
+            'copy_plugins_user',
+            is_staff=True,
+            is_superuser=False,
+            add_default_permissions=True,
+        )
+
+        self._give_cms_permissions(admin_user)
+
+        clipboard = Placeholder.objects.create()
+        UserSettings.objects.create(
+            language="fr",
+            user=admin_user,
+            clipboard=clipboard,
+        )
 
         url = admin_reverse('cms_page_copy_plugins')
-        data = dict(source_plugin_id='',
-                    source_placeholder_id=self._placeholder.pk,
-                    source_language='en',
-                    target_language='en',
-                    target_placeholder_id=clipboard.pk,
+        data = dict(
+            source_plugin_id='',
+            source_placeholder_id=source_placeholder.pk,
+            source_language='en',
+            target_language='en',
+            target_placeholder_id=clipboard.pk,
         )
-        response = self.client.post(url, data)
+
+        with self.login_user_context(admin_user):
+            # Copy plugins into the clipboard
+            response = self.client.post(url, data)
+
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
         clipboard_plugins = clipboard.get_plugins()
-        self.assertEqual(CMSPlugin.objects.count(), 5)
-        self.assertEqual(clipboard_plugins.count(), 1)
-        self.assertEqual(clipboard_plugins[0].plugin_type, "PlaceholderPlugin")
-        placeholder_plugin, _ = clipboard_plugins[0].get_plugin_instance()
+
+        # assert three new plugins have been created
+        # One for the PlaceholderPlugin and the other two
+        # are the plugins being copied.
+        self.assertEqual(plugin_count(), initial_plugin_count + 3)
+
+        # assert the clipboard has a PlaceholderPlugin
+        self.assertTrue(clipboard_plugins.filter(plugin_type='PlaceholderPlugin').exists())
+
+        placeholder_plugin = clipboard_plugins[0].get_plugin_instance()[0]
         ref_placeholder = placeholder_plugin.placeholder_ref
         copied_plugins = ref_placeholder.get_plugins()
+
+        # assert there's only two plugins in the clipboard
         self.assertEqual(copied_plugins.count(), 2)
-        data = dict(source_plugin_id=placeholder_plugin.pk,
-                    source_placeholder_id=clipboard.pk,
-                    source_language='en',
-                    target_language='fr',
-                    target_placeholder_id=self._placeholder.pk,
+
+        # Paste plugins from clipboard into placeholder
+        # under the french language.
+        data = dict(
+            source_plugin_id=placeholder_plugin.pk,
+            source_placeholder_id=clipboard.pk,
+            source_language='en',
+            target_language='fr',
+            target_placeholder_id=target_placeholder.pk,
         )
-        response = self.client.post(url, data)
+
+        with self.login_user_context(admin_user):
+            response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        plugins = self._placeholder.get_plugins()
-        self.assertEqual(plugins.count(), 4)
-        self.assertEqual(CMSPlugin.objects.count(), 7)
-        self.assertEqual(Placeholder.objects.count(), 4)
+
+        self.assertEqual(target_placeholder.get_plugins().count(), 2)
+        self.assertEqual(plugin_count(), initial_plugin_count + 5)
+
+        # Clear the clipboard
         url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
-        with self.assertNumQueries(FuzzyInt(70, 90)):
-            response = self.client.post(url, {'test': 0})
+
+        with self.login_user_context(admin_user):
+            with self.assertNumQueries(FuzzyInt(70, 90)):
+                response = self.client.post(url, {'test': 0})
+
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(CMSPlugin.objects.count(), 4)
-        self.assertEqual(Placeholder.objects.count(), 3)
+
+        # assert plugin count has only increased by two.
+        # The two new plugins pasted in french.
+        self.assertEqual(plugin_count(), initial_plugin_count + 2)
+
+    def test_plugins_copy_placeholder_from_generic_object(self):
+        """
+        Copies a placeholder into a clipboard from an object
+        with PlaceholderField and pastes the object into
+        a placeholder inside a page.
+        """
+        ex1 = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
+
+        source_placeholder = ex1.placeholder
+        target_placeholder = self._placeholder
+
+        add_plugin(ex1.placeholder, 'TextPlugin', 'en')
+        add_plugin(ex1.placeholder, 'TextPlugin', 'en')
+
+        plugin_count = CMSPlugin.objects.count
+        initial_plugin_count = plugin_count()
+
+        admin_user = self._create_user(
+            'copy_plugins_user',
+            is_staff=True,
+            is_superuser=False,
+            add_default_permissions=True,
+            permissions=[
+                'add_example1',
+                # These are required to alter the clipboard
+                'add_usersettings',
+                'change_usersettings',
+            ],
+        )
+
+        self._give_cms_permissions(admin_user)
+
+        clipboard = Placeholder.objects.create()
+        UserSettings.objects.create(
+            language="fr",
+            user=admin_user,
+            clipboard=clipboard,
+        )
+
+        # It's important that the plugin copy url is the one from
+        # the generic object.
+        url = admin_reverse('placeholderapp_example1_copy_plugins')
+        data = dict(
+            source_plugin_id='',
+            source_placeholder_id=source_placeholder.pk,
+            source_language='en',
+            target_language='en',
+            target_placeholder_id=clipboard.pk,
+        )
+
+        with self.login_user_context(admin_user):
+            # Copy plugins into the clipboard
+            response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        clipboard_plugins = clipboard.get_plugins()
+
+        # assert the clipboard has a PlaceholderPlugin
+        self.assertTrue(clipboard_plugins.filter(plugin_type='PlaceholderPlugin').exists())
+
+        # assert three new plugins have been created
+        # One for the PlaceholderPlugin and the other two
+        # are the plugins being copied.
+        self.assertEqual(plugin_count(), initial_plugin_count + 3)
+
+        placeholder_plugin = clipboard_plugins[0].get_plugin_instance()[0]
+        ref_placeholder = placeholder_plugin.placeholder_ref
+        copied_plugins = ref_placeholder.get_plugins()
+
+        # assert there's only two plugins in the clipboard
+        self.assertEqual(copied_plugins.count(), 2)
+
+        # Paste plugins from clipboard into placeholder
+        # under the french language.
+        data = dict(
+            source_plugin_id=placeholder_plugin.pk,
+            source_placeholder_id=clipboard.pk,
+            source_language='en',
+            target_language='fr',
+            target_placeholder_id=target_placeholder.pk,
+        )
+
+        with self.login_user_context(admin_user):
+            response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertEqual(target_placeholder.get_plugins().count(), 2)
+        self.assertEqual(plugin_count(), initial_plugin_count + 5)
+
+        # Clear the clipboard
+        url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
+
+        with self.login_user_context(admin_user):
+            with self.assertNumQueries(FuzzyInt(70, 90)):
+                response = self.client.post(url, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+
+        # assert plugin count has only increased by two.
+        # The two new plugins pasted in french.
+        self.assertEqual(plugin_count(), initial_plugin_count + 2)
 
     def test_plugins_copy_language(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""

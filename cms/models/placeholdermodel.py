@@ -182,7 +182,7 @@ class Placeholder(models.Model):
         """
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
         """
-        from cms.models import CMSPlugin
+        from cms.models import CMSPlugin, UserSettings
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
             relations = self._get_related_objects()
@@ -190,8 +190,22 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                parent = rel.related_model
-                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
+                related_model = rel.related_model
+
+                try:
+                    admin_class = admin.site._registry[related_model]
+                except KeyError:
+                    admin_class = None
+
+                # UserSettings is a special case
+                # Attached objects are used to check permissions
+                # and we filter out any attached object that does not
+                # inherit from PlaceholderAdminMixin
+                # Because UserSettings does not (and shouldn't) inherit
+                # from PlaceholderAdminMixin, we add a manual exception.
+                is_user_settings = related_model == UserSettings
+
+                if is_user_settings or isinstance(admin_class, PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.count():
