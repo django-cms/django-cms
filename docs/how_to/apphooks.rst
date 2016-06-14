@@ -253,7 +253,7 @@ As mentioned above, whenever you:
 * change the slug of a page with a descendant with an apphook
 
 The CMS the server will reload its URL caches. It does this by listening for
-the signal :obj:`cms.signals.urls_need_reloading`.
+the signal ``cms.signals.urls_need_reloading``.
 
 .. warning::
 
@@ -279,4 +279,3 @@ django CMS ``{% placeholder %}`` template tag may be invoked - **but will not wo
 
 ``{% static_placeholder %}`` tags on the other hand are *not* page-specific and *will* function
 normally.
-

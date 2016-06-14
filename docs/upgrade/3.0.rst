@@ -357,8 +357,8 @@ template tags you can just do:
 ``getter`` and ``setter`` for translatable plugin content
 =========================================================
 
-A plugin's translatable content can now be read and set through :meth:`get_translatable_content`
-and :meth:`set_translatable_content`. See :ref:`Custom Plugins <custom-plugins>` for more info.
+A plugin's translatable content can now be read and set through :meth:`~cms.models.pluginmodel.CMSPlugin.get_translatable_content()`
+and :meth:`~cms.models.pluginmodel.CMSPlugin.set_translatable_content()`. See :ref:`Custom Plugins <custom-plugins>` for more info.
 
 No more DB table-name magic for plugins
 =======================================

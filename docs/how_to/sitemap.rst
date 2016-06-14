@@ -10,7 +10,7 @@ Sitemap
 Sitemaps are XML files used by Google to index your website by using their
 **Webmaster Tools** and telling them the location of your sitemap.
 
-The :class:`CMSSitemap` will create a sitemap with all the published pages of
+The :class:`cms.sitemaps.CMSSitemap` will create a sitemap with all the published pages of
 your CMS.
 
 

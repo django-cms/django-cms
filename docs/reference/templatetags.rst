@@ -2,6 +2,8 @@
 Template Tags
 #############
 
+..  module:: cms.templatetags.cms_tags
+
 *****************
 CMS template tags
 *****************
@@ -13,11 +15,13 @@ top of your template::
 
     {% load cms_tags %}
 
-.. template tag:: placeholder
+..  templatetag:: placeholder
 
 placeholder
 ===========
+
 .. versionchanged:: 2.1
+
     The placeholder name became case sensitive.
 
 The ``placeholder`` template tag defines a placeholder on a page. All
@@ -63,7 +67,7 @@ pages have plugins that generate content::
 See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extra
 context variables and change some other placeholder behaviour.
 
-.. template tag:: static_placeholder
+..  templatetag:: static_placeholder
 
 static_placeholder
 ==================
@@ -221,7 +225,7 @@ page_lookup
 The ``page_lookup`` argument, passed to several template tags to retrieve a
 page, can be of any of the following types:
 
-* :class:`str <basestring>`: interpreted as the ``reverse_id`` field of the desired page, which
+* :class:`str`: interpreted as the ``reverse_id`` field of the desired page, which
   can be set in the "Advanced" section when editing a page.
 * :class:`int`: interpreted as the primary key (``pk`` field) of the desired page
 * :class:`dict`: a dictionary containing keyword arguments to find the desired page
@@ -279,12 +283,10 @@ Example::
 
 If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
 exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
-exception will not be raised. Additionally, if
-:setting:`django:SEND_BROKEN_LINK_EMAILS` is ``True`` and you have specified
-some addresses in :setting:`django:MANAGERS`, an email will be sent to those
-addresses to inform them of the broken link.
+exception will not be raised.
 
 .. versionadded:: 3.0
+
     page_url now supports the ``as`` argument. When used this way, the tag
     emits nothing, but sets a variable in the context with the specified name
     to the resulting value.
