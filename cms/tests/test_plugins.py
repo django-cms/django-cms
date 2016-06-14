@@ -226,7 +226,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         CMS_PLACEHOLDER_CONF = {
             'body': {
-                'excluded plugins': ['TextPlugin']
+                'excluded_plugins': ['TextPlugin']
             }
         }
 
@@ -242,7 +242,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         CMS_PLACEHOLDER_CONF = {
             'body': {
                 'plugins': ['TextPlugin'],
-                'excluded plugins': ['TextPlugin']
+                'excluded_plugins': ['TextPlugin']
             }
         }
 

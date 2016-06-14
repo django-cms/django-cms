@@ -166,18 +166,17 @@ class PluginPool(object):
         self.set_plugin_meta()
         plugins = sorted(self.plugins.values(), key=attrgetter('name'))
         template = page and page.get_template() or None
+
         allowed_plugins = get_placeholder_conf(
             setting_key,
             placeholder,
             template,
         ) or ()
-
         excluded_plugins = get_placeholder_conf(
-            'excluded plugins',
+            'excluded_plugins',
             placeholder,
             template,
         ) or ()
-        allowed_plugins = list(set(allowed_plugins) - set(excluded_plugins))
 
         if not include_page_only:
             # Filters out any plugin marked as page only because
@@ -185,12 +184,12 @@ class PluginPool(object):
             plugins = (plugin for plugin in plugins if not plugin.page_only)
 
         if allowed_plugins:
-            # Check that plugins are in the list of the allowed ones and not in the list
-            # of excluded ones
-            plugins = (
-                plugin for plugin in plugins if plugin.__name__ in allowed_plugins and
-                                                not plugin.__name__ not in excluded_plugins
-            )
+            # Check that plugins are in the list of the allowed ones
+            plugins = (plugin for plugin in plugins if plugin.__name__ in allowed_plugins)
+
+        if excluded_plugins:
+            # Check that plugins are not in the list of the excluded ones
+            plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
 
         if placeholder:
             # Filters out any plugin that requires a parent or has set parent classes

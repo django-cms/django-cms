@@ -47,25 +47,10 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     CMS_PLACEHOLDER_CONF['placeholder']
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
-    # Ideas:
-    # 1)using real regex as keys
-    # 2)turn the setting in an orderedict
-    # 3)handling dictionary and list both
-
-    # Use function set in PLACEHOLDER_CONF_KEYS_PARSER to match configuration
-    # keys with the generated list of keys
-
-    def _match_placeholder_conf(conf_key, key):
-        return force_text(conf_key) == force_text(key)
 
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
-        parser = get_cms_setting('PLACEHOLDER_CONF_KEYS_PARSER')
-        if parser == 'default':
-            parser_function = _match_placeholder_conf
-        else:
-            parser_function = parser
         # 1st level
         if template:
             keys.append(force_text('%s %s' % (template, placeholder)))
@@ -78,7 +63,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         keys.append(None)
         for key in keys:
             for conf_key, conf in iteritems(placeholder_conf):
-                if parser_function(conf_key, key):
+                if force_text(conf_key) == force_text(key):
                     if not conf:
                         continue
                     value = conf.get(setting)
