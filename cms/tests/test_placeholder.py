@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import itertools
-import re
 
 from django.conf import settings
 from django.contrib import admin
@@ -50,11 +49,6 @@ from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    _scan_placeholders)
 from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
-
-
-def match_placeholder_conf_regexp(conf_key, key):
-    compiled_regex = re.compile(conf_key)
-    return compiled_regex.match(key)
 
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
@@ -260,29 +254,30 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'main': {
                 'name': 'main content',
                 'plugins': ['TextPlugin', 'LinkPlugin'],
-                'default_plugins':[
+                'default_plugins': [
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{
-                            'body':'<p>Some default text</p>'
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': '<p>Some default text</p>'
                         },
                     },
                 ],
             },
             'layout/home.html main': {
                 'name': u'main content with FilerImagePlugin and limit',
-                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin',],
-                'inherit':'main',
-                'limits': {'global': 1,},
+                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin'],
+                'inherit': 'main',
+                'limits': {'global': 1},
             },
             'layout/other.html main': {
                 'name': u'main content with FilerImagePlugin and no limit',
-                'inherit':'layout/home.html main',
+                'inherit': 'layout/home.html main',
                 'limits': {},
+                'excluded_plugins': ['LinkPlugin']
             },
             None: {
                 'name': u'All',
-                'plugins': ['FilerImagePlugin', 'LinkPlugin',],
+                'plugins': ['FilerImagePlugin', 'LinkPlugin'],
                 'limits': {},
             },
         }
@@ -297,79 +292,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             # test direct inherited value
             returned = get_placeholder_conf('plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['layout/home.html main']['plugins'])
+            # test excluded_plugins key
+            returned = get_placeholder_conf('excluded_plugins', 'main', 'layout/other.html')
+            self.assertEqual(returned, TEST_CONF['layout/other.html main']['excluded_plugins'])
             # test grandparent inherited value
             returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
             # test generic configuration
             returned = get_placeholder_conf('plugins', 'something')
             self.assertEqual(returned, TEST_CONF[None]['plugins'])
-
-    def test_get_placeholder_regexp(self):
-        TEST_CONF_REGEXP = [
-            ('^main$', {
-                'name': 'main content',
-                'plugins': ['TextPlugin', 'LinkPlugin'],
-                'default_plugins':[
-                    {
-                        'plugin_type':'TextPlugin',
-                        'values':{
-                            'body':'<p>Some default text</p>'
-                        },
-                    },
-                ],
-            }),
-            ('^layout\/home\.html main$', {
-                'name': u'main content with FilerImagePlugin and limit',
-                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin',],
-                'inherit':'main',
-                'limits': {'global': 1,},
-            }),
-            ('^layout\/other\.html main$', {
-                'name': u'main content with FilerImagePlugin and no limit',
-                'inherit':'layout/home.html main',
-                'limits': {},
-            }),
-            ('^foo-.*?$', {
-                'name': u'Foo type',
-                'plugins': ['TextPlugin', 'LinkPlugin',],
-                'limits': {},
-            }),
-            ('^.*?foo-.*?$', {
-                'name': u'Random head Foo type',
-                'plugins': ['FilerImagePlugin',],
-                'limits': {},
-            }),
-            ('^.*$', {
-                'name': u'All',
-                'plugins': ['FilerImagePlugin', 'LinkPlugin',],
-                'limits': {},
-            }),
-        ]
-
-        with self.settings(
-            CMS_PLACEHOLDER_CONF=TEST_CONF_REGEXP,
-            CMS_PLACEHOLDER_CONF_KEYS_PARSER=match_placeholder_conf_regexp
-        ):
-            # test no inheritance
-            returned = get_placeholder_conf('plugins', 'main')
-            self.assertEqual(returned, TEST_CONF_REGEXP[0][1]['plugins'])
-            # test no inherited value with inheritance enabled
-            returned = get_placeholder_conf('plugins', 'main', 'layout/home.html')
-            self.assertEqual(returned, TEST_CONF_REGEXP[1][1]['plugins'])
-            # test direct inherited value
-            returned = get_placeholder_conf('plugins', 'main', 'layout/other.html')
-            self.assertEqual(returned, TEST_CONF_REGEXP[1][1]['plugins'])
-            # test grandparent inherited value
-            returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
-            self.assertEqual(returned, TEST_CONF_REGEXP[0][1]['default_plugins'])
-            # test generic configuration
-            returned = get_placeholder_conf('plugins', 'something')
-            self.assertEqual(returned, TEST_CONF_REGEXP[5][1]['plugins'])
-            # test regex
-            returned = get_placeholder_conf('plugins', 'foo-one')
-            self.assertEqual(returned, TEST_CONF_REGEXP[3][1]['plugins'])
-            returned = get_placeholder_conf('plugins', 'somethingfoo-one')
-            self.assertEqual(returned, TEST_CONF_REGEXP[4][1]['plugins'])
 
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}

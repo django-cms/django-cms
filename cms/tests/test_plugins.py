@@ -219,14 +219,14 @@ class PluginsTestCase(PluginsTestBaseCase):
                 FilteredSelectMultiple,
             )
 
-    def test_not_add_plugin(self):
+    def test_excluded_plugin(self):
         """
         Test that you can't add a text plugin
         """
 
         CMS_PLACEHOLDER_CONF = {
             'body': {
-                'excluded plugins': ['TextPlugin']
+                'excluded_plugins': ['TextPlugin']
             }
         }
 
@@ -242,7 +242,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         CMS_PLACEHOLDER_CONF = {
             'body': {
                 'plugins': ['TextPlugin'],
-                'excluded plugins': ['TextPlugin']
+                'excluded_plugins': ['TextPlugin']
             }
         }
 
