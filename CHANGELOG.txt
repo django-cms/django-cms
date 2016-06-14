@@ -20,6 +20,7 @@
 * Fixed typo in ``AdvancedSettingsForm`` error messages.
 * Fixed long standing bug that prevented apphook endspoints from being
   CSRF exempt.
+* Changed default value for ``CMS_INTERNAL_IPS``.
 
 
 === 3.3.0 (2016-05-26) ===

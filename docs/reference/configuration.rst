@@ -723,14 +723,13 @@ CMS_INTERNAL_IPS
 ================
 
 default
-    settings.INTERNAL_IPS
+    ``[]``
 
-By default ``CMS_INTERNAL_IPS`` takes the same value as the Django setting
-``INTERNAL_IPS`` which has a default value of an empty list.
+By default ``CMS_INTERNAL_IPS`` is an empty list (``[]``).
 
-If left as an empty list (or anything Falsey, really), this setting does not
-add any restrictions to the toolbar. However, if set, the toolbar will only
-appear for client IP addresses that are in this list.
+If left as an empty list, this setting does not add any restrictions to the
+toolbar. However, if set, the toolbar will only appear for client IP addresses
+that are in this list.
 
 This setting may also be set to an `IpRangeList` from the external package
 ``iptools``. This package allows convenient syntax for defining complex IP
