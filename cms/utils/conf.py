@@ -64,7 +64,7 @@ DEFAULTS = {
     'ADMIN_NAMESPACE': 'admin',
     'APP_NAME': None,
     'TOOLBAR_HIDE': False,
-    'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
+    'INTERNAL_IPS': [],
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
     'UNESCAPED_RENDER_MODEL_TAGS': True,
     'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
