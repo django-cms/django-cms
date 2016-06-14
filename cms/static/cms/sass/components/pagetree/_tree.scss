@@ -663,6 +663,7 @@
         list-style-type: none;
         padding: 0;
         margin: 0;
+        transform: translateZ(0);
     }
 
     .jstree-is-dragging {
@@ -672,6 +673,9 @@
             border-top: 1px solid $gray-lighter;
             margin-top: -1px;
         }
+    }
+    .jstree-is-dragging-copy {
+        opacity: 0.9 !important;
     }
 
     // grid settings and resets added by `jstree.grid.js`
