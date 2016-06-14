@@ -1,4 +1,4 @@
-NTER.. _configuration:
+.. _configuration:
 
 #############
 Configuration
@@ -723,7 +723,7 @@ CMS_INTERNAL_IPS
 ================
 
 default
-    settings.INTERNAL_IPS
+    ``[]``
 
 By default ``CMS_INTERNAL_IPS`` is an empty list (``[]``).
 
