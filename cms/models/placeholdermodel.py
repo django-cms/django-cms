@@ -26,6 +26,7 @@ from cms.constants import (
     PUBLISHER_STATE_DIRTY,
 )
 from cms.utils import get_language_from_request
+from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
 
@@ -156,6 +157,21 @@ class Placeholder(models.Model):
 
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
+
+    def has_clear_permission(self, user, language):
+        plugin_types = (
+            self
+            .get_plugins(language)
+            .values_list('plugin_type', flat=True)
+            .distinct()
+        )
+
+        has_permission = permissions.has_plugin_permission
+
+        for plugin_type in plugin_types.iterator():
+            if not has_permission(user, plugin_type, "delete"):
+                return False
+        return True
 
     def render(self, context, width, lang=None, editable=True, use_cache=True):
         '''
