@@ -182,6 +182,7 @@ class PlaceholderAdminMixin(object):
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
             return False
         placeholder = plugin.placeholder
+
         if not placeholder.has_delete_permission(request):
             return False
         return True
@@ -189,7 +190,8 @@ class PlaceholderAdminMixin(object):
     def has_clear_placeholder_permission(self, request, placeholder):
         if not placeholder.has_delete_permission(request):
             return False
-        return True
+        language = request.GET.get('language', None)
+        return placeholder.has_clear_permission(request.user, language)
 
     def post_add_plugin(self, request, placeholder, plugin):
         pass
@@ -521,6 +523,7 @@ class PlaceholderAdminMixin(object):
     @xframe_options_sameorigin
     def clear_placeholder(self, request, placeholder_id):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+
         if not self.has_clear_placeholder_permission(request, placeholder):
             return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
         language = request.GET.get('language', None)
