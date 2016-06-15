@@ -112,7 +112,7 @@ class AliasPlugin(CMSPluginBase):
     def get_cache_expiration(self, request, instance, placeholder):
         if self.plugin:
             return alias.plugin.get_cache_expiration()
-        else
+        else:
             return None
     
     
