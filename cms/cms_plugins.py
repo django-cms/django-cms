@@ -100,6 +100,7 @@ class AliasPlugin(CMSPluginBase):
         language = get_language()
         if plugin:
             language = plugin.language
+            cache = plugin.cache
         alias = AliasPluginModel(language=language, placeholder=clipboard, plugin_type="AliasPlugin")
         if plugin:
             alias.plugin = plugin
@@ -108,5 +109,11 @@ class AliasPlugin(CMSPluginBase):
         alias.save()
         return HttpResponse("ok")
 
-
+    def get_cache_expiration(self, request, instance, placeholder):
+        if self.plugin:
+            return alias.plugin.get_cache_expiration()
+        else
+            return None
+    
+    
 plugin_pool.register_plugin(AliasPlugin)
