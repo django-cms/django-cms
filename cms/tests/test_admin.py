@@ -51,8 +51,13 @@ class AdminTestsBase(CMSTestCase):
 
     def _get_guys(self, admin_only=False, use_global_permissions=True):
         admin_user = self.get_superuser()
+
         if admin_only:
             return admin_user
+        staff_user = self._get_staff_user(use_global_permissions)
+        return admin_user, staff_user
+
+    def _get_staff_user(self, use_global_permissions=True):
         USERNAME = 'test'
 
         if get_user_model().USERNAME_FIELD == 'email':
@@ -77,7 +82,7 @@ class AdminTestsBase(CMSTestCase):
                 can_move_page=True,
             )
             gpp.sites = Site.objects.all()
-        return admin_user, normal_guy
+        return normal_guy
 
 
 class AdminTestCase(AdminTestsBase):
@@ -637,6 +642,121 @@ class AdminTestCase(AdminTestsBase):
         # After cleaning the de placeholder, en placeholder must still have all the plugins
         self.assertEqual(ph.get_plugins('en').count(), 2)
         self.assertEqual(ph.get_plugins('de').count(), 0)
+
+    def test_clear_placeholder_permissions_page(self):
+        """
+        Ensures a user without delete plugin permissions
+        cannot clear a page placeholder that contains said plugin.
+        """
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        # add text plugin
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # add a link plugin to make sure we test diversity
+        add_plugin(ph, "LinkPlugin", "en", name='link-1')
+        add_plugin(ph, "LinkPlugin", "en", name='link-2')
+
+        # Staff user has basic page permissions but no
+        # plugin permissions.
+        staff = self._get_staff_user()
+        endpoint = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete text plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete link plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_link'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ph.get_plugins('en').count(), 0)
+
+    def test_clear_placeholder_permissions_generic(self):
+        """
+        Ensures a user without delete plugin permissions
+        cannot clear a generic placeholder that contains said plugin.
+        """
+        ex1 = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
+
+        ph = ex1.placeholder
+
+        # add text plugin
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # add a link plugin to make sure we test diversity
+        add_plugin(ph, "LinkPlugin", "en", name='link-1')
+        add_plugin(ph, "LinkPlugin", "en", name='link-2')
+
+        # Staff user has basic page permissions but no
+        # plugin permissions.
+        staff = self._get_staff_user()
+        endpoint = '%s?language=en' % admin_reverse('placeholderapp_example1_clear_placeholder', args=[ph.pk])
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete the object the placeholder is attached to
+        # which is Example1 and the user also does not have permission
+        # to delete text and links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the user permission to delete Example1 objects
+        staff.user_permissions.add(Permission.objects.get(codename='delete_example1'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete text and links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete text plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete links
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete link plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_link'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ph.get_plugins('en').count(), 0)
 
 
 class AdminTests(AdminTestsBase):
