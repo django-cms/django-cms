@@ -331,6 +331,73 @@ class AdminTestCase(AdminTestsBase):
             response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
+    def test_delete_permissions(self):
+        admin_user, staff_user = self._get_guys()
+        create_page("home", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
+
+        # CMS_PERMISSION is set to True and staff user
+        # has global permissions set.
+        with self.settings(CMS_PERMISSION=True):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
+
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugins but the page
+        # has no plugins.
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
+
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugin
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was unsuccessful
+                self.assertEqual(response.status_code, 403)
+                self.assertTrue(Page.objects.filter(pk=page.pk).exists())
+
+        # Give the staff user permission to delete text plugins
+        staff_user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        # CMS_PERMISSION is set to False and user has
+        # permission to delete text plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
+
     def test_delete_diff_language(self):
         admin_user = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
@@ -387,6 +454,78 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
+
+    def test_delete_translation_permissions(self):
+        admin_user, staff_user = self._get_guys()
+        page = create_page("delete-page-translation", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
+        create_title("fr", "delete-page-translation-fr", page.reload(), slug="delete-page-translation-fr")
+        add_plugin(body, 'TextPlugin', 'de', body='text')
+
+        # add a link plugin but never give the user permission to delete it
+        # all our tests target the german translation.
+        # this asserts that a plugin in another language does not interfere
+        # with deleting.
+        link = add_plugin(body, 'LinkPlugin', 'en', name='link-1')
+
+        # CMS_PERMISSION is set to True and staff user
+        # has global permissions set.
+        with self.settings(CMS_PERMISSION=True):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(page.title_set.filter(language='de').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+
+        # the API needs a fresh page object
+        page = page.reload()
+        create_title("de", "delete-page-translation-2", page.reload(), slug="delete-page-translation-2")
+        add_plugin(body, 'TextPlugin', 'de', body='text')
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete text plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+
+                # assert deleting page was successful
+                self.assertEqual(response.status_code, 403)
+                self.assertTrue(page.title_set.filter(language='de').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugins but the translation
+        # does not contain plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'fr'})
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(page.title_set.filter(language='fr').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+
+        # Give the staff user permission to delete text plugins
+        staff_user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        # CMS_PERMISSION is set to False and user has
+        # permission to delete text plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(page.title_set.filter(language='de').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
 
     def test_change_dates(self):
         admin_user, staff = self._get_guys()
