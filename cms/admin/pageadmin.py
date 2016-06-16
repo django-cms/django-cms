@@ -521,7 +521,37 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         if get_cms_setting('PERMISSION') and obj is not None:
             return obj.has_delete_permission(request)
-        return super(PageAdmin, self).has_delete_permission(request, obj)
+
+        can_delete = super(PageAdmin, self).has_delete_permission(request, obj)
+
+        if not can_delete or not obj:
+            return False
+
+        user = request.user
+        languages = obj.get_languages()
+        placeholders = obj.placeholders.filter(cmsplugin__language__in=languages)
+
+        for placeholder in placeholders.iterator():
+            if not placeholder.has_clear_permission(user, languages):
+                return False
+        return True
+
+    def has_delete_translation_permission(self, request, language, obj=None):
+        if get_cms_setting('PERMISSION') and obj is not None:
+            return obj.has_delete_permission(request)
+
+        can_delete = permissions.has_auth_page_permission(request.user, action='delete')
+
+        if not can_delete or not obj:
+            return False
+
+        user = request.user
+        placeholders = obj.placeholders.filter(cmsplugin__language=language)
+
+        for placeholder in placeholders.iterator():
+            if not placeholder.has_clear_permission(user, [language]):
+                return False
+        return True
 
     def has_recover_permission(self, request):
         """
@@ -602,7 +632,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if not page.has_change_permission(request):
                 return False
         language = request.GET.get('language', None)
-        return placeholder.has_clear_permission(request.user, language)
+        return placeholder.has_clear_permission(request.user, [language])
 
     def post_add_plugin(self, request, placeholder, plugin):
         if is_installed('reversion') and placeholder.page:
@@ -1136,7 +1166,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # to determine whether a given object exists.
             obj = None
 
-        if not self.has_delete_permission(request, obj):
+        if not self.has_delete_translation_permission(request, language, obj):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
 
         if obj is None:
