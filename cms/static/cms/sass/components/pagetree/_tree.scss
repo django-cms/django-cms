@@ -461,7 +461,7 @@
 .cms-tree-item-lang .cms-pagetree-dropdown-menu {
     right: 32px;
     top: -5px;
-    width: 180px;
+    min-width: 180px;
 }
 .cms-tree-item-button .cms-pagetree-dropdown-menu {
     right: 40px;
