@@ -5,7 +5,8 @@ Contributing to django CMS
 Like every open-source project, django CMS is always looking for motivated
 individuals to contribute to its source code.
 
-There's more guidance on `how to contribute in our documentation <http://docs.django-cms.org/en/latest/introduction>`_.
+There's more guidance on `how to contribute in our documentation
+<http://docs.django-cms.org/en/latest/contributing/>`_.
 
 Key points:
 
