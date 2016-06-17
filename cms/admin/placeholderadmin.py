@@ -209,7 +209,7 @@ class PlaceholderAdminMixin(object):
         if not placeholder.has_delete_permission(request):
             return False
         language = request.GET.get('language', None)
-        return placeholder.has_clear_permission(request.user, language)
+        return placeholder.has_clear_permission(request.user, [language])
 
     def post_add_plugin(self, request, plugin):
         pass

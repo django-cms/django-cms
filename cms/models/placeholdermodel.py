@@ -158,10 +158,13 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def has_clear_permission(self, user, language):
+    def has_clear_permission(self, user, languages):
         plugin_types = (
             self
-            .get_plugins(language)
+            .cmsplugin_set
+            .filter(language__in=languages)
+            # exclude the clipboard plugin
+            .exclude(plugin_type='PlaceholderPlugin')
             .values_list('plugin_type', flat=True)
             .distinct()
         )
