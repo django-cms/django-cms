@@ -631,7 +631,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return False
             if not page.has_change_permission(request):
                 return False
+
         language = request.GET.get('language', None)
+
+        if language is None:
+            language = get_language_from_request(request)
         return placeholder.has_clear_permission(request.user, [language])
 
     def post_add_plugin(self, request, placeholder, plugin):
