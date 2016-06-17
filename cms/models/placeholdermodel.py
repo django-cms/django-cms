@@ -163,6 +163,8 @@ class Placeholder(models.Model):
             self
             .cmsplugin_set
             .filter(language__in=languages)
+            # exclude the clipboard plugin
+            .exclude(plugin_type='PlaceholderPlugin')
             .values_list('plugin_type', flat=True)
             .distinct()
         )
