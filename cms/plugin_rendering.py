@@ -125,12 +125,30 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     request = context['request']
     if not hasattr(request, 'placeholders'):
         request.placeholders = {}
-    perms = (placeholder.has_change_permission(request) or not placeholder.cache_placeholder)
-    if not perms or placeholder.slot not in request.placeholders:
-        request.placeholders[placeholder.slot] = (placeholder, perms)
+
+    # Prepend frontedit toolbar output if applicable
+    toolbar = getattr(request, 'toolbar', None)
+    if (getattr(toolbar, 'edit_mode', False) and
+            getattr(toolbar, "show_toolbar", False) and
+            getattr(placeholder, 'is_editable', True) and editable):
+        from cms.middleware.toolbar import toolbar_plugin_processor
+        processors = (toolbar_plugin_processor, )
+        edit = True
+    else:
+        processors = None
+        edit = False
+
+    if edit:
+        perms = (placeholder.has_change_permission(request) or not placeholder.cache_placeholder)
+        if not perms or placeholder.slot not in request.placeholders:
+            request.placeholders[placeholder.slot] = (placeholder, perms)
+        else:
+            request.placeholders[placeholder.slot] = (
+                placeholder, perms and request.placeholders[placeholder.slot][1]
+            )
     else:
         request.placeholders[placeholder.slot] = (
-            placeholder, perms and request.placeholders[placeholder.slot][1]
+            placeholder, False
         )
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
@@ -147,18 +165,6 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     else:
         lang = get_language_from_request(request)
         save_language = lang
-
-    # Prepend frontedit toolbar output if applicable
-    toolbar = getattr(request, 'toolbar', None)
-    if (getattr(toolbar, 'edit_mode', False) and
-            getattr(toolbar, "show_toolbar", False) and
-            getattr(placeholder, 'is_editable', True) and editable):
-        from cms.middleware.toolbar import toolbar_plugin_processor
-        processors = (toolbar_plugin_processor, )
-        edit = True
-    else:
-        processors = None
-        edit = False
 
     use_cache = use_cache and not request.user.is_authenticated()
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:

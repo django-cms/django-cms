@@ -39,6 +39,8 @@
 * Fixed an issue where plugin permissions where not checked when deleting
   a page or page translation.
 * Added support for tiered ``CMS_PLACEHOLDER_CONF``.
+* Fixed a useless placeholders edit permissions checking when not in edit
+  mode.
 
 
 === 3.3.0 (2016-05-26) ===
