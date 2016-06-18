@@ -21,6 +21,12 @@
 * Fixed long standing bug that prevented apphook endspoints from being
   CSRF exempt.
 * Changed default value for ``CMS_INTERNAL_IPS``.
+* Fixed an issue that prevented non superusers from copying all plugins
+  in a placeholder.
+* Fixed an issue where plugin permissions where not checked when clearing
+  a placeholder.
+* Fixed an issue where plugin permissions where not checked when deleting
+  a page or page translation.
 
 
 === 3.3.0 (2016-05-26) ===
