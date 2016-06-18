@@ -27,6 +27,7 @@
   a placeholder.
 * Fixed an issue where plugin permissions where not checked when deleting
   a page or page translation.
+* Added support for tiered ``CMS_PLACEHOLDER_CONF``.
 
 
 === 3.3.0 (2016-05-26) ===
