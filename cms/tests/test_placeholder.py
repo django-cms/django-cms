@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import itertools
 
+from cms.tests.test_toolbar import ToolbarTestBase
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model, get_permission_codename
@@ -823,7 +824,7 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         de = Translations.objects.get(language_code='de')
 
 
-class PlaceholderModelTests(CMSTestCase):
+class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
     def get_mock_user(self, superuser):
         return AttributeObject(
             is_superuser=superuser,
@@ -872,8 +873,8 @@ class PlaceholderModelTests(CMSTestCase):
         self.assertNotIn(ex.placeholder, editable)
 
         # request.placeholders is populated for superuser
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_en['request'].user = self.get_superuser()
+        superuser = self.get_superuser()
+        context_en['request'] = self.get_page_request(page_en, superuser, edit=True)
         render_placeholder(ex.placeholder, context_en, use_cache=False)
         editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 1)
@@ -890,12 +891,27 @@ class PlaceholderModelTests(CMSTestCase):
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename=get_permission_codename('change', ex._meta)))
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_en['request'].user = get_user_model().objects.get(pk=user.pk)
+        user = self.reload(user)
+        context_en['request'] = self.get_page_request(page_en, user, edit=True)
         render_placeholder(ex.placeholder, context_en, use_cache=False)
         editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 1)
         self.assertIn(ex.placeholder, editable)
+
+        # request.placeholders is not populated for staff user with permission on the model
+        # but not in edit mode
+        context_en['request'] = self.get_page_request(page_en, user, edit=False)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 0)
+        self.assertNotIn(ex.placeholder, editable)
+
+        # request.placeholders is not populated for super user not in edit mode
+        context_en['request'] = self.get_page_request(page_en, superuser, edit=False)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
+        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
+        self.assertEqual(len(editable), 0)
+        self.assertNotIn(ex.placeholder, editable)
 
     def test_request_placeholders_permission_check_page(self):
         page_en = create_page('page_en', 'col_two.html', 'en')
@@ -904,8 +920,8 @@ class PlaceholderModelTests(CMSTestCase):
         context_en = SekizaiContext()
 
         # request.placeholders is populated for superuser
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_en['request'].user = self.get_superuser()
+        superuser = self.get_superuser()
+        context_en['request'] = self.get_page_request(page_en, superuser, edit=True)
         render_placeholder(placeholder_en, context_en)
         editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 1)
@@ -913,8 +929,7 @@ class PlaceholderModelTests(CMSTestCase):
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_en['request'].user = user
+        context_en['request'] = self.get_page_request(page_en, user, edit=True)
         render_placeholder(placeholder_en, context_en)
         editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 0)
@@ -922,8 +937,8 @@ class PlaceholderModelTests(CMSTestCase):
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_en['request'].user = get_user_model().objects.get(pk=user.pk)
+        user = self.reload(user)
+        context_en['request'] = self.get_page_request(page_en, user, edit=True)
         render_placeholder(placeholder_en, context_en)
         editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 1)
@@ -941,8 +956,8 @@ class PlaceholderModelTests(CMSTestCase):
         context = {'ex1': ex1}
 
         # request.placeholders is populated for superuser
-        request = self.get_request(language="en", page=page_en)
-        request.user = self.get_superuser()
+        superuser = self.get_superuser()
+        request = self.get_page_request(page_en, superuser, edit=True)
         self.render_template_obj(template, context, request)
         editable = [ph for ph, perms in getattr(request, 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 1)
@@ -950,8 +965,7 @@ class PlaceholderModelTests(CMSTestCase):
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
-        request = self.get_request(language="en", page=page_en)
-        request.user = user
+        request = self.get_page_request(page_en, user, edit=True)
         self.render_template_obj(template, context, request)
         editable = [ph for ph, perms in getattr(request, 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 0)
@@ -959,8 +973,8 @@ class PlaceholderModelTests(CMSTestCase):
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename='change_example1'))
-        request = self.get_request(language="en", page=page_en)
-        request.user = get_user_model().objects.get(pk=user.pk)
+        user = self.reload(user)
+        request = self.get_page_request(page_en, user, edit=True)
         self.render_template_obj(template, context, request)
         editable = [ph for ph, perms in getattr(request, 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 1)
