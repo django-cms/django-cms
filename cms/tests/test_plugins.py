@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import base64
 import datetime
 import json
+import pickle
 import os
 
 from cms.api import create_page
@@ -998,17 +999,32 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertFalse(len(out))
         self.assertTrue(len(placeholder._plugins_cache))
 
-    def test_defer_pickel(self):
+    def test_pickle(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.placeholders.get(slot='body')
+        text_plugin = api.add_plugin(
+            placeholder,
+            "TextPlugin",
+            'en',
+            body="Hello World",
+        )
+        cms_plugin = text_plugin.cmsplugin_ptr
+
+        # assert we can pickle and unpickle a solid plugin (subclass)
+        self.assertEqual(text_plugin, pickle.loads(pickle.dumps(text_plugin)))
+
+        # assert we can pickle and unpickle a cms plugin (parent)
+        self.assertEqual(cms_plugin, pickle.loads(pickle.dumps(cms_plugin)))
+
+    def test_defer_pickle(self):
         page = api.create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
         api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
         plugins = Text.objects.all().defer('path')
-        import pickle
         import io
         a = io.BytesIO()
         pickle.dump(plugins[0], a)
-
 
     def test_empty_plugin_description(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -1761,10 +1777,6 @@ class NoDatabasePluginTests(TestCase):
         # Plugin models have been moved away due to Django's AppConfig
         from cms.test_utils.project.bunch_of_plugins.models import TestPlugin2
         self.assertEqual(TestPlugin2._meta.db_table, 'bunch_of_plugins_testplugin2')
-
-    def test_pickle(self):
-        text = Text()
-        text.__reduce__()
 
 
 class PicturePluginTests(PluginsTestBaseCase):
