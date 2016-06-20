@@ -39,32 +39,44 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
 
-    If a template is given, it will try
-    CMS_PLACEHOLDER_CONF['template placeholder'] and
-    CMS_PLACEHOLDER_CONF['placeholder'], if no template is given only the latter
-    is checked.
+    Resulting value will be the last from:
+
+    CMS_PLACEHOLDER_CONF[None] (global)
+    CMS_PLACEHOLDER_CONF['template'] (if template is given)
+    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
+
     if placeholder:
         keys = []
+        placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
+        # 1st level
         if template:
-            keys.append("%s %s" % (template, placeholder))
+            keys.append(u'%s %s' % (template, placeholder))
+        # 2nd level
         keys.append(placeholder)
+        # 3rd level
+        if template:
+            keys.append(template)
+        # 4th level
+        keys.append(None)
         for key in keys:
-            conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
-            if not conf:
-                continue
-            value = conf.get(setting)
-            if value is not None:
-                return value
-            inherit = conf.get('inherit')
-            if inherit:
-                if ' ' in inherit:
-                    inherit = inherit.split(' ')
-                else:
-                    inherit = (None, inherit,)
-                value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                if value is not None:
-                    return value
+            for conf_key, conf in placeholder_conf.items():
+                if force_text(conf_key) == force_text(key):
+                    if not conf:
+                        continue
+                    value = conf.get(setting)
+                    if value is not None:
+                        return value
+                    inherit = conf.get('inherit')
+                    if inherit:
+                        if ' ' in inherit:
+                            inherit = inherit.split(' ')
+                        else:
+                            inherit = (None, inherit)
+                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                        if value is not None:
+                            return value
     return default
 
 

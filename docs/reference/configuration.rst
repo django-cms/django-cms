@@ -189,6 +189,10 @@ all placeholders.
 Example::
 
     CMS_PLACEHOLDER_CONF = {
+        None: {
+            "plugins": ['TextPlugin'],
+            'exclude_plugins': ['InheritPlugin'],
+        }
         'content': {
             'plugins': ['TextPlugin', 'PicturePlugin'],
             'text_only_plugins': ['LinkPlugin'],
@@ -232,8 +236,29 @@ Example::
         },
     }
 
+.. _placeholder_conf_precedence:
+
 You can combine template names and placeholder names to define
 plugins in a granular fashion, as shown above with ``base.html content``.
+
+Configuration is retrieved in the following order:
+
+* CMS_PLACEHOLDER_CONF['template placeholder']
+* CMS_PLACEHOLDER_CONF['placeholder']
+* CMS_PLACEHOLDER_CONF['template']
+* CMS_PLACEHOLDER_CONF[None]
+
+The first ``CMS_PLACEHOLDER_CONF`` key that matches for the required configuration attribute
+is used.
+
+E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
+placeholder in a page using the ``base.html`` template, the value
+``['TextPlugin', 'PicturePlugin', 'TeaserPlugin']`` will be returned as ``'base.html content'``
+matches; if the same configuration is retrieved for the ``content`` placeholder in a page using
+``fullwidth.html`` template, the returned value will be ``['TextPlugin', 'PicturePlugin']``. If
+``plugins`` configuration is retrieved for ``sidebar_left`` placeholder, ``['TextPlugin']`` from
+``CMS_PLACEHOLDER_CONF`` key ``None`` will be returned.
+
 
 ``plugins``
     A list of plugins that can be added to this placeholder. If not supplied,
@@ -242,6 +267,14 @@ plugins in a granular fashion, as shown above with ``base.html content``.
 ``text_only_plugins``
     A list of additional plugins available only in the TextPlugin, these
     plugins can't be added directly to this placeholder.
+
+``excluded_plugins``
+    A list of plugins that will not be added to the given placeholder; this takes precedence
+    over ``plugins`` configuration: if a plugin is present in both lists, it **will not** be
+    available in the placeholder. This is basically a way to **blacklist** a plugin: even if
+    registered, it will not be available in the placeholder. If set on the ``None`` (default)
+    key, the plugins will not be available in any placeholder (except the ``excluded_plugins``
+    configuration is overridden in more specific ``CMS_PLACEHOLDER_KEYS``.
 
 ``extra_context``
     Extra context that plugins in this placeholder receive.

@@ -254,40 +254,53 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'main': {
                 'name': 'main content',
                 'plugins': ['TextPlugin', 'LinkPlugin'],
-                'default_plugins':[
+                'default_plugins': [
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{
-                            'body':'<p>Some default text</p>'
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': '<p>Some default text</p>'
                         },
                     },
                 ],
             },
             'layout/home.html main': {
                 'name': u'main content with FilerImagePlugin and limit',
-                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin',],
-                'inherit':'main',
-                'limits': {'global': 1,},
+                'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin'],
+                'inherit': 'main',
+                'limits': {'global': 1},
             },
             'layout/other.html main': {
                 'name': u'main content with FilerImagePlugin and no limit',
-                'inherit':'layout/home.html main',
+                'inherit': 'layout/home.html main',
+                'limits': {},
+                'excluded_plugins': ['LinkPlugin']
+            },
+            None: {
+                'name': u'All',
+                'plugins': ['FilerImagePlugin', 'LinkPlugin'],
                 'limits': {},
             },
         }
+
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            #test no inheritance
+            # test no inheritance
             returned = get_placeholder_conf('plugins', 'main')
             self.assertEqual(returned, TEST_CONF['main']['plugins'])
-            #test no inherited value with inheritance enabled
+            # test no inherited value with inheritance enabled
             returned = get_placeholder_conf('plugins', 'main', 'layout/home.html')
             self.assertEqual(returned, TEST_CONF['layout/home.html main']['plugins'])
-            #test direct inherited value
+            # test direct inherited value
             returned = get_placeholder_conf('plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['layout/home.html main']['plugins'])
-            #test grandparent inherited value
+            # test excluded_plugins key
+            returned = get_placeholder_conf('excluded_plugins', 'main', 'layout/other.html')
+            self.assertEqual(returned, TEST_CONF['layout/other.html main']['excluded_plugins'])
+            # test grandparent inherited value
             returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
+            # test generic configuration
+            returned = get_placeholder_conf('plugins', 'something')
+            self.assertEqual(returned, TEST_CONF[None]['plugins'])
 
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}

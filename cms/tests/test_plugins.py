@@ -219,6 +219,42 @@ class PluginsTestCase(PluginsTestBaseCase):
                 FilteredSelectMultiple,
             )
 
+    def test_excluded_plugin(self):
+        """
+        Test that you can't add a text plugin
+        """
+
+        CMS_PLACEHOLDER_CONF = {
+            'body': {
+                'excluded_plugins': ['TextPlugin']
+            }
+        }
+
+        # try to add a new text plugin
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            page_data = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page = Page.objects.all()[0]
+            installed_plugins = plugin_pool.get_all_plugins('body', page)
+            installed_plugins = [cls.__name__ for cls in installed_plugins]
+            self.assertNotIn('TextPlugin', installed_plugins)
+
+        CMS_PLACEHOLDER_CONF = {
+            'body': {
+                'plugins': ['TextPlugin'],
+                'excluded_plugins': ['TextPlugin']
+            }
+        }
+
+        # try to add a new text plugin
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+            page_data = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page = Page.objects.all()[0]
+            installed_plugins = plugin_pool.get_all_plugins('body', page)
+            installed_plugins = [cls.__name__ for cls in installed_plugins]
+            self.assertNotIn('TextPlugin', installed_plugins)
+
     def test_plugin_edit_marks_page_dirty(self):
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
