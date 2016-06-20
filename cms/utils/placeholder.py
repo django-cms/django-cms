@@ -52,12 +52,12 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
         # 1st level
         if template:
-            keys.append(force_text('%s %s' % (template, placeholder)))
+            keys.append(u'%s %s' % (template, placeholder))
         # 2nd level
-        keys.append(force_text(placeholder))
+        keys.append(placeholder)
         # 3rd level
         if template:
-            keys.append(force_text(template))
+            keys.append(template)
         # 4th level
         keys.append(None)
         for key in keys:
