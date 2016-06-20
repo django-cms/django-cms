@@ -62,7 +62,7 @@ for importing ``PollsMenu`` and::
 
     _menus = [PollsMenu]
 
-to the ``PollsApp`` class.
+to the ``PollsApphook`` class.
 
 Any page that is attached to the ``Polls`` application will now have sub-menu
 items for each of the Polls in the database.
