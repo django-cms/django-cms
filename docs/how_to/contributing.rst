@@ -71,6 +71,8 @@ Target branches
 See :ref:`branch_policy` for information about branch policy.
 
 
+.. _write_test:
+
 *******************
 How to write a test
 *******************

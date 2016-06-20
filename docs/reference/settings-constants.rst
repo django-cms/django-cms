@@ -1,8 +1,8 @@
 .. _configuration:
 
-#############
-Configuration
-#############
+######################
+Settings and constants
+######################
 
 django CMS has a number of settings to configure its behaviour. These should
 be available in your ``settings.py`` file.
@@ -1168,3 +1168,59 @@ Once all template tags have been reviewed and adjusted where necessary,
 the administrator should set ``CMS_UNESCAPED_RENDER_MODEL_TAGS = False``
 in the project settings. At that point, the project is more secure and
 will be ready for any future upgrades.
+
+
+*************
+Constants
+*************
+
+.. module:: cms.constants
+
+
+.. data:: TEMPLATE_INHERITANCE_MAGIC
+
+    The token used to identify when a user selects "inherit" as template for a
+    page.
+
+
+.. data:: LEFT
+
+    Used as a position indicator in the toolbar.
+
+
+.. data:: RIGHT
+
+    Used as a position indicator in the toolbar.
+
+
+.. data:: REFRESH
+
+    Constant used by the toolbar.
+
+
+.. data:: EXPIRE_NOW
+
+    Constant of 0 (zero) used for cache control headers
+
+
+.. data:: MAX_EXPIRATION_TTL
+
+    Constant of 31536000 or 365 days in seconds used for cache control headers
+
+
+.. data:: VISIBILITY_ALL
+
+    Used for the ``limit_menu_visibility`` keyword argument to
+    :func:`~cms.api.create_page`. Does not limit menu visibility.
+
+
+.. data:: VISIBILITY_USERS
+
+    Used for the ``limit_menu_visibility`` keyword argument to
+    :func:`~cms.api.create_page`. Limits menu visibility to authenticated users.
+
+
+.. data:: VISIBILITY_ANONYMOUS
+
+    Used for the ``limit_menu_visibility`` keyword argument to
+    :func:`~cms.api.create_page`. Limits menu visibility to anonymous (not authenticated) users.

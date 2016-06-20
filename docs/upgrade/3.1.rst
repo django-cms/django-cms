@@ -61,7 +61,7 @@ Other than this, end users should not notice any changes.
 Action required
 ---------------
 
-Run :ref:`manage.py cms fix-mptt <fix-mptt>` before you upgrade.
+Run ``fix-mptt`` before you upgrade.
 
 Developers who use django CMS will need to run the schema and data migrations that are part of this
 release. Developers of third-party applications that relied on the Django MPTT that shipped with

@@ -9,12 +9,12 @@ user-editable content (plugins) in templates. That is, it's the place where a
 user can add text, video or any other plugin to a webpage, using the same
 frontend editing as the CMS pages.
 
-Placeholders can be viewed as containers for :class:`~cms.models.pluginmodel.CMSPlugin` instances, and
+Placeholders can be viewed as containers for :class:`~cms.models.CMSPlugin` instances, and
 can be used outside the CMS in custom applications using the
 :class:`~cms.models.fields.PlaceholderField`.
 
 By defining one (or several) :class:`~cms.models.fields.PlaceholderField` on a
-custom model you can take advantage of the full power of :class:`~cms.models.pluginmodel.CMSPlugin`.
+custom model you can take advantage of the full power of :class:`~cms.models.CMSPlugin`.
 
 ***********
 Get started

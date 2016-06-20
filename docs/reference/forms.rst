@@ -1,33 +1,11 @@
-#####################
-Form and model fields
-#####################
+..  module:: cms.forms
+
+*****
+Forms
+*****
 
 
-************
-Model fields
-************
-
-
-.. py:class:: cms.models.fields.PageField
-
-    This is a foreign key field to the :class:`cms.models.Page` model
-    that defaults to the :class:`cms.forms.fields.PageSelectFormField` form
-    field when rendered in forms. It has the same API as the
-    :class:`django:django.db.models.ForeignKey` but does not require
-    the ``othermodel`` argument.
-
-
-.. py:class:: cms.models.fields.PlaceholderField
-
-    A foreign key field to the :class:`cms.models.placeholdermodel.Placeholder` model.
-
-
-***********
-Form fields
-***********
-
-
-.. py:class:: cms.forms.fields.PageSelectFormField
+.. py:class:: fields.PageSelectFormField
 
     Behaves like a :class:`django.forms.ModelChoiceField` field for the
     :class:`cms.models.Page` model, but displays itself as a split
@@ -36,7 +14,7 @@ Form fields
     select drop-down is easier to use. This takes the same arguments as
     :class:`django.forms.ModelChoiceField`.
 
-.. py:class:: cms.forms.fields.PageSmartLinkField
+.. py:class:: fields.PageSmartLinkField
 
     A field making use of ``cms.forms.widgets.PageSmartLinkWidget``.
     This field will offer you a list of matching internal pages as you type.
