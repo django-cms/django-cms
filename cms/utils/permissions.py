@@ -215,6 +215,12 @@ def has_global_page_permission(request, site=None, user=None, **filters):
     return request._cms_global_perms[key]
 
 
+def can_change_global_permissions(user):
+    if user.is_superuser:
+        return True
+    return GlobalPagePermission.objects.with_can_change_permissions(user).exists()
+
+
 def get_user_permission_level(user):
     """
     Returns highest user level from the page/permission hierarchy on which
@@ -234,10 +240,9 @@ def get_user_permission_level(user):
         2.
 
     """
-    if (user.is_superuser or
-            GlobalPagePermission.objects.with_can_change_permissions(user).exists()):
-        # those
+    if can_change_global_permissions(user):
         return 0
+
     try:
         permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__path')[0]
     except IndexError:
@@ -276,11 +281,7 @@ def get_subordinate_users(user):
         Will return [user, C, X, D, Y, Z]. W was created by user, but is also
         assigned to higher level.
     """
-
-    # TODO: try to merge with PagePermissionManager.subordinate_to_user()
-
-    if user.is_superuser or \
-            GlobalPagePermission.objects.with_can_change_permissions(user):
+    if can_change_global_permissions(user):
         return get_user_model().objects.all()
     site = Site.objects.get_current()
     page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
@@ -295,13 +296,14 @@ def get_subordinate_users(user):
         )
         qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
         return qs
+
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) &
         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
-    qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
+    qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
     return qs
 
 
@@ -310,8 +312,7 @@ def get_subordinate_groups(user):
     Similar to get_subordinate_users, but returns queryset of Groups instead
     of Users.
     """
-    if (user.is_superuser or
-            GlobalPagePermission.objects.with_can_change_permissions(user)):
+    if can_change_global_permissions(user):
         return Group.objects.all()
     site = Site.objects.get_current()
     page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
