@@ -101,7 +101,7 @@ Disables dragging of child plugins in structure mode.
 frontend_edit_template
 ----------------------
 
-Default: ``cms/toolbar/placeholder_wrapper.html``
+Default: ``cms/toolbar/plugin.html``
 
 The template used for wrapping the plugin in frontend editing.
 
