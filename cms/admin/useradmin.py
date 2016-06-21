@@ -31,7 +31,7 @@ class PageUserAdmin(admin_class, GenericCmsPermissionAdmin):
             return self.model.objects.get_empty_query_set()
 
 
-class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
+class PageUserGroupAdmin(GenericCmsPermissionAdmin, admin.ModelAdmin):
     form = PageUserGroupForm
     list_display = ('name', 'created_by')
 
