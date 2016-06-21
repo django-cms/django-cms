@@ -212,12 +212,25 @@ class GenericCmsPermissionAdmin(object):
         return True
 
     def has_add_permission(self, request):
-        return self._has_change_permissions_permission(request) and \
-               super(self.__class__, self).has_add_permission(request)
+        has_model_perm = super(GenericCmsPermissionAdmin, self).has_add_permission(request)
+
+        if not has_model_perm:
+            return False
+        return self._has_change_permissions_permission(request)
 
     def has_change_permission(self, request, obj=None):
-        return self._has_change_permissions_permission(request) and \
-               super(self.__class__, self).has_change_permission(request, obj)
+        has_model_perm = super(GenericCmsPermissionAdmin, self).has_change_permission(request, obj)
+
+        if not has_model_perm:
+            return False
+        return self._has_change_permissions_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        has_model_perm = super(GenericCmsPermissionAdmin, self).has_delete_permission(request, obj)
+
+        if not has_model_perm:
+            return False
+        return self._has_change_permissions_permission(request)
 
 
 if get_cms_setting('PERMISSION'):
