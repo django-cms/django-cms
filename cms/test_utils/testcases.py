@@ -20,9 +20,11 @@ from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.models import Page
+from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.permissions import set_current_user
+from cms.utils.urlutils import admin_reverse
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -115,6 +117,27 @@ class BaseCMSTestCase(object):
 
     def login_user_context(self, user):
         return UserLoginContext(self, user)
+
+    def get_permission(self, codename):
+        return Permission.objects.get(codename=codename)
+
+    def add_permission(self, user, codename):
+        user.user_permissions.add(self.get_permission(codename))
+
+    def add_global_permission(self, user, **kwargs):
+        options = {
+            'can_change': True,
+            'can_delete': True,
+            'can_change_advanced_settings': False,
+            'can_publish': True,
+            'can_change_permissions': False,
+            'can_move_page': True,
+        }
+        options.update(**kwargs)
+
+        gpp = GlobalPagePermission.objects.create(user=user, **options)
+        gpp.sites = Site.objects.all()
+        return gpp
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):
@@ -406,6 +429,11 @@ class BaseCMSTestCase(object):
             if apphook_pool.apps[name].__class__.__module__ in sys.modules:
                 del sys.modules[apphook_pool.apps[name].__class__.__module__]
         apphook_pool.clear()
+
+    def get_admin_url(self, model, action, *args):
+        opts = model._meta
+        url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
+        return admin_reverse(url_name, args=args)
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
