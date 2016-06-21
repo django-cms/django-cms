@@ -832,8 +832,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.client.logout()
         cache.clear()
-        response = self.client.get(page.get_absolute_url())
         # TODO: Replace this test using a Test Plugin, not an externally managed one.
+        # response = self.client.get(page.get_absolute_url())
         # self.assertTrue(
         #     'https://maps-api-ssl.google.com/maps/api/js' in response.content.decode('utf8').replace("&amp;", "&"))
 
