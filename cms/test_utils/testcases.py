@@ -20,7 +20,7 @@ from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.models import Page
-from cms.models.permissionmodels import GlobalPagePermission
+from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.permissions import set_current_user
@@ -132,12 +132,30 @@ class BaseCMSTestCase(object):
             'can_publish': True,
             'can_change_permissions': False,
             'can_move_page': True,
+            'user': user,
         }
         options.update(**kwargs)
 
-        gpp = GlobalPagePermission.objects.create(user=user, **options)
+        gpp = GlobalPagePermission.objects.create(**options)
         gpp.sites = Site.objects.all()
         return gpp
+
+    def add_page_permission(self, user, page, **kwargs):
+        options = {
+            'can_change': True,
+            'can_delete': True,
+            'can_change_advanced_settings': False,
+            'can_publish': True,
+            'can_change_permissions': False,
+            'can_move_page': True,
+            'page': page,
+            'user': user,
+        }
+        options.update(**kwargs)
+
+        pp = PagePermission.objects.create(**options)
+        pp.sites = Site.objects.all()
+        return pp
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):

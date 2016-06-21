@@ -17,7 +17,8 @@ for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
 
-class PageUserAdmin(admin_class, GenericCmsPermissionAdmin):
+
+class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
     form = PageUserForm
     add_form = PageUserForm
     model = PageUser
