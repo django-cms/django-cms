@@ -445,7 +445,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\">")
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\" >")
             self.assertRegexpMatches(content_de, "en body")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
