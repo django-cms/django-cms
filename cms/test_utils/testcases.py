@@ -19,6 +19,7 @@ from django.utils.translation import activate
 from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
+from cms.api import create_page
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.util.context_managers import UserLoginContext
@@ -126,12 +127,12 @@ class BaseCMSTestCase(object):
 
     def add_global_permission(self, user, **kwargs):
         options = {
-            'can_change': True,
-            'can_delete': True,
+            'can_change': False,
+            'can_delete': False,
             'can_change_advanced_settings': False,
-            'can_publish': True,
+            'can_publish': False,
             'can_change_permissions': False,
-            'can_move_page': True,
+            'can_move_page': False,
             'user': user,
         }
         options.update(**kwargs)
@@ -452,6 +453,25 @@ class BaseCMSTestCase(object):
         opts = model._meta
         url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
         return admin_reverse(url_name, args=args)
+
+    def get_permissions_test_page(self):
+        admin = self.get_superuser()
+        create_page(
+            "home",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+            published=True,
+        )
+        page = create_page(
+            "permissions",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+            published=True,
+            reverse_id='permissions',
+        )
+        return page
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):

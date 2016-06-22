@@ -2,7 +2,6 @@
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
-from cms.api import create_page
 from cms.models.permissionmodels import PageUser
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
@@ -18,8 +17,16 @@ class PermissionsOnTestCase(CMSTestCase):
         query = {PageUser.USERNAME_FIELD: username}
         return PageUser.objects.filter(**query).exists()
 
-    def get_staff_page_user(self, created_by):
-        user = self._create_user("staff pageuser", is_staff=True, is_superuser=False)
+    def get_staff_page_user(self, created_by=None):
+        if not created_by:
+            created_by = self.get_superuser()
+
+        if PageUser.USERNAME_FIELD != "email":
+            username = "perms-testuser"
+        else:
+            username = "perms-testuser@django-cms.org"
+
+        user = self._create_user(username, is_staff=True, is_superuser=False)
         data = model_to_dict(user, exclude=['groups', 'user_permissions'])
         data['user_ptr'] = user
         data['created_by'] = created_by
@@ -38,40 +45,6 @@ class PermissionsOnTestCase(CMSTestCase):
 
         data.update(**kwargs)
         return data
-
-    def get_user(self, created_by=None):
-        if not created_by:
-            created_by = self.get_superuser()
-
-        data = {'created_by': created_by}
-
-        if PageUser.USERNAME_FIELD != "email":
-            data[PageUser.USERNAME_FIELD] = "perms-testuser"
-        else:
-            data[PageUser.USERNAME_FIELD] = "perms-testuser@django-cms.org"
-
-        user = PageUser(**data)
-        user.set_password('changeme')
-        user.save()
-        return user
-
-    def get_page(self):
-        admin = self.get_superuser()
-        create_page(
-            "home",
-            "nav_playground.html",
-            "en",
-            created_by=admin,
-            published=True,
-        )
-        page = create_page(
-            "permissions",
-            "nav_playground.html",
-            "en",
-            created_by=admin,
-            published=True,
-        )
-        return page
 
 
 @override_settings(CMS_PERMISSION=True)
@@ -119,7 +92,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 403)
 
-    def test_user_can_add(self):
+    def test_user_can_add_user(self):
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
         data = self.get_user_dummy_data()
@@ -134,7 +107,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertRedirects(response, endpoint)
             self.assertTrue(self._user_exists())
 
-    def test_user_cant_add(self):
+    def test_user_cant_add_user(self):
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
         data = self.get_user_dummy_data()
@@ -148,10 +121,11 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertFalse(self._user_exists())
 
-    def test_user_can_change(self):
-        user = self.get_user()
+    def test_user_can_change_user(self):
+        user = self.get_staff_page_user()
         endpoint = self.get_admin_url(PageUser, 'change', user.pk)
         staff_user = self.get_staff_user_with_no_permissions()
+
         data = model_to_dict(user, exclude=['date_joined'])
         data['_continue'] = '1'
         data['date_joined_0'] = '2016-06-21'
@@ -172,10 +146,11 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertRedirects(response, endpoint)
             self.assertTrue(self._user_exists(username))
 
-    def test_user_cant_change(self):
-        user = self.get_user()
+    def test_user_cant_change_user(self):
+        user = self.get_staff_page_user()
         endpoint = self.get_admin_url(PageUser, 'change', user.pk)
         staff_user = self.get_staff_user_with_no_permissions()
+
         data = model_to_dict(user, exclude=['date_joined'])
         data['_continue'] = '1'
         data['date_joined_0'] = '2016-06-21'
@@ -196,8 +171,8 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertFalse(self._user_exists(username))
 
-    def test_user_can_delete(self):
-        user = self.get_user()
+    def test_user_can_delete_user(self):
+        user = self.get_staff_page_user()
         endpoint = self.get_admin_url(PageUser, 'delete', user.pk)
         redirect_to = admin_reverse('index')
         staff_user = self.get_staff_user_with_no_permissions()
@@ -212,8 +187,8 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._user_exists())
 
-    def test_user_cant_delete(self):
-        user = self.get_user()
+    def test_user_cant_delete_user(self):
+        user = self.get_staff_page_user()
         endpoint = self.get_admin_url(PageUser, 'delete', user.pk)
         staff_user = self.get_staff_user_with_no_permissions()
         data = {'post': 'yes'}
@@ -235,7 +210,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
     """
 
     def setUp(self):
-        self._permissions_page = self.get_page()
+        self._permissions_page = self.get_permissions_test_page()
 
     def test_user_in_admin_index(self):
         endpoint = admin_reverse('app_list', args=['cms'])
@@ -289,7 +264,11 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 403)
 
-    def test_user_can_add(self):
+    def test_user_can_add_user(self):
+        """
+        User can add new users if can_change_permissions
+        is set to True.
+        """
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
         data = self.get_user_dummy_data()
@@ -308,7 +287,11 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertRedirects(response, endpoint)
             self.assertTrue(self._user_exists())
 
-    def test_user_cant_add(self):
+    def test_user_cant_add_user(self):
+        """
+        User can't add new users if can_change_permissions
+        is set to False.
+        """
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
         data = self.get_user_dummy_data()
@@ -327,23 +310,32 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertFalse(self._user_exists())
 
     def test_user_can_change_subordinate(self):
+        """
+        User can change users he created if can_change_permissions
+        is set to True.
+        """
         staff_user = self.get_staff_user_with_no_permissions()
-        user = self.get_user(created_by=staff_user)
-        endpoint = self.get_admin_url(PageUser, 'change', user.pk)
-        data = model_to_dict(user, exclude=['date_joined'])
+        subordinate = self.get_staff_page_user(created_by=staff_user)
+        endpoint = self.get_admin_url(PageUser, 'change', subordinate.pk)
+
+        data = model_to_dict(subordinate, exclude=['date_joined'])
         data['_continue'] = '1'
         data['date_joined_0'] = '2016-06-21'
         data['date_joined_1'] = '15:00:00'
 
         self.add_permission(staff_user, 'change_pageuser')
-        self.add_global_permission(staff_user, can_change_permissions=True)
+        self.add_page_permission(
+            staff_user,
+            self._permissions_page,
+            can_change_permissions=True,
+        )
 
-        if user.USERNAME_FIELD != "email":
+        if subordinate.USERNAME_FIELD != "email":
             username = "perms-testuser2"
         else:
             username = "perms-testuser+2@django-cms.org"
 
-        data[user.USERNAME_FIELD] = username
+        data[subordinate.USERNAME_FIELD] = username
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
@@ -351,23 +343,32 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertTrue(self._user_exists(username))
 
     def test_user_cant_change_subordinate(self):
+        """
+        User cant change users he created if can_change_permissions
+        is set to False.
+        """
         staff_user = self.get_staff_user_with_no_permissions()
-        user = self.get_user(created_by=staff_user)
-        endpoint = self.get_admin_url(PageUser, 'change', user.pk)
-        data = model_to_dict(user, exclude=['date_joined'])
+        subordinate = self.get_staff_page_user(created_by=staff_user)
+        endpoint = self.get_admin_url(PageUser, 'change', subordinate.pk)
+
+        data = model_to_dict(subordinate, exclude=['date_joined'])
         data['_continue'] = '1'
         data['date_joined_0'] = '2016-06-21'
         data['date_joined_1'] = '15:00:00'
 
         self.add_permission(staff_user, 'change_pageuser')
-        self.add_global_permission(staff_user, can_change_permissions=False)
+        self.add_page_permission(
+            staff_user,
+            self._permissions_page,
+            can_change_permissions=False,
+        )
 
-        if user.USERNAME_FIELD != "email":
+        if subordinate.USERNAME_FIELD != "email":
             username = "perms-testuser2"
         else:
             username = "perms-testuser+2@django-cms.org"
 
-        data[user.USERNAME_FIELD] = username
+        data[subordinate.USERNAME_FIELD] = username
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
@@ -375,7 +376,12 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertFalse(self._user_exists(username))
 
     def test_user_cant_change_self(self):
-        staff_user = self.get_staff_user_with_no_permissions()
+        """
+        User cant change his own user,
+        even with can_change_permissions set to True.
+        """
+        admin = self.get_superuser()
+        staff_user = self.get_staff_page_user(created_by=admin)
         endpoint = self.get_admin_url(PageUser, 'change', staff_user.pk)
 
         data = model_to_dict(staff_user, exclude=['date_joined'])
@@ -384,7 +390,11 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         data['date_joined_1'] = '15:00:00'
 
         self.add_permission(staff_user, 'change_pageuser')
-        self.add_global_permission(staff_user, can_change_permissions=True)
+        self.add_page_permission(
+            staff_user,
+            self._permissions_page,
+            can_change_permissions=True,
+        )
 
         if staff_user.USERNAME_FIELD != "email":
             username = "perms-testuser2"
@@ -398,25 +408,34 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertEqual(response.status_code, 404)
             self.assertFalse(self._user_exists(username))
 
-    def test_user_cant_change_superior(self):
+    def test_user_cant_change_others(self):
+        """
+        User cant change a users created by another user,
+        even with can_change_permissions set to True.
+        """
+        admin = self.get_superuser()
         staff_user = self.get_staff_user_with_no_permissions()
-        superior = self.get_superuser()
-        endpoint = self.get_admin_url(PageUser, 'change', superior.pk)
+        staff_user_2 = self.get_staff_page_user(created_by=admin)
+        endpoint = self.get_admin_url(PageUser, 'change', staff_user_2.pk)
 
-        data = model_to_dict(superior, exclude=['date_joined'])
+        data = model_to_dict(staff_user_2, exclude=['date_joined'])
         data['_continue'] = '1'
         data['date_joined_0'] = '2016-06-21'
         data['date_joined_1'] = '15:00:00'
 
         self.add_permission(staff_user, 'change_pageuser')
-        self.add_global_permission(staff_user, can_change_permissions=True)
+        self.add_page_permission(
+            staff_user,
+            self._permissions_page,
+            can_change_permissions=True,
+        )
 
-        if superior.USERNAME_FIELD != "email":
+        if staff_user_2.USERNAME_FIELD != "email":
             username = "perms-testuser2"
         else:
             username = "perms-testuser+2@django-cms.org"
 
-        data[superior.USERNAME_FIELD] = username
+        data[staff_user_2.USERNAME_FIELD] = username
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
@@ -424,9 +443,13 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertFalse(self._user_exists(username))
 
     def test_user_can_delete_subordinate(self):
+        """
+        User can delete users he created if can_change_permissions
+        is set to True.
+        """
         staff_user = self.get_staff_user_with_no_permissions()
-        user = self.get_user(created_by=staff_user)
-        endpoint = self.get_admin_url(PageUser, 'delete', user.pk)
+        subordinate = self.get_staff_page_user(created_by=staff_user)
+        endpoint = self.get_admin_url(PageUser, 'delete', subordinate.pk)
         redirect_to = admin_reverse('index')
         data = {'post': 'yes'}
 
@@ -444,9 +467,13 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertFalse(self._user_exists())
 
     def test_user_cant_delete_subordinate(self):
+        """
+        User cant delete users he created if can_change_permissions
+        is set to False.
+        """
         staff_user = self.get_staff_user_with_no_permissions()
-        user = self.get_user(created_by=staff_user)
-        endpoint = self.get_admin_url(PageUser, 'delete', user.pk)
+        subordinate = self.get_staff_page_user(created_by=staff_user)
+        endpoint = self.get_admin_url(PageUser, 'delete', subordinate.pk)
         data = {'post': 'yes'}
 
         self.add_permission(staff_user, 'delete_user')
@@ -463,6 +490,10 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertTrue(self._user_exists())
 
     def test_user_cant_delete_self(self):
+        """
+        User cant delete his own user,
+        even with can_change_permissions set to True.
+        """
         admin = self.get_superuser()
         staff_user = self.get_staff_page_user(created_by=admin)
         endpoint = self.get_admin_url(PageUser, 'delete', staff_user.pk)
@@ -487,11 +518,16 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             self.assertEqual(response.status_code, 404)
             self.assertTrue(self._user_exists(username))
 
-    def test_user_cant_delete_superior(self):
+    def test_user_cant_delete_others(self):
+        """
+        User cant delete a user created by another user,
+        even with can_change_permissions set to True.
+        """
         admin = self.get_superuser()
-        superior = self.get_staff_page_user(created_by=admin)
-        endpoint = self.get_admin_url(PageUser, 'delete', superior.pk)
         staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=admin)
+        endpoint = self.get_admin_url(PageUser, 'delete', staff_user_2.pk)
+
         data = {'post': 'yes'}
 
         self.add_permission(staff_user, 'delete_user')
@@ -503,7 +539,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         )
 
         with self.login_user_context(staff_user):
-            username = getattr(superior, superior.USERNAME_FIELD)
+            username = getattr(staff_user_2, staff_user_2.USERNAME_FIELD)
             response = self.client.post(endpoint, data)
             # The response is a 404 instead of a 403
             # because the queryset is limited to objects
