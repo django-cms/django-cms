@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Q
 
 from cms.exceptions import NoPermissionsException
-from cms.models import (Page, PagePermission, GlobalPagePermission,
+from cms.models import (Page, PageUser, PagePermission, GlobalPagePermission,
                         MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
 from cms.utils.conf import get_cms_setting
 
@@ -244,11 +244,16 @@ def get_user_permission_level(user):
         return 0
 
     try:
-        permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__path')[0]
+        permission = (
+            PagePermission
+            .objects
+            .with_can_change_permissions(user)
+            .order_by('page__path')
+        )[0]
     except IndexError:
         # user isn't assigned to any node
         raise NoPermissionsException
-    return permission.page.level
+    return permission.page.depth
 
 
 def get_subordinate_users(user):
@@ -283,24 +288,28 @@ def get_subordinate_users(user):
     """
     if can_change_global_permissions(user):
         return get_user_model().objects.all()
-    site = Site.objects.get_current()
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
+
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
-        # no permission so only staff and no page permissions
+        # user has no Global or Page permissions.
+        # return only staff users created by user
+        # whose page permission record has no page attached.
         qs = get_user_model().objects.distinct().filter(
                 Q(is_staff=True) &
                 Q(pageuser__created_by=user) &
                 Q(pagepermission__page=None)
         )
-        qs = qs.exclude(pk=user.id).exclude(groups__user__pk=user.id)
+        qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
         return qs
+
+    site = Site.objects.get_current()
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__depth__gte=user_level))
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
@@ -314,21 +323,32 @@ def get_subordinate_groups(user):
     """
     if can_change_global_permissions(user):
         return Group.objects.all()
-    site = Site.objects.get_current()
-    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
+
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
+        # user has no Global or Page permissions.
+        # return only groups created by user
+        # whose page permission record has no page attached.
+        groups = (
+            Group
+            .objects
+            .filter(
+                Q(pageusergroup__created_by=user) &
+                Q(pagepermission__page__isnull=True)
+            )
+            .distinct()
+        )
         # no permission no records
         # page_id_allow_list is empty
-        return Group.objects.distinct().filter(
-            Q(pageusergroup__created_by=user) &
-            Q(pagepermission__page=None)
-        )
+        return groups
+
+    site = Site.objects.get_current()
+    page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)
 
     return Group.objects.distinct().filter(
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
-        | (Q(pageusergroup__created_by=user) & Q(pagepermission__page=None))
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__depth__gte=user_level))
+        | (Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True))
     )
 
 

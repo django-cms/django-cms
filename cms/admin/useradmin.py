@@ -8,7 +8,7 @@ from cms.exceptions import NoPermissionsException
 from cms.models import PageUser, PageUserGroup
 from cms.utils.compat.forms import UserAdmin
 from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import get_subordinate_users
+from cms.utils.permissions import get_subordinate_groups, get_subordinate_users
 from django.contrib.admin import site
 
 user_model = get_user_model()
@@ -24,12 +24,13 @@ class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
     model = PageUser
 
     def get_queryset(self, request):
-        qs = super(PageUserAdmin, self).get_queryset(request)
+        queryset = super(PageUserAdmin, self).get_queryset(request)
+
         try:
-            user_id_set = get_subordinate_users(request.user).values_list('id', flat=True)
-            return qs.filter(pk__in=user_id_set)
+            user_ids = get_subordinate_users(request.user).values_list('pk', flat=True)
+            return queryset.filter(pk__in=user_ids)
         except NoPermissionsException:
-            return self.model.objects.get_empty_query_set()
+            return self.model.objects.none()
 
 
 class PageUserGroupAdmin(GenericCmsPermissionAdmin, admin.ModelAdmin):
@@ -42,6 +43,16 @@ class PageUserGroupAdmin(GenericCmsPermissionAdmin, admin.ModelAdmin):
 
     def get_fieldsets(self, request, obj=None):
         return self.update_permission_fieldsets(request, obj)
+
+    def get_queryset(self, request):
+        queryset = super(PageUserGroupAdmin, self).get_queryset(request)
+
+        try:
+            group_ids = get_subordinate_groups(request.user).values_list('pk', flat=True)
+            return queryset.filter(pk__in=group_ids)
+        except NoPermissionsException:
+            return self.model.objects.none()
+
 
 if get_cms_setting('PERMISSION'):
     admin.site.register(PageUser, PageUserAdmin)
