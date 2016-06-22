@@ -75,6 +75,9 @@ class CMSApp(object):
 
     @legacy_menus.setter
     def menus(self, value):
+        warnings.warn('Accessing CMSApp.menus directly is deprecated, '
+                      'and it will be removed in version 3.5; CMSApp.get_menus method',
+                      DeprecationWarning)
         self._menus = value
 
     def get_menus(self, page=None, language=None, **kwargs):
