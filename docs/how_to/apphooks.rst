@@ -204,8 +204,10 @@ To disable this behaviour set ``permissions = False`` on your apphook::
 
     class SampleApp(CMSApp):
         name = _("Sample App")
-        _urls = ["project.sampleapp.urls"]
         permissions = False
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["project.sampleapp.urls"]
 
 If you still want some of your views to use the CMS's permission checks you can enable them via a decorator, ``cms.utils.decorators.cms_perms``
 
