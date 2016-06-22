@@ -445,7 +445,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\">")
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\" >")
             self.assertRegexpMatches(content_de, "en body")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
@@ -464,7 +464,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             link_de = add_plugin(placeholder_en, LinkPlugin, 'de', name='de name', url='http://example.com/de')
             add_plugin(placeholder_en, TextPlugin, 'de',  target=link_de, body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\">")
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\" >")
             self.assertRegexpMatches(content_de, "de body")
 
     def test_plugins_non_default_language_fallback(self):
