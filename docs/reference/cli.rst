@@ -4,12 +4,15 @@
 Command Line Interface
 ######################
 
+..  module:: cms.management
+
 .. highlight:: bash
 
 You can invoke the django CMS command line interface using the ``cms`` Django
 command::
 
     python manage.py cms
+
 
 **********************
 Informational commands
@@ -57,21 +60,22 @@ Identifies and deletes orphaned plugins.
 
 Orphaned plugins are ones that exist in the CMSPlugins table, but:
 
-* have a plugin_type that is no longer even installed
+* have a ``plugin_type`` that is no longer even installed
 * have no corresponding saved instance in that particular plugin type's table
 
 Such plugins will cause problems when trying to use operations that need to copy
 pages (and therefore plugins), which includes ``cms moderator on`` as well as page
 copy operations in the admin.
 
-It is advised to run ``cms list plugins`` periodically, and ``cms
+It is recommended to run ``cms list plugins`` periodically, and ``cms
 delete-orphaned-plugins`` when required.
+
 
 ``cms uninstall``
 =================
 
 The ``uninstall`` subcommand can be used to make uninstalling a CMS
-Plugin or an apphook easier.
+plugin or an apphook easier.
 
 It has two sub-commands:
 
@@ -90,6 +94,7 @@ It has two sub-commands:
 
     The uninstall commands **permanently delete** data from your database.
     You should make a backup of your database before using them!
+
 
 .. _cms-copy-command:
 
