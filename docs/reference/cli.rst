@@ -1,3 +1,5 @@
+.. _management_commands:
+
 ######################
 Command Line Interface
 ######################

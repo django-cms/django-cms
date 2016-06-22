@@ -82,10 +82,13 @@ class CMSApp(object):
         Returns the menus for the apphook instance, eventually selected according
         to the given arguments.
 
-        By default it returns the menus assigned to :py:attr:`CMSApp._menus`
+        By default it returns the menus assigned to :py:attr:`CMSApp._menus`.
 
-        If no page and language si provided, this method **must** return all the
-        menus used by this apphook. Example::
+        If no menus are returned, then the user will need to attach menus to pages
+        manually in the admin.
+
+        This method must return all the menus used by this apphook if no arguments are
+        provided. Example::
 
             if page and page.reverse_id == 'page1':
                 return [Menu1]

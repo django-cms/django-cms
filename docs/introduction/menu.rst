@@ -9,8 +9,15 @@ is still only determined by django CMS Pages.
 We can hook into the django CMS menu system to add our own nodes to that
 navigation menu.
 
-For this we need a file called ``cms_menus.py`` in our application. Add
-``cms_menus.py`` in ``polls_cms_integration/``:
+
+**************************
+Create the navigation menu
+**************************
+
+We create the menu using a :class:`CMSAttachMenu <cms.menu_bases.CMSAttachMenu>` sub-class, and use the ``get_nodes()``
+method to add the nodes.
+
+For this we need a file called ``cms_menus.py`` in our application. Add ``cms_menus.py`` in ``polls_cms_integration/``:
 
 .. code-block:: python
 
@@ -53,21 +60,19 @@ What's happening here:
 * ... and then create a ``NavigationNode`` object from each one
 * ... and return a list of these ``NavigationNodes``
 
-This menu class is not active until attached to the apphook we created earlier.
-So open your ``cms_apps.py`` and add::
+This menu class won't actually do anything until attached to a page. In the *Advanced settings* of the page to which
+you attached the apphook earlier, select "Polls Menu" from the list of *Attached menu* options, and save once more.
+(You could add the menu to any page, but it makes most sense to add it to this page.)
 
-    from polls_cms_integration.cms_menus import PollsMenu
+.. image:: /introduction/images/attach-menu.png
+   :alt: select the 'Polls Menu'
+   :width: 400
+   :align: center
 
-for importing ``PollsMenu`` and::
+You can force the menu to be added automatically to the page by the apphook if you consider this appropriate. See
+:ref:`apphook_menus` for information on how to do that.
 
-    _menus = [PollsMenu]
-
-to the ``PollsApphook`` class.
-
-Any page that is attached to the ``Polls`` application will now have sub-menu
-items for each of the Polls in the database.
-
-.. note::
+..  note::
 
     The point here is to illustrate the basic principles. In this actual case, note that:
 
