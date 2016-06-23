@@ -46,7 +46,7 @@ Create a ``cms_menus.py`` in your application, with the following::
 If you refresh a page you should now see the menu entries above.
 The ``get_nodes`` function should return a list of
 :class:`NavigationNode <menus.base.NavigationNode>` instances. A
-:class:`NavigationNode` takes the following arguments:
+:class:`menus.base.NavigationNode` takes the following arguments:
 
 ``title``
   Text for the menu node
@@ -72,7 +72,7 @@ The ``get_nodes`` function should return a list of
 ``visible=True``
   Whether or not this menu item should be visible
 
-Additionally, each :class:`NavigationNode` provides a number of methods which are
+Additionally, each :class:`menus.base.NavigationNode` provides a number of methods which are
 detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 

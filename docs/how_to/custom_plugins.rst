@@ -71,9 +71,9 @@ A note about :class:`cms.plugin_base.CMSPluginBase`
 ===================================================
 
 :class:`cms.plugin_base.CMSPluginBase` is actually a sub-class of
-:class:`django.contrib.admin.options.ModelAdmin`.
+:class:`django:django.contrib.admin.ModelAdmin`.
 
-Because :class:`CMSPluginBase` sub-classes ``ModelAdmin`` several important
+Because :class:`~cms.plugin_base.CMSPluginBase` sub-classes ``ModelAdmin`` several important
 ``ModelAdmin`` options are also available to CMS plugin developers. These
 options are often used:
 
@@ -193,14 +193,14 @@ is ``True`` (the default):
 * ``get_render_template``: A method that returns a template path to render the
   plugin with.
 
-In addition to those attributes, you can also override the :ref:`render` method
+In addition to those attributes, you can also override the :meth:`~cms.plugin_base.CMSPluginBase.render()` method
 which determines the template context variables that are used to render your
 plugin. By default, this method only adds ``instance`` and ``placeholder``
 objects to your context, but plugins can override this to include any context
 that is required.
 
 A number of other methods are available for overriding on your CMSPluginBase
-sub-classes. See: :mod:`cms.plugin_base` for further details.
+sub-classes. See: :class:`~cms.plugin_base.CMSPluginBase` for further details.
 
 
 ***************
@@ -247,7 +247,7 @@ In our ``models.py`` we add the following::
 If you followed the Django tutorial, this shouldn't look too new to you. The
 only difference to normal models is that you sub-class
 :class:`cms.models.pluginmodel.CMSPlugin` rather than
-:class:`django.db.models.base.Model`.
+:class:`django.db.models.Model`.
 
 Now we need to change our plugin definition to use this model, so our new
 ``cms_plugins.py`` looks like this::
@@ -431,7 +431,7 @@ Plugin form
 ===========
 
 Since :class:`cms.plugin_base.CMSPluginBase` extends
-:class:`django.contrib.admin.options.ModelAdmin`, you can customise the form
+:class:`django:django.contrib.admin.ModelAdmin`, you can customise the form
 for your plugins just as you would customise your admin interfaces.
 
 The template that the plugin editing mechanism uses is
@@ -727,9 +727,9 @@ of placeholders or plugins.
 
 For this purpose you can overwrite 3 methods on CMSPluginBase.
 
-* :ref:`get_extra_placeholder_menu_items`
-* :ref:`get_extra_global_plugin_menu_items`
-* :ref:`get_extra_local_plugin_menu_items`
+* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_placeholder_menu_items`
+* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_global_plugin_menu_items`
+* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_local_plugin_menu_items`
 
 Example::
 
