@@ -10,11 +10,11 @@ Some commonly-used plugins
 
 These are the recommended plugins to use with django CMS.
 
-.. :module:: djangocms_file
+..  module:: djangocms_file
 
-.. :class:: djangocms_file.cms_plugins.FilePlugin
+..  class:: djangocms_file.cms_plugins.FilePlugin
 
-.. important::
+..  important::
     See the note on :ref:`installed_apps` about ordering.
 
 ****
@@ -85,9 +85,9 @@ setting in your project's ``settings.py`` file::
     )
 
 
-.. :module:: djangocms_picture
+..  module:: djangocms_picture
 
-.. :class:: djangocms_picture.cms_plugins.PicturePlugin
+..  class:: djangocms_picture.cms_plugins.PicturePlugin
 
 *******
 Picture
@@ -153,6 +153,8 @@ running.
 Teaser
 ******
 
+..  module:: djangocms_teaser
+
 Available on `GitHub (divio/djangocms-teaser) <http://github.com/divio/djangocms-teaser>`_
 and on `PyPi (djangocms-teaser) <https://pypi.python.org/pypi/djangocms-teaser>`_.
 
@@ -189,9 +191,9 @@ Consider using `djangocms-text-ckeditor
 <https://github.com/divio/djangocms-text-ckeditor>`_ for displaying text. You
 may of course use your preferred editor; others are available.
 
-.. :module:: djangocms_video
+..  module:: djangocms_video
 
-.. :class:: djangocms_video.cms_plugins.VideoPlugin
+..  class:: djangocms_video.cms_plugins.VideoPlugin
 
 *****
 Video
@@ -243,11 +245,11 @@ running.
 .. _django-filer: https://github.com/stefanfoulis/django-filer
 .. _django filer CMS plugin: https://github.com/stefanfoulis/cmsplugin-filer
 
-.. :module:: djangocms_twitter
+..  module:: djangocms_twitter
 
-.. :class:: djangocms_twitter.cms_plugins.TwitterRecentEntriesPlugin
+..  class:: djangocms_twitter.cms_plugins.TwitterRecentEntriesPlugin
 
-.. :class:: djangocms_twitter.cms_plugins.TwitterSearchPlugin
+..  class:: djangocms_twitter.cms_plugins.TwitterSearchPlugin
 
 *******
 Twitter
@@ -260,9 +262,9 @@ We recommend one of the following plugins:
 
 .. warning:: These plugins are not currently compatible with Django 1.7.
 
-.. :module:: djangocms_inherit
+..  module:: djangocms_inherit
 
-.. :class:: djangocms_inherit.cms_plugins.InheritPagePlaceholderPlugin
+..  class:: djangocms_inherit.cms_plugins.InheritPagePlaceholderPlugin
 
 *******
 Inherit

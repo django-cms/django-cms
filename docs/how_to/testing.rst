@@ -11,7 +11,7 @@ Resolving View Names
 
 Your apps need testing, but in your live site they aren't in ``urls.py`` as
 they are attached to a CMS page.  So if you want to be able to use
-:func:`~django.core.urlresolvers.reverse` in your tests, or test templates that
+:func:`~django.urls.reverse()` in your tests, or test templates that
 use the :ttag:`url` template tag, you need to hook up your app to a special
 test version of ``urls.py`` and tell your tests to use that.
 
@@ -27,7 +27,7 @@ So you could create ``myapp/tests/urls.py`` with the following code::
     ]
 
 And then in your tests you can plug this in with the
-:func:`~django.test.utils.override_settings` decorator::
+:func:`~django.test.override_settings` decorator::
 
     from django.test.utils import override_settings
     from cms.test_utils.testcases import CMSTestCase
