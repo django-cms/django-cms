@@ -8,6 +8,7 @@ from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.admin.sites import site, AdminSite
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.utils.http import urlencode
 from django.test.utils import override_settings
@@ -41,7 +42,7 @@ from cms.utils.urlutils import admin_reverse
 from djangocms_text_ckeditor.models import Text
 
 
-class PageAdminTestBase(CMSTestCase):
+class PageTestBase(CMSTestCase):
     """
     The purpose of this class is to provide some basic functionality
     to test methods of the Page admin.
@@ -69,7 +70,7 @@ class PageAdminTestBase(CMSTestCase):
         return self.get_request(post_data=data)
 
 
-class PageAdminTest(PageAdminTestBase):
+class PageTest(PageTestBase):
 
     def tearDown(self):
         cache.clear()
@@ -813,34 +814,730 @@ class PageAdminTest(PageAdminTestBase):
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
 
+class PermissionsTestCase(CMSTestCase):
+
+    def _add_plugin_to_page(self, page, plugin_type, language='en'):
+        plugin_data = {
+            'TextPlugin': {'body': 'text'}
+        }
+        placeholder = page.placeholders.get(slot='body')
+        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
+        page.publish('en')
+        return plugin
+
+    def _add_translation_to_page(self, page):
+        translation = create_title(
+            "de",
+            "permissions-de",
+            page.reload(),
+            slug="permissions-de"
+        )
+        return translation
+
+    def _page_exists(self, reverse_id=None):
+        if not reverse_id:
+            reverse_id = 'permissions'
+        return Page.objects.filter(reverse_id=reverse_id).exists()
+
+    def _translation_exists(self, slug=None, title=None):
+        if not slug:
+            slug = 'permissions-de'
+
+        lookup = Title.objects.filter(slug=slug)
+
+        if title:
+            lookup = lookup.filter(title=title)
+        return lookup.exists()
+
+    def _get_add_plugin_uri(self, page, plugin_type, language='en'):
+        endpoint = self.get_admin_url(Page, 'add_plugin')
+        placeholder = page.placeholders.get(slot='body')
+        uri = endpoint + '?' + urlencode({
+            'plugin_type': plugin_type,
+            'placeholder_id': placeholder.pk,
+            'plugin_language': language,
+        })
+        return uri
+
+    def get_page_dummy_data(self, permissions_inline=False, **kwargs):
+        site = Site.objects.get_current()
+        data = {
+            'title': 'permissions',
+            'slug': 'permissions',
+            'language': 'en',
+            'site': site.pk,
+            'template': 'nav_playground.html',
+        }
+
+        if permissions_inline:
+            permissions = {
+                'pagepermission_set-TOTAL_FORMS': 0,
+                'pagepermission_set-INITIAL_FORMS': 0,
+                'pagepermission_set-MAX_NUM_FORMS': 0,
+                'pagepermission_set-2-TOTAL_FORMS': 0,
+                'pagepermission_set-2-INITIAL_FORMS': 0,
+                'pagepermission_set-2-MAX_NUM_FORMS': 0,
+            }
+            data.update(permissions)
+        data.update(**kwargs)
+        return data
+
+
 @override_settings(CMS_PERMISSION=True)
-class PageAdminPermissionsOnTest(PageAdminTestBase):
+class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_pages_in_admin_index(self):
-        pass
+        endpoint = admin_reverse('app_list', args=['cms'])
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(
+                response,
+                '<a href="/en/admin/cms/page/">Pages</a>',
+                html=True,
+            )
+
+        endpoint = self.get_admin_url(Page, 'changelist')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
 
     def test_pages_not_in_admin_index(self):
-        pass
+        endpoint = admin_reverse('app_list', args=['cms'])
+        staff_user = self.get_staff_user_with_no_permissions()
 
-    def test_page_can_edit(self):
-        pass
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=False)
 
-    def test_page_cant_edit(self):
-        pass
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 404)
 
-    def test_get_permissions(self):
-        page = create_page('test-page', 'nav_playground.html', 'en')
-        url = admin_reverse('cms_page_get_permissions', args=(page.pk,))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/en/admin/login/?next=%s' % (URL_CMS_PAGE_PERMISSIONS % page.pk))
-        admin_user = self.get_superuser()
-        with self.login_user_context(admin_user):
-            response = self.client.get(url)
+        endpoint = self.get_admin_url(Page, 'changelist')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_edit_page_settings(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'change', page.pk)
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self.get_page_dummy_data(slug='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+            self.assertTrue(self._translation_exists(slug='permissions-2'))
+
+    def test_user_cant_edit_page_settings(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'change', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self.get_page_dummy_data(slug='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._translation_exists(slug='permissions-2'))
+
+    def test_user_can_edit_advanced_page_settings(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self.get_page_dummy_data(reverse_id='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+        self.add_global_permission(staff_user, can_change_advanced_settings=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+            self.assertTrue(self._page_exists(reverse_id='permissions-2'))
+
+    def test_user_cant_edit_advanced_page_settings(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self.get_page_dummy_data(reverse_id='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+        self.add_global_permission(staff_user, can_change_advanced_settings=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._page_exists(reverse_id='permissions-2'))
+
+    def test_user_can_delete_empty_page(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        redirect_to = admin_reverse('index')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=True)
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._page_exists())
+
+    def test_user_cant_delete_empty_page(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=False)
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_exists())
+
+    def test_user_can_delete_non_empty_page(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        redirect_to = admin_reverse('index')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self._add_plugin_to_page(page, 'TextPlugin')
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=True)
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._page_exists())
+
+    def test_user_cant_delete_non_empty_page(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self._add_plugin_to_page(page, 'TextPlugin')
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=True)
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_exists())
+
+    def test_user_can_delete_empty_translation(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+        redirect_to = admin_reverse('index')
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=True)
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._translation_exists())
+
+    def test_user_cant_delete_empty_translation(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=False)
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._translation_exists())
+
+    def test_user_can_delete_non_empty_translation(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        redirect_to = admin_reverse('index')
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self._add_plugin_to_page(page, 'TextPlugin', translation.language)
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=True)
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._translation_exists())
+
+    def test_user_cant_delete_non_empty_translation(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self._add_plugin_to_page(page, 'TextPlugin', translation.language)
+
+        self.add_permission(staff_user, 'delete_page')
+        self.add_global_permission(staff_user, can_delete=True)
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._translation_exists())
+
+    def test_user_can_view_page_permissions_summary(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'get_permissions', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'true'}
+
+            response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
-            self.assertTemplateNotUsed(response, 'admin/login.html')
+            self.assertContains(
+                response,
+                "<p>Page doesn't inherit any permissions.</p>",
+                html=True,
+            )
 
-    def test_delete_permissions(self):
+    def test_user_cant_view_page_permissions_summary(self):
+        page = self.get_permissions_test_page()
+        endpoint = self.get_admin_url(Page, 'get_permissions', page.pk)
+        non_staff_user = self.get_standard_user()
+
+        with self.login_user_context(non_staff_user):
+            data = {'post': 'true'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/en/admin/login/?next=%s' % endpoint)
+
+    def test_page_permission_inline_visibility(self):
+        User = get_user_model()
+
+        fields = dict(email='user@domain.com', password='user', is_staff=True)
+
+        if get_user_model().USERNAME_FIELD != 'email':
+            fields[get_user_model().USERNAME_FIELD] = 'user'
+
+        user = User(**fields)
+        user.save()
+        self._give_page_permission_rights(user)
+        page = create_page('A', 'nav_playground.html', 'en')
+        page_permission = PagePermission.objects.create(
+            can_change_permissions=True, user=user, page=page)
+        request = self._get_change_page_request(user, page)
+        page_admin = PageAdmin(Page, AdminSite())
+        page_admin._current_page = page
+        # user has can_change_permission
+        # => must see the PagePermissionInline
+        self.assertTrue(
+            any(type(inline) is PagePermissionInlineAdmin
+                for inline in page_admin.get_inline_instances(request, page)))
+
+        page = Page.objects.get(pk=page.pk)
+        # remove can_change_permission
+        page_permission.can_change_permissions = False
+        page_permission.save()
+        request = self._get_change_page_request(user, page)
+        page_admin = PageAdmin(Page, AdminSite())
+        page_admin._current_page = page
+        # => PagePermissionInline is no longer visible
+        self.assertFalse(
+            any(type(inline) is PagePermissionInlineAdmin
+                for inline in page_admin.get_inline_instances(request, page)))
+
+    def test_user_can_edit_title(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        title = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
+
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(title, fields=['title'])
+            data['title'] = 'permissions-de-2'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(self._translation_exists(title='permissions-de-2'))
+
+    def test_user_cant_edit_title(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        title = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
+
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(title, fields=['title'])
+            data['title'] = 'permissions-de-2'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._translation_exists(title='permissions-de-2'))
+
+    # Plugin related tests
+
+    def test_user_can_add_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        endpoint = self._get_add_plugin_uri(page, 'TextPlugin')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {})
+            self.assertEqual(response.status_code, 302)
+
+    def test_plugin_cant_add(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        endpoint = self._get_add_plugin_uri(page, 'LinkPlugin')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {})
+            print endpoint
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_edit_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_text')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(plugin, fields=['body'])
+            data['text'] = 'new text'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_cant_edit_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_text')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(plugin, fields=['body'])
+            data['text'] = 'new text'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_delete_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_text')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            data = {'post': True}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_cant_delete_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_text')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            data = {'post': True}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_move_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        endpoint = self.get_admin_url(Page, 'move_plugin')
+        placeholder = page.placeholders.get(slot='right-column')
+
+        data = {
+            'plugin_id': plugin.pk,
+            'placeholder_id': placeholder.pk,
+            'plugin_parent': '',
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_text')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_cant_move_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        endpoint = self.get_admin_url(Page, 'move_plugin')
+        placeholder = page.placeholders.get(slot='right-column')
+
+        data = {
+            'plugin_id': plugin.pk,
+            'placeholder_id': placeholder.pk,
+            'plugin_parent': '',
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_text')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_copy_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        translation = self._add_translation_to_page(page)
+        placeholder = page.placeholders.get(slot='right-column')
+        endpoint = self.get_admin_url(Page, 'copy_plugins')
+
+        data = {
+            'source_plugin_id': plugin.pk,
+            'source_placeholder_id': placeholder.pk,
+            'source_language': plugin.language,
+            'target_language': translation.language,
+            'target_placeholder_id': placeholder.pk,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_cant_copy_plugin(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page, 'TextPlugin')
+        translation = self._add_translation_to_page(page)
+        placeholder = page.placeholders.get(slot='right-column')
+        endpoint = self.get_admin_url(Page, 'copy_plugins')
+
+        data = {
+            'source_plugin_id': plugin.pk,
+            'source_placeholder_id': placeholder.pk,
+            'source_language': plugin.language,
+            'target_language': translation.language,
+            'target_placeholder_id': placeholder.pk,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_copy_plugins_to_language(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        plugins = [
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'TextPlugin'),
+        ]
+        placeholder = plugins[0].placeholder
+
+        data = {
+            'source_language': 'en',
+            'target_language': translation.language,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            new_plugins = placeholder.get_plugins(translation.language)
+            self.assertEqual(new_plugins.count(), len(plugins))
+
+    def test_user_cant_copy_plugins_to_language(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        plugins = [
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'TextPlugin'),
+        ]
+        placeholder = plugins[0].placeholder
+
+        data = {
+            'source_language': 'en',
+            'target_language': translation.language,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            new_plugins = placeholder.get_plugins(translation.language)
+            self.assertEqual(new_plugins.count(), 0)
+
+    # Placeholder related tests
+
+    def test_can_clear_placeholder(self):
+        """
+        Ensures a user without delete plugin permissions
+        cannot clear a page placeholder that contains said plugin.
+        """
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        # add text plugin
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # add a link plugin to make sure we test diversity
+        add_plugin(ph, "LinkPlugin", "en", name='link-1')
+        add_plugin(ph, "LinkPlugin", "en", name='link-2')
+
+        # Staff user has basic page permissions but no
+        # plugin permissions.
+        staff = self._get_staff_user()
+        endpoint = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+
+        # Give the staff user permission to delete text plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
+        # Give the staff user permission to delete link plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_link'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ph.get_plugins('en').count(), 0)
+
+    def test_cant_clear_placeholder(self):
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        # add text plugin
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # add a link plugin to make sure we test diversity
+        add_plugin(ph, "LinkPlugin", "en", name='link-1')
+        add_plugin(ph, "LinkPlugin", "en", name='link-2')
+
+        # Staff user has basic page permissions but no
+        # plugin permissions.
+        staff = self._get_staff_user()
+        endpoint = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete text plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+
+@override_settings(CMS_PERMISSION=True)
+class PermissionsOnPageTest(PermissionsTestCase):
+    pass
+
+
+class PermissionsOffTest(PermissionsTestCase):
+
+    def test_can_delete(self):
         admin_user, staff_user = self._get_guys()
         create_page("home", "nav_playground.html", "en",
                            created_by=admin_user, published=True)
@@ -849,20 +1546,6 @@ class PageAdminPermissionsOnTest(PageAdminTestBase):
         body = page.placeholders.get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
-
-        # CMS_PERMISSION is set to True and staff user
-        # has global permissions set.
-        with self.settings(CMS_PERMISSION=True):
-            with self.login_user_context(staff_user):
-                data = {'post': 'yes'}
-                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
-
-                # assert deleting page was successful
-                self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
-
-        page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user, published=True)
 
         # CMS_PERMISSION is set to False and user does not
         # have permission to delete any plugins but the page
@@ -907,62 +1590,44 @@ class PageAdminPermissionsOnTest(PageAdminTestBase):
                 self.assertRedirects(response, URL_CMS_PAGE)
                 self.assertFalse(Page.objects.filter(pk=page.pk).exists())
 
-    def test_delete_translation_permissions(self):
+    def test_cant_delete(self):
         admin_user, staff_user = self._get_guys()
-        page = create_page("delete-page-translation", "nav_playground.html", "en",
+        create_page("home", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        page = create_page("delete-page", "nav_playground.html", "en",
                            created_by=admin_user, published=True)
         body = page.placeholders.get(slot='body')
-        create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
-        create_title("fr", "delete-page-translation-fr", page.reload(), slug="delete-page-translation-fr")
-        add_plugin(body, 'TextPlugin', 'de', body='text')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
 
-        # add a link plugin but never give the user permission to delete it
-        # all our tests target the german translation.
-        # this asserts that a plugin in another language does not interfere
-        # with deleting.
-        link = add_plugin(body, 'LinkPlugin', 'en', name='link-1')
-
-        # CMS_PERMISSION is set to True and staff user
-        # has global permissions set.
-        with self.settings(CMS_PERMISSION=True):
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugins but the page
+        # has no plugins.
+        with self.settings(CMS_PERMISSION=False):
             with self.login_user_context(staff_user):
-                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
 
                 # assert deleting page was successful
                 self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertFalse(page.title_set.filter(language='de').exists())
-                # LinkPlugin should continue to be
-                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
 
-        # the API needs a fresh page object
-        page = page.reload()
-        create_title("de", "delete-page-translation-2", page.reload(), slug="delete-page-translation-2")
-        add_plugin(body, 'TextPlugin', 'de', body='text')
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
 
         # CMS_PERMISSION is set to False and user does not
-        # have permission to delete text plugins
+        # have permission to delete any plugin
         with self.settings(CMS_PERMISSION=False):
             with self.login_user_context(staff_user):
-                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
 
-                # assert deleting page was successful
+                # assert deleting page was unsuccessful
                 self.assertEqual(response.status_code, 403)
-                self.assertTrue(page.title_set.filter(language='de').exists())
-                # LinkPlugin should continue to be
-                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
-
-        # CMS_PERMISSION is set to False and user does not
-        # have permission to delete any plugins but the translation
-        # does not contain plugins
-        with self.settings(CMS_PERMISSION=False):
-            with self.login_user_context(staff_user):
-                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'fr'})
-
-                # assert deleting page was successful
-                self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertFalse(page.title_set.filter(language='fr').exists())
-                # LinkPlugin should continue to be
-                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+                self.assertTrue(Page.objects.filter(pk=page.pk).exists())
 
         # Give the staff user permission to delete text plugins
         staff_user.user_permissions.add(Permission.objects.get(codename='delete_text'))
@@ -971,458 +1636,12 @@ class PageAdminPermissionsOnTest(PageAdminTestBase):
         # permission to delete text plugins
         with self.settings(CMS_PERMISSION=False):
             with self.login_user_context(staff_user):
-                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
 
                 # assert deleting page was successful
                 self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertFalse(page.title_set.filter(language='de').exists())
-                # LinkPlugin should continue to be
-                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
-
-    def test_page_permission_inline_visibility(self):
-        User = get_user_model()
-
-        fields = dict(email='user@domain.com', password='user', is_staff=True)
-
-        if get_user_model().USERNAME_FIELD != 'email':
-            fields[get_user_model().USERNAME_FIELD] = 'user'
-
-        user = User(**fields)
-        user.save()
-        self._give_page_permission_rights(user)
-        page = create_page('A', 'nav_playground.html', 'en')
-        page_permission = PagePermission.objects.create(
-            can_change_permissions=True, user=user, page=page)
-        request = self._get_change_page_request(user, page)
-        page_admin = PageAdmin(Page, AdminSite())
-        page_admin._current_page = page
-        # user has can_change_permission
-        # => must see the PagePermissionInline
-        self.assertTrue(
-            any(type(inline) is PagePermissionInlineAdmin
-                for inline in page_admin.get_inline_instances(request, page)))
-
-        page = Page.objects.get(pk=page.pk)
-        # remove can_change_permission
-        page_permission.can_change_permissions = False
-        page_permission.save()
-        request = self._get_change_page_request(user, page)
-        page_admin = PageAdmin(Page, AdminSite())
-        page_admin._current_page = page
-        # => PagePermissionInline is no longer visible
-        self.assertFalse(
-            any(type(inline) is PagePermissionInlineAdmin
-                for inline in page_admin.get_inline_instances(request, page)))
-
-    def test_permissioned_page_list(self):
-        """
-        Makes sure that a user with restricted page permissions can view
-        the page list.
-        """
-        admin_user, normal_guy = self._get_guys(use_global_permissions=False)
-
-        current_site = Site.objects.get(pk=1)
-        page = create_page("Test page", "nav_playground.html", "en",
-                           site=current_site, created_by=admin_user)
-
-        PagePermission.objects.create(page=page, user=normal_guy)
-
-        with self.login_user_context(normal_guy):
-            resp = self.client.get(URL_CMS_PAGE)
-            self.assertEqual(resp.status_code, 200)
-
-    def test_edit_title_is_allowed_for_staff_user(self):
-        """
-        We check here both the permission on a single page, and the global permissions
-        """
-        user = self._create_user('user', is_staff=True)
-        another_user = self._create_user('another_user', is_staff=True)
-
-        page = create_page('A', 'nav_playground.html', 'en')
-        admin_url = reverse("admin:cms_page_edit_title_fields", args=(
-            page.pk, 'en'
-        ))
-        page_admin = PageAdmin(Page, None)
-        page_admin._current_page = page
-
-        username = getattr(user, get_user_model().USERNAME_FIELD)
-        self.client.login(username=username, password=username)
-        response = self.client.get(admin_url)
-        self.assertEqual(response.status_code, 403)
-
-        assign_user_to_page(page, user, grant_all=True)
-        username = getattr(user, get_user_model().USERNAME_FIELD)
-        self.client.login(username=username, password=username)
-        response = self.client.get(admin_url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        self._give_cms_permissions(another_user)
-        username = getattr(another_user, get_user_model().USERNAME_FIELD)
-        self.client.login(username=username, password=username)
-        response = self.client.get(admin_url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-    def test_edit_does_not_reset_apphook(self):
-        """
-        Makes sure that if a non-superuser with no rights to edit advanced page
-        fields edits a page, those advanced fields are not touched.
-        """
-        OLD_PAGE_NAME = 'Test Page'
-        NEW_PAGE_NAME = 'Test page 2'
-        REVERSE_ID = 'Test'
-        APPLICATION_URLS = 'project.sampleapp.urls'
-
-        admin_user, normal_guy = self._get_guys()
-
-        current_site = Site.objects.get(pk=1)
-
-        # The admin creates the page
-        page = create_page(OLD_PAGE_NAME, "nav_playground.html", "en",
-                           site=current_site, created_by=admin_user)
-        page.reverse_id = REVERSE_ID
-        page.save()
-        title = page.get_title_obj()
-        title.has_url_overwrite = True
-
-        title.save()
-        page.application_urls = APPLICATION_URLS
-        page.save()
-        self.assertEqual(page.get_title(), OLD_PAGE_NAME)
-        self.assertEqual(page.reverse_id, REVERSE_ID)
-        self.assertEqual(page.application_urls, APPLICATION_URLS)
-
-        # The user edits the page (change the page name for ex.)
-        page_data = {
-            'title': NEW_PAGE_NAME,
-            'slug': page.get_slug(),
-            'language': title.language,
-            'site': page.site.pk,
-            'template': page.template,
-            'pagepermission_set-TOTAL_FORMS': 0,
-            'pagepermission_set-INITIAL_FORMS': 0,
-            'pagepermission_set-MAX_NUM_FORMS': 0,
-            'pagepermission_set-2-TOTAL_FORMS': 0,
-            'pagepermission_set-2-INITIAL_FORMS': 0,
-            'pagepermission_set-2-MAX_NUM_FORMS': 0,
-        }
-
-        with self.login_user_context(normal_guy):
-            resp = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, page_data,
-                                    follow=True)
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateNotUsed(resp, 'admin/login.html')
-            page = Page.objects.get(pk=page.pk)
-            self.assertEqual(page.get_title(), NEW_PAGE_NAME)
-            self.assertEqual(page.reverse_id, REVERSE_ID)
-            self.assertEqual(page.application_urls, APPLICATION_URLS)
-            title = page.get_title_obj()
-            # The admin edits the page (change the page name for ex.)
-            page_data = {
-                'title': OLD_PAGE_NAME,
-                'slug': page.get_slug(),
-                'language': title.language,
-                'site': page.site.pk,
-                'template': page.template,
-                'reverse_id': page.reverse_id,
-            }
-
-        with self.login_user_context(admin_user):
-            resp = self.client.post(URL_CMS_PAGE_ADVANCED_CHANGE % page.pk, page_data,
-                                    follow=True)
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateNotUsed(resp, 'admin/login.html')
-            resp = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, page_data,
-                                    follow=True)
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateNotUsed(resp, 'admin/login.html')
-            page = Page.objects.get(pk=page.pk)
-
-            self.assertEqual(page.get_title(), OLD_PAGE_NAME)
-            self.assertEqual(page.reverse_id, REVERSE_ID)
-            self.assertEqual(page.application_urls, '')
-
-    def test_edit_does_not_reset_page_adv_fields(self):
-        """
-        Makes sure that if a non-superuser with no rights to edit advanced page
-        fields edits a page, those advanced fields are not touched.
-        """
-        OLD_PAGE_NAME = 'Test Page'
-        NEW_PAGE_NAME = 'Test page 2'
-        REVERSE_ID = 'Test'
-        OVERRIDE_URL = 'my/override/url'
-
-        admin_user, normal_guy = self._get_guys()
-
-        current_site = Site.objects.get(pk=1)
-
-        # The admin creates the page
-        page = create_page(OLD_PAGE_NAME, "nav_playground.html", "en",
-                           site=current_site, created_by=admin_user)
-        page.reverse_id = REVERSE_ID
-        page.save()
-        title = page.get_title_obj()
-        title.has_url_overwrite = True
-        title.path = OVERRIDE_URL
-        title.save()
-
-        self.assertEqual(page.get_title(), OLD_PAGE_NAME)
-        self.assertEqual(page.reverse_id, REVERSE_ID)
-        self.assertEqual(title.overwrite_url, OVERRIDE_URL)
-
-        # The user edits the page (change the page name for ex.)
-        page_data = {
-            'title': NEW_PAGE_NAME,
-            'slug': page.get_slug(),
-            'language': title.language,
-            'site': page.site.pk,
-            'template': page.template,
-            'pagepermission_set-TOTAL_FORMS': 0,
-            'pagepermission_set-INITIAL_FORMS': 0,
-            'pagepermission_set-MAX_NUM_FORMS': 0,
-            'pagepermission_set-2-TOTAL_FORMS': 0,
-            'pagepermission_set-2-INITIAL_FORMS': 0,
-            'pagepermission_set-2-MAX_NUM_FORMS': 0
-        }
-        # required only if user haves can_change_permission
-        with self.login_user_context(normal_guy):
-            resp = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, page_data,
-                                    follow=True)
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateNotUsed(resp, 'admin/login.html')
-            page = Page.objects.get(pk=page.pk)
-
-            self.assertEqual(page.get_title(), NEW_PAGE_NAME)
-            self.assertEqual(page.reverse_id, REVERSE_ID)
-            title = page.get_title_obj()
-            self.assertEqual(title.overwrite_url, OVERRIDE_URL)
-
-        # The admin edits the page (change the page name for ex.)
-        page_data = {
-            'title': OLD_PAGE_NAME,
-            'slug': page.get_slug(),
-            'language': title.language,
-            'site': page.site.pk,
-            'template': page.template,
-            'reverse_id': page.reverse_id,
-            'pagepermission_set-TOTAL_FORMS': 0,  # required only if user haves can_change_permission
-            'pagepermission_set-INITIAL_FORMS': 0,
-            'pagepermission_set-MAX_NUM_FORMS': 0,
-            'pagepermission_set-2-TOTAL_FORMS': 0,
-            'pagepermission_set-2-INITIAL_FORMS': 0,
-            'pagepermission_set-2-MAX_NUM_FORMS': 0
-        }
-        with self.login_user_context(admin_user):
-            resp = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, page_data,
-                                    follow=True)
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateNotUsed(resp, 'admin/login.html')
-            page = Page.objects.get(pk=page.pk)
-
-            self.assertEqual(page.get_title(), OLD_PAGE_NAME)
-            self.assertEqual(page.reverse_id, REVERSE_ID)
-            title = page.get_title_obj()
-            self.assertEqual(title.overwrite_url, OVERRIDE_URL)
-
-
-@override_settings(CMS_PERMISSION=True)
-class PluginPermissionsOnTest(PageAdminTestBase):
-
-    def test_plugin_add_requires_permissions(self):
-        """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
-        admin = self._get_admin()
-        self._give_cms_permissions(admin)
-
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='admin@django-cms.org', password='admin')
-        else:
-            self.client.login(username='admin', password='admin')
-
-        url = admin_reverse('cms_page_add_plugin') + '?' + urlencode({
-            'plugin_type': 'TextPlugin',
-            'placeholder_id': self._placeholder.pk,
-            'plugin_language': 'en',
-
-        })
-        response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 403)
-        self._give_permission(admin, Text, 'add')
-        response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 302)
-
-    def test_plugin_edit_requires_permissions(self):
-        """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
-        plugin = self._create_plugin()
-        _, normal_guy = self._get_guys()
-
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='test@test.com', password='test@test.com')
-        else:
-            self.client.login(username='test', password='test')
-
-        url = admin_reverse('cms_page_edit_plugin', args=[plugin.id])
-        response = self.client.post(url, dict())
-        self.assertEqual(response.status_code, 403)
-        # After he got the permissions, he can edit the plugin
-        self._give_permission(normal_guy, Text, 'change')
-        response = self.client.post(url, dict())
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-    def test_plugin_remove_requires_permissions(self):
-        """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
-        plugin = self._create_plugin()
-        _, normal_guy = self._get_guys()
-
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='test@test.com', password='test@test.com')
-        else:
-            self.client.login(username='test', password='test')
-
-        url = admin_reverse('cms_page_delete_plugin', args=[plugin.pk])
-        data = dict(plugin_id=plugin.id)
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 403)
-        # After he got the permissions, he can edit the plugin
-        self._give_permission(normal_guy, Text, 'delete')
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 302)
-
-    def test_plugin_move_requires_permissions(self):
-        """User tries to move a plugin but has no permissions. He can move the plugin after he got the permissions"""
-        plugin = self._create_plugin()
-        _, normal_guy = self._get_guys()
-
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='test@test.com', password='test@test.com')
-        else:
-            self.client.login(username='test', password='test')
-
-        url = admin_reverse('cms_page_move_plugin')
-        data = dict(plugin_id=plugin.id,
-                    placeholder_id=self._placeholder.pk,
-                    plugin_parent='',
-        )
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 403)
-        # After he got the permissions, he can edit the plugin
-        self._give_permission(normal_guy, Text, 'change')
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-    def test_plugins_copy_requires_permissions(self):
-        """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
-        plugin = self._create_plugin()
-        _, normal_guy = self._get_guys()
-
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='test@test.com', password='test@test.com')
-        else:
-            self.client.login(username='test', password='test')
-
-        url = admin_reverse('cms_page_copy_plugins')
-        data = dict(source_plugin_id=plugin.id,
-                    source_placeholder_id=self._placeholder.pk,
-                    source_language='en',
-                    target_language='fr',
-                    target_placeholder_id=self._placeholder.pk,
-        )
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 403)
-        # After he got the permissions, he can edit the plugin
-        self._give_permission(normal_guy, Text, 'add')
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-    def test_plugins_copy_language(self):
-        """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
-        self._create_plugin()
-        _, normal_guy = self._get_guys()
-
-        if get_user_model().USERNAME_FIELD != 'email':
-            self.client.login(username='test', password='test')
-        else:
-            self.client.login(username='test@test.com', password='test@test.com')
-
-        self.assertEqual(1, CMSPlugin.objects.all().count())
-        url = admin_reverse('cms_page_copy_language', args=[self._page.pk])
-        data = dict(
-            source_language='en',
-            target_language='fr',
-        )
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 403)
-        # After he got the permissions, he can edit the plugin
-        self._give_permission(normal_guy, Text, 'add')
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertEqual(2, CMSPlugin.objects.all().count())
-
-    def test_plugin_add_with_permissions_redirects(self):
-        admin_user = self._get_admin()
-        self._give_cms_permissions(admin_user)
-        self._give_permission(admin_user, Text, 'add')
-
-        username = getattr(admin_user, get_user_model().USERNAME_FIELD)
-        self.client.login(username=username, password='admin')
-
-        url = admin_reverse('cms_page_add_plugin') + '?' + urlencode({
-            'plugin_type': 'TextPlugin',
-            'placeholder_id': self._placeholder.pk,
-            'plugin_language': 'en',
-        })
-        response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 302)
-
-
-@override_settings(CMS_PERMISSION=True)
-class PlaceholderPermissionOnTest(PageAdminTestBase):
-    pass
-
-    def test_clear_placeholder_permissions_page(self):
-        """
-        Ensures a user without delete plugin permissions
-        cannot clear a page placeholder that contains said plugin.
-        """
-        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
-        ph = page_en.placeholders.get(slot="body")
-
-        # add text plugin
-        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
-        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
-
-        # add a link plugin to make sure we test diversity
-        add_plugin(ph, "LinkPlugin", "en", name='link-1')
-        add_plugin(ph, "LinkPlugin", "en", name='link-2')
-
-        # Staff user has basic page permissions but no
-        # plugin permissions.
-        staff = self._get_staff_user()
-        endpoint = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
-
-        with self.login_user_context(staff):
-            response = self.client.post(endpoint, {'test': 0})
-
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(ph.get_plugins('en').count(), 4)
-
-        # Give the staff user permission to delete text plugins
-        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
-
-        with self.login_user_context(staff):
-            response = self.client.post(endpoint, {'test': 0})
-
-        # Operation results in 403 because staff user does not have
-        # permission to delete links
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(ph.get_plugins('en').count(), 4)
-
-        # Give the staff user permission to delete link plugins
-        staff.user_permissions.add(Permission.objects.get(codename='delete_link'))
-
-        with self.login_user_context(staff):
-            response = self.client.post(endpoint, {'test': 0})
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(ph.get_plugins('en').count(), 0)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.noadmin_urls')
