@@ -1,15 +1,37 @@
-#########################
-Development of django CMS
-#########################
+..  _development-community:
 
-django CMS is developed by a community of developers from across the world,
-with a wide range and levels of skills and expertise. Every contribution,
-however small, is valued.
+##################################
+django CMS's development community
+##################################
 
-As an open source project, anyone is welcome to contribute in whatever form
-they are able, which can include taking part in discussions, filing bug reports,
-proposing improvements, contributing code or documentation, and testing the
-system - amongst others.
+You can join us online:
+
+* in our IRC channel, #django-cms, on ``irc.freenode.net``. If you don't have an IRC client, you can
+  `join our IRC channel using the KiwiIRC web client
+  <https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+* on our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ for
+  **general** django CMS questions and discussion
+* on our `django CMS developers email list
+  <https://groups.google.com/forum/#!forum/django-cms-developers>`_ for discussions about the
+  **development of django CMS**
+
+You can also follow:
+
+* the `Travis Continuous Integration build reports <https://travis-ci.org/divio/django-cms>`_
+* the `@djangocms`_ Twitter account for general announcements
+
+You don't need to be an expert developer to make a valuable contribution - all
+you need is a little knowledge of the system, and a willingness to follow the
+contribution guidelines.
+
+Remember that contributions to the documentation are highly prized, and key to
+the success of the django CMS project.
+
+Development is led by a team of **core developers**, and under the overall
+guidance of a **technical board**.
+
+All activity in the community is governed by our :doc:`code_of_conduct`.
+
 
 ********
 Divio AG
@@ -69,18 +91,6 @@ Finally, the core developers are responsible for setting the tone of the
 community and helping ensure that it continues to be friendly and welcoming to
 all who wish to participate. The values and standards of the community are set
 out in its Code of Conduct.
-
-Commit policy for core developers
-=================================
-
-Except in the case of very minor patches - for example, fixing typos in
-documentation - core developers are not expected to merge their own commits,
-but to follow good practice and have their work reviewed and merged by another
-member of the team.
-
-Similarly, substantial patches with significant implications for the codebase
-from other members of the community should be reviewed and discussed by more
-than one core developer before being accepted.
 
 
 Current core developers
@@ -190,3 +200,9 @@ The current members of the technical board are:
 * Matteo Larghi
 
 The board will co-opt new members as appropriate.
+
+
+.. _security@django-cms.org: mailto:security@django-cms.org
+.. _django-cms-developers: http://groups.google.com/group/django-cms-developers
+.. _freenode: http://freenode.net/
+.. _@djangocms: https://twitter.com/djangocms
