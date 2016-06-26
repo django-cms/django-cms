@@ -5,12 +5,14 @@ from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches, reverse, resolve, NoReverseMatch
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.timezone import now
 
+from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -183,6 +185,42 @@ class ApphooksTestCase(CMSTestCase):
         self.assertFalse(reverse('sample-settings').startswith('//'))
         self.apphook_clear()
 
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
+    def test_multisite_apphooks(self):
+        self.apphook_clear()
+        site1, _ = Site.objects.get_or_create(pk=1)
+        site2, _ = Site.objects.get_or_create(pk=2)
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        home_site_1 = create_page(
+            "home", "nav_playground.html", "en", created_by=superuser, published=True, site=site1
+        )
+        home_site_2 = create_page(
+            "home", "nav_playground.html", "de", created_by=superuser, published=True, site=site2
+        )
+
+        page_1 = create_page(
+            "apphooked-page", "nav_playground.html", "en", created_by=superuser, published=True, parent=home_site_1,
+            apphook=NS_APP_NAME, apphook_namespace="instance"
+        )
+        page_2_1 = create_page(
+            "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_2,
+            site=site1
+        )
+        page_2_2 = create_page(
+            "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_2,
+            site=site2
+        )
+        form = AdvancedSettingsForm(instance=page_1)
+        self.assertFalse(form._check_unique_namespace_instance("instance"))
+
+        form = AdvancedSettingsForm(instance=page_2_1)
+        self.assertTrue(form._check_unique_namespace_instance("instance"))
+
+        form = AdvancedSettingsForm(instance=page_2_2)
+        self.assertFalse(form._check_unique_namespace_instance("instance"))
+
+        self.apphook_clear()
+
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_page_for_apphook(self):
         en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
@@ -233,19 +271,19 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_permissions_preserves_view_name(self):
-            self.create_base_structure(APP_NAME, ['en', 'de'])
+        self.create_base_structure(APP_NAME, ['en', 'de'])
 
-            view_names = (
-                ('sample-settings', 'sample_view'),
-                ('sample-class-view', 'ClassView'),
-                ('sample-class-based-view', 'ClassBasedView'),
-            )
+        view_names = (
+            ('sample-settings', 'sample_view'),
+            ('sample-class-view', 'ClassView'),
+            ('sample-class-based-view', 'ClassBasedView'),
+        )
 
-            with force_language("en"):
-                for url_name, view_name in view_names:
-                    path = reverse(url_name)
-                    match = resolve(path)
-                    self.assertEqual(match.func.__name__, view_name)
+        with force_language("en"):
+            for url_name, view_name in view_names:
+                path = reverse(url_name)
+                match = resolve(path)
+                self.assertEqual(match.func.__name__, view_name)
 
     def test_apphooks_with_excluded_permissions(self):
         en_title = self.create_base_structure('SampleAppWithExcludedPermissions', 'en')
