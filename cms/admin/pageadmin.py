@@ -540,21 +540,25 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         Return true if the current user has permission to add a new page.
         """
-        if get_cms_setting('PERMISSION'):
+        can_add = super(PageAdmin, self).has_add_permission(request)
+
+        if can_add and get_cms_setting('PERMISSION'):
             return permissions.has_page_add_permission_from_request(request)
-        return super(PageAdmin, self).has_add_permission(request)
+        return can_add
 
     def has_change_permission(self, request, obj=None):
         """
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        if get_cms_setting('PERMISSION'):
+        can_change = super(PageAdmin, self).has_change_permission(request, obj)
+
+        if can_change and get_cms_setting('PERMISSION'):
             if obj:
                 return obj.has_change_permission(request)
             else:
                 return permissions.has_page_change_permission(request)
-        return super(PageAdmin, self).has_change_permission(request, obj)
+        return can_change
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -562,12 +566,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Django model instance. If CMS_PERMISSION are in use also takes look to
         object permissions.
         """
-        if get_cms_setting('PERMISSION') and obj is not None:
-            return obj.has_delete_permission(request)
-
         can_delete = super(PageAdmin, self).has_delete_permission(request, obj)
 
         if not can_delete or not obj:
+            return False
+
+        if get_cms_setting('PERMISSION') and not obj.has_delete_permission(request):
             return False
 
         user = request.user
@@ -580,12 +584,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return True
 
     def has_delete_translation_permission(self, request, language, obj=None):
-        if get_cms_setting('PERMISSION') and obj is not None:
-            return obj.has_delete_permission(request)
-
         can_delete = permissions.has_auth_page_permission(request.user, action='delete')
 
         if not can_delete or not obj:
+            return False
+
+        if get_cms_setting('PERMISSION') and not obj.has_delete_permission(request):
             return False
 
         user = request.user
