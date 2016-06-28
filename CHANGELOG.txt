@@ -43,6 +43,8 @@
   mode.
 * Fixed a bug where users with limited permissions could not interact with
   page tree dropdowns.
+* Fixed a bug where Django Compressor could not be used on the sekizai ``js``
+  block.
 
 
 === 3.3.0 (2016-05-26) ===

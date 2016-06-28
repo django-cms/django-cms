@@ -2,6 +2,11 @@
 {% load i18n l10n sekizai_tags %}
 
 <div class="cms-placeholder cms-placeholder-{{ placeholder.pk|unlocalize }}"></div>
+{% language request.toolbar.toolbar_language %}
+<script id="cms-plugin-child-classes-{{ placeholder.pk|unlocalize }}" type="text/cms-template">
+    {% include request.toolbar.drag_item_menu_template %}
+</script>
+{% endlanguage %}
 
 {% endspaceless %}{% addtoblock "js" %}
 {% language request.toolbar.toolbar_language %}
@@ -19,9 +24,6 @@ CMS._plugins.push(['cms-placeholder-{{ placeholder.pk|unlocalize }}', {
         copy_plugin: '{{ placeholder.get_copy_url }}'
     }
 }]);
-</script>
-<script id="cms-plugin-child-classes-{{ placeholder.pk|unlocalize }}" type="text/cms-template">
-    {% include request.toolbar.drag_item_menu_template %}
 </script>
 {% endlanguage %}
 {% endaddtoblock %}
