@@ -41,6 +41,8 @@
 * Added support for tiered ``CMS_PLACEHOLDER_CONF``.
 * Fixed a useless placeholders edit permissions checking when not in edit
   mode.
+* Fixed a bug where users with limited permissions could not interact with
+  page tree dropdowns.
 
 
 === 3.3.0 (2016-05-26) ===
