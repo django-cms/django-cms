@@ -1150,7 +1150,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
             for placeholder in placeholders:
                 plugins = list(
-                    placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
+                    placeholder.get_plugins(language=source_language).order_by('path'))
                 if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
                     return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
                 copy_plugins.copy_plugins_to(plugins, placeholder, target_language)

@@ -227,10 +227,10 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder = Placeholder.objects.create(slot="test")
         output = self.render_template_obj(template, {'placeholder': placeholder}, request)
         self.assertEqual(output, "")
-        self.assertEqual(placeholder.cmsplugin_set.count(), 0)
+        self.assertEqual(placeholder.get_plugins().count(), 0)
 
         add_plugin(placeholder, "TextPlugin", settings.LANGUAGES[0][0], body="test")
-        self.assertEqual(placeholder.cmsplugin_set.count(), 1)
+        self.assertEqual(placeholder.get_plugins().count(), 1)
         placeholder = self.reload(placeholder)
         output = self.render_template_obj(template, {'placeholder': placeholder}, request)
         self.assertEqual(output, "test")
@@ -778,8 +778,8 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         actions = MLNGPlaceholderActions()
         fr = Translations.objects.get(language_code='fr')
         de = Translations.objects.get(language_code='de')
-        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
-        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
+        self.assertEqual(de.placeholder.get_plugins().count(), 0)
 
         new_plugins = actions.copy(de.placeholder, 'fr', 'placeholder', Translations, 'de')
         self.assertEqual(len(new_plugins), 1)
@@ -787,15 +787,15 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         de = self.reload(de)
         fr = self.reload(fr)
 
-        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
-        self.assertEqual(de.placeholder.cmsplugin_set.count(), 1)
+        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
+        self.assertEqual(de.placeholder.get_plugins().count(), 1)
 
     def test_mlng_placeholder_actions_empty_copy(self):
         actions = MLNGPlaceholderActions()
         fr = Translations.objects.get(language_code='fr')
         de = Translations.objects.get(language_code='de')
-        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
-        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
+        self.assertEqual(de.placeholder.get_plugins().count(), 0)
 
         new_plugins = actions.copy(fr.placeholder, 'de', 'placeholder', Translations, 'fr')
         self.assertEqual(len(new_plugins), 0)
@@ -803,8 +803,8 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         de = self.reload(de)
         fr = self.reload(fr)
 
-        self.assertEqual(fr.placeholder.cmsplugin_set.count(), 1)
-        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        self.assertEqual(fr.placeholder.get_plugins().count(), 1)
+        self.assertEqual(de.placeholder.get_plugins().count(), 0)
 
     def test_mlng_placeholder_actions_no_placeholder(self):
         actions = MLNGPlaceholderActions()
@@ -812,7 +812,7 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         de = Translations.objects.get(language_code='de')
         nl = Translations.objects.get(language_code='nl')
         self.assertEqual(nl.placeholder, None)
-        self.assertEqual(de.placeholder.cmsplugin_set.count(), 0)
+        self.assertEqual(de.placeholder.get_plugins().count(), 0)
 
         okay = actions.copy(de.placeholder, 'nl', 'placeholder', Translations, 'de')
         self.assertEqual(okay, False)
