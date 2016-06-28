@@ -69,7 +69,7 @@
     data-col{{ lang|lower|cut:'-' }}='
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
-                <div class="cms-tree-item-inner cms-pagetree-dropdown js-cms-pagetree-dropdown">
+                <div class="cms-tree-item-inner cms-pagetree-dropdown{% if has_change_permission and has_publish_permission %} js-cms-pagetree-dropdown{% endif %}">
                     {% if has_change_permission and has_publish_permission %}
                         <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
                             class="cms-pagetree-dropdown-trigger js-cms-pagetree-dropdown-trigger"
