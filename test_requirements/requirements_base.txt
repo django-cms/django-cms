@@ -10,20 +10,21 @@ selenium
 djangocms-admin-style>=1.0
 django-sekizai>=0.9
 django-classy-tags>=0.7.2
--e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
--e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
--e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
--e git+git://github.com/divio/djangocms-flash.git#egg=djangocms-flash
--e git+git://github.com/divio/djangocms-googlemap.git#egg=djangocms-googlemap
--e git+git://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
--e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
--e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
--e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
--e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
+djangocms-column==1.6
+djangocms-style==1.7
+djangocms-file==1.0
+djangocms-flash==0.3
+djangocms-googlemap<0.5
+djangocms-inherit==0.2.1
+djangocms-picture==0.2
+djangocms-teaser==0.2
+djangocms-video==1.0
+djangocms-link==1.7.2
+djangocms-text-ckeditor>=2.9,<3.0
 https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
 https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
 sphinx
-sphinxcontrib-spelling
+# required until proper release to fix PyPi access over https
+-e git+https://bitbucket.org/dhellmann/sphinxcontrib-spelling.git#egg=sphinxcontrib-spelling
 pyflakes==1.1.0
 pyenchant
-
