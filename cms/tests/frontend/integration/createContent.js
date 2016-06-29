@@ -51,7 +51,7 @@ casper.test.begin('User Add Content', function (test) {
         .waitWhileVisible('.cms-modal-open')
         .then(cms.switchTo('content'))
         .waitWhileVisible('.cms-structure', function () {
-            test.assertSelectorDoesntHaveText('.cms-plugin p', randomText, 'Empty plugin hasn\'t been created');
+            test.assertSelectorDoesntHaveText('.cms-plugin', randomText, 'Empty plugin hasn\'t been created');
         })
         .then(cms.switchTo('structure'))
 
@@ -99,7 +99,7 @@ casper.test.begin('User Add Content', function (test) {
         .waitForUrl(/.*/)
         .then(cms.switchTo('content'))
         .waitUntilVisible('.cms-plugin', function () {
-            test.assertSelectorHasText('.cms-plugin p', randomText, 'Newly created text plugin can be seen on page');
+            test.assertSelectorHasText('.cms-plugin', randomText, 'Newly created text plugin can be seen on page');
         })
         .run(function () {
             test.done();

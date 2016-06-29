@@ -45,6 +45,7 @@ HELPER_SETTINGS = dict(
         'content': 0,
         'permissions': 0,
     },
+    CMS_PAGE_CACHE=False,
     CMS_TOOLBAR_URL__EDIT_ON=cms_toolbar_edit_on,
     # required for integration tests
     LOGIN_URL='/admin/login/?user-login=test',
@@ -119,7 +120,7 @@ def run():
 
     # we use '.runner()', not '.cms()' nor '.run()' because it does not
     # add 'test' argument implicitly
-    runner.runner([sys.argv[0], 'cms', '--cms', 'server'])
+    runner.runner([sys.argv[0], 'cms', '--cms', 'server', '--bind', '0.0.0.0'])
 
 if __name__ == "__main__":
     run()

@@ -371,7 +371,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         output = tag.render(context)
         self.assertEqual(
             output,
-            '<div class="cms-plugin cms-plugin-{0}">Test</div>'.format(
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>Test<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'.format(
                 plugin.pk
             )
         )
@@ -421,8 +421,10 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar.is_staff = True
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)
-        expected = 'cms-plugin cms-plugin-sampleapp-category-add-0 cms-render-model-add'
-        self.assertIn(expected, output)
+        expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
+        expected_end = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
+        self.assertIn(expected_start, output)
+        self.assertIn(expected_end, output)
 
         # Now test that it does NOT render when not in edit mode
         request = RequestFactory().get('/')
@@ -452,9 +454,12 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar.is_staff = True
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)
-        expected = 'cms-plugin cms-plugin-sampleapp-category-add-0 '
-        'cms-render-model-add'
-        self.assertIn(expected, output)
+        expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
+        'cms-render-model-add"></template>'
+        expected_end = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
+        'cms-render-model-add"></template>'
+        self.assertIn(expected_start, output)
+        self.assertIn(expected_end, output)
 
         # Now test that it does NOT render when not in edit mode
         request = RequestFactory().get('/')

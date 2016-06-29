@@ -160,6 +160,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             $(function () {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
+                    return input;
+                });
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
@@ -222,13 +225,13 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('remembers state', function () {
-            spyOn(CMS.StructureBoard.prototype, 'setSettings').and.callFake(function (input) {
+            CMS.API.Helpers.setSettings.and.callFake(function (input) {
                 return input;
             });
             expect(CMS.settings.mode).toEqual('edit');
             board.show();
             expect(CMS.settings.mode).toEqual('structure');
-            expect(CMS.StructureBoard.prototype.setSettings).toHaveBeenCalled();
+            expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
         });
 
         it('shows all placeholders', function () {
@@ -251,13 +254,16 @@ describe('CMS.StructureBoard', function () {
         var board;
         beforeEach(function (done) {
             fixture.load('plugins.html');
-            CMS.settings = {
-                mode: 'edit'
-            };
-            CMS.config = {
-                mode: 'edit'
-            };
             $(function () {
+                CMS.settings = {
+                    mode: 'edit'
+                };
+                CMS.config = {
+                    mode: 'edit'
+                };
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
+                    return input;
+                });
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
@@ -322,43 +328,12 @@ describe('CMS.StructureBoard', function () {
         it('remembers the state', function () {
             board.show();
             expect(CMS.settings.mode).toEqual('structure');
-            spyOn(CMS.StructureBoard.prototype, 'setSettings').and.callFake(function (input) {
+            CMS.API.Helpers.setSettings.and.callFake(function (input) {
                 return input;
             });
             board.hide();
             expect(CMS.settings.mode).toEqual('edit');
-            expect(CMS.StructureBoard.prototype.setSettings).toHaveBeenCalled();
-        });
-
-        it('hides the placeholders', function () {
-            board.show();
-            expect(board.ui.placeholders).toBeVisible();
-            board.hide();
-            expect(board.ui.placeholders).not.toBeVisible();
-        });
-
-        it('shows the plugins', function () {
-            board.show();
-            expect(board.ui.plugins.not(board.ui.render_model)).not.toBeVisible();
-            board.hide();
-            // toBeVisible doesn't work because they are display: inline and have no size
-            board.ui.plugins.each(function () {
-                expect($(this).css('display')).not.toEqual('none');
-            });
-        });
-
-        it('removes resize event for sideframe', function () {
-            board.show();
-            spyOn($.fn, 'off');
-            board.hide();
-            expect($.fn.off).toHaveBeenCalledWith('resize.sideframe');
-        });
-
-        it('triggers `strucutreboard_hidden` event on the window', function () {
-            board.show();
-            spyOn($.fn, 'trigger');
-            board.hide();
-            expect($.fn.trigger).toHaveBeenCalledWith('structureboard_hidden.sideframe');
+            expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
         });
 
         it('triggers `resize` event on the window', function () {
@@ -1088,7 +1063,7 @@ describe('CMS.StructureBoard', function () {
                 var placeholder = $('.cms-draggables').eq(0);
                 placeholder.parent().addClass('cms-draggable-disabled');
                 $('.cms-placeholder-1').remove();
-                pluginEdit.data('settings', { plugin_parent_restriction: [] });
+                pluginEdit.data('cms', { plugin_parent_restriction: [] });
 
                 expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                 expect(board.state).toEqual('mock');
@@ -1101,7 +1076,7 @@ describe('CMS.StructureBoard', function () {
                 var placeholder = $('.cms-draggables').eq(0);
                 placeholder.parent().addClass('cms-clipboard-containers');
                 $('.cms-placeholder-1').remove();
-                pluginEdit.data('settings', { plugin_parent_restriction: [] });
+                pluginEdit.data('cms', { plugin_parent_restriction: [] });
 
                 expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                 expect(board.state).toEqual('mock');
@@ -1113,8 +1088,8 @@ describe('CMS.StructureBoard', function () {
                     var pluginStructure = $('.cms-draggable-1');
                     var placeholder = $('.cms-dragarea-1 > .cms-draggables');
                     var placeholderEdit = $('.cms-placeholder-1');
-                    pluginStructure.data('settings', { plugin_parent_restriction: [] });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: [] });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(false);
                     expect(board.state).toEqual(false);
@@ -1125,8 +1100,8 @@ describe('CMS.StructureBoard', function () {
                     var pluginStructure = $('.cms-draggable-1');
                     var placeholder = $('.cms-dragarea-1 > .cms-draggables');
                     var placeholderEdit = $('.cms-placeholder-1');
-                    pluginStructure.data('settings', { plugin_parent_restriction: [], plugin_type: 'OnlyThisPlugin' });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OnlyThisPlugin' });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, pluginStructure)).toEqual(true);
                     expect(board.state).toEqual(true);
@@ -1141,9 +1116,9 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
-                    parentPluginStructure.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginStructure.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
                     expect(board.state).toEqual(false);
@@ -1158,9 +1133,9 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
-                    parentPluginStructure.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OtherPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginStructure.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OtherPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
                     expect(board.state).toEqual(false);
@@ -1175,9 +1150,9 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
-                    parentPluginStructure.data('settings', { plugin_restriction: [] });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginStructure.data('cms', { plugin_restriction: [] });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
                     expect(board.state).toEqual(true);
@@ -1192,9 +1167,9 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
-                    parentPluginStructure.data('settings', { plugin_restriction: [] });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: [], plugin_type: 'OtherPlugin' });
+                    parentPluginStructure.data('cms', { plugin_restriction: [] });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     // it's important that placeholder is used, and not .cms-draggable-1
                     expect(options.isAllowed($('.cms-draggable-1'), placeholder, $('.cms-draggable-1'))).toEqual(true);
@@ -1212,12 +1187,12 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', {
+                    pluginStructure.data('cms', {
                         plugin_parent_restriction: ['TestPlugin'],
                         plugin_type: 'OtherPlugin'
                     });
-                    parentPluginStructure.data('settings', { plugin_restriction: [], plugin_type: 'TestPlugin' });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    parentPluginStructure.data('cms', { plugin_restriction: [], plugin_type: 'TestPlugin' });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
                     expect(board.state).toEqual(true);
@@ -1232,12 +1207,12 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', {
+                    pluginStructure.data('cms', {
                         plugin_parent_restriction: ['TestPlugin'],
                         plugin_type: 'OtherPlugin'
                     });
-                    parentPluginStructure.data('settings', { plugin_restriction: [], plugin_type: 'OtherType' });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    parentPluginStructure.data('cms', { plugin_restriction: [], plugin_type: 'OtherType' });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(false);
                     expect(board.state).toEqual(false);
@@ -1252,9 +1227,9 @@ describe('CMS.StructureBoard', function () {
 
                     pluginStructure.appendTo(parentPluginStructure.find('> .cms-draggables'));
 
-                    pluginStructure.data('settings', { plugin_parent_restriction: ['0'], plugin_type: 'OtherPlugin' });
-                    parentPluginStructure.data('settings', { plugin_restriction: [], plugin_type: 'OtherType' });
-                    placeholderEdit.data('settings', { plugin_restriction: ['OnlyThisPlugin'] });
+                    pluginStructure.data('cms', { plugin_parent_restriction: ['0'], plugin_type: 'OtherPlugin' });
+                    parentPluginStructure.data('cms', { plugin_restriction: [], plugin_type: 'OtherType' });
+                    placeholderEdit.data('cms', { plugin_restriction: ['OnlyThisPlugin'] });
 
                     expect(options.isAllowed(placeholder, null, $('.cms-draggable-1'))).toEqual(true);
                     expect(board.state).toEqual(true);

@@ -104,13 +104,13 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms-plugin cms-plugin-cms-page-changelist-1">
+    <template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-1"></tempate>
         <h3>Menu</h3>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/another">another</a></li>
             [...]
-    </div>
+    <template class="cms-plugin cms-plugin-end cms-plugin-cms-page-changelist-1"></tempate>
 
 .. warning:
 

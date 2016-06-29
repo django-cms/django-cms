@@ -45,7 +45,7 @@ casper.test.begin('Edit content', function (test) {
         .waitForSelector('.cms-toolbar-expanded', function () {
             this.mouse.doubleclick(
                 // pick a div with class cms-plugin that has a p that has text "Random text"
-                xPath('//div[contains(@class, "cms-plugin ")][.//p[text()[contains(.,"Random text")]]][last()]')
+                xPath('//*[contains(@class, "cms-plugin")][contains(text(), "Random text")]')
             );
         })
         .waitUntilVisible('.cms-modal-open')

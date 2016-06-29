@@ -2,10 +2,17 @@
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base');
 var Plugin = require('../../../static/cms/js/modules/cms.plugins');
+var Modal = require('../../../static/cms/js/modules/cms.modal');
+var Messages = require('../../../static/cms/js/modules/cms.messages');
+var Clipboard = require('../../../static/cms/js/modules/cms.clipboard');
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;
 CMS.Plugin = Plugin;
+CMS.Modal = Modal;
+CMS.Messages = Messages;
+CMS.Clipboard = Clipboard;
+CMS.API.Clipboard = new CMS.Clipboard();
 
 describe('CMS.Plugin', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -37,6 +44,10 @@ describe('CMS.Plugin', function () {
             });
             done();
         });
+    });
+
+    afterEach(function () {
+        Plugin.aliasPluginDuplicatesMap = {};
     });
 
     describe('instance', function () {
@@ -238,14 +249,41 @@ describe('CMS.Plugin', function () {
         });
 
         it('sets its options to the dom node', function () {
-            expect(plugin1.ui.container.data('settings')).toEqual(plugin1.options);
-            expect(plugin2.ui.container.data('settings')).toEqual(plugin2.options);
-            expect(placeholder1.ui.container.data('settings')).toEqual(placeholder1.options);
-            expect(generic.ui.container.data('settings')).toEqual(generic.options);
+            expect(plugin1.ui.container.data('cms')).toEqual(jasmine.arrayContaining([plugin1.options]));
+            expect(plugin2.ui.container.data('cms')).toEqual(jasmine.arrayContaining([plugin2.options]));
+            expect(placeholder1.ui.container.data('cms')).toEqual(placeholder1.options);
+            expect(generic.ui.container.data('cms')).toEqual(jasmine.arrayContaining([generic.options]));
+        });
+
+        it('doesnt reset the ui if the same plugin is initialized twice (alias case)', function () {
+            spyOn(Plugin.prototype, '_setPlugin');
+            spyOn(Plugin.prototype, '_setPlaceholder');
+            spyOn(Plugin.prototype, '_setGeneric');
+            expect(Plugin.aliasPluginDuplicatesMap[plugin1.options.plugin_id]).toEqual(true);
+
+            new CMS.Plugin('cms-plugin-1', {
+                type: 'plugin',
+                plugin_id: 1,
+                plugin_type: 'TextPlugin',
+                placeholder_id: 1,
+                urls: {
+                    add_plugin: '/en/admin/cms/page/add-plugin/',
+                    edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                    move_plugin: '/en/admin/cms/page/move-plugin/',
+                    delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                    copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                }
+            });
+
+            expect(Plugin.aliasPluginDuplicatesMap[plugin1.options.plugin_id]).toEqual(true);
+            expect(Plugin.prototype._setPlugin).not.toHaveBeenCalled();
+            expect(Plugin.prototype._setPlaceholder).not.toHaveBeenCalled();
+            expect(Plugin.prototype._setGeneric).not.toHaveBeenCalled();
         });
 
         it('checks if pasting into this plugin is allowed', function () {
             spyOn(CMS.Plugin.prototype, '_checkIfPasteAllowed');
+            Plugin.aliasPluginDuplicatesMap = {};
 
             plugin1 = new CMS.Plugin('cms-plugin-1', {
                 type: 'plugin',
@@ -259,6 +297,125 @@ describe('CMS.Plugin', function () {
             expect(CMS.Plugin.prototype._checkIfPasteAllowed.calls.count()).toEqual(2);
             generic = new CMS.Plugin('cms-plugin-cms-page-changelist-33');
             expect(CMS.Plugin.prototype._checkIfPasteAllowed.calls.count()).toEqual(2);
+        });
+
+        it('removes the temlpate tags around the plugin markup', function () {
+            expect($('template')).not.toBeInDOM();
+        });
+
+        it('adds correct classes to the markup of the plugin', function () {
+            expect($('.plugin1')).toHaveClass('cms-plugin cms-plugin-1');
+            expect($('.plugin2')).toHaveClass('cms-plugin cms-plugin-2');
+            expect($('.generic')).toHaveClass(
+                'cms-plugin cms-plugin-cms-page-changelist-33 cms-render-model cms-render-model-block'
+            );
+        });
+
+        describe('handles no top-level element in plugin markup', function () {
+            var plugin;
+
+            beforeEach(function (done) {
+                fixture.load('plugins_complex_markup.html');
+                $(function () {
+                    done();
+                });
+            });
+
+            var testsMap = [
+                {
+                    pluginId: 99,
+                    name: 'element + element',
+                    expected: [
+                        '<div class="plugin99-1 cms-plugin cms-plugin-99">element</div>',
+                        '<div class="plugin99-2 cms-plugin cms-plugin-99">and another element</div>'
+                    ]
+                },
+                {
+                    pluginId: 100,
+                    name: 'textnode + element',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-100">\n' +
+                        '        text </cms-plugin>',
+                        '<div class="plugin100 cms-plugin cms-plugin-100">and element</div>'
+                    ]
+                },
+                {
+                    pluginId: 101,
+                    name: 'textnode + element + textnode',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101">text </cms-plugin>',
+                        '<div class="plugin101 cms-plugin cms-plugin-101">element</div>',
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101"> another text</cms-plugin>'
+                    ]
+                },
+                {
+                    pluginId: 102,
+                    name: 'element + textnode',
+                    expected: [
+                        '<div class="plugin102 cms-plugin cms-plugin-102">element</div>',
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-102"> and text\n' +
+                        '        </cms-plugin>'
+                    ]
+                },
+                {
+                    pluginId: 103,
+                    name: 'textnode',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-103">\n' +
+                        '        only text node\n    </cms-plugin>'
+                    ]
+                },
+                {
+                    pluginId: 104,
+                    name: 'textnode + comment',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-104">\n' +
+                        '        text node </cms-plugin>'
+                    ]
+                },
+                {
+                    pluginId: 105,
+                    name: 'comment + textnode',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-105">' +
+                        ' and a text node\n' +
+                        '    </cms-plugin>'
+                    ]
+                },
+                {
+                    pluginId: 106,
+                    name: 'textnode + comment + textnode',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-106">' +
+                        'text node </cms-plugin>',
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-106">' +
+                        ' and a text node\n' +
+                        '    </cms-plugin>'
+                    ]
+                },
+                {
+                    pluginId: 107,
+                    name: 'whitespace textnode + comment + textnode',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-107">' +
+                        ' and a text node\n' +
+                        '    </cms-plugin>'
+                    ]
+                }
+            ];
+
+            testsMap.forEach(function (test) {
+                it('handles ' + test.name, function () {
+                    plugin = new CMS.Plugin('cms-plugin-' + test.pluginId, {
+                        type: 'plugin',
+                        plugin_id: test.pluginId
+                    });
+
+                    expect(plugin.ui.container.map(function (i, el) {
+                        return el.outerHTML;
+                    })).toEqual(test.expected);
+                });
+            });
         });
     });
 
@@ -1059,6 +1216,7 @@ describe('CMS.Plugin', function () {
         });
 
         it('does not reload browser if response does not require it', function () {
+            spyOn(plugin, '_setPosition');
             spyOn($, 'ajax').and.callFake(function (ajax) {
                 ajax.success({
                     reload: false
@@ -1088,7 +1246,15 @@ describe('CMS.Plugin', function () {
                 copy_plugin: 'new-copy-url',
                 newObject: true
             });
-            expect(plugin.ui.container.data('settings').urls).toEqual({
+            expect(plugin.ui.container.data('cms')[0].urls).toEqual({
+                add_plugin: '/en/admin/cms/page/add-plugin/',
+                edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                move_plugin: '/en/admin/cms/page/move-plugin/',
+                delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                copy_plugin: 'new-copy-url',
+                newObject: true
+            });
+            expect(plugin.ui.draggable.data('cms').urls).toEqual({
                 add_plugin: '/en/admin/cms/page/add-plugin/',
                 edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
                 move_plugin: '/en/admin/cms/page/move-plugin/',
