@@ -422,7 +422,7 @@ def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_m
 
     if not items:
         return ''
-    return template.render(Context({'items': items}))
+    return template.render({'items': items})
 
 
 class PageAttribute(AsTag):

@@ -65,10 +65,11 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     if toolbar and isinstance(template, six.string_types):
         template = toolbar.get_cached_template(template)
 
+    context = flatten_context(context)
     if not processors:
         processors = []
     if isinstance(template, six.string_types):
-        content = render_to_string(template, flatten_context(context))
+        content = render_to_string(template, context)
     elif (isinstance(template, Template) or (hasattr(template, 'template') and
           hasattr(template, 'render') and isinstance(template.template, Template))):
         content = template.render(context)
@@ -207,7 +208,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         content = mark_safe("".join(content))
     elif default:
         # should be nodelist from a template
-        content = mark_safe(default.render(context_to_copy))
+        content = mark_safe(default.render(flatten_context(context_to_copy)))
     else:
         content = ''
     context['content'] = content
