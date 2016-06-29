@@ -236,7 +236,7 @@ To be accepted, proposed features should have *at least*:
    the behaviour
  * appropriate test coverage
  * Python 2/3 compatibility
- * South and Django migrations (where applicable)
+ * Django migrations (where applicable)
 
 The pull request description must briefly describe the feature and the intended goal and benefits.
 
@@ -249,7 +249,7 @@ To be accepted, proposed bug fixes should have *at least*:
    the behaviour
  * at least 1 regression test that demonstrates the issue and the fix
  * Python 2/3 compatibility
- * South and Django migrations (where applicable)
+ * Django migrations (where applicable)
 
 The pull request description must briefly describe the bug and the steps for its solution; in case
 the bug has been opened elsewhere, it must be linked in the pull request description, describing

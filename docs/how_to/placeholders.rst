@@ -106,7 +106,7 @@ translated fields::
         )
         placeholder_1 = PlaceholderField('placeholder_1')
 
-        def __unicode__(self):
+        def __str__(self): # use __unicode__() if you are using Python 2
             return self.title
 
 Be sure to combine both hvad's ``TranslatableAdmin`` and :class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` when

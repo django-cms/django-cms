@@ -153,7 +153,7 @@ Create the FAQ ``Entry`` model
 
         objects = AppHookConfigManager()
 
-        def __unicode__(self):
+        def __str__(self): # use __unicode__() if you are using Python 2
             return self.question
 
         class Meta:
