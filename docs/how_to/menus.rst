@@ -90,12 +90,12 @@ Complete example::
 
     class UserMenu(Menu):
         def get_nodes(self, request):
-                return [
-                    NavigationNode(_("Profile"), reverse(profile), 1, attr={'visible_for_anonymous': False}),
-                    NavigationNode(_("Log in"), reverse(login), 3, attr={'visible_for_authenticated': False}),
-                    NavigationNode(_("Sign up"), reverse(logout), 4, attr={'visible_for_authenticated': False}),
-                    NavigationNode(_("Log out"), reverse(logout), 2, attr={'visible_for_anonymous': False}),
-                ]
+            return [
+                NavigationNode(_("Profile"), reverse(profile), 1, attr={'visible_for_anonymous': False}),
+                NavigationNode(_("Log in"), reverse(login), 3, attr={'visible_for_authenticated': False}),
+                NavigationNode(_("Sign up"), reverse(logout), 4, attr={'visible_for_authenticated': False}),
+                NavigationNode(_("Log out"), reverse(logout), 2, attr={'visible_for_anonymous': False}),
+            ]
 
 
 .. _integration_attach_menus:

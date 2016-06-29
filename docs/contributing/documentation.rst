@@ -43,6 +43,12 @@ Now you can test and run the documentation locally using::
 
     make run
 
+``make run`` runs ``make html``, and serves the built documentation on port 8001 (that is, at
+``http://localhost:8001/``.
+
+It then watches the ``docs`` directory; when it spots changes, it will automatically rebuild
+the documentation, and refresh the page in your browser.
+
 This allows you to review your changes in your local browser using ``http://localhost:8001/``.
 
 .. note:: **What this does**
@@ -51,15 +57,10 @@ This allows you to review your changes in your local browser using ``http://loca
 
         virtualenv env
         source env/bin/activate
-        pip install -r requirements.txt
         cd docs
+        pip install -r requirements.txt
         make html
-
-    ``make run`` runs ``make html``, and serves the built documentation on port 8001 (that is, at
-    ``http://localhost:8001/``.
-
-    It then watches the ``docs`` directory; when it spots changes, it will automatically rebuild
-    the documentation, and refresh the page in your browser.
+        sphinx-autobuild . build/html 0.0.0.0 --port 8001
 
 
 .. _spelling:
