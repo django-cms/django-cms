@@ -10,6 +10,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
@@ -21,7 +22,11 @@ from menus.menu_pool import menu_pool
 
 from cms.api import create_page
 from cms.models import Page
-from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.models.permissionmodels import (
+    GlobalPagePermission,
+    PagePermission,
+    PageUser,
+)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.permissions import set_current_user
@@ -143,12 +148,12 @@ class BaseCMSTestCase(object):
 
     def add_page_permission(self, user, page, **kwargs):
         options = {
-            'can_change': True,
-            'can_delete': True,
+            'can_change': False,
+            'can_delete': False,
             'can_change_advanced_settings': False,
-            'can_publish': True,
+            'can_publish': False,
             'can_change_permissions': False,
-            'can_move_page': True,
+            'can_move_page': False,
             'page': page,
             'user': user,
         }
@@ -232,6 +237,21 @@ class BaseCMSTestCase(object):
         """
         standard = self._create_user("standard", is_staff=False, is_superuser=False)
         return standard
+
+    def get_staff_page_user(self, created_by=None):
+        if not created_by:
+            created_by = self.get_superuser()
+
+        if PageUser.USERNAME_FIELD != "email":
+            username = "perms-testuser"
+        else:
+            username = "perms-testuser@django-cms.org"
+
+        user = self._create_user(username, is_staff=True, is_superuser=False)
+        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data['user_ptr'] = user
+        data['created_by'] = created_by
+        return PageUser.objects.create(**data)
 
     def get_new_page_data(self, parent_id=''):
         page_data = {

@@ -36,9 +36,7 @@ from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (
     PageForm, AdvancedSettingsForm, PagePermissionForm, PublicationDatesForm
 )
-from cms.admin.permissionadmin import (
-    PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
-)
+from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
 from cms.constants import (
@@ -263,9 +261,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         else:
             return form.fieldsets
 
-    def get_inline_classes(self, request, obj=None, **kwargs):
+    def get_inline_instances(self, request, obj=None):
         if obj and 'permission' in request.path_info:
-            return PERMISSION_ADMIN_INLINES
+            return super(PageAdmin, self).get_inline_instances(request, obj)
         return []
 
     def get_form_class(self, request, obj=None, **kwargs):
@@ -304,8 +302,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             del form.base_fields['menu_title']
             del form.base_fields['meta_description']
             del form.base_fields['page_title']
-
-        self.inlines = self.get_inline_classes(request, obj, **kwargs)
 
         if obj:
             if 'history' in request.path_info or 'recover' in request.path_info:
@@ -376,22 +372,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not page.has_change_permissions_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'show_permissions': True, 'title': _("Change Permissions")})
-
-    def get_inline_instances(self, request, obj=None):
-        inlines = super(PageAdmin, self).get_inline_instances(request, obj)
-        if get_cms_setting('PERMISSION') and obj:
-            filtered_inlines = []
-            for inline in inlines:
-                if (isinstance(inline, PagePermissionInlineAdmin)
-                and not isinstance(inline, ViewRestrictionInlineAdmin)):
-                    if "recover" in request.path or "history" in request.path:
-                        # do not display permissions in recover mode
-                        continue
-                    if not obj.has_change_permissions_permission(request):
-                        continue
-                filtered_inlines.append(inline)
-            inlines = filtered_inlines
-        return inlines
 
     def get_unihandecode_context(self, language):
         if language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):

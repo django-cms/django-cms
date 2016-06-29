@@ -17,22 +17,7 @@ class PermissionsOnTestCase(CMSTestCase):
         query = {PageUser.USERNAME_FIELD: username}
         return PageUser.objects.filter(**query).exists()
 
-    def get_staff_page_user(self, created_by=None):
-        if not created_by:
-            created_by = self.get_superuser()
-
-        if PageUser.USERNAME_FIELD != "email":
-            username = "perms-testuser"
-        else:
-            username = "perms-testuser@django-cms.org"
-
-        user = self._create_user(username, is_staff=True, is_superuser=False)
-        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
-        data['user_ptr'] = user
-        data['created_by'] = created_by
-        return PageUser.objects.create(**data)
-
-    def get_user_dummy_data(self, **kwargs):
+    def _get_user_data(self, **kwargs):
         data = {
             'password1': 'changeme',
             'password2': 'changeme',
@@ -50,7 +35,9 @@ class PermissionsOnTestCase(CMSTestCase):
 @override_settings(CMS_PERMISSION=True)
 class PermissionsOnGlobalTest(PermissionsOnTestCase):
     """
-    Uses GlobalPermission
+    Tests all user interactions with the page user admin
+    while permissions are set to True and user has
+    global permissions.
     """
 
     def test_user_in_admin_index(self):
@@ -95,7 +82,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
     def test_user_can_add_user(self):
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_user_dummy_data()
+        data = self._get_user_data()
         data['_addanother'] = '1'
 
         self.add_permission(staff_user, 'add_pageuser')
@@ -110,7 +97,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
     def test_user_cant_add_user(self):
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_user_dummy_data()
+        data = self._get_user_data()
 
         self.add_permission(staff_user, 'add_pageuser')
         self.add_permission(staff_user, 'change_pageuser')
@@ -206,7 +193,9 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
 @override_settings(CMS_PERMISSION=True)
 class PermissionsOnPageTest(PermissionsOnTestCase):
     """
-    Uses PagePermission
+    Tests all user interactions with the page user admin
+    while permissions are set to True and user has
+    page permissions.
     """
 
     def setUp(self):
@@ -242,6 +231,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = admin_reverse('app_list', args=['cms'])
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_pageuser')
         self.add_page_permission(
             staff_user,
@@ -271,7 +261,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         """
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_user_dummy_data()
+        data = self._get_user_data()
         data['_addanother'] = '1'
 
         self.add_permission(staff_user, 'add_pageuser')
@@ -294,7 +284,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         """
         endpoint = self.get_admin_url(PageUser, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_user_dummy_data()
+        data = self._get_user_data()
 
         self.add_permission(staff_user, 'add_pageuser')
         self.add_permission(staff_user, 'change_pageuser')

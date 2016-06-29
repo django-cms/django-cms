@@ -66,7 +66,7 @@ class PagePermissionInlineAdmin(TabularInline):
             qs = self.model.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)
         except NoPermissionsException:
-            return self.objects.get_empty_query_set()
+            return self.objects.none()
 
     def get_formset(self, request, obj=None, **kwargs):
         """
@@ -107,11 +107,6 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
     ]
 
     def get_formset(self, request, obj=None, **kwargs):
-        """
-        Some fields may be excluded here. User can change only permissions
-        which are available for him. E.g. if user does not haves can_publish
-        flag, he can't change assign can_publish permissions.
-        """
         formset_cls = super(PagePermissionInlineAdmin, self).get_formset(request, obj, **kwargs)
         qs = self.get_queryset(request)
         if obj is not None:
@@ -120,10 +115,6 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         return formset_cls
 
     def get_queryset(self, request):
-        """
-        Returns a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view.
-        """
         qs = self.model.objects.subordinate_to_user(request.user)
         return qs.filter(can_view=True)
 

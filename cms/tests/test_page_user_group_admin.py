@@ -14,7 +14,7 @@ class PermissionsOnTestCase(CMSTestCase):
             name = 'Test group'
         return PageUserGroup.objects.filter(name=name).exists()
 
-    def get_group_dummy_data(self, **kwargs):
+    def _get_group_data(self, **kwargs):
         data = {
             'name': 'Test group',
             'can_add_page': 'on',
@@ -24,7 +24,7 @@ class PermissionsOnTestCase(CMSTestCase):
         data.update(**kwargs)
         return data
 
-    def get_group(self, created_by=None):
+    def _get_group(self, created_by=None):
         if not created_by:
             created_by = self.get_superuser()
 
@@ -81,7 +81,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
         endpoint = self.get_admin_url(PageUserGroup, 'add')
         redirect_to = admin_reverse('index')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_group_dummy_data()
+        data = self._get_group_data()
 
         self.add_permission(staff_user, 'add_pageusergroup')
         self.add_global_permission(staff_user, can_change_permissions=True)
@@ -94,7 +94,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
     def test_user_cant_add_group(self):
         endpoint = self.get_admin_url(PageUserGroup, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_group_dummy_data()
+        data = self._get_group_data()
 
         self.add_permission(staff_user, 'add_pageusergroup')
         self.add_global_permission(staff_user, can_change_permissions=False)
@@ -105,11 +105,11 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertFalse(self._group_exists())
 
     def test_user_can_change_group(self):
-        group = self.get_group()
+        group = self._get_group()
         endpoint = self.get_admin_url(PageUserGroup, 'change', group.pk)
         redirect_to = self.get_admin_url(PageUserGroup, 'changelist')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_group_dummy_data(name='New test group')
+        data = self._get_group_data(name='New test group')
 
         self.add_permission(staff_user, 'change_pageusergroup')
         self.add_global_permission(staff_user, can_change_permissions=True)
@@ -120,10 +120,10 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertTrue(self._group_exists('New test group'))
 
     def test_user_cant_change_group(self):
-        group = self.get_group()
+        group = self._get_group()
         endpoint = self.get_admin_url(PageUserGroup, 'change', group.pk)
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_group_dummy_data(name='New test group')
+        data = self._get_group_data(name='New test group')
 
         self.add_permission(staff_user, 'change_pageusergroup')
         self.add_global_permission(staff_user, can_change_permissions=False)
@@ -134,7 +134,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertTrue(self._group_exists())
 
     def test_user_can_delete_group(self):
-        group = self.get_group()
+        group = self._get_group()
         endpoint = self.get_admin_url(PageUserGroup, 'delete', group.pk)
         redirect_to = admin_reverse('index')
         staff_user = self.get_staff_user_with_no_permissions()
@@ -150,7 +150,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
             self.assertFalse(self._group_exists())
 
     def test_user_cant_delete_group(self):
-        group = self.get_group()
+        group = self._get_group()
         endpoint = self.get_admin_url(PageUserGroup, 'delete', group.pk)
         staff_user = self.get_staff_user_with_no_permissions()
         data = {'post': 'yes'}
@@ -204,6 +204,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         endpoint = admin_reverse('app_list', args=['cms'])
         staff_user = self.get_staff_user_with_no_permissions()
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_pageusergroup')
         self.add_page_permission(
             staff_user,
@@ -234,7 +235,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         endpoint = self.get_admin_url(PageUserGroup, 'add')
         redirect_to = admin_reverse('index')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_group_dummy_data()
+        data = self._get_group_data()
 
         self.add_permission(staff_user, 'add_pageusergroup')
         self.add_page_permission(
@@ -255,7 +256,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         """
         endpoint = self.get_admin_url(PageUserGroup, 'add')
         staff_user = self.get_staff_user_with_no_permissions()
-        data = self.get_group_dummy_data()
+        data = self._get_group_data()
 
         self.add_permission(staff_user, 'add_pageusergroup')
         self.add_page_permission(
@@ -275,7 +276,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         is set to True.
         """
         staff_user = self.get_staff_user_with_no_permissions()
-        group = self.get_group(created_by=staff_user)
+        group = self._get_group(created_by=staff_user)
         endpoint = self.get_admin_url(PageUserGroup, 'change', group.pk)
         data = model_to_dict(group)
         data['_continue'] = '1'
@@ -299,7 +300,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         is set to False.
         """
         staff_user = self.get_staff_user_with_no_permissions()
-        group = self.get_group(created_by=staff_user)
+        group = self._get_group(created_by=staff_user)
         endpoint = self.get_admin_url(PageUserGroup, 'change', group.pk)
 
         data = model_to_dict(group)
@@ -323,7 +324,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         User cant change a group he's a part of,
         even with can_change_permissions set to True.
         """
-        group = self.get_group()
+        group = self._get_group()
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user.groups.add(group)
         endpoint = self.get_admin_url(PageUserGroup, 'change', group.pk)
@@ -350,7 +351,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         even with can_change_permissions set to True.
         """
         admin = self.get_superuser()
-        group = self.get_group(created_by=admin)
+        group = self._get_group(created_by=admin)
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = self.get_admin_url(PageUserGroup, 'change', group.pk)
 
@@ -376,7 +377,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         is set to True.
         """
         staff_user = self.get_staff_user_with_no_permissions()
-        group = self.get_group(created_by=staff_user)
+        group = self._get_group(created_by=staff_user)
         endpoint = self.get_admin_url(PageUserGroup, 'delete', group.pk)
         redirect_to = admin_reverse('index')
         data = {'post': 'yes'}
@@ -400,7 +401,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         is set to False.
         """
         staff_user = self.get_staff_user_with_no_permissions()
-        group = self.get_group(created_by=staff_user)
+        group = self._get_group(created_by=staff_user)
         endpoint = self.get_admin_url(PageUserGroup, 'delete', group.pk)
         data = {'post': 'yes'}
 
@@ -422,7 +423,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         User cant delete a group he's a part of,
         even with can_change_permissions set to True.
         """
-        group = self.get_group()
+        group = self._get_group()
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user.groups.add(group)
         endpoint = self.get_admin_url(PageUserGroup, 'delete', group.pk)
@@ -452,7 +453,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         even with can_change_permissions set to True.
         """
         admin = self.get_superuser()
-        group = self.get_group(created_by=admin)
+        group = self._get_group(created_by=admin)
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = self.get_admin_url(PageUserGroup, 'delete', group.pk)
         data = {'post': 'yes'}
