@@ -4,6 +4,7 @@ module.exports = function (opts) {
     'use strict';
 
     var PROJECT_PATH = opts.PROJECT_PATH;
+    var CMS_VERSION = opts.CMS_VERSION;
     var debug = opts.debug;
 
     var baseConfig = {
@@ -16,7 +17,7 @@ module.exports = function (opts) {
             'admin.changeform': PROJECT_PATH.js + '/admin.changeform.js'
         },
         output: {
-            path: PROJECT_PATH.js + '/dist/',
+            path: PROJECT_PATH.js + '/dist/' + CMS_VERSION + '/',
             filename: 'bundle.[name].min.js',
             jsonpFunction: 'cmsWebpackJsonp'
         },

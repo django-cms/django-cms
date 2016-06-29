@@ -798,7 +798,7 @@
         margin-top: -1px;
         border: 1px solid $gray-lighter;
         border-right: none;
-        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+        background: $white url('../../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
         image-rendering: pixelated;
 
         &:hover {
@@ -906,7 +906,7 @@
     height: $pagetree-cell-height;
     padding: $pagetree-anchor-padding !important;
     margin-left: -$pagetree-marker-size + 1;
-    background: $color-primary url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+    background: $color-primary url('../../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
     color: $white;
     // copy icon triggered when pressing `CMD`
     .jstree-copy {

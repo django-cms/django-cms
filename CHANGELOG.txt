@@ -5,6 +5,8 @@
   tags and JavaScript is used to add event handlers and plugin data directly to
   the plugin markup. This fixes most of the rendering issues that were present
   because of the extra markup.
+* Changed cache-busting implementation, it is now handled by a path change,
+  not by GET parameter.
 
 
 === 3.3.1 (unreleased) ===

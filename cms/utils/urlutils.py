@@ -61,7 +61,12 @@ def is_media_request(request):
 
 
 def static_with_version(path):
-    return '%s?%s' % (path, cms.__version__)
+    """
+    Changes provided path from `path/to/filename.ext` to `path/to/$CMS_VERSION/filename.ext`
+    """
+    path_re = re.compile('(.*)/([^/]*$)')
+
+    return re.sub(path_re, r'\1/%s/\2' % (cms.__version__), path)
 
 
 def add_url_parameters(url, *args, **params):
