@@ -125,7 +125,7 @@ Functions and constants
     :param plugin_type: What type of plugin to add
     :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
     :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
-    :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
+    :param string position: Position to add this plugin to the placeholder, must be a valid django-treebeard position
     :param target: Parent plugin. Must be plugin instance
     :param data: Data for the plugin type instance
 

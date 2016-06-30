@@ -509,28 +509,6 @@ setting should look like::
 django CMS, as well as its plugins, supports both Django 1.7 and Django 1.6
 migrations.
 
-Since version 3.1, migrations are stored in modules compatible with Django 1.7
-**and** South 1.0.2 without further configuration.
-
-If you're using Django 1.6 and South earlier then version 1.0.2, you may need to
-add this to settings if you also use any of the following plugins::
-
-    SOUTH_MIGRATION_MODULES = {
-        'djangocms_file': 'djangocms_file.south_migrations',
-        'djangocms_googlemap': 'djangocms_googlemap.south_migrations',
-        'djangocms_inherit': 'djangocms_inherit.south_migrations',
-        'djangocms_link': 'djangocms_link.south_migrations',
-        'djangocms_picture': 'djangocms_picture.south_migrations',
-        'djangocms_snippet': 'djangocms_snippet.south_migrations',
-        'djangocms_teaser': 'djangocms_teaser.south_migrations',
-        'djangocms_video': 'djangocms_video.south_migrations',
-        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.south_migrations',
-    }
-
-Note that older versions of some of the above plugins may use non-standard
-locations for South and Django migrations. Please check each installed plugin
-configuration option to see how to configure Django migrations support.
-
 URL configuration
 =================
 

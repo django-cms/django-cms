@@ -230,14 +230,3 @@ Typical symptoms include problems when trying to copy or delete plugins or pages
 
 This commands will fix small corruptions by recalculating the tree information from
  the other parameters
-
-.. _fix-mptt:
-
-``fix-mptt``
-============
-
-Occasionally, the MPTT tree can become corrupted (this is one of the reasons for :doc:`our move
-away from MPTT to MP in django CMS 3.1 </upgrade/3.1>`). Typical symptoms include problems when
-trying to copy or delete plugins or pages.
-
-This command has been removed in django CMS 3.1 </upgrade/3.1>` and replaced with `fix-tree`_.
