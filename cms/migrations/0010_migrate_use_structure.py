@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import warnings
-from django.contrib.auth.models import Permission, Group
-from django.contrib.contenttypes.models import ContentType
 
 from django.conf import settings
 from django.db import models, migrations
 
-
 def forwards(apps, schema_editor):
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    Permission = apps.get_model('auth', 'Permission')
+    Group = apps.get_model('auth', 'Group')
     user_model = apps.get_model(settings.AUTH_USER_MODEL)
     ph_model = apps.get_model('cms', 'Placeholder')
     page_model = apps.get_model('cms', 'Page')
@@ -30,6 +30,9 @@ def forwards(apps, schema_editor):
 
 
 def backwards(apps, schema_editor):
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    Permission = apps.get_model('auth', 'Permission')
+    Group = apps.get_model('auth', 'Group')
     user_model = apps.get_model(settings.AUTH_USER_MODEL)
     ph_model = apps.get_model('cms', 'Placeholder')
     ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
