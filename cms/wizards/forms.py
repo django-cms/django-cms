@@ -56,8 +56,6 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
             'cms/js/modules/cms.wizards.js',
         )
 
-        js = tuple(map(static_with_version, js))
-
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         required=False,

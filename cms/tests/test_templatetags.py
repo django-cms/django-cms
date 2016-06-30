@@ -82,7 +82,7 @@ class TemplatetagTests(CMSTestCase):
         self.assertEqual('"%s"' % today.isoformat()[:-3], json_filter(today))
 
     def test_static_with_version(self):
-        expected = '<script src="/static/cms/css/cms.base.css?%(version)s" type="text/javascript"></script>'
+        expected = '<script src="/static/cms/css/%(version)s/cms.base.css" type="text/javascript"></script>'
         expected = expected % {'version': cms.__version__}
 
         template = (

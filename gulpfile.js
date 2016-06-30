@@ -107,22 +107,6 @@ var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
 
 // #####################################################################################################################
 // #TASKS#
-/**
- * @function cacheBuster
- * @param {Object} opts
- * @param {String} [opts.version]
- * @returns {Function}
- */
-var cacheBuster = function (opts) {
-    var version = opts && opts.version ? opts.version : Math.random();
-
-    return function (css) {
-        css.replaceValues(/__VERSION__/g, { fast: '__VERSION__' }, function () {
-            return version;
-        });
-    };
-};
-
 gulp.task('sass', function () {
     gulp.src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
@@ -133,25 +117,22 @@ gulp.task('sass', function () {
         .pipe(postcss([
             autoprefixer({
                 cascade: false
-            }),
-            cacheBuster({
-                version: CMS_VERSION
             })
         ]))
         .pipe(minifyCss({
             rebase: false
         }))
         .pipe(gulpif(options.debug, sourcemaps.write()))
-        .pipe(gulp.dest(PROJECT_PATH.css));
+        .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
 });
 
 gulp.task('icons', function () {
     gulp.src(PROJECT_PATTERNS.icons)
     .pipe(iconfontCss({
         fontName: 'django-cms-iconfont',
-        fontPath: '../fonts/',
+        fontPath: '../../fonts/' + CMS_VERSION + '/',
         path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-        targetPath: '../sass/components/_iconography.scss'
+        targetPath: '../../sass/components/_iconography.scss'
     }))
     .pipe(iconfont({
         fontName: 'django-cms-iconfont',
@@ -160,7 +141,7 @@ gulp.task('icons', function () {
     .on('glyphs', function (glyphs, opts) {
         gutil.log.bind(glyphs, opts);
     })
-    .pipe(gulp.dest(PROJECT_PATH.icons));
+    .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
 });
 
 gulp.task('lint', ['lint:javascript']);
@@ -207,6 +188,7 @@ var webpackBundle = function (opts) {
 
     webpackOptions.PROJECT_PATH = PROJECT_PATH;
     webpackOptions.debug = options.debug;
+    webpackOptions.CMS_VERSION = CMS_VERSION;
 
     return function (done) {
         var config = require('./webpack.config')(webpackOptions);
