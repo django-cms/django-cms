@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.db.models import Q
 
 from cms.exceptions import NoPermissionsException
-from cms.models import (Page, PageUser, PagePermission, GlobalPagePermission,
+from cms.models import (Page, PagePermission, GlobalPagePermission,
                         MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
 from cms.utils.conf import get_cms_setting
 

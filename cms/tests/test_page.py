@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import signals
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.timezone import now as tz_now
 
 from cms import constants
