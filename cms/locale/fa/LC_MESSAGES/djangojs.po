@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # cafe-click <cafeclick@rocketmail.com>, 2013
@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-26 15:08-0400\n"
-"PO-Revision-Date: 2016-06-03 20:14+0000\n"
+"PO-Revision-Date: 2016-07-01 02:17+0000\n"
 "Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
@@ -18,23 +18,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #: static/cms/js/dist/bundle.admin.base.min.js:5
 #: static/cms/js/dist/bundle.toolbar.min.js:6
 msgid "show"
-msgstr ""
+msgstr "نمایش"
 
 #: static/cms/js/dist/bundle.admin.base.min.js:5
 #: static/cms/js/dist/bundle.toolbar.min.js:6
 msgid "hide"
-msgstr ""
+msgstr "مخفی"
 
 #: static/cms/js/dist/bundle.admin.base.min.js:5
 #: static/cms/js/dist/bundle.toolbar.min.js:6
 msgid "toggle"
-msgstr ""
+msgstr "تغییر وضعیت "
 
 #: static/cms/js/dist/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:74
 msgid "Are you sure you want to change tabs without saving the page first?"
-msgstr "آیا بدون ذخیره صفحه، تَب تغییر کند؟"
+msgstr "آیا مطمئن هستید میخواهید تب‌ها را تغییر دهید بدون اینکه صفحه را از قبل ذخیره کرده باشید؟"
