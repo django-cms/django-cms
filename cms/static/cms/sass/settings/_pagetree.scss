@@ -6,7 +6,7 @@ $pagetree-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 $pagetree-border: 1px solid $gray-lighter;
 
 // top header area
-$pagetree-header-background: lighten($gray-lightest, 2%);
+$pagetree-header-background: $gray-super-lightest;
 $pagetree-header-height: 36px;
 $pagetree-header-padding: 15px 20px;
 $pagetree-header-space: 10px;
