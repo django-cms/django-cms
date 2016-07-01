@@ -334,11 +334,14 @@ The simplified Toolbar API works by deriving your toolbar class from ``Extension
 which provides the following API:
 
 
-* :py:meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
+* :meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
   the environment and do the permission checking;
-* :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin`: for page extensions, retrieves the
+* :py:meth:`~cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin()`: for page extensions, retrieves the
   correct admin URL for the related toolbar item; returns the extension instance (or `None` if not exists)
   and the admin URL for the toolbar item;
-* :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin`: for title extensions, retrieves the
+* :py:meth:`~cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin()`: for title extensions, retrieves the
   correct admin URL for the related toolbar item; returns a list of the extension instances
   (or `None` if not exists) and the admin urls for each title of the current page;
+
+* :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu`
+* :meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`

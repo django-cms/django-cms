@@ -7,6 +7,7 @@ Configuration
 django CMS has a number of settings to configure its behaviour. These should
 be available in your ``settings.py`` file.
 
+
 .. _installed_apps:
 
 ******************************
@@ -43,7 +44,7 @@ the classes as possible.
 Custom User Requirements
 ************************
 
-.. setting:: AUTH_USER_MODEL
+..  setting:: AUTH_USER_MODEL
 
 When using a custom user model (i.e. the ``AUTH_USER_MODEL`` Django setting), there are a few
 requirements that must be met.
@@ -68,13 +69,11 @@ Additionally, the application in which the model is defined **must** be loaded b
     only at the beginning of a project, before the database is created.
 
 
-
-
 *****************
 Required Settings
 *****************
 
-.. setting:: CMS_TEMPLATES
+..  setting:: CMS_TEMPLATES
 
 CMS_TEMPLATES
 =============
@@ -115,7 +114,7 @@ Example::
 Basic Customisation
 *******************
 
-.. setting:: CMS_TEMPLATE_INHERITANCE
+..  setting:: CMS_TEMPLATE_INHERITANCE
 
 CMS_TEMPLATE_INHERITANCE
 ========================
@@ -129,7 +128,7 @@ When enabled, pages' ``Template`` options will include a new default: *Inherit
 from the parent page* (unless the page is a root page).
 
 
-.. setting:: CMS_TEMPLATES_DIR
+..  setting:: CMS_TEMPLATES_DIR
 
 CMS_TEMPLATES_DIR
 =================
@@ -167,7 +166,7 @@ as keys and template names as values::::
 Being a normal python file, templates labels can be passed through gettext
 for translation.
 
-.. note::
+..  note::
 
     As templates are still loaded by the Django template loader, the given
     directory **must** be reachable by the template loading system.
@@ -175,7 +174,7 @@ for translation.
     supported.
 
 
-.. setting:: CMS_PLACEHOLDER_CONF
+..  setting:: CMS_PLACEHOLDER_CONF
 
 CMS_PLACEHOLDER_CONF
 ====================
@@ -385,8 +384,8 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     and just overwrites the ``plugins`` setting to allow ``TeaserPlugin``, thus you
     have not to duplicate the configuration of ``content``.
 
-.. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
+..  setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
 =============================
@@ -398,8 +397,8 @@ A list of plugin context processors. Plugin context processors are callables
 that modify all plugins' context *before* rendering. See
 :doc:`/how_to/custom_plugins` for more information.
 
-.. setting:: CMS_PLUGIN_PROCESSORS
 
+..  setting:: CMS_PLUGIN_PROCESSORS
 
 CMS_PLUGIN_PROCESSORS
 =====================
@@ -411,7 +410,7 @@ A list of plugin processors. Plugin processors are callables that modify all
 plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
 for more information.
 
-.. setting:: CMS_APPHOOKS
+..  setting:: CMS_APPHOOKS
 
 
 CMS_APPHOOKS
@@ -440,10 +439,11 @@ Example::
 I18N and L10N
 *************
 
-.. setting:: CMS_LANGUAGES
-
 CMS_LANGUAGES
 =============
+
+..  setting:: CMS_LANGUAGES
+
 
 default
     Value of :setting:`django:LANGUAGES` converted to this format
@@ -522,8 +522,8 @@ language.
 
 What are the properties a language node can have?
 
-.. setting::code
 
+..  setting:: code
 
 code
 ----
@@ -542,7 +542,7 @@ String. The verbose name of the language.
 .. note:: Is required for every language.
 
 
-.. setting::public
+..  setting:: public
 
 public
 ------
@@ -553,8 +553,8 @@ type
 default
     ``True``
 
-.. setting::fallbacks
 
+..  setting:: fallbacks
 
 fallbacks
 ---------
@@ -566,8 +566,8 @@ example
 default
     ``[]``
 
-.. setting::hide_untranslated
 
+..  setting:: hide_untranslated
 
 hide_untranslated
 -----------------
@@ -578,8 +578,8 @@ type
 default
     ``True``
 
-.. setting::redirect_on_fallback
 
+.. setting:: redirect_on_fallback
 
 redirect_on_fallback
 --------------------
@@ -608,7 +608,7 @@ unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
 :setting:`CMS_UNIHANDECODE_VERSION` must be set.
 
 
-.. setting:: CMS_UNIHANDECODE_HOST
+..  setting:: CMS_UNIHANDECODE_HOST
 
 CMS_UNIHANDECODE_HOST
 ---------------------
@@ -630,7 +630,7 @@ If set to ``None``, the default, unihandecode.js is not used.
     can be cached by the browser for a very long period.
 
 
-.. setting:: CMS_UNIHANDECODE_VERSION
+..  setting:: CMS_UNIHANDECODE_VERSION
 
 CMS_UNIHANDECODE_VERSION
 ------------------------
@@ -644,7 +644,7 @@ URLs for the javascript files. URLs are built like this:
 ``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
 
 
-.. setting:: CMS_UNIHANDECODE_DECODERS
+..  setting:: CMS_UNIHANDECODE_DECODERS
 
 CMS_UNIHANDECODE_DECODERS
 -------------------------
@@ -655,7 +655,7 @@ default
 If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST`, you can add them to this setting.
 
 
-.. setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
+..  setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
 
 CMS_UNIHANDECODE_DEFAULT_DECODER
 --------------------------------
@@ -697,7 +697,8 @@ More documentation is available on `unihandecode.js' Read the Docs <https://unih
 Media Settings
 **************
 
-.. setting:: CMS_MEDIA_PATH
+
+..  setting:: CMS_MEDIA_PATH
 
 CMS_MEDIA_PATH
 ==============
@@ -708,7 +709,7 @@ default
 The path from :setting:`django:MEDIA_ROOT` to the media files located in ``cms/media/``
 
 
-.. setting:: CMS_MEDIA_ROOT
+..  setting:: CMS_MEDIA_ROOT
 
 CMS_MEDIA_ROOT
 ==============
@@ -719,7 +720,7 @@ default
 The path to the media root of the cms media files.
 
 
-.. setting:: CMS_MEDIA_URL
+..  setting:: CMS_MEDIA_URL
 
 CMS_MEDIA_URL
 =============
@@ -730,7 +731,7 @@ default
 The location of the media files that are located in ``cms/media/cms/``
 
 
-.. setting:: CMS_PAGE_MEDIA_PATH
+..  setting:: CMS_PAGE_MEDIA_PATH
 
 CMS_PAGE_MEDIA_PATH
 ===================
@@ -750,7 +751,7 @@ user under which Django will be running.
 Advanced Settings
 *****************
 
-.. setting:: CMS_INTERNAL_IPS
+..  setting:: CMS_INTERNAL_IPS
 
 CMS_INTERNAL_IPS
 ================
@@ -772,7 +773,7 @@ The client IP address is obtained via the :setting:`CMS_REQUEST_IP_RESOLVER`
 in the ``cms.middleware.toolbar.ToolbarMiddleware`` middleware.
 
 
-.. setting:: CMS_REQUEST_IP_RESOLVER
+..  setting:: CMS_REQUEST_IP_RESOLVER
 
 CMS_REQUEST_IP_RESOLVER
 =======================
@@ -790,7 +791,7 @@ The supplied method should accept a single argument `request` and return an
 IP address String.
 
 
-.. setting:: CMS_PERMISSION
+..  setting:: CMS_PERMISSION
 
 CMS_PERMISSION
 ==============
@@ -816,7 +817,7 @@ Naturally he can limit the rights of the users he creates even further,
 allowing them to see only a subset of the pages to which he is allowed access.
 
 
-.. setting:: CMS_RAW_ID_USERS
+..  setting:: CMS_RAW_ID_USERS
 
 CMS_RAW_ID_USERS
 ================
@@ -845,10 +846,10 @@ performance.
           benefit from this setting.
 
 .. versionchanged:: 3.2.1: CMS_RAW_ID_USERS also applies to
-                           :class:`cms.model.GlobalPagePermission`` admin.
+                           ``GlobalPagePermission`` admin.
 
 
-.. setting:: CMS_PUBLIC_FOR
+..  setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR
 ==============
@@ -860,7 +861,7 @@ Determines whether pages without any view restrictions are public by default or
 staff only. Possible values are ``all`` and ``staff``.
 
 
-.. setting:: CMS_CACHE_DURATIONS
+..  setting:: CMS_CACHE_DURATIONS
 
 CMS_CACHE_DURATIONS
 ===================
@@ -879,7 +880,7 @@ template tags.
 
 .. note::
 
-    This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
+    This settings was previously called ``CMS_CONTENT_CACHE_DURATION``
 
 
 ``'menus'``
@@ -892,7 +893,7 @@ Cache expiration (in seconds) for the menu tree.
 
 .. note::
 
-    This settings was previously called :setting:`MENU_CACHE_DURATION`
+    This settings was previously called ``MENU_CACHE_DURATION``
 
 
 ``'permissions'``
@@ -904,7 +905,7 @@ default
 Cache expiration (in seconds) for view and other permissions.
 
 
-.. setting:: CMS_CACHE_PREFIX
+..  setting:: CMS_CACHE_PREFIX
 
 CMS_CACHE_PREFIX
 ================
@@ -921,13 +922,13 @@ Example::
 
     CMS_CACHE_PREFIX = 'mysite-live'
 
-.. note::
+..  note::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs
     on :ref:`cache key prefixing <django:cache_key_prefixing>`
 
 
-.. setting:: CMS_PAGE_CACHE
+..  setting:: CMS_PAGE_CACHE
 
 CMS_PAGE_CACHE
 ==============
@@ -940,7 +941,7 @@ Takes the language, and time zone into account. Pages for logged in users are no
 If the toolbar is visible the page is not cached as well.
 
 
-.. setting:: CMS_PLACEHOLDER_CACHE
+..  setting:: CMS_PLACEHOLDER_CACHE
 
 CMS_PLACEHOLDER_CACHE
 =====================
@@ -953,7 +954,7 @@ Takes the current language and time zone into account. If the toolbar is in edit
 present the placeholders will not be cached.
 
 
-.. setting:: CMS_PLUGIN_CACHE
+..  setting:: CMS_PLUGIN_CACHE
 
 CMS_PLUGIN_CACHE
 ================
@@ -967,7 +968,7 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
     If you disable the plugin cache be sure to restart the server and clear the cache afterwards.
 
 
-.. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
+..  setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
 CMS_MAX_PAGE_HISTORY_REVERSIONS
 ===============================
@@ -1005,7 +1006,7 @@ If set to *0* all published revisions are kept, but you will need to ensure
 that the revision table does not grow excessively large.
 
 
-.. setting:: CMS_TOOLBARS
+..  setting:: CMS_TOOLBARS
 
 CMS_TOOLBARS
 ============
@@ -1069,6 +1070,7 @@ This should be an integer preferably taken from the ``cms.constants`` e.g.
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
 
+
 .. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
 
 CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
@@ -1087,7 +1089,7 @@ Example::
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
 
-.. setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+..  setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 
 CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 ================================
@@ -1098,7 +1100,7 @@ default
 This is the path of the template used to create pages in the wizard. It must be
 one of the templates in :setting:`CMS_TEMPLATES`.
 
-.. setting:: CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+..  setting:: CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 
 CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 ===================================
@@ -1112,7 +1114,8 @@ adding any content supplied in the wizards' "Content" field. If this is left
 unset, then the content will target the first suitable placeholder found on
 the page's template.
 
-.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN
+
+..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN
 
 CMS_PAGE_WIZARD_CONTENT_PLUGIN
 ==============================
@@ -1124,7 +1127,7 @@ This is the name of the plugin created in the Page Wizard when the "Content"
 field is filled in. There should be no need to change it, unless you
 **don't** use ``djangocms-text-ckeditor`` in your project.
 
-.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
 CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 ===================================
@@ -1137,3 +1140,31 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
+
+
+..  setting:: CMS_UNESCAPED_RENDER_MODEL_TAGS
+
+CMS_UNESCAPED_RENDER_MODEL_TAGS
+===================================
+
+..  versionadded:: 3.2.4
+
+default
+    True
+
+To immediately improve the security of your project and to prepare for
+future releases of django CMS and related addons, the project
+administrator should carefully review each use of the ``render_model``
+template tags provided by django CMS. He or she is encouraged to ensure
+that all content which is rendered to a page using this template tag is
+cleansed of any potentially harmful HTML markup, CSS styles or JavaScript.
+Once the administrator or developer is satisfied that the content is
+clean, he or she can add the "safe" filter parameter to the render_model
+template tag if the content should be rendered without escaping. If there
+is no need to render the content unescaped, no further action
+is required.
+
+Once all template tags have been reviewed and adjusted where necessary,
+the administrator should set ``CMS_UNESCAPED_RENDER_MODEL_TAGS = False``
+in the project settings. At that point, the project is more secure and
+will be ready for any future upgrades.

@@ -33,7 +33,7 @@ automatically loaded as long :setting:`CMS_TOOLBARS` is not set (or is set to
 ``None``).
 
 If you use the automated way, your ``cms_toolbars.py`` file should contain
-classes that extend ``cms.toolbar_base.CMSToolbar`` and are registered using :meth:`cms.toolbar_pool.toolbar_pool.register`.
+classes that extend ``cms.toolbar_base.CMSToolbar`` and are registered using :meth:`~cms.toolbar_pool.ToolbarPool.register()`.
 The register function can be used as a decorator.
 
 These classes have four attributes:
@@ -154,7 +154,7 @@ menus::
 
 
 If you wish to simply detect the presence of a menu without actually creating
-it, you can use :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`, which will
+it, you can use :meth:`~cms.toolbar.toolbar.CMSToolbar.get_menu()`, which will
 return the menu if it is present, or, if not, will return ``None``.
 
 

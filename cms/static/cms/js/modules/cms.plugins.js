@@ -1037,52 +1037,58 @@ var Plugin = new Class({
             return false;
         }
         var that = this;
-        var placeholder = $(
-            '<div class="cms-add-plugin-placeholder">' +
-                CMS.config.lang.addPluginPlaceholder +
-            '</div>'
-        );
-        var modal = new Modal({
-            minWidth: 400,
-            minHeight: 400
-        });
-        var dragItem = nav.closest('.cms-dragitem');
-        var isPlaceholder = !dragItem.length;
-        var childrenList;
+        var modal;
         var isTouching;
+        var plugins;
 
-        if (isPlaceholder) {
-            childrenList = nav.closest('.cms-dragarea').find('> .cms-draggables');
-        } else {
-            childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
-        }
+        var initModal = Helpers.once(function initModal() {
+            var placeholder = $(
+                '<div class="cms-add-plugin-placeholder">' +
+                    CMS.config.lang.addPluginPlaceholder +
+                '</div>'
+            );
+            var dragItem = nav.closest('.cms-dragitem');
+            var isPlaceholder = !dragItem.length;
+            var childrenList;
 
-        modal.on('cms.modal.loaded', $.proxy(that._setupKeyboardTraversing, that));
-        modal.on('cms.modal.loaded', function addPlaceholder() {
-            if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
-                that._toggleCollapsable(dragItem);
+            modal = new Modal({
+                minWidth: 400,
+                minHeight: 400
+            });
+
+            if (isPlaceholder) {
+                childrenList = nav.closest('.cms-dragarea').find('> .cms-draggables');
+            } else {
+                childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
             }
-            $('.cms-add-plugin-placeholder').remove();
-            placeholder.appendTo(childrenList);
-            that._scrollToElement(placeholder);
-        });
-        modal.on('cms.modal.closed', function removePlaceholder() {
-            $('.cms-add-plugin-placeholder').remove();
-        });
-        modal.on('cms.modal.shown', function () {
-            var dropdown = $('.cms-modal-markup .cms-plugin-picker');
 
-            if (!isTouching) {
-                // only focus the field if using mouse
-                // otherwise keyboard pops up
-                dropdown.find('input').trigger('focus');
-            }
-            isTouching = false;
+            modal.on('cms.modal.loaded', $.proxy(that._setupKeyboardTraversing, that));
+            modal.on('cms.modal.loaded', function addPlaceholder() {
+                if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
+                    that._toggleCollapsable(dragItem);
+                }
+                $('.cms-add-plugin-placeholder').remove();
+                placeholder.appendTo(childrenList);
+                that._scrollToElement(placeholder);
+            });
+            modal.on('cms.modal.closed', function removePlaceholder() {
+                $('.cms-add-plugin-placeholder').remove();
+            });
+            modal.on('cms.modal.shown', function () {
+                var dropdown = $('.cms-modal-markup .cms-plugin-picker');
+
+                if (!isTouching) {
+                    // only focus the field if using mouse
+                    // otherwise keyboard pops up
+                    dropdown.find('input').trigger('focus');
+                }
+                isTouching = false;
+            });
+
+            plugins = nav.siblings('.cms-plugin-picker');
+
+            that._setupQuickSearch(plugins);
         });
-
-        var plugins = nav.siblings('.cms-plugin-picker');
-
-        that._setupQuickSearch(plugins);
 
         nav.on(this.touchStart, function (e) {
             isTouching = true;
@@ -1096,11 +1102,14 @@ var Plugin = new Class({
 
             Plugin._hideSettingsMenu();
 
+            initModal();
+
             // since we don't know exact plugin parent (because dragndrop)
             // we need to know the parent id by the time we open "add plugin" dialog
             var pluginsCopy = plugins.clone(true, true).data(
                 'parentId', that._getId(nav.closest('.cms-draggable'))
             ).append(that._getPossibleChildClasses());
+
 
             modal.open({
                 title: that.options.addPluginHelpTitle,
@@ -1208,14 +1217,15 @@ var Plugin = new Class({
      */
     _setupActions: function _setupActions(nav) {
         var items = '.cms-submenu-edit, .cms-submenu-item a';
+        var parent = nav.parent();
 
-        nav.parent().find('.cms-submenu-edit').on(this.touchStart, function (e) {
+        parent.find('.cms-submenu-edit').on(this.touchStart, function (e) {
             // required on some touch devices so
             // ui touch punch is not triggering mousemove
             // which in turn results in pep triggering pointercancel
             e.stopPropagation();
         });
-        nav.parent().find(items).on(this.click, nav, this._delegate.bind(this));
+        parent.find(items).on(this.click, nav, this._delegate.bind(this));
     },
 
     /**
@@ -1500,22 +1510,20 @@ var Plugin = new Class({
         var that = this;
 
         this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
-        var dragitem = this.ui.draggable.find('> .cms-dragitem');
-
         // cancel here if its not a draggable
         if (!this.ui.draggable.length) {
             return false;
         }
 
-        // check which button should be shown for collapsemenu
-        this.ui.draggable.each(function (index, item) {
-            var els = $(item).find('.cms-dragitem-collapsable');
-            var open = els.filter('.cms-dragitem-expanded');
+        var dragitem = this.ui.draggable.find('> .cms-dragitem');
 
-            if (els.length === open.length && (els.length + open.length !== 0)) {
-                $(item).find('.cms-dragbar-title').addClass('cms-dragbar-title-expanded');
-            }
-        });
+        // check which button should be shown for collapsemenu
+        var els = this.ui.draggable.find('.cms-dragitem-collapsable');
+        var open = els.filter('.cms-dragitem-expanded');
+
+        if (els.length === open.length && (els.length + open.length !== 0)) {
+            this.ui.draggable.find('.cms-dragbar-title').addClass('cms-dragbar-title-expanded');
+        }
 
         // attach events to draggable
         // debounce here required because on some devices click is not triggered,

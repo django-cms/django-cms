@@ -20,10 +20,10 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 
 .. warning::
 
-    By default and for consistency with previous releases, templatetags used
+    By default and for consistency with previous releases, template tags used
     by this feature mark as safe the content of the rendered
     model attribute. This may be a security risk if used on fields which may
-    hold non-trusted content. Be aware, and use the templatetags accordingly.
+    hold non-trusted content. Be aware, and use the template tags accordingly.
     To change this behaviour, set the setting: :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS` to False.
 
 
@@ -154,7 +154,7 @@ template tag::
     <h1>{% render_model instance "some_attribute" %}</h1>
     {% endblock content %}
 
-See :ttag:`templatetag reference <render_model>` for arguments documentation.
+See :ttag:`template tag reference <render_model>` for arguments documentation.
 
 
 Selected fields edit
@@ -215,7 +215,7 @@ evaluated with ``request`` as parameter.
 The custom view does not need to obey any specific interface; it will get
 ``edit_fields`` value as a ``GET`` parameter.
 
-See :ttag:`templatetag reference <render_model>` for arguments documentation.
+See :ttag:`template tag reference <render_model>` for arguments documentation.
 
 Example ``view_url``::
 

@@ -1066,12 +1066,18 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms-placeholder cms-placeholder-{0}"></div>\n'
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{1}"></template>'
-            '{2}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{1}"></template></h1>'.format(ex1.placeholder.pk,
-                                                                           plugin.pk, render_placeholder_body)
-            )
+            '<h1><div class="cms-placeholder cms-placeholder-{0}"></div>'.format(ex1.placeholder.pk))
+
+        self.assertContains(
+            response,
+            '<script id="cms-plugin-child-classes-{0}" type="text/cms-template">'.format(ex1.placeholder.pk))
+
+        self.assertContains(
+            response,
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>'
+            '{1}'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template></h1>'.format(
+                                                                           plugin.pk, render_placeholder_body))
 
         self.assertContains(
             response,

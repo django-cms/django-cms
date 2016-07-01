@@ -173,7 +173,7 @@ In your poll application’s ``models.py`` add the following:
 
 .. note::
 
-    django CMS plugins inherit from :class:`cms.models.CMSPlugin` (or a
+    django CMS plugins inherit from :class:`cms.models.pluginmodel.CMSPlugin` (or a
     sub-class thereof) and not :class:`models.Model <django.db.models.Model>`.
 
     ``PollPluginModel`` might seem an odd choice for a model name (that is, with ``model`` in the
@@ -213,7 +213,7 @@ For our poll plugin, we're going to write the following plugin class:
 .. note::
 
     All plugin classes must inherit from :class:`cms.plugin_base.CMSPluginBase`
-    and must register themselves with the :data:`cms.plugin_pool.plugin_pool`.
+    and must register themselves with the :class:`plugin_pool <cms.plugin_pool.PluginPool>`.
 
 A reasonable convention for plugin naming is:
 

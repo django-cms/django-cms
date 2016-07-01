@@ -107,8 +107,8 @@ can publish changes to the public site.
     will fail and leave bad data in your database. See :ref:`cms-list-command`
     and :ref:`cms-delete-orphaned-plugins-command`.
 
-    Also, check if all your plugins define a
-    :meth:`~cms.models.CMSPlugin.copy_relations` method if required. You can do
+    Also, check that all your plugins define a
+    :meth:`~cms.models.pluginmodel.CMSPlugin.copy_relations()` method if required. You can do
     this by running ``manage.py cms check`` and read the *Presence of
     "copy_relations"* section. See :ref:`handling-relations` for guidance on
     this topic.
@@ -360,7 +360,7 @@ to the way revisions are handled for pages.
 Changes to the show_sub_menu template tag
 =========================================
 
-the :ttag:`show_sub_menu` has received two new parameters.
+The :ttag:`show_sub_menu` has received two new parameters.
 The first stays the same and is still: how many levels of menu should be displayed.
 
 The second: ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
@@ -372,9 +372,8 @@ The third argument: ``nephews`` (default=100), specifies how many levels of neph
 PlaceholderAdmin support i18n
 =============================
 
-
 If you use placeholders in other apps or models we now support more than one language out of the box.
-If you just use the :class:`PlaceholderAdmin` it will display language tabs like the cms. If you
+If you just use ``PlaceholderAdmin`` it will display language tabs like the cms. If you
 use `django-hvad`_ it uses the hvad language tabs.
 
 If you want to disable this behaviour you can set ``render_placeholder_language_tabs = False`` on your Admin
