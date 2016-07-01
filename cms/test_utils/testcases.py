@@ -246,14 +246,14 @@ class BaseCMSTestCase(object):
         if not created_by:
             created_by = self.get_superuser()
 
-        if PageUser.USERNAME_FIELD != "email":
-            username = "perms-testuser"
-        else:
-            username = "perms-testuser@django-cms.org"
-
-        user = self._create_user(username, is_staff=True, is_superuser=False)
+        parent_link_field = list(PageUser._meta.parents.values())[0]
+        user = self._create_user(
+            'perms-testuser',
+            is_staff=True,
+            is_superuser=False,
+        )
         data = model_to_dict(user, exclude=['groups', 'user_permissions'])
-        data['user_ptr'] = user
+        data[parent_link_field.name] = user
         data['created_by'] = created_by
         return PageUser.objects.create(**data)
 

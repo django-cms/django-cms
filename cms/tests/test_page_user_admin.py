@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
@@ -30,6 +31,9 @@ class PermissionsOnTestCase(CMSTestCase):
 
         data.update(**kwargs)
         return data
+
+    def _get_delete_perm(self):
+        return get_permission_codename('delete', get_user_model()._meta)
 
 
 @override_settings(CMS_PERMISSION=True)
@@ -165,7 +169,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         data = {'post': 'yes'}
 
-        self.add_permission(staff_user, 'delete_user')
+        self.add_permission(staff_user, self._get_delete_perm())
         self.add_permission(staff_user, 'delete_pageuser')
         self.add_global_permission(staff_user, can_change_permissions=True)
 
@@ -180,7 +184,7 @@ class PermissionsOnGlobalTest(PermissionsOnTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         data = {'post': 'yes'}
 
-        self.add_permission(staff_user, 'delete_user')
+        self.add_permission(staff_user, self._get_delete_perm())
         self.add_permission(staff_user, 'delete_pageuser')
         self.add_global_permission(staff_user, can_change_permissions=False)
 
@@ -443,7 +447,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         redirect_to = admin_reverse('index')
         data = {'post': 'yes'}
 
-        self.add_permission(staff_user, 'delete_user')
+        self.add_permission(staff_user, self._get_delete_perm())
         self.add_permission(staff_user, 'delete_pageuser')
         self.add_page_permission(
             staff_user,
@@ -466,7 +470,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         endpoint = self.get_admin_url(PageUser, 'delete', subordinate.pk)
         data = {'post': 'yes'}
 
-        self.add_permission(staff_user, 'delete_user')
+        self.add_permission(staff_user, self._get_delete_perm())
         self.add_permission(staff_user, 'delete_pageuser')
         self.add_page_permission(
             staff_user,
@@ -489,7 +493,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         endpoint = self.get_admin_url(PageUser, 'delete', staff_user.pk)
         data = {'post': 'yes'}
 
-        self.add_permission(staff_user, 'delete_user')
+        self.add_permission(staff_user, self._get_delete_perm())
         self.add_permission(staff_user, 'delete_pageuser')
         self.add_page_permission(
             staff_user,
@@ -520,7 +524,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         data = {'post': 'yes'}
 
-        self.add_permission(staff_user, 'delete_user')
+        self.add_permission(staff_user, self._get_delete_perm())
         self.add_permission(staff_user, 'delete_pageuser')
         self.add_page_permission(
             staff_user,

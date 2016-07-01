@@ -2,7 +2,6 @@
 import datetime
 import os.path
 from unittest import skipIf
-from functools import partial
 
 from django.conf import settings
 from django.core.cache import cache
