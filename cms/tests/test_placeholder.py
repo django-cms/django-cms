@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
-import itertools
-
-from cms.tests.test_toolbar import ToolbarTestBase
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
-from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
 from django.template import TemplateSyntaxError, Template
 from django.template.loader import get_template
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from sekizai.context import SekizaiContext
 
 from cms import constants
@@ -28,18 +21,17 @@ from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
+from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholderapp.exceptions import PlaceholderHookException
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
     Example1,
     MultilingualExample1,
     TwoPlaceholderExample,
-    CharPksExample)
+)
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat import DJANGO_1_8
@@ -864,14 +856,6 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
         context_en = SekizaiContext()
 
-        # no user: no placeholders but no error either
-        factory = RequestFactory()
-        context_en['request'] = factory.get(page_en.get_absolute_url())
-        render_placeholder(ex.placeholder, context_en, use_cache=False)
-        editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
-        self.assertEqual(len(editable), 0)
-        self.assertNotIn(ex.placeholder, editable)
-
         # request.placeholders is populated for superuser
         superuser = self.get_superuser()
         context_en['request'] = self.get_page_request(page_en, superuser, edit=True)
@@ -1019,432 +1003,6 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         add_plugin(ph, TextPlugin, 'en', body='en body')
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
-
-
-class PlaceholderAdminTestBase(CMSTestCase):
-    def get_placeholder(self):
-        return Placeholder.objects.create(slot='test')
-
-    def get_admin(self):
-        admin.autodiscover()
-        return admin.site._registry[Example1]
-
-    def get_charpk_example_admin(self):
-        admin.autodiscover()
-        return admin.site._registry[CharPksExample]
-
-    def get_post_request(self, data):
-        return self.get_request(post_data=data)
-
-
-class PlaceholderAdminTest(PlaceholderAdminTestBase):
-    placeholderconf = {'test': {
-        'limits': {
-            'global': 2,
-            'TextPlugin': 1,
-        }
-    }
-    }
-
-    def test_global_limit(self):
-        placeholder = self.get_placeholder()
-        admin_instance = self.get_admin()
-        post_data = {
-            'name': 'test',
-            'url': 'http://www.example.org/'
-        }
-        superuser = self.get_superuser()
-        with UserLoginContext(self, superuser):
-            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(post_data)
-                request.GET = request.GET.copy()
-                request.GET.update({
-                    'plugin_type': 'LinkPlugin',
-                    'placeholder_id': placeholder.pk,
-                    'plugin_language': 'en',
-                })
-                response = admin_instance.add_plugin(request)  # first
-                self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request)  # second
-                self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request)  # third
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(
-                    response.content,
-                    b"This placeholder already has the maximum number of plugins (2).",
-                )
-
-    def test_type_limit(self):
-        placeholder = self.get_placeholder()
-        admin_instance = self.get_admin()
-        superuser = self.get_superuser()
-        with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request({
-                    'body': 'test'
-                })
-                request.GET = request.GET.copy()
-                request.GET.update({
-                    'plugin_type': 'TextPlugin',
-                    'placeholder_id': placeholder.pk,
-                    'plugin_language': 'en',
-                })
-                response = admin_instance.add_plugin(request)  # first
-                # Note: TextPlugin returns 302 instead of 200 on successful
-                # add_view call.
-                self.assertEqual(response.status_code, 302)
-                response = admin_instance.add_plugin(request)  # second
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(
-                    response.content,
-                    b"This placeholder already has the "
-                    b"maximum number (1) of allowed Text plugins."
-                )
-
-    def test_global_limit_on_plugin_move(self):
-        admin_instance = self.get_admin()
-        superuser = self.get_superuser()
-        source_placeholder = Placeholder.objects.create(slot='source')
-        target_placeholder = self.get_placeholder()
-        data = {
-            'placeholder': source_placeholder,
-            'plugin_type': 'LinkPlugin',
-            'language': 'en',
-        }
-        plugin_1 = add_plugin(**data)
-        plugin_2 = add_plugin(**data)
-        plugin_3 = add_plugin(**data)
-        with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
-                response = admin_instance.move_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
-                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
-                response = admin_instance.move_plugin(request) # second
-                self.assertEqual(response.status_code, 200)
-                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk})
-                response = admin_instance.move_plugin(request) # third
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(
-                    response.content,
-                    b"This placeholder already has the maximum number of plugins (2)."
-                )
-
-    def test_type_limit_on_plugin_move(self):
-        admin_instance = self.get_admin()
-        superuser = self.get_superuser()
-        source_placeholder = Placeholder.objects.create(slot='source')
-        target_placeholder = self.get_placeholder()
-        data = {
-            'placeholder': source_placeholder,
-            'plugin_type': 'TextPlugin',
-            'language': 'en',
-        }
-        plugin_1 = add_plugin(**data)
-        plugin_2 = add_plugin(**data)
-        with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
-                response = admin_instance.move_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
-                request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk})
-                response = admin_instance.move_plugin(request) # second
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.content,
-                                 b"This placeholder already has the maximum number (1) of allowed Text plugins.")
-
-    def test_no_limit_check_same_placeholder_move(self):
-        admin_instance = self.get_admin()
-        superuser = self.get_superuser()
-        source_placeholder = self.get_placeholder()
-        data = {
-            'placeholder': source_placeholder,
-            'plugin_type': 'LinkPlugin',
-            'language': 'en',
-        }
-        plugin_1 = add_plugin(**data)
-        add_plugin(**data)
-        with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
-                                                 'plugin_order': 1, })
-                response = admin_instance.move_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
-
-    def test_edit_plugin_and_cancel(self):
-        placeholder = self.get_placeholder()
-        admin_instance = self.get_admin()
-        superuser = self.get_superuser()
-        with UserLoginContext(self, superuser):
-            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                plugin = add_plugin(
-                    placeholder=placeholder,
-                    plugin_type='TextPlugin',
-                    language='en',
-                    body='Test'
-                )
-                data = {
-                    'body': 'Hello World',
-                }
-                request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin.pk)
-                self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin.pk)
-                self.assertEqual('Hello World', text_plugin.body)
-
-    def test_placeholder_post_move_hook_resolve(self):
-        # We test that moving a plugin from placeholder A
-        # registered with admin A calls the move plugin hooks
-        # on the target placeholder's registered admin.
-        example_admin = self.get_admin()
-
-        exception = PlaceholderHookException
-        message = 'move plugin hook has been called.'
-
-        example_1 = Example1.objects.create(
-            char_1='one',
-            char_2='two',
-            char_3='tree',
-            char_4='four',
-        )
-        placeholder_1 = example_1.placeholder
-
-        example_2 = CharPksExample.objects.create(
-            char_1='one',
-            slug='two',
-        )
-        placeholder_2 = example_2.placeholder_1
-
-        data = {
-            'placeholder': placeholder_1,
-            'plugin_type': 'LinkPlugin',
-            'language': 'en',
-        }
-
-        # Add plugin to placeholder 1
-        plugin = add_plugin(**data)
-
-        superuser = self.get_superuser()
-
-        with UserLoginContext(self, superuser):
-            with self.assertRaisesMessage(exception, message):
-                # move plugin to placeholder_2
-                # this will cause the Example1 admin
-                # to resolve the attached model/admin of the target placeholder
-                # and call it's hook.
-                request = self.get_post_request({
-                    'placeholder_id': placeholder_2.pk,
-                    'plugin_id': plugin.pk,
-                })
-                example_admin.move_plugin(request)
-
-    def test_placeholder_post_copy_hook_resolve(self):
-        # We test that copying a plugin from placeholder A
-        # registered with admin A calls the copy plugin hooks
-        # on the target placeholder's registered admin.
-        example_admin = self.get_admin()
-
-        exception = PlaceholderHookException
-        message = 'copy plugin hook has been called.'
-
-        example_1 = Example1.objects.create(
-            char_1='one',
-            char_2='two',
-            char_3='tree',
-            char_4='four',
-        )
-        placeholder_1 = example_1.placeholder
-
-        example_2 = CharPksExample.objects.create(
-            char_1='one',
-            slug='two',
-        )
-        placeholder_2 = example_2.placeholder_1
-
-        data = {
-            'placeholder': placeholder_1,
-            'plugin_type': 'LinkPlugin',
-            'language': 'en',
-        }
-
-        # Add plugin to placeholder 1
-        plugin = add_plugin(**data)
-
-        superuser = self.get_superuser()
-
-        with UserLoginContext(self, superuser):
-            with self.assertRaisesMessage(exception, message):
-                # move plugin to placeholder_2
-                # this will cause the Example1 admin
-                # to resolve the attached model/admin of the target placeholder
-                # and call it's hook.
-                request = self.get_post_request({
-                    'source_language': plugin.language,
-                    'source_placeholder_id': placeholder_1.pk,
-                    'source_plugin_id': plugin.pk,
-                    'target_language': plugin.language,
-                    'target_placeholder_id': placeholder_2.pk,
-                })
-                request.toolbar = CMSToolbar(request)
-                example_admin.copy_plugins(request)
-
-
-class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
-    def _testuser(self):
-        User = get_user_model()
-        u = User(is_staff=True, is_active=True, is_superuser=False)
-        setattr(u, u.USERNAME_FIELD, "test")
-        u.set_password("test")
-        u.save()
-        return u
-
-    def _create_example(self):
-        ex = Example1(
-            char_1='one',
-            char_2='two',
-            char_3='tree',
-            char_4='four'
-        )
-        ex.save()
-        self._placeholder = ex.placeholder
-        self.example_object = ex
-        return ex
-
-    def _create_plugin(self):
-        self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
-
-    def _give_permission(self, user, model, permission_type, save=True):
-        codename = get_permission_codename(permission_type, model._meta)
-        user.user_permissions.add(Permission.objects.get(codename=codename))
-
-    def _delete_permission(self, user, model, permission_type, save=True):
-        codename = get_permission_codename(permission_type, model._meta)
-        user.user_permissions.remove(Permission.objects.get(codename=codename))
-
-    def _post_request(self, user):
-        data = {
-            'plugin_type': 'TextPlugin',
-            'placeholder_id': self._placeholder.pk,
-            'plugin_language': 'en',
-        }
-        request = self.get_post_request(data)
-        request.user = self.reload(user)
-        request._messages = default_storage(request)
-        return request
-
-    def test_plugin_add_requires_permissions(self):
-        """User wants to add a plugin to the example app placeholder (with and without perms)"""
-        self._test_plugin_action_requires_permissions('add')
-
-    def test_plugin_edit_requires_permissions(self):
-        """User wants to edit a plugin to the example app placeholder (with and without perms)"""
-        self._test_plugin_action_requires_permissions('change')
-
-    def test_plugin_delete_requires_permissions(self):
-        """User wants to delete a plugin to the example app placeholder (with and without perms)"""
-        self._test_plugin_action_requires_permissions('delete')
-
-    def _test_plugin_action_requires_permissions(self, key):
-        """
-        checks all combinations of plugin, app and object permission for all
-        available actions (add, delete, change)
-
-        * `itertools.product(*[[False, True]]*3)` is an iterable of all combinations available
-           with 3 booleans. e.g : `(True, True, True)`, `(True, True, False)`,  etc.
-        * `Text` is the CMSPlugin Model from djangocms_text_ckeditor
-        * `Exemple1` is the Model from placeholderapp test app
-        * `self.example_object` is an instance of this model which have a placeholder
-        * `perms` is a dict with "add", "change" and "delete" keys with corresponding
-          permissions assigned to user.
-        An user can "action" on a Text plugin if he has "action" perm on the Text plugin AND
-        some perms on Model OR instance:
-            * `add` plugin needs (`add` OR `change`) on Example1
-            * `change` plugin needs (`add` OR `change`) on (Example1 OR example_object)
-            * `delete` plugin needs (`add` OR `change` OR `delete`) on (Example1 OR example_object)
-
-
-        ## Testing performance issue
-
-        This method could tests the 2^3^3 = 512 perms combinations:
-          True/False combinations (2)
-          on Plugin, Model and instance (^3)
-          for add, change and delete perms (^3)
-        but we remove some unuseful tests :
-          * when user has not perm on Plugin, we only test the most permissive case : when he has
-            perms on instance AND model. (nb tests is now (2^3 - (2^2-1))^3 = 125)
-          * as adding perm on an instance is currently the same than adding perm to the model,
-            we don't test case of instance perms. (nb tests is now (2^(3-1) - (2^(2-1)-1))^3 = 27)
-        """
-        self._create_example()
-        if key not in ('add', 'change', 'delete'):
-            raise Exception("key '%s' is not valid. "
-                            "Only 'add', 'change' and 'delete are allowed" % key)
-        if key in ('change', 'delete'):
-            self._create_plugin()
-
-        # until perms on instance stay the same than perms on Model, we do not test instance perms
-        # objects_list = [Text, Example1, self.example_object,]
-        objects_list = [Text, Example1]
-        objects_labels = [getattr(o, '__name__', 'example_object') for o in objects_list]
-        perms_combinations = list(itertools.product(*[[False, True]]*len(objects_list)))
-
-        # only keep False, True* combinations
-        for combination in itertools.product(*[[False, True]]*(len(objects_list)-1)):
-            if combination == (True,) * (len(objects_list)-1):
-                continue  # all True : we keep it
-            perms_combinations.remove((False,) + combination)
-
-        request = self._post_request(self._testuser())
-        has_perm = getattr(self.get_admin(), 'has_%s_plugin_permission' % key)
-        has_perm_kwargs = {'request': request}
-        if key in ('change', 'delete'):
-            has_perm_kwargs['plugin'] = self._plugin
-        elif key == 'add':
-            has_perm_kwargs['placeholder'] = self.example_object.placeholder
-            has_perm_kwargs['plugin_type'] = 'TextPlugin'
-        perms = {}
-
-        for add_perms in perms_combinations:
-            self._set_perms(request.user, objects_list, add_perms, 'add')
-            perms['add'] = dict(zip(objects_labels, add_perms))
-            for change_perms in perms_combinations:
-                self._set_perms(request.user, objects_list, change_perms, 'change')
-                perms['change'] = dict(zip(objects_labels, change_perms))
-                for delete_perms in perms_combinations:
-                    self._set_perms(request.user, objects_list, delete_perms, 'delete')
-                    perms['delete'] = dict(zip(objects_labels, delete_perms))
-
-                    other_should_pass = (perms['add']['Example1'], perms['change']['Example1'])
-                    if self.example_object in objects_list:
-                        other_should_pass += (perms['add']['example_object'], perms['change']['example_object'])
-                    if key == 'delete':
-                        other_should_pass += (perms['delete']['Example1'],)
-                        if self.example_object in objects_list:
-                            other_should_pass += (perms['delete']['example_object'],)
-                    should_pass = perms[key]['Text'] and (True in other_should_pass)
-                    if should_pass != has_perm(**has_perm_kwargs):
-                        msg = 'User SHOULD %s able to perform "%s" action with those perms : %s'
-                        self.fail(msg % ('BE' if should_pass else 'NOT BE', key, perms))
-        # cleanup
-        self._set_perms(request.user, objects_list, (False,)*len(objects_list), 'add')
-        self._set_perms(request.user, objects_list, (False,)*len(objects_list), 'delete')
-        self._set_perms(request.user, objects_list, (False,)*len(objects_list), 'change')
-
-    def _set_perms(self, user, objects, perms, key):
-        for obj, perm in zip(objects, perms):
-            action = 'give' if perm else 'delete'
-            object_key = '_object' if isinstance(obj, models.Model) else ''
-            method_name = '_%s%s_permission' % (action, object_key)
-            getattr(self, method_name)(user, obj, key)
-            # This is 'fragile' as it depends on Django internals
-            # This is true for Django < 1.8
-            if hasattr(user, '_perm_cache'):
-                delattr(user, '_perm_cache')
-            # This is true for Django >= 1.8
-            if hasattr(user, '_user_perm_cache'):
-                delattr(user, '_user_perm_cache')
-            if hasattr(user, '_group_perm_cache'):
-                delattr(user, '_group_perm_cache')
 
 
 class PlaceholderConfTests(TestCase):

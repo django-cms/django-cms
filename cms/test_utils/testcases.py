@@ -15,6 +15,7 @@ from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate
 from django.utils.six.moves.urllib.parse import unquote, urljoin
@@ -129,6 +130,9 @@ class BaseCMSTestCase(object):
 
     def add_permission(self, user, codename):
         user.user_permissions.add(self.get_permission(codename))
+
+    def remove_permission(self, user, codename):
+        user.user_permissions.remove(Permission.objects.get(codename=codename))
 
     def add_global_permission(self, user, **kwargs):
         options = {
@@ -492,6 +496,15 @@ class BaseCMSTestCase(object):
             reverse_id='permissions',
         )
         return page
+
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en'):
+        endpoint = placeholder.get_add_url()
+        uri = endpoint + '?' + urlencode({
+            'plugin_type': plugin_type,
+            'placeholder_id': placeholder.pk,
+            'plugin_language': language,
+        })
+        return uri
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
