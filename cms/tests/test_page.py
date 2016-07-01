@@ -252,7 +252,6 @@ class PagesTestCase(CMSTestCase):
             'slug': 'root',
             'language': settings.LANGUAGES[0][0],
             'template': 'nav_playground.html',
-
         }
         page = create_page(**page_data)
         page = page.reload()

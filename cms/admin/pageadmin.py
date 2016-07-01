@@ -3,7 +3,7 @@ import copy
 from functools import wraps
 import json
 import sys
-
+import warnings
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -131,6 +131,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/change-template/$', self.change_template),
+            pat(r'^([0-9]+)/set-home/$', self.set_home),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -1012,6 +1013,23 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(force_text(_("The template was successfully changed")))
+
+    @require_POST
+    @create_revision()
+    def set_home(self, request, object_id):
+        page = get_object_or_404(self.model, pk=object_id)
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(
+                force_text(_("You do not have permission to set 'home'")))
+        try:
+            home_set = page.set_home()
+        except Exception as e:
+            warnings.warn('Exception in pageadmin.set_home(): {0}'.format(e))
+            return HttpResponseBadRequest(
+                force_text(_("An error occurred setting page to be home.")))
+        if not home_set:
+            return HttpResponseBadRequest(force_text(_("The page is not eligible to be home.")))
+        return HttpResponse('ok')
 
     @require_POST
     @transaction.atomic

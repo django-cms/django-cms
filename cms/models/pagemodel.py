@@ -30,6 +30,29 @@ from treebeard.mp_tree import MP_Node
 logger = getLogger(__name__)
 
 
+def _update_title_paths(instance, exclude=None):
+    """
+    Updates the paths of the given «instance» and its sub-pages' titles.
+
+    :param instance: A page to start from.
+    :type instance: Page
+    :param exclude: A list of pages which should not be processed, even if
+                    they are sub-pages of «instance»
+    :type exclude: List of Page
+    :return: None
+    """
+    from cms.signals.title import update_title
+    if exclude is None:
+        exclude = []
+    page_set = filter(lambda x: x not in exclude,
+                      [instance] + list(instance.get_descendants()))
+    for page in page_set:
+        for title in page.title_set.all().select_related('page'):
+            update_title(title)
+            title._publisher_keep_state = True
+            title.save()
+
+
 @python_2_unicode_compatible
 class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     """
@@ -169,6 +192,41 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     def is_dirty(self, language):
         state = self.get_publisher_state(language)
         return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
+
+    def is_potential_home(self):
+        """
+        Encapsulates logic for determining if this page is eligible to be set
+        as `is_home`. This is a public method so that it can be accessed in the
+        admin for determining whether to enable the "Set as home" menu item.
+        :return: Boolean
+        """
+        if not self.parent_id and self.title_set.exists():
+            return True
+        return False
+
+    def set_home(self):
+        """
+        Sets is_home for the current page and unset it for all others. Also
+        updates the title paths for all affected pages.
+        """
+        if self.is_potential_home():
+            # Unset is_home on other page(s) of this publisher type (public/draft)
+            affected_pages = Page.objects.filter(
+                is_home=True,
+                publisher_is_draft=self.publisher_is_draft,
+            )
+            for old_home in affected_pages:
+                if old_home.id == self.id:
+                    continue
+                Page.objects.filter(pk=old_home.id).update(is_home=False)
+                _update_title_paths(old_home, exclude=[self, ])
+
+            # Set is_home on this page
+            self.is_home = True
+            self.save()
+
+            return True
+        return False
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
@@ -875,18 +933,30 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 publisher_public = page.publisher_public
 
                 if not publisher_public.parent_id:
-                    # This page clearly has a parent because it shows up
-                    # when calling self.get_descendants()
-                    # So this condition can be True when a published page
-                    # is moved under a page that has never been published.
-                    # It's draft version (page) has a reference to the new parent
-                    # but it's live version does not because it was never set
-                    # since it didn't exist when the move happened.
+                    # So this condition can be True when:
+                    #
+                    # 1) a published page is moved under a page that has never
+                    #    been published. It's draft version (page) has a
+                    #    reference to the new parent but it's live version
+                    #    does not because it was never set since it didn't
+                    #    exist when the move happened.
+                    #
+                    # 2) a published child page is moved to root. In this
+                    #    case, the published page is parent-less, but but its
+                    #    draft-twin still has a parent. In this case, calling
+                    #    _publisher_save_public() won't help at all.
+
+                    # This helps with case 1 and is ineffectual for case 2
                     publisher_public = page._publisher_save_public(publisher_public)
 
-                # Check if the parent of this page's
-                # public version is published.
-                if publisher_public.parent.is_published(language):
+                # If publisher_public still has no parent, then it probably
+                # was case 2 above, ok to proceed.
+                #
+                # If it has a parent that is published, then it was probably
+                # case 1 above, or had a parent anyway, ok to proceed.
+                #
+                # If the page has an unpublished parent, then skip this...
+                if not publisher_public.parent_id or publisher_public.parent.is_published(language):
                     public_title = titles_by_page_id.get(page.publisher_public_id)
 
                     if public_title and not public_title.published:
@@ -901,6 +971,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         draft_title.publisher_state = PUBLISHER_STATE_DEFAULT
                         draft_title._publisher_keep_state = True
                         draft_title.save()
+
             elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                 page.publish(language)
 

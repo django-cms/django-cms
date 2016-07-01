@@ -12,6 +12,7 @@
     {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
     data-slug="{{ page.get_slug }}"
+    data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-colview='
         <div class="cms-tree-col">
             <div class="cms-tree-item-wrapper">
@@ -215,6 +216,21 @@
                                     <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}" title="{% filter escapejs %}{% trans 'Delete' %}{% endfilter %}">
                                         <span class="cms-icon cms-icon-bin"></span>
                                         <span>{% filter escapejs %}{% trans 'Delete' %}...{% endfilter %}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if has_change_permission and page.is_potential_home %}
+                                <li class="js-cms-tree-item-set-home">
+                                    <a href="{% url 'admin:cms_page_set_home' page.id %}" title="{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}">
+                                        <span class="cms-icon cms-icon-home"></span>
+                                        <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="js-cms-tree-item-set-home">
+                                    <a href="#" class="cms-pagetree-dropdown-item-disabled">
+                                        <span class="cms-icon cms-icon-home"></span>
+                                        <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
                                     </a>
                                 </li>
                             {% endif %}

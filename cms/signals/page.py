@@ -28,7 +28,7 @@ def post_save_page(instance, **kwargs):
             instance.rescan_placeholders()
         except TemplateDoesNotExist as e:
             warnings.warn('Exception occurred: %s template does not exists' % e)
-        update_home(instance)
+        update_home(instance, **kwargs)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
         pages = [instance] + list(instance.get_descendants())
         for page in pages:
@@ -50,6 +50,7 @@ def post_save_page(instance, **kwargs):
                 pass
         elif not instance.publisher_is_draft:
             apphook_post_page_checker(instance)
+    update_title_paths(instance)
 
 
 def pre_delete_page(instance, **kwargs):
@@ -71,45 +72,44 @@ def post_delete_page(instance, **kwargs):
 
 def post_moved_page(instance, **kwargs):
     update_title_paths(instance, **kwargs)
-    update_home(instance, **kwargs)
 
 
 def update_home(instance, **kwargs):
     """
-    Updates the is_home flag of page instances after they are saved or moved.
+    Updates the is_home flag of page instances after when there are changes to the page tree that
+    renders the current home no longer eligible to be home.
 
     :param instance: Page instance
     :param kwargs:
     :return:
     """
+
     if getattr(instance, '_home_checked', False):
+        # Already checked. Bail.
         return
-    if not instance.parent_id or (getattr(instance, 'old_page', False) and not instance.old_page.parent_id):
-        if instance.publisher_is_draft:
-            qs = Page.objects.drafts()
-        else:
-            qs = Page.objects.public()
-        try:
-            home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
-        except NoHomeFound:
-            if instance.publisher_is_draft and instance.title_set.filter(published=True,
-                                                                         publisher_public__published=True).count():
-                return
-            home_pk = instance.pk
-        for page in qs.filter(site=instance.site_id, is_home=True).exclude(pk=home_pk):
-            if instance.pk == page.pk:
-                instance.is_home = False
-            page.is_home = False
-            page._publisher_keep_state = True
-            page._home_checked = True
-            page.save()
-        try:
-            page = qs.get(pk=home_pk, site=instance.site_id)
-        except Page.DoesNotExist:
-            return
-        page.is_home = True
-        if instance.pk == home_pk:
-            instance.is_home = True
-        page._publisher_keep_state = True
-        page._home_checked = True
-        page.save()
+
+    instance._home_checked = True
+
+    qs = Page.objects.filter(publisher_is_draft=instance.publisher_is_draft, site=instance.site_id)
+    current_home = qs.filter(is_home=True).first()
+    if current_home and current_home.is_potential_home():
+        return
+
+    # Need to find a new home
+    try:
+        # This selects the first, published root page as the candidate to be
+        # set as home.
+        new_home = qs.filter(title_set__published=True).get_home(instance.site_id)
+    except NoHomeFound:
+        # No eligible candidates, bail.
+        return
+
+    new_home.set_home()
+
+    if current_home and current_home.pk == instance.pk:
+        instance._publisher_keep_state = True
+        instance.is_home = False
+
+    if new_home.pk == instance.pk:
+        instance._publisher_keep_state = True
+        instance.is_home = True
