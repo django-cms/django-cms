@@ -200,13 +200,13 @@ var Plugin = new Class({
         });
 
         // adds listener for all plugin updates
-        this.ui.container.add(this.ui.draggable).on('cms.plugins.update', function (e) {
+        this.ui.container.add(this.ui.draggable).on('cms-plugins-update', function (e) {
             e.stopPropagation();
             that.movePlugin();
         });
 
         // adds listener for copy/paste updates
-        this.ui.container.add(this.ui.draggable).on('cms.plugin.update', function (e) {
+        this.ui.container.add(this.ui.draggable).on('cms-paste-plugin-update', function (e) {
             e.stopPropagation();
 
             var el = $(e.delegateTarget);
@@ -523,8 +523,8 @@ var Plugin = new Class({
      */
     pastePlugin: function () {
         clipboardDraggable.appendTo(this.ui.draggables);
-        this.ui.draggables.trigger('cms.update');
-        clipboardDraggable.trigger('cms.plugin.update');
+        this.ui.draggables.trigger('cms-structure-update');
+        clipboardDraggable.trigger('cms-paste-plugin-update');
     },
 
     /**
