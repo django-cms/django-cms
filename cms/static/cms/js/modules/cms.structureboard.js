@@ -32,7 +32,6 @@ function actualizeEmptyPlaceholders() {
         } else {
             placeholder.addClass('cms-dragarea-empty');
             copyAll.addClass('cms-submenu-item-disabled');
-
         }
     });
 }
@@ -498,9 +497,9 @@ var StructureBoard = new Class({
 
                 // check if we copy/paste a plugin or not
                 if (originalPluginContainer.hasClass('cms-clipboard-containers')) {
-                    plugin.trigger('cms.plugin.update');
+                    plugin.trigger('cms-paste-plugin-update');
                 } else {
-                    plugin.trigger('cms.plugins.update');
+                    plugin.trigger('cms-plugins-update');
                 }
 
                 // reset placeholder without entries
@@ -578,7 +577,7 @@ var StructureBoard = new Class({
 
                 return that.state;
             }
-        }).on('cms.update', actualizeEmptyPlaceholders);
+        }).on('cms-structure-update', actualizeEmptyPlaceholders);
     }
 
 });
