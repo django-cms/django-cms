@@ -630,6 +630,19 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return False
         return True
 
+    def has_paste_plugin_permission(self, request, plugins, target_placeholder):
+        for plugin in plugins:
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
+                return False
+
+        page = target_placeholder.page
+
+        if page and not page.has_change_permission(request):
+            return False
+        if page and not page.publisher_is_draft:
+            return False
+        return True
+
     def has_move_plugin_permission(self, request, plugin, target_placeholder):
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
             return False

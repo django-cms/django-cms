@@ -118,7 +118,12 @@ class Placeholder(models.Model):
         """
         if user.is_superuser:
             return True
+
         objects = [self.page] if self.page else self._get_attached_objects()
+
+        if not objects:
+            return False
+
         get_permission = self._get_object_permission
         return all(get_permission(obj, user, 'change') for obj in objects)
 

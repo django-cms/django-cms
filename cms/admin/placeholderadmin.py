@@ -190,6 +190,15 @@ class PlaceholderAdminMixin(object):
             return False
         return True
 
+    def has_paste_plugin_permission(self, request, plugins, target_placeholder):
+        if not target_placeholder.has_change_permission(request):
+            return False
+
+        for plugin in plugins:
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
+                return False
+        return True
+
     def has_move_plugin_permission(self, request, plugin, target_placeholder):
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
             return False
@@ -470,9 +479,6 @@ class PlaceholderAdminMixin(object):
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
 
-        if not self.has_move_plugin_permission(request, plugin, placeholder):
-            return HttpResponseForbidden(
-                force_text(_("You have no permission to move this plugin")))
         if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
@@ -488,6 +494,10 @@ class PlaceholderAdminMixin(object):
                 plugins = inst.placeholder_ref.get_plugins()
             else:
                 plugins = [plugin] + list(plugin.get_descendants())
+
+            if not self.has_paste_plugin_permission(request, plugins, placeholder):
+                return HttpResponseForbidden(
+                    force_text(_("You have no permission to move this plugin")))
 
             new_plugins = copy_plugins.copy_plugins_to(
                 plugins,
@@ -532,6 +542,9 @@ class PlaceholderAdminMixin(object):
             plugin = new_plugins[0][0]
         else:
             # Regular move
+            if not self.has_move_plugin_permission(request, plugin, placeholder):
+                return HttpResponseForbidden(
+                    force_text(_("You have no permission to move this plugin")))
 
             plugin_data = {
                 'language': language,
