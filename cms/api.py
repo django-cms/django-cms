@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Public Python API to create CMS contents.
+Python APIs to create and manage CMS content.
 
 WARNING: None of the functions defined in this module checks for permissions.
 You must implement the necessary permission checks in your own code before
@@ -133,6 +133,21 @@ def _verify_plugin_type(plugin_type):
     else:
         raise TypeError('plugin_type must be CMSPluginBase subclass or string')
     return plugin_model, plugin_type
+
+
+def can_change_page(request):
+    """
+    Check whether a user has the permission to change the page.
+
+    This will work across all permission-related setting, with a unified interface
+    to permission checking.
+    """
+    # check global permissions if CMS_PERMISSION is active
+    global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
+    # check if user has page edit permission
+    page_permission = request.current_page and request.current_page.has_change_permission(request)
+
+    return global_permission or page_permission
 
 
 #===============================================================================
@@ -574,18 +589,3 @@ def copy_plugins_to_language(page, source_language, target_language,
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
-
-
-def can_change_page(request):
-    """
-    Check whether a user has the permission to change the page.
-
-    This will work across all permission-related setting, with a unified interface
-    to permission checking.
-    """
-    # check global permissions if CMS_PERMISSION is active
-    global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
-    # check if user has page edit permission
-    page_permission = request.current_page and request.current_page.has_change_permission(request)
-
-    return global_permission or page_permission

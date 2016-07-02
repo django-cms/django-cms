@@ -58,6 +58,8 @@ CMSTestCase
 Django CMS includes ``CMSTestCase`` which has various utility methods that
 might be useful for testing your CMS app and manipulating CMS pages.
 
+.. _testing_plugins:
+
 ***************
 Testing Plugins
 ***************

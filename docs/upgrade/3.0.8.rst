@@ -26,12 +26,12 @@ Bug Fixes
 * Minor code clean-ups
 
 .. warning:: Fix for plugin copy patches a reference leak in
-             ``cms.models.pluginmodel.CMSPlugin.copy_plugins``, which caused the
+             ``cms.models.CMSPlugin.copy_plugins``, which caused the
              original plugin object to be modified in memory. The fixed code
              leaves the original unaltered and returns a modified copy.
 
              Custom plugins that called ``cms.utils.plugins.copy_plugins_to`` or
-             ``cms.models.pluginmodel.CMSPlugin.copy_plugins`` may have relied on the
+             ``cms.models.CMSPlugin.copy_plugins`` may have relied on the
              incorrect behaviour. Check your code for calls to these methods. Correctly
              implemented calls should expect the original plugin instance to remain
              unaltered.

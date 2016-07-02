@@ -61,7 +61,7 @@ These correspond to the familiar Model-View-Template scheme:
 
 And so to build your plugin, you'll make it from:
 
-* a sub-class of :class:`cms.models.pluginmodel.CMSPlugin` to
+* a sub-class of :class:`cms.models.CMSPlugin` to
   **store the configuration** for your plugin instances
 * a sub-class of :class:`cms.plugin_base.CMSPluginBase` that **defines
   the operating logic** of your plugin
@@ -116,7 +116,7 @@ that are ignored by the CMS are:
 An aside on models and configuration
 ====================================
 
-The plugin **model**, the sub-class of :class:`cms.models.pluginmodel.CMSPlugin`,
+The plugin **model**, the sub-class of :class:`cms.models.CMSPlugin`,
 is actually optional.
 
 You could have a plugin that doesn't need to be configured, because it only
@@ -174,7 +174,7 @@ There are two required attributes on those classes:
 * ``model``: The model you wish to use for storing information about this plugin.
   If you do not require any special information, for example configuration, to
   be stored for your plugins, you can simply use
-  :class:`cms.models.pluginmodel.CMSPlugin` (we'll look at that model more
+  :class:`cms.models.CMSPlugin` (we'll look at that model more
   closely in a bit). In a normal admin class, you don't need to supply this
   information because ``admin.site.register(Model, Admin)`` takes care of it,
   but a plugin is not registered in that way.
@@ -228,7 +228,7 @@ to be able to choose the amount of entries shown. Another example would be a
 gallery plugin where you want to choose the pictures to show for the plugin.
 
 To do so, you create a Django model by sub-classing
-:class:`cms.models.pluginmodel.CMSPlugin` in the ``models.py`` of an installed
+:class:`cms.models.CMSPlugin` in the ``models.py`` of an installed
 application.
 
 Let's improve our ``HelloPlugin`` from above by making its fallback name for
@@ -246,7 +246,7 @@ In our ``models.py`` we add the following::
 
 If you followed the Django tutorial, this shouldn't look too new to you. The
 only difference to normal models is that you sub-class
-:class:`cms.models.pluginmodel.CMSPlugin` rather than
+:class:`cms.models.CMSPlugin` rather than
 :class:`django.db.models.Model`.
 
 Now we need to change our plugin definition to use this model, so our new
@@ -296,10 +296,8 @@ clause.
     ``googlemap``, ``link``, ``picture``, ``snippetptr``, ``teaser``,
     ``twittersearch``, ``twitterrecententries`` and ``video``.
 
-    Additionally, it is *recommended* that you avoid using ``page`` as a model
-    field, as it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`,
-    and your plugin will not work as intended in the administration without
-    further work.
+    In :class:`cms.models.CMSPlugin`, don't use ``page`` as a model field. ``page`` is already a property of
+    :class:`cms.models.CMSPlugin`, and a plugin that overrides this will not work as intended in the administration.
 
 .. warning::
 
@@ -320,7 +318,7 @@ relations you are responsible for copying those related objects, if required,
 whenever the CMS copies the plugin - **it won't do it for you automatically**.
 
 Every plugin model inherits the empty
-:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` method from the base
+:meth:`cms.models.CMSPlugin.copy_relations` method from the base
 class, and it's called when your plugin is copied. So, it's there for you to
 adapt to your purposes as required.
 

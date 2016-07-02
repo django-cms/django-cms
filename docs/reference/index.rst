@@ -6,20 +6,20 @@ Reference
 
 Technical reference material.
 
-.. toctree::
+..  toctree::
     :maxdepth: 1
 
-    api_references
+    admin
+    api
+    apphooks
     cli
-    configuration
-    fields
+    forms
+    models
     navigation
-    pages
     permissions
-    placeholders
     plugins
+    settings-constants
     sitemaps
     templatetags
-    titles
     toolbar
     wizards

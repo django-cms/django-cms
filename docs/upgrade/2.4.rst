@@ -108,7 +108,7 @@ can publish changes to the public site.
     and :ref:`cms-delete-orphaned-plugins-command`.
 
     Also, check that all your plugins define a
-    :meth:`~cms.models.pluginmodel.CMSPlugin.copy_relations()` method if required. You can do
+    :meth:`~cms.models.CMSPlugin.copy_relations()` method if required. You can do
     this by running ``manage.py cms check`` and read the *Presence of
     "copy_relations"* section. See :ref:`handling-relations` for guidance on
     this topic.
