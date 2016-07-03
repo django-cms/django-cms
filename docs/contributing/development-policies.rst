@@ -28,24 +28,25 @@ Reporting security issues
 Review
 ******
 
-All patches should be made as pull requests to `the GitHub repository <https://github.com/divio/django-cms>`_. Patches
-should never be pushed directly.
+Patches should never be pushed directly to `the GitHub repository <https://github.com/divio/django-cms>`_ - they should
+arrive in the form of pull requests so that they can be reviewed publicly.
 
 **Nothing** may enter the code-base, *including the documentation*, without proper review and formal approval from the
 core team.
 
 Reviews are welcomed by all members of the community. You don't need to be a core developer, or even an experienced
-programmer, to contribute usefully to code review. Even noting that you don't understand something in a pull request
-is valuable feedback and will be taken seriously.
+programmer, to make a useful contribution to code review. Even noting that you don't understand something in a pull
+request is valuable feedback and will be taken seriously.
 
 
 Formal approval
 ===============
 
-Formal approval means "OK to merge" comments, following review, from at least two different members of the core team
-who have expertise in the relevant areas, and excluding the author of the pull request.
+Formal approval means "OK to merge" comments (a "+1", a "Looks good to me", etc), following review, from at least two
+different members of the core team who have expertise in the relevant areas, and excluding the author of the pull
+request.
 
-The exceptions to this are frontend code and documentation, where one "OK to merge" comment will suffice, at least
+The exceptions to this are frontend code and documentation, where a single "OK to merge" comment will suffice, at least
 until the team has more expert developers in those areas.
 
 
@@ -55,7 +56,8 @@ Proposal and discussion of significant changes
 
 New features and backward-incompatible changes should be proposed using the `django CMS developers email list
 <http://groups.google.com/group/django-cms-developers>`_. Discussion should take place there before any pull requests
-are made.
+are made. Note that the core developers will simply close any discussions of this kind on GitHub, and redirect them to
+the email list.
 
 This is in the interests of openness and transparency, and to give the community a chance to participate in and
 understand the decisions taken by the project.
@@ -72,7 +74,8 @@ We are planning releases according to **key principles and aims**. Issues within
 therefore subject to change.
 
 The `django CMS developers email list <http://groups.google.com/group/django-cms-developers>`_ serves as gathering
-point for developers. We submit ideas and proposals prior to the roadmap goals.
+point for developers. Ideas and proposals prior are discussed here, and added to the roadmap following discussion
+by the :ref:`technical_board`.
 
 django CMS 3.4 will be the first "LTS" ("Long-Term Support") release of the application. *Long-term support* means that
 this version will continue to receive security and other critical updates for 24 months after its first release.
@@ -96,14 +99,14 @@ Branches
 We maintain a number of branches on `our GitHub repository <https://github.com/divio/django-cms>`_.
 
 the latest (highest-numbered) ``release/x.y.z``
-    This is the branch that will become the next release on PyPI.
+    This is the branch that will become the next minor release on PyPI.
 
     **Fixes and backwards-compatible improvements** (i.e. most pull requests) will be made against
     this branch.
 
 ``develop``
-    This is the branch that will become the next release that increments the ``x`` or ``y`` of the latest
-    ``release/x.y.z``.
+    This is the branch that will become the next major release (one that increments the ``x`` or ``y`` of the latest
+    ``release/x.y.z``).
 
     This branch is for **new features and backwards-incompatible changes**. By their nature, these will require more
     substantial team co-ordination.
@@ -114,7 +117,8 @@ Older ``release/x.y.z`` branches
 
      These branches will only rarely be patched, with security fixes representing the main reason for a patch.
 
-Commits in ``release/x.y.z`` will be merged forward into ``develop`` periodically by the core developers.
+Commits in ``release/x.y.z`` will be ported forward into ``develop`` (if appropriate) by the core developers. It is
+the responsibility of the core team member who merges a patch to port it forward.
 
 If in doubt about which branch to work from, ask on the #django-cms IRC channel on `freenode`_ or the
 `django-cms-developers`_ email list!

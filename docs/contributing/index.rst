@@ -11,7 +11,8 @@ however small, is valued.
 
 As an open source project, anyone is welcome to contribute in whatever form
 they are able, which can include taking part in discussions, filing bug reports,
-proposing improvements, contributing code or documentation, and testing the
+proposing improvements, contributing code or documentation, and testing the system
+simply by using it.
 
 
 .. toctree::
