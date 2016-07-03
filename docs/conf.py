@@ -35,7 +35,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'django': ('https://docs.djangoproject.com/en/dev/', 'http://docs.djangoproject.com/en/dev/_objects/'),
     'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
-    'sekizai': ('http://django-sekizai.readthedocs.io/en/latest/', None),
+    'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

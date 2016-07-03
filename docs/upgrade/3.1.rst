@@ -54,7 +54,7 @@ Other than this, end users should not notice any changes.
 
 .. note:: Handling plugin data migrations
 
-    Please check :ref:`plugin-datamigrations-3.1` for information on how to create
+    Please refer to the django CMS version 3.1 documentation on plugin data migrations for information on how to create
     migrations compatible with django CMS 3.0 and 3.1
 
 
