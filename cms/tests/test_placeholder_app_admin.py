@@ -713,14 +713,6 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'add_link')
         self.add_permission(staff_user, 'add_style')
 
-        # This is sadly required to copy the plugins into the clipboard
-        # FIXME: https://github.com/divio/django-cms/issues/5488
-        self.add_permission(staff_user, 'change_example1')
-
-        # This are sadly required to alter the clipboard
-        # FIXME: https://github.com/divio/django-cms/issues/5488
-        self.add_permission(staff_user, 'change_usersettings')
-
         data = {
             'source_plugin_id': '',
             'source_placeholder_id': source_placeholder.pk,
@@ -739,9 +731,6 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         # assert the clipboard has a PlaceholderPlugin
         self.assertTrue(clipboard_plugins.filter(plugin_type='PlaceholderPlugin').exists())
 
-        # assert three new plugins have been created
-        # One for the PlaceholderPlugin and the other two
-        # are the plugins being copied.
         self.assertEqual(len(clipboard_plugins), 1)
 
         placeholder_plugin = clipboard_plugins[0].get_plugin_instance()[0]
@@ -773,14 +762,6 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'change_style')
         self.add_permission(staff_user, 'delete_style')
 
-        # This is sadly required to copy the plugins
-        # FIXME: https://github.com/divio/django-cms/issues/5488
-        self.add_permission(staff_user, 'change_example1')
-
-        # This are sadly required to alter the clipboard
-        # FIXME: https://github.com/divio/django-cms/issues/5488
-        self.add_permission(staff_user, 'change_usersettings')
-
         data = {
             'source_plugin_id': '',
             'source_placeholder_id': source_placeholder.pk,
@@ -797,9 +778,6 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         clipboard_plugins = user_settings.clipboard.get_plugins()
 
-        # assert three new plugins have been created
-        # One for the PlaceholderPlugin and the other two
-        # are the plugins being copied.
         self.assertEqual(len(clipboard_plugins), 0)
 
     def test_user_can_paste_from_clipboard(self):
@@ -815,10 +793,6 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         self.add_permission(staff_user, 'change_example1')
         self.add_permission(staff_user, 'add_link')
-
-        # This is sadly required to paste from the clipboard
-        # FIXME: https://github.com/divio/django-cms/issues/5432
-        self.add_permission(staff_user, 'change_placeholderreference')
 
         user_settings = UserSettings.objects.create(
             language="en",
@@ -864,10 +838,6 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'add_example1')
         self.add_permission(staff_user, 'delete_example1')
         self.add_permission(staff_user, 'add_link')
-
-        # This is sadly required to paste from the clipboard
-        # FIXME: https://github.com/divio/django-cms/issues/5432
-        self.add_permission(staff_user, 'change_placeholderreference')
 
         user_settings = UserSettings.objects.create(
             language="en",

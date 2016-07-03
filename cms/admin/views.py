@@ -3,6 +3,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from cms.models import Page, Title, CMSPlugin, Placeholder
+from cms.utils.page_permissions import user_can_change_page
 
 
 def revert_plugins(request, version_id, obj):
@@ -30,7 +31,7 @@ def revert_plugins(request, version_id, obj):
             titles.append(obj)
         else:
             others.append(rev)
-    if not page.has_change_permission(request):
+    if not user_can_change_page(request.user, page):
         raise Http404
     current_plugins = list(CMSPlugin.objects.filter(placeholder__page=page))
     for pk, placeholder in placeholders.items():

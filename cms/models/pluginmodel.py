@@ -455,14 +455,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         )
         return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
-    def has_change_permission(self, request):
-        page = self.placeholder.page if self.placeholder else None
-        if page:
-            return page.has_change_permission(request)
-        elif self.placeholder:
-            return self.placeholder.has_change_permission(request)
-        return False
-
     def get_position_in_placeholder(self):
         """
         1 based position!

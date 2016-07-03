@@ -235,7 +235,6 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         endpoint = admin_reverse('app_list', args=['cms'])
 
-        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_pageuser')
         self.add_page_permission(
             staff_user,
@@ -245,12 +244,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertEqual(response.status_code, 200)
-            self.assertNotContains(
-                response,
-                '<a href="/en/admin/cms/pageuser/">Users (page)</a>',
-                html=True,
-            )
+            self.assertEqual(response.status_code, 404)
 
         endpoint = self.get_admin_url(PageUser, 'changelist')
 

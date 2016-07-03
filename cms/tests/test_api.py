@@ -8,7 +8,6 @@ from django.core.exceptions import FieldError
 from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.template import TemplateDoesNotExist
-from django.test.testcases import TestCase
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from menus.menu_pool import menu_pool
@@ -27,8 +26,8 @@ from cms.models.pagemodel import Page
 from cms.models.titlemodels import Title
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.plugin_base import CMSPluginBase
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
-from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
 from cms.utils.reversion_hacks import Revision
 
@@ -40,7 +39,7 @@ def _grant_page_permission(user, codename):
     user.user_permissions.add(perm)
 
 
-class PythonAPITests(TestCase):
+class PythonAPITests(CMSTestCase):
     def _get_default_create_page_arguments(self):
         return {
             'title': 'Test',
@@ -168,8 +167,7 @@ class PythonAPITests(TestCase):
         user = get_user_model().objects.create_user(username='user', email='user@django-cms.org',
                                                     password='user')
         user.is_staff = True
-        request = AttributeObject(user=user)
-        self.assertFalse(page.has_change_permission(request))
+        self.assertFalse(page.has_change_permission(user))
 
     def test_assign_user_to_page_single(self):
         page = create_page(**self._get_default_create_page_arguments())
@@ -177,16 +175,14 @@ class PythonAPITests(TestCase):
                                                     password='user')
         user.is_staff = True
         user.save()
-        request = AttributeObject(user=user)
         assign_user_to_page(page, user, can_change=True)
-        self.assertFalse(page.has_change_permission(request))
-        self.assertFalse(page.has_add_permission(request))
+        self.assertFalse(page.has_change_permission(user))
+        self.assertFalse(page.has_add_permission(user))
         _grant_page_permission(user, 'change')
         page = Page.objects.get(pk=page.pk)
         user = get_user_model().objects.get(pk=user.pk)
-        request = AttributeObject(user=user)
-        self.assertTrue(page.has_change_permission(request))
-        self.assertFalse(page.has_add_permission(request))
+        self.assertTrue(page.has_change_permission(user))
+        self.assertFalse(page.has_add_permission(user))
 
     def test_assign_user_to_page_all(self):
         page = create_page(**self._get_default_create_page_arguments())
@@ -194,17 +190,15 @@ class PythonAPITests(TestCase):
                                                     password='user')
         user.is_staff = True
         user.save()
-        request = AttributeObject(user=user)
         assign_user_to_page(page, user, grant_all=True)
-        self.assertFalse(page.has_change_permission(request))
-        self.assertTrue(page.has_add_permission(request))
+        self.assertFalse(page.has_change_permission(user))
+        self.assertFalse(page.has_add_permission(user))
         _grant_page_permission(user, 'change')
         _grant_page_permission(user, 'add')
         page = Page.objects.get(pk=page.pk)
         user = get_user_model().objects.get(pk=user.pk)
-        request = AttributeObject(user=user)
-        self.assertTrue(page.has_change_permission(request))
-        self.assertTrue(page.has_add_permission(request))
+        self.assertTrue(page.has_change_permission(user))
+        self.assertTrue(page.has_add_permission(user))
 
     def test_page_overwrite_url_default(self):
         self.assertEqual(Page.objects.all().count(), 0)
@@ -243,8 +237,11 @@ class PythonAPITests(TestCase):
         user.save()
         # Permissions are cached on user instances, so create a new one.
         user = get_user_model().objects.get(pk=user.pk)
-        _grant_page_permission(user, 'publish')
-        gpp = GlobalPagePermission.objects.create(user=user, can_publish=True)
+
+        self.add_permission(user, 'change_page')
+        self.add_permission(user, 'publish_page')
+
+        gpp = GlobalPagePermission.objects.create(user=user, can_change=True, can_publish=True)
         gpp.sites.add(page.site)
         publish_page(page, user, 'en')
         # Reload the page to get updates.

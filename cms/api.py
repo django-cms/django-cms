@@ -35,7 +35,7 @@ from cms.utils import copy_plugins
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import is_installed
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals, current_user, has_page_change_permission
+from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
 
@@ -272,7 +272,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
         )
 
     del _thread_locals.user
-    return page.reload()
+
+    page = page.reload()
+
+    # Avoid an extra query when accessing the site
+    # for the newly created page.
+    page._site_cache = site
+    return page
 
 
 def create_title(language, title, page, menu_title=None, slug=None,
@@ -481,12 +487,7 @@ def publish_page(page, user, language):
     """
     page = page.reload()
 
-    class FakeRequest(object):
-        def __init__(self, user):
-            self.user = user
-
-    request = FakeRequest(user)
-    if not page.has_publish_permission(request):
+    if not page.has_publish_permission(user):
         raise PermissionDenied()
     # Set the current_user to have the page's changed_by
     # attribute set correctly.
@@ -583,9 +584,13 @@ def can_change_page(request):
     This will work across all permission-related setting, with a unified interface
     to permission checking.
     """
-    # check global permissions if CMS_PERMISSION is active
-    global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
-    # check if user has page edit permission
-    page_permission = request.current_page and request.current_page.has_change_permission(request)
+    from cms.utils import page_permissions
 
-    return global_permission or page_permission
+    user = request.user
+    current_page = request.current_page
+
+    if current_page:
+        return page_permissions.user_can_change_page(user, current_page)
+
+    site = Site.objects.get_current(request)
+    return page_permissions.user_can_change_all_pages(user, site)

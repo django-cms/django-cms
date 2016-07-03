@@ -137,12 +137,14 @@ class BaseCMSTestCase(object):
 
     def add_global_permission(self, user, **kwargs):
         options = {
+            'can_add': False,
             'can_change': False,
             'can_delete': False,
             'can_change_advanced_settings': False,
             'can_publish': False,
             'can_change_permissions': False,
             'can_move_page': False,
+            'can_recover_page': False,
             'user': user,
         }
         options.update(**kwargs)
@@ -153,6 +155,7 @@ class BaseCMSTestCase(object):
 
     def add_page_permission(self, user, page, **kwargs):
         options = {
+            'can_add': False,
             'can_change': False,
             'can_delete': False,
             'can_change_advanced_settings': False,

@@ -435,8 +435,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         toolbar.populate()
         toolbar.post_template_populate()
-        self.assertTrue(page.has_change_permission(request))
-        self.assertFalse(page.has_publish_permission(request))
+        self.assertTrue(page.has_change_permission(request.user))
+        self.assertFalse(page.has_publish_permission(request.user))
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + templates + page-menu + admin-menu + logout
@@ -462,8 +462,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         toolbar.populate()
         toolbar.post_template_populate()
-        self.assertFalse(page.has_change_permission(request))
-        self.assertFalse(page.has_publish_permission(request))
+        self.assertFalse(page.has_change_permission(request.user))
+        self.assertFalse(page.has_publish_permission(request.user))
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout

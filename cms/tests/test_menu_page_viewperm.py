@@ -11,7 +11,10 @@ from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.page_permissions import user_can_view_page
+
 from menus.menu_pool import menu_pool
+
 
 __all__ = [
     'ViewPermissionTreeBugTests',
@@ -181,12 +184,10 @@ class ViewPermissionTests(CMSTestCase):
         self.assertEqual(response.status_code, 404)
 
     def assertViewAllowed(self, page, user):
-        request = self.get_request(user, page)
-        self.assertTrue(page.has_view_permission(request))
+        self.assertTrue(user_can_view_page(user, page))
 
     def assertViewNotAllowed(self, page, user):
-        request = self.get_request(user, page)
-        self.assertFalse(page.has_view_permission(request))
+        self.assertFalse(user_can_view_page(user, page))
 
     def assertInMenu(self, page, user):
         request = self.get_request(user, page)

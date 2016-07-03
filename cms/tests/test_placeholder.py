@@ -825,6 +825,7 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         de = Translations.objects.get(language_code='de')
 
 
+@override_settings(CMS_PERMISSION=False)
 class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
     def get_mock_user(self, superuser):
         return AttributeObject(
@@ -840,12 +841,14 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
     def test_check_placeholder_permissions_ok_for_superuser(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = ph.has_change_permission(self.get_mock_request(True))
+        user = self.get_mock_user(True)
+        result = ph.has_change_permission(user)
         self.assertTrue(result)
 
     def test_check_placeholder_permissions_nok_for_user(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = ph.has_change_permission(self.get_mock_request(False))
+        user = self.get_mock_user(False)
+        result = ph.has_change_permission(user)
         self.assertFalse(result)
 
     def test_check_unicode_rendering(self):

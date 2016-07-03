@@ -1098,16 +1098,17 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_can_delete_empty_page(self):
         """
-        User can delete an empty page if he has delete permissions
-        on the Page model and he has global delete permissions.
+        User can delete an empty page if he has delete & change permissions
+        on the Page model and he has global delete & change permissions.
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'delete', page.pk)
-        redirect_to = admin_reverse('index')
+        redirect_to = self.get_admin_url(Page, 'changelist')
         staff_user = self.get_staff_user_with_no_permissions()
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
-        self.add_global_permission(staff_user, can_delete=True)
+        self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
@@ -1127,7 +1128,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
 
         self.add_permission(staff_user, 'delete_page')
-        gp = self.add_global_permission(staff_user, can_delete=False)
+        gp = self.add_global_permission(staff_user, can_change=True, can_delete=False)
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
@@ -1149,20 +1150,21 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_can_delete_non_empty_page(self):
         """
-        User can delete a page with plugins if he has delete permissions
+        User can delete a page with plugins if he has delete & change permissions
         on the Page model, delete permissions on the plugins in the page
-        translations and global delete permissions.
+        translations and global delete & change permissions.
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'delete', page.pk)
-        redirect_to = admin_reverse('index')
+        redirect_to = self.get_admin_url(Page, 'changelist')
         staff_user = self.get_staff_user_with_no_permissions()
 
         self._add_plugin_to_page(page)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
         self.add_permission(staff_user, 'delete_link')
-        self.add_global_permission(staff_user, can_delete=True)
+        self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
@@ -1185,8 +1187,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         self._add_plugin_to_page(page)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
-        gp = self.add_global_permission(staff_user, can_delete=True)
+        gp = self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
@@ -1209,17 +1212,18 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
     def test_user_can_delete_empty_translation(self):
         """
         User can delete an empty translation if he has
-        delete permissions on the Page model and he has
-        global delete permissions.
+        delete & change permissions on the Page model and he has
+        global delete & change permissions.
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        redirect_to = admin_reverse('index')
+        redirect_to = self.get_admin_url(Page, 'changelist')
         staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
-        self.add_global_permission(staff_user, can_delete=True)
+        self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
             data = {'language': translation.language}
@@ -1239,8 +1243,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
-        gp = self.add_global_permission(staff_user, can_delete=False)
+        gp = self.add_global_permission(staff_user, can_change=True, can_delete=False)
 
         with self.login_user_context(staff_user):
             data = {'language': translation.language}
@@ -1262,21 +1267,22 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_user_can_delete_non_empty_translation(self):
         """
-        User can delete a translation with plugins if he has delete permissions
+        User can delete a translation with plugins if he has delete & change permissions
         on the Page model, delete permissions on the plugins in the translation
-        and global delete permissions.
+        and global delete & change permissions.
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        redirect_to = admin_reverse('index')
+        redirect_to = self.get_admin_url(Page, 'changelist')
         staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
 
         self._add_plugin_to_page(page, language=translation.language)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
         self.add_permission(staff_user, 'delete_link')
-        self.add_global_permission(staff_user, can_delete=True)
+        self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
             data = {'language': translation.language}
@@ -1299,8 +1305,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         self._add_plugin_to_page(page, language=translation.language)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
-        self.add_global_permission(staff_user, can_delete=True)
+        self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
             data = {'language': translation.language}
@@ -1814,6 +1821,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         title = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=True)
 
         with self.login_user_context(staff_user):
@@ -1834,6 +1842,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         title = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
 
+        self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=False)
 
         with self.login_user_context(staff_user):
@@ -2276,7 +2285,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertEqual(placeholder.get_plugins('en').count(), 2)
 
-
 @override_settings(CMS_PERMISSION=True)
 class PermissionsOnPageTest(PermissionsTestCase):
     """
@@ -2284,6 +2292,1436 @@ class PermissionsOnPageTest(PermissionsTestCase):
     while permissions are set to True and user has
     page permissions.
     """
+
+    def setUp(self):
+        self._permissions_page = self.get_permissions_test_page()
+
+    def test_pages_in_admin_index(self):
+        """
+        User can see the "Pages" section the admin
+        if he has change permissions on the Page model
+        and he has global change permissions.
+        """
+        page = self._permissions_page
+        endpoint = admin_reverse('app_list', args=['cms'])
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(
+                response,
+                '<a href="/en/admin/cms/page/">Pages</a>',
+                html=True,
+            )
+
+        endpoint = self.get_admin_url(Page, 'changelist')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+
+    def test_pages_not_in_admin_index(self):
+        """
+        User can't see the "Pages" section the admin
+        if he does not have change permissions on the Page model
+        and/or does not have global change permissions.
+        """
+        page = self._permissions_page
+        endpoint = admin_reverse('app_list', args=['cms'])
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 404)
+
+        endpoint = self.get_admin_url(Page, 'changelist')
+
+        with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_edit_page_settings(self):
+        """
+        User can edit page settings if he has change permissions
+        on the Page model and and he has global change permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'change', page.pk)
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self._get_page_data(slug='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+            self.assertTrue(self._translation_exists(slug='permissions-2'))
+
+    def test_user_cant_edit_page_settings(self):
+        """
+        User can't edit page settings if he does not
+        have change permissions on the Page model and/or
+        does not have global change permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'change', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self._get_page_data(slug='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        page_perm = self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._translation_exists(slug='permissions-2'))
+
+        self.remove_permission(staff_user, 'change_page')
+        page_perm.can_change = True
+        page_perm.save(update_fields=['can_change'])
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._translation_exists(slug='permissions-2'))
+
+    def test_user_can_edit_advanced_page_settings(self):
+        """
+        User can edit advanced page settings if he has change permissions
+        on the Page model, global change permissions and
+        global change advanced settings permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self._get_page_data(reverse_id='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_advanced_settings=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+            self.assertTrue(self._page_exists(reverse_id='permissions-2'))
+
+    def test_user_cant_edit_advanced_page_settings(self):
+        """
+        User can't edit advanced page settings if he does not
+        have change permissions on the Page model,
+        does not have global change permissions and/or
+        does not have global change advanced settings permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        data = self._get_page_data(reverse_id='permissions-2')
+
+        self.add_permission(staff_user, 'change_page')
+        page_perm = self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_advanced_settings=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._page_exists(reverse_id='permissions-2'))
+
+        self.remove_permission(staff_user, 'change_page')
+        page_perm.can_change = True
+        page_perm.save(update_fields=['can_change'])
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._page_exists(reverse_id='permissions-2'))
+
+    def test_user_can_delete_empty_page(self):
+        """
+        User can delete an empty page if he has delete & change permissions
+        on the Page model and he has page delete & change permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        redirect_to = admin_reverse('index')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_delete=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._page_exists())
+
+    def test_user_cant_delete_empty_page(self):
+        """
+        User can't delete an empty page if he does not
+        have delete permissions on the Page model and/or
+        does not have global delete permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        page_perm = self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+            can_delete=False,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_exists())
+
+        self.remove_permission(staff_user, 'delete_page')
+        page_perm.can_delete = True
+        page_perm.save(update_fields=['can_delete'])
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_exists())
+
+    def test_user_can_delete_non_empty_page(self):
+        """
+        User can delete a page with plugins if he has delete permissions
+        on the Page model, delete permissions on the plugins in the page
+        translations and page delete & change permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        redirect_to = admin_reverse('index')
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self._add_plugin_to_page(page)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        self.add_permission(staff_user, 'delete_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_delete=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._page_exists())
+
+    def test_user_cant_delete_non_empty_page(self):
+        """
+        User can't delete a page with plugins if he
+        does not have delete permissions on the Page model,
+        does not have delete permissions on the plugins
+        in the page translations, and/or does not have
+        global delete permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self._add_plugin_to_page(page)
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+
+        page_perm = self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_delete=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_exists())
+
+        self.remove_permission(staff_user, 'delete_page')
+        page_perm.can_delete = True
+        page_perm.save(update_fields=['can_delete'])
+
+        with self.login_user_context(staff_user):
+            data = {'post': 'yes'}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_exists())
+
+    def test_user_can_delete_empty_translation(self):
+        """
+        User can delete an empty translation if he has
+        delete permissions on the Page model and he has
+        page delete & change permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_delete=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._translation_exists())
+
+    def test_user_cant_delete_empty_translation(self):
+        """
+        User can't delete an empty translation if he does not
+        have delete permissions on the Page model and/or
+        does not have global delete permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        page_perm = self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+            can_delete=False,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._translation_exists())
+
+        self.remove_permission(staff_user, 'delete_page')
+        page_perm.can_delete = True
+        page_perm.save(update_fields=['can_delete'])
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._translation_exists())
+
+    def test_user_can_delete_non_empty_translation(self):
+        """
+        User can delete a translation with plugins if he has delete permissions
+        on the Page model, delete permissions on the plugins in the translation
+        and page delete & change permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self._add_plugin_to_page(page, language=translation.language)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        self.add_permission(staff_user, 'delete_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_delete=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+            response = self.client.post(endpoint, data)
+
+            self.assertRedirects(response, redirect_to)
+            self.assertFalse(self._translation_exists())
+
+    def test_user_cant_delete_non_empty_translation(self):
+        """
+        User can't delete a translation with plugins if he
+        does not have delete permissions on the Page model,
+        does not have delete permissions on the plugins in the translation,
+        and/or does not have global delete permissions.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+
+        self._add_plugin_to_page(page, language=translation.language)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_page')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_delete=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'language': translation.language}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._translation_exists())
+
+    def test_user_can_add_page_permissions(self):
+        """
+        User can add page permissions if he has
+        change permissions on the Page model,
+        add permissions on the PagePermission model,
+        global change permission and global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        data = self._get_page_permissions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, endpoint)
+            self.assertTrue(self._page_permission_exists(user=staff_user_2))
+
+    def test_user_cant_add_page_permissions(self):
+        """
+        User can't add page permissions if he
+        does not have change permissions on the Page model,
+        does not have add permissions on the PagePermission model,
+        does not have global change permission,
+        and/or does not have global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        data = self._get_page_permissions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._page_permission_exists(user=staff_user_2))
+
+    def test_user_can_edit_page_permissions(self):
+        """
+        User can edit page permissions if he has
+        change permissions on the Page model,
+        change permissions on the PagePermission model,
+        global change permission and global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        permission = self.add_page_permission(
+            user=staff_user_2,
+            page=page,
+            can_change_permissions=True
+        )
+
+        data = self._get_page_permissions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+            id=permission.pk,
+            can_change_permissions=False,
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, endpoint)
+            self.assertTrue(
+                self._page_permission_exists(
+                    user=staff_user_2,
+                    can_change_permissions=False,
+                )
+            )
+
+    def test_user_cant_edit_page_permissions(self):
+        """
+        User can't edit page permissions if he
+        does not have change permissions on the Page model,
+        does not have change permissions on the PagePermission model,
+        does not have global change permission,
+        and/or does not have global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        permission = self.add_page_permission(
+            user=staff_user_2,
+            page=page,
+            can_change_permissions=True
+        )
+
+        data = self._get_page_permissions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+            id=permission.pk,
+            can_change_permissions=False,
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(
+                self._page_permission_exists(
+                    user=staff_user_2,
+                    can_change_permissions=False,
+                )
+            )
+
+    def test_user_can_delete_page_permissions(self):
+        """
+        User can delete page permissions if he has
+        change permissions on the Page model,
+        delete permissions on the PagePermission model,
+        global change permission and global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+        permission = self.add_page_permission(user=staff_user_2, page=page)
+
+        data = self._get_page_permissions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+            id=permission.pk,
+            DELETE='on',
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, endpoint)
+            self.assertFalse(self._page_permission_exists(user=staff_user_2))
+
+    def test_user_cant_delete_page_permissions(self):
+        """
+        User can't delete page permissions if he
+        does not have change permissions on the Page model,
+        does not have delete permissions on the PagePermission model,
+        does not have global change permission,
+        and/or does not have global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+        permission = self.add_page_permission(user=staff_user_2, page=page)
+
+        data = self._get_page_permissions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+            id=permission.pk,
+            DELETE='on',
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_permission_exists(user=staff_user_2))
+
+    def test_user_can_add_page_view_restrictions(self):
+        """
+        User can add page view restrictions if he has
+        change permissions on the Page model,
+        add permissions on the PagePermission model,
+        global change permission and global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        data = self._get_page_view_restrictions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, endpoint)
+            self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
+
+    def test_user_cant_add_page_view_restrictions(self):
+        """
+        User can't add page view restrictions if he
+        does not have change permissions on the Page model,
+        does not have add permissions on the PagePermission model,
+        does not have global change permission,
+        and/or does not have global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        data = self._get_page_view_restrictions_data(
+            page=page.pk,
+            user=staff_user_2.pk,
+        )
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
+
+    def test_user_can_edit_page_view_restrictions(self):
+        """
+        User can edit page view restrictions if he has
+        change permissions on the Page model,
+        change permissions on the PagePermission model,
+        global change permission and global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+
+        permission = self.add_page_permission(
+            user=staff_user_2,
+            page=page,
+            can_view=True,
+            grant_on=1,
+        )
+
+        data = model_to_dict(permission, exclude=['group'])
+        data['grant_on'] = 5
+
+        data = self._get_page_view_restrictions_data(**data)
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, endpoint)
+            self.assertTrue(
+                self._page_permission_exists(
+                    user=staff_user_2,
+                    grant_on=5,
+                )
+            )
+
+    def test_user_cant_edit_page_view_restrictions(self):
+        """
+        User can't edit page view restrictions if he
+        does not have change permissions on the Page model,
+        does not have change permissions on the PagePermission model,
+        does not have global change permission,
+        and/or does not have global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+        permission = self.add_page_permission(
+            user=staff_user_2,
+            page=page,
+            can_view=True,
+            grant_on=1,
+        )
+
+        data = model_to_dict(permission, exclude=['group'])
+        data['grant_on'] = 5
+
+        data = self._get_page_view_restrictions_data(**data)
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(
+                self._page_permission_exists(
+                    user=staff_user_2,
+                    grant_on=5,
+                )
+            )
+
+    def test_user_can_delete_page_view_restrictions(self):
+        """
+        User can delete view restrictions if he has
+        change permissions on the Page model,
+        delete permissions on the PagePermission model,
+        global change permission and global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+        permission = self.add_page_permission(
+            user=staff_user_2,
+            page=page,
+            can_view=True,
+        )
+
+        data = model_to_dict(permission, exclude=['group'])
+        data['DELETE'] = True
+
+        data = self._get_page_view_restrictions_data(**data)
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, endpoint)
+            self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
+
+    def test_user_cant_delete_page_view_restrictions(self):
+        """
+        User can't delete view restrictions if he
+        does not have change permissions on the Page model,
+        does not have delete permissions on the PagePermission model,
+        does not have global change permission,
+        and/or does not have global change permissions permission.
+        """
+        page = self._permissions_page
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        staff_user = self.get_staff_user_with_no_permissions()
+        staff_user_2 = self.get_staff_page_user(created_by=staff_user)
+        permission = self.add_page_permission(
+            user=staff_user_2,
+            page=page,
+            can_view=True,
+        )
+
+        data = model_to_dict(permission, exclude=['group'])
+        data['DELETE'] = True
+
+        data = self._get_page_view_restrictions_data(**data)
+        data['_continue'] = '1'
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_pagepermission')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+            can_change_permissions=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
+
+    def test_user_can_edit_title_fields(self):
+        """
+        User can edit title (translation) fields if he has
+        global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        title = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
+
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+        self.add_permission(staff_user, 'change_page')
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(title, fields=['title'])
+            data['title'] = 'permissions-de-2'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(self._translation_exists(title='permissions-de-2'))
+
+    def test_user_cant_edit_title_fields(self):
+        """
+        User can't edit title (translation) fields if he does not have
+        global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        title = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
+
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+        self.add_permission(staff_user, 'change_page')
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(title, fields=['title'])
+            data['title'] = 'permissions-de-2'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(self._translation_exists(title='permissions-de-2'))
+
+    # Plugin related tests
+
+    def test_user_can_add_plugin(self):
+        """
+        User can add a plugin if he has change permissions
+        on the Page model, add permissions on the plugin model
+        and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        placeholder = page.placeholders.get(slot='body')
+        plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
+        endpoint = self._get_add_plugin_uri(page)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(plugins.count(), 1)
+
+    def test_user_cant_add_plugin(self):
+        """
+        User can't add a plugin if he
+        does not have change permissions on the Page model,
+        does not have add permissions on the plugin model
+        and/or does not have global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        placeholder = page.placeholders.get(slot='body')
+        plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
+        endpoint = self._get_add_plugin_uri(page)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(plugins.count(), 0)
+
+    def test_user_can_edit_plugin(self):
+        """
+        User can edit a plugin if he has change permissions
+        on the Page model, change permissions on the plugin model
+        and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(plugin, fields=['name', 'url'])
+            data['name'] = 'A link 2'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            plugin.refresh_from_db()
+            self.assertEqual(plugin.name, data['name'])
+
+    def test_user_cant_edit_plugin(self):
+        """
+        User can't edit a plugin if he
+        does not have change permissions on the Page model,
+        does not have change permissions on the plugin model
+        and/or does not have global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            data = model_to_dict(plugin, fields=['name', 'url'])
+            data['name'] = 'A link 2'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            plugin.refresh_from_db()
+            self.assertNotEqual(plugin.name, data['name'])
+
+    def test_user_can_delete_plugin(self):
+        """
+        User can delete a plugin if he has change permissions
+        on the Page model, delete permissions on the plugin model
+        and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'post': True}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 302)
+            self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
+
+    def test_user_cant_delete_plugin(self):
+        """
+        User can't delete a plugin if he
+        does not have change permissions on the Page model,
+        does not have delete permissions on the plugin model
+        and/or does not have global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'delete_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            data = {'post': True}
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(CMSPlugin.objects.filter(pk=plugin.pk).exists())
+
+    def test_user_can_move_plugin(self):
+        """
+        User can move a plugin if he has change permissions
+        on the Page model, change permissions on the plugin model
+        and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        endpoint = self.get_admin_url(Page, 'move_plugin')
+        source_placeholder = plugin.placeholder
+        target_placeholder = page.placeholders.get(slot='right-column')
+
+        data = {
+            'plugin_id': plugin.pk,
+            'placeholder_id': target_placeholder.pk,
+            'plugin_parent': '',
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(target_placeholder.get_plugins('en').filter(pk=plugin.pk))
+            self.assertFalse(source_placeholder.get_plugins('en').filter(pk=plugin.pk))
+
+    def test_user_cant_move_plugin(self):
+        """
+        User can't move a plugin if he
+        does not have change permissions on the Page model,
+        does not have change permissions on the plugin model
+        and/or does not have global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        endpoint = self.get_admin_url(Page, 'move_plugin')
+        source_placeholder = plugin.placeholder
+        target_placeholder = page.placeholders.get(slot='right-column')
+
+        data = {
+            'plugin_id': plugin.pk,
+            'placeholder_id': target_placeholder.pk,
+            'plugin_parent': '',
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'change_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(target_placeholder.get_plugins('en').filter(pk=plugin.pk))
+            self.assertTrue(source_placeholder.get_plugins('en').filter(pk=plugin.pk))
+
+    def test_user_can_copy_plugin(self):
+        """
+        User can copy a plugin if he has change permissions
+        on the Page model, add permissions on the plugin model
+        and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        source_placeholder = plugin.placeholder
+        target_placeholder = page.placeholders.get(slot='right-column')
+
+        data = {
+            'source_plugin_id': plugin.pk,
+            'source_placeholder_id': source_placeholder.pk,
+            'source_language': plugin.language,
+            'target_language': translation.language,
+            'target_placeholder_id': target_placeholder.pk,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(source_placeholder.get_plugins('en').filter(pk=plugin.pk).exists())
+            self.assertTrue(
+                target_placeholder
+                .get_plugins(translation.language)
+                .filter(plugin_type=plugin.plugin_type)
+                .exists()
+            )
+
+    def test_user_cant_copy_plugin(self):
+        """
+        User can't copy a plugin if he
+        does not have change permissions on the Page model,
+        does not have add permissions on the plugin model,
+        and/or does not have global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugin = self._add_plugin_to_page(page)
+        translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        source_placeholder = plugin.placeholder
+        target_placeholder = page.placeholders.get(slot='right-column')
+
+        data = {
+            'source_plugin_id': plugin.pk,
+            'source_placeholder_id': source_placeholder.pk,
+            'source_language': plugin.language,
+            'target_language': translation.language,
+            'target_placeholder_id': target_placeholder.pk,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(source_placeholder.get_plugins('en').filter(pk=plugin.pk).exists())
+            self.assertFalse(
+                target_placeholder
+                .get_plugins(translation.language)
+                .filter(plugin_type=plugin.plugin_type)
+                .exists()
+            )
+
+    def test_user_can_copy_plugins_to_language(self):
+        """
+        User can copy all plugins to another language if he has
+        change permissions on the Page model, add permissions on the
+        plugins being copied and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        plugins = [
+            self._add_plugin_to_page(page),
+            self._add_plugin_to_page(page),
+            self._add_plugin_to_page(page),
+            self._add_plugin_to_page(page),
+        ]
+        placeholder = plugins[0].placeholder
+
+        data = {
+            'source_language': 'en',
+            'target_language': translation.language,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=True,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            new_plugins = placeholder.get_plugins(translation.language)
+            self.assertEqual(new_plugins.count(), len(plugins))
+
+    def test_user_cant_copy_plugins_to_language(self):
+        """
+        User can't copy all plugins to another language if he does have
+        change permissions on the Page model, does not have add permissions
+        on the plugins being copied and/or does not have global
+        change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        plugins = [
+            self._add_plugin_to_page(page),
+            self._add_plugin_to_page(page),
+            self._add_plugin_to_page(page),
+            self._add_plugin_to_page(page),
+        ]
+        placeholder = plugins[0].placeholder
+
+        data = {
+            'source_language': 'en',
+            'target_language': translation.language,
+        }
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_link')
+        self.add_page_permission(
+            staff_user,
+            page,
+            can_change=False,
+        )
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            new_plugins = placeholder.get_plugins(translation.language)
+            self.assertEqual(new_plugins.count(), 0)
+
+    # Placeholder related tests
+
+    def test_user_can_clear_empty_placeholder(self):
+        """
+        User can clear an empty placeholder if he has change permissions
+        on the Page model and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        placeholder = page.placeholders.get(slot='body')
+        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {'test': 0})
+            self.assertEqual(response.status_code, 302)
+
+    def test_user_cant_clear_empty_placeholder(self):
+        """
+        User can't clear an empty placeholder if he does not have
+        change permissions on the Page model and/or does not have
+        global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        placeholder = page.placeholders.get(slot='body')
+        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {'test': 0})
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_can_clear_non_empty_placeholder(self):
+        """
+        User can clear a placeholder with plugins if he has
+        change permissions on the Page model, delete permissions
+        on the plugin models in the placeholder and global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugins = [
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'LinkPlugin'),
+        ]
+        placeholder = plugins[0].placeholder
+        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+
+        self.add_permission(staff_user, 'delete_text')
+        self.add_permission(staff_user, 'delete_link')
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {'test': 0})
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(placeholder.get_plugins('en').count(), 0)
+
+    def test_user_cant_clear_non_empty_placeholder(self):
+        """
+        User can't clear a placeholder with plugins if he does not have
+        change permissions on the Page model, does not have delete
+        permissions on the plugin models in the placeholder and/or
+        does not have global change permissions.
+        """
+        page = self._permissions_page
+        staff_user = self.get_staff_user_with_no_permissions()
+        plugins = [
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'LinkPlugin'),
+        ]
+        placeholder = plugins[0].placeholder
+        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+
+        self.add_permission(staff_user, 'delete_text')
+        self.add_permission(staff_user, 'delete_link')
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=False)
+
+        with self.login_user_context(staff_user):
+            response = self.client.post(endpoint, {'test': 0})
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(placeholder.get_plugins('en').count(), 2)
 
 
 @override_settings(CMS_PERMISSION=False)

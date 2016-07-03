@@ -2,8 +2,9 @@
 from cms.utils.urlutils import admin_reverse
 from cms.api import get_page_draft
 from cms.toolbar_base import CMSToolbar
-from cms.utils import get_cms_setting, get_language_list
-from cms.utils.permissions import has_page_change_permission
+from cms.utils import get_language_list
+from cms.utils.page_permissions import user_can_change_page
+
 from django.core.urlresolvers import NoReverseMatch
 
 
@@ -58,22 +59,10 @@ class ExtensionToolbar(CMSToolbar):
         It returns the page menu or None if the above conditions are not met
         """
         page = self._get_page()
-        if not page:
-            # Nothing to do
-            return
-        # check global permissions if CMS_PERMISSION is active
-        if get_cms_setting('PERMISSION'):
-            has_global_current_page_change_permission = has_page_change_permission(self.request)
-        else:
-            has_global_current_page_change_permission = True
-            # check if user has page edit permission
-        can_change = (self.request.current_page and
-                      self.request.current_page.has_change_permission(self.request))
-        current_page_menu = self.toolbar.get_or_create_menu('page')
-        if can_change and has_global_current_page_change_permission:
-            return current_page_menu
-        else:
-            return
+
+        if page and user_can_change_page(self.request.user, page=page):
+            return self.toolbar.get_or_create_menu('page')
+        return
 
     def _get_page(self):
         """

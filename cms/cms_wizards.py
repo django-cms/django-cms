@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.sites.models import Site
 
 from cms.models import Page
-from cms.utils import permissions
+from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
 from .wizards.wizard_pool import wizard_pool
 from .wizards.wizard_base import Wizard
@@ -15,12 +13,13 @@ from .forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 class CMSPageWizard(Wizard):
 
     def user_has_add_permission(self, user, page=None, **kwargs):
-        if not page or not page.site_id:
-            site = Site.objects.get_current()
+        if page and page.parent_id:
+            # User is adding a page which will be a right
+            # sibling to the current page.
+            has_perm = user_can_add_subpage(user, target=page.parent)
         else:
-            site = Site.objects.get(pk=page.site_id)
-        return permissions.has_page_add_permission(
-            user, page, position="right", site=site)
+            has_perm = user_can_add_page(user)
+        return has_perm
 
 
 class CMSSubPageWizard(Wizard):
@@ -30,12 +29,7 @@ class CMSSubPageWizard(Wizard):
             # We can't really add a sub-page to a non-existent page. Or to an
             # app-hooked page.
             return False
-        if not page.site_id:
-            site = Site.objects.get_current()
-        else:
-            site = Site.objects.get(pk=page.site_id)
-        return permissions.has_page_add_permission(
-            user, page, position="last-child", site=site)
+        return user_can_add_subpage(user, target=page)
 
 
 cms_page_wizard = CMSPageWizard(

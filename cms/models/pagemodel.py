@@ -16,7 +16,7 @@ from cms import constants
 from cms.cache.page import set_xframe_cache, get_xframe_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
-from cms.models.managers import PageManager, PagePermissionsPermissionManager
+from cms.models.managers import PageManager
 from cms.models.metaclasses import PageMetaClass
 from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
@@ -113,7 +113,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     # Managers
     objects = PageManager()
-    permissions = PagePermissionsPermissionManager()
 
     class Meta:
         permissions = (
@@ -554,9 +553,10 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.reverse_id = None
         if self.application_namespace == "":
             self.application_namespace = None
-        from cms.utils.permissions import _thread_locals
+        from cms.utils.permissions import get_current_user
 
-        user = getattr(_thread_locals, "user", None)
+        user = get_current_user()
+
         if user:
             try:
                 changed_by = force_text(user)
@@ -962,9 +962,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return self.ancestors_ascending
 
     def get_cached_descendants(self):
-        if not hasattr(self, "_cached_descendants"):
+        if not self.has_cached_descendants():
             self._cached_descendants = list(self.get_descendants())
         return self._cached_descendants
+
+    def has_cached_descendants(self):
+        return hasattr(self, "_cached_descendants")
 
     # ## Title object access
 
@@ -1177,107 +1180,65 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 return t[1]
         return _("default")
 
-    def has_view_permission(self, request, user=None):
-        if not user:
-            user = request.user
-        from cms.utils.permissions import get_any_page_view_permissions, has_global_page_permission
-        can_see_unrestricted = get_cms_setting('PUBLIC_FOR') == 'all' or (
-            get_cms_setting('PUBLIC_FOR') == 'staff' and user.is_staff)
+    def has_view_permission(self, user):
+        from cms.utils.page_permissions import user_can_view_page
+        return user_can_view_page(user, page=self)
 
-        # inherited and direct view permissions
-        is_restricted = bool(get_any_page_view_permissions(request, self))
+    def get_view_restrictions(self):
+        from cms.models import PagePermission
 
-        if not is_restricted and can_see_unrestricted:
-            return True
-        elif not user.is_authenticated():
-            return False
+        page = self.get_draft_object()
+        return PagePermission.objects.for_page(page=page).filter(can_view=True)
 
-        if not is_restricted:
-            # a global permission was given to the request's user
-            if has_global_page_permission(request, self.site_id, user=user, can_view=True):
-                return True
-        else:
-            # a specific permission was granted to the request's user
-            if self.get_draft_object().has_generic_permission(request, "view", user=user):
-                return True
+    def has_view_restrictions(self):
+        if get_cms_setting('PERMISSION'):
+            return self.get_view_restrictions().exists()
+        return False
 
-        # The user has a normal django permission to view pages globally
-        opts = self._meta
-        codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-        return request.user.has_perm(codename)
-
-    def has_change_permission(self, request, user=None):
-        from cms.utils.permissions import has_auth_page_permission
-
-        if not user:
-            user = request.user
-
-        if user.is_superuser:
-            return True
-        return (has_auth_page_permission(user, action='change')
-                and self.has_generic_permission(request, "change"))
-
-    def has_delete_permission(self, request, user=None):
-        from cms.utils.permissions import has_auth_page_permission
-
-        if not user:
-            user = request.user
-
-        if user.is_superuser:
-            return True
-        return (has_auth_page_permission(user, action='delete')
-                and self.has_generic_permission(request, "delete"))
-
-    def has_publish_permission(self, request, user=None):
-        if not user:
-            user = request.user
-        if user.is_superuser:
-            return True
-        opts = self._meta
-        return (user.has_perm(opts.app_label + '.' + "publish_page")
-                and self.has_generic_permission(request, "publish"))
-
-    has_moderate_permission = has_publish_permission
-
-    def has_advanced_settings_permission(self, request, user=None):
-        return self.has_generic_permission(request, "advanced_settings", user)
-
-    def has_change_permissions_permission(self, request, user=None):
-        """
-        Has user ability to change permissions for current page?
-        """
-        return self.has_generic_permission(request, "change_permissions", user)
-
-    def has_add_permission(self, request, user=None):
+    def has_add_permission(self, user):
         """
         Has user ability to add page under current page?
         """
-        return self.has_generic_permission(request, "add", user)
+        from cms.utils.page_permissions import user_can_add_subpage
+        return user_can_add_subpage(user, self)
 
-    def has_move_page_permission(self, request, user=None):
+    def has_change_permission(self, user):
+        from cms.utils.page_permissions import user_can_change_page
+        return user_can_change_page(user, page=self)
+
+    def has_delete_permission(self, user):
+        from cms.utils.page_permissions import user_can_delete_page
+        return user_can_delete_page(user, page=self)
+
+    def has_delete_translation_permission(self, user, language):
+        from cms.utils.page_permissions import user_can_delete_page_translation
+        return user_can_delete_page_translation(user, page=self, language=language)
+
+    def has_publish_permission(self, user):
+        from cms.utils.page_permissions import user_can_publish_page
+        return user_can_publish_page(user, page=self)
+
+    def has_advanced_settings_permission(self, user):
+        from cms.utils.page_permissions import user_can_change_page_advanced_settings
+        return user_can_change_page_advanced_settings(user, page=self)
+
+    def has_change_permissions_permission(self, user):
+        """
+        Has user ability to change permissions for current page?
+        """
+        from cms.utils.page_permissions import user_can_change_page_permissions
+        return user_can_change_page_permissions(user, page=self)
+
+    def has_move_page_permission(self, user):
         """Has user ability to move current page?
         """
-        return self.has_generic_permission(request, "move_page", user)
+        from cms.utils.page_permissions import user_can_move_page
+        return user_can_move_page(user, page=self)
 
-    def has_generic_permission(self, request, perm_type, user=None):
-        """
-        Return true if the current user has permission on the page.
-        Return the string 'All' if the user has all rights.
-        """
-        if not user:
-            user = request.user
-        att_name = "permission_%s_cache" % perm_type
-        if (not hasattr(self, "permission_user_cache")
-                or not hasattr(self, att_name)
-                or user.pk != self.permission_user_cache.pk):
-            from cms.utils.permissions import has_generic_permission
-
-            self.permission_user_cache = user
-            setattr(self, att_name, has_generic_permission(
-                self.pk, user, perm_type, self.site_id))
-            if getattr(self, att_name):
-                self.permission_edit_cache = True
-        return getattr(self, att_name)
+    def has_placeholder_change_permission(self, user):
+        if not self.publisher_is_draft:
+            return False
+        return self.has_change_permission(user)
 
     def get_media_path(self, filename):
         """

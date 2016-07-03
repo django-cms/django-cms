@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 
 from cms.admin import forms
-from cms.admin.forms import (PageUserForm, PagePermissionInlineAdminForm,
+from cms.admin.forms import (PagePermissionInlineAdminForm,
                              ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
                              PageUserGroupForm)
-from cms.api import create_page, create_page_user, assign_user_to_page
+from cms.api import create_page, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
@@ -191,22 +189,6 @@ class FormsTestCase(CMSTestCase):
 
         self.assertEqual(normal_result, list(lazy_result))
 
-    def test_page_user_form_initial(self):
-        if get_user_model().USERNAME_FIELD == 'email':
-            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org",
-                                                               "myuser@django-cms.org")
-        else:
-            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
-
-        user = create_page_user(myuser, myuser, grant_all=True)
-        puf = PageUserForm(instance=user)
-        names = ['can_add_page', 'can_change_page', 'can_delete_page',
-                 'can_add_pageuser', 'can_change_pageuser',
-                 'can_delete_pageuser', 'can_add_pagepermission',
-                 'can_change_pagepermission', 'can_delete_pagepermission']
-        for name in names:
-            self.assertTrue(puf.initial.get(name, False))
-
 
 class PermissionFormTestCase(CMSTestCase):
     def test_permission_forms(self):
@@ -244,13 +226,16 @@ class PermissionFormTestCase(CMSTestCase):
                 'can_change': ''
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
+
+            error_message = ("<li>Users can&#39;t create a page without permissions "
+                             "to change the created page. Edit permissions required.</li>")
             self.assertFalse(form.is_valid())
-            self.assertTrue('<li>Add page permission also requires edit page '
-                            'permission.</li>' in str(form.errors))
+            self.assertTrue(error_message in str(form.errors))
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
                 'can_add': '1',
+                'can_change': '1',
 
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
@@ -295,34 +280,8 @@ class PermissionFormTestCase(CMSTestCase):
 
     def test_user_forms(self):
         user = self.get_superuser()
-        user2 = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
         set_current_user(user)
-        data = {'username': "test",
-                'password': 'hello',
-                'password1': 'hello',
-                'password2': 'hello',
-                'created_by': user.pk,
-                'last_login': datetime.now(),
-                'date_joined': datetime.now(),
-                'email': 'test@example.com',
-        }
 
-        form = PageUserForm(data=data, files=None)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-        data = {'username': "test2",
-                'password': 'hello',
-                'password1': 'hello',
-                'password2': 'hello',
-                'email': 'test2@example.com',
-                'created_by': user.pk,
-                'last_login': datetime.now(),
-                'date_joined': datetime.now(),
-                'notify_user': 'on',
-        }
-        form = PageUserForm(data=data, files=None, instance=user2)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
         data = {
             'name': 'test_group'
         }

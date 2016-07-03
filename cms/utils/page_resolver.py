@@ -15,6 +15,8 @@ from cms.models.pagemodel import Page
 from cms.utils.compat.dj import is_installed
 from cms.utils.moderator import use_draft
 from cms.utils.urlutils import any_path_re, admin_reverse
+from cms.utils.page_permissions import user_can_change_page
+
 
 ADMIN_PAGE_RE_PATTERN = r'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
@@ -116,7 +118,8 @@ def get_page_from_request(request, use_path=None):
             path = path[:-1]
 
     page = get_page_from_path(path, preview, draft)
-    if draft and page and not page.has_change_permission(request):
+
+    if draft and page and not user_can_change_page(request.user, page):
         page = get_page_from_path(path, preview, draft=False)
 
     # For public pages we check if any parent is hidden due to published dates

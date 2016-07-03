@@ -5,10 +5,10 @@ from cms.utils import get_cms_setting
 
 
 PERMISSION_KEYS = [
-    'can_change', 'can_add', 'can_delete',
-    'can_change_advanced_settings', 'can_publish',
-    'can_change_permissions', 'can_move_page',
-    'can_moderate', 'can_view']
+    'add_page', 'change_page', 'change_page_advanced_settings',
+    'change_page_permissions', 'delete_page', 'move_page',
+    'publish_page', 'recover_page', 'view_page',
+]
 
 
 def get_cache_key(user, key):

@@ -253,18 +253,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def has_change_permission(self, request, obj=None):
-        """
-        By default requires the user to have permission to change the plugin
-        instance and the object, to which the plugin is attached (eg a page).
-        """
-        if obj:
-            return obj.has_change_permission(request)
-        # When obj is None, we can't check permissions correctly
-        # because we need a placeholder object to do so.
-        return False
-    has_delete_permission = has_change_permission
-
     def render_close_frame(self, obj, extra_context=None):
         context = {
             'plugin': obj,

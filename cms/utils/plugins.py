@@ -3,23 +3,19 @@ from collections import defaultdict
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
 
-from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_text
 from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
 
 
 from cms.exceptions import PluginLimitReached
-from cms.models import Page, CMSPlugin
+from cms.models import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (get_placeholder_conf, get_placeholders)
-
-def get_page_from_plugin_or_404(cms_plugin):
-    return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
 
 
 def get_plugins(request, placeholder, template, lang=None):
@@ -117,7 +113,6 @@ def create_default_plugins(request, placeholders, template, lang):
             parent.notify_on_autoadd_children(request, conf, plugins)
         return plugins + descendants
 
-
     unfiltered_confs = ((ph, get_placeholder_conf('default_plugins',
                                                   ph.slot, template))
                         for ph in placeholders)
@@ -125,7 +120,7 @@ def create_default_plugins(request, placeholders, template, lang):
     mutable_confs = ((ph, default_plugin_confs)
                      for ph, default_plugin_confs
                      in filter(itemgetter(1), unfiltered_confs)
-                     if ph.has_add_permission(request))
+                     if ph.has_change_permission(request.user))
     return sum(starmap(_create_default_plugins, mutable_confs), [])
 
 

@@ -6,8 +6,8 @@ from cms.constants import PUBLISHER_STATE_PENDING
 from cms.toolbar.utils import get_plugin_toolbar_js
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
-from cms.utils.permissions import get_any_page_view_permissions
 from sekizai.helpers import get_varname
+
 from django import template
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -20,33 +20,24 @@ register = template.Library()
 CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
-class ShowAdminMenu(InclusionTag):
-    name = 'show_admin_menu'
-    template = 'admin/cms/page/tree/menu.html'
+@register.inclusion_tag('admin/cms/page/tree/menu.html', takes_context=True)
+def show_admin_menu(context, page):
+    request = context['request']
 
-    options = Options(
-        Argument('page')
-    )
+    if 'cl' in context:
+        filtered = context['cl'].is_filtered()
+    else:
+        filtered = context.get('filtered', False)
 
-    def get_context(self, context, page):
-        request = context['request']
+    language = context['preview_language']
 
-        if 'cl' in context:
-            filtered = context['cl'].is_filtered()
-        elif 'filtered' in context:
-            filtered = context['filtered']
-        language = context['preview_language']
-
-
-        # following function is newly used for getting the context per item (line)
-        # if something more will be required, then get_admin_menu_item_context
-        # function have to be updated.
-        # This is done because item can be reloaded after some action over ajax.
-        context.update(get_admin_menu_item_context(request, page, filtered, language))
-        return context
-
-
-register.tag(ShowAdminMenu)
+    # following function is newly used for getting the context per item (line)
+    # if something more will be required, then get_admin_menu_item_context
+    # function have to be updated.
+    # This is done because item can be reloaded after some action over ajax.
+    context['children'] = page.children.all()
+    context.update(get_admin_menu_item_context(request, page, filtered, language))
+    return context
 
 
 class TreePublishRow(Tag):
@@ -116,34 +107,6 @@ def all_ancestors_are_published(page, language):
     return True
 
 
-class ShowLazyAdminMenu(InclusionTag):
-    name = 'show_lazy_admin_menu'
-    template = 'admin/cms/page/tree/lazy_child_menu.html'
-
-    options = Options(
-        Argument('page')
-    )
-
-    def get_context(self, context, page):
-        request = context['request']
-
-        if 'cl' in context:
-            filtered = context['cl'].is_filtered()
-        elif 'filtered' in context:
-            filtered = context['filtered']
-
-        language = context['preview_language']
-        # following function is newly used for getting the context per item (line)
-        # if something more will be required, then get_admin_menu_item_context
-        # function have to be updated.
-        # This is done because item can be reloaded after some action over ajax.
-        context.update(get_admin_menu_item_context(request, page, filtered, language))
-        return context
-
-
-register.tag(ShowLazyAdminMenu)
-
-
 class CleanAdminListFilter(InclusionTag):
     """
     used in admin to display only these users that have actually edited a page
@@ -178,14 +141,13 @@ def boolean_icon(value):
         u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
 
 
-@register.filter
-def is_restricted(page, request):
+@register.assignment_tag(takes_context=True)
+def page_has_restrictions(context, page):
     if get_cms_setting('PERMISSION'):
         if hasattr(page, 'permission_restricted'):
             text = bool(page.permission_restricted)
         else:
-            all_perms = list(get_any_page_view_permissions(request, page))
-            text = bool(all_perms)
+            text = page.has_view_restrictions()
         return text
     else:
         return boolean_icon(None)
@@ -216,10 +178,17 @@ class PageSubmitRow(InclusionTag):
         change = context['change']
         is_popup = context['is_popup']
         save_as = context['save_as']
-        basic_info = context.get('advanced_settings', False)
-        advanced_settings = context.get('basic_info', False)
+        basic_info = context.get('basic_info', False)
+        advanced_settings = context.get('advanced_settings', False)
+        change_advanced_settings = context.get('can_change_advanced_settings', False)
         language = context.get('language', '')
         filled_languages = context.get('filled_languages', [])
+
+        show_buttons = language in filled_languages
+
+        if show_buttons:
+            show_buttons = (basic_info or advanced_settings) and change_advanced_settings
+
         context = {
             # TODO check this (old code: opts.get_ordered_objects() )
             'onclick_attrib': (opts and change
@@ -229,8 +198,9 @@ class PageSubmitRow(InclusionTag):
             'show_save_and_add_another': False,
             'show_save_and_continue': not is_popup and context['has_change_permission'],
             'is_popup': is_popup,
-            'basic_info': basic_info,
-            'advanced_settings': advanced_settings,
+            'basic_info_active': basic_info,
+            'advanced_settings_active': advanced_settings,
+            'show_buttons': show_buttons,
             'show_save': True,
             'language': language,
             'language_is_filled': language in filled_languages,

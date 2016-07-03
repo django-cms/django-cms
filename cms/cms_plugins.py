@@ -99,7 +99,7 @@ class AliasPlugin(CMSPluginBase):
                 placeholder = Placeholder.objects.get(pk=pk)
             except Placeholder.DoesNotExist:
                 return HttpResponseBadRequest("placeholder with id %s not found." % pk)
-            if not placeholder.has_change_permission(request):
+            if not placeholder.has_change_permission(request.user):
                 return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
         clipboard = request.toolbar.clipboard
         clipboard.cmsplugin_set.all().delete()
