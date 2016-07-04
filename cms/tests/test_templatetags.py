@@ -422,7 +422,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
-        expected_end = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
+        expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
         self.assertIn(expected_start, output)
         self.assertIn(expected_end, output)
 
@@ -456,7 +456,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
         'cms-render-model-add"></template>'
-        expected_end = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
+        expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 '
         'cms-render-model-add"></template>'
         self.assertIn(expected_start, output)
         self.assertIn(expected_end, output)
