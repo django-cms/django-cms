@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import uuid
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.util.context_managers import apphooks
@@ -264,6 +265,43 @@ class ManagementTestCase(CMSTestCase):
         management.call_command('cms', 'uninstall', 'plugins', PLUGIN, interactive=False, stdout=out)
         self.assertEqual(out.getvalue(), "1 'TextPlugin' plugins uninstalled\n")
         self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 0)
+
+    def test_publisher_public(self):
+        admin = self.get_superuser()
+        create_page(
+            'home',
+            published=True,
+            language='de',
+            template='nav_playground.html',
+            created_by=admin,
+        )
+        page_1 = create_page(
+            'página 1',
+            published=True,
+            language='de',
+            template='nav_playground.html',
+            created_by=admin,
+        )
+        page_1.unpublish('de')
+
+        page_2 = create_page(
+            'página 2',
+            published=True,
+            language='de',
+            template='nav_playground.html',
+            created_by=admin,
+        )
+        page_2.unpublish('de')
+
+        management.call_command(
+            'cms',
+            'publisher-publish',
+            '-l de',
+            '--unpublished',
+            interactive=False,
+        )
+
+        self.assertEqual(Page.objects.public().count(), 3)
 
 
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
