@@ -6,6 +6,7 @@ from cms.constants import PUBLISHER_STATE_PENDING
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
+from menus.utils import DefaultLanguageChanger
 from django import template
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -267,6 +268,27 @@ def admin_static_url():
     If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
     """
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
+
+
+@register.assignment_tag(takes_context=True)
+def get_current_url_languages(context):
+    """
+    Exposes a dictionary mapping
+    configured languages to the current url
+    in that language.
+    """
+    request = context.get('request')
+
+    if not request:
+        return ''
+
+    languages = {}
+
+    for language in settings.LANGUAGES:
+        code = language[0]
+        # leverage the existing language changer
+        languages[code] = DefaultLanguageChanger(request)(code)
+    return languages
 
 
 class CMSAdminIconBase(Tag):
