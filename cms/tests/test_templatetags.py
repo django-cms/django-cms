@@ -467,6 +467,38 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         with self.assertNumQueries(4):
             self.render_template_obj(template, {}, request)
 
+    def test_render_model_with_deferred_fields(self):
+        from django.core.cache import cache
+        from cms.test_utils.project.sampleapp.models import Category
+
+        Category.objects.create(name='foo', depth=1)
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        template = "{% load cms_tags %}{% render_model category 'name' %}"
+        user = self._create_user("admin", True, True)
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = True
+        request.toolbar.is_staff = True
+        category = Category.objects.only('name').get()
+        output = self.render_template_obj(template, {'category': category}, request)
+        expected = "cms-plugin cms-plugin-start cms-plugin-sampleapp-category-name-%d cms-render-model" % category.pk
+        self.assertIn(expected, output)
+
+        # Now test that it does NOT render when not in edit mode
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        with self.assertNumQueries(0):
+            output = self.render_template_obj(template, {'category': category}, request)
+        expected = 'foo'
+        self.assertEqual(expected, output)
+
     def test_render_model_add(self):
         from django.core.cache import cache
         from cms.test_utils.project.sampleapp.models import Category
