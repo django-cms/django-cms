@@ -2,6 +2,7 @@
 import datetime
 import os.path
 from unittest import skipIf
+from functools import partial
 
 from django.conf import settings
 from django.core.cache import cache
@@ -32,7 +33,7 @@ from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADVANCED_CHANGE,
-                                      URL_CMS_PAGE_MOVE)
+                                      URL_CMS_PAGE_MOVE, URL_CMS_PAGE_COPY)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import installed_apps
@@ -574,22 +575,100 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = create_page("page_a", "nav_playground.html", "en", published=True)
-        page_a_a = create_page("page_a_a", "nav_playground.html", "en",
-                               parent=page_a, published=True, reverse_id="hello")
-        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a, published=True)
+        _create_page = partial(
+            create_page,
+            language="en",
+            template="nav_playground.html",
+            published=True,
+        )
 
-        page_b = create_page("page_b", "nav_playground.html", "en", published=True)
-        page_b_a = create_page("page_b_b", "nav_playground.html", "en",
-                               parent=page_b, published=True)
+        # The tree path comparisons done in this test
+        # are critical to ensuring tree integrity.
+        # Do NOT alter these paths, if tests fail
+        # then something has broken the tree!.
 
-        count = Page.objects.drafts().count()
+        home = _create_page("home")
+        child_1 = _create_page("Child 1", parent=home)
+        _create_page("Child 2", parent=home)
+
+        child_1_1 = _create_page("Child 1 1", parent=child_1, reverse_id="hello")
+        _create_page("Child 1 1", parent=child_1_1)
+        _create_page("Child 1 1", parent=child_1_1)
+
+        expected_tree = [
+            # Home
+            '0001',
+            # Home -> Child 1
+            '00010001',
+            # Home -> Child 1 -> Child 1 1
+            '000100010001',
+            # Home -> Child 1 -> Child 1 1 -> Child 1 1 1
+            '0001000100010001',
+            # Home -> Child 1 -> Child 1 1 -> Child 1 1 2
+            '0001000100010002',
+            # Home -> Child 2
+            '00010002',
+        ]
+
+        db_tree = (
+            home
+            .reload()
+            .get_descendants(True)
+            .order_by('path')
+            .values_list('path', flat=True)
+        )
+
+        self.assertListEqual(expected_tree, list(db_tree))
 
         superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            self.copy_page(page_a, page_b_a)
 
-        self.assertEqual(Page.objects.drafts().count() - count, 3)
+        # Copy the home page and insert it under Child 1 1 1
+        # to the left of Child 1 1 2.
+        with self.login_user_context(superuser):
+            page_data = {
+                'id': home.pk,
+                'target': child_1_1.pk,
+                'position': 1,
+                'copy_permissions': 'on',
+            }
+            self.client.post(URL_CMS_PAGE_COPY % home.pk, page_data)
+
+        expected_tree = [
+            # Home
+            '0001',
+            # Home -> Child 1
+            '00010001',
+            # Home -> Child 1 -> Child 1 1
+            '000100010001',
+            # Home -> Child 1 -> Child 1 1 -> Child 1 1 1
+            '0001000100010001',
+            # Home -> Child 1 -> Child 1 1 -> Home
+            '0001000100010002',
+            # Home -> Child 1 -> Child 1 1 -> Home -> Child 1
+            '00010001000100020001',
+            # Home -> Child 1 -> Child 1 1 -> Home -> Child 1 -> Child 1 1
+            '000100010001000200010001',
+            # Home -> Child 1 -> Child 1 1 -> Home -> Child 1 -> Child 1 1 -> Child 1 1 1
+            '0001000100010002000100010001',
+            # Home -> Child 1 -> Child 1 1 -> Home -> Child 1 -> Child 1 1 -> Child 1 1 2
+            '0001000100010002000100010002',
+            # Home -> Child 1 -> Child 1 1 -> Home -> Child 2
+            '00010001000100020002',
+            # Home -> Child 1 -> Child 1 1 -> Child 1 1 2
+            '0001000100010003',
+            # Home -> Child 2
+            '00010002',
+        ]
+
+        db_tree = (
+            home
+            .reload()
+            .get_descendants(True)
+            .order_by('path')
+            .values_list('path', flat=True)
+        )
+
+        self.assertListEqual(expected_tree, list(db_tree))
 
     def test_copy_page_method(self):
         """

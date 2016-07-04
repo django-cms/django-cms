@@ -4,7 +4,7 @@
   "devDependencies": {
     "autoprefixer": "^6.3.6",
     "browserslist-saucelabs": "^0.2.3",
-    "djangocms-casper-helpers": "^1.1.1",
+    "djangocms-casper-helpers": "^1.1.2",
     "exports-loader": "^0.6.3",
     "gulp": "3.9.0",
     "gulp-clean-css": "^2.0.6",

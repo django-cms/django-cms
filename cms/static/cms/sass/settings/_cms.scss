@@ -11,7 +11,6 @@ $color-primary: #00bbff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
-$color-window: #fcfcfc;
 
 // COLORS gray
 $gray:            lighten($black, 40%); // #666;
@@ -20,6 +19,9 @@ $gray-lighter:    lighten($gray, 46.5%); // #ddd
 $gray-light:      lighten($gray, 20%); // #999
 $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
+
+// used in pagetree / filer headers
+$gray-super-lightest: #f7f7f7;
 
 $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
