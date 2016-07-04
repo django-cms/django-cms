@@ -707,6 +707,11 @@ class CMSEditableObject(InclusionTag):
         else:
             lang = get_language()
         opts = instance._meta
+        # Django < 1.10 creates dynamic proxy model subclasses when fields are
+        # deferred using .only()/.exclude(). Make sure to use the underlying
+        # model options when it's the case.
+        if getattr(instance, '_deferred', False):
+            opts = opts.proxy_for_model._meta
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
