@@ -168,7 +168,7 @@ In your poll application’s ``models.py`` add the following:
     class PollPluginModel(CMSPlugin):
         poll = models.ForeignKey(Poll)
 
-        def __unicode__(self):
+        def __unicode__(self):  # __str__ if using Python3
             return self.poll.question
 
 .. note::
