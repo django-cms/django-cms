@@ -19,7 +19,7 @@ class MyPageExtension(PageExtension):
 extension_pool.register(MyPageExtension)
 
 
+# extension_pool.register can be used also as a decorator
+@extension_pool.register
 class MyTitleExtension(TitleExtension):
     extra_title = models.CharField(blank=True, default='', max_length=255)
-
-extension_pool.register(MyTitleExtension)
