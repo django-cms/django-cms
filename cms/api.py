@@ -158,14 +158,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         # but not enabled on the project.
         _verify_revision_support()
 
-    # ugly permissions hack
-    if created_by and isinstance(created_by, get_user_model()):
-        _thread_locals.user = created_by
-
-        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
-    else:
-        _thread_locals.user = None
-
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
         assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
@@ -215,11 +207,20 @@ def create_page(title, template, language, menu_title=None, slug=None,
             parent_id = parent.parent_id
     else:
         parent_id = None
+
     # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook, apphook_namespace)
     else:
         application_urls = None
+
+    # ugly permissions hack
+    if created_by and isinstance(created_by, get_user_model()):
+        _thread_locals.user = created_by
+
+        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+    else:
+        _thread_locals.user = None
 
     if reverse_id:
         if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).count():
