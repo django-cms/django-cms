@@ -577,7 +577,10 @@ var PageTree = new Class({
                 $('.js-cms-dialog-dimmer').remove();
             }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
                 e.preventDefault();
-                var formData = $(this).closest('form').serialize().split('&');
+                var submitButton = $(this);
+                var formData = submitButton.closest('form').serialize().split('&');
+
+                submitButton.prop('disabled', true);
 
                 // loop through form data and attach to obj
                 for (var i = 0; i < formData.length; i++) {
