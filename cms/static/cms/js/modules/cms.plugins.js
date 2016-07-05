@@ -67,6 +67,9 @@ var Plugin = new Class({
 
         // bind data element to the container
         this.ui.container.data('settings', this.options);
+        if (Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
+            return;
+        }
         Plugin._initializeDragItemsStates();
 
         // determine type of plugin
@@ -76,6 +79,7 @@ var Plugin = new Class({
                 this._collapsables();
                 break;
             case 'plugin': // handler for all plugins
+                Plugin.aliasPluginDuplicatesMap[this.options.plugin_id] = true;
                 this._setPlugin();
                 this._collapsables();
                 break;
@@ -1644,6 +1648,8 @@ Plugin._initializeDragItemsStates = Helpers.once(function _initializeDragItemsSt
         }
     });
 });
+
+Plugin.aliasPluginDuplicatesMap = {};
 
 // shorthand for jQuery(document).ready();
 $(Plugin._initializeGlobalHandlers);

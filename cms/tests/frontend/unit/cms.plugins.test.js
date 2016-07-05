@@ -39,6 +39,10 @@ describe('CMS.Plugin', function () {
         });
     });
 
+    afterEach(function () {
+        Plugin.aliasPluginDuplicatesMap = {};
+    });
+
     describe('instance', function () {
         var plugin1;
         var plugin2;
@@ -244,8 +248,35 @@ describe('CMS.Plugin', function () {
             expect(generic.ui.container.data('settings')).toEqual(generic.options);
         });
 
+        it('doesnt reset the ui if the same plugin is initialized twice (alias case)', function () {
+            spyOn(Plugin.prototype, '_setPlugin');
+            spyOn(Plugin.prototype, '_setPlaceholder');
+            spyOn(Plugin.prototype, '_setGeneric');
+            expect(Plugin.aliasPluginDuplicatesMap[plugin1.options.plugin_id]).toEqual(true);
+
+            new CMS.Plugin('cms-plugin-1', {
+                type: 'plugin',
+                plugin_id: 1,
+                plugin_type: 'TextPlugin',
+                placeholder_id: 1,
+                urls: {
+                    add_plugin: '/en/admin/cms/page/add-plugin/',
+                    edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                    move_plugin: '/en/admin/cms/page/move-plugin/',
+                    delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                    copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                }
+            });
+
+            expect(Plugin.aliasPluginDuplicatesMap[plugin1.options.plugin_id]).toEqual(true);
+            expect(Plugin.prototype._setPlugin).not.toHaveBeenCalled();
+            expect(Plugin.prototype._setPlaceholder).not.toHaveBeenCalled();
+            expect(Plugin.prototype._setGeneric).not.toHaveBeenCalled();
+        });
+
         it('checks if pasting into this plugin is allowed', function () {
             spyOn(CMS.Plugin.prototype, '_checkIfPasteAllowed');
+            Plugin.aliasPluginDuplicatesMap = {};
 
             plugin1 = new CMS.Plugin('cms-plugin-1', {
                 type: 'plugin',
