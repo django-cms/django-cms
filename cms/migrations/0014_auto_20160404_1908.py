@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.db import migrations, models
 
 
 def forwards(apps, schema_editor):
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    Permission = apps.get_model('auth', 'Permission')
     page_model = apps.get_model('cms', 'Page')
     page_ctype = ContentType.objects.get_for_model(page_model)
     Permission.objects.filter(
