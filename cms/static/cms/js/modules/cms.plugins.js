@@ -1776,7 +1776,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         if (e.keyCode === KEYS.SHIFT) {
             doc.data('expandmode', false);
         }
-    }).on('click.cms.plugin', '.cms-plugin a, a:has(.cms-plugin)', function (e) {
+    }).on('click.cms.plugin', '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin', function (e) {
         var DOUBLECLICK_DELAY = 300;
 
         // prevents single click from messing up the edit call

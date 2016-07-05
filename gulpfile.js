@@ -71,7 +71,8 @@ var INTEGRATION_TESTS = [
         'modal',
         'permissions',
         'logout',
-        'clipboard'
+        'clipboard',
+        'link-plugin-content-mode'
     ],
     [
         'pageTypes',
