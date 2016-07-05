@@ -248,13 +248,13 @@ var Plugin = new Class({
         }
 
         // adds listener for all plugin updates
-        this.ui.draggable.on('cms.plugins.update', function (e, eventData) {
+        this.ui.draggable.on('cms-plugins-update', function (e, eventData) {
             e.stopPropagation();
             that.movePlugin(null, eventData);
         });
 
         // adds listener for copy/paste updates
-        this.ui.draggable.on('cms.plugin.update', function (e, eventData) {
+        this.ui.draggable.on('cms-paste-plugin-update', function (e, eventData) {
             e.stopPropagation();
 
             var el = $(e.delegateTarget);
@@ -577,8 +577,8 @@ var Plugin = new Class({
         };
 
         clipboardDraggable.appendTo(this.ui.draggables);
-        this.ui.draggables.trigger('cms.update', [eventData]);
-        clipboardDraggable.trigger('cms.plugin.update', [eventData]);
+        this.ui.draggables.trigger('cms-structure-update', [eventData]);
+        clipboardDraggable.trigger('cms-paste-plugin-update', [eventData]);
     },
 
     /**
