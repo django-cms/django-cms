@@ -6,6 +6,7 @@
 - Deprecates the old-style wizard-related settings
 - CMS handles uninstalled apphooks better
 - Fix toolbar placement when foundation is installed
+- Removed globally unique constraint for Apphook configs.
 
 === 3.2.5 (2016-04-27) ===
 
