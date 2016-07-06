@@ -12,6 +12,20 @@ class ExtensionPool(object):
     def register(self, extension):
         """
         Registers the given extension.
+
+        Example::
+
+            class MyExtension(PageExtension):
+                pass
+
+            extension_pool.register(MyExtension)
+
+        or as decorator::
+
+            @extension_pool.register
+            class MyExtension(PageExtension):
+                pass
+
         """
 
         if issubclass(extension, PageExtension):
@@ -23,6 +37,7 @@ class ExtensionPool(object):
                 'Extension has to subclass either %r or %r. %r does not!' % (PageExtension, TitleExtension, extension)
             )
         self._activate_signaling()
+        return extension
 
     def unregister(self, extension):
         """
