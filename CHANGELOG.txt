@@ -36,6 +36,7 @@
   block.
 * Fixed an issue when plugin that is aliased on the same page couldn't be
   operated upon in the structure mode.
+* Removed globally unique constraint for Apphook configs.
 
 
 === 3.3.0 (2016-05-26) ===
