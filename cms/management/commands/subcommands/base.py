@@ -4,7 +4,7 @@ import os
 
 from collections import OrderedDict
 
-from django.core.management.base import BaseCommand, CommandParser, OutputWrapper
+from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import no_style
 
 
@@ -40,8 +40,6 @@ def add_builtin_arguments(parser):
 class SubcommandsCommand(BaseCommand):
     subcommands = OrderedDict()
     instances = {}
-    stdout = None
-    stderr = None
     help_string = ''
     command_name = ''
 
@@ -62,7 +60,7 @@ class SubcommandsCommand(BaseCommand):
         if self.subcommands:
             subparsers = parser.add_subparsers(dest=self.subcommand_dest)
             for command, cls in self.subcommands.items():
-                instance = cls(self.stdout, self.stderr)
+                instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
                 parser_sub = subparsers.add_parser(
                     cmd=self, name=instance.command_name, help=instance.help_string,
@@ -80,9 +78,9 @@ class SubcommandsCommand(BaseCommand):
                 command.style = no_style()
                 command.stderr.style_func = None
             if options.get('stdout'):
-                command.stdout = OutputWrapper(options['stdout'])
+                command.stdout._out = options.get('stdout')
             if options.get('stderr'):
-                command.stderr = OutputWrapper(options.get('stderr'), command.stderr.style_func)
+                command.stderr._out = options.get('stderr')
             command.handle(*args, **options)
         else:
             self.print_help('manage.py', 'cms')
