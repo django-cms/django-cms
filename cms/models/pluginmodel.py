@@ -294,7 +294,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def get_media_path(self, filename):
         pages = self.placeholder.page_set.all()
-        if pages.count():
+        if pages.exists():
             return pages[0].get_media_path(filename)
         else:  # django 1.0.2 compatibility
             today = date.today()

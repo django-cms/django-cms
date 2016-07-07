@@ -93,7 +93,7 @@ def update_home(instance, **kwargs):
             home_pk = qs.filter(title_set__published=True).distinct().get_home(instance.site_id).pk
         except NoHomeFound:
             if instance.publisher_is_draft and instance.title_set.filter(published=True,
-                                                                         publisher_public__published=True).count():
+                                                                         publisher_public__published=True).exists():
                 return
             home_pk = instance.pk
         for page in qs.filter(site=instance.site_id, is_home=True).exclude(pk=home_pk):

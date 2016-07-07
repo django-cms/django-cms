@@ -222,7 +222,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls = None
 
     if reverse_id:
-        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).count():
+        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
