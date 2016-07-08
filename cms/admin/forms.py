@@ -134,7 +134,7 @@ class PageForm(forms.ModelForm):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
 
-        if page and page.title_set.count():
+        if page and page.title_set.exists():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
@@ -335,7 +335,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             site_id = cleaned_data['site']
             if id:
                 if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(
-                        pk=self.instance.pk).count():
+                        pk=self.instance.pk).exists():
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
         apphook = cleaned_data.get('application_urls', None)

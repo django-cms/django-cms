@@ -227,7 +227,7 @@ class Placeholder(models.Model):
                 if is_user_settings or isinstance(admin_class, PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
-                        if field.count():
+                        if field.exists():
                             self._attached_fields_cache.append(rel.field)
                     except:
                         pass
@@ -250,7 +250,7 @@ class Placeholder(models.Model):
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
-                        if field.count():
+                        if field.exists():
                             self._attached_field_cache = rel.field
                             break
                     except:
@@ -266,7 +266,7 @@ class Placeholder(models.Model):
     def _get_attached_model(self):
         if hasattr(self, '_attached_model_cache'):
             return self._attached_model_cache
-        if self.page or self.page_set.all().count():
+        if self.page or self.page_set.exists():
             from cms.models import Page
             self._attached_model_cache = Page
             return Page
