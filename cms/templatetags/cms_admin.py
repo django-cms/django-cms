@@ -6,6 +6,7 @@ from cms.constants import PUBLISHER_STATE_PENDING
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
+from copy import copy
 from django import template
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -290,12 +291,13 @@ def render_plugin_toolbar_config(context, plugin, placeholder_slot=None):
     child_classes = cms_plugin.get_child_classes(placeholder_slot, page)
     parent_classes = cms_plugin.get_parent_classes(placeholder_slot, page)
 
-    context.update({
+    new_context = copy(context)
+    new_context.update({
         'allowed_child_classes': child_classes,
         'allowed_parent_classes': parent_classes,
         'instance': plugin
     })
-    return context
+    return new_context
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)
