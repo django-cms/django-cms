@@ -148,24 +148,26 @@ def build_plugin_tree(plugins):
                   key=attrgetter('position'))
 
 
-def downcast_plugins(queryset,
+def downcast_plugins(plugins,
                      placeholders=None, select_placeholder=False, request=None):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
 
     # make a map of plugin types, needed later for downcasting
-    for plugin in queryset:
+    for plugin in plugins:
         plugin_types_map[plugin.plugin_type].append(plugin.pk)
+
     for plugin_type, pks in plugin_types_map.items():
         cls = plugin_pool.get_plugin(plugin_type)
         # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
+
         if select_placeholder:
             plugin_qs = plugin_qs.select_related('placeholder')
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs:
+        for instance in plugin_qs.iterator():
             plugin_lookup[instance.pk] = instance
             # cache the placeholder
             if placeholders:
@@ -175,8 +177,8 @@ def downcast_plugins(queryset,
                         if not cls().get_cache_expiration(
                                 request, instance, pl) and not cls.cache:
                             pl.cache_placeholder = False
-            # make the equivalent list of qs, but with downcasted instances
-    return [plugin_lookup.get(plugin.pk, plugin) for plugin in queryset]
+    # make the equivalent list of qs, but with downcasted instances
+    return [plugin_lookup[plugin.pk] for plugin in plugins if plugin.pk in plugin_lookup]
 
 
 def reorder_plugins(placeholder, parent_id, language, order):
@@ -231,15 +233,17 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
         global_limit = limits.get("global")
         type_limit = limits.get(plugin_type)
         # total plugin count
-        count = placeholder.cmsplugin_set.filter(language=language).count()
+        count = placeholder.get_plugins(language=language).count()
         if global_limit and count >= global_limit:
             raise PluginLimitReached(_("This placeholder already has the maximum number of plugins (%s)." % count))
         elif type_limit:
             # total plugin type count
-            type_count = placeholder.cmsplugin_set.filter(
-                language=language,
-                plugin_type=plugin_type,
-            ).count()
+            type_count = (
+                placeholder
+                .get_plugins(language=language)
+                .filter(plugin_type=plugin_type)
+                .count()
+            )
             if type_count >= type_limit:
                 plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(

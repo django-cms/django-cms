@@ -13,7 +13,7 @@ from django.http import (
     HttpResponseNotFound,
     HttpResponseRedirect,
 )
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
+from cms.admin.forms import PluginAddValidationForm
 from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION, SLUG_REGEXP
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
@@ -189,6 +190,15 @@ class PlaceholderAdminMixin(object):
             return False
         return True
 
+    def has_paste_plugin_permission(self, request, plugins, target_placeholder):
+        if not target_placeholder.has_change_permission(request):
+            return False
+
+        for plugin in plugins:
+            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
+                return False
+        return True
+
     def has_move_plugin_permission(self, request, plugin, target_placeholder):
         if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
             return False
@@ -244,21 +254,49 @@ class PlaceholderAdminMixin(object):
             - plugin_parent (optional)
             - plugin_position (optional)
         """
-        plugin_type = request.GET.get('plugin_type')
+        form = PluginAddValidationForm(request.GET)
 
-        if not plugin_type:
-            return HttpResponseBadRequest(force_text(
-                    _("Invalid request, missing plugin_type parameter")
-                ))
+        if not form.is_valid():
+            # list() is necessary for python 3 compatibility.
+            # errors is s dict mapping fields to a list of errors
+            # for that field.
+            error = list(form.errors.values())[0][0]
+            return HttpResponseBadRequest(force_text(error))
 
-        try:
-            plugin_class = plugin_pool.get_plugin(plugin_type)
-        except KeyError:
-            return HttpResponseBadRequest(force_text(
-                _("Invalid plugin type '%s'") % plugin_type
-            ))
+        plugin_data = form.cleaned_data
+        placeholder = plugin_data['placeholder_id']
+        plugin_type = plugin_data['plugin_type']
 
+        if not self.has_add_plugin_permission(request, placeholder, plugin_type):
+            message = force_text(_('You do not have permission to add a plugin'))
+            return HttpResponseForbidden(message)
+
+        parent = plugin_data.get('plugin_parent')
+
+        if parent:
+            position = parent.cmsplugin_set.count()
+        else:
+            position = CMSPlugin.objects.filter(
+                parent__isnull=True,
+                language=plugin_data['plugin_language'],
+                placeholder=placeholder,
+            ).count()
+
+        plugin_data['position'] = position
+
+        plugin_class = plugin_pool.get_plugin(plugin_type)
         plugin_admin = plugin_class(admin_site=self.admin_site)
+
+        # Setting attributes on the form class is perfectly fine.
+        # The form class is created by modelform factory every time
+        # this get_form() method is called.
+        plugin_admin._cms_initial_attributes = {
+            'language': plugin_data['plugin_language'],
+            'placeholder': plugin_data['placeholder_id'],
+            'parent': plugin_data.get('plugin_parent', None),
+            'plugin_type': plugin_data['plugin_type'],
+            'position': plugin_data['position'],
+        }
 
         response = plugin_admin.add_view(request)
 
@@ -299,14 +337,13 @@ class PlaceholderAdminMixin(object):
                 plugins = inst.placeholder_ref.get_plugins_list()
             else:
                 plugins = list(
-                    source_placeholder.cmsplugin_set.filter(
+                    source_placeholder.get_plugins().filter(
                         path__startswith=source_plugin.path,
                         depth__gte=source_plugin.depth).order_by('path')
                 )
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(
-                    language=source_language).order_by('path'))
+                source_placeholder.get_plugins(language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(
                 request, source_placeholder, target_placeholder, plugins):
@@ -371,28 +408,23 @@ class PlaceholderAdminMixin(object):
             plugin_id = int(plugin_id)
         except ValueError:
             return HttpResponseNotFound(force_text(_("Plugin not found")))
-        cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
-        instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
+        queryset = CMSPlugin.objects.values_list('plugin_type', flat=True)
+        plugin_type = get_list_or_404(queryset, pk=plugin_id)[0]
+        # CMSPluginBase subclass
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        # CMSPluginBase subclass instance
+        plugin_instance = plugin_class(plugin_class.model, self.admin_site)
+        # CMSPlugin subclass instance
+        obj = get_object_or_404(plugin_class.model, pk=plugin_id)
 
-        if not self.has_change_plugin_permission(request, cms_plugin):
+        if not self.has_change_plugin_permission(request, obj):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this plugin")))
 
-        plugin_admin.cms_plugin_instance = cms_plugin
-        plugin_admin.placeholder = cms_plugin.placeholder
+        response = plugin_instance.change_view(request, str(plugin_id))
 
-        if not instance:
-            # instance doesn't exist, call add view
-            response = plugin_admin.add_view(request)
-        else:
-            # already saved before, call change view
-            # we actually have the instance here, but since i won't override
-            # change_view method, is better if it will be loaded again, so
-            # just pass id to plugin_admin
-            response = plugin_admin.change_view(request, str(plugin_id))
-
-        if request.method == "POST" and plugin_admin.object_successfully_changed:
-            self.post_edit_plugin(request, plugin_admin.saved_object)
+        if request.method == "POST" and plugin_instance.object_successfully_changed:
+            self.post_edit_plugin(request, plugin_instance.saved_object)
         return response
 
     @method_decorator(require_POST)
@@ -447,9 +479,6 @@ class PlaceholderAdminMixin(object):
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
 
-        if not self.has_move_plugin_permission(request, plugin, placeholder):
-            return HttpResponseForbidden(
-                force_text(_("You have no permission to move this plugin")))
         if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
@@ -465,6 +494,10 @@ class PlaceholderAdminMixin(object):
                 plugins = inst.placeholder_ref.get_plugins()
             else:
                 plugins = [plugin] + list(plugin.get_descendants())
+
+            if not self.has_paste_plugin_permission(request, plugins, placeholder):
+                return HttpResponseForbidden(
+                    force_text(_("You have no permission to move this plugin")))
 
             new_plugins = copy_plugins.copy_plugins_to(
                 plugins,
@@ -509,6 +542,9 @@ class PlaceholderAdminMixin(object):
             plugin = new_plugins[0][0]
         else:
             # Regular move
+            if not self.has_move_plugin_permission(request, plugin, placeholder):
+                return HttpResponseForbidden(
+                    force_text(_("You have no permission to move this plugin")))
 
             plugin_data = {
                 'language': language,

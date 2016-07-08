@@ -111,52 +111,35 @@ class Placeholder(models.Model):
             model_name = model.__name__.lower()
             return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
-    def _get_permission(self, request, key):
+    def _has_permission(self, user, key):
         """
-        Generic method to check the permissions for a request for a given key,
-        the key can be: 'add', 'change' or 'delete'. For each attached object
-        permission has to be granted either on attached model or on attached object.
-          * 'add' and 'change' permissions on placeholder need either on add or change
-            permission on attached object to be granted.
-          * 'delete' need either on add, change or delete
+        Returns True if user has permission
+        to change all objects attached to this placeholder.
         """
-        if getattr(request, 'user', None) and request.user.is_superuser:
+        if user.is_superuser:
             return True
-        perm_keys = {
-            'add': ('add', 'change',),
-            'change': ('add', 'change',),
-            'delete': ('add', 'change', 'delete'),
-        }
-        if key not in perm_keys:
-            raise Exception("%s is not a valid perm key. "
-                            "'Only 'add', 'change' and 'delete' are allowed" % key)
-        objects = [self.page] if self.page else self._get_attached_objects()
-        obj_perm = None
-        for obj in objects:
-            obj_perm = False
-            for key in perm_keys[key]:
-                if self._get_object_permission(obj, request, key):
-                    obj_perm = True
-                    break
-            if not obj_perm:
-                return False
-        return obj_perm
 
-    def _get_object_permission(self, obj, request, key):
-        if not getattr(request, 'user', None):
+        objects = [self.page] if self.page else self._get_attached_objects()
+
+        if not objects:
             return False
+
+        get_permission = self._get_object_permission
+        return all(get_permission(obj, user, 'change') for obj in objects)
+
+    def _get_object_permission(self, obj, user, key):
         opts = obj._meta
         perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
-        return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
+        return user.has_perm(perm_code) or user.has_perm(perm_code, obj)
 
     def has_change_permission(self, request):
-        return self._get_permission(request, 'change')
+        return self._has_permission(request.user, 'change')
 
     def has_add_permission(self, request):
-        return self._get_permission(request, 'add')
+        return self._has_permission(request.user, 'add')
 
     def has_delete_permission(self, request):
-        return self._get_permission(request, 'delete')
+        return self._has_permission(request.user, 'delete')
 
     def has_clear_permission(self, user, languages):
         plugin_types = (

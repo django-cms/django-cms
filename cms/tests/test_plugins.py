@@ -998,7 +998,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # this should not raise any errors, but just ignore the empty plugin
         out = placeholder.render(self.get_context(), width=300)
         self.assertFalse(len(out))
-        self.assertTrue(len(placeholder._plugins_cache))
+        self.assertFalse(len(placeholder._plugins_cache))
 
     def test_pickle(self):
         page = api.create_page("page", "nav_playground.html", "en")

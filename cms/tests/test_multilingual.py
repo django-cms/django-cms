@@ -137,15 +137,15 @@ class MultilingualTestCase(CMSTestCase):
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, "TextPlugin", TESTLANG2, body="test")
         add_plugin(placeholder, "TextPlugin", TESTLANG, body="test")
-        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
-        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
+        self.assertEqual(placeholder.get_plugins(language=TESTLANG2).count(), 1)
+        self.assertEqual(placeholder.get_plugins(language=TESTLANG).count(), 1)
         user = get_user_model().objects.create_superuser('super', 'super@django-cms.org', 'super')
         page = publish_page(page, user, TESTLANG)
         page = publish_page(page, user, TESTLANG2)
         public = page.publisher_public
         placeholder = public.placeholders.all()[0]
-        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
-        self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
+        self.assertEqual(placeholder.get_plugins(language=TESTLANG2).count(), 1)
+        self.assertEqual(placeholder.get_plugins(language=TESTLANG).count(), 1)
 
     def test_hide_untranslated(self):
         TESTLANG = get_primary_language()

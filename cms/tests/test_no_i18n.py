@@ -6,7 +6,7 @@ from django.utils.http import urlencode
 from django.test import RequestFactory
 from django.test.utils import override_settings
 
-from djangocms_text_ckeditor.models import Text
+from djangocms_link.models import Link
 
 from cms.api import create_page
 from cms.middleware.toolbar import ToolbarMiddleware
@@ -66,10 +66,13 @@ class TestNoI18N(CMSTestCase):
         request.session = {}
         request.user = user
         request.LANGUAGE_CODE = lang_code
+        request.GET = request.GET.copy()
+
         if edit:
-            request.GET = {'edit': None}
+            request.GET['edit'] = None
         else:
-            request.GET = {'edit_off': None}
+            request.GET['edit_off'] = None
+
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
@@ -150,28 +153,26 @@ class TestNoI18N(CMSTestCase):
         page = Page.objects.all()[0]
 
         get_params = {
-            'plugin_type': "TextPlugin",
+            'plugin_type': "LinkPlugin",
             'plugin_language': "en-us",
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
-        data = {}
+        data = {'name': 'Hello', 'url': 'http://www.example.org/'}
         add_url = URL_CMS_PLUGIN_ADD[3:] + '?' + urlencode(
             get_params
         )
         response = self.client.post(add_url, data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         created_plugin_id = CMSPlugin.objects.all()[0].pk
         # now edit the plugin
         edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
         response = self.client.get(edit_url)
         self.assertEqual(response.status_code, 200)
-        data = {
-            "body": "Hello World"
-        }
+        data['name'] = 'Hello World'
         response = self.client.post(edit_url, data)
         self.assertEqual(response.status_code, 200)
-        txt = Text.objects.get(pk=created_plugin_id)
-        self.assertEqual("Hello World", txt.body)
+        link = Link.objects.get(pk=created_plugin_id)
+        self.assertEqual("Hello World", link.name)
 
     def test_toolbar_no_locale(self):
         page = create_page('test', 'nav_playground.html', 'en-us', published=True)

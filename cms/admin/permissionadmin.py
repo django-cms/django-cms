@@ -55,9 +55,9 @@ class PagePermissionInlineAdmin(TabularInline):
     def get_queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise can user see only permissions for
+        all permissions. Otherwise user can see only permissions for
         peoples which are under him (he can't see his permissions, because
-        this will lead to violation, when he can add more power to itself)
+        this will lead to violation, when he can add more power to himself)
         """
         # can see only permissions for users which are under him in tree
 
@@ -66,7 +66,7 @@ class PagePermissionInlineAdmin(TabularInline):
             qs = self.model.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)
         except NoPermissionsException:
-            return self.objects.get_empty_query_set()
+            return self.objects.none()
 
     def get_formset(self, request, obj=None, **kwargs):
         """
@@ -107,11 +107,6 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
     ]
 
     def get_formset(self, request, obj=None, **kwargs):
-        """
-        Some fields may be excluded here. User can change only permissions
-        which are available for him. E.g. if user does not haves can_publish
-        flag, he can't change assign can_publish permissions.
-        """
         formset_cls = super(PagePermissionInlineAdmin, self).get_formset(request, obj, **kwargs)
         qs = self.get_queryset(request)
         if obj is not None:
@@ -120,10 +115,6 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         return formset_cls
 
     def get_queryset(self, request):
-        """
-        Returns a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view.
-        """
         qs = self.model.objects.subordinate_to_user(request.user)
         return qs.filter(can_view=True)
 
@@ -212,12 +203,25 @@ class GenericCmsPermissionAdmin(object):
         return True
 
     def has_add_permission(self, request):
-        return self._has_change_permissions_permission(request) and \
-               super(self.__class__, self).has_add_permission(request)
+        has_model_perm = super(GenericCmsPermissionAdmin, self).has_add_permission(request)
+
+        if not has_model_perm:
+            return False
+        return self._has_change_permissions_permission(request)
 
     def has_change_permission(self, request, obj=None):
-        return self._has_change_permissions_permission(request) and \
-               super(self.__class__, self).has_change_permission(request, obj)
+        has_model_perm = super(GenericCmsPermissionAdmin, self).has_change_permission(request, obj)
+
+        if not has_model_perm:
+            return False
+        return self._has_change_permissions_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        has_model_perm = super(GenericCmsPermissionAdmin, self).has_delete_permission(request, obj)
+
+        if not has_model_perm:
+            return False
+        return self._has_change_permissions_permission(request)
 
 
 if get_cms_setting('PERMISSION'):

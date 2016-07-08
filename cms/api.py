@@ -568,9 +568,9 @@ def copy_plugins_to_language(page, source_language, target_language,
     for placeholder in placeholders:
         # only_empty is True we check if the placeholder already has plugins and
         # we skip it if has some
-        if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
+        if not only_empty or not placeholder.get_plugins(language=target_language).exists():
             plugins = list(
-                placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
+                placeholder.get_plugins(language=source_language).order_by('path'))
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
