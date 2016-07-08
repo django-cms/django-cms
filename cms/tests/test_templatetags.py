@@ -1,5 +1,7 @@
 from copy import deepcopy
 import os
+from collections import defaultdict
+
 from classytags.tests import DummyParser, DummyTokens
 
 from django.conf import settings
@@ -12,9 +14,12 @@ from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
+from sekizai.data import UniqueSequence
+from sekizai.helpers import get_varname
+
 import cms
 from cms.api import create_page, create_title, add_plugin
-from cms.middleware.toolbar import ToolbarMiddleware
+from cms.middleware.toolbar import ToolbarMiddleware, toolbar_plugin_processor
 from cms.models import Page, Placeholder
 from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
                                        _show_placeholder_for_page,
@@ -249,6 +254,64 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         placeholder = _get_placeholder(page, page, dict(request=FakeRequest()), 'col_right')
         page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
+
+    def test_render_plugin_toolbar_config(self):
+        """
+        Ensures that the render_plugin_toolbar_config tag
+        sets the correct values in the sekizai context.
+        """
+        page = self._getfirst()
+        placeholder = page.placeholders.get(slot='body')
+        parent_plugin = add_plugin(placeholder, 'SolarSystemPlugin', 'en')
+        child_plugin_1 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
+        child_plugin_2 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
+
+        parent_plugin.child_plugin_instances = [
+            child_plugin_1,
+            child_plugin_2,
+        ]
+
+        plugins = [
+            parent_plugin,
+            child_plugin_1,
+            child_plugin_2,
+        ]
+
+        placeholder_slot = placeholder.slot
+
+        with self.login_user_context(self.get_superuser()):
+            context = self.get_context(path=page.get_absolute_url(), page=page)
+            context['request'].toolbar = CMSToolbar(context['request'])
+            context['request'].toolbar.edit_mode = True
+            context[get_varname()] = defaultdict(UniqueSequence)
+
+            parent_plugin.render_plugin(
+                context,
+                placeholder=placeholder,
+                processors=[toolbar_plugin_processor],
+            )
+
+            # Rendering the parent plugin will put
+            # three strings into the "js" collection in sekizai.
+            # These strings contain the toolbar configuration
+            # for each plugin.
+            plugin_scripts = context[get_varname()]['js']
+
+            self.assertEqual(len(plugin_scripts), 3)
+
+            for plugin, script in zip(plugins, reversed(plugin_scripts)):
+                plugin_instance = plugin.get_plugin_class_instance()
+
+                child_classes = plugin_instance.get_child_classes(placeholder_slot, page) or []
+                plugin_restrictions = ['"{}"'.format(klass) for klass in child_classes]
+                plugin_restrictions_text = "plugin_restriction: [{}]".format(','.join(plugin_restrictions))
+
+                parent_classes = plugin_instance.get_parent_classes(placeholder_slot, page) or []
+                parent_restrictions = ['"{}"'.format(klass) for klass in parent_classes]
+                parent_restrictions_text = "plugin_parent_restriction: [{}]".format(','.join(parent_restrictions))
+
+                self.assertTrue(plugin_restrictions_text in script)
+                self.assertTrue(parent_restrictions_text in script)
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
