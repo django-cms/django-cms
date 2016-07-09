@@ -113,5 +113,5 @@ Credits
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
 * JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
-  `over 515 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 515 contributors <https://github.com/divio/django-cms/blob/develop/AUTHORS>`_
   to the django CMS!
