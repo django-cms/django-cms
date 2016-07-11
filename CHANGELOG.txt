@@ -40,6 +40,8 @@
 * Fixed an encoding error when running the ``publisher-publish`` command.
 * Fixed ``render_model`` template tags to work with models containing deferred
   fields.
+* Fixed regression introduced in 3.3.0 when using the
+  ``render_plugin_toolbar_config`` template tag directly.
 
 
 === 3.3.0 (2016-05-26) ===
