@@ -42,6 +42,7 @@
   fields.
 * Fixed regression introduced in 3.3.0 when using the
   ``render_plugin_toolbar_config`` template tag directly.
+* Fixed error in retrieving placeholder label from configuration.
 
 
 === 3.3.0 (2016-05-26) ===

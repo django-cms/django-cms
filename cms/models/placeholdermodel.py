@@ -70,13 +70,11 @@ class Placeholder(models.Model):
 
     def get_label(self):
         from cms.utils.placeholder import get_placeholder_conf
-        name = None
         if self.page:
-            name = get_placeholder_conf(
-                "name", self.slot, template=self.page.get_template(), default=title(self.slot)
-            )
-        if not name:
-            name = get_placeholder_conf("name", self.slot, default=title(self.slot))
+            template = self.page.get_template()
+        else:
+            template = None
+        name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
 
