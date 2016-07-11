@@ -226,7 +226,16 @@ describe('CMS.ChangeTracker', function () {
                 editedValue: 'original',
                 originalValue: 'original'
             });
+        });
 
+        it('handles the case where original value is the same as edited one', function () {
+            var element = $(fixture.el).find('input[type="text"]');
+
+            expect(tracker.state.formChanged).toEqual(false);
+
+            element.trigger('change');
+
+            expect(tracker.state.formChanged).toEqual(false);
         });
     });
 });
