@@ -66,12 +66,17 @@ var ChangeTracker = new Class({
                 })
             );
         } else {
+            var defaultValue = that._getOriginalValue(e.target);
+            var editedValue = that._getValue(e.target);
+
             that.state.fields.set(e.target, {
-                originalValue: that._getOriginalValue(e.target),
-                editedValue: that._getValue(e.target)
+                originalValue: defaultValue,
+                editedValue: editedValue
             });
 
-            that.state.formChanged = true;
+            if (defaultValue !== editedValue) {
+                that.state.formChanged = true;
+            }
         }
     },
 
