@@ -61,22 +61,22 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         # 4th level
         keys.append(None)
         for key in keys:
-            for conf_key, conf in placeholder_conf.items():
-                if force_text(conf_key) == force_text(key):
-                    if not conf:
-                        continue
-                    value = conf.get(setting)
+            try:
+                conf = placeholder_conf[key]
+                value = conf.get(setting, None)
+                if value is not None:
+                    return value
+                inherit = conf.get('inherit')
+                if inherit:
+                    if ' ' in inherit:
+                        inherit = inherit.split(' ')
+                    else:
+                        inherit = (None, inherit)
+                    value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
                     if value is not None:
                         return value
-                    inherit = conf.get('inherit')
-                    if inherit:
-                        if ' ' in inherit:
-                            inherit = inherit.split(' ')
-                        else:
-                            inherit = (None, inherit)
-                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                        if value is not None:
-                            return value
+            except KeyError:
+                continue
     return default
 
 
