@@ -1,0 +1,67 @@
+.. _upgrade-to-3.3.1:
+
+###################
+3.3.1 release notes
+###################
+
+*******************
+What's new in 3.3.1
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug when clicking inside sideframe didn't close toolbar dropdowns
+* Fixed a bug where saving errors wouldn't be shown in the modal window.
+* Fixed a misleading message when modal iframe contents couldn't be accessed.
+* Added a workaround for a bug when plugins couldn't be deleted in Firefox
+  with 1Password extension installed
+* Changed CMS JavaScript bundling from simple concatenation to webpack-based.
+  Using CMS Javascript modules directly is no longer possible.
+* Fixed an issue where plugins that have no immediate DOM representation
+  wouldn't be editable or movable.
+* Fixed a regression in which plugins that defined ``parent_classes``
+  would not show up in the structure mode.
+* Backported a performance fix from Django to avoid extra queries when
+  plugins access their parent via the parent link field ``cmsplugin_ptr``.
+* Fixed typo in ``AdvancedSettingsForm`` error messages.
+* Fixed long standing bug that prevented apphook endspoints from being
+  CSRF exempt.
+* Changed default value for ``CMS_INTERNAL_IPS``.
+* Fixed an issue that prevented non superusers from copying all plugins
+  in a placeholder.
+* Fixed an issue where plugin permissions where not checked when clearing
+  a placeholder.
+* Fixed an issue where plugin permissions where not checked when deleting
+  a page or page translation.
+* Fixed a useless placeholders edit permissions checking when not in edit
+  mode.
+* Fixed a bug where users with limited permissions could not interact with
+  page tree dropdowns.
+* Fixed a bug where Django Compressor could not be used on the sekizai ``js``
+  block.
+* Fixed an issue when plugin that is aliased on the same page couldn't be
+  operated upon in the structure mode.
+* Removed globally unique constraint for Apphook configs.
+* Fixed an encoding error when running the ``publisher-publish`` command.
+* Fixed ``render_model`` template tags to work with models containing deferred
+  fields.
+* Fixed regression introduced in 3.3.0 when using the
+  ``render_plugin_toolbar_config`` template tag directly.
+* Fixed error in retrieving placeholder label from configuration.
+* Adjusted migrations to no longer use models directly.
+* Fixed pickling support for plugins.
+* Updated contributing policy documentation.
+* Fixed several documentation typos.
+* Changed all readthedocs links to use ``.io`` instead of ``.org``
+* Fixed text overflow in the page tree dropdown menu.
+
+
+Features
+========
+
+* Added a warning for users who are leaving the page or closing the plugin
+  modal by pressing ESC to prevent accidental loss of content.
+* Added support for tiered ``CMS_PLACEHOLDER_CONF``.
+* Introduced new logic to leverage Django's dynamic related name
+  functionality on ``CMSPlugin`` subclasses for the parent link field.
