@@ -6,6 +6,7 @@
   CachedStaticFilesStorage or similar is used for STATICFILES_STORAGE
 * Changed the signature for internal ``cms.plugin_base.CMSPluginBase`` methods ``get_child_classes``
   and ``get_parent_classes`` to take an optional ``instance`` parameter.
+* Fixed error in retrieving placeholder label from configuration.
 
 
 === 3.4.2 (2017-01-23) ===
@@ -166,6 +167,7 @@
   ``render_plugin_toolbar_config`` template tag directly.
 * Fixed ``render_model`` template tags to work with models containing deferred
   fields.
+* Fixed error in retrieving placeholder label from configuration.
 
 
 === 3.3.0 (2016-05-26) ===

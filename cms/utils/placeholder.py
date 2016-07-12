@@ -10,7 +10,6 @@ from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
-from django.utils.encoding import force_text
 
 from sekizai.helpers import get_varname, is_variable_extend_node
 
@@ -61,22 +60,22 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         # 4th level
         keys.append(None)
         for key in keys:
-            for conf_key, conf in placeholder_conf.items():
-                if force_text(conf_key) == force_text(key):
-                    if not conf:
-                        continue
-                    value = conf.get(setting)
+            try:
+                conf = placeholder_conf[key]
+                value = conf.get(setting, None)
+                if value is not None:
+                    return value
+                inherit = conf.get('inherit')
+                if inherit:
+                    if ' ' in inherit:
+                        inherit = inherit.split(' ')
+                    else:
+                        inherit = (None, inherit)
+                    value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
                     if value is not None:
                         return value
-                    inherit = conf.get('inherit')
-                    if inherit:
-                        if ' ' in inherit:
-                            inherit = inherit.split(' ')
-                        else:
-                            inherit = (None, inherit)
-                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                        if value is not None:
-                            return value
+            except KeyError:
+                continue
     return default
 
 
