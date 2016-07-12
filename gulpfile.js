@@ -5,6 +5,7 @@
 // #IMPORTS#
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var plumber = require('gulp-plumber');
 var fs = require('fs');
 var autoprefixer = require('autoprefixer');
 var postcss = require('gulp-postcss');
@@ -150,9 +151,11 @@ gulp.task('lint', ['lint:javascript']);
 gulp.task('lint:javascript', function () {
     // DOCS: http://eslint.org
     return gulp.src(PROJECT_PATTERNS.js)
+        .pipe(gulpif(!process.env.CI, plumber()))
         .pipe(eslint())
         .pipe(eslint.format())
-        .pipe(eslint.failAfterError());
+        .pipe(eslint.failAfterError())
+        .pipe(gulpif(!process.env.CI, plumber.stop()));
 });
 
 gulp.task('tests', ['tests:unit', 'tests:integration']);
@@ -210,7 +213,8 @@ var webpackBundle = function (opts) {
 gulp.task('bundle:watch', webpackBundle({ watch: true }));
 gulp.task('bundle', webpackBundle());
 
-gulp.task('watch', ['bundle:watch'], function () {
+gulp.task('watch', function () {
+    gulp.start('bundle:watch');
     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
 });
