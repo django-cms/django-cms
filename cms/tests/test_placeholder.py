@@ -371,6 +371,36 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             returned = get_placeholder_conf('plugins', 'something')
             self.assertEqual(returned, TEST_CONF[None]['plugins'])
 
+    def test_placeholder_name_conf(self):
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        placeholder_1 = page_en.placeholders.get(slot='col_left')
+        placeholder_2 = Placeholder.objects.create(slot='col_left')
+        placeholder_3 = Placeholder.objects.create(slot='no_name')
+
+        TEST_CONF = {
+            'col_left': {
+                'name': 'renamed left column',
+            },
+            'col_two.html col_left': {
+                'name': 'left column',
+            },
+            None: {
+                'name': 'fallback',
+            },
+        }
+
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_text(placeholder_3.get_label()), 'fallback')
+
+        del TEST_CONF[None]
+
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
+            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_text(placeholder_3.get_label()), 'No_Name')
+
     def test_placeholder_context_leaking(self):
         TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
         ph = Placeholder.objects.create(slot='test')
