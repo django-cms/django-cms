@@ -43,6 +43,12 @@
 * Fixed regression introduced in 3.3.0 when using the
   ``render_plugin_toolbar_config`` template tag directly.
 * Fixed error in retrieving placeholder label from configuration.
+* Adjusted migrations to no longer use models directly.
+* Fixed pickling support for plugins.
+* Updated contributing policy documentation.
+* Fixed several documentation typos.
+* Changed all readthedocs links to use ``.io`` instead of ``.org``
+* Fixed text overflow in the page tree dropdown menu.
 
 
 === 3.3.0 (2016-05-26) ===
