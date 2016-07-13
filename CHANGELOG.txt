@@ -1,4 +1,4 @@
-=== 3.3.1 (unreleased) ===
+=== 3.3.1 (2016-07-13) ===
 
 * Added a warning for users who are leaving the page or closing the plugin
   modal by pressing ESC to prevent accidental loss of content.
