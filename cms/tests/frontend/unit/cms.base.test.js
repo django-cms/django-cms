@@ -37,7 +37,7 @@ describe('cms.base.js', function () {
         it('exists', function () {
             expect(CMS.API.Helpers).toEqual(jasmine.any(Object));
             // this expectation is here so no one ever forgets to add a test
-            expect(Object.keys(CMS.API.Helpers).length).toEqual(17);
+            expect(Object.keys(CMS.API.Helpers).length).toEqual(18);
         });
 
         describe('.reloadBrowser()', function () {
@@ -319,6 +319,16 @@ describe('cms.base.js', function () {
                 expect(CMS.API.Helpers.reloadBrowser('/new-url', 50, false)).toEqual(undefined);
                 expect($.ajax).not.toHaveBeenCalled();
                 expect(win.parent.location.href).toEqual('/new-url');
+            });
+        });
+
+        describe('onPluginSave()', function () {
+            it('proxies to reloadBrowser', function () {
+                spyOn(CMS.API.Helpers, 'reloadBrowser');
+
+                CMS.API.Helpers.onPluginSave();
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledTimes(1);
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(null, 300);
             });
         });
 
