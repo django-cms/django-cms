@@ -46,10 +46,10 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
         qs = qs.exclude(Q(language=lang) & Q(page=page))
         qs = qs.exclude(page__publisher_public=page)
     # Check for slugs
-    if qs.filter(slug=slug).count():
+    if qs.filter(slug=slug).exists():
         return False
     # Check for path
-    if path and qs.filter(path=path).count():
+    if path and qs.filter(path=path).exists():
         return False
     return True
 

@@ -18,6 +18,7 @@ from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
 from cms.models import (CMSPlugin, Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title,
                         Placeholder, EmptyTitle, GlobalPagePermission)
+from cms.plugin_pool import plugin_pool
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_object, get_language_tuple
@@ -134,7 +135,7 @@ class PageForm(forms.ModelForm):
             self._errors['slug'] = ErrorList([_('Another page with this slug already exists')])
             del cleaned_data['slug']
 
-        if page and page.title_set.count():
+        if page and page.title_set.exists():
             #Check for titles attached to the page makes sense only because
             #AdminFormsTests.test_clean_overwrite_url validates the form with when no page instance available
             #Looks like just a theoretical corner case
@@ -335,7 +336,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             site_id = cleaned_data['site']
             if id:
                 if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(
-                        pk=self.instance.pk).count():
+                        pk=self.instance.pk).exists():
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
         apphook = cleaned_data.get('application_urls', None)
@@ -696,10 +697,17 @@ class PluginAddValidationForm(forms.Form):
         CMSPlugin.objects.all(),
         required=False,
     )
+    plugin_type = forms.CharField(required=True)
 
-    def __init__(self, *args, **kwargs):
-        self.plugin_type = kwargs.pop('plugin_type')
-        super(PluginAddValidationForm, self).__init__(*args, **kwargs)
+    def clean_plugin_type(self):
+        plugin_type = self.cleaned_data['plugin_type']
+
+        try:
+            plugin_pool.get_plugin(plugin_type)
+        except KeyError:
+            message = ugettext("Invalid plugin type '%s'") % plugin_type
+            raise ValidationError(message)
+        return plugin_type
 
     def clean(self):
         from cms.utils.plugins import has_reached_plugin_limit
@@ -737,7 +745,7 @@ class PluginAddValidationForm(forms.Form):
         try:
             has_reached_plugin_limit(
                 placeholder,
-                self.plugin_type,
+                data['plugin_type'],
                 language,
                 template=template
             )

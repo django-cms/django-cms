@@ -648,13 +648,14 @@ describe('CMS.StructureBoard', function () {
             }));
         });
 
-        it('adds event handler for cms.update to actualize empty placeholders', function () {
-            if (!CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name) {
+        it('adds event handler for cms-structure-update to actualize empty placeholders', function () {
+            if (!CMS.$._data(board.ui.sortables[0]).events['cms-structure-update'][0].handler.name) {
                 pending();
             }
-            expect(board.ui.sortables).toHandle('cms.update');
+            expect(board.ui.sortables).toHandle('cms-structure-update');
             // cheating here a bit
-            expect(CMS.$._data(board.ui.sortables[0]).events.cms[0].handler.name).toEqual('actualizeEmptyPlaceholders');
+            expect(CMS.$._data(board.ui.sortables[0]).events['cms-structure-update'][0].handler.name)
+                .toEqual('actualizeEmptyPlaceholders');
         });
 
         it('defines how draggable helper is created', function () {
@@ -904,7 +905,7 @@ describe('CMS.StructureBoard', function () {
                 var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
 
                 var spy = jasmine.createSpy();
-                textPlugin.on('cms.plugins.update', spy);
+                textPlugin.on('cms-plugins-update', spy);
 
                 // we need to start first to set a private variable original container
                 options.start(null, { item: textPlugin, helper: helper });
@@ -952,8 +953,8 @@ describe('CMS.StructureBoard', function () {
                 var pluginSpy = jasmine.createSpy();
                 var clipboardSpy = jasmine.createSpy();
 
-                textPlugin.on('cms.plugins.update', pluginSpy);
-                textPlugin.on('cms.plugin.update', clipboardSpy);
+                textPlugin.on('cms-plugins-update', pluginSpy);
+                textPlugin.on('cms-paste-plugin-update', clipboardSpy);
 
                 // we need to start first to set a private variable original container
                 options.start(null, { item: textPlugin, helper: helper });

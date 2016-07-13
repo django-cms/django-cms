@@ -10,19 +10,28 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate
 from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
+from cms.api import create_page
 from cms.models import Page
+from cms.models.permissionmodels import (
+    GlobalPagePermission,
+    PagePermission,
+    PageUser,
+)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.permissions import set_current_user
+from cms.utils.urlutils import admin_reverse
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -116,6 +125,48 @@ class BaseCMSTestCase(object):
     def login_user_context(self, user):
         return UserLoginContext(self, user)
 
+    def get_permission(self, codename):
+        return Permission.objects.get(codename=codename)
+
+    def add_permission(self, user, codename):
+        user.user_permissions.add(self.get_permission(codename))
+
+    def remove_permission(self, user, codename):
+        user.user_permissions.remove(Permission.objects.get(codename=codename))
+
+    def add_global_permission(self, user, **kwargs):
+        options = {
+            'can_change': False,
+            'can_delete': False,
+            'can_change_advanced_settings': False,
+            'can_publish': False,
+            'can_change_permissions': False,
+            'can_move_page': False,
+            'user': user,
+        }
+        options.update(**kwargs)
+
+        gpp = GlobalPagePermission.objects.create(**options)
+        gpp.sites = Site.objects.all()
+        return gpp
+
+    def add_page_permission(self, user, page, **kwargs):
+        options = {
+            'can_change': False,
+            'can_delete': False,
+            'can_change_advanced_settings': False,
+            'can_publish': False,
+            'can_change_permissions': False,
+            'can_move_page': False,
+            'page': page,
+            'user': user,
+        }
+        options.update(**kwargs)
+
+        pp = PagePermission.objects.create(**options)
+        pp.sites = Site.objects.all()
+        return pp
+
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):
         """
@@ -190,6 +241,21 @@ class BaseCMSTestCase(object):
         """
         standard = self._create_user("standard", is_staff=False, is_superuser=False)
         return standard
+
+    def get_staff_page_user(self, created_by=None):
+        if not created_by:
+            created_by = self.get_superuser()
+
+        parent_link_field = list(PageUser._meta.parents.values())[0]
+        user = self._create_user(
+            'perms-testuser',
+            is_staff=True,
+            is_superuser=False,
+        )
+        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data[parent_link_field.name] = user
+        data['created_by'] = created_by
+        return PageUser.objects.create(**data)
 
     def get_new_page_data(self, parent_id=''):
         page_data = {
@@ -406,6 +472,39 @@ class BaseCMSTestCase(object):
             if apphook_pool.apps[name].__class__.__module__ in sys.modules:
                 del sys.modules[apphook_pool.apps[name].__class__.__module__]
         apphook_pool.clear()
+
+    def get_admin_url(self, model, action, *args):
+        opts = model._meta
+        url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
+        return admin_reverse(url_name, args=args)
+
+    def get_permissions_test_page(self):
+        admin = self.get_superuser()
+        create_page(
+            "home",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+            published=True,
+        )
+        page = create_page(
+            "permissions",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+            published=True,
+            reverse_id='permissions',
+        )
+        return page
+
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en'):
+        endpoint = placeholder.get_add_url()
+        uri = endpoint + '?' + urlencode({
+            'plugin_type': plugin_type,
+            'placeholder_id': placeholder.pk,
+            'plugin_language': language,
+        })
+        return uri
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):

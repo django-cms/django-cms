@@ -279,10 +279,10 @@ class PagePermissionManager(BasicPagePermissionManager):
 
         Result of this is used in admin for page permissions inline.
         """
-        from cms.models import GlobalPagePermission, Page
+        from cms.models import Page
+        from cms.utils.permissions import can_change_global_permissions
 
-        if user.is_superuser or \
-                GlobalPagePermission.objects.with_can_change_permissions(user):
+        if can_change_global_permissions(user):
             # everything for those guys
             return self.all()
 
@@ -293,7 +293,8 @@ class PagePermissionManager(BasicPagePermissionManager):
             user_level = get_user_permission_level(user)
         except NoPermissionsException:
             return self.none()
-            # get current site
+
+        # get current site
         site = Site.objects.get_current()
         # get all permissions
         page_id_allow_list = Page.permissions.get_change_permissions_id_list(user, site)

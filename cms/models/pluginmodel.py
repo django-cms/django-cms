@@ -271,7 +271,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             page = None
             if request:
                 page = request.current_page
-            plugin.cms_plugin_instance = instance
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
             context['allowed_parent_classes'] = plugin.get_parent_classes(placeholder_slot, page)
             if plugin.render_plugin:
@@ -281,20 +280,11 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             else:
                 template = None
             return render_plugin(context, instance, placeholder, template, processors, current_app)
-        else:
-            from cms.middleware.toolbar import toolbar_plugin_processor
-
-            if processors and toolbar_plugin_processor in processors:
-                if not placeholder:
-                    placeholder = self.placeholder
-                context = PluginContext(context, self, placeholder, current_app=current_app)
-                template = None
-                return render_plugin(context, self, placeholder, template, processors, current_app)
         return ""
 
     def get_media_path(self, filename):
         pages = self.placeholder.page_set.all()
-        if pages.count():
+        if pages.exists():
             return pages[0].get_media_path(filename)
         else:  # django 1.0.2 compatibility
             today = date.today()

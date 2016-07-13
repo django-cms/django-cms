@@ -3,18 +3,12 @@ import json
 import re
 import warnings
 
-from django.http import HttpResponseBadRequest
-from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response
 
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    PermissionDenied,
-    ValidationError,
-)
+from django.core.exceptions import ImproperlyConfigured
 from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
@@ -143,11 +137,13 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             super(CMSPluginBase, self).__init__(self.model, admin_site)
 
         self.object_successfully_changed = False
-
-        # variables will be overwritten in edit_view, so we got required
-        self.cms_plugin_instance = None
         self.placeholder = None
         self.page = None
+        self.cms_plugin_instance = None
+        # The _cms_initial_attributes acts as a hook to set
+        # certain values when the form is saved.
+        # Currently this only happens on plugin creation.
+        self._cms_initial_attributes = {}
 
     def _get_render_template(self, context, instance, placeholder):
         if getattr(instance, 'render_template', False):
@@ -186,10 +182,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # config overrides..
         require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
         return require_parent
-
-    @property
-    def parent(self):
-        return self.cms_plugin_instance.parent
 
     def get_cache_expiration(self, request, instance, placeholder):
         """
@@ -250,7 +242,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         context.update({
             'preview': "no_preview" not in request.GET,
             'is_popup': True,
-            'plugin': self.cms_plugin_instance,
+            'plugin': obj,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
         })
 
@@ -267,98 +259,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # because we need a placeholder object to do so.
         return False
     has_delete_permission = has_change_permission
-
-    def get_form(self, request, obj=None, **kwargs):
-        form_class = super(CMSPluginBase, self).get_form(request, obj, **kwargs)
-
-        if obj:
-            return form_class
-
-        plugin_data = self.validate_add_request(request)
-
-        # Setting attributes on the form class is perfectly fine.
-        # The form class is created by modelform factory every time
-        # this get_form() method is called.
-        # Subclassing is not advisable because Django does metaclass
-        # magic and some attributes get lost. Ticket #5273
-
-        # The _cms_initial_attributes acts as a hook to set
-        # certain values when the form is saved.
-        # Currently this only happens on plugin creation.
-        form_class._cms_initial_attributes = {
-            'language': plugin_data['plugin_language'],
-            'placeholder': plugin_data['placeholder_id'],
-            'parent': plugin_data.get('plugin_parent', None),
-            'plugin_type': plugin_data['plugin_type'],
-            'position': plugin_data['position'],
-        }
-        return form_class
-
-    def validate_add_request(self, request):
-        from cms.admin.forms import PluginAddValidationForm
-
-        if getattr(self, "cms_plugin_instance"):
-            # cms_plugin_instance points to an instance of CMSPlugin
-            # that has no real instance aka a "ghost plugin".
-            # This can easily happen in <= CMS 3.2 if the user
-            # adds a plugin and then reloads the page without canceling
-            # or submitting the form.
-            # No need to validate the data in this plugin because
-            # it's already been created.
-            plugin = self.cms_plugin_instance
-            plugin_data = {
-                'placeholder_id': plugin.placeholder,
-                'plugin_language': plugin.language,
-                'plugin_parent': plugin.parent,
-                'plugin_position': plugin.position,
-                'plugin_type': plugin.plugin_type,
-            }
-        else:
-            form = PluginAddValidationForm(
-                data=request.GET,
-                plugin_type=self.__class__.__name__,
-            )
-
-            if form.is_valid():
-                plugin_data = form.cleaned_data
-                plugin_data['plugin_type'] = form.plugin_type
-            else:
-                # list() is necessary for python 3 compatibility.
-                # errors is s dict mapping fields to a list of errors
-                # for that field.
-                error = list(form.errors.values())[0][0]
-                raise ValidationError(message=force_text(error))
-
-        if not plugin_data['placeholder_id'].has_add_permission(request):
-            # No need to run self.has_add_permission(request)
-            # This method (validate_add_request) is called on get_form
-            # and get_form is called after Django checks permissions.
-            raise PermissionDenied
-
-        parent = plugin_data.get('plugin_parent')
-
-        if parent:
-            position = parent.cmsplugin_set.count()
-        else:
-            position = CMSPlugin.objects.filter(
-                parent__isnull=True,
-                language=plugin_data['plugin_language'],
-                placeholder=plugin_data['placeholder_id'],
-            ).count()
-
-        plugin_data['position'] = position
-        return plugin_data
-
-    def add_view(self, request, form_url='', extra_context=None):
-        try:
-            response = super(CMSPluginBase, self).add_view(
-                request, form_url, extra_context)
-        except PermissionDenied:
-            message = force_text(_('You do not have permission to add a plugin'))
-            return HttpResponseForbidden(message)
-        except ValidationError as error:
-            return HttpResponseBadRequest(error.message)
-        return response
 
     def render_close_frame(self, obj, extra_context=None):
         context = {
@@ -382,32 +282,17 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         Override original method, and add some attributes to obj
         This have to be made, because if object is newly created, he must know
         where he lives.
-        Attributes from cms_plugin_instance have to be assigned to object, if
-        is cms_plugin_instance attribute available.
         """
-
-        if getattr(self, "cms_plugin_instance"):
-            # assign stuff to object
-            fields = self.cms_plugin_instance._meta.fields
-            for field in fields:
-                # assign all the fields - we can do this, because object is
-                # subclassing cms_plugin_instance (one to one relation)
-                value = getattr(self.cms_plugin_instance, field.name)
-                setattr(obj, field.name, value)
-
         # remember the saved object
         self.saved_object = obj
-
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 
     def save_form(self, request, form, change):
         obj = super(CMSPluginBase, self).save_form(request, form, change)
-        initial_attributes = getattr(form, '_cms_initial_attributes', None)
 
-        if initial_attributes:
-            # Form has the initial attribute hooks
-            for field, value in initial_attributes.items():
-                setattr(obj, field, value)
+        for field, value in self._cms_initial_attributes.items():
+            # Set the initial attribute hooks (if any)
+            setattr(obj, field, value)
         return obj
 
     def response_add(self, request, obj, **kwargs):

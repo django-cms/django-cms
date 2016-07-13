@@ -1043,14 +1043,14 @@ describe('CMS.Plugin', function () {
 
         it('triggers correct events on a freshly pasted clipboard plugin', function (done) {
             var clipboardPluginDOM = $('.cms-clipboard .cms-draggable:first');
-            clipboardPluginDOM.on('cms.plugin.update', function () {
+            clipboardPluginDOM.on('cms-paste-plugin-update', function () {
                 done();
             });
             plugin.pastePlugin();
         });
 
         it('triggers correct events on a child list where the plugin was just moved', function (done) {
-            plugin.ui.draggables.on('cms.update', function () {
+            plugin.ui.draggables.on('cms-structure-update', function () {
                 setTimeout(function () {
                     done();
                 }, 10);

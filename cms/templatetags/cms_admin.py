@@ -279,8 +279,17 @@ class CMSAdminIconBase(Tag):
 register.tag(CMSAdminIconBase)
 
 
-@register.inclusion_tag('cms/toolbar/plugin.html', takes_context=True)
-def render_plugin_toolbar_config(context, plugin, placeholder_slot=None):
+@register.simple_tag(takes_context=True)
+def render_plugin_toolbar_config(context, plugin, placeholder_slot=None,
+                                 template='cms/toolbar/plugin.html'):
+    request = context['request']
+    toolbar = getattr(request, 'toolbar', None)
+
+    if toolbar:
+        template = toolbar.get_cached_template(template)
+    else:
+        template = context.template.engine.get_template(template)
+
     page = context['request'].current_page
     cms_plugin = plugin.get_plugin_class_instance()
 
@@ -290,12 +299,14 @@ def render_plugin_toolbar_config(context, plugin, placeholder_slot=None):
     child_classes = cms_plugin.get_child_classes(placeholder_slot, page)
     parent_classes = cms_plugin.get_parent_classes(placeholder_slot, page)
 
-    context.update({
+    updated = {
         'allowed_child_classes': child_classes,
         'allowed_parent_classes': parent_classes,
         'instance': plugin
-    })
-    return context
+    }
+
+    with context.push(**updated):
+        return template.render(context)
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)

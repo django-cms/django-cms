@@ -222,7 +222,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls = None
 
     if reverse_id:
-        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).count():
+        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
@@ -568,9 +568,9 @@ def copy_plugins_to_language(page, source_language, target_language,
     for placeholder in placeholders:
         # only_empty is True we check if the placeholder already has plugins and
         # we skip it if has some
-        if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
+        if not only_empty or not placeholder.get_plugins(language=target_language).exists():
             plugins = list(
-                placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
+                placeholder.get_plugins(language=source_language).order_by('path'))
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
