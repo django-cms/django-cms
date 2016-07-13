@@ -93,14 +93,14 @@
     {# start: structure #}
     <div class="cms-structure">
         <div class="cms-structure-content" data-touch-action="pan-y">
-            {% for placeholder in request.toolbar.placeholder_list %}
+            {% for placeholder in cms_content_renderer.get_rendered_placeholders %}
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
-                {% include request.toolbar.dragbar_template with placeholder=placeholder language=language %}
+                {% include cms_content_renderer.dragbar_template with placeholder=placeholder language=language %}
 
                 <div class="cms-draggables cms-draggables-root">
                     <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
                     {% for plugin in placeholder.get_cached_plugins %}
-                        {% include request.toolbar.drag_item_template with plugin=plugin slot=slot %}
+                        {% include cms_content_renderer.drag_item_template with plugin=plugin slot=slot %}
                     {% endfor %}
                 </div>
             </div>

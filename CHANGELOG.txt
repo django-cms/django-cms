@@ -14,6 +14,8 @@
   non-existing JavaScript dependencies.
 * Fixed a possible recursion error when using the ``Alias`` plugin.
 * Make it possible to use multi-table inheritance for Page/Title extensions.
+* Refactored plugin rendering functionality to speed up loading time in both
+  structure and content mode.
 
 
 === 3.3.2 (unreleased) ===

@@ -19,11 +19,13 @@ from sekizai.helpers import get_varname
 
 import cms
 from cms.api import create_page, create_title, add_plugin
-from cms.middleware.toolbar import ToolbarMiddleware, toolbar_plugin_processor
+from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, Placeholder
-from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
-                                       _show_placeholder_for_page,
-                                       _get_placeholder, RenderPlugin)
+from cms.templatetags.cms_tags import (
+    _get_page_by_untyped_arg,
+    _show_placeholder_by_id,
+    RenderPlugin,
+)
 from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
@@ -180,11 +182,11 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         with self.settings(DEBUG=True):
             context = self.get_context('/')
 
-            self.assertRaises(Placeholder.DoesNotExist, _show_placeholder_for_page,
+            self.assertRaises(Placeholder.DoesNotExist, _show_placeholder_by_id,
                               context, 'does_not_exist', 'myreverseid')
         with self.settings(DEBUG=False):
-            content = _show_placeholder_for_page(context, 'does_not_exist', 'myreverseid')
-            self.assertEqual(content['content'], '')
+            content = _show_placeholder_by_id(context, 'does_not_exist', 'myreverseid')
+            self.assertEqual(content, '')
 
     def test_untranslated_language_url(self):
         """ Tests page_language_url templatetag behavior when used on a page
@@ -244,14 +246,16 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         creates the placeholder.
         """
         page = create_page('Test', 'col_two.html', 'en')
-        # I need to make it seem like the user added another plcaeholder to the SAME template.
+        # I need to make it seem like the user added another placeholder to the SAME template.
         page._template_cache = 'col_three.html'
 
         class FakeRequest(object):
             current_page = page
             GET = {'language': 'en'}
 
-        placeholder = _get_placeholder(page, page, dict(request=FakeRequest()), 'col_right')
+        context = self.get_context(page=page)
+        content_renderer = context['cms_content_renderer']
+        placeholder = content_renderer._get_page_placeholder(context, page, 'col_right')
         page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
 
@@ -277,41 +281,26 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             child_plugin_2,
         ]
 
-        placeholder_slot = placeholder.slot
-
         with self.login_user_context(self.get_superuser()):
             context = self.get_context(path=page.get_absolute_url(), page=page)
             context['request'].toolbar = CMSToolbar(context['request'])
             context['request'].toolbar.edit_mode = True
             context[get_varname()] = defaultdict(UniqueSequence)
 
-            parent_plugin.render_plugin(
-                context,
+            content_renderer = context['cms_content_renderer']
+
+            output = content_renderer.render_plugin(
+                instance=parent_plugin,
+                context=context,
                 placeholder=placeholder,
-                processors=[toolbar_plugin_processor],
+                editable=True
             )
 
-            # Rendering the parent plugin will put
-            # three strings into the "js" collection in sekizai.
-            # These strings contain the toolbar configuration
-            # for each plugin.
-            plugin_scripts = context[get_varname()]['js']
+            tag_format = '<template class="cms-plugin cms-plugin-start cms-plugin-{}">'
 
-            self.assertEqual(len(plugin_scripts), 3)
-
-            for plugin, script in zip(plugins, reversed(plugin_scripts)):
-                plugin_instance = plugin.get_plugin_class_instance()
-
-                child_classes = plugin_instance.get_child_classes(placeholder_slot, page) or []
-                plugin_restrictions = ['"{}"'.format(klass) for klass in child_classes]
-                plugin_restrictions_text = "plugin_restriction: [{}]".format(','.join(plugin_restrictions))
-
-                parent_classes = plugin_instance.get_parent_classes(placeholder_slot, page) or []
-                parent_restrictions = ['"{}"'.format(klass) for klass in parent_classes]
-                parent_restrictions_text = "plugin_parent_restriction: [{}]".format(','.join(parent_restrictions))
-
-                self.assertTrue(plugin_restrictions_text in script)
-                self.assertTrue(parent_restrictions_text in script)
+            for plugin in plugins:
+                start_tag = tag_format.format(plugin.pk)
+                self.assertIn(start_tag, output)
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
@@ -346,9 +335,20 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>En Test</b>')
         add_plugin(placeholder, TextPlugin, 'fr', body='<b>Fr Test</b>')
+
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
         request.current_page = page
+
+        template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        self.assertIn('<b>En Test</b>', output)
+
+        template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'fr' 1 %}{% render_block 'js' %}"
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        self.assertIn('<b>Fr Test</b>', output)
+
+        # Cache is now primed for both languages
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
         output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>En Test</b>', output)
@@ -364,9 +364,11 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         page = create_page('Test', 'col_two.html', 'en')
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
         request.current_page = page
+
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
         with self.assertNumQueries(4):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
@@ -387,14 +389,14 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page.publisher_public
         request.user = user
         template = "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}"
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
         request = RequestFactory().get('/?preview')
         request.current_page = page
         request.user = user
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test2</b>', output)
 
@@ -429,7 +431,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar = CMSToolbar(request)
         request.toolbar.edit_mode = True
         context = SekizaiContext({
-            'request': request
+            'request': request,
+            'cms_content_renderer': request.toolbar.content_renderer,
         })
         output = tag.render(context)
         self.assertEqual(
@@ -450,8 +453,9 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar = CMSToolbar(request)
         request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
-        with self.assertNumQueries(4):
-            self.render_template_obj(template, {}, request)
+        with self.assertNumQueries(2):
+            output = self.render_template_obj(template, {}, request)
+            self.assertEqual(output, '< --- empty --->')
 
     def test_render_placeholder_as_var(self):
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -464,8 +468,9 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar = CMSToolbar(request)
         request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
-        with self.assertNumQueries(4):
-            self.render_template_obj(template, {}, request)
+        with self.assertNumQueries(2):
+            output = self.render_template_obj(template, {}, request)
+            self.assertEqual(output, '< --- empty --->')
 
     def test_render_model_with_deferred_fields(self):
         from django.core.cache import cache

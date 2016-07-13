@@ -17,8 +17,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
-from django.template import Template
-from django.template.loader import get_template
 from django.utils.functional import cached_property
 
 
@@ -41,7 +39,6 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
-        self._cached_templates = {}
         self.right_items = []
         self.left_items = []
         self.last_left_items = []
@@ -66,6 +63,12 @@ class CMSToolbar(ToolbarAPIMixin):
         self.toolbar_language = None
         self.show_toolbar = True
         self.init_toolbar(request)
+        # Internal attribute to track whether we can cache
+        # a response from the current request.
+        # This attribute is modified by the placeholder rendering
+        # mechanism in case a placeholder rendered by the current
+        # request cannot be cached.
+        self._cache_disabled = self.edit_mode
 
         with force_language(self.language):
             try:
@@ -118,8 +121,8 @@ class CMSToolbar(ToolbarAPIMixin):
         # We need to store the current language in case the user's preferred language is different.
         self.toolbar_language = self.language
 
-        user_settings = self.get_user_settings()
-        if user_settings:
+        if self.is_staff:
+            user_settings = self.user_settings
             if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
                     not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
                 self.toolbar_language = user_settings.language
@@ -131,6 +134,16 @@ class CMSToolbar(ToolbarAPIMixin):
         if hasattr(self, 'toolbars'):
             for key, toolbar in self.toolbars.items():
                 self.toolbars[key].request = self.request
+
+    @cached_property
+    def user_settings(self):
+        return self.get_user_settings()
+
+    @cached_property
+    def content_renderer(self):
+        from cms.plugin_rendering import ContentRenderer
+
+        return ContentRenderer(request=self.request)
 
     def get_user_settings(self):
         user_settings = None
@@ -349,26 +362,6 @@ class CMSToolbar(ToolbarAPIMixin):
         else:
             return self._request_hook_post()
 
-    def get_cached_template(self, template):
-        if isinstance(template, Template):
-            return template
-
-        if not template in self._cached_templates:
-            self._cached_templates[template] = get_template(template)
-        return self._cached_templates[template]
-
-    @cached_property
-    def drag_item_template(self):
-        return self.get_cached_template('cms/toolbar/dragitem.html')
-
-    @cached_property
-    def drag_item_menu_template(self):
-        return self.get_cached_template('cms/toolbar/dragitem_menu.html')
-
-    @cached_property
-    def dragbar_template(self):
-        return self.get_cached_template('cms/toolbar/dragbar.html')
-
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:
             logout(self.request)
@@ -405,3 +398,19 @@ class CMSToolbar(ToolbarAPIMixin):
                 result = getattr(toolbar, func_name)()
                 if isinstance(result, HttpResponse):
                     return result
+
+
+class EmptyToolbar(object):
+    is_staff = False
+    edit_mode = False
+    show_toolbar = False
+    _cache_disabled = False
+
+    def __init__(self, request):
+        self.request = request
+
+    @cached_property
+    def content_renderer(self):
+        from cms.plugin_rendering import ContentRenderer
+
+        return ContentRenderer(request=self.request)

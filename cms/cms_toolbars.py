@@ -60,15 +60,16 @@ class PlaceholderToolbar(CMSToolbar):
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
 
-    def init_placeholders_from_request(self):
-        self.placeholders = getattr(self.request, 'placeholders', {})
-        self.statics = getattr(self.request, 'static_placeholders', [])
+    def init_placeholders(self):
+        content_renderer = self.toolbar.content_renderer
+        self.placeholders = content_renderer.get_rendered_placeholders()
+        self.statics = content_renderer.get_rendered_static_placeholders()
 
     def populate(self):
         self.init_from_request()
 
     def post_template_populate(self):
-        self.init_placeholders_from_request()
+        self.init_placeholders()
 
         self.add_wizard_button()
         self.add_structure_mode()
@@ -78,7 +79,7 @@ class PlaceholderToolbar(CMSToolbar):
             if self.page.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
-        elif any([ph for ph, perms in self.placeholders.values() if perms]):
+        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request)):
             return self.add_structure_mode_item()
 
         for sp in self.statics:
@@ -135,9 +136,7 @@ class BasicToolbar(CMSToolbar):
     def populate(self):
         if not self.page:
             self.init_from_request()
-
-            user_settings = self.request.toolbar.get_user_settings()
-            self.clipboard = user_settings.clipboard
+            self.clipboard = self.request.toolbar.user_settings.clipboard
             self.add_admin_menu()
             self.add_language_menu()
 
@@ -247,7 +246,7 @@ class BasicToolbar(CMSToolbar):
 
         if not hasattr(self, "clipboard"):
             return CMSPlugin.objects.none()
-        return self.clipboard.get_plugins()
+        return self.clipboard.get_plugins().select_related('placeholder')
 
     def render_addons(self, context):
         context.push()
@@ -269,9 +268,10 @@ class PageToolbar(CMSToolbar):
         self.title = self.get_title()
         self.permissions_activated = get_cms_setting('PERMISSION')
 
-    def init_placeholders_from_request(self):
-        self.placeholders = getattr(self.request, 'placeholders', [])
-        self.statics = getattr(self.request, 'static_placeholders', [])
+    def init_placeholders(self):
+        content_renderer = self.toolbar.content_renderer
+        self.placeholders = content_renderer.get_rendered_placeholders()
+        self.statics = content_renderer.get_rendered_static_placeholders()
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 
     def get_title(self):
@@ -356,7 +356,7 @@ class PageToolbar(CMSToolbar):
         self.change_language_menu()
 
     def post_template_populate(self):
-        self.init_placeholders_from_request()
+        self.init_placeholders()
         self.add_draft_live()
         self.add_publish_button()
 

@@ -22,7 +22,10 @@ use_threadlocal = False
 def ensure_urlconf_is_up_to_date():
     global_revision = get_global_revision()
     local_revision = get_local_revision()
-    if global_revision != local_revision:
+
+    if not local_revision:
+        set_local_revision(global_revision)
+    elif global_revision != local_revision:
         if settings.DEBUG:
             print("   New revision!!!! RELOAD!\n"
                   "      {0} ({1})\n"

@@ -35,3 +35,7 @@ SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
 EXPIRE_NOW = 0
 # HTTP Specification says max caching should only be up to one year.
 MAX_EXPIRATION_TTL = 365 * 24 * 3600
+
+PLUGIN_TOOLBAR_JS = "CMS._plugins.push(['cms-plugin-%(pk)s', %(config)s]);"
+
+PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push(['cms-placeholder-%(pk)s', %(config)s]);"

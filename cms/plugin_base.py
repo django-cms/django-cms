@@ -8,7 +8,7 @@ from django.shortcuts import render_to_response
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
@@ -96,7 +96,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     form = None
     change_form_template = "admin/cms/page/plugin/change_form.html"
-    frontend_edit_template = 'cms/toolbar/plugin.html'
     # Should the plugin be rendered in the admin?
     admin_preview = False
 
@@ -150,11 +149,17 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             warnings.warn('CMSPlugin.render_template attribute is deprecated '
                           'and it will be removed in version 3.2; please move'
                           'template in plugin classes', DeprecationWarning)
-            return getattr(instance, 'render_template', False)
+            template = getattr(instance, 'render_template', False)
         elif hasattr(self, 'get_render_template'):
-            return self.get_render_template(context, instance, placeholder)
+            template = self.get_render_template(context, instance, placeholder)
         elif getattr(self, 'render_template', False):
-            return getattr(self, 'render_template', False)
+            template = getattr(self, 'render_template', False)
+        else:
+            template = None
+
+        if not template:
+            raise ValidationError("plugin has no render_template: %s" % self.__class__)
+        return template
 
     @classmethod
     def get_render_queryset(cls):
@@ -386,22 +391,23 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_all_plugins()
 
-    def get_child_classes(self, slot, page):
+    @classmethod
+    def get_child_classes(cls, slot, page):
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
         """
         # Placeholder overrides are highest in priority
-        child_classes = self.get_child_class_overrides(slot, page)
+        child_classes = cls.get_child_class_overrides(slot, page)
 
         if child_classes:
             return child_classes
 
         # Get all child plugin candidates
-        installed_plugins = self.get_child_plugin_candidates(slot, page)
+        installed_plugins = cls.get_child_plugin_candidates(slot, page)
 
         child_classes = []
-        plugin_type = self.__class__.__name__
+        plugin_type = cls.__name__
 
         # The following will go through each
         # child plugin candidate and check if
@@ -422,14 +428,15 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 continue
         return child_classes
 
-    def get_parent_classes(self, slot, page):
+    @classmethod
+    def get_parent_classes(cls, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = page and page.get_template() or None
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
-        parent_classes = ph_conf.get(self.__class__.__name__, self.parent_classes)
+        parent_classes = ph_conf.get(cls.__name__, cls.parent_classes)
         return parent_classes
 
     def get_action_options(self):

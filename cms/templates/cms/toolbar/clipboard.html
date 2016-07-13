@@ -1,17 +1,17 @@
 {% load i18n cms_admin %}
 
 {% if request.toolbar.edit_mode or request.toolbar.build_mode %}
-{% with slot="clipboard" clipboard_plugins=local_toolbar.get_clipboard_plugins|slice:":1" %}
+{% with clipboard_plugins=local_toolbar.get_clipboard_plugins|slice:":1" %}
 {% if clipboard_plugins %}
 <div class="cms-clipboard" data-title="{% trans 'Clipboard' %}">
     {% for plugin in clipboard_plugins %}
     <div class="cms-plugins">
-        {% render_plugin_toolbar_config plugin slot %}
+        {% render_plugin_toolbar_config plugin %}
     </div>
     {% endfor %}
     <div class="cms-clipboard-containers cms-dragarea cms-draggables">
         {% for plugin in clipboard_plugins %}
-            {% with clipboard="true" %}{% include request.toolbar.drag_item_template with plugin=plugin %}{% endwith %}
+            {% with clipboard="true" %}{% include cms_content_renderer.drag_item_template with plugin=plugin %}{% endwith %}
         {% endfor %}
     </div>
 </div>

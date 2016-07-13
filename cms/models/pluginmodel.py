@@ -7,7 +7,7 @@ import warnings
 
 from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import ModelBase
@@ -27,7 +27,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
-from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
 from cms.utils.helpers import reversion_register
 from cms.utils.urlutils import admin_reverse
@@ -252,35 +251,20 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
-        instance, plugin = self.get_plugin_instance()
-        request = None
-        current_app = None
-        if context:
-            request = context.get('request', None)
-            if request:
-                current_app = getattr(request, 'current_app', None)
-            if not current_app:
-                current_app = context.current_app if context else None
+        if not context or not 'cms_content_renderer' in context:
+            return ''
 
-        if instance and not (admin and not plugin.admin_preview):
-            if not placeholder or not isinstance(placeholder, Placeholder):
-                placeholder = instance.placeholder
-            placeholder_slot = placeholder.slot
-            context = PluginContext(context, instance, placeholder, current_app=current_app)
-            context = plugin.render(context, instance, placeholder_slot)
-            page = None
-            if request:
-                page = request.current_page
-            context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
-            context['allowed_parent_classes'] = plugin.get_parent_classes(placeholder_slot, page)
-            if plugin.render_plugin:
-                template = plugin._get_render_template(context, instance, placeholder)
-                if not template:
-                    raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
-            else:
-                template = None
-            return render_plugin(context, instance, placeholder, template, processors, current_app)
-        return ""
+        if not isinstance(placeholder, Placeholder):
+            # Sadly this method blindly accepted a placeholder slot.
+            placeholder = self.placeholder
+
+        content_renderer = context['cms_content_renderer']
+        content = content_renderer.render_plugin(
+            instance=self,
+            context=context,
+            placeholder=placeholder,
+        )
+        return content
 
     def get_media_path(self, filename):
         pages = self.placeholder.page_set.all()

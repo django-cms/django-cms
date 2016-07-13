@@ -4,7 +4,6 @@ from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
-from cms.plugin_rendering import render_placeholder
 from cms.utils.urlutils import admin_reverse
 from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
@@ -15,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _, get_language
 
 class PlaceholderPlugin(CMSPluginBase):
     name = _("Placeholder")
-    parent_classes = [0]  # so you will not be able to add it something
+    parent_classes = ['0']  # so you will not be able to add it something
     #require_parent = True
     render_plugin = False
     admin_preview = False
@@ -37,21 +36,24 @@ class AliasPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         from cms.utils.plugins import downcast_plugins, build_plugin_tree
 
-        if instance.is_recursive():
+        context = super(AliasPlugin, self).render(context, instance, placeholder)
+        cms_content_renderer = context.get('cms_content_renderer')
+
+        if not cms_content_renderer or instance.is_recursive():
             return context
 
-        request = context.get('request', None)
-        context['instance'] = instance
-        context['placeholder'] = placeholder
         if instance.plugin_id:
             plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
             plugins = [instance.plugin] + list(plugins)
-            plugins = downcast_plugins(plugins, request=request)
+            plugins = downcast_plugins(plugins, request=cms_content_renderer.request)
             plugins[0].parent_id = None
             plugins = build_plugin_tree(plugins)
             context['plugins'] = plugins
         if instance.alias_placeholder_id:
-            content = render_placeholder(instance.alias_placeholder, context)
+            content = cms_content_renderer.render_placeholder(
+                placeholder=instance.alias_placeholder,
+                context=context,
+            )
             context['content'] = mark_safe(content)
         return context
 
