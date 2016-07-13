@@ -457,30 +457,30 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
 
-    def get_filled_languages(self, obj):
+    def get_filled_languages(self, request, obj):
         filled_languages = []
 
         if obj:
             filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
-        allowed_languages = [lang[0] for lang in self._get_site_languages(obj)]
+        allowed_languages = [lang[0] for lang in self._get_site_languages(request, obj)]
         return [lang for lang in filled_languages if lang in allowed_languages]
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
-        context['filled_languages'] = self.get_filled_languages(obj)
+        context['filled_languages'] = self.get_filled_languages(request, obj)
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def _get_site_languages(self, obj=None):
+    def _get_site_languages(self, request, obj=None):
         if obj:
             site_id = obj.site_id
         else:
-            site_id = Site.objects.get_current().pk
+            site_id = request.session.get('cms_admin_site', Site.objects.get_current().pk)
         return get_language_tuple(site_id)
 
     def update_language_tab_context(self, request, obj=None, context=None):
         if not context:
             context = {}
         language = get_language_from_request(request, obj)
-        languages = self._get_site_languages(obj)
+        languages = self._get_site_languages(request, obj)
         context.update({
             'language': language,
             'language_tabs': languages,
