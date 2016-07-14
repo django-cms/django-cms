@@ -113,7 +113,7 @@ casper.test.begin('User Login (via Toolbar) through apphooked object page', func
         .waitForUrl(/detail/)
         .waitForSelector('.cms-ready', function () {
             appObjectUrl = this.getCurrentUrl() + '?edit';
-            appObjectId = this.getCurrentUrl().replace('8000', '').replace(/\D/g, '');
+            appObjectId = this.getCurrentUrl().replace(globals.port, '').replace(/\D/g, '');
         })
         .then(cms.logout())
         .then(function () {
