@@ -10,11 +10,17 @@ def noop_gettext(s):
 permission = True
 cms_toolbar_edit_on = 'edit'
 
-if '--CMS_PERMISSION=False' in sys.argv:
-    permission = False
+port = 8000
 
-if '--CMS_TOOLBAR_URL__EDIT_ON=test-edit' in sys.argv:
-    cms_toolbar_edit_on = 'test-edit'
+for arg in sys.argv:
+    if arg == '--CMS_PERMISSION=False':
+        permission = False
+
+    if arg == '--CMS_TOOLBAR_URL__EDIT_ON=test-edit':
+        cms_toolbar_edit_on = 'test-edit'
+
+    if arg.startswith('--port='):
+        port = arg.split('=')[1]
 
 gettext = noop_gettext
 
@@ -120,7 +126,7 @@ def run():
 
     # we use '.runner()', not '.cms()' nor '.run()' because it does not
     # add 'test' argument implicitly
-    runner.runner([sys.argv[0], 'cms', '--cms', 'server', '--bind', '0.0.0.0'])
+    runner.runner([sys.argv[0], 'cms', '--cms', 'server', '--bind', '0.0.0.0', '--port', str(port)])
 
 if __name__ == "__main__":
     run()
