@@ -47,7 +47,7 @@ def get_language_from_request(request, current_page=None):
         language = request.POST.get('language', None)
     if hasattr(request, 'GET') and not language:
         language = request.GET.get('language', None)
-    site_id = current_page.site_id if current_page else None
+    site_id = current_page.site_id if current_page else request.session.get('cms_admin_site')
     if language:
         language = get_language_code(language)
         if not language in get_language_list(site_id):
@@ -58,9 +58,12 @@ def get_language_from_request(request, current_page=None):
         if not language in get_language_list(site_id):
             language = None
 
-    if language is None and current_page:
-        # in last resort, get the first language available in the page
-        languages = current_page.get_languages()
+    if language is None:
+        # in last resort, get the first language available in the page or site
+        if current_page:
+            languages = current_page.get_languages()
+        else:
+            languages = get_language_list(site_id)
 
         if len(languages) > 0:
             language = languages[0]

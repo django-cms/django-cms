@@ -896,7 +896,9 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
         # no user: no placeholders but no error either
         factory = RequestFactory()
-        context_en['request'] = factory.get(page_en.get_absolute_url())
+        request = factory.get(page_en.get_absolute_url())
+        request.session = {}
+        context_en['request'] = request
         render_placeholder(ex.placeholder, context_en, use_cache=False)
         editable = [ph for ph, perms in getattr(context_en['request'], 'placeholders', {}).values() if perms]
         self.assertEqual(len(editable), 0)
