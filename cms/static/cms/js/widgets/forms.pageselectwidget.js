@@ -2,82 +2,86 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-// #############################################################################
-// NAMESPACES
-/**
- * @module CMS
- */
-var CMS = window.CMS || {};
+// this essentially makes sure that dynamically required bundles are loaded
+// from the same place
+// eslint-disable-next-line
+__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.pageselectwidget.min.js');
 
 // #############################################################################
 // PAGE SELECT WIDGET
 // cms/forms/widgets.py
-(function ($) {
-    'use strict';
+require.ensure([], function (require) {
+    var CMS = window.CMS || {};
+    var $ = require('jquery');
+    var Class = require('classjs');
 
-    // shorthand for jQuery(document).ready();
-    $(function () {
+    /**
+     * Manages the selection of two select fields. The first field
+     * sets the "Site" and the second the "Pagetree".
+     *
+     * @class PageSelectWidget
+     * @namespace CMS
+     */
+    CMS.PageSelectWidget = new Class({
+
+        initialize: function initialize(options) {
+            this.options = $.extend(true, {}, this.options, options);
+            // load functionality
+            this._setup(options);
+        },
+
         /**
-         * Manages the selection of two select fields. The first field
-         * sets the "Site" and the second the "Pagetree".
+         * Setup internal functions and events.
          *
-         * @class PageSelectWidget
-         * @namespace CMS
+         * @private
+         * @method _setup
+         * @param {Object} options
+         * @param {String} options.name
          */
-        CMS.PageSelectWidget = new CMS.Class({
+        _setup: function _setup(options) {
+            var group0 = $('#id_' + options.name + '_0');
+            var group1 = $('#id_' + options.name + '_1');
+            var group2 = $('#id_' + options.name + '_2');
+            var tmp;
 
-            initialize: function initialize(options) {
-                this.options = $.extend(true, {}, this.options, options);
-                // load functionality
-                this._setup(options);
-            },
+            // handles the change event on the first select "site"
+            // that controls the display of the second select "pagetree"
+            group0.on('change', function () {
+                tmp = $(this).children(':selected').text();
 
-            /**
-             * Setup internal functions and events.
-             *
-             * @private
-             * @method _setup
-             * @param {Object} options
-             * @param {String} options.name
-             */
-            _setup: function _setup(options) {
-                var group0 = $('#id_' + options.name + '_0');
-                var group1 = $('#id_' + options.name + '_1');
-                var group2 = $('#id_' + options.name + '_2');
-                var tmp;
+                group1.find('optgroup').remove();
+                group1.append(
+                    group2.find('optgroup[label="' + tmp + '"]').clone()
+                ).change();
 
-                // handles the change event on the first select "site"
-                // that controls the display of the second select "pagetree"
-                group0.on('change', function () {
-                    tmp = $(this).children(':selected').text();
+                // refresh second select
+                setTimeout(function () {
+                    group1.trigger('change');
+                }, 0);
+            }).trigger('change');
 
-                    group1.find('optgroup').remove();
-                    group1.append(
-                        group2.find('optgroup[label="' + tmp + '"]').clone()
-                    ).change();
+            // sets the correct value
+            group1.on('change', function () {
+                tmp = $(this).find('option:selected').val();
 
-                    // refresh second select
-                    setTimeout(function () {
-                        group1.trigger('change');
-                    }, 0);
-                }).trigger('change');
+                if (tmp) {
+                    group2.find('option').prop('selected', false);
+                    group2.find('option[value="' + tmp + '"]').prop('selected', true);
+                } else if (group2.length) {
+                    group2.find('option[value=""]').prop('selected', true);
+                }
+            });
 
-                // sets the correct value
-                group1.on('change', function () {
-                    tmp = $(this).find('option:selected').val();
-
-                    if (tmp) {
-                        group2.find('option').prop('selected', false);
-                        group2.find('option[value="' + tmp + '"]').prop('selected', true);
-                    } else if (group2.length) {
-                        group2.find('option[value=""]').prop('selected', true);
-                    }
-                });
-
-                // don't allow to add another page from in here
-                $('#add_id_' + options.name).hide();
-            }
-        });
-
+            // don't allow to add another page from in here
+            $('#add_id_' + options.name).hide();
+        }
     });
-})(CMS.$);
+
+
+    // init
+    $(function () {
+        CMS.Widgets._pageSelectWidgets.forEach(function (widget) {
+            new CMS.PageSelectWidget(widget);
+        });
+    });
+}, 'admin.widget');
