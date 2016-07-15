@@ -1,3 +1,5 @@
+.. _toolbar_introduction:
+
 #####################
 Extending the Toolbar
 #####################
@@ -7,25 +9,13 @@ to integrate your application in the frontend editing mode of django CMS and
 provide your users with a streamlined editing experience.
 
 
-*************************
-Registering toolbar items
-*************************
-
-There are two ways to control what gets shown in the toolbar.
-
-One is the ``CMS_TOOLBARS`` setting. This gives you full control over which
-classes are loaded, but requires that you specify them all manually.
-
-The other is to provide ``cms_toolbars.py`` files in your apps, which will be
-automatically loaded as long ``CMS_TOOLBARS`` is not set (or set to ``None``).
-We'll work with this second method.
-
-
 ******************
 Create the toolbar
 ******************
 
-Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application:
+We'll create a toolbar using a ``cms.toolbar_base.CMSToolbar`` sub-class.
+
+Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application. Here's a basic example:
 
 .. code-block:: python
 
@@ -36,7 +26,6 @@ Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application:
     from polls.models import Poll
 
 
-    @toolbar_pool.register
     class PollToolbar(CMSToolbar):
         supported_apps = (
             'polls',
@@ -60,49 +49,34 @@ Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application:
                 url=admin_reverse('polls_poll_add'),
             )
 
+
+    toolbar_pool.register(PollToolbar)  # register the toolbar
+
+
 .. note:: Don't forget to restart the runserver to have your new toolbar item recognised.
 
 
 What this all means
 ===================
 
-Right now you don't need to know exactly what this does, but once you've got it working here's
-a quick run-down what the code above does:
 
-* defines a ``CMSToolbar`` sub-class
-* registers the toolbar class with ``@toolbar_pool.register``
-* defines a ``populate()`` method that adds an item to the menu
-
-The ``populate()`` method:
+``CMSToolbar`` sub-classes must implement a ``populate()`` method. The ``populate()`` method will only be called if the
+current user is a staff user. The ``populate()`` method is what actually manages the toolbar - it:
 
 * checks whether we're in a page belonging to this application
-* if so, it creates a menu if one's not already there
+* ... if so, it creates a menu, if one's not already there
 * adds a menu item to list all polls in the overlay
 * adds a menu item to add a new poll as a modal window
 
-Your ``cms_toolbars.py`` file should contain classes that extend ``cms.toolbar_base.CMSToolbar``
-and are registered using ``cms.toolbar_pool.toolbar_pool.register()``. The register function can be
-used as a decorator, as in the example above.
+We also provide:
 
-``CMSToolbar`` instances will have these attributes:
-
-* ``toolbar``: the toolbar object
-* ``request`` the current request
-* ``is_current_app`` a flag indicating whether the current request is handled
-  by the same app as the function is in (use ``supported_apps`` to add more
-  apps that should be considered the "active app")
-* ``app_path`` the name of the app used for the current request
-* ``watch_models`` which allow the frontend editor to redirect the user to the model instance
+* ``watch_models``, which allows the frontend editor to redirect the user to the model instance
   ``get_absolute_url`` whenever an instance is created or saved through the frontend editor
   (see :ref:`url_changes` for details)
-
-``CMSToolbar`` sub-classes must implement a ``populate`` method. The ``populate``
-method will only be called if the current user is a staff user.
-``supported_apps`` is a list of app names that should be considered as
-``is_current_app``. Usually you don't need to set ``supported_apps``, but in
-our case we need it so ``is_current_app`` can be detected properly (because the
-views for the poll app are in ``polls`` and our ``cms_toolbars.py`` is in the
-``polls_cms_integration`` app).
+* ``supported_apps``, a list of application names in which the toolbar should be active. Usually you don't need to set
+  ``supported_apps``. However, in our case there's a small complication: the views for the Polls application are in
+  ``polls``, but our ``cms_toolbars.py`` is in the ``polls_cms_integration`` application - we want the toolbar to be
+  available in both of these.
 
 
 **************
@@ -115,4 +89,4 @@ It gives you quick access to the list of Polls in the Admin, and gives you a sho
 creating a new Poll.
 
 There's a lot more to django CMS toolbar classes than this - see
-:doc:`/how_to/toolbar` for more.
+:ref:`toolbar_how_to` for more.
