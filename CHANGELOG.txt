@@ -8,6 +8,10 @@
 * Changed cache-busting implementation, it is now handled by a path change,
   not by GET parameter.
 * Added a possibility to copy pages in the Page Tree by drag'n'drop.
+* Fixed a bug where it wasn't possible to scroll the toolbar menu if scroll
+  started on the disabled menu item on small screens.
+* Fixed a regression when standalone CMS Widgets wouldn't work due to
+  non-existing JavaScript dependencies.
 
 
 === 3.3.2 (unreleased) ===
