@@ -314,7 +314,8 @@ class MenuPool(object):
         if menu_cls.__module__.split('.')[-1] == 'menu':
             warnings.warn('menu.py filename is deprecated, '
                           'and it will be removed in version 3.4; '
-                          'please rename it to cms_menus.py', DeprecationWarning)
+                          'please rename it to cms_menus.py',
+                          DeprecationWarning, stacklevel=2)
         from menus.base import Menu
         assert issubclass(menu_cls, Menu)
         if menu_cls.__name__ in self.menus:
@@ -332,7 +333,8 @@ class MenuPool(object):
         if source_file == 'menu.py':
             warnings.warn('menu.py filename is deprecated, '
                           'and it will be removed in version 3.4; '
-                          'please rename it to cms_menus.py', DeprecationWarning)
+                          'please rename it to cms_menus.py',
+                          DeprecationWarning, stacklevel=2)
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
         if modifier_class not in self.modifiers:
@@ -361,7 +363,8 @@ class MenuPool(object):
             post_cut=False, breadcrumb=False):
         warnings.warn('menu_pool.apply_modifiers is deprecated '
                       'and it will be removed in version 3.4; '
-                      'please use the menu renderer instead.', DeprecationWarning)
+                      'please use the menu renderer instead.',
+                      DeprecationWarning, stacklevel=2)
         renderer = self.get_renderer(request)
         nodes = renderer.apply_modifiers(
             nodes=nodes,
@@ -376,7 +379,8 @@ class MenuPool(object):
                   breadcrumb=False):
         warnings.warn('menu_pool.get_nodes is deprecated '
                       'and it will be removed in version 3.4; '
-                      'please use the menu renderer instead.', DeprecationWarning)
+                      'please use the menu renderer instead.',
+                      DeprecationWarning, stacklevel=2)
         renderer = self.get_renderer(request)
         nodes = renderer.get_nodes(
             namespace=namespace,
