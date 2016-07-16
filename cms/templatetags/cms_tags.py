@@ -706,22 +706,28 @@ class CMSEditableObject(InclusionTag):
             lang = request.toolbar.toolbar_language
         else:
             lang = get_language()
+        opts = instance._meta
+        # Django < 1.10 creates dynamic proxy model subclasses when fields are
+        # deferred using .only()/.exclude(). Make sure to use the underlying
+        # model options when it's the case.
+        if getattr(instance, '_deferred', False):
+            opts = opts.proxy_for_model._meta
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
                                                         if not isinstance('edit_fields', six.string_types) else edit_fields
             else:
-                instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
+                instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
-            extra_context['generic'] = instance._meta
+            extra_context['generic'] = opts
             # view_method has the precedence and we retrieve the corresponding
             # attribute in the instance class.
             # If view_method refers to a method it will be called passing the
@@ -737,12 +743,12 @@ class CMSEditableObject(InclusionTag):
                 # current instance
                 if not editmode:
                     view_url = 'admin:%s_%s_add' % (
-                        instance._meta.app_label, instance._meta.model_name)
+                        opts.app_label, opts.model_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
                         view_url = 'admin:%s_%s_change' % (
-                            instance._meta.app_label, instance._meta.model_name)
+                            opts.app_label, opts.model_name)
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
@@ -750,7 +756,7 @@ class CMSEditableObject(InclusionTag):
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
-                            instance._meta.app_label, instance._meta.model_name)
+                            opts.app_label, opts.model_name)
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:
