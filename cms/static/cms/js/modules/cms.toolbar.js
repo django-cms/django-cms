@@ -255,7 +255,7 @@ var Toolbar = new Class({
             });
 
             // attach hover
-            lists.on(that.pointerOverOut, 'li', function () {
+            lists.on(that.pointerOverOut, 'li', function (e) {
                 var el = $(this);
                 var parent = el.closest('.cms-toolbar-item-navigation-children')
                     .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -264,7 +264,8 @@ var Toolbar = new Class({
                 // do not attach hover effect if disabled
                 // cancel event if element has already hover class
                 if (el.hasClass(disabled)) {
-                    return false;
+                    e.stopPropagation();
+                    return;
                 }
                 if (el.hasClass(hover)) {
                     return true;
