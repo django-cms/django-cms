@@ -10,7 +10,13 @@
 * Added a possibility to copy pages in the Page Tree by drag'n'drop.
 
 
-=== 3.3.1 (unreleased) ===
+=== 3.3.2 (unreleased) ===
+
+* Fixed a bug where it wasn't possible to scroll the toolbar menu if scroll
+  started on the disabled menu item on small screens.
+
+
+=== 3.3.1 (2016-07-13) ===
 
 * Added a warning for users who are leaving the page or closing the plugin
   modal by pressing ESC to prevent accidental loss of content.
