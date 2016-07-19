@@ -2,15 +2,16 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-// #############################################################################
-// NAMESPACES
-var CMS = window.CMS || {};
-var apphooks_configuration = window.apphooks_configuration || {};
+// this essentially makes sure that dynamically required bundles are loaded
+// from the same place
+// eslint-disable-next-line
+__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.apphookselect.min.js');
 
 // #############################################################################
 // APP HOOK SELECT
-(function ($) {
-    'use strict';
+require.ensure([], function (require) {
+    var $ = require('jquery');
+    var apphooks_configuration = window.apphooks_configuration || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
@@ -91,4 +92,4 @@ var apphooks_configuration = window.apphooks_configuration || {};
         });
 
     });
-})(CMS.$);
+}, 'admin.widget');
