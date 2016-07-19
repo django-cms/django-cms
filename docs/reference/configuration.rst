@@ -191,7 +191,7 @@ Example::
         None: {
             "plugins": ['TextPlugin'],
             'exclude_plugins': ['InheritPlugin'],
-        }
+        },
         'content': {
             'plugins': ['TextPlugin', 'PicturePlugin'],
             'text_only_plugins': ['LinkPlugin'],
