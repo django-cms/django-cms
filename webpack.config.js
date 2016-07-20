@@ -11,14 +11,22 @@ module.exports = function (opts) {
         devtool: false,
         watch: !!opts.watch,
         entry: {
+            // CMS frontend
             'toolbar': PROJECT_PATH.js + '/toolbar.js',
+            // CMS admin
             'admin.base': PROJECT_PATH.js + '/admin.base.js',
             'admin.pagetree': PROJECT_PATH.js + '/admin.pagetree.js',
-            'admin.changeform': PROJECT_PATH.js + '/admin.changeform.js'
+            'admin.changeform': PROJECT_PATH.js + '/admin.changeform.js',
+            // CMS widgets
+            // they will load the on-demand bundle called admin.widget
+            'forms.pageselectwidget': PROJECT_PATH.js + '/widgets/forms.pageselectwidget.js',
+            'forms.pagesmartlinkwidget': PROJECT_PATH.js + '/widgets/forms.pagesmartlinkwidget.js',
+            'forms.apphookselect': PROJECT_PATH.js + '/widgets/forms.apphookselect.js'
         },
         output: {
             path: PROJECT_PATH.js + '/dist/' + CMS_VERSION + '/',
             filename: 'bundle.[name].min.js',
+            chunkFilename: 'bundle.[name].min.js',
             jsonpFunction: 'cmsWebpackJsonp'
         },
         plugins: [
@@ -26,7 +34,10 @@ module.exports = function (opts) {
             // include deps already required in admin.base bundle
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'admin.base',
-                chunks: ['admin.pagetree', 'admin.changeform']
+                chunks: [
+                    'admin.pagetree',
+                    'admin.changeform'
+                ]
             })
         ],
         resolve: {
@@ -40,7 +51,7 @@ module.exports = function (opts) {
         module: {
             loaders: [
                 {
-                    test: /(modules\/jquery|libs\/pep)/,
+                    test: /(modules\/jquery|libs\/pep|select2\/select2)/,
                     loaders: [
                         'imports?jQuery=jquery'
                     ]
