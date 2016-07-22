@@ -185,7 +185,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
             test_plugin.pk)
         response = self.client.post(pl_url, {})
-        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        self.assertContains(response, "CMS.API.Helpers.onPluginSave")
 
     @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs_page(self):
@@ -204,7 +204,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             admin_reverse('cms_page_change', args=(page.pk,)),
             test_plugin.pk)
         response = self.client.post(pl_url, {})
-        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        self.assertContains(response, "CMS.API.Helpers.onPluginSave")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')

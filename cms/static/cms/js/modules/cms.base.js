@@ -9,6 +9,8 @@ if (typeof require === 'function') {
 var $ = require('jquery');
 var Class = require('classjs');
 
+var isReloading = false;
+
 /**
  * @module CMS
  */
@@ -88,6 +90,8 @@ CMS.API.Helpers = {
         var win = this._getWindow();
         var parent = win.parent ? win.parent : win;
 
+        isReloading = true;
+
         // if there is an ajax reload, prioritize
         if (ajax) {
             parent.CMS.API.locked = true;
@@ -126,6 +130,7 @@ CMS.API.Helpers = {
 
         // add timeout if provided
         parent.setTimeout(function () {
+            isReloading = false;
             if (url && url !== parent.location.href) {
                 // location.reload() takes precedence over this, so we
                 // don't want to reload the page if we need a redirect
@@ -135,6 +140,19 @@ CMS.API.Helpers = {
                 parent.location.reload();
             }
         }, timeout || 0);
+    },
+
+    /**
+     * Overridable callback that is being called in close_frame.html when plugin is saved
+     *
+     * @function onPluginSave
+     * @public
+     */
+    onPluginSave: function () {
+        // istanbul ignore else
+        if (!isReloading) {
+            this.reloadBrowser(null, 300); // eslint-disable-line
+        }
     },
 
     /**
