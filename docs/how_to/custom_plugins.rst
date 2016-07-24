@@ -273,6 +273,9 @@ Now we need to change our plugin definition to use this model, so our new
 We changed the ``model`` attribute to point to our newly created ``Hello``
 model and pass the model instance to the context.
 
+Remember to run ``python manage.py makemigrations`` and then
+``python manage.py migrate`` to apply changes to our database.
+
 As a last step, we have to update our template to make use of this
 new configuration:
 
