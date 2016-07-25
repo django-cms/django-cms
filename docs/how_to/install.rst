@@ -26,7 +26,6 @@ Requirements
 * `django-classy-tags`_ 0.7.0 or higher
 * `django-treebeard`_ 4.0
 * `django-sekizai`_ 0.8.2 or higher
-* `html5lib`_ 0.9999999
 * `djangocms-admin-style`_ 1.0 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
@@ -39,7 +38,6 @@ Requirements
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
-.. _html5lib: https://github.com/html5lib/html5lib-python
 .. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
 Recommended
@@ -145,7 +143,6 @@ django CMS and its dependencies:
     django-sekizai==0.8.2
     django-classy-tags==0.6.2
     djangocms-admin-style==0.2.2
-    html5lib==0.999
     six==1.3.0
 
     # Optional, recommended packages
