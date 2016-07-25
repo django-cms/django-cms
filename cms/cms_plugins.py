@@ -36,6 +36,10 @@ class AliasPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         from cms.utils.plugins import downcast_plugins, build_plugin_tree
+
+        if instance.is_recursive():
+            return context
+
         request = context.get('request', None)
         context['instance'] = instance
         context['placeholder'] = placeholder
