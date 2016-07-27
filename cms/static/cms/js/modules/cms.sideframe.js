@@ -18,8 +18,6 @@ var KEYS = require('./cms.base').KEYS;
  */
 var Sideframe = new Class({
 
-    implement: [Helpers],
-
     options: {
         onClose: false,
         sideframeDuration: 300
@@ -153,7 +151,7 @@ var Sideframe = new Class({
             }
         }
 
-        url = this.makeURL(url, params);
+        url = Helpers.makeURL(url, params);
 
         // load the iframe
         this._content(url);
@@ -254,7 +252,7 @@ var Sideframe = new Class({
 
             // save url in settings
             CMS.settings.sideframe.url = iframe[0].contentWindow.location.href;
-            CMS.settings = that.setSettings(CMS.settings);
+            CMS.settings = Helpers.setSettings(CMS.settings);
 
             // This essentially hides the toolbar dropdown when
             // click happens inside of a sideframe iframe
@@ -325,7 +323,7 @@ var Sideframe = new Class({
 
         // disable scrolling for touch
         this.ui.body.addClass('cms-prevent-scrolling');
-        this.preventTouchScrolling($(document), 'sideframe');
+        Helpers.preventTouchScrolling($(document), 'sideframe');
     },
 
     /**
@@ -342,10 +340,10 @@ var Sideframe = new Class({
             url: null,
             hidden: false
         };
-        CMS.settings = this.setSettings(CMS.settings);
+        CMS.settings = Helpers.setSettings(CMS.settings);
 
         // check for reloading
-        this.reloadBrowser(this.options.onClose, false, true);
+        Helpers.reloadBrowser(this.options.onClose, false, true);
 
         // trigger hide animation
         this._hide({
@@ -382,7 +380,7 @@ var Sideframe = new Class({
 
         // enable scrolling again
         this.ui.body.removeClass('cms-prevent-scrolling');
-        this.allowTouchScrolling($(document), 'sideframe');
+        Helpers.allowTouchScrolling($(document), 'sideframe');
     },
 
     /**

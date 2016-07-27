@@ -488,7 +488,7 @@ describe('CMS.Modal', function () {
         it('reloads the browser if onClose is provided', function (done) {
             modal = new CMS.Modal({ onClose: '/this-url' });
             modal.open({ html: '<div></div>' });
-            spyOn(modal, 'reloadBrowser').and.callFake(function (url, timeout, ajax) {
+            spyOn(CMS.API.Helpers, 'reloadBrowser').and.callFake(function (url, timeout, ajax) {
                 expect(url).toEqual('/this-url');
                 expect(timeout).toEqual(false);
                 expect(ajax).toEqual(true);
@@ -1889,7 +1889,7 @@ describe('CMS.Modal', function () {
             $(function () {
                 modal = new CMS.Modal();
                 modal.ui.modal.show();
-                spyOn(modal, 'reloadBrowser');
+                spyOn(CMS.API.Helpers, 'reloadBrowser');
                 spyOn(modal, '_setBreadcrumb');
                 spyOn(modal, '_setButtons');
                 spyOn(CMS.Modal, '_setupCtrlEnterSave');
@@ -2021,7 +2021,7 @@ describe('CMS.Modal', function () {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function () {
-                expect(modal.reloadBrowser).not.toHaveBeenCalled();
+                expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
                 done();
             });
         });
@@ -2031,7 +2031,7 @@ describe('CMS.Modal', function () {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             modal.ui.modal.find('iframe').on('load', function () {
-                expect(modal.reloadBrowser).not.toHaveBeenCalled();
+                expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
                 done();
             });
         });
@@ -2042,7 +2042,7 @@ describe('CMS.Modal', function () {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function () {
-                expect(modal.reloadBrowser).toHaveBeenCalledWith();
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
                 done();
             });
         });
@@ -2172,7 +2172,7 @@ describe('CMS.Modal', function () {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function () {
-                expect(modal.reloadBrowser).toHaveBeenCalledWith(
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(
                     jasmine.any(String),
                     false,
                     true
@@ -2188,7 +2188,7 @@ describe('CMS.Modal', function () {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function () {
-                expect(modal.reloadBrowser).toHaveBeenCalledWith(
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(
                     '/custom-on-close',
                     false,
                     true
@@ -2362,7 +2362,7 @@ describe('CMS.Modal', function () {
             $(function () {
                 modal = new CMS.Modal();
                 modal.ui.modal.show();
-                spyOn(modal, 'reloadBrowser');
+                spyOn(CMS.API.Helpers, 'reloadBrowser');
                 spyOn(modal, '_setBreadcrumb');
                 spyOn(modal, '_setButtons');
                 spyOn(CMS.Modal, '_setupCtrlEnterSave');

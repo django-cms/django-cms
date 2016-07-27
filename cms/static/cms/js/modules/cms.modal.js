@@ -400,7 +400,7 @@ var Modal = new Class({
 
         // handle refresh option
         if (this.options.onClose) {
-            this.reloadBrowser(this.options.onClose, false, true);
+            Helpers.reloadBrowser(this.options.onClose, false, true);
         }
 
         this._hide({
@@ -952,7 +952,7 @@ var Modal = new Class({
             if (messages.length && that.enforceReload) {
                 that.ui.modalBody.addClass('cms-loader');
                 CMS.API.Toolbar.showLoader();
-                that.reloadBrowser();
+                Helpers.reloadBrowser();
             }
             if (messages.length && that.enforceClose) {
                 that.close();
@@ -978,7 +978,7 @@ var Modal = new Class({
             if (that.saved && saveSuccess && !contents.find('.delete-confirmation').length) {
                 that.ui.modalBody.addClass('cms-loader');
                 CMS.API.Toolbar.showLoader();
-                that.reloadBrowser(
+                Helpers.reloadBrowser(
                     that.options.onClose ? that.options.onClose : window.location.href,
                     false,
                     true
