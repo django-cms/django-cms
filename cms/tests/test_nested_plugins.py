@@ -687,7 +687,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
-            in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
+            in_txt = """<cms-plugin id="%s" title="Link" alt="Link"></cms-plugin>"""
             nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
@@ -831,16 +831,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # validate the textplugin body texts
             msg = u"org plugin and copied plugin are the same"
             self.assertTrue(org_link_child_plugin.id != copied_link_child_plugin.id, msg)
-            needle = u"plugin_obj_%s"
-            msg = u"child plugin id differs to parent in body plugin_obj_id"
+            needle = u"%s"
+            msg = u"child plugin id differs to parent in body"
             # linked child is in body
             self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
-            msg = u"copy: child plugin id differs to parent in body plugin_obj_id"
+            msg = u"copy: child plugin id differs to parent in body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
             # really nothing else
-            msg = u"child link plugin id differs to parent body plugin_obj_id"
+            msg = u"child link plugin id differs to parent body"
             self.assertTrue(org_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) == -1, msg)
-            msg = u"copy: child link plugin id differs to parent body plugin_obj_id"
+            msg = u"copy: child link plugin id differs to parent body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) == -1, msg)
             # now reverse lookup the placeholders from the plugins
             org_placeholder = org_link_child_plugin.placeholder
@@ -894,7 +894,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # reload after every save
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
-            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
+            in_txt = u"""<cms-plugin id="%s" title="Link" alt="Link"></cms-plugin>"""
             nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
@@ -1071,16 +1071,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # validate the textplugin body texts
             msg = u"org plugin and copied plugin are the same"
             self.assertNotEqual(org_link_child_plugin.id, copied_link_child_plugin.id, msg)
-            needle = u"plugin_obj_%s"
-            msg = u"child plugin id differs to parent in body plugin_obj_id"
+            needle = u"%s"
+            msg = u"child plugin id differs to parent in body"
             # linked child is in body
             self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
             msg = u"copy: child plugin id differs to parent in body plugin_obj_id"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
             # really nothing else
-            msg = u"child link plugin id differs to parent body plugin_obj_id"
+            msg = u"child link plugin id differs to parent body"
             self.assertTrue(org_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) == -1, msg)
-            msg = u"copy: child link plugin id differs to parent body plugin_obj_id"
+            msg = u"copy: child link plugin id differs to parent body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) == -1, msg)
             # now reverse lookup the placeholders from the plugins
             org_placeholder = org_link_child_plugin.placeholder
