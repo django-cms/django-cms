@@ -59,7 +59,7 @@ from djangocms_link.forms import LinkForm
 from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
-from djangocms_text_ckeditor.utils import plugin_tags_to_id_list, plugin_to_tag
+from djangocms_text_ckeditor.utils import plugin_to_tag
 
 
 @contextmanager
@@ -506,10 +506,10 @@ class PluginsTestCase(PluginsTestBaseCase):
             # text plugins (both old and new) should contain a reference
             # to the link plugins
             if plugin.plugin_type == 'TextPlugin':
-                self.assertTrue('link.png' in plugin.body)
-                self.assertTrue('plugin_obj_%s' % plugin.get_children()[0].pk in plugin.body)
-                self.assertTrue('link.png' in new_plugins[idx].body)
-                self.assertTrue('plugin_obj_%s' % new_plugins[idx].get_children()[0].pk in new_plugins[idx].body)
+                self.assertTrue('Link - A Link' in plugin.body)
+                self.assertTrue('id="%s"' % plugin.get_children()[0].pk in plugin.body)
+                self.assertTrue('Link - A Link' in new_plugins[idx].body)
+                self.assertTrue('id="%s"' % new_plugins[idx].get_children()[0].pk in new_plugins[idx].body)
 
     def test_plugin_position(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
@@ -860,106 +860,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         # this should not fail, even if there in an empty plugin
         rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url(), page=other_page), width=200)
         self.assertIn("foobar", rendered)
-
-    def test_render_textplugin(self):
-        # Setup
-        page = api.create_page("render test", "nav_playground.html", "en")
-        ph = page.placeholders.get(slot="body")
-        text_plugin = api.add_plugin(ph, "TextPlugin", "en", body="Hello World")
-        link_plugins = []
-        for i in range(0, 10):
-            link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
-                                               target=text_plugin,
-                                               name="A Link %d" % i,
-                                               url="http://django-cms.org"))
-            text_plugin.body += '<img src="/static/cms/img/icons/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
-                link_plugins[-1].name,
-                link_plugins[-1].pk,
-                link_plugins[-1].name,
-            )
-        text_plugin.save()
-        ph = Placeholder.objects.get(pk=ph.pk)
-        text_plugin.body = '\n'.join(['<img id="plugin_obj_%d" src=""/>' % l.cmsplugin_ptr_id for l in link_plugins])
-        text_plugin.save()
-        text_plugin = self.reload(text_plugin)
-
-        with self.assertNumQueries(2):
-            rendered = text_plugin.render_plugin(placeholder=ph)
-        for i in range(0, 10):
-            self.assertTrue('A Link %d' % i in rendered)
-
-    def test_copy_textplugin(self):
-        """
-        Test that copying of textplugins replaces references to copied plugins
-        """
-        page = api.create_page("page", "nav_playground.html", "en")
-
-        placeholder = page.placeholders.get(slot='body')
-
-        plugin_base = CMSPlugin(
-            plugin_type='TextPlugin',
-            placeholder=placeholder,
-            position=0,
-            language=self.FIRST_LANG)
-        plugin_base = plugin_base.add_root(instance=plugin_base)
-        plugin = Text(body='')
-        plugin_base.set_base_attr(plugin)
-        plugin.save()
-
-        plugin_ref_1_base = CMSPlugin(
-            plugin_type='EmptyPlugin',
-            placeholder=placeholder,
-            position=0,
-            language=self.FIRST_LANG)
-        plugin_ref_1_base = plugin_base.add_child(instance=plugin_ref_1_base)
-        plugin_ref_2_base = CMSPlugin(
-            plugin_type='TextPlugin',
-            placeholder=placeholder,
-            position=1,
-            language=self.FIRST_LANG)
-        plugin_ref_2_base = plugin_base.add_child(instance=plugin_ref_2_base)
-        plugin_ref_2 = Text(body='')
-        plugin_ref_2_base.set_base_attr(plugin_ref_2)
-
-        plugin_ref_2.save()
-
-        plugin.body = ' <img id="plugin_obj_%s" src=""/><img id="plugin_obj_%s" src=""/>' % (
-            str(plugin_ref_1_base.pk), str(plugin_ref_2.pk))
-        plugin.save()
-
-        page_data = self.get_new_page_data()
-
-        #create 2nd language page
-        page_data.update({
-            'language': self.SECOND_LANG,
-            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
-        })
-        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
-
-        self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
-        self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
-        self.assertEqual(CMSPlugin.objects.count(), 3)
-        self.assertEqual(Page.objects.all().count(), 1)
-
-        copy_data = {
-            'source_placeholder_id': placeholder.pk,
-            'target_placeholder_id': placeholder.pk,
-            'target_language': self.SECOND_LANG,
-            'source_language': self.FIRST_LANG,
-        }
-        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode('utf8').count('"position":'), 3)
-        # assert copy success
-        self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 3)
-        self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 3)
-        self.assertEqual(CMSPlugin.objects.count(), 6)
-        plugins = list(CMSPlugin.objects.all())
-        new_plugin = plugins[3].get_plugin_instance()[0]
-        idlist = sorted(plugin_tags_to_id_list(new_plugin.body))
-        expected = sorted([plugins[4].pk, plugins[5].pk])
-        self.assertEqual(idlist, expected)
 
     def test_search_pages(self):
         """
