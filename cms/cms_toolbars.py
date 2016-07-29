@@ -16,7 +16,6 @@ from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language, get_language_dict, get_default_language
-from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting, get_language_from_request
 from cms.utils import page_permissions
 from cms.utils.permissions import get_user_sites_queryset
@@ -40,7 +39,6 @@ PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
 PAGE_MENU_THIRD_BREAK = 'Page Menu Third Break'
 PAGE_MENU_FOURTH_BREAK = 'Page Menu Fourth Break'
 PAGE_MENU_LAST_BREAK = 'Page Menu Last Break'
-HISTORY_MENU_IDENTIFIER = 'history'
 HISTORY_MENU_BREAK = 'History Menu Break'
 MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
@@ -608,37 +606,6 @@ class PageToolbar(CMSToolbar):
                     disabled=not edit_mode or not user_can_publish,
                     on_success=refresh,
                 )
-
-            # fourth break
-            current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
-            history_menu = current_page_menu.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'))
-            if is_installed('reversion'):
-                from cms.utils.reversion_hacks import reversion, Revision
-
-                versions = reversion.get_for_object(self.page)
-                if self.page.revision_id:
-                    current_revision = Revision.objects.get(pk=self.page.revision_id)
-                    has_undo = versions.filter(revision__pk__lt=current_revision.pk).exists()
-                    has_redo = versions.filter(revision__pk__gt=current_revision.pk).exists()
-                else:
-                    has_redo = False
-                    has_undo = versions.count() > 1
-
-                undo_action = admin_reverse('cms_page_undo', args=(self.page.pk,))
-                redo_action = admin_reverse('cms_page_redo', args=(self.page.pk,))
-
-                history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo, on_success=refresh)
-                history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo, on_success=refresh)
-
-                history_menu.add_break(HISTORY_MENU_BREAK)
-
-            revert_action = admin_reverse('cms_page_revert_page', args=(self.page.pk, self.current_lang))
-            revert_question = _('Are you sure you want to revert to live?')
-            is_enabled = self.page.is_dirty(self.current_lang) and self.page.publisher_public
-            history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
-                                       disabled=not is_enabled,
-                                       on_success=refresh, extra_classes=('cms-toolbar-revert',))
-            history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))
 
             # last break
             current_page_menu.add_break(PAGE_MENU_LAST_BREAK)

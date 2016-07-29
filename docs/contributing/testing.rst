@@ -77,8 +77,7 @@ OS X users
 
 In some versions of OS X, ``gettext`` needs to be installed so that it is
 available to Django. If you run the tests and find that various tests in
-``cms.tests.frontend`` and ``cms.tests.reversion_tests.ReversionTestCase``
-raise errors, it's likely that you have this problem.
+``cms.tests.frontend`` raise errors, it's likely that you have this problem.
 
 A solution is::
 

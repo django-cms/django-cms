@@ -29,8 +29,6 @@ X_FRAME_OPTIONS_ALLOW = 3
 
 PAGE_USERNAME_MAX_LENGTH = 255
 
-REVISION_INITIAL_COMMENT = "Initial version."
-
 SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
 
 EXPIRE_NOW = 0
@@ -47,3 +45,5 @@ PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push(['cms-placeholder-%(pk)s', %(config)
 ROOT_USER_LEVEL = -1
 
 GRANT_ALL_PERMISSIONS = 'All'
+
+PUBLISH_COMMENT = "Publish"

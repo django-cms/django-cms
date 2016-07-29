@@ -5,9 +5,7 @@ from cms.signals.page import pre_save_page, post_save_page, pre_delete_page, pos
 from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
 from cms.signals.placeholder import pre_delete_placeholder_ref, post_delete_placeholder_ref
 from cms.signals.plugins import post_delete_plugins, pre_save_plugins, pre_delete_plugins
-from cms.signals.reversion_signals import post_revision
 from cms.signals.title import pre_save_title, post_save_title, pre_delete_title, post_delete_title
-from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 
 from django.db.models import signals
@@ -95,10 +93,3 @@ if get_cms_setting('PERMISSION'):
                              dispatch_uid='cms_pre_save_globalpagepermission')
     signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
                                dispatch_uid='cms_pre_delete_globalpagepermission')
-
-###################### reversion #########################
-
-if is_installed('reversion'):
-    from cms.utils.reversion_hacks import post_revision_commit
-
-    post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')

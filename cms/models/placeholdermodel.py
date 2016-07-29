@@ -15,7 +15,6 @@ from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
 from cms.utils.compat import DJANGO_1_8
-from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
 from cms.constants import (
@@ -555,5 +554,3 @@ class Placeholder(models.Model):
                         })
 
         return sorted(list(vary_list))
-
-reversion_register(Placeholder)

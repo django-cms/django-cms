@@ -96,7 +96,6 @@ HELPER_SETTINGS = dict(
         }
     },
     INSTALLED_APPS=[
-        'reversion',
         'djangocms_text_ckeditor',
         'djangocms_grid',
         'filer',

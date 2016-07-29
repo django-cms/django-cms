@@ -60,7 +60,7 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
-.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False)
+.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT)
 
     Creates a :class:`cms.models.Page` instance and returns it. Also
     creates a :class:`cms.models.Title` instance for the specified
@@ -95,10 +95,9 @@ Functions and constants
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection
-    :param bool with_revision: Whether to create a revision for the new page.
 
 
-.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None, with_revision=False)
+.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None)
 
     Creates a :class:`cms.models.Title` instance and returns it.
 
@@ -113,7 +112,6 @@ Functions and constants
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.Page` instance
     :param string overwrite_url: Overwritten path for this page
-    :param bool with_revision: Whether to create a revision for the new page.
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)

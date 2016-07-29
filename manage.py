@@ -60,7 +60,6 @@ if __name__ == '__main__':
         'cms.test_utils.project.pluginapp.plugins.one_thing',
         'cms.test_utils.project.pluginapp.plugins.revdesc',
         'cms.test_utils.project.fakemlng',
-        'cms.test_utils.project.fileapp',
         'cms.test_utils.project.objectpermissionsapp',
         'cms.test_utils.project.bunch_of_plugins',
         'cms.test_utils.project.extensionapp',
@@ -81,7 +80,6 @@ if __name__ == '__main__':
         'treebeard',
         'cms',
         'menus',
-        'reversion',
         'sekizai',
         'hvad',
     ] + PLUGIN_APPS
