@@ -9,8 +9,6 @@ if (typeof require === 'function') {
 var $ = require('jquery');
 var Class = require('classjs');
 
-var isReloading = false;
-
 /**
  * @module CMS
  */
@@ -70,6 +68,14 @@ var _ns = function nameSpaceEvent(events) {
 CMS.API.Helpers = {
 
     /**
+     * See {@link reloadBrowser}
+     *
+     * @property {Boolean} isRloading
+     * @private
+     */
+    _isReloading: false,
+
+    /**
      * Redirects to a specific url or reloads browser.
      *
      * @method reloadBrowser
@@ -90,7 +96,7 @@ CMS.API.Helpers = {
         var win = this._getWindow();
         var parent = win.parent ? win.parent : win;
 
-        isReloading = true;
+        that._isReloading = true;
 
         // if there is an ajax reload, prioritize
         if (ajax) {
@@ -130,7 +136,6 @@ CMS.API.Helpers = {
 
         // add timeout if provided
         parent.setTimeout(function () {
-            isReloading = false;
             if (url && url !== parent.location.href) {
                 // location.reload() takes precedence over this, so we
                 // don't want to reload the page if we need a redirect
@@ -150,7 +155,7 @@ CMS.API.Helpers = {
      */
     onPluginSave: function () {
         // istanbul ignore else
-        if (!isReloading) {
+        if (!this._isReloading) {
             this.reloadBrowser(null, 300); // eslint-disable-line
         }
     },

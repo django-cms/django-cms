@@ -9,6 +9,10 @@ window.CMS = window.CMS || CMS;
 CMS.Sideframe = Sideframe;
 
 describe('CMS.Sideframe', function () {
+    beforeEach(function () {
+        CMS.API.Helpers._isStorageSupported = true;
+    });
+
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
     it('creates a Sideframe class', function () {
@@ -86,7 +90,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Messages = {
                 open: $.noop
             };
-            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
@@ -95,10 +99,10 @@ describe('CMS.Sideframe', function () {
             };
             $(function () {
                 sideframe = new CMS.Sideframe();
-                spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
                     return input;
                 });
-                spyOn(sideframe, 'getSettings').and.callFake(function () {
+                spyOn(CMS.API.Helpers, 'getSettings').and.callFake(function () {
                     return { sideframe: {} };
                 });
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
@@ -142,46 +146,46 @@ describe('CMS.Sideframe', function () {
         });
 
         it('correctly modifies the url based on request params', function () {
-            spyOn(sideframe, 'makeURL').and.returnValue(url);
+            spyOn(CMS.API.Helpers, 'makeURL').and.returnValue(url);
             CMS.config.request.tree = 'non-existent-url-part';
 
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, []]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
 
             CMS.config.request.language = 'ru';
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, []]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
 
             CMS.config.request.language = false;
             CMS.config.request.page_id = 'page_id';
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, []]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
 
             CMS.config.request.language = 'de';
             CMS.config.request.page_id = 'page_id_another';
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, []]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
 
             CMS.config.request.tree = 'sideframe_iframe.html';
 
             CMS.config.request.language = false;
             CMS.config.request.page_id = false;
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, []]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
 
             CMS.config.request.language = 'ru';
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, ['language=ru']]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, ['language=ru']]);
 
             CMS.config.request.language = false;
             CMS.config.request.page_id = 'page_id';
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual([url, ['page_id=page_id']]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, ['page_id=page_id']]);
 
             CMS.config.request.language = 'de';
             CMS.config.request.page_id = 'page_id_another';
             sideframe.open({ url: url });
-            expect(sideframe.makeURL.calls.mostRecent().args).toEqual(
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual(
                 [url, ['language=de', 'page_id=page_id_another']]
             );
         });
@@ -240,14 +244,14 @@ describe('CMS.Sideframe', function () {
         });
 
         it('prevents scrolling of the outer body for mobile devices', function () {
-            spyOn(sideframe, 'preventTouchScrolling');
-            spyOn(sideframe, 'allowTouchScrolling');
+            spyOn(CMS.API.Helpers, 'preventTouchScrolling');
+            spyOn(CMS.API.Helpers, 'allowTouchScrolling');
             sideframe.ui.body.removeClass('cms-prevent-scrolling');
 
             sideframe.open({ url: url });
             expect(sideframe.ui.body).toHaveClass('cms-prevent-scrolling');
-            expect(sideframe.preventTouchScrolling).toHaveBeenCalledWith($(document), 'sideframe');
-            expect(sideframe.allowTouchScrolling).not.toHaveBeenCalled();
+            expect(CMS.API.Helpers.preventTouchScrolling).toHaveBeenCalledWith($(document), 'sideframe');
+            expect(CMS.API.Helpers.allowTouchScrolling).not.toHaveBeenCalled();
         });
 
         it('is chainable', function () {
@@ -295,7 +299,7 @@ describe('CMS.Sideframe', function () {
 
             expect(CMS.settings.sideframe).toEqual({ hidden: false });
             sideframe.ui.frame.find('iframe').on('load', function () {
-                expect(sideframe.setSettings).toHaveBeenCalled();
+                expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
                 // actual url would be http://localhost:port/${url}
                 expect(CMS.settings.sideframe.url).toMatch(new RegExp(url));
                 done();
@@ -337,7 +341,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Messages = {
                 open: jasmine.createSpy()
             };
-            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
             // fake _content that loads the iframe since
             // we do not really care, and things fail in IE
             spyOn(CMS.Sideframe.prototype, '_content');
@@ -349,10 +353,10 @@ describe('CMS.Sideframe', function () {
             };
             $(function () {
                 sideframe = new CMS.Sideframe();
-                spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
                     return input;
                 });
-                spyOn(sideframe, 'getSettings').and.callFake(function () {
+                spyOn(CMS.API.Helpers, 'getSettings').and.callFake(function () {
                     return { sideframe: {} };
                 });
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
@@ -378,18 +382,18 @@ describe('CMS.Sideframe', function () {
                 url: null,
                 hidden: false
             });
-            expect(sideframe.setSettings).toHaveBeenCalled();
+            expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
         });
 
         it('checks if page requires reloading', function () {
             sideframe.open({ url: url });
             sideframe.close();
-            expect(CMS.Sideframe.prototype.reloadBrowser).toHaveBeenCalledWith(false, false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false, false, true);
 
             sideframe = new CMS.Sideframe({ onClose: 'REFRESH_PAGE' });
             sideframe.open({ url: url });
             sideframe.close();
-            expect(CMS.Sideframe.prototype.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE', false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE', false, true);
         });
 
         it('unlocks the toolbar', function () {
@@ -413,14 +417,14 @@ describe('CMS.Sideframe', function () {
         });
 
         it('restores scrolling of the outer body for mobile devices', function () {
-            spyOn(sideframe, 'allowTouchScrolling');
+            spyOn(CMS.API.Helpers, 'allowTouchScrolling');
             sideframe.ui.body.removeClass('cms-prevent-scrolling');
             sideframe.open({ url: url });
             expect(sideframe.ui.body).toHaveClass('cms-prevent-scrolling');
-            expect(sideframe.allowTouchScrolling).not.toHaveBeenCalled();
+            expect(CMS.API.Helpers.allowTouchScrolling).not.toHaveBeenCalled();
             sideframe.close();
             expect(sideframe.ui.frame).not.toHaveClass('cms-prevent-scrolling');
-            expect(sideframe.allowTouchScrolling).toHaveBeenCalledWith($(document), 'sideframe');
+            expect(CMS.API.Helpers.allowTouchScrolling).toHaveBeenCalledWith($(document), 'sideframe');
         });
 
         it('animates the sideframe to 0 and then hides it', function () {
@@ -451,7 +455,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Messages = {
                 open: jasmine.createSpy()
             };
-            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
             // fake _content that loads the iframe since
             // we do not really care, and things fail in IE
             spyOn(CMS.Sideframe.prototype, '_content');
@@ -557,7 +561,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Messages = {
                 open: jasmine.createSpy()
             };
-            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
