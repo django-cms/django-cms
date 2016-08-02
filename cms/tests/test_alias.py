@@ -33,6 +33,27 @@ class AliasTestCase(CMSTestCase):
         admin.render(context, instance, ph_en)
         self.assertEqual(context['content'], "I'm the first")
 
+    def test_alias_recursion(self):
+        page_en = api.create_page(
+            "Alias plugin",
+            "col_two.html",
+            "en",
+            slug="page1",
+            published=True,
+            in_navigation=True,
+        )
+        ph_1_en = page_en.placeholders.get(slot="col_left")
+        ph_2_en = page_en.placeholders.get(slot="col_sidebar")
+
+        api.add_plugin(ph_1_en, 'StylePlugin', 'en', tag_type='div', class_name='info')
+        api.add_plugin(ph_1_en, 'AliasPlugin', 'en', alias_placeholder=ph_2_en)
+        api.add_plugin(ph_2_en, 'AliasPlugin', 'en', alias_placeholder=ph_1_en)
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_en.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<div class="info">', html=True)
+
     def test_move_and_delete_plugin_alias(self):
         '''
         Test moving the plugin from the clipboard to a placeholder.

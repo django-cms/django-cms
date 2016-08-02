@@ -4,6 +4,7 @@
   started on the disabled menu item on small screens.
 * Fixed a regression when standalone CMS Widgets wouldn't work due to
   non-existing JavaScript dependencies.
+* Fixed a possible recursion error when using the ``Alias`` plugin.
 
 
 === 3.3.1 (2016-07-13) ===
