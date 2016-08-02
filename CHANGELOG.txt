@@ -266,9 +266,27 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
-=== 3.1.6 (unreleased) ===
+=== 3.1.8 (unreleased) ===
+
+- Removed html5lib from setup.py
+
+
+=== 3.1.7 (2016-04-27) ===
+
+- Fix packaging problem with the wheel distribution
+
+
+=== 3.1.6 (2016-04-26) ===
 
 - Fix cache settings
+- Fix user lookup for view restrictions/page permissions when using raw id field
+- Fixes an issue relating to uninstalling a namespaced application
+- Adds "Can change page" permission
+- Addresses security vulnerabilities in the `render_model` template tag that
+  could lead to escalation of privileges or other security issues.
+- Addresses a security vulnerability in the cms' usage of the messages framework
+- Fixes security vulnerabilities in custom FormFields that could lead to
+  escalation of privileges or other security issues.
 
 
 === 3.1.5 (2016-01-29) ===
