@@ -44,6 +44,12 @@ class BaseExtension(models.Model):
         clone.pk = None
         clone.public_extension = None
         clone.extended_object = target  # set the new public object
+
+        # Nullify all concrete parent primary keys. See issue #5494
+        for parent, field in clone._meta.parents.items():
+            if field:
+                setattr(clone, parent._meta.pk.attname, None)
+
         clone.save(mark_page=False)
 
         # If the target we're copying already has a publisher counterpart, then
@@ -75,8 +81,19 @@ class BaseExtension(models.Model):
         if public_extension:
             this.pk = public_extension.pk  # overwrite current public extension
             this.public_extension = None  # remove public extension or it will point to itself and raise duplicate entry
+
+            # Set public_extension concrete parents PKs. See issue #5494
+            for parent, field in this._meta.parents.items():
+                if field:
+                    setattr(this, parent._meta.pk.attname, getattr(public_extension, parent._meta.pk.attname))
         else:
             this.pk = None  # create new public extension
+
+            # Nullify all concrete parent primary keys. See issue #5494
+            for parent, field in this._meta.parents.items():
+                if field:
+                    setattr(this, parent._meta.pk.attname, None)
+
             this.save(mark_page=False)
             self.public_extension = this
             self.save(mark_page=False)

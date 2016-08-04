@@ -23,3 +23,24 @@ extension_pool.register(MyPageExtension)
 @extension_pool.register
 class MyTitleExtension(TitleExtension):
     extra_title = models.CharField(blank=True, default='', max_length=255)
+
+
+class MultiTablePageExtensionParent(models.Model):
+    extension_parent_field = models.CharField(blank=True, default='', max_length=255)
+
+
+class MultiTablePageExtension(MultiTablePageExtensionParent, PageExtension):
+    multitable_extra = models.CharField(blank=True, default='', max_length=255)
+
+extension_pool.register(MultiTablePageExtension)
+
+
+class MultiTableTitleExtensionParent(models.Model):
+    extension_title_parent_field = models.CharField(blank=True, default='', max_length=255)
+
+
+class MultiTableTitleExtension(MultiTableTitleExtensionParent, TitleExtension):
+    multitable_extra_title = models.CharField(blank=True, default='', max_length=255)
+
+extension_pool.register(MultiTableTitleExtension)
+
