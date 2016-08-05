@@ -361,6 +361,11 @@ new plugin::
         title = models.CharField(max_length=50)
 
         def copy_relations(self, oldinstance):
+            # Before coping related objects from old instance current one need
+            # to be deleted or at public version of the page can appear
+            # duplicate items.
+            self.associated_item.all().delete()
+
             for associated_item in oldinstance.associated_item.all():
                 # instance.pk = None; instance.pk.save() is the slightly odd but
                 # standard Django way of copying a saved model instance
