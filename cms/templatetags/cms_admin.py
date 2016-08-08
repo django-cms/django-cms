@@ -3,9 +3,11 @@ from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.constants import PUBLISHER_STATE_PENDING
+from cms.toolbar.utils import get_plugin_toolbar_js
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
+from sekizai.helpers import get_varname
 from django import template
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -205,20 +207,6 @@ def preview_link(page, language):
     return page.get_absolute_url(language)
 
 
-class RenderPlugin(InclusionTag):
-    template = 'cms/content.html'
-
-    options = Options(
-        Argument('plugin')
-    )
-
-    def get_context(self, context, plugin):
-        return {'content': plugin.render_plugin(context, admin=True)}
-
-
-register.tag(RenderPlugin)
-
-
 class PageSubmitRow(InclusionTag):
     name = 'page_submit_row'
     template = 'admin/cms/page/submit_row.html'
@@ -280,33 +268,35 @@ register.tag(CMSAdminIconBase)
 
 
 @register.simple_tag(takes_context=True)
-def render_plugin_toolbar_config(context, plugin, placeholder_slot=None,
-                                 template='cms/toolbar/plugin.html'):
-    request = context['request']
-    toolbar = getattr(request, 'toolbar', None)
+def render_plugin_toolbar_config(context, plugin):
+    content_renderer = context['cms_content_renderer']
 
-    if toolbar:
-        template = toolbar.get_cached_template(template)
-    else:
-        template = context.template.engine.get_template(template)
+    instance, plugin_class = plugin.get_plugin_instance()
 
-    page = context['request'].current_page
-    cms_plugin = plugin.get_plugin_class_instance()
+    if not instance:
+        return ''
 
-    if placeholder_slot is None:
-        placeholder_slot = plugin.placeholder.slot
-
-    child_classes = cms_plugin.get_child_classes(placeholder_slot, page)
-    parent_classes = cms_plugin.get_parent_classes(placeholder_slot, page)
-
-    updated = {
-        'allowed_child_classes': child_classes,
-        'allowed_parent_classes': parent_classes,
-        'instance': plugin
-    }
-
-    with context.push(**updated):
-        return template.render(context)
+    with context.push():
+        content = content_renderer.render_editable_plugin(
+            instance,
+            context,
+            plugin_class,
+        )
+        # render_editable_plugin will populate the plugin
+        # parents and children cache.
+        placeholder_cache = content_renderer.get_rendered_plugins_cache(instance.placeholder)
+        toolbar_js = get_plugin_toolbar_js(
+            instance,
+            request_language=content_renderer.request_language,
+            children=placeholder_cache['plugin_children'][instance.plugin_type],
+            parents=placeholder_cache['plugin_parents'][instance.plugin_type],
+        )
+        varname = get_varname()
+        toolbar_js = '<script>{}</script>'.format(toolbar_js)
+        # Add the toolbar javascript for this plugin to the
+        # sekizai "js" namespace.
+        context[varname]['js'].append(toolbar_js)
+    return mark_safe(content)
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)

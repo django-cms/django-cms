@@ -21,7 +21,6 @@ from cms.cache.placeholder import (
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
-from cms.plugin_rendering import render_placeholder
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
     DateTimeCacheExpirationPlugin,
@@ -202,6 +201,7 @@ class CacheTestCase(CMSTestCase):
             request.toolbar = CMSToolbar(request)
             with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
                 response = self.client.get('/en/')
+
             self.assertTrue('max-age=45' in response['Cache-Control'], response['Cache-Control'])
 
         plugin_pool.unregister_plugin(TimeDeltaCacheExpirationPlugin)
@@ -571,10 +571,13 @@ class CacheTestCase(CMSTestCase):
         test_plugin = add_plugin(ph1, u"TextPlugin", u"en", body="Some text")
         test_plugin.save()
 
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
         # asserting initial text
         context = SekizaiContext()
+        context['cms_content_renderer'] = content_renderer
         context['request'] = self.get_request()
-        text = render_placeholder(ph1, context)
+        text = content_renderer.render_placeholder(ph1, context)
         self.assertEqual(text, "Some text")
 
         # deleting local plugin cache
@@ -583,7 +586,7 @@ class CacheTestCase(CMSTestCase):
         test_plugin.save()
 
         # plugin text has changed, so the placeholder rendering
-        text = render_placeholder(ph1, context)
+        text = content_renderer.render_placeholder(ph1, context)
         self.assertEqual(text, "Other text")
 
 
@@ -677,9 +680,18 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def test_set_get_placeholder_cache(self):
         # Test with a super-long prefix
-        en_context = Context({'request': self.en_request})
-        en_us_context = Context({'request': self.en_us_request})
-        en_uk_context = Context({'request': self.en_uk_request})
+        en_context = Context({
+            'request': self.en_request,
+            'cms_content_renderer': self.get_content_renderer(self.en_request)
+        })
+        en_us_context = Context({
+            'request': self.en_us_request,
+            'cms_content_renderer': self.get_content_renderer(self.en_us_request)
+        })
+        en_uk_context = Context({
+            'request': self.en_uk_request,
+            'cms_content_renderer': self.get_content_renderer(self.en_uk_request)
+        })
 
         en_content = self.placeholder.render(en_context, 350, lang='en')
         en_us_content = self.placeholder.render(en_us_context, 350, lang='en')
@@ -687,7 +699,10 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
         del self.placeholder._plugins_cache
 
-        de_context = Context({'request': self.de_request})
+        de_context = Context({
+            'request': self.de_request,
+            'cms_content_renderer': self.get_content_renderer(self.de_request)
+        })
         de_content = self.placeholder.render(de_context, 350, lang='de')
 
         self.assertNotEqual(en_content, de_content)

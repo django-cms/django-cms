@@ -15,7 +15,6 @@ from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
-from cms.cms_toolbars import PlaceholderToolbar
 from cms.models import Title, Page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
@@ -626,6 +625,9 @@ class ApphooksTestCase(CMSTestCase):
         apphooks = (
             'cms.test_utils.project.placeholderapp.cms_apps.Example1App',
         )
+
+        switcher_id = 'Mode Switcher'
+
         with self.settings(CMS_APPHOOKS=apphooks, ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
             self.create_base_structure('Example1App', 'en')
             ex1 = Example1.objects.create(char_1='1', char_2='2', char_3='3', char_4='4', date_field=now())
@@ -634,47 +636,49 @@ class ApphooksTestCase(CMSTestCase):
             self.user = self._create_user('admin_staff', True, True)
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            toolbar = CMSToolbar(response.context['request'])
-            toolbar.populate()
-            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
-            placeholder_toolbar.populate()
-            placeholder_toolbar.init_placeholders_from_request()
-            placeholder_toolbar.add_structure_mode()
-            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 1)
+
+            request = response.context['request']
+            toolbar = request.toolbar
+            items = toolbar.get_right_items()
+            switchers = [item.identifier for item in items
+                         if getattr(item, 'identifier', '') == switcher_id]
+            self.assertEqual(len(switchers), 1)
 
             self.user = self._create_user('staff', True, False)
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
-            toolbar = CMSToolbar(response.context['request'])
-            toolbar.populate()
-            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
-            placeholder_toolbar.populate()
-            placeholder_toolbar.init_placeholders_from_request()
-            placeholder_toolbar.add_structure_mode()
-            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 0)
+
+            request = response.context['request']
+            request.user = get_user_model().objects.get(pk=self.user.pk)
+            toolbar = request.toolbar
+            items = toolbar.get_right_items()
+            switchers = [item.identifier for item in items
+                         if getattr(item, 'identifier', '') == switcher_id]
+            self.assertEqual(len(switchers), 0)
 
             self.user.user_permissions.add(Permission.objects.get(codename='change_example1'))
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
-            toolbar = CMSToolbar(response.context['request'])
-            toolbar.populate()
-            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
-            placeholder_toolbar.populate()
-            placeholder_toolbar.init_placeholders_from_request()
-            placeholder_toolbar.add_structure_mode()
-            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 0)
 
-            permission = Permission.objects.get(codename='use_structure')
-            self.user.user_permissions.add(permission)
+            request = response.context['request']
+            request.user = get_user_model().objects.get(pk=self.user.pk)
+            toolbar = request.toolbar
+            items = toolbar.get_right_items()
+            switchers = [item.identifier for item in items
+                         if getattr(item, 'identifier', '') == switcher_id]
+            self.assertEqual(len(switchers), 0)
 
-            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
-            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
-            placeholder_toolbar.populate()
-            placeholder_toolbar.init_placeholders_from_request()
-            placeholder_toolbar.add_structure_mode()
-            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 1)
+            self.user.user_permissions.add(Permission.objects.get(codename='use_structure'))
+            with self.login_user_context(self.user):
+                response = self.client.get(path + "?edit")
+
+            request = response.context['request']
+            request.user = get_user_model().objects.get(pk=self.user.pk)
+            toolbar = request.toolbar
+            items = toolbar.get_right_items()
+            switchers = [item.identifier for item in items
+                         if getattr(item, 'identifier', '') == switcher_id]
+            self.assertEqual(len(switchers), 1)
 
             self.user = None
 

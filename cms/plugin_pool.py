@@ -19,6 +19,7 @@ from cms.utils.compat.dj import is_installed
 
 
 class PluginPool(object):
+
     def __init__(self):
         self.plugins = {}
         self.discovered = False
@@ -235,5 +236,6 @@ class PluginPool(object):
         self.discover_plugins()
         self.set_plugin_meta()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
+
 
 plugin_pool = PluginPool()

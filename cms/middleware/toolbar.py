@@ -7,34 +7,12 @@ from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import force_language
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
 from menus.menu_pool import menu_pool
 
 get_request_ip = get_request_ip_resolver()
-
-
-def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
-    toolbar = original_context['request'].toolbar
-
-    instance.placeholder = placeholder
-
-    with force_language(toolbar.toolbar_language):
-        data = {
-            'instance': instance,
-            'rendered_content': rendered_content,
-        }
-        # TODO: Remove js_compat once get_action_urls is refactored.
-        data.update(instance.get_action_urls(js_compat=False))
-
-    original_context.update(data)
-    template = toolbar.get_cached_template(
-        template=instance.get_plugin_class().frontend_edit_template
-    )
-    output = template.render(original_context).strip()
-    original_context.pop()
-    return output
 
 
 class ToolbarMiddleware(object):
@@ -125,20 +103,21 @@ class ToolbarMiddleware(object):
 
         from django.utils.cache import add_never_cache_headers
 
-        if ((hasattr(request, 'toolbar') and request.toolbar.edit_mode) or
-                not all(ph.cache_placeholder
-                        for ph, __ in getattr(request, 'placeholders', {}).values())):
+        toolbar = get_toolbar_from_request(request)
+
+        if toolbar._cache_disabled:
             add_never_cache_headers(response)
 
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:
             try:
-                pk = LogEntry.objects.filter(
-                    user=request.user,
-                    action_flag__in=(ADDITION, CHANGE)
-                ).only('pk').order_by('-pk')[0].pk
-                if hasattr(request, 'cms_latest_entry') and request.cms_latest_entry != pk:
-                    log = LogEntry.objects.filter(user=request.user, action_flag__in=(ADDITION, CHANGE))[0]
-                    request.session['cms_log_latest'] = log.pk
+                if hasattr(request, 'cms_latest_entry'):
+                    pk = LogEntry.objects.filter(
+                        user=request.user,
+                        action_flag__in=(ADDITION, CHANGE)
+                    ).only('pk').order_by('-pk')[0].pk
+
+                    if request.cms_latest_entry != pk:
+                        request.session['cms_log_latest'] = pk
             # If there were no LogEntries, just don't touch the session.
             # Note that in the case of a user logging-in as another user,
             # request may have a cms_latest_entry attribute, but there are no

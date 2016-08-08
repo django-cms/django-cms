@@ -501,7 +501,8 @@ class PermissionModeratorTests(CMSTestCase):
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
-            # non logged in user
+
+        # non logged in user
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 

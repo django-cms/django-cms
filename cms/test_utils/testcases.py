@@ -22,6 +22,7 @@ from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page
+from cms.plugin_rendering import ContentRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
     GlobalPagePermission,
@@ -382,7 +383,12 @@ class BaseCMSTestCase(object):
         context = {}
         request = self.get_request(path, page=page)
         context['request'] = request
+        context['cms_content_renderer'] = self.get_content_renderer(request=request)
         return Context(context)
+
+    def get_content_renderer(self, request=None):
+        request = request or self.get_request()
+        return ContentRenderer(request)
 
     def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
         factory = RequestFactory()

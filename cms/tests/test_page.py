@@ -22,7 +22,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
-from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
@@ -708,9 +707,15 @@ class PagesTestCase(CMSTestCase):
             # trigger the get_languages query so it doesn't get in our way
             context = self.get_context(page=page)
             context['request'].current_page.get_languages()
+
+            content_renderer = context['cms_content_renderer']
             with self.assertNumQueries(4):
                 for i, placeholder in enumerate(placeholders):
-                    content = get_placeholder_content(context, context['request'], page, placeholder.slot, False, None)
+                    content = content_renderer.render_page_placeholder(
+                        placeholder.slot,
+                        context,
+                        inherit=False,
+                    )
                     for j in range(5):
                         self.assertIn('text-%d-%d' % (i, j), content)
                         self.assertIn('link-%d-%d' % (i, j), content)

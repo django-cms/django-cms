@@ -74,6 +74,10 @@ class Placeholder(models.Model):
         name = _(name)
         return name
 
+    def get_extra_context(self, template=None):
+        from cms.utils.placeholder import get_placeholder_conf
+        return get_placeholder_conf("extra_context", self.slot, template, {})
+
     def get_add_url(self):
         return self._get_url('add_plugin')
 
@@ -163,14 +167,25 @@ class Placeholder(models.Model):
         '''
         Set editable = False to disable front-end rendering for this render.
         '''
-        from cms.plugin_rendering import render_placeholder
-        if not 'request' in context:
-            return '<!-- missing request -->'
+        content_renderer = context.get('cms_content_renderer')
+
+        if not content_renderer:
+            return '<!-- missing cms_content_renderer -->'
+
         width = width or self.default_width
+
         if width:
             context['width'] = width
-        return render_placeholder(self, context, lang=lang, editable=editable,
-                                  use_cache=use_cache)
+
+        content = content_renderer.render_placeholder(
+            self,
+            context,
+            language=lang,
+            editable=editable,
+            use_cache=use_cache,
+        )
+        return content
+
 
     def _get_related_objects(self):
         fields = self._meta._get_fields(

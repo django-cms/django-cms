@@ -8,11 +8,9 @@ from cms import plugin_rendering
 from cms.api import create_page, add_plugin
 from cms.cache.placeholder import get_placeholder_cache
 from cms.models import Page, Placeholder, CMSPlugin
-from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
+from cms.plugin_rendering import PluginContext
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import ChangeModel
-from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.views import details
 
@@ -167,17 +165,12 @@ class RenderingTestCase(CMSTestCase):
         self.test_page5 = self.reload(p5.publisher_public)
         self.test_page6 = self.reload(p6.publisher_public)
 
-    def get_request(self, page, *args, **kwargs):
-        request = super(RenderingTestCase, self).get_request(*args, **kwargs)
-        request.current_page = page
-        return request
-
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, template, page, context_vars={}):
-        request = self.get_request(page)
+        request = self.get_request(page=page)
         output = self.render_template_obj(template, context_vars, request)
         return self.strip_rendered(output)
 
@@ -186,7 +179,7 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests that the `detail` view is working.
         """
-        response = details(self.get_request(self.test_page), '')
+        response = details(self.get_request(page=self.test_page), '')
         response.render()
         r = self.strip_rendered(response.content.decode('utf8'))
         self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
@@ -210,7 +203,9 @@ class RenderingTestCase(CMSTestCase):
         context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
                                 self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
         plugin_rendering._standard_processors = {}
-        c = render_plugins((instance,), context, self.test_placeholders['main'])
+
+        content_renderer = self.get_content_renderer()
+        c = content_renderer.render_plugins([instance], context, self.test_placeholders['main'])
         r = "".join(c)
         self.assertEqual(r, u'1|' + self.test_data[
             'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
@@ -407,7 +402,7 @@ class RenderingTestCase(CMSTestCase):
         """
         template = '{% load cms_tags %}<h1>{% show_uncached_placeholder "sub" test_page %}</h1>'
         placeholder = self.test_page.placeholders.get(slot='sub')
-        request = self.get_request(self.test_page)
+        request = self.get_request(page=self.test_page)
         cache_value_before = get_placeholder_cache(placeholder, 'en', 1, request)
         output = self.render(template, self.test_page, {'test_page': self.test_page})
         cache_value_after = get_placeholder_cache(placeholder, 'en', 1, request)
@@ -526,34 +521,24 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page6)
         self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
 
-    def test_extra_context_isolation(self):
-        with ChangeModel(self.test_page, template='extra_context.html'):
-            response = self.client.get(self.test_page.get_absolute_url())
-            # only test the swallower context, other items in response.context are throwaway
-            # contexts used for rendering templates fragments and templatetags
-            self.assertFalse('extra_width' in response.context[0])
-
     def test_render_placeholder_toolbar(self):
         placeholder = Placeholder()
         placeholder.slot = 'test'
         placeholder.pk = placeholder.id = 99
-        request = AttributeObject(
-            GET={'language': 'en'},
-            session={},
-            path='/',
-            user=self.test_user,
-            current_page=None,
-            method='GET',
-        )
+        request = self.get_request(page=None)
         request.toolbar = CMSToolbar(request)
+
+        content_renderer = self.get_content_renderer(request)
 
         context = SekizaiContext()
         context['request'] = request
+        context['cms_content_renderer'] = content_renderer
 
         classes = [
             "cms-placeholder-%s" % placeholder.pk,
             'cms-placeholder',
         ]
-        output = render_placeholder_toolbar(placeholder, context, 'test', 'en')
+
+        output = content_renderer.render_editable_placeholder(placeholder, context, 'en')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))

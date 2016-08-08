@@ -1362,15 +1362,16 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         ph_en = page_en.placeholders.get(slot="body")
         api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="a title")
         api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="custom template")
-        request = self.get_request(path=page_en.get_absolute_url())
+        context = self.get_context(path=page_en.get_absolute_url())
+        request = context['request']
         plugins = get_plugins(request, ph_en, page_en.template)
         for plugin in plugins:
             if plugin.title == 'custom template':
                 self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html')
-                self.assertTrue('Articles Custom template' in plugin.render_plugin({}, ph_en))
+                self.assertTrue('Articles Custom template' in plugin.render_plugin(context, ph_en))
             else:
                 self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html')
-                self.assertFalse('Articles Custom template' in plugin.render_plugin({}, ph_en))
+                self.assertFalse('Articles Custom template' in plugin.render_plugin(context, ph_en))
 
     def test_add_plugin_with_m2m(self):
         # add a new text plugin

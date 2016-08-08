@@ -1,29 +1,13 @@
 {% spaceless %}
-{% load i18n l10n sekizai_tags %}
+{% load cms_js_tags i18n l10n sekizai_tags %}
 
 <div class="cms-placeholder cms-placeholder-{{ placeholder.pk|unlocalize }}"></div>
 {% language request.toolbar.toolbar_language %}
 <script id="cms-plugin-child-classes-{{ placeholder.pk|unlocalize }}" type="text/cms-template">
-    {% include request.toolbar.drag_item_menu_template %}
-</script>
-{% endlanguage %}
-
+    {% include cms_content_renderer.drag_item_menu_template %}
+</script>{% endlanguage %}
 {% endspaceless %}{% addtoblock "js" %}
 {% language request.toolbar.toolbar_language %}
-<script>
-CMS._plugins.push(['cms-placeholder-{{ placeholder.pk|unlocalize }}', {
-    type: 'placeholder',
-    name: '{{ placeholder.get_label|escapejs }}',
-    page_language: '{{ LANGUAGE_CODE }}',
-    placeholder_id: '{{ placeholder.pk|unlocalize }}',
-    plugin_language: '{{ language }}',
-    plugin_restriction: [{% for module in allowed_plugins %}"{{ module }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
-    addPluginHelpTitle: '{% trans "Add plugin to placeholder" %} "{{ placeholder.get_label|escapejs }}"',
-    urls: {
-        add_plugin: '{{ placeholder.get_add_url }}',
-        copy_plugin: '{{ placeholder.get_copy_url }}'
-    }
-}]);
-</script>
+<script>{% render_placeholder_toolbar_js placeholder language cms_content_renderer %}</script>
 {% endlanguage %}
 {% endaddtoblock %}

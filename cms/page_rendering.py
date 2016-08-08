@@ -27,7 +27,6 @@ def render_page(request, page, current_language, slug):
         return _handle_no_page(request, slug)
 
     response = TemplateResponse(request, template_name, context)
-
     response.add_post_render_callback(set_page_cache)
 
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
