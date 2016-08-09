@@ -3,6 +3,7 @@ var CMS = require('../../../static/cms/js/modules/cms.base');
 var StructureBoard = require('../../../static/cms/js/modules/cms.structureboard');
 var Plugin = require('../../../static/cms/js/modules/cms.plugins');
 var $ = require('jquery');
+var Mousetrap = require('mousetrap');
 
 window.CMS = window.CMS || CMS;
 CMS.StructureBoard = StructureBoard;
@@ -247,6 +248,114 @@ describe('CMS.StructureBoard', function () {
             expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:first'));
             board.show();
             expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:last'));
+        });
+    });
+
+    describe('highlights', function () {
+        var board;
+        beforeEach(function (done) {
+            fixture.load('plugins.html', 'clipboard.html');
+            CMS.settings = {
+                mode: 'edit'
+            };
+            CMS.config = {
+                mode: 'edit'
+            };
+            $(function () {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
+                    return input;
+                });
+                CMS.API.Tooltip = {
+                    domElem: {
+                        is: function () {
+                            return true;
+                        },
+                        data: function () {
+                            return 1;
+                        }
+                    }
+                };
+                CMS.StructureBoard._initializeGlobalHandlers();
+                board = new CMS.StructureBoard();
+                spyOn(board, 'show');
+                spyOn(board, 'hide');
+                spyOn(Plugin, '_highlightPluginStructure');
+                spyOn(Plugin, '_highlightPluginContent');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        describe('._showAndHighlightPlugin()', function () {
+            it('returns false if tooltip does not exist', function () {
+                CMS.API.Tooltip = false;
+                expect(board._showAndHighlightPlugin()).toEqual(false);
+                expect(board.show).not.toHaveBeenCalled();
+            });
+
+            it('returns false if no plugin is hovered', function () {
+                CMS.API.Tooltip.domElem.is = function () {
+                    return false;
+                };
+
+                expect(board._showAndHighlightPlugin()).toEqual(false);
+                expect(board.show).not.toHaveBeenCalled();
+            });
+
+            it('shows board if plugin is hovered', function () {
+                jasmine.clock().install();
+                expect(board._showAndHighlightPlugin()).not.toBeDefined();
+                expect(board.show).toHaveBeenCalledTimes(1);
+                expect(Plugin._highlightPluginStructure).not.toHaveBeenCalled();
+                jasmine.clock().tick(201);
+                expect(Plugin._highlightPluginStructure).toHaveBeenCalledTimes(1);
+                jasmine.clock().uninstall();
+            });
+        });
+
+        describe('._hideAndHighlightPlugin()', function () {
+            beforeEach(function (done) {
+                $(function () {
+                    CMS.settings.mode = 'structure';
+                    done();
+                });
+            });
+
+            it('returns false if no plugin is hovered', function () {
+                expect(board._hideAndHighlightPlugin()).toEqual(false);
+                expect(board.hide).not.toHaveBeenCalled();
+            });
+
+            it('returns false if hovered plugin is inside clipboard', function () {
+                var clipboardDraggable = $('.cms-draggable-from-clipboard');
+
+                spyOn($.fn, 'init').and.returnValue(clipboardDraggable);
+
+                expect(board._hideAndHighlightPlugin()).toEqual(false);
+                expect(board.hide).not.toHaveBeenCalled();
+            });
+
+            it('hides board if plugin is hovered', function () {
+                jasmine.clock().install();
+                var draggable = $('.cms-draggable-1');
+
+                spyOn($.fn, 'init').and.returnValue(draggable);
+                spyOn($.fn, 'closest').and.returnValue([]);
+                spyOn(board, 'getId').and.returnValue(999);
+
+                expect(board._hideAndHighlightPlugin()).not.toBeDefined();
+                expect(board.hide).toHaveBeenCalledTimes(1);
+                expect(Plugin._highlightPluginContent).not.toHaveBeenCalled();
+
+                jasmine.clock().tick(201);
+
+                expect(Plugin._highlightPluginContent).toHaveBeenCalledTimes(1);
+                expect(Plugin._highlightPluginContent).toHaveBeenCalledWith(999);
+                jasmine.clock().uninstall();
+            });
         });
     });
 
@@ -504,6 +613,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             $(function () {
+                spyOn(Mousetrap, 'bind');
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 spyOn(board, 'show').and.callFake(function () {
@@ -573,34 +683,77 @@ describe('CMS.StructureBoard', function () {
             expect(board.hide).toHaveBeenCalledTimes(2);
         });
 
-        it('sets up keydown handler to toggle board', function () {
-            expect(board.ui.doc).toHandle('keydown.cms.structureboard.switcher');
+        it('sets up shortcuts to toggle board', function () {
+            spyOn(board, '_toggleStructureBoard');
 
-            var wrongEvent = new $.Event('keydown.cms.structureboard.switcher', {
-                keyCode: 123344534
+            expect(Mousetrap.bind).toHaveBeenCalledTimes(2);
+            expect(Mousetrap.bind).toHaveBeenCalledWith('space', jasmine.any(Function));
+            expect(Mousetrap.bind).toHaveBeenCalledWith('shift+space', jasmine.any(Function));
+
+            var calls = Mousetrap.bind.calls.all();
+
+            calls[0].args[1]();
+            expect(board._toggleStructureBoard).toHaveBeenCalledTimes(1);
+            expect(board._toggleStructureBoard).toHaveBeenCalledWith();
+
+            calls[1].args[1]();
+            expect(board._toggleStructureBoard).toHaveBeenCalledTimes(2);
+            expect(board._toggleStructureBoard).toHaveBeenCalledWith({
+                useHoveredPlugin: true
             });
-            var correctEvent = new $.Event('keydown.cms.structureboard.switcher', {
-                keyCode: CMS.KEYS.SPACE
+        });
+    });
+
+    describe('._toggleStructureBoard()', function () {
+        var board;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.settings = {
+                mode: 'edit'
+            };
+            CMS.config = {
+                mode: 'edit'
+            };
+            $(function () {
+                spyOn(Mousetrap, 'bind');
+                CMS.StructureBoard._initializeGlobalHandlers();
+                board = new CMS.StructureBoard();
+                spyOn(board, 'show').and.callFake(function () {
+                    CMS.settings.mode = 'structure';
+                });
+                spyOn(board, 'hide').and.callFake(function () {
+                    CMS.settings.mode = 'edit';
+                });
+                spyOn(board, '_showAndHighlightPlugin');
+                spyOn(board, '_hideAndHighlightPlugin');
+                done();
             });
+        });
 
-            board.ui.doc.trigger(wrongEvent);
+        it('shows structureboard', function () {
+            board._toggleStructureBoard();
+            expect(board.show).toHaveBeenCalledTimes(1);
+            expect(board.hide).not.toHaveBeenCalled();
+        });
 
+        it('hides strucrueboard', function () {
+            CMS.settings.mode = 'structure';
+            board._toggleStructureBoard();
             expect(board.show).not.toHaveBeenCalled();
-            expect(board.hide).not.toHaveBeenCalled();
-
-            CMS.settings.mode = 'edit';
-
-            board.ui.doc.trigger(correctEvent);
-            expect(board.show).toHaveBeenCalledTimes(1);
-            expect(board.hide).not.toHaveBeenCalled();
-
-            board.ui.doc.trigger(correctEvent);
-            expect(board.show).toHaveBeenCalledTimes(1);
             expect(board.hide).toHaveBeenCalledTimes(1);
+        });
 
-            board.ui.doc.trigger(correctEvent);
-            expect(board.show).toHaveBeenCalledTimes(2);
-            expect(board.hide).toHaveBeenCalledTimes(1);
+        it('shows structureboard and highlights plugin', function () {
+            board._toggleStructureBoard({ useHoveredPlugin: true });
+            expect(board._showAndHighlightPlugin).toHaveBeenCalledTimes(1);
+            expect(board._hideAndHighlightPlugin).not.toHaveBeenCalled();
+        });
+
+        it('hides structureboard and highlights plugin', function () {
+            CMS.settings.mode = 'structure';
+            board._toggleStructureBoard({ useHoveredPlugin: true });
+            expect(board._showAndHighlightPlugin).not.toHaveBeenCalled();
+            expect(board._hideAndHighlightPlugin).toHaveBeenCalledTimes(1);
         });
     });
 

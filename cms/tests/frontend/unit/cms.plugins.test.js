@@ -1288,10 +1288,10 @@ describe('CMS.Plugin', function () {
             spyOn($, 'ajax').and.callFake(function (ajax) {
                 ajax.success({});
             });
-            spyOn(plugin, '_showSuccess');
+            spyOn(Plugin, '_highlightPluginStructure');
 
             plugin.movePlugin();
-            expect(plugin._showSuccess).toHaveBeenCalledWith(plugin.ui.draggable);
+            expect(Plugin._highlightPluginStructure).toHaveBeenCalledWith(plugin.ui.draggable);
         });
 
         it('shows the error message if request failed', function () {
@@ -2275,6 +2275,52 @@ describe('CMS.Plugin', function () {
             expect(CMS._plugins[1][1]).toEqual({
                 something: 2
             });
+        });
+    });
+
+    describe('CMS.Plugin._highlightPluginContent()', function () {
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            $(function () {
+                CMS.config = {
+                    csrf: 'CSRF_TOKEN',
+                    lang: {}
+                };
+                CMS.settings = {
+                    dragbars: [],
+                    states: []
+                };
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                spyOn(plugin, '_getId').and.returnValue(1);
+                done();
+            });
+        });
+
+        it('appends / deletes success overlay', function (done) {
+            spyOn($.fn, 'fadeOut').and.callFake(function (timeout, callback) {
+                expect(timeout).toEqual(1000);
+                setTimeout(function () {
+                    callback.bind($('.cms-plugin-overlay'))();
+                    expect($('.cms-plugin-overlay')).not.toBeInDOM();
+                    done();
+                }, 100);
+            });
+            Plugin._highlightPluginContent(1);
+            expect($('.cms-plugin-overlay')).toBeInDOM();
         });
     });
 });

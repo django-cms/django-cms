@@ -352,17 +352,6 @@
     .cms-dragitem-expanded:before {
         transform: rotate(-90deg);
     }
-    .cms-dragitem-success {
-        position: absolute;
-        top: -1px;
-        right: -1px;
-        bottom: -1px;
-        left: -1px;
-        z-index: z(structure, content, droppable);
-        border-radius: $border-radius-base;
-        opacity: 0.6;
-    }
-
     // #DRAGGABLES/states#
 
     .cms-draggable-selected .cms-dragitem,
@@ -384,10 +373,6 @@
     .cms-draggable-placeholder {
         color: $white;
         background: rgba($color-primary, 0.2);
-    }
-    .cms-dragitem-success {
-        border: 1px solid $color-primary;
-        background: mix(white, $color-primary, 80%);
     }
 
     .cms-draggable-disallowed,
@@ -453,6 +438,20 @@
         opacity: 0.3;
     }
 }
+
+@at-root .cms-dragitem-success {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    z-index: z(structure, content, droppable);
+    border: 1px solid $color-primary !important;
+    background: mix(white, $color-primary, 80%) !important;
+    border-radius: $border-radius-base;
+    opacity: 0.6;
+}
+
 
 @at-root .cms-structure-mode-structure {
     overflow: hidden;

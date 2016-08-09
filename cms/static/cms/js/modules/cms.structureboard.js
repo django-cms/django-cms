@@ -7,6 +7,7 @@ var Class = require('classjs');
 var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var Plugin = require('./cms.plugins');
+var Mousetrap = require('mousetrap');
 
 require('./jquery.ui.custom');
 require('./jquery.ui.touchpunch');
@@ -180,20 +181,117 @@ var StructureBoard = new Class({
         // keyboard handling
         // only if there is a structure / content switcher
         if (that.ui.toolbarModeSwitcher.length) {
-            that.ui.doc.on('keydown.cms.structureboard.switcher', function (e) {
-                // check if we have an important focus
-                var haveFocusedField = document.activeElement !== document.body;
+            Mousetrap.bind('space', function () {
+                that._toggleStructureBoard();
+            });
+            Mousetrap.bind('shift+space', function () {
+                that._toggleStructureBoard({ useHoveredPlugin: true });
+            });
+        }
+    },
 
-                if (e.keyCode === KEYS.SPACE && !haveFocusedField) {
-                    e.preventDefault();
-                    if (CMS.settings.mode === 'structure') {
-                        that.hide();
-                    } else /* istanbul ignore else */ if (CMS.settings.mode === 'edit') {
-                        that.show();
-                    }
+    /**
+     * @method _toggleStructureBoard
+     * @private
+     * @param {Object} [opts] options
+     * @param {Boolean} [opts.useHoveredPlugin] should the plugin be taken into account
+     */
+    _toggleStructureBoard: function _toggleStructureBoard(opts) {
+        var that = this;
+        var options = opts ? opts : {};
+
+        if (options.useHoveredPlugin) {
+            if (CMS.settings.mode === 'structure') {
+                that._hideAndHighlightPlugin();
+            } else {
+                that._showAndHighlightPlugin();
+            }
+        } else {
+            // eslint-disable-next-line no-lonely-if
+            if (CMS.settings.mode === 'structure') {
+                that.hide();
+            } else /* istanbul ignore else */ if (CMS.settings.mode === 'edit') {
+                that.show();
+            }
+        }
+    },
+
+    /**
+     * Shows structureboard, scrolls into view and highlights hovered plugin.
+     * Uses CMS.API.Tooltip because it already handles multiple plugins living on
+     * the same DOM node.
+     *
+     * @method _showAndHighlightPlugin
+     * @private
+     * @returns {Boolean|void}
+     */
+    _showAndHighlightPlugin: function _showAndHighlightPlugin() {
+        if (!CMS.API.Tooltip) {
+            return false;
+        }
+
+        var tooltip = CMS.API.Tooltip.domElem;
+        var HIGHLIGHT_TIMEOUT = 10;
+
+        if (!tooltip.is(':visible')) {
+            return false;
+        }
+
+        var pluginId = tooltip.data('plugin_id');
+        var draggable = $('.cms-draggable-' + pluginId);
+
+        // expand necessary parents
+        draggable.parents('.cms-draggable').find(
+            '> .cms-dragitem-collapsable:not(".cms-dragitem-expanded") > .cms-dragitem-text').trigger('click');
+
+        this.show();
+
+        setTimeout(function () {
+            var position = draggable.position().top;
+
+            draggable.offsetParent().scrollTop(position - window.innerHeight / 2);
+
+            Plugin._highlightPluginStructure(draggable.find('.cms-dragitem:first'));
+        }, HIGHLIGHT_TIMEOUT);
+    },
+
+    /**
+     * Hides structureboard, scrolls into view, expands tree, highlights hovered plugin.
+     *
+     * @method _hideAndHighlightPlugin
+     * @private
+     * @returns {Boolean|void}
+     */
+    _hideAndHighlightPlugin: function _hideAndHighlightPlugin() {
+        var dragitem = [];
+        var HIGHLIGHT_TIMEOUT = 10;
+
+        try {
+            dragitem = $('.cms-dragitem:hover');
+        } catch (e) {
+            // weird bug in jQuery where `:hover` is seen as invalid pseudo, dance around it
+            /* istanbul ignore next */
+            $('.cms-dragitem').each(function () {
+                var el = $(this);
+
+                if (el.is(':hover')) {
+                    dragitem = el;
                 }
             });
         }
+
+        if (!dragitem.length || dragitem.closest('.cms-clipboard-containers').length) {
+            return false;
+        }
+
+        var draggable = dragitem.closest('.cms-draggable');
+        var pluginId = this.getId(draggable);
+
+        this.hide();
+
+        setTimeout(function () {
+            Plugin._highlightPluginContent(pluginId);
+        }, HIGHLIGHT_TIMEOUT);
     },
 
     /**

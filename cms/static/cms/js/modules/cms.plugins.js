@@ -678,7 +678,7 @@ var Plugin = new Class({
                 CMS.API.Toolbar.hideLoader();
 
                 // TODO: show only if (response.status)
-                that._showSuccess(dragitem);
+                Plugin._highlightPluginStructure(dragitem);
                 Plugin._updateRegistry({
                     pluginId: options.plugin_id,
                     update: {
@@ -1625,28 +1625,6 @@ var Plugin = new Class({
     },
 
     /**
-     * Shows and immediately fades out a success notification (when
-     * plugin was successfully moved.
-     *
-     * @method _showSuccess
-     * @private
-     * @param {jQuery} el draggable element
-     */
-    _showSuccess: function (el) {
-        var tpl = $('<div class="cms-dragitem-success"></div>');
-        var SUCCESS_TIMEOUT = 1000;
-
-        el.addClass('cms-draggable-success').append(tpl);
-        // start animation
-        tpl.fadeOut(SUCCESS_TIMEOUT, function () {
-            $(this).remove();
-            el.removeClass('cms-draggable-success');
-        });
-        // make sure structurboard gets updated after success
-        this.ui.window.trigger('resize.sideframe');
-    },
-
-    /**
      * Traverses the registry to find plugin parents
      *
      * @method _getPluginBreadcrumbs
@@ -1862,6 +1840,82 @@ Plugin._isContainingMultiplePlugins = function _isContainingMultiplePlugins(node
 
     return false;
 };
+
+/**
+ * Shows and immediately fades out a success notification (when
+ * plugin was successfully moved.
+ *
+ * @method _highlightPluginStructure
+ * @private
+ * @static
+ * @param {jQuery} el draggable element
+ */
+Plugin._highlightPluginStructure = function _highlightPluginStructure(el) {
+    var tpl = $('<div class="cms-dragitem-success"></div>');
+    var SUCCESS_TIMEOUT = 1000;
+
+    el.addClass('cms-draggable-success').append(tpl);
+    // start animation
+    tpl.fadeOut(SUCCESS_TIMEOUT, function () {
+        $(this).remove();
+        el.removeClass('cms-draggable-success');
+    });
+    // make sure structurboard gets updated after success
+    $(Helpers._getWindow()).trigger('resize.sideframe');
+};
+
+/**
+ * Highlights plugin in content mode
+ *
+ * @method _highlightPluginContent
+ * @private
+ * @static
+ * @param {String|Number} pluginId
+ */
+Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
+    var coordinates = {};
+    var positions = [];
+    var win = $(Helpers._getWindow());
+    var SUCCESS_TIMEOUT = 1000;
+
+    $('.cms-plugin-' + pluginId).each(function () {
+        var el = $(this);
+        var offset = el.offset();
+
+        positions.push(
+            {
+                x1: offset.left,
+                x2: offset.left + el.outerWidth(),
+                y1: offset.top,
+                y2: offset.top + el.outerHeight()
+            }
+        );
+    });
+
+    coordinates.left = Math.min.apply(null, positions.map(function (pos) {
+        return pos.x1;
+    }));
+    coordinates.top = Math.min.apply(null, positions.map(function (pos) {
+        return pos.y1;
+    }));
+    coordinates.width = Math.max.apply(null, positions.map(function (pos) {
+        return pos.x2;
+    })) - coordinates.left;
+    coordinates.height = Math.max.apply(null, positions.map(function (pos) {
+        return pos.y2;
+    })) - coordinates.top;
+
+    win.scrollTop(coordinates.top + coordinates.height / 2 - win.height() / 2);
+
+    $('<div class="cms-plugin-overlay cms-dragitem-success"></div>').css(coordinates).css({
+        zIndex: 9999
+    }).appendTo($('body'));
+
+    $('.cms-plugin-overlay').fadeOut(SUCCESS_TIMEOUT, function () {
+        $(this).remove();
+    });
+};
+
 
 Plugin.aliasPluginDuplicatesMap = {};
 
