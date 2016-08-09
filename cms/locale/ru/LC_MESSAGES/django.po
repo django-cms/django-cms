@@ -33,9 +33,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-12 12:36-0400\n"
-"PO-Revision-Date: 2016-07-12 16:30+0000\n"
-"Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
+"POT-Creation-Date: 2016-08-09 07:43-0400\n"
+"PO-Revision-Date: 2016-07-13 08:52+0000\n"
+"Last-Translator: Oleg Rybkin <okfish@yandex.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -158,12 +158,12 @@ msgstr "Опции, независимые от языка"
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr ""
+msgstr "Пожалуйста, создайте перевод страницы на %(language)s перед редактированием расширенных настроек."
 
 #: admin/forms.py:330
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Пожалуйста, установите код (slug) для языка %(language)s перед редактированием расширенных настроек страницы."
 
 #: admin/forms.py:341
 msgid "A page with this reverse URL id exists already."
@@ -273,7 +273,7 @@ msgstr "Язык должен совпадать с языком родител�
 #: admin/forms.py:729
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Плейсхолдер родительского плагина должен быть таким же!"
 
 #: admin/pageadmin.py:360
 #, python-format
@@ -332,7 +332,7 @@ msgstr "%(plugin_name)s плагин, редактируемый в %(position)s
 #, python-format
 #| msgid "Copied plugins to %(placeholder)s"
 msgid "Moved plugins to %(placeholder)s"
-msgstr ""
+msgstr "Плагины, перемещенные в %(placeholder)s"
 
 #: admin/pageadmin.py:738
 #, python-format
@@ -366,7 +366,7 @@ msgstr "Изменения в странице были отменены, но s
 #: admin/pageadmin.py:864 admin/pageadmin.py:945
 #, python-format
 msgid "Reverted to previous version, saved on %(datetime)s"
-msgstr ""
+msgstr "Возвращено к предыдущей версии, сохраненной %(datetime)s"
 
 #: admin/pageadmin.py:1002
 msgid "You do not have permission to change the template"
@@ -504,7 +504,7 @@ msgstr "Неверный запрос, отсутствует параметр p
 #: admin/placeholderadmin.py:258
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Неправильный тип плагина '%s'"
 
 #: admin/placeholderadmin.py:373
 msgid "Plugin not found"
@@ -520,7 +520,7 @@ msgstr "У вас нет прав на перемещение данного п�
 
 #: admin/placeholderadmin.py:523
 msgid "parent must be in the same placeholder"
-msgstr "родитель должен быть в той же именованной области"
+msgstr "родитель должен быть в том же плейсхолдере"
 
 #: admin/placeholderadmin.py:526
 msgid "parent must be in the same language as plugin_language"
@@ -528,7 +528,7 @@ msgstr "родитель должен быть на языке plugin_language "
 
 #: admin/placeholderadmin.py:555
 msgid "order parameter references plugins in different trees"
-msgstr ""
+msgstr "параметр \"порядок\" ссылается на плагины из различных деревьев"
 
 #: admin/placeholderadmin.py:622 admin/placeholderadmin.py:633
 msgid "You do not have permission to delete this plugin"
@@ -546,12 +546,12 @@ msgstr "Не могу удалить %(name)s"
 
 #: admin/placeholderadmin.py:666 admin/placeholderadmin.py:678
 msgid "You do not have permission to clear this placeholder"
-msgstr "У вас нет прав очистить содержимое этой именованной области"
+msgstr "У вас нет прав очистить содержимое этого плейсхолдера"
 
 #: admin/placeholderadmin.py:681
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr "Именованная область \"%(obj)s\" была успешно очищена."
+msgstr "Плейсхолдер \"%(obj)s\" был успешно очищен."
 
 #: admin/placeholderadmin.py:691
 msgid "placeholder"
@@ -570,13 +570,13 @@ msgstr "django CMS"
 
 #: cms_plugins.py:17
 msgid "Placeholder"
-msgstr "Местозаполнитель"
+msgstr "Плейсхолдер"
 
 #: cms_plugins.py:31
 msgid "Alias"
 msgstr "Псевдоним"
 
-#: cms_plugins.py:57 cms_plugins.py:66
+#: cms_plugins.py:61 cms_plugins.py:70
 msgid "Create Alias"
 msgstr "Добавить псевдоним"
 
@@ -638,7 +638,7 @@ msgstr "Выход"
 #: cms_toolbars.py:379
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Опубликовать изменения страницы"
 
 #: cms_toolbars.py:381
 msgid "Publish page now"
@@ -781,7 +781,7 @@ msgstr "Выбрать правильный сайт"
 msgid "Select a valid page"
 msgstr "Выбрать правильную страницу"
 
-#: forms/widgets.py:272
+#: forms/widgets.py:275
 msgid "Add Another"
 msgstr "Добавить другое"
 
@@ -1115,21 +1115,21 @@ msgstr "по коду"
 
 #: models/static_placeholder.py:32 models/static_placeholder.py:57
 msgid "static placeholder name"
-msgstr "Название местозаполнителя"
+msgstr "название статического плейсхолдера"
 
 #: models/static_placeholder.py:33
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr "Красноречивое название для идентификации местозаполнителя. Невидимо для пользователей."
+msgstr "Описательное название для идентификации плейсхолдера. Невидимо для пользователей."
 
 #: models/static_placeholder.py:35
 msgid "placeholder code"
-msgstr "Код местозаполнителя"
+msgstr "Код плейсхолдера"
 
 #: models/static_placeholder.py:36
 msgid "To render the static placeholder in templates."
-msgstr "Для отображения местозаполнителя как части шаблона"
+msgstr "Для отображения статического плейсхолдера в шаблоне"
 
 #: models/static_placeholder.py:37
 msgid "placeholder content"
@@ -1141,15 +1141,15 @@ msgstr "Метод создания"
 
 #: models/static_placeholder.py:47
 msgid "static placeholder"
-msgstr "Местозаполнитель"
+msgstr "статический плейсхолдер"
 
 #: models/static_placeholder.py:48
 msgid "static placeholders"
-msgstr "Местозаполнители"
+msgstr "статические плейсхолдеры"
 
 #: models/static_placeholder.py:68
 msgid "A static placeholder with the same site and code already exists"
-msgstr "Именованная область с таким сайтом и кодом уже есть."
+msgstr "Статический плейсхолдер с таким сайтом и кодом уже есть."
 
 #: models/titlemodels.py:18 models/titlemodels.py:19 models/titlemodels.py:21
 msgid "title"
@@ -1293,7 +1293,7 @@ msgid ""
 "\n"
 "                Recover deleted %(verbose_name)s\n"
 "            "
-msgstr ""
+msgstr "\n                Восстановить удаленную %(verbose_name)s\n            "
 
 #: templates/admin/cms/page/history/recover_header.html:25
 msgid "Press the save button below to recover this version of the object."
@@ -1423,7 +1423,7 @@ msgstr "Основная навигация"
 #: templates/admin/cms/page/tree/menu.html:184
 #| msgid "Actions"
 msgid "Options"
-msgstr ""
+msgstr "Настройки"
 
 #: templates/admin/cms/page/tree/base.html:155
 #: templates/admin/cms/page/tree/menu.html:210
@@ -1461,11 +1461,11 @@ msgstr "Перезагрузить"
 #: templates/admin/cms/page/tree/base.html:190
 #| msgid "New Page"
 msgid "New node"
-msgstr ""
+msgstr "Новый узел"
 
 #: templates/admin/cms/page/tree/base.html:191
 msgid "nodes"
-msgstr ""
+msgstr "узлы"
 
 #: templates/admin/cms/page/tree/base.html:202
 msgid "View"
@@ -1487,7 +1487,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Страниц пока нет.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Добавить страницу</a> now.\n                        "
 
 #: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
@@ -1656,7 +1656,7 @@ msgstr "Фильтруем плагины..."
 
 #: templates/cms/toolbar/dragbar.html:28
 msgid "This is a static placeholder"
-msgstr "Это статический местозаполнитель"
+msgstr "Это статический плейсхолдер"
 
 #: templates/cms/toolbar/dragbar.html:30
 msgid "Expand all"
@@ -1698,7 +1698,7 @@ msgstr "Доступные плагины"
 #: templates/cms/toolbar/items/live_draft.html:6
 #| msgid "View published"
 msgid "View published page"
-msgstr ""
+msgstr "Просмотр опубликованных страниц"
 
 #: templates/cms/toolbar/items/live_draft.html:11
 #| msgid "Edit this Page"
@@ -1711,7 +1711,7 @@ msgstr "Войти"
 
 #: templates/cms/toolbar/placeholder.html:21
 msgid "Add plugin to placeholder"
-msgstr "Добавить плагин в местозаполнитель"
+msgstr "Добавить плагин в плейсхолдер"
 
 #: templates/cms/toolbar/plugin.html:20
 msgid "Add plugin to"
@@ -1767,7 +1767,7 @@ msgstr "Было перенаправлено на:"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
-msgstr ""
+msgstr "Девелоперская версия django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 
 #: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Cancel"
@@ -1780,7 +1780,7 @@ msgstr "Произошли следующие ошибки:"
 #: templates/cms/toolbar/toolbar_javascript.html:31
 #| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
-msgstr ""
+msgstr "Действие прошло успешно... обновляем страницу."
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Are you sure you want to delete this plugin?"
@@ -1797,18 +1797,18 @@ msgstr "Плагин будет добавлен здесь"
 #: templates/cms/toolbar/toolbar_javascript.html:35
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "У вас есть несохраненные изменения."
 
 #: templates/cms/toolbar/toolbar_javascript.html:36
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Вы уверены, что хотите отменить эти изменения?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:37
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "Невозможно загрузить форму. Пожалуйста, проверьте, что сервер работает корректно."
 
 #: templates/cms/toolbar/toolbar_javascript.html:57
 msgid ""
@@ -2043,7 +2043,7 @@ msgstr "Дочернее приложение"
 
 #: test_utils/project/sampleapp/cms_apps.py:62
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "Различные приложения для меню и URLs"
 
 #: test_utils/project/sampleapp/cms_menus.py:17
 msgid "sample root page"
@@ -2150,14 +2150,14 @@ msgstr "Этот плейсхолдер уже имеет максимально
 #: utils/request_ip_resolvers.py:24
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "Невозможно найти указанный в CMS_REQUEST_IP_RESOLVER модуль: \"{0}\"."
 
 #: utils/request_ip_resolvers.py:28
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
-msgstr ""
+msgstr "Невозможно найти указанную в CMS_REQUEST_IP_RESOLVER функцию: \"{0}\" в модуле \"{1}\"."
 
 #: wizards/wizard_base.py:91
 #, python-format

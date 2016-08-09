@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-12 12:36-0400\n"
-"PO-Revision-Date: 2016-07-12 16:30+0000\n"
-"Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
+"POT-Creation-Date: 2016-08-09 07:43-0400\n"
+"PO-Revision-Date: 2016-07-13 08:26+0000\n"
+"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/divio/django-cms/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -137,12 +137,12 @@ msgstr "Opcions independents d'idioma"
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr ""
+msgstr "Creeu la traducció a %(language)s de la pàgina abans d'editar la seva configuració avançada."
 
 #: admin/forms.py:330
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Informeu l'slug en %(language)s abans d'editar la seva configuració avançada."
 
 #: admin/forms.py:341
 msgid "A page with this reverse URL id exists already."
@@ -555,7 +555,7 @@ msgstr "Marcador de posició"
 msgid "Alias"
 msgstr "Àlies"
 
-#: cms_plugins.py:57 cms_plugins.py:66
+#: cms_plugins.py:61 cms_plugins.py:70
 msgid "Create Alias"
 msgstr "Crear Àlies"
 
@@ -760,7 +760,7 @@ msgstr "Seleccionar un lloc vàlid"
 msgid "Select a valid page"
 msgstr "Seleccionar una pàgina vàlida"
 
-#: forms/widgets.py:272
+#: forms/widgets.py:275
 msgid "Add Another"
 msgstr "Afegir un altre"
 
@@ -1757,7 +1757,7 @@ msgstr "S´ha produït el següent error:"
 #: templates/cms/toolbar/toolbar_javascript.html:31
 #| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
-msgstr ""
+msgstr "Execució correcta... recarregant."
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Are you sure you want to delete this plugin?"
@@ -1774,18 +1774,18 @@ msgstr "El plugin serà afegit aquí"
 #: templates/cms/toolbar/toolbar_javascript.html:35
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Teniu modificacions sense desar."
 
 #: templates/cms/toolbar/toolbar_javascript.html:36
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Segur que voleu descartar aquestes modificacions?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:37
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "No s'ha pogut carregar el formulari. Comproveu que el servidor està funcionant correctament."
 
 #: templates/cms/toolbar/toolbar_javascript.html:57
 msgid ""
