@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-12 12:36-0400\n"
+"POT-Creation-Date: 2016-08-09 07:43-0400\n"
 "PO-Revision-Date: 2016-07-12 16:30+0000\n"
 "Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/divio/django-cms/language/hu/)\n"
@@ -561,7 +561,7 @@ msgstr "Hely"
 msgid "Alias"
 msgstr ""
 
-#: cms_plugins.py:57 cms_plugins.py:66
+#: cms_plugins.py:61 cms_plugins.py:70
 msgid "Create Alias"
 msgstr ""
 
@@ -766,7 +766,7 @@ msgstr "Válasszon egy érvényes webhelyet"
 msgid "Select a valid page"
 msgstr "Válasszon egy érvényes oldalt"
 
-#: forms/widgets.py:272
+#: forms/widgets.py:275
 msgid "Add Another"
 msgstr "Új hozzáadása"
 
