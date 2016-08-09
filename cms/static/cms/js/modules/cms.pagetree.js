@@ -161,8 +161,7 @@ var PageTree = new Class({
                         }
                     }
 
-                    // cancel dragging when filtering is active by setting `false`
-                    return !that.options.filtered;
+                    return that._hasPermission(node_parent, 'add');
                 },
                 // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                 data: data,
@@ -195,8 +194,8 @@ var PageTree = new Class({
                 // disable the multi selection of nodes for now
                 drag_selection: false,
                 // disable dragging if filtered
-                is_draggable: function () {
-                    return !that.options.filtered;
+                is_draggable: function (nodes) {
+                    return that._hasPermission(nodes[0], 'move') && !that.options.filtered;
                 },
                 large_drop_target: true,
                 copy: true
@@ -349,7 +348,11 @@ var PageTree = new Class({
         this.ui.container.on(this.click, '.js-cms-tree-advanced-settings', function (e) {
             if (e.shiftKey) {
                 e.preventDefault();
-                window.location.href = $(this).data('url');
+                var link = $(this);
+
+                if (link.data('url')) {
+                    window.location.href = link.data('url');
+                }
             }
         });
 
@@ -830,11 +833,28 @@ var PageTree = new Class({
      * @private
      */
     _enablePaste: function _enablePaste(selector) {
-        var sel = typeof selector === 'undefined' ? this.options.pasteSelector : selector;
+        var sel = typeof selector === 'undefined' ?
+            this.options.pasteSelector :
+            selector + ' ' + this.options.pasteSelector;
+        var dropdownSel = '.js-cms-pagetree-actions-dropdown';
+
+        if (typeof selector !== 'undefined') {
+            dropdownSel = selector + ' .js-cms-pagetree-actions-dropdown';
+        }
 
         // helpers are generated on the fly, so we need to reference
         // them every single time
         $(sel).removeClass('cms-pagetree-dropdown-item-disabled');
+
+        var data = {};
+
+        if (this.clipboard.type === 'cut') {
+            data.has_cut = true;
+        } else {
+            data.has_copy = true;
+        }
+        // not loaded actions dropdown have to be updated as well
+        $(dropdownSel).data('lazyUrlData', data);
     },
 
     /**
@@ -845,11 +865,22 @@ var PageTree = new Class({
      * @private
      */
     _disablePaste: function _disablePaste(selector) {
-        var sel = typeof selector === 'undefined' ? this.options.pasteSelector : selector;
+        var sel = typeof selector === 'undefined' ?
+            this.options.pasteSelector :
+            selector + ' ' + this.options.pasteSelector;
+        var dropdownSel = '.js-cms-pagetree-actions-dropdown';
+
+        if (typeof selector !== 'undefined') {
+            dropdownSel = selector + ' .js-cms-pagetree-actions-dropdown';
+        }
+
 
         // helpers are generated on the fly, so we need to reference
         // them every single time
         $(sel).addClass('cms-pagetree-dropdown-item-disabled');
+
+        // not loaded actions dropdown have to be updated as well
+        $(dropdownSel).removeData('lazyUrlData');
     },
 
     /**
@@ -876,7 +907,7 @@ var PageTree = new Class({
             }
 
             nodes.forEach(function (id) {
-                that._disablePaste('.jsgrid_' + id + '_col ' + that.options.pasteSelector);
+                that._disablePaste('.jsgrid_' + id + '_col');
             });
         }
     },
@@ -949,6 +980,22 @@ var PageTree = new Class({
      */
     _getDescendantsIds: function _getDescendantsIds(nodeId) {
         return this.ui.tree.jstree(true).get_node(nodeId).children_d;
+    },
+
+    /**
+     * @method _hasPermision
+     * @private
+     * @param {Object} node jstree node
+     * @param {String} permission move / add
+     * @returns {Boolean}
+     */
+    _hasPermission: function _hasPermision(node, permission) {
+        if (node.id === '#' && permission === 'add') {
+            return this.options.hasAddRootPermission;
+        } else if (node.id === '#') {
+            return false;
+        }
+        return Boolean(node.li_attr['data-' + permission + '-permission']);
     }
 });
 

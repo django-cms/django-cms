@@ -86,6 +86,36 @@ var PageTreeDropdowns = new Class({
         // otherwise show the dropdown
         dropdowns.removeClass(this.options.openCls);
         dropdown.addClass(this.options.openCls);
+
+        this._loadContent(dropdown);
+    },
+
+    /**
+     * @method _loadContent
+     * @private
+     * @param {jQuery} dropdown
+     * @returns {Boolean|$.Deferred} false if not lazy or already loaded or promise
+     */
+    _loadContent: function _loadContent(dropdown) {
+        var data = dropdown.data();
+        var LOADER_SHOW_TIMEOUT = 200;
+
+        if (!data.lazyUrl || data.loaded) {
+            return false;
+        }
+
+        var loaderTimeout = setTimeout(function () {
+            dropdown.find('.js-cms-pagetree-dropdown-loader').addClass('cms-loader');
+        }, LOADER_SHOW_TIMEOUT);
+
+        $.ajax({
+            url: data.lazyUrl,
+            data: data.lazyUrlData
+        }).done(function (response) {
+            dropdown.find('.js-cms-pagetree-dropdown-menu').html(response);
+            dropdown.data('loaded', true);
+            clearTimeout(loaderTimeout);
+        });
     },
 
     /**

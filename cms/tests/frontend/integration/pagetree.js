@@ -446,7 +446,8 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('.cms-pagetree-dropdown-menu-open a[href*="/de/publish/"]');
             })
             .waitForResource(/publish/)
-            .waitForResource(/get-tree/);
+            .waitForResource(/get-tree/)
+            .wait(200);
         })
         .wait(2000)
         .withFrame(0, function () {
@@ -464,7 +465,8 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('.cms-pagetree-dropdown-menu-open a[href*="/de/unpublish/"]');
             })
             .waitForResource(/unpublish/)
-            .waitForResource(/get-tree/);
+            .waitForResource(/get-tree/)
+            .wait(200);
         })
         .wait(2000)
         .withFrame(0, function () {
@@ -488,7 +490,8 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('.cms-pagetree-dropdown-menu-open a[href*="/en/unpublish/"]');
             })
             .waitForResource(/unpublish/)
-            .waitForResource(/get-tree/);
+            .waitForResource(/get-tree/)
+            .wait(200);
         })
         .wait(2000)
         .withFrame(0, function () {
@@ -539,8 +542,23 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         xPath(getPasteHelpersXPath({
                             visible: true
                         })),
+                        2,
+                        'Two possible paste targets, root and self'
+                    );
+                })
+                .then(function () {
+                    var firstPageId = cms.getPageId('Homepage');
+
+                    this.click('.js-cms-pagetree-options[data-id="' + firstPageId + '"]');
+                })
+                .then(cms.waitUntilActionsDropdownLoaded())
+                .then(function () {
+                    test.assertElementCount(
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         3,
-                        'Three possible paste targets'
+                        'Three possible paste targets, root, parent and self'
                     );
                 })
                 // click on it again
@@ -1017,7 +1035,19 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
 
                     this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
-                // wait until paste buttons show up
+                // open all of the actions dropdowns
+                .then(function () {
+                    var pages = ['Homepage', 'Second', 'Third', 'Fourth', 'Top sibling'];
+
+                    return this.eachThen(pages, function (page) {
+                        var pageId = cms.getPageId(page.data);
+
+                        this.then(function () {
+                            this.click('.js-cms-pagetree-options[data-id="' + pageId + '"]');
+                        }).then(cms.waitUntilActionsDropdownLoaded());
+                    });
+                })
+                // wait until all paste buttons show up
                 .then(function () {
                     test.assertElementCount(
                         xPath(getPasteHelpersXPath({
