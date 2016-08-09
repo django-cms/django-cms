@@ -26,7 +26,7 @@ from cms.templatetags.cms_tags import (
     _show_placeholder_by_id,
     RenderPlugin,
 )
-from cms.templatetags.cms_js_tags import json_filter
+from cms.templatetags.cms_js_tags import json_filter, render_placeholder_toolbar_js
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -301,6 +301,28 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             for plugin in plugins:
                 start_tag = tag_format.format(plugin.pk)
                 self.assertIn(start_tag, output)
+
+    def test_render_placeholder_toolbar_js_with_no_plugins(self):
+        page = self._getfirst()
+        request = self.get_request(language='en', page=page)
+        renderer = self.get_content_renderer(request)
+        placeholder = page.placeholders.get(slot='body')
+        content = render_placeholder_toolbar_js(
+            placeholder,
+            render_language='en',
+            content_renderer=renderer,
+        )
+
+        expected_bits = [
+            '"addPluginHelpTitle": "Add plugin to placeholder \\"Body\\""',
+            '"name": "Body"',
+            '"placeholder_id": "{}"'.format(placeholder.pk),
+            '"plugin_language": "en"',
+            '"page_language": "en"',
+        ]
+
+        for bit in expected_bits:
+            self.assertIn(bit, content)
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
