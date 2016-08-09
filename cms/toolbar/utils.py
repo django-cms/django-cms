@@ -1,15 +1,11 @@
 import json
-import functools
 
 from django.template.defaultfilters import escapejs
+from django.utils.encoding import force_text
 from django.utils.six import text_type
 from django.utils.translation import ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.utils.encoder import SafeJSONEncoder
-
-
-dump_json = functools.partial(json.dumps, cls=SafeJSONEncoder)
 
 
 def get_placeholder_toolbar_js(placeholder, request_language,
@@ -21,18 +17,18 @@ def get_placeholder_toolbar_js(placeholder, request_language,
 
     data = {
         'type': 'placeholder',
-        'name': label,
+        'name': force_text(label),
         'page_language': request_language,
         'placeholder_id': text_type(placeholder.pk),
         'plugin_language': request_language,
         'plugin_restriction': allowed_plugins or [],
-        'addPluginHelpTitle': help_text,
+        'addPluginHelpTitle': force_text(help_text),
         'urls': {
             'add_plugin': placeholder.get_add_url(),
             'copy_plugin': placeholder.get_copy_url(),
         }
     }
-    return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': dump_json(data)}
+    return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
 def get_plugin_toolbar_js(plugin, request_language, children=None, parents=None):
@@ -45,7 +41,7 @@ def get_plugin_toolbar_js(plugin, request_language, children=None, parents=None)
         'type': 'plugin',
         'page_language': request_language,
         'placeholder_id': text_type(plugin.placeholder_id),
-        'plugin_name': plugin_name or '',
+        'plugin_name': force_text(plugin_name) or '',
         'plugin_type': plugin.plugin_type,
         'plugin_id': text_type(plugin.pk),
         'plugin_language': plugin.language or '',
@@ -54,10 +50,10 @@ def get_plugin_toolbar_js(plugin, request_language, children=None, parents=None)
         'plugin_restriction': children or [],
         'plugin_parent_restriction': parents or [],
         'onClose': False,
-        'addPluginHelpTitle': help_text,
+        'addPluginHelpTitle': force_text(help_text),
         'urls': plugin.get_action_urls(),
     }
-    return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': dump_json(data)}
+    return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
 
 def get_toolbar_from_request(request):
