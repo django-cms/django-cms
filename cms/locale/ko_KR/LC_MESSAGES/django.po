@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-12 12:36-0400\n"
+"POT-Creation-Date: 2016-08-09 07:43-0400\n"
 "PO-Revision-Date: 2016-07-12 16:30+0000\n"
 "Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/divio/django-cms/language/ko_KR/)\n"
@@ -555,7 +555,7 @@ msgstr "영역"
 msgid "Alias"
 msgstr "별명"
 
-#: cms_plugins.py:57 cms_plugins.py:66
+#: cms_plugins.py:61 cms_plugins.py:70
 msgid "Create Alias"
 msgstr "별명 만들기"
 
@@ -760,7 +760,7 @@ msgstr "유효한 사이트를 선택하세요"
 msgid "Select a valid page"
 msgstr "유효한 페이지를 선택하세요"
 
-#: forms/widgets.py:272
+#: forms/widgets.py:275
 msgid "Add Another"
 msgstr "계속 추가"
 

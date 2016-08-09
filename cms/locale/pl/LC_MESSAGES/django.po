@@ -29,9 +29,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-12 12:36-0400\n"
-"PO-Revision-Date: 2016-07-12 16:30+0000\n"
-"Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
+"POT-Creation-Date: 2016-08-09 07:43-0400\n"
+"PO-Revision-Date: 2016-07-21 22:40+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -154,12 +154,12 @@ msgstr "Opcje niezależne od języka"
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr ""
+msgstr "Proszę stworzyć tłumaczenie strony na język %(language)s przed edytowaniem jego zaawansowanych ustawień."
 
 #: admin/forms.py:330
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Proszę ustawić %(language)s slug przed edytowaniem jego zaawansowanych ustawień."
 
 #: admin/forms.py:341
 msgid "A page with this reverse URL id exists already."
@@ -328,7 +328,7 @@ msgstr "Wtyczka %(plugin_name)s została zmieniona na pozycji %(position)s w %(p
 #, python-format
 #| msgid "Copied plugins to %(placeholder)s"
 msgid "Moved plugins to %(placeholder)s"
-msgstr ""
+msgstr "Przeniesiono wtyczki do %(placeholder)s"
 
 #: admin/pageadmin.py:738
 #, python-format
@@ -362,7 +362,7 @@ msgstr "Strona przywrócona, ale skrót pozostaje bez zmian przez kolizje url"
 #: admin/pageadmin.py:864 admin/pageadmin.py:945
 #, python-format
 msgid "Reverted to previous version, saved on %(datetime)s"
-msgstr ""
+msgstr "Przywrócono poprzednią wersję, zapisaną %(datetime)s"
 
 #: admin/pageadmin.py:1002
 msgid "You do not have permission to change the template"
@@ -495,12 +495,12 @@ msgstr "Nie masz uprawnień do edycji tej pozycji"
 
 #: admin/placeholderadmin.py:251
 msgid "Invalid request, missing plugin_type parameter"
-msgstr ""
+msgstr "Niepoprawne żądanie, brakuje parametru plugin_type"
 
 #: admin/placeholderadmin.py:258
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Niepoprawny typ wtyczki '%s'"
 
 #: admin/placeholderadmin.py:373
 msgid "Plugin not found"
@@ -572,7 +572,7 @@ msgstr "Symbol zastępczy"
 msgid "Alias"
 msgstr "Alias"
 
-#: cms_plugins.py:57 cms_plugins.py:66
+#: cms_plugins.py:61 cms_plugins.py:70
 msgid "Create Alias"
 msgstr "Utwórz Alias"
 
@@ -777,7 +777,7 @@ msgstr "Wybierz poprawną domenę"
 msgid "Select a valid page"
 msgstr "Wybierz poprawną podstronę"
 
-#: forms/widgets.py:272
+#: forms/widgets.py:275
 msgid "Add Another"
 msgstr "Dodaj kolejny"
 

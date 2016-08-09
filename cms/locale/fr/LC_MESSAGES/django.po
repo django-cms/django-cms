@@ -34,9 +34,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-12 12:36-0400\n"
-"PO-Revision-Date: 2016-07-12 16:30+0000\n"
-"Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
+"POT-Creation-Date: 2016-08-09 07:43-0400\n"
+"PO-Revision-Date: 2016-07-12 21:36+0000\n"
+"Last-Translator: Frigory33 <chironsylvain@orange.fr>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -55,11 +55,11 @@ msgstr "Langue"
 
 #: admin/forms.py:68 admin/forms.py:170 admin/forms.py:213
 msgid "The current language of the content fields."
-msgstr "Langue dans laquelle le contenu sera saisi."
+msgstr "La langue actuelle des champs de contenu."
 
 #: admin/forms.py:69 forms/wizards.py:103
 msgid "Page type"
-msgstr "Modèle de page"
+msgstr "Type de page"
 
 #: admin/forms.py:70 forms/wizards.py:96
 msgid "Title"
@@ -71,11 +71,11 @@ msgstr "Le titre par défaut"
 
 #: admin/forms.py:72 forms/wizards.py:99
 msgid "Slug"
-msgstr "“Slug”"
+msgstr "Slug"
 
 #: admin/forms.py:73
 msgid "The part of the title that is used in the URL"
-msgstr "Partie du titre utilisée dans l'URL"
+msgstr "La partie du titre qui doit être utilisée dans l'URL"
 
 #: admin/forms.py:74
 msgid "Menu Title"
@@ -96,19 +96,19 @@ msgstr "Écrase le titre affiché dans l'onglet du navigateur et dans les favori
 
 #: admin/forms.py:79
 msgid "Description meta tag"
-msgstr "Balise méta description"
+msgstr "Balise méta de description"
 
 #: admin/forms.py:81
 msgid "A description of the page used by search engines."
-msgstr "Entrez une liste de mots clés séparés par des virgules, cela sera utilisé par les moteurs de recherche."
+msgstr "Une description de la page utilisée par les moteurs de recherche."
 
 #: admin/forms.py:134
 msgid "Another page with this slug already exists"
-msgstr "Une autre page avec le même “slug” existe déjà"
+msgstr "Une autre page avec le même slug existe déjà"
 
 #: admin/forms.py:164
 msgid "Slug must not be empty."
-msgstr "Le champ slug ne doit pas être vide"
+msgstr "Un slug doit être indiqué."
 
 #: admin/forms.py:192
 msgid "Application"
@@ -116,7 +116,7 @@ msgstr "Application"
 
 #: admin/forms.py:194
 msgid "Hook application to this page."
-msgstr "Associer une application à cette page."
+msgstr "Accrocher une application à cette page."
 
 #: admin/forms.py:195
 msgid "Overwrite URL"
@@ -128,11 +128,11 @@ msgstr "Laissez ce champ vide pour utiliser l'URL par défaut."
 
 #: admin/forms.py:200
 msgid "X Frame Options"
-msgstr "Options X Frame"
+msgstr "Options du cadre X"
 
 #: admin/forms.py:201
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Est-ce que cette page peut être intégrée dans d'autres pages ou sites web"
+msgstr "Si cette page peut être incorporée dans d'autres pages ou sites web"
 
 #: admin/forms.py:206
 msgid "Redirect"
@@ -159,12 +159,12 @@ msgstr "Options indépendantes de la langue"
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr ""
+msgstr "Veuillez créer la traduction de page en %(language)s avant de modifier ses paramètres avancés."
 
 #: admin/forms.py:330
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Veuillez définir le slug en %(language)s avant de modifier les paramètres avancés."
 
 #: admin/forms.py:341
 msgid "A page with this reverse URL id exists already."
@@ -172,7 +172,7 @@ msgstr "Une page avec cet identifiant existe déjà."
 
 #: admin/forms.py:358
 msgid "An application instance using this configuration already exists."
-msgstr "Une application utilisant cette configuration existe déjà."
+msgstr "Il existe déjà une instance d'application utilisant cette configuration."
 
 #: admin/forms.py:366 admin/forms.py:377
 msgid "An application instance with this name already exists."
@@ -196,7 +196,7 @@ msgstr "La permission d'ajouter une page nécessite la permission de modifier un
 
 #: admin/forms.py:529
 msgid "can_view"
-msgstr "can_view"
+msgstr "peut_voir"
 
 #: admin/forms.py:540
 msgid "Please select user or group first."
@@ -235,7 +235,7 @@ msgstr "Notifier l'utilisateur"
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
-msgstr "Envoyer une notification par courriel du changement de nom d'utilisateur ou mot de passe. Nécessite un courriel valide. "
+msgstr "Envoyer une notification par courriel du changement de nom d'utilisateur ou mot de passe. Requiert l'adresse électronique."
 
 #: admin/forms.py:605
 msgid "New password"
@@ -247,7 +247,7 @@ msgstr "Nouveau mot de passe (confirmation)"
 
 #: admin/forms.py:632
 msgid "Email notification requires valid email address."
-msgstr "La notification par courriel nécessite un courriel valide."
+msgstr "La notification par courriel nécessite une adresse électronique valide."
 
 #: admin/forms.py:634
 msgid ""
@@ -297,7 +297,7 @@ msgstr "Modifier les permissions"
 
 #: admin/pageadmin.py:422
 msgid "Add Page Type"
-msgstr "Ajouter un modèle de page"
+msgstr "Ajouter un type de page"
 
 #: admin/pageadmin.py:426
 msgid "Add Page Copy"
@@ -307,7 +307,7 @@ msgstr "Ajouter une copie de la page"
 #: templates/admin/cms/page/tree/menu.html:174
 #: templates/admin/cms/page/tree/menu.html:177
 msgid "New sub page"
-msgstr "Nouveau chapitre"
+msgstr "Nouvelle sous-page"
 
 #: admin/pageadmin.py:435 cms_wizards.py:42
 msgid "New page"
@@ -321,7 +321,7 @@ msgstr "Le greffon %(plugin_name)s a été ajouté à la zone %(placeholder)s"
 #: admin/pageadmin.py:699
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
-msgstr "Greffons copiés vers %(placeholder)s"
+msgstr "Greffons copiés dans %(placeholder)s"
 
 #: admin/pageadmin.py:711
 #, python-format
@@ -349,7 +349,7 @@ msgstr "Tous les greffons de la zone « %(name)s » ont été supprimés."
 
 #: admin/pageadmin.py:771
 msgid "You do not have permission to change pages."
-msgstr "Vous n'avez pas la permission de changer des pages."
+msgstr "Vous n'avez pas la permission de modifier les pages."
 
 #: admin/pageadmin.py:783
 msgid "Database error"
@@ -362,7 +362,7 @@ msgstr "Vous n'avez pas la permission de modifier cette page"
 
 #: admin/pageadmin.py:860 admin/pageadmin.py:972 admin/pageadmin.py:991
 msgid "Page reverted but slug stays the same because of url collisions."
-msgstr "La page a été rétablie mais le slug reste le même pour éviter les conflits d'url."
+msgstr "La page a été rétablie mais le slug est resté le même afin d'éviter une collision d'URL."
 
 #: admin/pageadmin.py:864 admin/pageadmin.py:945
 #, python-format
@@ -380,7 +380,7 @@ msgstr "Modèle invalide"
 #: admin/pageadmin.py:1011
 #, python-format
 msgid "Template changed to %s"
-msgstr "Le modèle a changé pour %s"
+msgstr "Le modèle a été changé en %s"
 
 #: admin/pageadmin.py:1014
 msgid "The template was successfully changed"
@@ -389,7 +389,7 @@ msgstr "Le modèle a été modifié avec succès"
 #: admin/pageadmin.py:1095
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Erreur ! Vous n'avez pas les permissions pour déplacer cette page. Veuillez actualiser la page"
+msgstr "Erreur ! Vous n'avez pas la permission de déplacer cette page. Veuillez actualiser la page"
 
 #: admin/pageadmin.py:1103
 msgid "Page moved"
@@ -418,7 +418,7 @@ msgstr "Le contenu a bien été publié. "
 
 #: admin/pageadmin.py:1280
 msgid "There was a problem publishing your content"
-msgstr "Il y a eu un problème lors de la publication."
+msgstr "Il y a eu un problème lors de la publication"
 
 #: admin/pageadmin.py:1347
 msgid "You do not have permission to unpublish this page"
@@ -431,7 +431,7 @@ msgstr "Cette page n'a jamais été publiée"
 #: admin/pageadmin.py:1352
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "La traduction en %(language)s de la page « %(page)s » a bien été dépubliée"
+msgstr "La page en %(language)s « %(page)s » a bien été dépubliée"
 
 #: admin/pageadmin.py:1384
 #, python-format
@@ -463,7 +463,7 @@ msgstr "Vous n'avez pas la permission de changer le statut « Apparaître dans 
 
 #: admin/pageadmin.py:1574
 msgid "Page Types"
-msgstr "Modèles de page"
+msgstr "Types de page"
 
 #: admin/pageadmin.py:1654
 msgid "You do not have permission to edit this page"
@@ -577,7 +577,7 @@ msgstr "Zone"
 msgid "Alias"
 msgstr "Alias"
 
-#: cms_plugins.py:57 cms_plugins.py:66
+#: cms_plugins.py:61 cms_plugins.py:70
 msgid "Create Alias"
 msgstr "Créer un alias"
 
@@ -715,7 +715,7 @@ msgstr "Modèles"
 
 #: cms_toolbars.py:545
 msgid "Save as Page Type"
-msgstr "Enregistrer comme modèle de page"
+msgstr "Enregistrer comme type de page"
 
 #: cms_toolbars.py:554
 msgid "Permissions"
@@ -782,7 +782,7 @@ msgstr "Choisissez un site valide"
 msgid "Select a valid page"
 msgstr "Choisissez une page valide"
 
-#: forms/widgets.py:272
+#: forms/widgets.py:275
 msgid "Add Another"
 msgstr "Ajouter"
 
@@ -1174,7 +1174,7 @@ msgstr "Le texte affiché dans les moteurs de recherche."
 
 #: models/titlemodels.py:25
 msgid "slug"
-msgstr "“slug”"
+msgstr "slug"
 
 #: models/titlemodels.py:26
 msgid "Path"
@@ -1301,7 +1301,7 @@ msgstr "Enregistrez pour revenir à cette version."
 #: templates/admin/cms/page/history/revision_header.html:12
 #, python-format
 msgid "Revert %(verbose_name)s"
-msgstr "Annuler %(verbose_name)s"
+msgstr "Restaurer %(verbose_name)s"
 
 #: templates/admin/cms/page/history/revision_header.html:21
 msgid "Press the save button below to revert to this version of the object."
@@ -1317,7 +1317,7 @@ msgstr "Groupe"
 
 #: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
-msgstr "Peut éditer"
+msgstr "Peut modifier"
 
 #: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
@@ -1429,7 +1429,7 @@ msgstr "Options"
 #: templates/cms/toolbar/dragbar.html:15
 #: templates/cms/toolbar/dragitem.html:35
 msgid "Paste"
-msgstr "coller"
+msgstr "Coller"
 
 #: templates/admin/cms/page/tree/base.html:183
 msgid "Successfully moved"
@@ -1447,15 +1447,15 @@ msgstr "Erreur :"
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
-msgstr "Cette page ne peut pas être copiée car une application y est attachée. Consultez les Paramètres avancés de la page pour gérer les applications accrochées."
+msgstr "Cette page ne peut pas être copiée car une application y est attachée. Consultez les Paramètres avancés de la page pour gérer les accroches d'application."
 
 #: templates/admin/cms/page/tree/base.html:187
 msgid "Are you sure you want to § this page?"
-msgstr "Êtes-vous sûr de vouloir § cette page ?"
+msgstr "Êtes-vous sûr(e) de vouloir § cette page ?"
 
 #: templates/admin/cms/page/tree/base.html:188
 msgid "Reload"
-msgstr "Recharger"
+msgstr "Actualiser"
 
 #: templates/admin/cms/page/tree/base.html:190
 #| msgid "New Page"
@@ -1779,7 +1779,7 @@ msgstr "L\\'erreur suivante est survenue:"
 #: templates/cms/toolbar/toolbar_javascript.html:31
 #| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
-msgstr ""
+msgstr "Action réussie. Actualisation…"
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Are you sure you want to delete this plugin?"
@@ -1796,18 +1796,18 @@ msgstr "Le greffon sera ajouté ici"
 #: templates/cms/toolbar/toolbar_javascript.html:35
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Vous avez effectué des modifications non sauvegardées."
 
 #: templates/cms/toolbar/toolbar_javascript.html:36
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Êtes-vous sûr(e) de vouloir abandonner ces modifications ?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:37
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "Le formulaire n'a pas pu être chargé. Veuillez vérifier que le serveur est en fonctionnement."
 
 #: templates/cms/toolbar/toolbar_javascript.html:57
 msgid ""

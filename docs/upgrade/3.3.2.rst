@@ -1,0 +1,21 @@
+.. _upgrade-to-3.3.2:
+
+###################
+3.3.2 release notes
+###################
+
+*******************
+What's new in 3.3.2
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug where it wasn't possible to scroll the toolbar menu if scroll
+  started on the disabled menu item on small screens.
+* Fixed a regression when standalone CMS Widgets wouldn't work due to
+  non-existing JavaScript dependencies.
+* Fixed a possible recursion error when using the ``Alias`` plugin.
+* Fixed a migration error (0014) that occurred under certain environments.
+* Fixed a regression where submit handlers for modal form wouldn't be executed
+  under certain circumstances
