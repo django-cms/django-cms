@@ -55,8 +55,23 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                         xPath(getPasteHelpersXPath({
                             visible: true
                         })),
+                        2,
+                        'Two possible paste targets, root and self'
+                    );
+                })
+                .then(function () {
+                    var firstPageId = cms.getPageId('Homepage');
+
+                    this.click('.js-cms-pagetree-options[data-id="' + firstPageId + '"]');
+                })
+                .then(cms.waitUntilActionsDropdownLoaded())
+                .then(function () {
+                    test.assertElementCount(
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         3,
-                        'Three possible paste targets'
+                        'Three possible paste targets, root, parent and self'
                     );
                 })
                 // click on it again

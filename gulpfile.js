@@ -84,6 +84,7 @@ var INTEGRATION_TESTS = [
         'loginToolbar',
         'changeSettings',
         'toolbar-login-apphooks',
+        'permissions-enabled',
         {
             serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
             file: 'copy-from-language'
@@ -91,6 +92,10 @@ var INTEGRATION_TESTS = [
         {
             serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
             file: 'pagetree-no-permission'
+        },
+        {
+            serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
+            file: 'permissions-disabled'
         }
     ],
     [

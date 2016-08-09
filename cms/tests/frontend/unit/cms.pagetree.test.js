@@ -154,13 +154,15 @@ describe('CMS.PageTree', function () {
         var pagetree;
         var paste1;
         var paste2;
+        var paste1wrapper;
 
         beforeEach(function (done) {
             $(function () {
                 paste1 = $('<div class="paste-1 js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled"></div>');
                 paste2 = $('<div class="paste-2 js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled"></div>');
+                paste1wrapper = paste1.wrap('<div class="wrapper"></div>').parent();
                 pagetree = new CMS.PageTree();
-                pagetree.ui.container.append(paste1);
+                pagetree.ui.container.append(paste1wrapper);
                 pagetree.ui.container.append(paste2);
                 done();
             });
@@ -177,7 +179,7 @@ describe('CMS.PageTree', function () {
         it('accepts optional selector', function () {
             expect(paste1).toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).toHaveClass('cms-pagetree-dropdown-item-disabled');
-            pagetree._enablePaste('.paste-1');
+            pagetree._enablePaste('.wrapper');
             expect(paste1).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).toHaveClass('cms-pagetree-dropdown-item-disabled');
         });
@@ -187,13 +189,15 @@ describe('CMS.PageTree', function () {
         var pagetree;
         var paste1;
         var paste2;
+        var paste1wrapper;
 
         beforeEach(function (done) {
             $(function () {
                 paste1 = $('<div class="paste-1 js-cms-tree-item-paste"></div>');
                 paste2 = $('<div class="paste-2 js-cms-tree-item-paste"></div>');
+                paste1wrapper = paste1.wrap('<div class="wrapper"></div>').parent();
                 pagetree = new CMS.PageTree();
-                pagetree.ui.container.append(paste1);
+                pagetree.ui.container.append(paste1wrapper);
                 pagetree.ui.container.append(paste2);
                 done();
             });
@@ -210,7 +214,7 @@ describe('CMS.PageTree', function () {
         it('accepts optional selector', function () {
             expect(paste1).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
-            pagetree._disablePaste('.paste-1');
+            pagetree._disablePaste('.wrapper');
             expect(paste1).toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
         });
@@ -259,7 +263,7 @@ describe('CMS.PageTree', function () {
             expect(pagetree._enablePaste).toHaveBeenCalledTimes(1);
             expect(pagetree._getDescendantsIds).toHaveBeenCalledTimes(1);
             expect(pagetree._disablePaste).toHaveBeenCalledTimes(1);
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col .js-cms-tree-item-paste');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col');
         });
 
         it('enables "Paste" action only where needed if action is "cut"', function () {
@@ -274,9 +278,9 @@ describe('CMS.PageTree', function () {
             expect(pagetree._enablePaste).toHaveBeenCalledTimes(1);
             expect(pagetree._getDescendantsIds).toHaveBeenCalledTimes(1);
             expect(pagetree._disablePaste).toHaveBeenCalledTimes(3);
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col .js-cms-tree-item-paste');
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_111_col .js-cms-tree-item-paste');
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col .js-cms-tree-item-paste');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_111_col');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col');
         });
     });
 

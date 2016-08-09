@@ -435,6 +435,11 @@
     }
 
 }
+
+.cms-tree-item-disabled {
+    opacity: 0.3;
+}
+
 .cms-tree-item-wrapper {
     display: table-row;
     min-width: $pagetree-cell-inner-height;
@@ -474,7 +479,7 @@
         bottom: $pagetree-cell-inner-height / 2 + 7px;
     }
 }
-.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil {
+.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil:not(.cms-btn-disabled)[data-url] {
     @include icon(cogs);
 }
 
@@ -809,6 +814,12 @@
             color: $gray !important;
         }
     }
+
+    .jstree-node[data-move-permission="false"] .jstree-anchor {
+        cursor: default;
+        background: $white;
+    }
+
     .jstree-open,
     .jstree-closed,
     .jstree-loading {
@@ -847,7 +858,7 @@
     // hover states
     .jstree-hovered,
     .jstree-clicked {
-        background-color: lighten($gray-lightest, 3%);
+        background-color: lighten($gray-lightest, 3%) !important;
     }
 
     // special case for paste header
