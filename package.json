@@ -33,9 +33,10 @@
     "karma-webpack": "^1.7.0",
     "minimist": "1.1.1",
     "phantomjs-prebuilt": "^2.1.7",
+    "raw-loader": "^0.5.1",
     "webpack": "^1.13.1"
   },
   "dependencies": {
-    "mousetrap": "^1.6.0"
+    "keyboardjs": "^2.3.1"
   }
 }

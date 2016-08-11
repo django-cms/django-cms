@@ -333,12 +333,14 @@ var Plugin = new Class({
 
         if (!clipboardDraggable.length) {
             pasteItem.addClass('cms-submenu-item-disabled');
+            pasteItem.find('a').attr('tabindex', '-1');
             pasteItem.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
             return false;
         }
 
         if (this.ui.draggable && this.ui.draggable.hasClass('cms-draggable-disabled')) {
             pasteItem.addClass('cms-submenu-item-disabled');
+            pasteItem.find('a').attr('tabindex', '-1');
             pasteItem.find('.cms-submenu-item-paste-tooltip-disabled').css('display', 'block');
             return false;
         }
@@ -357,12 +359,15 @@ var Plugin = new Class({
             if ((bounds.length && $.inArray(type, bounds) === -1) ||
                 (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
                 pasteItem.addClass('cms-submenu-item-disabled');
+                pasteItem.find('a').attr('tabindex', '-1');
                 pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
                 return false;
             }
         } else {
             return false;
         }
+
+        pasteItem.find('a').removeAttr('tabindex');
 
         return true;
     },

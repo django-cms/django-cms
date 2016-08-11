@@ -119,7 +119,7 @@ describe('CMS.Navigation', function () {
 
             [300, 500, 678].forEach(function (width) {
                 fakeWindow.css('width', width);
-                expect(nav._calculateAvailableWidth()).toEqual(width - 115 - 15 - 15 - 10);
+                expect(nav._calculateAvailableWidth()).toEqual(width - 100 - 10);
             });
         });
     });

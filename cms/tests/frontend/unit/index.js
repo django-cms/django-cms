@@ -22,6 +22,7 @@ if (files[0] === '*') {
     require('./cms.pagetree.dropdown.test');
     require('./cms.pagetree.stickyheader.test');
     require('./cms.pagetree.test');
+    require('./shortcuts.test');
 } else {
     files.forEach(function (file) {
         require('./' + file + '.test');

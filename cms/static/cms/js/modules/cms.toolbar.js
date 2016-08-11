@@ -126,7 +126,10 @@ var Toolbar = new Class({
         var LONG_MENUS_THROTTLE = 10;
 
         // attach event to the trigger handler
-        this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
+        this.ui.toolbarTrigger.on(this.pointerUp + ' keyup.cms.toolbar', function (e) {
+            if (e.type === 'keyup' && e.keyCode !== CMS.KEYS.ENTER) {
+                return;
+            }
             e.preventDefault();
             that.toggle();
             that.ui.document.trigger(that.click);
@@ -163,6 +166,20 @@ var Toolbar = new Class({
                 that._handleLongMenus();
             }
 
+            $(window).on('keyup.cms.toolbar', function (e) {
+                if (e.keyCode === CMS.KEYS.ESC) {
+                    reset();
+                }
+            });
+
+            navigation.find('> li > a').add(
+                that.ui.toolbar.find('.cms-toolbar-item:not(.cms-toolbar-item-navigation) > a')
+            ).off('keyup.cms.toolbar.reset').on('keyup.cms.toolbar.reset', function (e) {
+                if (e.keyCode === CMS.KEYS.TAB) {
+                    reset();
+                }
+            });
+
             // remove events from first level
             navigation.find('a').on(that.click + ' ' + that.key, function (e) {
                 var el = $(this);
@@ -188,12 +205,15 @@ var Toolbar = new Class({
                     el.attr('href') !== '#' &&
                     !el.parent().hasClass(disabled)) {
 
-                    if (cmdPressed) {
+                    if (cmdPressed && e.type === 'click') {
                         // control the behaviour when ctrl/cmd is pressed
                         Helpers._getWindow().open(el.attr('href'), '_blank');
-                    } else {
+                    } else if (e.type === 'click') {
                         // otherwise delegate as usual
                         that._delegate($(this));
+                    } else {
+                        // tabbing through
+                        return;
                     }
 
                     reset();
@@ -255,7 +275,8 @@ var Toolbar = new Class({
             });
 
             // attach hover
-            lists.on(that.pointerOverOut, 'li', function (e) {
+            lists.on(that.pointerOverOut + ' keyup.cms.toolbar', 'li', function (e) {
+                // debugger
                 var el = $(this);
                 var parent = el.closest('.cms-toolbar-item-navigation-children')
                     .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -267,7 +288,7 @@ var Toolbar = new Class({
                     e.stopPropagation();
                     return;
                 }
-                if (el.hasClass(hover)) {
+                if (el.hasClass(hover) && e.type !== 'keyup') {
                     return true;
                 }
 
@@ -278,12 +299,13 @@ var Toolbar = new Class({
                 el.addClass(hover);
 
                 // handle children elements
-                if (hasChildren) {
+                if (hasChildren && e.type !== 'keyup' ||
+                    hasChildren && e.type === 'keyup' && e.keyCode === CMS.KEYS.ENTER) {
                     el.find('> ul').show();
                     // add parent class
                     parent.addClass(hover);
                     that._handleLongMenus();
-                } else {
+                } else if (e.type !== 'keyup') {
                     lists.find('ul ul').hide();
                     that._handleLongMenus();
                 }

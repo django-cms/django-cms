@@ -23,7 +23,6 @@
         left: 0;
         top: 0;
         z-index: z(toolbar, left);
-        padding-left: $toolbar-left-space;
     }
     .cms-toolbar-right {
         position: absolute;
@@ -368,7 +367,7 @@
 //###########################################################
 // #TOOLBAR/elements/logo#
 .cms-toolbar-item-logo {
-    margin-right: $toolbar-left-space;
+    margin-right: 0 !important;
 
     a {
         @extend .cms-icon;
@@ -377,6 +376,8 @@
         line-height: $toolbar-height;
         height: $toolbar-height;
         transition: color $speed-base;
+        padding-left: $toolbar-left-space;
+        padding-right: $toolbar-left-space;
 
         span {
             display: none;

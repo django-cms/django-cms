@@ -18,5 +18,6 @@ CMS.StructureBoard = require('./modules/cms.structureboard');
 CMS.Navigation = require('./modules/cms.navigation');
 CMS.Toolbar = require('./modules/cms.toolbar');
 CMS.Tooltip = require('./modules/cms.tooltip');
+require('./modules/shortcuts')();
 
 window.CMS = CMS;

@@ -1,0 +1,28 @@
+<div class="cms-shortcuts">
+    <div class="cms-shortcuts-list-wrapper">
+        <table class="cms-shortcuts-list">
+            <% shortcutAreas.forEach(function (area) { %>
+                <tr>
+                    <th></th>
+                    <th class="cms-shortcut-key-wrapper"><h2>
+                        <%= area.title %>
+                    </h2></th>
+                </tr>
+                <% Object.keys(area.shortcuts).forEach(function (key) { %>
+                    <% var content = area.shortcuts[key]; %>
+                        <tr class="cms-shortcut">
+                            <td class="cms-shortcut-key-wrapper">
+                                <% content.shortcut.replace(/>/g, '').split(' / ').forEach(function (k, i) { %>
+                                    <% if (i === 1) { %> / <% } %>
+                                    <kbd class="cms-shortcut-key"><%= k %></kbd>
+                                <% }); %>
+                            </td>
+                            <td class="cms-shortcut-desc">
+                                <%= content.desc %>
+                            </td>
+                        </tr>
+                <% }); %>
+            <% }); %>
+        </table>
+    </div>
+</div>

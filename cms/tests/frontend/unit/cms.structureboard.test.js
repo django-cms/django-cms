@@ -3,7 +3,7 @@ var CMS = require('../../../static/cms/js/modules/cms.base');
 var StructureBoard = require('../../../static/cms/js/modules/cms.structureboard');
 var Plugin = require('../../../static/cms/js/modules/cms.plugins');
 var $ = require('jquery');
-var Mousetrap = require('mousetrap');
+var keyboard = require('keyboardjs');
 
 window.CMS = window.CMS || CMS;
 CMS.StructureBoard = StructureBoard;
@@ -613,7 +613,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             $(function () {
-                spyOn(Mousetrap, 'bind');
+                spyOn(keyboard, 'bind');
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 spyOn(board, 'show').and.callFake(function () {
@@ -686,11 +686,11 @@ describe('CMS.StructureBoard', function () {
         it('sets up shortcuts to toggle board', function () {
             spyOn(board, '_toggleStructureBoard');
 
-            expect(Mousetrap.bind).toHaveBeenCalledTimes(2);
-            expect(Mousetrap.bind).toHaveBeenCalledWith('space', jasmine.any(Function));
-            expect(Mousetrap.bind).toHaveBeenCalledWith('shift+space', jasmine.any(Function));
+            expect(keyboard.bind).toHaveBeenCalledTimes(2);
+            expect(keyboard.bind).toHaveBeenCalledWith('space', jasmine.any(Function));
+            expect(keyboard.bind).toHaveBeenCalledWith('shift+space', jasmine.any(Function));
 
-            var calls = Mousetrap.bind.calls.all();
+            var calls = keyboard.bind.calls.all();
 
             calls[0].args[1]();
             expect(board._toggleStructureBoard).toHaveBeenCalledTimes(1);
@@ -715,7 +715,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             $(function () {
-                spyOn(Mousetrap, 'bind');
+                spyOn(keyboard, 'bind');
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 spyOn(board, 'show').and.callFake(function () {

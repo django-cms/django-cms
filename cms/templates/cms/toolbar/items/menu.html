@@ -1,5 +1,5 @@
 <li class="{% if sub_level %}cms-toolbar-item-navigation-children {% endif %}{% if active %}cms-toolbar-item-navigation-active {% endif %}{% if disabled %}cms-toolbar-item-navigation-disabled {% endif %}">
-    <a href="{{ url }}">
+    <a{% if disabled %} tabindex="-1"{% endif %} href="{{ url }}">
         <span>{{ title }}<span class="cms-icon cms-icon-arrow"></span></span>
     </a>
     {% if items %}
