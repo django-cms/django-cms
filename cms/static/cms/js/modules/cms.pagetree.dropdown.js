@@ -74,21 +74,18 @@ var PageTreeDropdowns = new Class({
      * @returns {Boolean|void}
      */
     _toggleDropdown: function _toggleDropdown(trigger) {
-        var triggers = $(this.options.triggerSelector);
         var dropdowns = $(this.options.dropdownSelector);
-        var index = triggers.index(trigger);
+        var dropdown = $(trigger).closest(this.options.dropdownSelector);
 
         // cancel if opened tooltip is triggered again
-        if (dropdowns.eq(index).hasClass(this.options.openCls)) {
+        if (dropdown.hasClass(this.options.openCls)) {
             dropdowns.removeClass(this.options.openCls);
             return false;
         }
 
         // otherwise show the dropdown
-        dropdowns
-            .removeClass(this.options.openCls)
-            .eq(index)
-            .addClass(this.options.openCls);
+        dropdowns.removeClass(this.options.openCls);
+        dropdown.addClass(this.options.openCls);
     },
 
     /**
