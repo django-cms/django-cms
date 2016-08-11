@@ -1,4 +1,4 @@
-=== 3.3.2 (unreleased) ===
+=== 3.3.2 (2016-08-11) ===
 
 * Fixed a bug where it wasn't possible to scroll the toolbar menu if scroll
   started on the disabled menu item on small screens.
