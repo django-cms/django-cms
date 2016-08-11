@@ -802,7 +802,20 @@ var Modal = new Class({
                         // as we are inside an iframe and magic is happening
                         item[0].click();
                     } else {
-                        frm.submit();
+                        // have to dispatch native submit event so all the submit handlers
+                        // can be fired, see #5590
+                        var evt = document.createEvent('HTMLEvents');
+
+                        evt.initEvent('submit', false, true);
+                        if (frm[0].dispatchEvent(evt)) {
+                            // triggering submit event in webkit based browsers won't
+                            // actually submit the form, while in Gecko-based ones it
+                            // will and calling frm.submit() would throw NS_ERROR_UNEXPECTED
+                            try {
+                                frm[0].submit();
+                            } catch (err) {
+                            }
+                        }
                     }
                 }
 
