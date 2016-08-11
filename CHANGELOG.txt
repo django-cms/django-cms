@@ -11,6 +11,8 @@
 * Make it possible to use multi-table inheritance for Page/Title extensions.
 * Refactored plugin rendering functionality to speed up loading time in both
   structure and content mode.
+* Added ``Shift + Space`` shortcut that behaves similar to ``Space`` shortcut
+  but takes into account currently hovered plugin.
 
 
 === 3.3.2 (unreleased) ===
