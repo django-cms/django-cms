@@ -158,10 +158,10 @@ describe('CMS.PageTreeDropdowns', function () {
                 dropdowns = new CMS.PageTreeDropdowns({
                     container: $('.cms-pagetree')
                 });
-                dropdowns.ui.container.append(trigger1);
-                dropdowns.ui.container.append(trigger2);
                 dropdowns.ui.container.append(menu1);
                 dropdowns.ui.container.append(menu2);
+                menu1.append(trigger1);
+                menu2.append(trigger2);
                 done();
             });
         });
