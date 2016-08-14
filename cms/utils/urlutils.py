@@ -12,7 +12,7 @@ import cms
 from cms.utils.conf import get_cms_setting
 
 # checks validity of absolute / relative url
-any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
+any_path_re = re.compile('^(((https?://)|(//))[a-zA-Z0-9]+[a-zA-Z0-9\.:_-]*)?(/[a-zA-Z0-9_.-]+)*/?$')
 
 
 def levelize_path(path):

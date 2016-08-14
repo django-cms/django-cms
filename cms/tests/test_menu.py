@@ -314,10 +314,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(15):
             """
             The queries should be:
                 get all pages
+                for each page get the corresponding site
                 get all page permissions
                 get all titles
                 get the menu cache key
@@ -929,10 +930,11 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         context = self.get_context(page.get_absolute_url())
 
         # test standard show_menu
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(15):
             """
             The queries should be:
                 get all pages
+                for each page get the corresponding site
                 get all page permissions
                 get all titles
                 get the menu cache key
@@ -1102,10 +1104,11 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(7):
+            with self.assertNumQueries(11):
                 """
                 The queries should be:
                     get all pages
+                    for each page get the corresponding site
                     get all page permissions
                     get all titles
                     get the menu cache key

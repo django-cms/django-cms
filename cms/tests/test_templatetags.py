@@ -541,7 +541,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar = CMSToolbar(request)
         request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(2):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
         expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
@@ -574,7 +574,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar = CMSToolbar(request)
         request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(2):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
         'cms-render-model-add"></template>'

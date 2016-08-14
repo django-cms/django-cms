@@ -86,11 +86,11 @@ class CacheTestCase(CMSTestCase):
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get('/en/')
-            with self.assertNumQueries(FuzzyInt(5, 10)):
+            with self.assertNumQueries(FuzzyInt(5, 11)):
                 self.client.get('/en/')
 
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
-            with self.assertNumQueries(FuzzyInt(7, 14)):
+            with self.assertNumQueries(FuzzyInt(7, 15)):
                 self.client.get('/en/')
 
     def test_no_cache_plugin(self):
@@ -164,7 +164,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(4):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
-                with self.assertNumQueries(FuzzyInt(8, 13)):
+                with self.assertNumQueries(FuzzyInt(8, 14)):
                     response = self.client.get('/en/')
                     resp2 = response.content.decode('utf8').split("$$$")[1]
             self.assertNotEqual(output, output2)
@@ -412,7 +412,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
@@ -488,7 +488,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
