@@ -5,6 +5,7 @@ Edit Toolbar middleware
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
+from django.utils.translation import get_language
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -86,13 +87,19 @@ class ToolbarMiddleware(object):
         ):
             if edit_on in request.GET and not request.session.get('cms_edit', False):
                 if not request.session.get('cms_edit', False):
-                    menu_pool.clear()
+                    if hasattr(request, 'site'):
+                        menu_pool.clear(site_id=request.site.pk, language=get_language())
+                    else:
+                        menu_pool.clear(language=get_language())
                 request.session['cms_edit'] = True
                 if request.session.get('cms_build', False):
                     request.session['cms_build'] = False
             if edit_off in request.GET and request.session.get('cms_edit', True):
                 if request.session.get('cms_edit', True):
-                    menu_pool.clear()
+                    if hasattr(request, 'site'):
+                        menu_pool.clear(site_id=request.site.pk, language=get_language())
+                    else:
+                        menu_pool.clear(language=get_language())
                 request.session['cms_edit'] = False
                 if request.session.get('cms_build', False):
                     request.session['cms_build'] = False
