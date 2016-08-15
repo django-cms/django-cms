@@ -4,8 +4,7 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.toolbar.utils import get_plugin_toolbar_js
-from cms.utils import get_cms_setting
-from cms.utils.admin import get_admin_menu_item_context
+from cms.utils.admin import render_admin_rows
 from sekizai.helpers import get_varname
 
 from django import template
@@ -20,24 +19,18 @@ register = template.Library()
 CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
-@register.inclusion_tag('admin/cms/page/tree/menu.html', takes_context=True)
-def show_admin_menu(context, page):
+@register.simple_tag(takes_context=True)
+def show_admin_menu_for_pages(context, pages):
     request = context['request']
 
     if 'cl' in context:
-        filtered = context['cl'].is_filtered()
+        filtered = context['cl'].is_filtered or context['cl'].query
     else:
-        filtered = context.get('filtered', False)
+        filtered = False
 
+    site = context['cms_current_site']
     language = context['preview_language']
-
-    # following function is newly used for getting the context per item (line)
-    # if something more will be required, then get_admin_menu_item_context
-    # function have to be updated.
-    # This is done because item can be reloaded after some action over ajax.
-    context['children'] = page.children.all()
-    context.update(get_admin_menu_item_context(request, page, filtered, language))
-    return context
+    return render_admin_rows(request, pages=pages, site=site, filtered=filtered, language=language)
 
 
 class TreePublishRow(Tag):
@@ -139,18 +132,6 @@ def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     return mark_safe(
         u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
-
-
-@register.assignment_tag(takes_context=True)
-def page_has_restrictions(context, page):
-    if get_cms_setting('PERMISSION'):
-        if hasattr(page, 'permission_restricted'):
-            text = bool(page.permission_restricted)
-        else:
-            text = page.has_view_restrictions()
-        return text
-    else:
-        return boolean_icon(None)
 
 
 @register.filter

@@ -12,7 +12,6 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
-from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import get_deleted_objects, quote
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -33,7 +32,7 @@ from django.template.defaultfilters import escape
 from django.utils.encoding import force_text
 from django.utils.formats import localize
 from django.utils.six.moves.urllib.parse import unquote
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.http import QueryDict
@@ -58,10 +57,10 @@ from cms.constants import (
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
+from cms.utils import helpers, permissions, get_language_from_request, copy_plugins
 from cms.utils import page_permissions
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
-from cms.utils.admin import jsonify_request
+from cms.utils.admin import jsonify_request, render_admin_rows
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import find_placeholder_relation, current_site
@@ -127,6 +126,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
+            pat(r'^([0-9]+)/actions-menu/$', self.actions_menu),
             pat(r'^([0-9]+)/dates/$', self.dates),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
             pat(r'^([0-9]+)/delete-translation/$', self.delete_translation),
@@ -374,6 +374,26 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
 
+    def actions_menu(self, request, object_id):
+        page = get_object_or_404(self.model, pk=object_id)
+        paste_enabled = request.GET.get('has_copy') or request.GET.get('has_cut')
+        can_change_advanced_settings = self.has_change_advanced_settings_permission(request, obj=page)
+        has_change_permissions_permission = self.has_change_permissions_permission(request, obj=page)
+
+        context = {
+            'page': page,
+            'page_is_restricted': page.has_view_restrictions(),
+            'paste_enabled': paste_enabled,
+            'has_add_permission': page_permissions.user_can_add_subpage(request.user, target=page),
+            'has_change_permission': self.has_change_permission(request, obj=page),
+            'has_change_advanced_settings_permission': can_change_advanced_settings,
+            'has_change_permissions_permission': has_change_permissions_permission,
+            'has_move_page_permission': self.has_move_page_permission(request, obj=page),
+            'has_delete_permission': self.has_delete_permission(request, obj=page),
+            'CMS_PERMISSION': get_cms_setting('PERMISSION'),
+        }
+        return render(request, "admin/cms/page/tree/actions_dropdown.html", context)
+
     def dates(self, request, object_id):
         return self.change_view(request, object_id, extra_context={'publishing_dates': True, 'title': _("Publishing dates")})
 
@@ -482,8 +502,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         page = get_object_or_404(self.model, pk=page_id)
         can_change_page = self.has_change_permission(request, obj=page)
 
-        if not can_change_page or (target_id and not self.has_add_permission(request)):
-            raise Http404
+        if not can_change_page:
+            raise PermissionDenied
+
+        if target_id:
+            try:
+                target = Page.objects.get(pk=target_id)
+            except Page.DoesNotExist:
+                raise Http404
+
+            if not page_permissions.user_can_add_subpage(request.user, target=target):
+                raise PermissionDenied
 
         context = {
             'dialog_id': 'dialog-copy',
@@ -599,8 +628,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         if obj:
             return page_permissions.user_can_change_page(request.user, page=obj)
-        site = current_site(request)
-        return permissions.has_any_write_permission(request.user, site)
+        can_change_page = page_permissions.user_can_change_at_least_one_page(
+            user=request.user,
+            site=current_site(request),
+        )
+        return can_change_page
 
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
@@ -631,6 +663,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         )
         return has_perm
 
+    def has_move_page_permission(self, request, obj=None):
+        if not obj:
+            return False
+        return page_permissions.user_can_move_page(user=request.user, page=obj)
+
     def has_publish_permission(self, request, obj=None):
         if not obj:
             return False
@@ -641,7 +678,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Returns True if the use has the right to recover pages
         """
         site = current_site(request)
-        return page_permissions.user_can_recover_any_page(request.user, site)
+        return page_permissions.user_can_recover_all_pages(request.user, site)
 
     @create_revision()
     def post_add_plugin(self, request, plugin):
@@ -723,73 +760,29 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if page:
             return page.get_template()
 
+    def get_changelist(self, request, **kwargs):
+        return CMSChangeList
+
     def changelist_view(self, request, extra_context=None):
-        "The 'change list' admin view for this model."
-        from django.contrib.admin.views.main import ERROR_FLAG
+        site = current_site(request)
 
-        opts = self.model._meta
-        app_label = opts.app_label
-        if not self.has_change_permission(request, None):
-            return HttpResponseForbidden(force_text(_("You do not have permission to change pages.")))
-        try:
-            cl = CMSChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                               self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page,
-                               self.list_max_show_all, self.list_editable, self)
-        except IncorrectLookupParameters:
-            # Wacky lookup parameters were given, so redirect to the main
-            # changelist page, without parameters, and pass an 'invalid=1'
-            # parameter via the query string. If wacky parameters were given and
-            # the 'invalid=1' parameter was already in the query string, something
-            # is screwed up with the database, so display an error page.
-            if ERROR_FLAG in request.GET.keys():
-                return render(request, 'admin/invalid_setup.html', {'title': _('Database error')})
-            return HttpResponseRedirect(request.path_info + '?' + ERROR_FLAG + '=1')
-        cl.set_items(request)
+        request.session['cms_admin_site'] = site.pk
 
-        site_id = request.GET.get('site__exact', None)
-        if site_id is None:
-            site_id = current_site(request).pk
-        site_id = int(site_id)
-
-        # languages
-        languages = get_language_list(site_id)
-
-        # parse the cookie that saves which page trees have
-        # been opened already and extracts the page ID
-        djangocms_nodes_open = request.COOKIES.get('djangocms_nodes_open', '')
-        raw_nodes = unquote(djangocms_nodes_open).split(',')
-        try:
-            open_menu_trees = [int(c.split('page_', 1)[1]) for c in raw_nodes]
-        except IndexError:
-            open_menu_trees = []
         # Language may be present in the GET dictionary but empty
         language = request.GET.get('language', get_language())
+
         if not language:
             language = get_language()
+
         context = {
-            'title': cl.title,
-            'is_popup': cl.is_popup,
-            'cl': cl,
-            'opts': opts,
-            'has_add_permission': self.has_add_permission(request),
-            'root_path': admin_reverse('index'),
-            'app_label': app_label,
-            'preview_language': language,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
-            'DEBUG': settings.DEBUG,
-            'site_languages': languages,
-            'open_menu_trees': open_menu_trees,
+            'site_languages': get_language_list(site.pk),
+            'preview_language': language,
+            'cms_current_site': site,
         }
-        if is_installed('reversion'):
-            context['has_recover_permission'] = self.has_recover_permission(request)
-            context['has_change_permission'] = self.has_change_permission(request)
         context.update(extra_context or {})
-        return render(request, self.change_list_template or [
-            'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
-            'admin/%s/change_list.html' % app_label,
-            'admin/change_list.html'
-        ], context)
+        return super(PageAdmin, self).changelist_view(request, extra_context=context)
 
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
@@ -1056,7 +1049,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     tb_position = "last-child"
 
         # Does the user have permissions to do this...?
-        if not page.has_move_page_permission(user) or (
+        if not self.has_move_page_permission(request, obj=page) or (
                     target and not target.has_add_permission(user)):
             return jsonify_request(
                 HttpResponseForbidden(
@@ -1481,9 +1474,21 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         ], context)
 
     def preview_page(self, request, object_id, language):
-        """Redirecting preview function based on draft_id
+        """
+        Redirecting preview function based on draft_id
         """
         page = get_object_or_404(self.model, id=object_id)
+        can_see_page = page_permissions.user_can_view_page(request.user, page)
+
+        if can_see_page and not self.has_change_permission(request, obj=page):
+            can_see_page = page.is_published(language)
+
+        if not can_see_page:
+            message = ugettext('You don\'t have permissions to see page "%(title)s"')
+            message = message % {'title': force_text(page)}
+            self.message_user(request, message, level=messages.ERROR)
+            return HttpResponseRedirect('/en/admin/cms/page/')
+
         attrs = "?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         attrs += "&language=" + language
         with force_language(language):
@@ -1519,8 +1524,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         page_id = request.GET.get('pageId', None)
         site_id = request.GET.get('site', None)
-        language = request.GET.get('language', None)
-        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
 
         try:
             site_id = int(site_id)
@@ -1529,25 +1532,18 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 ObjectDoesNotExist):
             site = get_current_site(request)
 
-        if not language:
-            language = get_language_from_request(request)
-
         if page_id:
             page = get_object_or_404(self.model, pk=int(page_id))
             pages = page.get_children()
         else:
-            pages = Page.get_root_nodes().filter(site=site,
-                                                 publisher_is_draft=True)
+            pages = Page.get_root_nodes().filter(site=site, publisher_is_draft=True)
 
-        template = "admin/cms/page/tree/menu.html"
-        response = u""
-        for page in pages:
-            response += admin_utils.render_admin_menu_item(
-                request, page,
-               template=template,
-               language=language,
-               open_nodes=open_nodes,
-           )
+        pages = (
+            pages
+            .select_related('parent', 'publisher_public', 'site')
+            .prefetch_related('children')
+        )
+        response = render_admin_rows(request, pages, site=site, filtered=False)
         return HttpResponse(response)
 
     def add_page_type(self, request):

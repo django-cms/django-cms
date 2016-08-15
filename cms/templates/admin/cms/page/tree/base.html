@@ -164,7 +164,7 @@
                 </div>
 
                 {# INFO: javascript is loaded from cms.pagetree.js #}
-                {% if cl.get_items or cl.get_items and cl.is_filtered %}
+                {% if cl.items %}
                     <div class="cms-pagetree cms-pagetree-container">
                         <div class="cms-pagetree-jstree js-cms-pagetree" data-json='{
                             "urls": {
@@ -218,9 +218,7 @@
                             <ul>
                                 {% if cl.is_filtered or request.GET.q %}
                                     {# INFO: load html data source when filtering #}
-                                    {% for page in cl.get_items %}
-                                        {% show_admin_menu page %}
-                                    {% endfor %}
+                                    {% show_admin_menu_for_pages cl.items %}
                                 {% endif %}
                             </ul>
                         </div>

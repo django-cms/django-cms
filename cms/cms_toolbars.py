@@ -456,7 +456,16 @@ class PageToolbar(CMSToolbar):
                     )
 
     def change_admin_menu(self):
-        if not self._changed_admin_menu and self.has_page_change_permission():
+        can_change_page = self.has_page_change_permission()
+
+        if not can_change_page:
+            # Check if the user has permissions to change at least one page
+            can_change_page = page_permissions.user_can_change_at_least_one_page(
+                user=self.request.user,
+                site=self.current_site,
+            )
+
+        if not self._changed_admin_menu and can_change_page:
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             url = admin_reverse('cms_page_changelist')  # cms page admin
             params = {'language': self.toolbar.language}

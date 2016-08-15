@@ -251,6 +251,11 @@ def user_can_view_page(user, page):
         # Page has no restrictions but user can't see unrestricted pages
         return False
 
+    if user_can_change_page(user, page):
+        # If user has change permissions on a page
+        # then he can automatically view it.
+        return True
+
     has_perm = has_generic_permission(
         page=page,
         user=user,
@@ -268,8 +273,18 @@ def user_can_change_all_pages(user, site):
 
 @permission_pre_checks(action='recover_page')
 @cached_func
-def user_can_recover_any_page(user, site):
+def user_can_recover_all_pages(user, site):
     return has_global_permission(user, site, action='recover_page')
+
+
+@permission_pre_checks(action='change_page')
+def user_can_change_at_least_one_page(user, site):
+    page_ids = get_change_id_list(
+        user=user,
+        site=site,
+        check_global=True
+    )
+    return page_ids == GRANT_ALL_PERMISSIONS or bool(page_ids)
 
 
 @cached_func
@@ -289,6 +304,10 @@ def user_can_view_all_pages(user, site):
         # This is for backwards compatibility.
         # The previous system allowed any user with the explicit view_page
         # permission to see all pages.
+        return True
+
+    if user_can_change_all_pages(user, site):
+        # If a user can change all pages then he can see all pages.
         return True
     return has_global_permission(user, site, action='view_page')
 

@@ -17,7 +17,6 @@ from cms.forms.widgets import ApplicationConfigSelect
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
 )
-from cms.utils.permissions import set_current_user
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -191,6 +190,7 @@ class FormsTestCase(CMSTestCase):
 
 
 class PermissionFormTestCase(CMSTestCase):
+
     def test_permission_forms(self):
         page = create_page("page_b", "nav_playground.html", "en",
                            created_by=self.get_superuser())
@@ -208,12 +208,14 @@ class PermissionFormTestCase(CMSTestCase):
             data = {
                 'page': page.pk,
                 'grant_on': "hello",
+                'user': normal_user.pk,
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertFalse(form.is_valid())
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
+                'user': normal_user.pk,
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertTrue(form.is_valid())
@@ -223,7 +225,8 @@ class PermissionFormTestCase(CMSTestCase):
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE_AND_CHILDREN,
                 'can_add': '1',
-                'can_change': ''
+                'can_change': '',
+                'user': normal_user.pk,
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
 
@@ -236,6 +239,7 @@ class PermissionFormTestCase(CMSTestCase):
                 'grant_on': ACCESS_PAGE,
                 'can_add': '1',
                 'can_change': '1',
+                'user': normal_user.pk,
 
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
@@ -246,23 +250,22 @@ class PermissionFormTestCase(CMSTestCase):
 
     def test_inlines(self):
         user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        current_user = self.get_superuser()
         page = create_page("page_b", "nav_playground.html", "en",
-                           created_by=self.get_superuser())
+                           created_by=current_user)
         data = {
             'page': page.pk,
             'grant_on': ACCESS_PAGE_AND_CHILDREN,
             'can_view': 'True',
-            'user': '',
+            'user': user.pk,
             'group': '',
         }
-        set_current_user(self.get_superuser())
         form = ViewRestrictionInlineAdminForm(data=data, files=None)
         self.assertTrue(form.is_valid())
         data = {
             'page': page.pk,
             'grant_on': ACCESS_PAGE_AND_CHILDREN,
             'can_view': 'True',
-            'user': '',
             'group': ''
         }
         form = GlobalPagePermissionAdminForm(data=data, files=None)
@@ -273,22 +276,22 @@ class PermissionFormTestCase(CMSTestCase):
             'grant_on': ACCESS_PAGE_AND_CHILDREN,
             'can_view': 'True',
             'user': user.pk,
-
         }
         form = GlobalPagePermissionAdminForm(data=data, files=None)
         self.assertTrue(form.is_valid())
 
     def test_user_forms(self):
         user = self.get_superuser()
-        set_current_user(user)
 
         data = {
             'name': 'test_group'
         }
         form = PageUserGroupForm(data=data, files=None)
+        form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         instance = form.save()
 
         form = PageUserGroupForm(data=data, files=None, instance=instance)
+        form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
