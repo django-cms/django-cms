@@ -52,44 +52,6 @@ def get_model_permission_codename(model, action):
     return opts.app_label + '.' + get_permission_codename(action, opts)
 
 
-def has_any_write_permission(user, site):
-    if has_any_write_global_permission(user, site):
-        return True
-    return has_any_write_page_permission(user, site)
-
-
-def has_any_write_page_permission(user, site):
-    if not user.is_authenticated():
-        return False
-
-    if user.is_superuser:
-        return True
-
-    write_perms = PagePermission.get_write_permissions()
-    has_perms = (
-        PagePermission
-        .objects
-        .user_has_permissions(user, site, perms=write_perms)
-    )
-    return has_perms
-
-
-def has_any_write_global_permission(user, site):
-    if not user.is_authenticated():
-        return False
-
-    if user.is_superuser:
-        return True
-
-    write_perms = GlobalPagePermission.get_write_permissions()
-    has_perms = (
-        GlobalPagePermission
-        .objects
-        .user_has_permissions(user, site, perms=write_perms)
-    )
-    return has_perms
-
-
 def _has_global_permission(user, site, action):
     if not user.is_authenticated():
         return False

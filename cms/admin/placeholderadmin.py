@@ -182,16 +182,32 @@ class PlaceholderAdminMixin(object):
         placeholder = request.toolbar.clipboard
         return placeholder.has_add_plugins_permission(request.user, plugins)
 
-    def has_paste_plugins_permission(self, request, placeholder, plugins):
+    def has_copy_from_clipboard_permission(self, request, placeholder, plugins):
         return placeholder.has_add_plugins_permission(request.user, plugins)
+
+    def has_copy_from_placeholder_permission(self, request, source_placeholder, target_placeholder, plugins):
+        if not source_placeholder.has_add_plugins_permission(request.user, plugins):
+            return False
+        return target_placeholder.has_add_plugins_permission(request.user, plugins)
 
     def has_move_plugin_permission(self, request, plugin, target_placeholder):
         placeholder = plugin.placeholder
         return placeholder.has_move_plugin_permission(request.user, plugin, target_placeholder)
 
-    def has_clear_placeholder_permission(self, request, placeholder):
-        language = request.GET.get('language', None)
-        return placeholder.has_clear_permission(request.user, [language])
+    def has_clear_placeholder_permission(self, request, placeholder, language=None):
+        if language:
+            languages = [language]
+        else:
+            # fetch all languages this placeholder contains
+            # based on it's plugins
+            languages = (
+                placeholder
+                .cmsplugin_set
+                .values_list('language', flat=True)
+                .distinct()
+                .order_by()
+            )
+        return placeholder.has_clear_permission(request.user, languages)
 
     def post_add_plugin(self, request, plugin):
         pass
@@ -257,12 +273,12 @@ class PlaceholderAdminMixin(object):
         plugin_data['position'] = position
 
         plugin_class = plugin_pool.get_plugin(plugin_type)
-        plugin_admin = plugin_class(admin_site=self.admin_site)
+        plugin_instance = plugin_class(plugin_class.model, self.admin_site)
 
         # Setting attributes on the form class is perfectly fine.
         # The form class is created by modelform factory every time
         # this get_form() method is called.
-        plugin_admin._cms_initial_attributes = {
+        plugin_instance._cms_initial_attributes = {
             'language': plugin_data['plugin_language'],
             'placeholder': plugin_data['placeholder_id'],
             'parent': plugin_data.get('plugin_parent', None),
@@ -270,10 +286,10 @@ class PlaceholderAdminMixin(object):
             'position': plugin_data['position'],
         }
 
-        response = plugin_admin.add_view(request)
+        response = plugin_instance.add_view(request)
 
-        if request.method == "POST" and plugin_admin.object_successfully_changed:
-            self.post_add_plugin(request, plugin_admin.saved_object)
+        if request.method == "POST" and plugin_instance.object_successfully_changed:
+            self.post_add_plugin(request, plugin_instance.saved_object)
         return response
 
     @method_decorator(require_POST)
@@ -322,14 +338,19 @@ class PlaceholderAdminMixin(object):
                 source_placeholder.get_plugins(language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
 
-        if not copy_to_clipboard:
+        if copy_to_clipboard:
+            has_permissions = self.has_copy_plugins_permission(request, plugins)
+        else:
             # Plugins are being copied from a placeholder in another language
             # using the "Copy from language" placeholder action.
-            # Check for paste permissions as copy permissions are only for
-            # copying into the clipboard.
-            has_permissions = self.has_paste_plugins_permission(request, target_placeholder, plugins)
-        else:
-            has_permissions = self.has_copy_plugins_permission(request, plugins)
+            # Check if the user can copy plugins from source placeholder to
+            # target placeholder.
+            has_permissions = self.has_copy_from_placeholder_permission(
+                request,
+                source_placeholder,
+                target_placeholder,
+                plugins,
+            )
 
         if not has_permissions:
             return HttpResponseForbidden(force_text(
@@ -480,9 +501,9 @@ class PlaceholderAdminMixin(object):
             else:
                 plugins = [plugin] + list(plugin.get_descendants())
 
-            if not self.has_paste_plugins_permission(request, placeholder, plugins):
+            if not self.has_copy_from_clipboard_permission(request, placeholder, plugins):
                 return HttpResponseForbidden(
-                    force_text(_("You have no permission to move this plugin")))
+                    force_text(_("You have no permission to paste this plugin")))
 
             new_plugins = copy_plugins.copy_plugins_to(
                 plugins,
@@ -654,7 +675,9 @@ class PlaceholderAdminMixin(object):
                 raise PermissionDenied(_("You do not have permission to delete this plugin"))
             obj_display = force_text(plugin)
             self.log_deletion(request, plugin, obj_display)
+
             plugin.delete()
+
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_text(opts.verbose_name), 'obj': force_text(obj_display)})
             self.post_delete_plugin(request, plugin)
@@ -682,10 +705,11 @@ class PlaceholderAdminMixin(object):
     @xframe_options_sameorigin
     def clear_placeholder(self, request, placeholder_id):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-
-        if not self.has_clear_placeholder_permission(request, placeholder):
-            return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
         language = request.GET.get('language', None)
+
+        if not self.has_clear_placeholder_permission(request, placeholder, language):
+            return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
+
         plugins = placeholder.get_plugins(language)
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)

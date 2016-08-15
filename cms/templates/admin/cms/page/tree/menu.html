@@ -1,7 +1,6 @@
 {% load i18n cms_admin admin_urls %}
 
 {# INFO: columns are defined in base.html options #}
-{% page_has_restrictions page as page_is_restricted %}
 {% spaceless %}
 <li class="cms-tree-node {{ css_class }}
     {% if page.pk in open_nodes %} jstree-open{% elif children %} jstree-closed{% endif %}
@@ -257,9 +256,7 @@
     {# INFO render children #}
     {% if page.pk in open_nodes and children %}
         <ul>
-            {% for child in children %}
-                {% show_admin_menu child %}
-            {% endfor %}
+            {% show_admin_menu_for_pages children %}
         </ul>
     {% endif %}
 </li>

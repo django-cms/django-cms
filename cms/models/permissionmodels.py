@@ -74,6 +74,9 @@ class AbstractPagePermission(models.Model):
     def clean(self):
         super(AbstractPagePermission, self).clean()
 
+        if not self.user and not self.group:
+            raise ValidationError(_('Please select user or group.'))
+
         if self.can_change:
             return
 
@@ -160,19 +163,6 @@ class AbstractPagePermission(models.Model):
         }
         return permissions_by_action
 
-    @classmethod
-    def get_write_permissions(cls):
-        perms = [
-            'can_add',
-            'can_change',
-            'can_delete',
-            'can_publish',
-            'can_change_advanced_settings',
-            'can_change_permissions',
-            'can_move_page',
-        ]
-        return perms
-
 
 @python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
@@ -203,9 +193,6 @@ class GlobalPagePermission(AbstractPagePermission):
     def clean(self):
         super(GlobalPagePermission, self).clean()
 
-        if not self.user and not self.group:
-            raise ValidationError(_('Please select user or group.'))
-
         can_recover = self.can_add and self.can_change
 
         if self.can_recover_page and not can_recover:
@@ -215,7 +202,7 @@ class GlobalPagePermission(AbstractPagePermission):
 
     @classmethod
     def get_all_permissions(cls):
-        perms = super(GlobalPagePermission, cls).get_write_permissions()
+        perms = super(GlobalPagePermission, cls).get_all_permissions()
         return perms + ['can_recover_page']
 
     @classmethod
@@ -223,11 +210,6 @@ class GlobalPagePermission(AbstractPagePermission):
         perms_by_action = super(GlobalPagePermission, cls).get_permissions_by_action()
         perms_by_action['recover_page'] = ['can_add', 'can_change', 'can_recover_page']
         return perms_by_action
-
-    @classmethod
-    def get_write_permissions(cls):
-        perms = super(GlobalPagePermission, cls).get_write_permissions()
-        return perms + ['can_recover_page']
 
 
 @python_2_unicode_compatible

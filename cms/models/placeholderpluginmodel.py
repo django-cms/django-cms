@@ -21,7 +21,8 @@ class PlaceholderReference(CMSPlugin):
         copy_plugins_to(self.placeholder_ref.get_plugins(), placeholder, to_language=language)
 
     def copy_from(self, placeholder, language):
-        copy_plugins_to(placeholder.get_plugins(language), self.placeholder_ref, to_language=self.language)
+        plugins = placeholder.get_plugins(language)
+        return copy_plugins_to(plugins, self.placeholder_ref, to_language=self.language)
 
     def move_to(self, placeholder, language):
         for plugin in self.placeholder_ref.get_plugins():

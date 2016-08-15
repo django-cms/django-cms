@@ -115,18 +115,20 @@ class classproperty(object):
 
 
 def current_site(request):
-    site_pk = request.GET.get(SITE_VAR, None) if request.GET.get(SITE_VAR, None) else request.POST.get(SITE_VAR, None)
+    site_pk = request.GET.get(SITE_VAR, None) or request.POST.get(SITE_VAR, None)
+
     if not site_pk:
         site_pk = request.session.get('cms_admin_site', None)
+
     if site_pk:
         try:
             site = SITE_CACHE.get(site_pk) or Site.objects.get(pk=site_pk)
             SITE_CACHE[site_pk] = site
             return site
         except Site.DoesNotExist:
-            return None
+            return Site.objects.get_current(request)
     else:
-        return Site.objects.get_current()
+        return Site.objects.get_current(request)
 
 
 def normalize_name(name):

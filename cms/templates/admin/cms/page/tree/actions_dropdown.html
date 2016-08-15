@@ -1,12 +1,11 @@
 {% load i18n %}
-
 {% spaceless %}
 <ul class="cms-pagetree-dropdown-menu-inner">
     <li
         {% if has_change_permission %}
             class="js-cms-tree-item-copy"
             data-id="{{ page.pk }}"
-            data-apphook="{{ page.application_urls|default_if_none:'' }}"
+            data-apphook="{{ page.application_urls|default_if_none:"" }}"
         {% endif %}
     >
             <a{% if not has_change_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %} href="#" title="{% filter escapejs %}{% trans "Copy" %}{% endfilter %}">

@@ -17,11 +17,11 @@ from django.utils.encoding import force_text, smart_str
 from django.utils import timezone
 from django.utils.six.moves.urllib.parse import urlparse
 
+from cms import api
+from cms.api import create_page, create_title, add_plugin, publish_page
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
-from cms import api
-from cms.api import create_page, create_title, add_plugin, publish_page
 from cms.constants import PLUGIN_MOVE_ACTION, TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
 from cms.models.pagemodel import Page
@@ -312,9 +312,7 @@ class AdminTestCase(AdminTestsBase):
         cl_params.extend([page_admin.list_editable, page_admin])
         cl = CMSChangeList(*tuple(cl_params))
 
-        cl.set_items(request)
-
-        root_page = cl.get_items()[0]
+        root_page = cl.items[0]
 
         self.assertEqual(root_page, first_level_page)
         self.assertEqual(root_page.get_children()[0], second_level_page_top)

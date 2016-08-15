@@ -45,6 +45,11 @@ class GenericCmsPermissionAdmin(object):
             return False
         return True
 
+    def get_form(self, request, obj=None, **kwargs):
+        form_class = super(GenericCmsPermissionAdmin, self).get_form(request, obj, **kwargs)
+        form_class._current_user = request.user
+        return form_class
+
     def get_queryset(self, request):
         queryset = super(GenericCmsPermissionAdmin, self).get_queryset(request)
         site = Site.objects.get_current(request)
@@ -77,19 +82,8 @@ class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
     form = PageUserChangeForm
     model = PageUser
 
-    def get_form(self, request, obj=None, **kwargs):
-        form_class = super(PageUserAdmin, self).get_form(request, obj, **kwargs)
-        form_class._manager = request.user
-        return form_class
-
     def get_subordinates(self, user, site):
         return get_subordinate_users(user, site).values_list('pk', flat=True)
-
-    def get_queryset(self, request):
-        queryset = super(PageUserAdmin, self).get_queryset(request)
-        site = Site.objects.get_current(request)
-        user_ids = get_subordinate_users(request.user, site).values_list('pk', flat=True)
-        return queryset.filter(pk__in=user_ids)
 
     def get_readonly_fields(self, request, obj=None):
         fields = super(PageUserAdmin, self).get_readonly_fields(request, obj)

@@ -659,7 +659,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         placeholder = plugins[0].placeholder
         endpoint = self.get_admin_url(Example1, 'clear_placeholder', placeholder.pk)
 
-        self.add_permission(staff_user, 'delete_text')
+        self.add_permission(staff_user, 'delete_style')
         self.add_permission(staff_user, 'delete_link')
         self.add_permission(staff_user, 'change_example1')
 

@@ -17,9 +17,10 @@ from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
 from cms.models import (CMSPlugin, Page, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, EmptyTitle, GlobalPagePermission)
+from cms.models.permissionmodels import User
 from cms.plugin_pool import plugin_pool
-from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
+from cms.utils.compat.forms import UserChangeForm
 from cms.utils.i18n import get_language_list, get_language_object, get_language_tuple
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import is_valid_url
@@ -49,19 +50,24 @@ def save_permissions(data, obj):
         (PageUserGroup, 'pageuser'),
         (PagePermission, 'pagepermission'),
     )
+
     if not obj.pk:
         # save obj, otherwise we can't assign permissions to him
         obj.save()
+
     permission_accessor = get_permission_accessor(obj)
+
     for model, name in models:
         content_type = ContentType.objects.get_for_model(model)
         for key in ('add', 'change', 'delete'):
             # add permission `key` for model `model`
             codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
-            if data.get('can_%s_%s' % (key, name), None):
+            field = 'can_%s_%s' % (key, name)
+
+            if data.get(field):
                 permission_accessor.add(permission)
-            else:
+            elif field in data:
                 permission_accessor.remove(permission)
 
 
@@ -561,10 +567,11 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 class GenericCmsPermissionForm(forms.ModelForm):
     """Generic form for User & Grup permissions in cms
     """
+    _current_user = None
+
     can_add_page = forms.BooleanField(label=_('Add'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Change'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Delete'), required=False)
-    can_recover_page = forms.BooleanField(label=_('Recover (any) pages'), required=False)
 
     # pageuser is for pageuser & group - they are combined together,
     # and read out from PageUser model
@@ -576,11 +583,59 @@ class GenericCmsPermissionForm(forms.ModelForm):
     can_change_pagepermission = forms.BooleanField(label=_('Change'), required=False)
     can_delete_pagepermission = forms.BooleanField(label=_('Delete'), required=False)
 
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
+        initial = kwargs.get('initial') or {}
+
+        if instance:
+            initial = initial or {}
+            initial.update(self.populate_initials(instance))
+            kwargs['initial'] = initial
+        super(GenericCmsPermissionForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        data = super(GenericCmsPermissionForm, self).clean()
+
+        # Validate Page options
+        if not data.get('can_change_page'):
+            if data.get('can_add_page'):
+                message = _("Users can't create a page without permissions "
+                            "to change the created page. Edit permissions required.")
+                raise ValidationError(message)
+
+            if data.get('can_delete_page'):
+                message = _("Users can't delete a page without permissions "
+                            "to change the page. Edit permissions required.")
+                raise ValidationError(message)
+
+            if data.get('can_add_pagepermission'):
+                message = _("Users can't set page permissions without permissions "
+                            "to change a page. Edit permissions required.")
+                raise ValidationError(message)
+
+            if data.get('can_delete_pagepermission'):
+                message = _("Users can't delete page permissions without permissions "
+                            "to change a page. Edit permissions required.")
+                raise ValidationError(message)
+
+        # Validate PagePermission options
+        if not data.get('can_change_pagepermission'):
+            if data.get('can_add_pagepermission'):
+                message = _("Users can't create page permissions without permissions "
+                            "to change the created permission. Edit permissions required.")
+                raise ValidationError(message)
+
+            if data.get('can_delete_pagepermission'):
+                message = _("Users can't delete page permissions without permissions "
+                            "to change permissions. Edit permissions required.")
+                raise ValidationError(message)
+
     def populate_initials(self, obj):
         """Read out permissions from permission system.
         """
         initials = {}
         permission_accessor = get_permission_accessor(obj)
+
         for model in (Page, PageUser, PagePermission):
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
@@ -590,10 +645,49 @@ class GenericCmsPermissionForm(forms.ModelForm):
                 initials['can_%s_%s' % (key, name)] = codename in permissions
         return initials
 
+    def save(self, commit=True):
+        instance = super(GenericCmsPermissionForm, self).save(commit=False)
+        instance.save()
+        save_permissions(self.cleaned_data, instance)
+        return instance
+
+
+class PageUserAddForm(forms.ModelForm):
+    _current_user = None
+
+    user = forms.ModelChoiceField(queryset=User.objects.none())
+
+    class Meta:
+        fields = ['user']
+        model = PageUser
+
+    def __init__(self, *args, **kwargs):
+        super(PageUserAddForm, self).__init__(*args, **kwargs)
+        self.fields['user'].queryset = self.get_subordinates()
+
+    def get_subordinates(self):
+        subordinates = get_subordinate_users(self._current_user, self._current_site)
+        return subordinates.filter(pageuser__isnull=True)
+
+    def save(self, commit=True):
+        user = self.cleaned_data['user']
+        instance = super(PageUserAddForm, self).save(commit=False)
+        instance.created_by = self._current_user
+
+        for field in user._meta.fields:
+            # assign all the fields - we can do this, because object is
+            # subclassing User (one to one relation)
+            value = getattr(user, field.name)
+            setattr(instance, field.name, value)
+
+        if commit:
+            instance.save()
+        return instance
+
 
 class PageUserChangeForm(UserChangeForm):
 
-    _manager = None
+    _current_user = None
 
     class Meta:
         fields = '__all__'
@@ -602,7 +696,7 @@ class PageUserChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super(PageUserChangeForm, self).__init__(*args, **kwargs)
 
-        if not self._manager.is_superuser:
+        if not self._current_user.is_superuser:
             # Limit permissions to include only
             # the permissions available to the manager.
             permissions = self.get_available_permissions()
@@ -613,12 +707,12 @@ class PageUserChangeForm(UserChangeForm):
             self.fields['groups'].queryset = self.get_available_groups()
 
     def get_available_permissions(self):
-        permissions = self._manager.get_all_permissions()
+        permissions = self._current_user.get_all_permissions()
         permission_codes = (perm.rpartition('.')[-1] for perm in permissions)
         return Permission.objects.filter(codename__in=permission_codes)
 
     def get_available_groups(self):
-        return self._manager.groups.all()
+        return self._current_user.groups.all()
 
 
 class PageUserGroupForm(GenericCmsPermissionForm):
@@ -627,27 +721,10 @@ class PageUserGroupForm(GenericCmsPermissionForm):
         model = PageUserGroup
         fields = ('name', )
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False, instance=None):
-
-        if instance:
-            initial = initial or {}
-            initial.update(self.populate_initials(instance))
-
-        super(PageUserGroupForm, self).__init__(data, files, auto_id, prefix,
-                                                initial, error_class, label_suffix, empty_permitted, instance)
-
     def save(self, commit=True):
-        group = super(GenericCmsPermissionForm, self).save(commit=False)
-        created = not bool(group.pk)
-        # assign creator to user
-        if created:
-            group.created_by = get_current_user()
-        if commit:
-            group.save()
-        save_permissions(self.cleaned_data, group)
-        return group
+        if not self.instance.pk:
+            self.instance.created_by = self._current_user
+        return super(PageUserGroupForm, self).save(commit=commit)
 
 
 class PluginAddValidationForm(forms.Form):
