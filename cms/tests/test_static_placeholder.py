@@ -5,11 +5,10 @@ from django.contrib.admin.sites import site
 from django.template import Context
 from django.template.base import Template
 from django.utils import six
-from django.utils.encoding import force_text
 
 from cms.api import add_plugin
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
+from cms.constants import PLUGIN_MOVE_ACTION
+from cms.models import StaticPlaceholder, Placeholder, UserSettings
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
@@ -135,10 +134,14 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         admin = self.get_admin()
 
         with self.login_user_context(admin):
-            request = self.get_request(post_data={'plugin_id': sourceplugin.pk,
+            endpoint = self.get_move_plugin_uri(sourceplugin, container=StaticPlaceholder)
+            data = {
+                'plugin_id': sourceplugin.pk,
                 'placeholder_id': static_placeholder_target.draft.id,
-                'plugin_parent': '', 'plugin_language': 'en'})
-            response = self.admin_class.move_plugin(request)
+                'plugin_parent': '',
+                'plugin_language': 'en',
+            }
+            response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(json.loads(response.content.decode('utf8')), expected)
             source = StaticPlaceholder.objects.get(pk=static_placeholder_source.pk)
@@ -146,49 +149,34 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             self.assertTrue(source.dirty)
             self.assertTrue(target.dirty)
 
-    def test_copy_plugin(self):
-        static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar', site_id=1)
-        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
-        sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test source')
-        targetplugin = add_plugin(static_placeholder_target.draft, 'TextPlugin', 'en', body='test dest')
-        StaticPlaceholder.objects.filter(pk=static_placeholder_source.pk).update(dirty=False)
-        plugin_class = sourceplugin.get_plugin_class_instance()
+    def test_paste_plugin(self):
         admin = self.get_admin()
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=admin,
+            clipboard=Placeholder.objects.create(slot='clipboard'),
+        )
+        clipboard = user_settings.clipboard
+        static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
+
+        plugin = add_plugin(clipboard, 'TextPlugin', 'en', body='test source')
+
+        endpoint = self.get_move_plugin_uri(plugin)
+
+        data = {
+            'plugin_id': plugin.pk,
+            'placeholder_id': static_placeholder_target.draft.pk,
+            'move_a_copy': 'true',
+            'plugin_order[]': ['__COPY__'],
+        }
 
         with self.login_user_context(admin):
-            request = self.get_request(post_data={
-                'source_language': 'en',
-                'source_placeholder_id': static_placeholder_source.draft.pk,
-                'source_plugin_id': sourceplugin.pk,
-                'target_language': 'en',
-                'target_placeholder_id': static_placeholder_target.draft.pk,
-                'target_plugin_id': targetplugin.pk,
-            })
-            response = self.admin_class.copy_plugins(request)
+            response = self.client.post(endpoint, data)
+            static_placeholder_target = self.reload(static_placeholder_target)
 
-            # generate the expected response
-            plugin_list = CMSPlugin.objects.filter(
-                language='en', placeholder_id=static_placeholder_target.draft.pk).order_by(
-                'depth', 'position')
-            reduced_list = []
-            for plugin in plugin_list:
-                reduced_list.append(
-                    {
-                        'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
-                        'position': plugin.position, 'desc': force_text(plugin.get_short_description()),
-                        'language': plugin.language, 'placeholder_id': static_placeholder_target.draft.pk
-                    }
-                )
-            expected = json.loads(
-                json.dumps({'plugin_list': reduced_list, 'reload': plugin_class.requires_reload(PLUGIN_COPY_ACTION)}))
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
-
-            # Check dirty bit
-            source = StaticPlaceholder.objects.get(pk=static_placeholder_source.pk)
-            target = StaticPlaceholder.objects.get(pk=static_placeholder_target.pk)
-            self.assertFalse(source.dirty)
-            self.assertTrue(target.dirty)
+            self.assertTrue(static_placeholder_target.dirty)
+            self.assertTrue(static_placeholder_target.draft.get_plugins(plugin.language).exists())
 
     def test_create_by_admin(self):
         url = admin_reverse("cms_staticplaceholder_add")

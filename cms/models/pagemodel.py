@@ -1003,6 +1003,10 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     def has_cached_descendants(self):
         return hasattr(self, "_cached_descendants")
 
+    def set_translations_cache(self):
+        translations = self.title_set.all()
+        self._title_cache = {trans.language: trans for trans in translations.iterator()}
+
     # ## Title object access
 
     def get_title_obj(self, language=None, fallback=True, force_reload=False):

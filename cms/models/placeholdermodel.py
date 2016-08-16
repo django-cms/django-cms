@@ -234,7 +234,6 @@ class Placeholder(models.Model):
         )
         return content
 
-
     def _get_related_objects(self):
         fields = self._meta._get_fields(
             forward=False, reverse=True,
@@ -323,6 +322,18 @@ class Placeholder(models.Model):
         self._attached_model_cache = None
         return None
 
+    def _get_attached_admin(self, admin_site=None):
+        from django.contrib.admin import site
+
+        if not admin_site:
+            admin_site = site
+
+        model = self._get_attached_model()
+
+        if not model:
+            return
+        return admin_site._registry.get(model)
+
     def _get_attached_models(self):
         """
         Returns a list of models of attached to this placeholder.
@@ -373,6 +384,7 @@ class Placeholder(models.Model):
 
         This is not cached as it's meant to eb used in the frontend editor.
         """
+
         languages = []
         for lang_code in set(self.get_plugins().values_list('language', flat=True)):
             try:
@@ -509,6 +521,20 @@ class Placeholder(models.Model):
 
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
+
+    def get_plugin_tree_order(self, language, parent_id=None):
+        """
+        Returns a list of plugin ids matching the given language
+        ordered by plugin position.
+        """
+        plugin_tree_order = (
+            self
+            .get_plugins(language)
+            .filter(parent=parent_id)
+            .order_by('position')
+            .values_list('pk', flat=True)
+        )
+        return list(plugin_tree_order)
 
     def get_vary_cache_on(self, request):
         """

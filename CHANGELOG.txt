@@ -27,6 +27,7 @@
 * Removed the deprecated ``add_url()``, ``edit_url()``, ``move_url()``, ``delete_url()``, ``copy_url()`` properties of
   CMSPlugin model.
 * Deprecated ``frontend_edit_template`` of CMSPluginBase.
+* Introduced placeholder operation signals.
 
 
 === 3.4.1 (2016-10-04) ===

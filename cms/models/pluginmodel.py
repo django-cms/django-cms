@@ -250,6 +250,23 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         self._inst = instance
         return self._inst, plugin
 
+    def get_bound_plugin(self, admin=None):
+        """
+        Returns an instance of the plugin model
+        configured for this plugin type.
+        """
+        if hasattr(self, "_inst"):
+            return self._inst
+
+        plugin = self.get_plugin_class()
+
+        if plugin.model != CMSPlugin:
+            self._inst = plugin.model.objects.get(cmsplugin_ptr=self)
+            self._inst._render_meta = self._render_meta
+        else:
+            self._inst = self
+        return self._inst
+
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         warnings.warn(
             "Method `render_plugin` will be removed in django CMS 3.5",
@@ -270,6 +287,16 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             placeholder=placeholder,
         )
         return content
+
+    def refresh_from_db(self, *args, **kwargs):
+        super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
+
+        try:
+            del self._inst
+        except AttributeError:
+            # Delete this internal cache to let the cms populate it
+            # on demand.
+            pass
 
     def get_media_path(self, filename):
         pages = self.placeholder.page_set.all()

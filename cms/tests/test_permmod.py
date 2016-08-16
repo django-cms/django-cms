@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils.http import urlencode
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
@@ -24,8 +23,7 @@ from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          PagePermission,
                                          GlobalPagePermission)
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
-                                      URL_CMS_PLUGIN_ADD, CMSTestCase)
+from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.i18n import force_language
@@ -146,12 +144,8 @@ class PermissionModeratorTests(CMSTestCase):
             post_data = {
                 'body': 'Test'
             }
-            url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
-                'plugin_language': 'en',
-                'placeholder_id': placeholder.pk,
-                'plugin_type': 'TextPlugin'
-            })
-            response = self.client.post(url, post_data)
+            endpoint = self.get_add_plugin_uri(placeholder, 'TextPlugin')
+            response = self.client.post(endpoint, post_data)
             self.assertEqual(response.status_code, 302)
             return response.content.decode('utf8')
 
@@ -435,8 +429,8 @@ class PermissionModeratorTests(CMSTestCase):
             plugin_data = {
                 'plugin_id': plugin.pk
             }
-            remove_url = URL_CMS_PLUGIN_REMOVE + "%s/" % plugin.pk
-            response = self.client.post(remove_url, plugin_data)
+            endpoint = self.get_delete_plugin_uri(plugin)
+            response = self.client.post(endpoint, plugin_data)
             self.assertEqual(response.status_code, 302)
 
             # there should only be a public plugin - since the draft has been deleted

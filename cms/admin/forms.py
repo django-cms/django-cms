@@ -751,6 +751,7 @@ class PluginAddValidationForm(forms.Form):
         required=False,
     )
     plugin_type = forms.CharField(required=True)
+    cms_path = forms.CharField(required=True)
 
     def clean_plugin_type(self):
         plugin_type = self.cleaned_data['plugin_type']
