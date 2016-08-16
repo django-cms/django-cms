@@ -8,7 +8,7 @@ window.CMS = window.CMS || CMS;
 CMS.Tooltip = Tooltip;
 
 
-describe('CMS.Messages', function () {
+describe('CMS.Tooltip', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
     it('creates a Tooltip class', function () {
@@ -135,7 +135,7 @@ describe('CMS.Messages', function () {
             expect(tooltip.body).not.toHandle('mousemove');
             expect(tooltip.position.calls.count()).toEqual(1);
             expect(tooltip.domElem).toHandle('touchstart');
-            var dblclick = spyOnEvent('.cms-plugin-1', 'dblclick.cms');
+            var dblclick = spyOnEvent(document, 'dblclick.cms');
 
             tooltip.domElem.trigger('touchstart');
             expect(dblclick).toHaveBeenTriggered();
