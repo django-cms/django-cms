@@ -3,6 +3,7 @@ import copy
 from collections import namedtuple
 import json
 import sys
+import uuid
 
 
 import django
@@ -35,6 +36,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.http import QueryDict
 
+from cms import operations
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import (
     AdvancedSettingsForm,
@@ -52,6 +54,7 @@ from cms.constants import (
 )
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
+from cms.signals import pre_obj_operation, post_obj_operation
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import permissions, get_language_from_request, copy_plugins
 from cms.utils import page_permissions
@@ -113,6 +116,26 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         url_patterns += super(PageAdmin, self).get_urls()
         return url_patterns
+
+    def _send_pre_page_operation(self, request, operation, **kwargs):
+        token = str(uuid.uuid4())
+        pre_obj_operation.send(
+            sender=self.__class__,
+            operation=operation,
+            request=request,
+            token=token,
+            **kwargs
+        )
+        return token
+
+    def _send_post_page_operation(self, request, operation, token, **kwargs):
+        post_obj_operation.send(
+            sender=self.__class__,
+            operation=operation,
+            request=request,
+            token=token,
+            **kwargs
+        )
 
     def save_model(self, request, obj, form, change):
         """
@@ -386,6 +409,22 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
+
+    def delete_model(self, request, obj):
+        operation_token = self._send_pre_page_operation(
+            request,
+            operation=operations.DELETE_PAGE,
+            obj=obj,
+        )
+
+        super(PageAdmin, self).delete_model(request, obj)
+
+        self._send_post_page_operation(
+            request,
+            operation=operations.DELETE_PAGE,
+            token=operation_token,
+            obj=obj,
+        )
 
     def get_copy_dialog(self, request, page_id):
         if not get_cms_setting('PERMISSION'):
@@ -697,7 +736,23 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                     force_text(_("Error! You don't have permissions to move "
                                  "this page. Please reload the page"))))
 
+        operation_token = self._send_pre_page_operation(
+            request,
+            operation=operations.MOVE_PAGE,
+            obj=page,
+        )
+
         page.move_page(tb_target, tb_position)
+
+        # Fetch updated tree attributes from the database
+        page.refresh_from_db()
+
+        self._send_post_page_operation(
+            request,
+            operation=operations.MOVE_PAGE,
+            token=operation_token,
+            obj=page,
+        )
         return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):
@@ -757,6 +812,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if not target_language or not target_language in get_language_list():
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
+
         for placeholder in placeholders:
             plugins = list(
                 placeholder.get_plugins(language=source_language).order_by('path'))
@@ -841,28 +897,69 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     @require_POST
     @transaction.atomic
     def publish_page(self, request, page_id, language):
+        all_published = True
+
         try:
-            page = Page.objects.get(id=page_id, publisher_is_draft=True)
+            page = Page.objects.get(
+                id=page_id,
+                title_set__language=language,
+                publisher_is_draft=True,
+            )
         except Page.DoesNotExist:
             page = None
-        # ensure user has permissions to publish this page
-        all_published = True
-        if page:
-            if not self.has_publish_permission(request, obj=page):
-                return HttpResponseForbidden(force_text(_("You do not have permission to publish this page")))
-            published = page.publish(language)
-            if not published:
-                all_published = False
+
         statics = request.GET.get('statics', '')
+
         if not statics and not page:
-            raise Http404("No page or stack found for publishing.")
+            raise Http404("No page or static placeholder found for publishing.")
+
+        # ensure user has permissions to publish this page
+        if page and not self.has_publish_permission(request, obj=page):
+            return HttpResponseForbidden(force_text(_("You do not have permission to publish this page")))
+
+        if page:
+            operation_token = self._send_pre_page_operation(
+                request,
+                operation=operations.PUBLISH_PAGE_TRANSLATION,
+                obj=page,
+                translation=page.get_title_obj(language=language),
+            )
+            all_published = page.publish(language)
+            page = page.reload()
+            self._send_post_page_operation(
+                request,
+                operation=operations.PUBLISH_PAGE_TRANSLATION,
+                token=operation_token,
+                obj=page,
+                translation=page.get_title_obj(language=language),
+            )
+
         if statics:
-            static_ids = statics .split(',')
-            for pk in static_ids:
-                static_placeholder = StaticPlaceholder.objects.get(pk=pk)
+            static_ids = statics.split(',')
+            static_placeholders = StaticPlaceholder.objects.filter(pk__in=static_ids)
+
+            for static_placeholder in static_placeholders.iterator():
+                # TODO: Maybe only send one signal...
+                # this would break the obj signal format though
+                operation_token = self._send_pre_page_operation(
+                    request,
+                    operation=operations.PUBLISH_STATIC_PLACEHOLDER,
+                    obj=static_placeholder,
+                    target_language=language,
+                )
+
                 published = static_placeholder.publish(request, language)
+
+                self._send_post_page_operation(
+                    request,
+                    operation=operations.PUBLISH_STATIC_PLACEHOLDER,
+                    token=operation_token,
+                    obj=static_placeholder,
+                    target_language=language,
+                )
                 if not published:
                     all_published = False
+
         if page:
             if all_published:
                 if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
@@ -1008,6 +1105,13 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             if perms_needed:
                 raise PermissionDenied
 
+            operation_token = self._send_pre_page_operation(
+                request,
+                operation=operations.DELETE_PAGE_TRANSLATION,
+                obj=obj,
+                translation=titleobj,
+            )
+
             message = _('Title and plugins with language %(language)s was deleted') % {
                 'language': force_text(get_language_object(language)['name'])
             }
@@ -1022,6 +1126,14 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
             if public:
                 public.save()
+
+            self._send_post_page_operation(
+                request,
+                operation=operations.DELETE_PAGE_TRANSLATION,
+                token=operation_token,
+                obj=obj,
+                translation=titleobj,
+            )
 
             if not self.has_change_permission(request, None):
                 return HttpResponseRedirect(admin_reverse('index'))

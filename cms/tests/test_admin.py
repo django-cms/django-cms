@@ -405,10 +405,10 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(ph.get_plugins('en').count(), 3)
 
         admin_user, staff = self._get_guys()
+        endpoint = self.get_clear_placeholder_url(ph, language='en')
 
         with self.login_user_context(admin_user):
-            url = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
-            response = self.client.post(url, {'test': 0})
+            response = self.client.post(endpoint, {'test': 0})
 
         self.assertEqual(response.status_code, 302)
 
@@ -438,9 +438,10 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(ph.get_plugins('de').count(), 3)
 
         admin_user, staff = self._get_guys()
+        endpoint = self.get_clear_placeholder_url(ph, language='de')
+
         with self.login_user_context(admin_user):
-            url = '%s?language=de' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
-            response = self.client.post(url, {'test': 0})
+            response = self.client.post(endpoint, {'test': 0})
 
         self.assertEqual(response.status_code, 302)
 
@@ -567,8 +568,8 @@ class AdminTests(AdminTestsBase):
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
-            request = self.get_request()
-            response = self.admin_class.delete_plugin(request, plugin.pk)
+            endpoint = self.get_delete_plugin_uri(plugin)
+            response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
     def test_move_plugin(self):
@@ -589,37 +590,65 @@ class AdminTests(AdminTestsBase):
         placeholder = Placeholder.objects.all()[0]
         permless = self.get_permless()
         admin_user = self.get_admin()
+
+        move_plugin_endpoint = self.get_move_plugin_uri(plugin)
+        move_page_plugin_endpoint = self.get_move_plugin_uri(pageplugin)
+
         with self.login_user_context(permless):
-            request = self.get_request()
-            response = self.admin_class.move_plugin(request)
+            response = self.client.get(move_plugin_endpoint)
             self.assertEqual(response.status_code, 405)
-            request = self.get_request(post_data={'not_usable': '1'})
-            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.client.post, move_plugin_endpoint, {'not_usable': '1'})
+
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'ids': plugin.pk})
-            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.client.post, move_plugin_endpoint, {'ids': plugin.pk})
+
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': 'invalid-placeholder', 'plugin_language': 'en'})
-            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
+            data = {
+                'plugin_id': pageplugin.pk,
+                'placeholder_id': 'invalid-placeholder',
+                'plugin_language': 'en',
+            }
+            self.assertRaises(RuntimeError, self.client.post, move_page_plugin_endpoint, data)
+
         with self.login_user_context(permless):
-            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
-            self.assertEqual(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
+            data = {
+                'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.pk,
+                'plugin_parent': '',
+                'plugin_language': 'en',
+            }
+            response = self.client.post(move_page_plugin_endpoint, data)
+            self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
-            response = self.admin_class.move_plugin(request)
+            data = {
+                'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.pk,
+                'plugin_parent': '',
+                'plugin_language': 'en',
+            }
+            response = self.client.post(move_page_plugin_endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(json.loads(response.content.decode('utf8')), expected)
+
         with self.login_user_context(permless):
-            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
-            self.assertEqual(self.admin_class.move_plugin(request).status_code, HttpResponseForbidden.status_code)
+            data = {
+                'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.id,
+                'plugin_parent': '',
+                'plugin_language': 'en',
+            }
+            response = self.client.post(move_page_plugin_endpoint, data)
+            self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id, 'plugin_parent': '', 'plugin_language': 'en'})
-            response = self.admin_class.move_plugin(request)
+            data = {
+                'plugin_id': pageplugin.pk,
+                'placeholder_id': placeholder.id,
+                'plugin_parent': '',
+                'plugin_language': 'en',
+            }
+            response = self.client.post(move_page_plugin_endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
@@ -632,13 +661,14 @@ class AdminTests(AdminTestsBase):
 
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={
+            data = {
                 'plugin_id': sub_col.pk,
                 'placeholder_id': source.id,
                 'plugin_parent': col2.pk,
                 'plugin_language': 'de'
-            })
-            response = self.admin_class.move_plugin(request)
+            }
+            endpoint = self.get_move_plugin_uri(sub_col)
+            response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
         sub_col = CMSPlugin.objects.get(pk=sub_col.pk)
         self.assertEqual(sub_col.language, "de")

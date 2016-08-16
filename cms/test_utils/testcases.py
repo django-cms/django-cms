@@ -506,14 +506,108 @@ class BaseCMSTestCase(object):
         )
         return page
 
-    def get_add_plugin_uri(self, placeholder, plugin_type, language='en'):
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None):
+        if placeholder.page:
+            path = placeholder.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
         endpoint = placeholder.get_add_url()
-        uri = endpoint + '?' + urlencode({
+        data = {
             'plugin_type': plugin_type,
             'placeholder_id': placeholder.pk,
             'plugin_language': language,
+            'cms_path': path,
+        }
+
+        if parent:
+            data['plugin_parent'] = parent.pk
+        return endpoint + '?' + urlencode(data)
+
+    def get_change_plugin_uri(self, plugin, container=None, language=None):
+        container = container or Page
+        language = language or 'en'
+
+        if plugin.page:
+            path = plugin.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
+        endpoint = self.get_admin_url(container, 'edit_plugin', plugin.pk)
+        endpoint += '?' + urlencode({'cms_path': path})
+        return endpoint
+
+    def get_move_plugin_uri(self, plugin, container=None, language=None):
+        container = container or Page
+        language = language or 'en'
+
+        if plugin.page:
+            path = plugin.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
+        endpoint = self.get_admin_url(container, 'move_plugin')
+        endpoint += '?' + urlencode({'cms_path': path})
+        return endpoint
+
+    def get_copy_plugin_uri(self, plugin, container=None, language=None):
+        container = container or Page
+        language = language or 'en'
+
+        if plugin.page:
+            path = plugin.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
+        endpoint = self.get_admin_url(container, 'copy_plugins')
+        endpoint += '?' + urlencode({'cms_path': path})
+        return endpoint
+
+    def get_copy_placeholder_uri(self, placeholder, container=None, language=None):
+        container = container or Page
+        language = language or 'en'
+
+        if placeholder.page:
+            path = placeholder.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
+        endpoint = self.get_admin_url(container, 'copy_plugins')
+        endpoint += '?' + urlencode({'cms_path': path})
+        return endpoint
+
+    def get_delete_plugin_uri(self, plugin, container=None, language=None):
+        container = container or Page
+        language = language or 'en'
+
+        if plugin.page:
+            path = plugin.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
+        endpoint = self.get_admin_url(container, 'delete_plugin', plugin.pk)
+        endpoint += '?' + urlencode({'cms_path': path})
+        return endpoint
+
+    def get_clear_placeholder_url(self, placeholder, container=None, language=None):
+        container = container or Page
+        language = language or 'en'
+
+        if placeholder.page:
+            path = placeholder.page.get_absolute_url(language)
+        else:
+            path = '/{}/'.format(language)
+
+        endpoint = self.get_admin_url(
+            container,
+            'clear_placeholder',
+            placeholder.pk,
+        )
+        endpoint += '?' + urlencode({
+            'language': language,
+            'cms_path': path,
         })
-        return uri
+        return endpoint
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):

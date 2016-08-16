@@ -13,6 +13,7 @@ from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext, ugettext_lazy as _
 
+from cms import operations
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
@@ -122,7 +123,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     action_options = {
         PLUGIN_MOVE_ACTION: {
-            'requires_reload': False
+            'requires_reload': True
         },
         PLUGIN_COPY_ACTION: {
             'requires_reload': True
@@ -141,6 +142,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # certain values when the form is saved.
         # Currently this only happens on plugin creation.
         self._cms_initial_attributes = {}
+        self._operation_token = None
 
     def _get_render_template(self, context, instance, placeholder):
         if hasattr(self, 'get_render_template'):
@@ -269,6 +271,27 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         This have to be made, because if object is newly created, he must know
         where he lives.
         """
+        pl_admin = obj.placeholder._get_attached_admin()
+
+        if pl_admin:
+            operation_kwargs = {
+                'request': request,
+                'placeholder': obj.placeholder,
+            }
+
+            if change:
+                operation_kwargs['old_plugin'] = self.model.objects.get(pk=obj.pk)
+                operation_kwargs['new_plugin'] = obj
+                operation_kwargs['operation'] = operations.CHANGE_PLUGIN
+            else:
+                parent_id = obj.parent.pk if obj.parent else None
+                tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
+                operation_kwargs['plugin'] = obj
+                operation_kwargs['operation'] = operations.ADD_PLUGIN
+                operation_kwargs['tree_order'] = tree_order
+            # Remember the operation token
+            self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
+
         # remember the saved object
         self.saved_object = obj
         return super(CMSPluginBase, self).save_model(request, obj, form, change)

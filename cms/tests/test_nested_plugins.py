@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 
@@ -10,7 +9,6 @@ from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
-from cms.test_utils.testcases import URL_CMS_PLUGIN_PAGE_MOVE, URL_CMS_PLUGIN_PAGE_ADD
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import force_language
@@ -947,7 +945,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
                     'urls': action_urls,
                 }
-                edit_url = URL_CMS_PLUGIN_PAGE_MOVE % page_one.id
+                edit_url = self.get_move_plugin_uri(text_plugin_two)
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(json.loads(response.content.decode('utf8')), expected)
@@ -1100,16 +1098,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 'name': 'test',
                 'url': 'http://www.example.org/'
             }
-            get_data = {
-                'placeholder_id': page_one_ph_one.id,
-                'plugin_type': 'LinkPlugin',
-                'plugin_language': 'en',
-                'plugin_parent': text_plugin_en.pk,
-
-            }
-            add_url = URL_CMS_PLUGIN_PAGE_ADD % page_one.pk + '?' + urlencode(
-                get_data
-            )
+            add_url = self.get_add_plugin_uri(page_one_ph_one, 'LinkPlugin', parent=text_plugin_en)
             response = self.client.post(add_url, post_data)
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(

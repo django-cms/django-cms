@@ -920,7 +920,6 @@ class PageTest(PageTestBase):
             self.assertNotIn('<li>\nGamma\n</li>', content)
 
     def test_global_limit_on_plugin_move(self):
-        admin = self.get_admin()
         superuser = self.get_superuser()
         cms_page = self.get_page()
         source_placeholder = cms_page.placeholders.get(slot='right-column')
@@ -935,22 +934,21 @@ class PageTest(PageTestBase):
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(
-                    {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # first
+                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
+                endpoint = self.get_move_plugin_uri(plugin_1)
+                response = self.client.post(endpoint, data) # first
                 self.assertEqual(response.status_code, 200)
-                request = self.get_post_request(
-                    {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # second
+                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
+                endpoint = self.get_move_plugin_uri(plugin_2)
+                response = self.client.post(endpoint, data) # second
                 self.assertEqual(response.status_code, 200)
-                request = self.get_post_request(
-                    {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # third
+                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk, 'plugin_parent': ''}
+                endpoint = self.get_move_plugin_uri(plugin_3)
+                response = self.client.post(endpoint, data) # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
     def test_type_limit_on_plugin_move(self):
-        admin = self.get_admin()
         superuser = self.get_superuser()
         cms_page = self.get_page()
         source_placeholder = cms_page.placeholders.get(slot='right-column')
@@ -964,13 +962,13 @@ class PageTest(PageTestBase):
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(
-                    {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # first
+                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
+                endpoint = self.get_move_plugin_uri(plugin_1)
+                response = self.client.post(endpoint, data) # first
                 self.assertEqual(response.status_code, 200)
-                request = self.get_post_request(
-                    {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''})
-                response = admin.move_plugin(request) # second
+                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
+                endpoint = self.get_move_plugin_uri(plugin_1)
+                response = self.client.post(endpoint, data) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
@@ -2081,7 +2079,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_change_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -2106,7 +2104,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_change_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -2130,7 +2128,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_link')
@@ -2153,7 +2151,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_link')
@@ -2175,7 +2173,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'move_plugin')
+        endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -2205,7 +2203,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'move_plugin')
+        endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -2235,7 +2233,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
         translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -2273,7 +2271,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
         translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -2378,7 +2376,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.placeholders.get(slot='body')
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=True)
@@ -2397,7 +2395,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.placeholders.get(slot='body')
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=False)
@@ -2419,7 +2417,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self._add_plugin_to_page(page, 'LinkPlugin'),
         ]
         placeholder = plugins[0].placeholder
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'delete_text')
         self.add_permission(staff_user, 'delete_link')
@@ -2445,7 +2443,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self._add_plugin_to_page(page, 'LinkPlugin'),
         ]
         placeholder = plugins[0].placeholder
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'delete_text')
         self.add_permission(staff_user, 'delete_link')
@@ -3481,7 +3479,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_change_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -3510,7 +3508,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_change_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -3538,7 +3536,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_link')
@@ -3565,7 +3563,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_link')
@@ -3591,7 +3589,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'move_plugin')
+        endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -3625,7 +3623,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
-        endpoint = self.get_admin_url(Page, 'move_plugin')
+        endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -3659,7 +3657,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
         translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -3701,7 +3699,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         plugin = self._add_plugin_to_page(page)
         translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = page.placeholders.get(slot='right-column')
 
@@ -3817,7 +3815,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.placeholders.get(slot='body')
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=True)
@@ -3835,7 +3833,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.placeholders.get(slot='body')
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=False)
@@ -3857,7 +3855,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
             self._add_plugin_to_page(page, 'LinkPlugin'),
         ]
         placeholder = plugins[0].placeholder
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'delete_text')
         self.add_permission(staff_user, 'delete_link')
@@ -3883,7 +3881,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
             self._add_plugin_to_page(page, 'LinkPlugin'),
         ]
         placeholder = plugins[0].placeholder
-        endpoint = self.get_admin_url(Page, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'delete_text')
         self.add_permission(staff_user, 'delete_link')

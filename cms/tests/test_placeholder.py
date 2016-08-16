@@ -159,11 +159,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
         ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
-        response = self.client.post(admin_reverse('placeholderapp_twoplaceholderexample_move_plugin'), {
+
+        data = {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
             'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
-        })
+        }
+        endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)
+
+        response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
@@ -258,10 +262,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ###
         test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
         test_plugin.save()
-        pl_url = "%sedit-plugin/%s/" % (
-            admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
-            test_plugin.pk)
-        response = self.client.post(pl_url, {})
+        endpoint = self.get_change_plugin_uri(test_plugin, container=Example1)
+        response = self.client.post(endpoint, {})
         self.assertContains(response, "CMS.API.Helpers.onPluginSave")
 
     @override_settings(CMS_PERMISSION=False)
@@ -277,10 +279,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ###
         test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
         test_plugin.save()
-        pl_url = "%sedit-plugin/%s/" % (
-            admin_reverse('cms_page_change', args=(page.pk,)),
-            test_plugin.pk)
-        response = self.client.post(pl_url, {})
+
+        endpoint = self.get_change_plugin_uri(test_plugin)
+        response = self.client.post(endpoint, {})
         self.assertContains(response, "CMS.API.Helpers.onPluginSave")
 
     def test_placeholder_scanning_fail(self):

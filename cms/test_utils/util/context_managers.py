@@ -147,3 +147,28 @@ def apphooks(*hooks):
         apphook_pool.apphooks = _apphooks
         apphook_pool.apps = _apps
         apphook_pool.discovered = _discovered
+
+
+@contextmanager
+def signal_tester(*signals):
+    env = SignalTester()
+
+    for signal in signals:
+        signal.connect(env, weak=True)
+
+    try:
+        yield env
+    finally:
+        for signal in signals:
+            signal.disconnect(env, weak=True)
+
+
+class SignalTester(object):
+
+    def __init__(self):
+        self.call_count = 0
+        self.calls = []
+
+    def __call__(self, *args, **kwargs):
+        self.call_count += 1
+        self.calls.append((args, kwargs))

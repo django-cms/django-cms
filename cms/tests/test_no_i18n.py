@@ -3,7 +3,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches
 from django.template import Template
-from django.utils.http import urlencode
 from django.test import RequestFactory
 from django.test.utils import override_settings
 
@@ -13,8 +12,7 @@ from cms.api import create_page
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, CMSPlugin
 from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT,
-                                      URL_CMS_PLUGIN_ADD,
+                                      URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting
@@ -156,26 +154,21 @@ class TestNoI18N(CMSTestCase):
         self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
         page = Page.objects.all()[0]
 
-        get_params = {
-            'plugin_type': "LinkPlugin",
-            'plugin_language': "en-us",
-            'placeholder_id': page.placeholders.get(slot="body").pk,
-        }
+        placeholder = page.placeholders.get(slot="body")
         data = {'name': 'Hello', 'url': 'http://www.example.org/'}
-        add_url = URL_CMS_PLUGIN_ADD[3:] + '?' + urlencode(
-            get_params
-        )
+        add_url = self.get_add_plugin_uri(placeholder, 'LinkPlugin', 'en-us')
+
         response = self.client.post(add_url, data)
         self.assertEqual(response.status_code, 200)
-        created_plugin_id = CMSPlugin.objects.all()[0].pk
+        created_plugin = CMSPlugin.objects.all()[0]
         # now edit the plugin
-        edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
+        edit_url = self.get_change_plugin_uri(created_plugin)
         response = self.client.get(edit_url)
         self.assertEqual(response.status_code, 200)
         data['name'] = 'Hello World'
         response = self.client.post(edit_url, data)
         self.assertEqual(response.status_code, 200)
-        link = Link.objects.get(pk=created_plugin_id)
+        link = Link.objects.get(pk=created_plugin.pk)
         self.assertEqual("Hello World", link.name)
 
     def test_toolbar_no_locale(self):
