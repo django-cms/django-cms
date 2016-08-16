@@ -48,6 +48,7 @@ describe('CMS.Plugin', function () {
 
     afterEach(function () {
         Plugin.aliasPluginDuplicatesMap = {};
+        $(document).off('dblclick.cms.plugin pointerover.cms.plugin pointerout.cms.plugin');
     });
 
     describe('instance', function () {

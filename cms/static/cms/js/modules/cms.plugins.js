@@ -225,26 +225,33 @@ var Plugin = new Class({
         this.ui.dragitem.on(this.doubleClick, dblClickHandler);
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
-            this.ui.container.on(this.doubleClick, dblClickHandler);
-            this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
-                // required for both, click and touch
-                // otherwise propagation won't work to the nested plugin
-                e.stopPropagation();
-                if (e.type === 'touchstart') {
-                    CMS.API.Tooltip._forceTouchOnce();
+            // have to delegate here because there might be plugins that
+            // have their content replaced by something dynamic. in case that tool
+            // copies the classes - double click to edit would still work
+            doc.on(this.doubleClick, '.cms-plugin-' + this.options.plugin_id, dblClickHandler);
+            doc.on(
+                this.pointerOverAndOut + ' ' + this.touchStart,
+                '.cms-plugin-' + this.options.plugin_id,
+                function (e) {
+                    // required for both, click and touch
+                    // otherwise propagation won't work to the nested plugin
+                    e.stopPropagation();
+                    if (e.type === 'touchstart') {
+                        CMS.API.Tooltip._forceTouchOnce();
+                    }
+                    var name = that.options.plugin_name;
+                    var id = that.options.plugin_id;
+
+                    var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+                    var placeholder = $('.cms-placeholder-' + placeholderId);
+
+                    if (placeholder.length && placeholder.data('cms')) {
+                        name = placeholder.data('cms').name + ': ' + name;
+                    }
+
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
                 }
-                var name = that.options.plugin_name;
-                var id = that.options.plugin_id;
-
-                var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
-                var placeholder = $('.cms-placeholder-' + placeholderId);
-
-                if (placeholder.length && placeholder.data('cms')) {
-                    name = placeholder.data('cms').name + ': ' + name;
-                }
-
-                CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
-            });
+            );
         }
 
         // adds listener for all plugin updates
