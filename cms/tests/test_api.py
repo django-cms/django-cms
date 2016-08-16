@@ -1,11 +1,9 @@
 import sys
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.template import TemplateDoesNotExist
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -15,7 +13,6 @@ from menus.menu_pool import menu_pool
 from cms.api import (
     generate_valid_slug,
     create_page,
-    create_title,
     _verify_plugin_type,
     assign_user_to_page,
     publish_page,
