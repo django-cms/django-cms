@@ -1,13 +1,14 @@
 {% load i18n cms_admin admin_urls %}
 
 {# INFO: columns are defined in base.html options #}
+{% page_has_restrictions page as page_is_restricted %}
 {% spaceless %}
 <li class="cms-tree-node {{ css_class }}
     {% if page.pk in open_nodes %} jstree-open{% elif children %} jstree-closed{% endif %}
     {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
     {% if page.level == 0 %} cms-tree-node-top{% endif %}
     {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
-    {% if not CMS_PERMISSION or has_add_permission %} cms-tree-node-root-allow-children{% endif %}
+    {% if has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     "
     {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
@@ -69,8 +70,8 @@
     data-col{{ lang|lower|cut:'-' }}='
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
-                <div class="cms-tree-item-inner cms-pagetree-dropdown{% if has_change_permission and has_publish_permission %} js-cms-pagetree-dropdown{% endif %}">
-                    {% if has_change_permission and has_publish_permission %}
+                <div class="cms-tree-item-inner cms-pagetree-dropdown{% if has_publish_permission %} js-cms-pagetree-dropdown{% endif %}">
+                    {% if has_publish_permission %}
                         <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
                             class="cms-pagetree-dropdown-trigger js-cms-pagetree-dropdown-trigger"
                             {# INFO: delegate click event to parent window when in sideframe #}
@@ -168,7 +169,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
+                {% if has_add_page_permission %}
                     <div class="cms-tree-item cms-tree-item-button">
                         <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                             data-cms-tooltip="{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}">
@@ -218,7 +219,7 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if has_change_permission %}
+                            {% if has_change_advanced_settings_permission %}
                                 <li>
                                     <a href="{% url 'admin:cms_page_advanced' page.id %}" title="{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}">
                                         <span class="cms-icon cms-icon-cogs"></span>
@@ -235,9 +236,9 @@
                                 {% if page.publication_end_date %}
                                     <p title="{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}: {{ page.publication_end_date|date:"Y-m-d" }}"><strong>{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
                                 {% endif %}
-                                <p title="{% filter escapejs %}{% trans "is restricted" %}: {% if page|is_restricted:request %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}{% endfilter %}">
+                                <p title="{% filter escapejs %}{% trans "is restricted" %}: {% if page_is_restricted %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}{% endfilter %}">
                                     <strong>{% filter escapejs %}{% trans "is restricted" %}{% endfilter %}:</strong>
-                                    {% if page|is_restricted:request %}
+                                    {% if page_is_restricted %}
                                         {% filter escapejs %}{% trans "Yes" %}{% endfilter %}
                                     {% else %}
                                         {% filter escapejs %}{% trans "No" %}{% endfilter %}
@@ -272,7 +273,7 @@
     {% if page.pk in open_nodes and children %}
         <ul>
             {% for child in children %}
-                {% show_lazy_admin_menu child %}
+                {% show_admin_menu child %}
             {% endfor %}
         </ul>
     {% endif %}

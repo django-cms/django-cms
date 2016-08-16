@@ -5,9 +5,7 @@ import warnings
 from datetime import datetime, timedelta
 
 from django.contrib import admin
-from django.contrib.auth import get_permission_codename
 from django.db import models
-from django.db.models import ManyToManyField
 from django.template.defaultfilters import title
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
@@ -115,37 +113,85 @@ class Placeholder(models.Model):
             model_name = model.__name__.lower()
             return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
-    def _has_permission(self, user, key):
+    def has_change_permission(self, user):
         """
         Returns True if user has permission
-        to change all objects attached to this placeholder.
+        to change all models attached to this placeholder.
         """
+        from cms.utils.permissions import get_model_permission_codename
+
         if user.is_superuser:
             return True
 
-        objects = [self.page] if self.page else self._get_attached_objects()
+        attached_models = self._get_attached_models()
 
-        if not objects:
+        if not attached_models:
             return False
 
-        get_permission = self._get_object_permission
-        return all(get_permission(obj, user, 'change') for obj in objects)
+        attached_objects = self._get_attached_objects()
 
-    def _get_object_permission(self, obj, user, key):
-        opts = obj._meta
-        perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
-        return user.has_perm(perm_code) or user.has_perm(perm_code, obj)
+        for obj in attached_objects:
+            try:
+                perm = obj.has_placeholder_change_permission(user)
+            except AttributeError:
+                model = type(obj)
+                change_perm = get_model_permission_codename(model, 'change')
+                perm = user.has_perm(change_perm)
 
-    def has_change_permission(self, request):
-        return self._has_permission(request.user, 'change')
+            if not perm:
+                return False
+        return True
 
-    def has_add_permission(self, request):
-        return self._has_permission(request.user, 'add')
+    def has_add_plugin_permission(self, user, plugin_type):
+        if not permissions.has_plugin_permission(user, plugin_type, "add"):
+            return False
 
-    def has_delete_permission(self, request):
-        return self._has_permission(request.user, 'delete')
+        if not self.has_change_permission(user):
+            return False
+        return True
+
+    def has_add_plugins_permission(self, user, plugins):
+        if not self.has_change_permission(user):
+            return False
+
+        for plugin in plugins:
+            if not permissions.has_plugin_permission(user, plugin.plugin_type, "add"):
+                return False
+        return True
+
+    def has_change_plugin_permission(self, user, plugin):
+        if not permissions.has_plugin_permission(user, plugin.plugin_type, "change"):
+            return False
+
+        if not self.has_change_permission(user):
+            return False
+        return True
+
+    def has_delete_plugin_permission(self, user, plugin):
+        if not permissions.has_plugin_permission(user, plugin.plugin_type, "delete"):
+            return False
+
+        if not self.has_change_permission(user):
+            return False
+        return True
+
+    def has_move_plugin_permission(self, user, plugin, target_placeholder):
+        if not permissions.has_plugin_permission(user, plugin.plugin_type, "change"):
+            return False
+
+        if not target_placeholder.has_change_permission(user):
+            return False
+
+        if self != target_placeholder and not self.has_change_permission(user):
+            return False
+        return True
 
     def has_clear_permission(self, user, languages):
+        if not self.has_change_permission(user):
+            return False
+        return self.has_delete_plugins_permission(user, languages)
+
+    def has_delete_plugins_permission(self, user, languages):
         plugin_types = (
             self
             .cmsplugin_set
@@ -154,6 +200,8 @@ class Placeholder(models.Model):
             .exclude(plugin_type='PlaceholderPlugin')
             .values_list('plugin_type', flat=True)
             .distinct()
+            # remove default ordering
+            .order_by()
         )
 
         has_permission = permissions.has_plugin_permission
@@ -193,11 +241,11 @@ class Placeholder(models.Model):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        return list(obj for obj in fields)
 
     def _get_attached_fields(self):
         """
-        Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
+        Returns an ITERATOR of all non-cmsplugin reverse related fields.
         """
         from cms.models import CMSPlugin, UserSettings
         if not hasattr(self, '_attached_fields_cache'):

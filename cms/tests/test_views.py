@@ -258,7 +258,7 @@ class ContextTests(CMSTestCase):
 
         # Number of queries when context processors is enabled
         with self.settings(**original_context):
-            with self.assertNumQueries(FuzzyInt(13, 25)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 26)) as context:
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)

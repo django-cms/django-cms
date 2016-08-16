@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.api import get_page_draft
 from cms.test_utils.project.extensionapp.models import MyTitleExtension, MyPageExtension
-from cms.utils import get_cms_setting
-from cms.utils.permissions import has_page_change_permission
+from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
@@ -21,14 +20,7 @@ class MyTitleExtensionToolbar(CMSToolbar):
             # Nothing to do
             return
 
-        # check global permissions if CMS_PERMISSION is active
-        if get_cms_setting('PERMISSION'):
-            has_global_current_page_change_permission = has_page_change_permission(self.request)
-        else:
-            has_global_current_page_change_permission = False
-            # check if user has page edit permission
-        can_change = self.request.current_page and self.request.current_page.has_change_permission(self.request)
-        if has_global_current_page_change_permission or can_change:
+        if user_can_change_page(self.request.user, page=self.page):
             try:
                 mytitleextension = MyTitleExtension.objects.get(extended_object_id=self.page.id)
             except MyTitleExtension.DoesNotExist:
@@ -59,14 +51,7 @@ class MyPageExtensionToolbar(CMSToolbar):
             # Nothing to do
             return
 
-        # check global permissions if CMS_PERMISSION is active
-        if get_cms_setting('PERMISSION'):
-            has_global_current_page_change_permission = has_page_change_permission(self.request)
-        else:
-            has_global_current_page_change_permission = False
-            # check if user has page edit permission
-        can_change = self.request.current_page and self.request.current_page.has_change_permission(self.request)
-        if has_global_current_page_change_permission or can_change:
+        if user_can_change_page(self.request.user, page=self.page):
             try:
                 mypageextension = MyPageExtension.objects.get(extended_object_id=self.page.id)
             except MyPageExtension.DoesNotExist:

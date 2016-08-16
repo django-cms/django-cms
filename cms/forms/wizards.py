@@ -19,6 +19,10 @@ from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
+from cms.utils.page_permissions import (
+    user_can_add_page,
+    user_can_add_subpage,
+)
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 
@@ -28,51 +32,6 @@ try:
     text_widget = TextEditorWidget
 except ImportError:
     text_widget = forms.Textarea
-
-
-def user_has_view_permission(user, page=None):
-    """
-    This code largely duplicates Page.has_view_permission(). We do this because
-    the source method requires a request object, which isn't appropriate in
-    this case. Fortunately, the source method (and its dependencies) use the
-    request object only to get the user object, when it isn't explicitly
-    provided and for caching permissions. We don't require caching here and we
-    can explicitly provide the user object.
-    """
-    if not user:
-        return False
-
-    class FakeRequest(object):
-        pass
-    fake_request = FakeRequest()
-
-    can_see_unrestricted = get_cms_setting('PUBLIC_FOR') == 'all' or (
-        get_cms_setting('PUBLIC_FOR') == 'staff' and user.is_staff)
-
-    # Inherited and direct view permissions
-    is_restricted = bool(
-        permissions.get_any_page_view_permissions(fake_request, page))
-
-    if not is_restricted and can_see_unrestricted:
-        return True
-    elif not user.is_authenticated():
-        return False
-
-    if not is_restricted:
-        # a global permission was given to the request's user
-        if permissions.has_global_page_permission(
-                fake_request, page.site_id, user=user, can_view=True):
-            return True
-    else:
-        # a specific permission was granted to the request's user
-        if page.get_draft_object().has_generic_permission(
-                fake_request, "view", user=user):
-            return True
-
-    # The user has a normal django permission to view pages globally
-    opts = page._meta
-    codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-    return user.has_perm(codename)
 
 
 class PageTypeSelect(forms.widgets.Select):
@@ -203,7 +162,6 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
-        from cms.utils.permissions import has_page_add_permission
 
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
@@ -214,22 +172,24 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             sub_page = False
 
-        if self.page:
-            if sub_page:
-                parent = self.page
-                position = "last-child"
-            else:
-                parent = self.page.parent
-                position = "right"
+        if self.page and sub_page:
+            # User is adding a page which will be a direct
+            # child of the current page.
+            position = 'last-child'
+            parent = self.page
+            has_perm = user_can_add_subpage(self.user, target=parent)
+        elif self.page and self.page.parent_id:
+            # User is adding a page which will be a right
+            # sibling to the current page.
+            position = 'last-child'
+            parent = self.page.parent
+            has_perm = user_can_add_subpage(self.user, target=parent)
         else:
             parent = None
-            position = "last-child"
+            position = 'last-child'
+            has_perm = user_can_add_page(self.user)
 
-        # Before we do this, verify this user has perms to do so.
-        if not (self.user.is_superuser or
-                has_page_add_permission(self.user, self.page,
-                                             position=position,
-                                             site=self.page.site)):
+        if not has_perm:
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
 
@@ -240,6 +200,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
             language=self.language_code,
             created_by=smart_text(self.user),
             parent=parent,
+            position=position,
             in_navigation=True,
             published=False
         )
@@ -252,7 +213,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
         if copy_target:
             # If the user selected a page type, copy that.
-            if not user_has_view_permission(self.user, copy_target):
+            if not copy_target.has_view_permission(self.user):
                 raise PermissionDenied()
 
             # Copy page attributes

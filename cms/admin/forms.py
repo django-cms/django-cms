@@ -5,7 +5,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db.models.fields import BooleanField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
@@ -14,20 +13,22 @@ from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import PluginLimitReached
-from cms.constants import PAGE_TYPES_ID
+from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (CMSPlugin, Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title,
+from cms.models import (CMSPlugin, Page, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, EmptyTitle, GlobalPagePermission)
 from cms.plugin_pool import plugin_pool
-from cms.utils.compat.forms import UserCreationForm
+from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_object, get_language_tuple
-from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import is_valid_url
-from cms.utils.permissions import (get_current_user, get_subordinate_users,
-                                   get_subordinate_groups,
-                                   get_user_permission_level)
+from cms.utils.permissions import (
+    get_current_user,
+    get_subordinate_users,
+    get_subordinate_groups,
+    get_user_permission_level,
+)
 from menus.menu_pool import menu_pool
 
 
@@ -62,6 +63,17 @@ def save_permissions(data, obj):
                 permission_accessor.add(permission)
             else:
                 permission_accessor.remove(permission)
+
+
+class CopyPermissionForm(forms.Form):
+    """
+    Holds the specific field for permissions
+    """
+    copy_permissions = forms.BooleanField(
+        label=_('Copy permissions'),
+        required=False,
+        initial=True,
+    )
 
 
 class PageForm(forms.ModelForm):
@@ -418,24 +430,42 @@ class AdvancedSettingsForm(forms.ModelForm):
 
 
 class PagePermissionForm(forms.ModelForm):
+
     class Meta:
         model = Page
         fields = ['login_required', 'limit_visibility_in_menu']
 
 
-class PagePermissionInlineAdminForm(forms.ModelForm):
+class BasePermissionAdminForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(BasePermissionAdminForm, self).__init__(*args, **kwargs)
+        permission_fields = self._meta.model.get_all_permissions()
+
+        for field in permission_fields:
+            if field not in self.base_fields:
+                setattr(self.instance, field, False)
+
+
+class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     """
     Page permission inline admin form used in inline admin. Required, because
     user and group queryset must be changed. User can see only users on the same
-    level or under him in choosen page tree, and users which were created by him,
+    level or under him in chosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
-    page = forms.ModelChoiceField(Page.objects.all(), label=_('user'), widget=HiddenInput(), required=True)
+    page = forms.ModelChoiceField(
+        queryset=Page.objects.all(),
+        label=_('user'),
+        widget=HiddenInput(),
+        required=True,
+    )
 
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdminForm, self).__init__(*args, **kwargs)
         user = get_current_user() # current user from threadlocals
-        sub_users = get_subordinate_users(user)
+        site = Site.objects.get_current()
+        sub_users = get_subordinate_users(user, site)
 
         limit_choices = True
         use_raw_id = False
@@ -451,7 +481,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
                 # raw id field with limit_choices_to
                 limit_choices = True
                 use_raw_id = True
-            elif get_user_permission_level(user) == 0:
+            elif get_user_permission_level(user, site) == ROOT_USER_LEVEL:
                 # If there are enough choices to possibly cause a 414 request
                 # URI too large error, we only proceed with the raw id field if
                 # the user is a superuser & thus can legitimately circumvent
@@ -477,68 +507,51 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             self.fields['user'].queryset = sub_users
             self.fields['user'].widget.user = user # assign current user
 
-        self.fields['group'].queryset = get_subordinate_groups(user)
-
-    def clean(self):
-        super(PagePermissionInlineAdminForm, self).clean()
-        for field in self.Meta.model._meta.fields:
-            if not isinstance(field, BooleanField) or not field.name.startswith('can_'):
-                continue
-            name = field.name
-            self.cleaned_data[name] = self.cleaned_data.get(name, False)
-        can_add = self.cleaned_data['can_add']
-        can_edit = self.cleaned_data['can_change']
-        # check if access for childrens, or descendants is granted
-        if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
-            # this is a missconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to
-            # access this page anymore, so avoid this
-            raise forms.ValidationError(_("Add page permission requires also "
-                                          "access to children, or descendants, otherwise added page "
-                                          "can't be changed by its creator."))
-
-        if can_add and not can_edit:
-            raise forms.ValidationError(_('Add page permission also requires edit page permission.'))
-            # TODO: finish this, but is it really required? might be nice to have
-
-        # check if permissions assigned in cms are correct, and display
-        # a message if not - correctness mean: if user has add permission to
-        # page, but he doesn't have auth permissions to add page object,
-        # display warning
-        return self.cleaned_data
-
-    def save(self, commit=True):
-        """
-        Makes sure the boolean fields are set to False if they aren't
-        available in the form.
-        """
-        instance = super(PagePermissionInlineAdminForm, self).save(commit=False)
-        for field in self._meta.model._meta.fields:
-            if isinstance(field, BooleanField) and field.name.startswith('can_'):
-                setattr(instance, field.name, self.cleaned_data.get(field.name, False))
-        if commit:
-            instance.save()
-        return instance
+        self.fields['group'].queryset = get_subordinate_groups(user, site)
 
     class Meta:
-        fields = '__all__'
+        fields = [
+            'user',
+            'group',
+            'can_add',
+            'can_change',
+            'can_delete',
+            'can_publish',
+            'can_change_advanced_settings',
+            'can_change_permissions',
+            'can_move_page',
+            'grant_on',
+        ]
         model = PagePermission
 
 
-class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
-    can_view = forms.BooleanField(label=_('can_view'), widget=HiddenInput(), initial=True)
+class ViewRestrictionInlineAdminForm(BasePermissionAdminForm):
+    page = forms.ModelChoiceField(
+        queryset=Page.objects.all(),
+        label=_('user'),
+        widget=HiddenInput(),
+        required=True,
+    )
+    can_view = forms.BooleanField(
+        label=_('can_view'),
+        widget=HiddenInput(),
+        initial=True,
+    )
+
+    class Meta:
+        fields = [
+            'user',
+            'group',
+            'grant_on',
+            'can_view',
+        ]
+        model = PagePermission
 
     def clean_can_view(self):
-        self.cleaned_data["can_view"] = True
         return True
 
 
-class GlobalPagePermissionAdminForm(forms.ModelForm):
-    def clean(self):
-        super(GlobalPagePermissionAdminForm, self).clean()
-        if not self.cleaned_data['user'] and not self.cleaned_data['group']:
-            raise forms.ValidationError(_('Please select user or group first.'))
-        return self.cleaned_data
+class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
     class Meta:
         fields = '__all__'
@@ -578,88 +591,38 @@ class GenericCmsPermissionForm(forms.ModelForm):
         return initials
 
 
-class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
-    notify_user = forms.BooleanField(label=_('Notify user'), required=False,
-                                     help_text=_(
-                                         'Send email notification to user about username or password change. Requires user email.'))
+class PageUserChangeForm(UserChangeForm):
+
+    _manager = None
 
     class Meta:
         fields = '__all__'
         model = PageUser
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False, instance=None):
+    def __init__(self, *args, **kwargs):
+        super(PageUserChangeForm, self).__init__(*args, **kwargs)
 
-        if instance:
-            initial = initial or {}
-            initial.update(self.populate_initials(instance))
+        if not self._manager.is_superuser:
+            # Limit permissions to include only
+            # the permissions available to the manager.
+            permissions = self.get_available_permissions()
+            self.fields['user_permissions'].queryset = permissions
 
-        super(PageUserForm, self).__init__(data, files, auto_id, prefix,
-                                           initial, error_class, label_suffix, empty_permitted, instance)
+            # Limit groups to include only those where
+            # the manager is a member.
+            self.fields['groups'].queryset = self.get_available_groups()
 
-        if instance:
-            # if it is a change form, keep those fields as not required
-            # password will be changed only if there is something entered inside
-            self.fields['password1'].required = False
-            self.fields['password1'].label = _('New password')
-            self.fields['password2'].required = False
-            self.fields['password2'].label = _('New password confirmation')
+    def get_available_permissions(self):
+        permissions = self._manager.get_all_permissions()
+        permission_codes = (perm.rpartition('.')[-1] for perm in permissions)
+        return Permission.objects.filter(codename__in=permission_codes)
 
-        self._password_change = True
-
-    def clean_username(self):
-        if self.instance:
-            return self.cleaned_data['username']
-        return super(PageUserForm, self).clean_username()
-
-    # required if the User model's USERNAME_FIELD is the email field
-    def clean_email(self):
-        if self.instance:
-            return self.cleaned_data['email']
-        return super(PageUserForm, self).clean_email()
-
-    def clean_password2(self):
-        if self.instance and self.cleaned_data['password1'] == '' and self.cleaned_data['password2'] == '':
-            self._password_change = False
-            return u''
-        return super(PageUserForm, self).clean_password2()
-
-    def clean(self):
-        cleaned_data = super(PageUserForm, self).clean()
-        notify_user = self.cleaned_data['notify_user']
-        if notify_user and not self.cleaned_data.get('email', None):
-            raise forms.ValidationError(_("Email notification requires valid email address."))
-        if self.cleaned_data['can_add_page'] and not self.cleaned_data['can_change_page']:
-            raise forms.ValidationError(_("The permission to add new pages requires the permission to change pages!"))
-        if self.cleaned_data['can_add_pageuser'] and not self.cleaned_data['can_change_pageuser']:
-            raise forms.ValidationError(_("The permission to add new users requires the permission to change users!"))
-        if self.cleaned_data['can_add_pagepermission'] and not self.cleaned_data['can_change_pagepermission']:
-            raise forms.ValidationError(_("To add permissions you also need to edit them!"))
-        return cleaned_data
-
-    def save(self, commit=True):
-        """Create user, assign him to staff users, and create permissions for
-        him if required. Also assigns creator to user.
-        """
-        Super = self._password_change and PageUserForm or UserCreationForm
-        user = super(Super, self).save(commit=False)
-
-        user.is_staff = True
-        created = not bool(user.pk)
-        # assign creator to user
-        if created:
-            get_current_user()
-            user.created_by = get_current_user()
-        if commit:
-            user.save()
-        save_permissions(self.cleaned_data, user)
-        if self.cleaned_data['notify_user']:
-            mail_page_user_change(user, created, self.cleaned_data['password1'])
-        return user
+    def get_available_groups(self):
+        return self._manager.groups.all()
 
 
 class PageUserGroupForm(GenericCmsPermissionForm):
+
     class Meta:
         model = PageUserGroup
         fields = ('name', )

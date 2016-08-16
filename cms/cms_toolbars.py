@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -19,9 +18,12 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language, get_language_dict, get_default_language
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting, get_language_from_request
-from cms.utils.permissions import (
-    get_user_sites_queryset,
-    has_auth_page_permission,
+from cms.utils import page_permissions
+from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.page_permissions import (
+    user_can_change_page,
+    user_can_delete_page,
+    user_can_publish_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
@@ -76,10 +78,10 @@ class PlaceholderToolbar(CMSToolbar):
 
     def add_structure_mode(self):
         if self.page and not self.page.application_urls:
-            if self.page.has_change_permission(self.request):
+            if page_permissions.user_can_change_page(self.request.user, page=self.page):
                 return self.add_structure_mode_item()
 
-        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request)):
+        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
             return self.add_structure_mode_item()
 
         for sp in self.statics:
@@ -147,10 +149,7 @@ class BasicToolbar(CMSToolbar):
             self.add_users_button(self._admin_menu)
 
             # sites menu
-            if get_cms_setting('PERMISSION'):
-                sites_queryset = get_user_sites_queryset(self.request.user)
-            else:
-                sites_queryset = Site.objects.all()
+            sites_queryset = get_user_sites_queryset(self.request.user)
 
             if len(sites_queryset) > 1:
                 sites_menu = self._admin_menu.get_or_create_menu('sites', _('Sites'))
@@ -206,7 +205,7 @@ class BasicToolbar(CMSToolbar):
         # * published page with view permissions: redirect to the home page
 
         if (self.page and self.page.is_published(self.current_lang) and not self.page.login_required and
-                self.page.has_view_permission(self.request, AnonymousUser())):
+                page_permissions.user_can_view_page(AnonymousUser(), page=self.page)):
             on_success = self.toolbar.REFRESH_PAGE
         else:
             on_success = '/'
@@ -285,7 +284,7 @@ class PageToolbar(CMSToolbar):
             publish_permission = bool(self.page or self.statics)
 
             if self.page:
-                publish_permission = self.page.has_publish_permission(self.request)
+                publish_permission = page_permissions.user_can_publish_page(self.request.user, page=self.page)
 
             if self.statics:
                 publish_permission &= all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
@@ -296,16 +295,7 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            if not self.page and not get_cms_setting('PERMISSION'):
-                # We can't check permissions for an individual page
-                # and can't check global cms permissions because
-                # user opted out of them.
-                # So just check django auth permissions.
-                user = self.request.user
-                can_change = has_auth_page_permission(user, action='change')
-            else:
-                can_change = can_change_page(self.request)
-            self.page_change_permission = can_change
+            self.page_change_permission = can_change_page(self.request)
         return self.page_change_permission
 
     def page_is_pending(self, page, language):
@@ -402,7 +392,7 @@ class PageToolbar(CMSToolbar):
             if self.toolbar.edit_mode and not self.title:
                 self.add_page_settings_button()
 
-            if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
+            if user_can_change_page(self.request.user, page=self.page) and self.page.is_published(self.current_lang):
                 return self.add_draft_live_item()
 
         elif self.placeholders:
@@ -490,24 +480,46 @@ class PageToolbar(CMSToolbar):
             current_page_menu = self.toolbar.get_or_create_menu(
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
-            # page operations menu
-            add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Create Page'))
-            app_page_url = admin_reverse('cms_page_add')
-
             new_page_params = {'edit': 1, 'position': 'last-child'}
+            new_sub_page_params = {'edit': 1, 'position': 'last-child', 'target': self.page.pk}
 
             if self.page.parent_id:
                 new_page_params['target'] = self.page.parent_id
+                can_add_sibling_page = page_permissions.user_can_add_subpage(
+                    user=self.request.user,
+                    target=self.page.parent,
+                )
+            else:
+                can_add_sibling_page = page_permissions.user_can_add_page(
+                    user=self.request.user,
+                    site=self.current_site,
+                )
 
-            add_page_menu_modal_items = (
-                (_('New Page'), new_page_params),
-                (_('New Sub Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.pk}),
-                (_('Duplicate this Page'), {'copy_target': self.page.pk})
+            can_add_sub_page = page_permissions.user_can_add_subpage(
+                user=self.request.user,
+                target=self.page,
             )
 
-            for title, params in add_page_menu_modal_items:
+            # page operations menu
+            add_page_menu = current_page_menu.get_or_create_menu(
+                PAGE_MENU_ADD_IDENTIFIER,
+                _('Create Page'),
+            )
+            app_page_url = admin_reverse('cms_page_add')
+
+            add_page_menu_modal_items = (
+                (_('New Page'), new_page_params, can_add_sibling_page),
+                (_('New Sub Page'), new_sub_page_params, can_add_sub_page),
+                (_('Duplicate this Page'), {'copy_target': self.page.pk}, can_add_sibling_page)
+            )
+
+            for title, params, has_perm in add_page_menu_modal_items:
                 params.update(language=self.toolbar.language)
-                add_page_menu.add_modal_item(title, url=add_url_parameters(app_page_url, params))
+                add_page_menu.add_modal_item(
+                    title,
+                    url=add_url_parameters(app_page_url, params),
+                    disabled=not has_perm,
+                )
 
             # first break
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
@@ -525,7 +537,7 @@ class PageToolbar(CMSToolbar):
             # advanced settings
             advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
             advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
-            advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not edit_mode
+            advanced_disabled = not edit_mode or not self.page.has_advanced_settings_permission(self.request.user)
             current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
 
             # templates menu
@@ -550,7 +562,13 @@ class PageToolbar(CMSToolbar):
             # permissions
             if self.permissions_activated:
                 permissions_url = admin_reverse('cms_page_permissions', args=(self.page.pk,))
-                permission_disabled = not edit_mode or not self.page.has_change_permissions_permission(self.request)
+                permission_disabled = not edit_mode
+
+                if not permission_disabled:
+                    permission_disabled = not page_permissions.user_can_change_page_permissions(
+                        user=self.request.user,
+                        page=self.page,
+                    )
                 current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, disabled=permission_disabled)
 
             # dates settings
@@ -573,8 +591,14 @@ class PageToolbar(CMSToolbar):
                 else:
                     publish_title = _('Publish page')
                     publish_url = admin_reverse('cms_page_publish_page', args=(self.page.pk, self.current_lang))
-                current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not edit_mode,
-                                                on_success=refresh)
+
+                user_can_publish = user_can_publish_page(self.request.user, page=self.page)
+                current_page_menu.add_ajax_item(
+                    publish_title,
+                    action=publish_url,
+                    disabled=not edit_mode or not user_can_publish,
+                    on_success=refresh,
+                )
 
             # fourth break
             current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
@@ -612,6 +636,7 @@ class PageToolbar(CMSToolbar):
 
             # delete
             delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
+            delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
             on_delete_redirect_url = self.get_on_delete_redirect_url()
             current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
-                                             disabled=not edit_mode)
+                                             disabled=delete_disabled)

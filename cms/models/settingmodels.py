@@ -19,3 +19,6 @@ class UserSettings(models.Model):
 
     def __str__(self):
         return force_text(self.user)
+
+    def has_placeholder_change_permission(self, user):
+        return True

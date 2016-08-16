@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -52,6 +52,7 @@ ACCESS_CHOICES = (
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
     """
+
     # who:
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
@@ -70,6 +71,42 @@ class AbstractPagePermission(models.Model):
         abstract = True
         app_label = 'cms'
 
+    def clean(self):
+        super(AbstractPagePermission, self).clean()
+
+        if self.can_change:
+            return
+
+        if self.can_add:
+            message = _("Users can't create a page without permissions "
+                        "to change the created page. Edit permissions required.")
+            raise ValidationError(message)
+
+        if self.can_delete:
+            message = _("Users can't delete a page without permissions "
+                        "to change the page. Edit permissions required.")
+            raise ValidationError(message)
+
+        if self.can_publish:
+            message = _("Users can't publish a page without permissions "
+                        "to change the page. Edit permissions required.")
+            raise ValidationError(message)
+
+        if self.can_change_advanced_settings:
+            message = _("Users can't change page advanced settings without permissions "
+                        "to change the page. Edit permissions required.")
+            raise ValidationError(message)
+
+        if self.can_change_permissions:
+            message = _("Users can't change page permissions without permissions "
+                        "to change the page. Edit permissions required.")
+            raise ValidationError(message)
+
+        if self.can_move_page:
+            message = _("Users can't move a page without permissions "
+                        "to change the page. Edit permissions required.")
+            raise ValidationError(message)
+
     @property
     def audience(self):
         """Return audience by priority, so: All or User, Group
@@ -83,13 +120,75 @@ class AbstractPagePermission(models.Model):
             return
         return super(AbstractPagePermission, self).save(*args, **kwargs)
 
+    def get_configured_actions(self):
+        actions = [action for action in self.get_permissions_by_action()
+                   if self.has_configured_action(action)]
+        return actions
+
+    def has_configured_action(self, action):
+        permissions = self.get_permissions_by_action()[action]
+        return all(getattr(self, perm) for perm in permissions)
+
+    @classmethod
+    def get_all_permissions(cls):
+        perms = [
+            'can_add',
+            'can_change',
+            'can_delete',
+            'can_publish',
+            'can_change_advanced_settings',
+            'can_change_permissions',
+            'can_move_page',
+            'can_view',
+        ]
+        return perms
+
+    @classmethod
+    def get_permissions_by_action(cls):
+        # Maps an action to the required flags on the
+        # PagePermission model or GlobalPagePermission model
+        permissions_by_action = {
+            'add_page': ['can_add', 'can_change'],
+            'change_page': ['can_change'],
+            'change_page_advanced_settings': ['can_change', 'can_change_advanced_settings'],
+            'change_page_permissions': ['can_change', 'can_change_permissions'],
+            'delete_page': ['can_change', 'can_delete'],
+            'delete_page_translation': ['can_change', 'can_delete'],
+            'move_page': ['can_change', 'can_move_page'],
+            'publish_page': ['can_change', 'can_publish'],
+            'view_page': ['can_view'],
+        }
+        return permissions_by_action
+
+    @classmethod
+    def get_write_permissions(cls):
+        perms = [
+            'can_add',
+            'can_change',
+            'can_delete',
+            'can_publish',
+            'can_change_advanced_settings',
+            'can_change_permissions',
+            'can_move_page',
+        ]
+        return perms
+
 
 @python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
-    can_recover_page = models.BooleanField(_("can recover pages"), default=True, help_text=_("can recover any deleted page"))
-    sites = models.ManyToManyField(Site, blank=True, help_text=_('If none selected, user haves granted permissions to all sites.'), verbose_name=_('sites'))
+    can_recover_page = models.BooleanField(
+        verbose_name=_("can recover pages"),
+        default=True,
+        help_text=_("can recover any deleted page"),
+    )
+    sites = models.ManyToManyField(
+        to=Site,
+        blank=True,
+        help_text=_('If none selected, user haves granted permissions to all sites.'),
+        verbose_name=_('sites'),
+    )
 
     objects = GlobalPagePermissionManager()
 
@@ -100,6 +199,35 @@ class GlobalPagePermission(AbstractPagePermission):
 
     def __str__(self):
         return "%s :: GLOBAL" % self.audience
+
+    def clean(self):
+        super(GlobalPagePermission, self).clean()
+
+        if not self.user and not self.group:
+            raise ValidationError(_('Please select user or group.'))
+
+        can_recover = self.can_add and self.can_change
+
+        if self.can_recover_page and not can_recover:
+            message = _("Users can't recover pages without permissions to "
+                        "create and modify pages. Add & Edit permissions required.")
+            raise ValidationError(message)
+
+    @classmethod
+    def get_all_permissions(cls):
+        perms = super(GlobalPagePermission, cls).get_write_permissions()
+        return perms + ['can_recover_page']
+
+    @classmethod
+    def get_permissions_by_action(cls):
+        perms_by_action = super(GlobalPagePermission, cls).get_permissions_by_action()
+        perms_by_action['recover_page'] = ['can_add', 'can_change', 'can_recover_page']
+        return perms_by_action
+
+    @classmethod
+    def get_write_permissions(cls):
+        perms = super(GlobalPagePermission, cls).get_write_permissions()
+        return perms + ['can_recover_page']
 
 
 @python_2_unicode_compatible
@@ -118,7 +246,37 @@ class PagePermission(AbstractPagePermission):
 
     def __str__(self):
         page = self.page_id and force_text(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, force_text(dict(ACCESS_CHOICES)[self.grant_on]))
+        return "%s :: %s has: %s" % (page, self.audience, force_text(self.get_grant_on_display()))
+
+    def clean(self):
+        super(PagePermission, self).clean()
+
+        if self.can_add and self.grant_on == ACCESS_PAGE:
+            # this is a misconfiguration - user can add/move page to current
+            # page but after he does this, he will not have permissions to
+            # access this page anymore, so avoid this.
+            message = _("Add page permission requires also access to children, "
+                        "or descendants, otherwise added page can't be changed "
+                        "by its creator.")
+            raise ValidationError(message)
+
+    def get_page_ids(self):
+        if self.grant_on & MASK_PAGE:
+            yield self.page_id
+
+        if self.grant_on & MASK_CHILDREN:
+            children = self.page.get_children().values_list('id', flat=True)
+
+            for child in children:
+                yield child
+        elif self.grant_on & MASK_DESCENDANTS:
+            if self.page.has_cached_descendants():
+                descendants = (page.pk for page in self.page.get_cached_descendants())
+            else:
+                descendants = self.page.get_descendants().values_list('id', flat=True).iterator()
+
+            for descendant in descendants:
+                yield descendant
 
 
 class PageUserManager(UserManager):

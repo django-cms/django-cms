@@ -552,7 +552,7 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'no': 'data'})
             old = page.in_navigation
             response = self.admin_class.change_innavigation(request, page.pk)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 204)
             page = self.reload(page)
             self.assertEqual(old, not page.in_navigation)
 
@@ -1228,7 +1228,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(18, 33)):
+            with self.assertNumQueries(FuzzyInt(12, 22)):
                 force_text(self.client.get(URL_CMS_PAGE))
 
     def test_smart_link_published_pages(self):

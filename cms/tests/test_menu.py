@@ -314,10 +314,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             """
             The queries should be:
-                get all pages
+                get all public pages
+                get all draft pages from public pages
                 get all page permissions
                 get all titles
                 get the menu cache key
@@ -929,10 +930,11 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         context = self.get_context(page.get_absolute_url())
 
         # test standard show_menu
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             """
             The queries should be:
-                get all pages
+                get all public pages
+                get all draft pages for public pages
                 get all page permissions
                 get all titles
                 get the menu cache key
@@ -1102,10 +1104,11 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(7):
+            with self.assertNumQueries(8):
                 """
                 The queries should be:
-                    get all pages
+                    get all public pages
+                    get all draft pages for public pages
                     get all page permissions
                     get all titles
                     get the menu cache key
@@ -1181,9 +1184,12 @@ class ViewPermissionMenuTests(CMSTestCase):
     def test_public_for_all_staff(self):
         request = self.get_request(self.user)
         request.user.is_staff = True
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(4):
             """
             The queries are:
+            User permissions
+            Content type
+            GlobalPagePermission query
             PagePermission count query
             """
             result = get_visible_pages(request, self.pages)
@@ -1192,9 +1198,13 @@ class ViewPermissionMenuTests(CMSTestCase):
     @override_settings(CMS_PUBLIC_FOR='all')
     def test_public_for_all(self):
         request = self.get_request(self.user)
-        with self.assertNumQueries(1):
+
+        with self.assertNumQueries(4):
             """
             The queries are:
+            User permissions
+            Content type
+            GlobalPagePermission query
             PagePermission query for affected pages
             """
             result = get_visible_pages(request, self.pages)
@@ -1214,12 +1224,10 @@ class ViewPermissionMenuTests(CMSTestCase):
     def test_authed_basic_perm(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_page'))
         request = self.get_request(self.user)
-        with self.assertNumQueries(5):
+
+        with self.assertNumQueries(2):
             """
             The queries are:
-            Site
-            PagePermission count query
-            GlobalpagePermission count query
             User permissions
             Content type
             """
@@ -1228,10 +1236,10 @@ class ViewPermissionMenuTests(CMSTestCase):
 
     def test_authed_no_access(self):
         request = self.get_request(self.user)
-        with self.assertNumQueries(5):
+
+        with self.assertNumQueries(4):
             """
             The queries are:
-            Site
             View Permission Calculation Query
             GlobalpagePermission query for user
             User permissions
@@ -1242,17 +1250,21 @@ class ViewPermissionMenuTests(CMSTestCase):
 
     def test_unauthed_no_access(self):
         request = self.get_request()
-        with self.assertNumQueries(1):
+
+        with self.assertNumQueries(0):
             result = get_visible_pages(request, self.pages)
             self.assertEqual(result, [])
 
     def test_page_permissions(self):
         request = self.get_request(self.user)
         PagePermission.objects.create(can_view=True, user=self.user, page=self.page)
-        with self.assertNumQueries(2):
+
+        with self.assertNumQueries(4):
             """
             The queries are:
             PagePermission query for affected pages
+            User permissions
+            Content type
             GlobalpagePermission query for user
             """
             result = get_visible_pages(request, self.pages)
@@ -1263,10 +1275,13 @@ class ViewPermissionMenuTests(CMSTestCase):
         self.user.groups.add(group)
         request = self.get_request(self.user)
         PagePermission.objects.create(can_view=True, group=group, page=self.page)
-        with self.assertNumQueries(3):
+
+        with self.assertNumQueries(5):
             """
             The queries are:
             PagePermission query for affected pages
+            User permissions
+            Content type
             GlobalpagePermission query for user
             Group query via PagePermission
             """
@@ -1278,10 +1293,12 @@ class ViewPermissionMenuTests(CMSTestCase):
         request = self.get_request(self.user)
         group = Group.objects.create(name='testgroup')
         PagePermission.objects.create(can_view=True, group=group, page=self.page)
-        with self.assertNumQueries(2):
+
+        with self.assertNumQueries(3):
             """
             The queries are:
-            PagePermission query for affected pages
+            User permissions
+            Content type
             GlobalpagePermission query for user
             """
             result = get_visible_pages(request, self.pages)

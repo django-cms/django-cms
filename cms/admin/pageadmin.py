@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+from collections import namedtuple
 from functools import wraps
 import json
 import sys
@@ -20,7 +21,13 @@ from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist,
                                     PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponse,
+    Http404,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+)
 from django.shortcuts import render, get_object_or_404
 from django.template.defaultfilters import escape
 from django.utils.encoding import force_text
@@ -32,29 +39,32 @@ from django.views.decorators.http import require_POST
 from django.http import QueryDict
 
 from cms.admin.change_list import CMSChangeList
-from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (
-    PageForm, AdvancedSettingsForm, PagePermissionForm, PublicationDatesForm
+    AdvancedSettingsForm,
+    CopyPermissionForm,
+    PageForm,
+    PagePermissionForm,
+    PublicationDatesForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
 from cms.constants import (
+    PAGE_TREE_POSITIONS,
     PAGE_TYPES_ID,
     PUBLISHER_STATE_PENDING,
     REVISION_INITIAL_COMMENT,
 )
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
-from cms.models.managers import PagePermissionsPermissionManager
 from cms.plugin_pool import plugin_pool
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
+from cms.utils import page_permissions
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.admin import jsonify_request
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import find_placeholder_relation, current_site
-from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
 require_POST = method_decorator(require_POST)
@@ -123,7 +133,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/move-page/$', self.move_page),
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/copy-language/$', self.copy_language),
-            pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
+            pat(r'^([0-9]+)/dialog/copy/$', self.get_copy_dialog),  # copy dialog
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
@@ -232,7 +242,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if page_type_id:
                 copy_target_id = page_type_id
             copy_target = self.model.objects.get(pk=copy_target_id)
-            if not copy_target.has_view_permission(request):
+            if not page_permissions.user_can_view_page(request.user, page=copy_target):
                 raise PermissionDenied()
             obj = obj.reload()
             copy_target._copy_attributes(obj, clean=True)
@@ -360,7 +370,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             path = admin_reverse('cms_page_change', args=(quote(object_id),))
             return HttpResponseRedirect("%s?language=%s" % (path, language))
 
-        if not page.has_advanced_settings_permission(request):
+        if not self.has_change_advanced_settings_permission(request, obj=page):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
 
@@ -369,7 +379,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def permissions(self, request, object_id):
         page = get_object_or_404(self.model, pk=object_id)
-        if not page.has_change_permissions_permission(request):
+
+        if not self.has_change_permissions_permission(request, obj=page):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'show_permissions': True, 'title': _("Change Permissions")})
 
@@ -423,6 +434,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         if extra_context is None:
             extra_context = {'basic_info': True}
+
         try:
             obj = self.model.objects.get(pk=object_id)
         except self.model.DoesNotExist:
@@ -435,12 +447,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 'page': obj,
                 'CMS_PERMISSION': get_cms_setting('PERMISSION'),
                 'ADMIN_MEDIA_URL': settings.STATIC_URL,
-                'can_change': obj.has_change_permission(request),
-                'can_change_permissions': obj.has_change_permissions_permission(request),
+                'can_change': self.has_change_permission(request, obj=obj),
+                'can_change_permissions': self.has_change_permissions_permission(request, obj=obj),
                 'current_site_id': settings.SITE_ID,
             }
             context.update(extra_context or {})
             extra_context = self.update_language_tab_context(request, obj, context)
+
+        if 'advanced_settings' in extra_context or 'basic_info' in extra_context:
+            _has_advanced_settings_perm = self.has_change_advanced_settings_permission(request, obj=obj)
+            extra_context['can_change_advanced_settings'] = _has_advanced_settings_perm
 
         tab_language = get_language_from_request(request)
         extra_context.update(self.get_unihandecode_context(tab_language))
@@ -456,6 +472,25 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             elif 'recover' in request.path_info:
                 return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
+
+    def get_copy_dialog(self, request, page_id):
+        if not get_cms_setting('PERMISSION'):
+            return HttpResponse('')
+
+        target_id = request.GET.get('target', False) or request.POST.get('target', False)
+        callback = request.GET.get('callback', False) or request.POST.get('callback', False)
+        page = get_object_or_404(self.model, pk=page_id)
+        can_change_page = self.has_change_permission(request, obj=page)
+
+        if not can_change_page or (target_id and not self.has_add_permission(request)):
+            raise Http404
+
+        context = {
+            'dialog_id': 'dialog-copy',
+            'form': CopyPermissionForm(),  # class needs to be instantiated
+            'callback': callback,
+        }
+        return render(request, "admin/cms/page/tree/copy_premissions.html", context)
 
     def get_filled_languages(self, obj):
         filled_languages = []
@@ -516,167 +551,97 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         return preserved_filters.urlencode()
 
+    def _has_add_permission_from_request(self, request):
+        position = request.GET.get('position', None)
+        target_page_id = request.GET.get('target', None)
+
+        if position and position not in PAGE_TREE_POSITIONS:
+            return False
+        elif not position and target_page_id:
+            # target was provided but no position
+            return False
+
+        if target_page_id:
+            try:
+                target = Page.objects.get(pk=target_page_id)
+            except Page.DoesNotExist:
+                return False
+        else:
+            target = None
+
+        site = current_site(request)
+
+        if target:
+            if position in ('last-child', 'first-child'):
+                parent = target
+            else:
+                parent = target.parent
+
+            has_perm = page_permissions.user_can_add_subpage(
+                request.user,
+                target=parent,
+                site=site,
+            )
+        else:
+            has_perm = page_permissions.user_can_add_page(request.user, site=site)
+        return has_perm
+
     def has_add_permission(self, request):
         """
         Return true if the current user has permission to add a new page.
         """
-        can_add = super(PageAdmin, self).has_add_permission(request)
-
-        if can_add and get_cms_setting('PERMISSION'):
-            return permissions.has_page_add_permission_from_request(request)
-        return can_add
+        return self._has_add_permission_from_request(request)
 
     def has_change_permission(self, request, obj=None):
         """
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        can_change = super(PageAdmin, self).has_change_permission(request, obj)
+        if obj:
+            return page_permissions.user_can_change_page(request.user, page=obj)
+        site = current_site(request)
+        return permissions.has_any_write_permission(request.user, site)
 
-        if can_change and get_cms_setting('PERMISSION'):
-            if obj:
-                return obj.has_change_permission(request)
-            else:
-                return permissions.has_page_change_permission(request)
-        return can_change
+    def has_change_advanced_settings_permission(self, request, obj=None):
+        if not obj:
+            return False
+        return page_permissions.user_can_change_page_advanced_settings(request.user, page=obj)
+
+    def has_change_permissions_permission(self, request, obj=None):
+        if not obj:
+            return False
+        return page_permissions.user_can_change_page_permissions(request.user, page=obj)
 
     def has_delete_permission(self, request, obj=None):
         """
-        Returns True if the given request has permission to change the given
-        Django model instance. If CMS_PERMISSION are in use also takes look to
-        object permissions.
+        Returns True if the current user has permission to delete the page.
         """
-        can_delete = super(PageAdmin, self).has_delete_permission(request, obj)
-
-        if not can_delete or not obj:
+        if not obj:
             return False
-
-        if get_cms_setting('PERMISSION') and not obj.has_delete_permission(request):
-            return False
-
-        user = request.user
-        languages = obj.get_languages()
-        placeholders = obj.placeholders.filter(cmsplugin__language__in=languages)
-
-        for placeholder in placeholders.iterator():
-            if not placeholder.has_clear_permission(user, languages):
-                return False
-        return True
+        return page_permissions.user_can_delete_page(request.user, page=obj)
 
     def has_delete_translation_permission(self, request, language, obj=None):
-        can_delete = permissions.has_auth_page_permission(request.user, action='delete')
-
-        if not can_delete or not obj:
+        if not obj:
             return False
 
-        if get_cms_setting('PERMISSION') and not obj.has_delete_permission(request):
+        has_perm = page_permissions.user_can_delete_page_translation(
+            user=request.user,
+            page=obj,
+            language=language,
+        )
+        return has_perm
+
+    def has_publish_permission(self, request, obj=None):
+        if not obj:
             return False
-
-        user = request.user
-        placeholders = obj.placeholders.filter(cmsplugin__language=language)
-
-        for placeholder in placeholders.iterator():
-            if not placeholder.has_clear_permission(user, [language]):
-                return False
-        return True
+        return page_permissions.user_can_publish_page(request.user, page=obj)
 
     def has_recover_permission(self, request):
         """
         Returns True if the use has the right to recover pages
         """
-        if not is_installed('reversion'):
-            return False
-        user = request.user
-        if user.is_superuser:
-            return True
-        try:
-            if has_global_page_permission(request, can_recover_page=True):
-                return True
-        except:
-            pass
-        return False
-
-    def has_add_plugin_permission(self, request, placeholder, plugin_type):
-        if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
-            return False
-        page = placeholder.page
-        if page and not page.has_change_permission(request):
-            return False
-        if page and not page.publisher_is_draft:
-            return False
-        return True
-
-    def has_copy_plugin_permission(self, request, source_placeholder, target_placeholder, plugins):
-        source_page = source_placeholder.page
-        if source_page and not source_page.has_change_permission(request):
-            return False
-        target_page = target_placeholder.page
-        if target_page and not target_page.has_change_permission(request):
-            return False
-        if target_page and not target_page.publisher_is_draft:
-            return False
-        for plugin in plugins:
-            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
-                return False
-        return True
-
-    def has_change_plugin_permission(self, request, plugin):
-        page = plugin.placeholder.page if plugin.placeholder else None
-        if page and not page.has_change_permission(request):
-            return False
-        if page and not page.publisher_is_draft:
-            return False
-        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
-            return False
-        return True
-
-    def has_paste_plugin_permission(self, request, plugins, target_placeholder):
-        for plugin in plugins:
-            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
-                return False
-
-        page = target_placeholder.page
-
-        if page and not page.has_change_permission(request):
-            return False
-        if page and not page.publisher_is_draft:
-            return False
-        return True
-
-    def has_move_plugin_permission(self, request, plugin, target_placeholder):
-        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
-            return False
-        page = plugin.placeholder.page
-        if page and not page.has_change_permission(request):
-            return False
-        if page and not page.publisher_is_draft:
-            return False
-        return True
-
-    def has_delete_plugin_permission(self, request, plugin):
-        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
-            return False
-        page = plugin.placeholder.page
-        if page:
-            if not page.publisher_is_draft:
-                return False
-            if not page.has_change_permission(request):
-                return False
-        return True
-
-    def has_clear_placeholder_permission(self, request, placeholder):
-        page = placeholder.page if placeholder else None
-        if page:
-            if not page.publisher_is_draft:
-                return False
-            if not page.has_change_permission(request):
-                return False
-
-        language = request.GET.get('language', None)
-
-        if language is None:
-            language = get_language_from_request(request)
-        return placeholder.has_clear_permission(request.user, [language])
+        site = current_site(request)
+        return page_permissions.user_can_recover_any_page(request.user, site)
 
     @create_revision()
     def post_add_plugin(self, request, plugin):
@@ -842,13 +807,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
 
-        if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
-            raise PermissionDenied
-
         page = get_object_or_404(self.model, pk=object_id)
+
         if not page.publisher_is_draft:
             page = page.publisher_draft
-        if not page.has_change_permission(request):
+
+        if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
         try:
             version = Version.objects.get(pk=version_id)
@@ -959,9 +923,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseBadRequest('django reversion not installed')
 
         page = get_object_or_404(self.model, pk=object_id)
+
         if not page.publisher_is_draft:
             page = page.publisher_draft
-        if not page.has_change_permission(request):
+
+        if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
         try:
             reverted, clean = page.undo()
@@ -978,9 +944,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseBadRequest('django reversion not installed')
 
         page = get_object_or_404(self.model, pk=object_id)
+
         if not page.publisher_is_draft:
             page = page.publisher_draft
-        if not page.has_change_permission(request):
+
+        if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
         try:
             reverted, clean = page.redo()
@@ -995,10 +963,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @create_revision()
     def change_template(self, request, object_id):
         page = get_object_or_404(self.model, pk=object_id)
-        if not page.has_change_permission(request):
+
+        if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to change the template")))
 
         to_template = request.POST.get("template", None)
+
         if to_template not in dict(get_cms_setting('TEMPLATES')):
             return HttpResponseBadRequest(force_text(_("Template not valid")))
 
@@ -1036,6 +1006,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.POST.get('target', None)
         position = request.POST.get('position', 0)
         site_id = request.POST.get('site', None)
+        user = request.user
 
         try:
             position = int(position)
@@ -1085,8 +1056,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     tb_position = "last-child"
 
         # Does the user have permissions to do this...?
-        if not page.has_move_page_permission(request) or (
-                    target and not target.has_add_permission(request)):
+        if not page.has_move_page_permission(user) or (
+                    target and not target.has_add_permission(user)):
             return jsonify_request(
                 HttpResponseForbidden(
                     force_text(_("Error! You don't have permissions to move "
@@ -1097,40 +1068,53 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if is_installed('reversion'):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(
-                page, request.user, _("Page moved"))
-
-        return jsonify_request(
-            HttpResponse(admin_utils.render_admin_menu_item(request, page)))
+                page, user, _("Page moved"))
+        return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):
+        rows = []
+        user = request.user
         page = get_object_or_404(self.model, id=page_id)
+        site = get_current_site(request)
+        PermissionRow = namedtuple('Permission', ['is_global', 'can_change', 'permission'])
 
-        can_change_list = Page.permissions.get_change_id_list(request.user, page.site_id)
+        global_permissions = GlobalPagePermission.objects.filter(sites__in=[page.site_id])
+        can_change_global_permissions = permissions.user_can_change_global_permissions(user, site)
 
-        global_page_permissions = GlobalPagePermission.objects.filter(sites__in=[page.site_id])
-        page_permissions = PagePermission.objects.for_page(page)
-        all_permissions = list(global_page_permissions) + list(page_permissions)
+        for permission in global_permissions.iterator():
+            row = PermissionRow(
+                is_global=True,
+                can_change=can_change_global_permissions,
+                permission=permission,
+            )
+            rows.append(row)
 
-        # does he can change global permissions ?
-        has_global = permissions.has_global_change_permissions_permission(request)
+        _page_permissions = (
+            PagePermission
+            .objects
+            .for_page(page)
+            .select_related('page')
+        )
 
-        permission_set = []
-        for permission in all_permissions:
-            if isinstance(permission, GlobalPagePermission):
-                if has_global:
-                    permission_set.append([(True, True), permission])
-                else:
-                    permission_set.append([(True, False), permission])
+        if not can_change_global_permissions:
+            allowed_pages = frozenset(page_permissions.get_change_id_list(user, site, check_global=False))
+
+        for permission in _page_permissions.iterator():
+            if can_change_global_permissions:
+                can_change = True
             else:
-                if can_change_list == PagePermissionsPermissionManager.GRANT_ALL:
-                    can_change = True
-                else:
-                    can_change = permission.page_id in can_change_list
-                permission_set.append([(False, can_change), permission])
+                can_change = permission.page_id in allowed_pages
+
+            row = PermissionRow(
+                is_global=False,
+                can_change=can_change,
+                permission=permission,
+            )
+            rows.append(row)
 
         context = {
             'page': page,
-            'permission_set': permission_set,
+            'rows': rows,
         }
         return render(request, 'admin/cms/page/permissions.html', context)
 
@@ -1148,7 +1132,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             for placeholder in placeholders:
                 plugins = list(
                     placeholder.get_plugins(language=source_language).order_by('path'))
-                if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
+                if not placeholder.has_add_plugins_permission(request.user, plugins):
                     return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
                 copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             if page and is_installed('reversion'):
@@ -1206,7 +1190,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         else:
             try:
                 tb_target = self.model.objects.get(pk=int(target), site=site)
-                assert tb_target.has_add_permission(request)
+                assert tb_target.has_add_permission(request.user)
             except (TypeError, ValueError, self.model.DoesNotExist,
                     AssertionError):
                 return jsonify_request(HttpResponseBadRequest("Error"))
@@ -1242,7 +1226,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         # ensure user has permissions to publish this page
         all_published = True
         if page:
-            if not page.has_publish_permission(request):
+            if not self.has_publish_permission(request, obj=page):
                 return HttpResponseForbidden(force_text(_("You do not have permission to publish this page")))
             published = page.publish(language)
             if not published:
@@ -1279,9 +1263,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page, publish=True)
             helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
             # create a new publish reversion
+
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
+            # 204 -> request was successful but no response returned.
+            return HttpResponse(status=204)
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
@@ -1340,10 +1326,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         site = Site.objects.get_current()
         page = get_object_or_404(self.model, pk=page_id)
-        if not page.has_publish_permission(request):
+
+        if not self.has_publish_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to unpublish this page")))
+
         if not page.publisher_public_id:
             return HttpResponseForbidden(force_text(_("This page was never published")))
+
         try:
             page.unpublish(language)
             message = _('The %(language)s page "%(page)s" was successfully unpublished') % {
@@ -1373,7 +1362,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def revert_page(self, request, page_id, language):
         page = get_object_or_404(self.model, id=page_id)
         # ensure user has permissions to publish this page
-        if not page.has_change_permission(request):
+        if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
 
         page.revert(language)
@@ -1382,7 +1371,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
+            # 204 -> request was successful but no response returned.
+            return HttpResponse(status=204)
 
         # TODO: This should never fail, but it may be a POF
         path = page.get_absolute_url(language=language)
@@ -1510,10 +1500,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Switch the in_navigation of a page
         """
         page = get_object_or_404(self.model, pk=page_id)
-        if page.has_change_permission(request):
+
+        if self.has_change_permission(request, obj=page):
             page.toggle_in_navigation()
-            language = request.GET.get('language') or get_language_from_request(request)
-            return HttpResponse(admin_utils.render_admin_menu_item(request, page, language=language))
+            # 204 -> request was successful but no response returned.
+            return HttpResponse(status=204)
         return HttpResponseForbidden(force_text(_("You do not have permission to change this page's in_navigation status")))
 
     def get_tree(self, request):
@@ -1538,18 +1529,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 ObjectDoesNotExist):
             site = get_current_site(request)
 
-        if language is None:
-            language = (request.GET.get('language') or
-                        get_language_from_request(request))
+        if not language:
+            language = get_language_from_request(request)
 
         if page_id:
             page = get_object_or_404(self.model, pk=int(page_id))
-            pages = list(page.get_children())
+            pages = page.get_children()
         else:
             pages = Page.get_root_nodes().filter(site=site,
                                                  publisher_is_draft=True)
 
-        template = "admin/cms/page/tree/lazy_menu.html"
+        template = "admin/cms/page/tree/menu.html"
         response = u""
         for page in pages:
             response += admin_utils.render_admin_menu_item(
@@ -1646,8 +1636,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Defaults to title
             edit_fields = ('title',)
 
-        if not has_generic_permission(title.page.pk, request.user, "change",
-                                      title.page.site.pk):
+        if not self.has_change_permission(request, obj=title.page):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this page")))
 
         class PageTitleForm(django.forms.ModelForm):
@@ -1720,8 +1709,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     }
                 )
             return HttpResponse(json.dumps(results), content_type='application/json')
-        else:
-            return HttpResponseForbidden()
+        return HttpResponseForbidden()
 
 
 admin.site.register(Page, PageAdmin)

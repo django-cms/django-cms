@@ -9,6 +9,7 @@ from cms.cache.page import set_page_cache
 from cms.models import Page
 from cms.utils import get_template_from_request
 from cms.utils.conf import get_cms_setting
+from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 
 
 def render_page(request, page, current_language, slug):
@@ -20,8 +21,8 @@ def render_page(request, page, current_language, slug):
     context = {}
     context['lang'] = current_language
     context['current_page'] = page
-    context['has_change_permissions'] = page.has_change_permission(request)
-    context['has_view_permissions'] = page.has_view_permission(request)
+    context['has_change_permissions'] = user_can_change_page(request.user, page)
+    context['has_view_permissions'] = user_can_view_page(request.user, page)
 
     if not context['has_view_permissions']:
         return _handle_no_page(request, slug)

@@ -2,11 +2,11 @@
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
-from cms.models import Page
 from cms.api import create_page, assign_user_to_page
 from cms.cache.permissions import (get_permission_cache, set_permission_cache,
                                    clear_user_permission_cache)
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.page_permissions import get_change_id_list
 
 
 @override_settings(CMS_PERMISSION=True)
@@ -24,25 +24,25 @@ class PermissionCacheTests(CMSTestCase):
         """
         Test basic permissions cache get / set / clear low-level api
         """
-        cached_permissions = get_permission_cache(self.user_normal, "can_change")
+        cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-        set_permission_cache(self.user_normal, "can_change", [self.home_page.id])
-        cached_permissions = get_permission_cache(self.user_normal, "can_change")
+        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
+        cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertEqual(cached_permissions, [self.home_page.id])
 
         clear_user_permission_cache(self.user_normal)
-        cached_permissions = get_permission_cache(self.user_normal, "can_change")
+        cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
     def test_cache_invalidation(self):
         """
         Test permission cache clearing on page save
         """
-        set_permission_cache(self.user_normal, "can_change", [self.home_page.id])
+        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
 
         self.home_page.save()
-        cached_permissions = get_permission_cache(self.user_normal, "can_change")
+        cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
     def test_permission_manager(self):
@@ -53,16 +53,15 @@ class PermissionCacheTests(CMSTestCase):
                              created_by=self.user_super)
         assign_user_to_page(page_b, self.user_normal, can_view=True,
                             can_change=True)
-        cached_permissions = get_permission_cache(self.user_normal, "can_change")
+        cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-        live_permissions = Page.permissions.get_change_id_list(self.user_normal,
-                                                               Site.objects.get_current())
+        live_permissions = get_change_id_list(self.user_normal, Site.objects.get_current())
         cached_permissions_permissions = get_permission_cache(self.user_normal,
-                                                              "can_change")
+                                                              "change_page")
         self.assertEqual(live_permissions, [page_b.id])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
         self.home_page.save()
-        cached_permissions = get_permission_cache(self.user_normal, "can_change")
+        cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)

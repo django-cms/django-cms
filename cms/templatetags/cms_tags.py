@@ -49,13 +49,6 @@ PYTHON_VERSION = python_version()
 register = template.Library()
 
 
-def has_permission(page, request):
-    return page.has_change_permission(request)
-
-
-register.filter(has_permission)
-
-
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
     """
     The `page_lookup` argument can be of any of the following types:
