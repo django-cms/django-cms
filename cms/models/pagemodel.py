@@ -3,6 +3,7 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -174,10 +175,15 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if not language:
             language = get_language()
         with i18n.force_language(language):
-            if self.is_home:
-                return reverse('pages-root')
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)
-            return reverse('pages-details-by-slug', kwargs={"slug": path})
+            if self.is_home:
+                relative_url = reverse('pages-root')
+            else:
+                relative_url = reverse('pages-details-by-slug', kwargs={"slug": path})
+            if self.site:
+                if self.site.domain and settings.SITE_ID != self.site.pk:
+                    return '//%s%s' % (self.site.domain, relative_url)
+        return relative_url
 
     def get_public_url(self, language=None, fallback=True):
         """

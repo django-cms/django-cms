@@ -1498,10 +1498,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         attrs += "&language=" + language
         with force_language(language):
             url = page.get_absolute_url(language) + attrs
-        site = get_current_site(request)
-        if not site == page.site:
-            url = "http%s://%s%s" % ('s' if request.is_secure() else '',
-            page.site.domain, url)
         return HttpResponseRedirect(url)
 
     @require_POST
