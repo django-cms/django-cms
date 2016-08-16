@@ -132,10 +132,8 @@ var Navigation = new Class({
      * @returns {Number} available width in px
      */
     _calculateAvailableWidth: function _calculateAvailableWidth() {
-        var PADDING = 15;
         var fullWidth = this.ui.window.width();
-        var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.offset().left +
-            this.ui.logo.outerWidth(true) + PADDING;
+        var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.outerWidth(true);
 
         return fullWidth - reduce;
     },

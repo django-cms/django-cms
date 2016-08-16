@@ -30,6 +30,24 @@ div.cms {
     @import "components/subnav";
     @import "components/clipboard";
     @import "components/pluginpicker";
+    @import "components/shortcuts";
+
+    *:not(.cms-modal):focus {
+        outline: 2px dotted $gray-darker;
+        outline-offset: -3px;
+
+        &::-moz-focus-inner {
+            border: 0 !important;
+        }
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -3px;
+        }
+
+        .cms-hover-tooltip {
+            display: none;
+        }
+    }
 }
 
 //##############################################################################

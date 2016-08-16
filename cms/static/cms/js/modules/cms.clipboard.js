@@ -133,7 +133,7 @@ var Clipboard = new Class({
     clear: function (callback) {
         // post needs to be a string, it will be converted using JSON.parse
         var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
-        var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent()
+        var pasteItems = $('.cms-submenu-item [data-rel=paste]').attr('tabindex', '-1').parent()
             .addClass('cms-submenu-item-disabled');
 
         pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');

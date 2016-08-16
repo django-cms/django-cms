@@ -61,6 +61,12 @@ module.exports = function (opts) {
                     loaders: [
                         'exports?Class'
                     ]
+                },
+                {
+                    test: /.html$/,
+                    loaders: [
+                        'raw'
+                    ]
                 }
             ]
         }

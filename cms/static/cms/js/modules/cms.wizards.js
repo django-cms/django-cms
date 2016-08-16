@@ -29,10 +29,18 @@ var CMS = window.CMS || {};
                 var form = $('form');
                 var choices = $('.choice');
 
-                choices.on('click', function (e) {
+                choices.on('click keyup', function (e) {
+                    if (e.type === 'keydown' && e.keyCode !== CMS.KEYS.ENTER) {
+                        return;
+                    }
+
                     choices.removeClass('active')
                         .eq(choices.index(e.currentTarget))
                         .addClass('active');
+
+                    if (e.type === 'keyup' && e.keyCode === CMS.KEYS.ENTER) {
+                        form.submit();
+                    }
                 });
                 // submit the form on double click
                 choices.on('dblclick', function () {
@@ -40,7 +48,7 @@ var CMS = window.CMS || {};
                 });
 
                 // focus window so hitting "enter" doesnt trigger a refresh
-                $(window).focus();
+                choices.eq(0).focus();
             }
 
         };

@@ -13,6 +13,8 @@
   structure and content mode.
 * Added ``Shift + Space`` shortcut that behaves similar to ``Space`` shortcut
   but takes into account currently hovered plugin.
+* Improved keyboard navigation
+* Added help modal about available shortcuts
 
 
 === 3.3.2 (unreleased) ===

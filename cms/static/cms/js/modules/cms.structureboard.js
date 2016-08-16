@@ -7,7 +7,7 @@ var Class = require('classjs');
 var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var Plugin = require('./cms.plugins');
-var Mousetrap = require('mousetrap');
+var keyboard = require('keyboardjs');
 
 require('./jquery.ui.custom');
 require('./jquery.ui.touchpunch');
@@ -181,10 +181,11 @@ var StructureBoard = new Class({
         // keyboard handling
         // only if there is a structure / content switcher
         if (that.ui.toolbarModeSwitcher.length) {
-            Mousetrap.bind('space', function () {
+            keyboard.setContext('cms');
+            keyboard.bind('space', function () {
                 that._toggleStructureBoard();
             });
-            Mousetrap.bind('shift+space', function () {
+            keyboard.bind('shift+space', function () {
                 that._toggleStructureBoard({ useHoveredPlugin: true });
             });
         }

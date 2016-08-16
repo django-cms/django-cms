@@ -9,6 +9,9 @@
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
+            <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
+            </div>
             <div class="cms-submenu-btn cms-submenu-add cms-btn
                 {% if not allow_children %} cms-btn-disabled{% endif %}">
                 {% if not allow_children %}
@@ -16,9 +19,6 @@
                 {% else %}
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
                 {% endif %}
-            </div>
-            <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
-                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
             </div>
             <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
         {% else %}
