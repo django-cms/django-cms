@@ -13,7 +13,7 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from cms import constants
 from cms.cache.page import set_xframe_cache, get_xframe_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable, LanguageError
+from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager
 from cms.models.metaclasses import PageMetaClass
 from cms.publisher.errors import PublisherCantPublish
@@ -903,6 +903,25 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         draft_title.save()
             elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                 page.publish(language)
+
+    def reset_to_public(self, language):
+        """
+        Resets the draft version to the same state as the public version
+        """
+        # reset_to_public can only be called on draft pages
+        if not self.publisher_is_draft:
+            raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
+
+        if not self.publisher_public:
+            raise PublicVersionNeeded('A public version of this page is needed')
+
+        public = self.publisher_public
+        public._copy_titles(self, language, public.is_published(language))
+        public._copy_contents(self, language)
+        public._copy_attributes(self)
+        self.title_set.filter(language=language).update(publisher_state=PUBLISHER_STATE_DEFAULT, published=True)
+        self._publisher_keep_state = True
+        self.save()
 
     def get_draft_object(self):
         if not self.publisher_is_draft:

@@ -562,42 +562,6 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.publish_page(request, Page.objects.all()[0].pk, "en")
             self.assertEqual(response.status_code, 403)
 
-    def test_revert_page(self):
-        self.page.publish('en')
-        title = self.page.title_set.get(language='en')
-        title.title = 'new'
-        title.save()
-        self.assertEqual(Title.objects.all().count(), 2)
-        self.assertEqual(Page.objects.all().count(), 2)
-        with self.login_user_context(self.get_superuser()):
-            request = self.get_request()
-            request.method = "POST"
-            response = self.admin_class.revert_page(request, Page.objects.all()[0].pk, "en")
-            self.assertEqual(response.status_code, 302)
-        self.assertEqual(Title.objects.all().count(), 2)
-        self.assertEqual(Page.objects.all().count(), 2)
-        new_title = Title.objects.get(pk=title.pk)
-        self.assertNotEqual(title.title, new_title.title)
-        self.assertTrue(title.publisher_is_draft)
-        self.assertTrue(new_title.publisher_is_draft)
-
-    def test_revert_page_requires_perms(self):
-        permless = self.get_permless()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            request.method = "POST"
-            response = self.admin_class.revert_page(request, Page.objects.all()[0].pk, 'en')
-            self.assertEqual(response.status_code, 403)
-
-    def test_revert_page_redirects(self):
-        admin_user = self.get_admin()
-        self.page.publish("en")  # Ensure public copy exists before reverting
-        with self.login_user_context(admin_user):
-            response = self.client.post(admin_reverse('cms_page_revert_page', args=(self.page.pk, 'en')))
-            self.assertEqual(response.status_code, 302)
-            url = response['Location']
-            self.assertTrue(url.endswith('?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
-
     def test_remove_plugin_requires_post(self):
         ph = Placeholder.objects.create(slot='test')
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')

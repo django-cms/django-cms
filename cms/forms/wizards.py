@@ -7,7 +7,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import (
-    ugettext,
     ugettext_lazy as _,
     get_language,
 )

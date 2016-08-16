@@ -900,7 +900,7 @@ class PublishingTests(TestCase):
         self.assertEqual(CMSPlugin.objects.count(), 3)
 
         # Now let's revert and restore
-        page.revert('en')
+        page.reset_to_public('en')
         self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
 
         self.assertEqual(CMSPlugin.objects.count(), 4)
