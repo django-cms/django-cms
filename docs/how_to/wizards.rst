@@ -56,8 +56,9 @@ And you need a form::
     from django import forms
 
     class MyAppWizardForm(forms.ModelForm):
-        model = MyApp
-        exclude = []
+        class Meta:
+            model = MyApp
+            exclude = []
 
 
 That's it!
