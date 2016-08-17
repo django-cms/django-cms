@@ -8,6 +8,7 @@ var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var Modal = require('./cms.modal');
 var nextUntil = require('./nextuntil');
+var fuzzyFilter = require('fuzzaldrin').filter;
 
 require('../polyfills/array.prototype.findindex');
 
@@ -1414,17 +1415,20 @@ var Plugin = new Class({
             return false;
         }
 
-        // loop through items and figure out if we need to hide items
-        items.find('a, span').each(function (index, submenuItem) {
-            var item = $(submenuItem);
-            var text = item.text().toLowerCase();
-            var search = query.toLowerCase();
+        var itemsToFilter = items.toArray().map(function (el) {
+            var element = $(el);
 
-            if (text.indexOf(search) >= 0) {
-                item.parent().show();
-            } else {
-                item.parent().hide();
-            }
+            return {
+                value: element.text(),
+                element: element
+            };
+        });
+
+        var filteredItems = fuzzyFilter(itemsToFilter, query, { key: 'value' });
+
+        items.hide();
+        filteredItems.forEach(function (item) {
+            item.element.show();
         });
 
         // check if a title is matching

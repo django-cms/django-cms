@@ -37,6 +37,7 @@
     "webpack": "^1.13.1"
   },
   "dependencies": {
+    "fuzzaldrin": "^2.1.0",
     "keyboardjs": "^2.3.1"
   }
 }
