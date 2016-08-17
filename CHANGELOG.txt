@@ -15,6 +15,7 @@
   but takes into account currently hovered plugin.
 * Improved keyboard navigation
 * Added help modal about available shortcuts
+* Added fuzzy matching to plugin picker
 
 
 === 3.3.2 (unreleased) ===
