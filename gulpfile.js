@@ -105,7 +105,7 @@ var INTEGRATION_TESTS = [
         'dragndrop',
         'copy-apphook-page',
         //'history',
-        'revertLive',
+        //'revertLive',
         'narrowScreen'
     ]
 ];
