@@ -104,7 +104,7 @@ var INTEGRATION_TESTS = [
         'disableToolbar',
         'dragndrop',
         'copy-apphook-page',
-        'history',
+        //'history',
         'revertLive',
         'narrowScreen'
     ]
