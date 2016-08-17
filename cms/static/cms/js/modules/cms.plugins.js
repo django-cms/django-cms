@@ -1868,7 +1868,7 @@ Plugin._isContainingMultiplePlugins = function _isContainingMultiplePlugins(node
  */
 Plugin._highlightPluginStructure = function _highlightPluginStructure(el) {
     var tpl = $('<div class="cms-dragitem-success"></div>');
-    var SUCCESS_TIMEOUT = 1000;
+    var SUCCESS_TIMEOUT = 2000;
 
     el.addClass('cms-draggable-success').append(tpl);
     // start animation
@@ -1892,7 +1892,8 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
     var coordinates = {};
     var positions = [];
     var win = $(Helpers._getWindow());
-    var SUCCESS_TIMEOUT = 1000;
+    var SUCCESS_TIMEOUT = 2000;
+    var OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO = 0.20;
 
     $('.cms-plugin-' + pluginId).each(function () {
         var el = $(this);
@@ -1921,7 +1922,7 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
         return pos.y2;
     })) - coordinates.top;
 
-    win.scrollTop(coordinates.top + coordinates.height / 2 - win.height() / 2);
+    win.scrollTop(coordinates.top - win.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
 
     $('<div class="cms-plugin-overlay cms-dragitem-success"></div>').css(coordinates).css({
         zIndex: 9999
