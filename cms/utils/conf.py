@@ -127,12 +127,9 @@ def get_templates():
         # valid templates directory. Here we mimick what the filesystem and
         # app_directories template loaders do
         prefix = ''
-        # Relative to TEMPLATE_DIRS for filesystem loader
+        # Relative to TEMPLATE['DIRS'] for filesystem loader
 
-        try:
-            path = settings.TEMPLATE_DIRS
-        except IndexError:
-            path = [template['DIRS'][0] for template in settings.TEMPLATES]
+        path = [template['DIRS'][0] for template in settings.TEMPLATES]
 
         for basedir in path:
             if tpldir.find(basedir) == 0:

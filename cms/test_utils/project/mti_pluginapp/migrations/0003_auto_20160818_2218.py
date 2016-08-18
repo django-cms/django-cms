@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0015_auto_20160409_0838'),
+        ('cms', '0016_auto_20160608_1535'),
         ('mti_pluginapp', '0002_auto_20150112_2250'),
     ]
 
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TestPluginGammaModel',
             fields=[
-                ('cmsplugin_ptr', models.OneToOneField(parent_link=True, related_name=b'mti_pluginapp_testplugingammamodel', auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
+                ('cmsplugin_ptr', models.OneToOneField(parent_link=True, related_name='mti_pluginapp_testplugingammamodel', auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
                 ('abs', models.CharField(default=b'test plugin abs', max_length=32, verbose_name=b'abs')),
                 ('gamma', models.CharField(default=b'test plugin gamma', max_length=32, verbose_name=b'gamma')),
             ],
@@ -57,17 +57,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='LessMixedPlugin',
             fields=[
+                ('nonpluginmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, to='mti_pluginapp.NonPluginModel')),
+                ('cmsplugin_ptr', models.OneToOneField(parent_link=True, related_name='mti_pluginapp_lessmixedplugin', auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
                 ('less_mixed', models.CharField(default=b'test plugin mixed', max_length=32, verbose_name=b'mixed')),
             ],
             options={
                 'abstract': False,
             },
-            bases=('mti_pluginapp.nonpluginmodel', 'cms.cmsplugin'),
+            bases=('cms.cmsplugin', 'mti_pluginapp.nonpluginmodel'),
         ),
         migrations.CreateModel(
             name='MixedPlugin',
             fields=[
-                ('cmsplugin_ptr', models.OneToOneField(parent_link=True, auto_created=True, to='cms.CMSPlugin')),
+                ('nonpluginmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, to='mti_pluginapp.NonPluginModel')),
+                ('cmsplugin_ptr', models.OneToOneField(parent_link=True, related_name='mti_pluginapp_mixedplugin', auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
                 ('abs', models.CharField(default=b'test plugin abs', max_length=32, verbose_name=b'abs')),
                 ('mixed', models.CharField(default=b'test plugin mixed', max_length=32, verbose_name=b'mixed')),
             ],

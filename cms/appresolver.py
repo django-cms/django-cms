@@ -13,7 +13,7 @@ from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
-from cms.utils.compat import DJANGO_1_8
+from cms.utils.compat import DJANGO_1_8, DJANGO_1_9
 from cms.utils.i18n import get_language_list
 
 APP_RESOLVERS = []
@@ -149,7 +149,10 @@ def _set_permissions(patterns, exclude_permissions):
             _set_permissions(pattern.url_patterns, exclude_permissions)
         else:
             from cms.utils.decorators import cms_perms
-            pattern._callback = cms_perms(pattern.callback)
+            if DJANGO_1_9:
+                pattern._callback = cms_perms(pattern.callback)
+            else:
+                pattern.callback = cms_perms(pattern.callback)
 
 
 def get_app_urls(urls):
