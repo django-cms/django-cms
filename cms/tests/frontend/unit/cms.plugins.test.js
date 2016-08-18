@@ -2314,10 +2314,10 @@ describe('CMS.Plugin', function () {
         it('appends / deletes success overlay', function (done) {
             spyOn($.fn, 'fadeOut').and.callFake(function (timeout, callback) {
                 // race condition :(
-                if (timeout !== 1000) {
+                if (timeout !== 2000) {
                     return;
                 }
-                expect(timeout).toEqual(1000);
+                expect(timeout).toEqual(2000);
                 setTimeout(function () {
                     callback.bind($('.cms-plugin-overlay'))();
                     expect($('.cms-plugin-overlay')).not.toBeInDOM();
