@@ -22,6 +22,7 @@ from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
 from django.utils import timezone
+from django.utils.encoding import force_text
 
 from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
@@ -1163,21 +1164,42 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_toolbar_struct(self):
         # Tests that the output of the plugin toolbar structure.
-        GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
+        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        placeholder = page.placeholders.get(slot='body')
 
-        with register_plugins(GenericParentPlugin):
-            page = api.create_page("page", "nav_playground.html", "en", published=True)
-            placeholder = page.placeholders.get(slot='body')
+        from cms.utils.placeholder import get_toolbar_plugin_struct
 
-            from cms.utils.placeholder import get_toolbar_plugin_struct
-            expected_struct = {'module': u'Generic',
-                           'name': u'Parent Classes Plugin',
-                           'value': 'ParentClassesPlugin'}
+        expected_struct_en = {
+            'module': u'Generic',
+            'name': u'Style',
+            'value': 'StylePlugin',
+        }
 
-            toolbar_struct = get_toolbar_plugin_struct([GenericParentPlugin],
-                                                        placeholder.slot,
-                                                        page,)
-            self.assertFalse(expected_struct in toolbar_struct)
+        expected_struct_de = {
+            'module': u'Generisch',
+            'name': u'Stil',
+            'value': 'StylePlugin',
+        }
+
+        toolbar_struct = get_toolbar_plugin_struct(
+            plugins=plugin_pool.get_all_plugins(),
+            slot=placeholder.slot,
+            page=page,
+        )
+
+        style_config = [config for config in toolbar_struct if config['value'] == 'StylePlugin']
+
+        self.assertEqual(len(style_config), 1)
+
+        style_config = style_config[0]
+
+        with force_language('en'):
+            self.assertEqual(force_text(style_config['module']), expected_struct_en['module'])
+            self.assertEqual(force_text(style_config['name']), expected_struct_en['name'])
+
+        with force_language('de'):
+            self.assertEqual(force_text(style_config['module']), expected_struct_de['module'])
+            self.assertEqual(force_text(style_config['name']), expected_struct_de['name'])
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
