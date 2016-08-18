@@ -10,7 +10,6 @@ from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
-from django.utils.encoding import force_text
 
 from sekizai.helpers import get_varname, is_variable_extend_node
 
@@ -107,8 +106,8 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     # It's added on registration. TIL.
     for plugin in plugins:
         main_list.append({'value': plugin.value,
-                          'name': force_text(names.get(plugin.value, plugin.name)),
-                          'module': force_text(modules.get(plugin.value, plugin.module))})
+                          'name': names.get(plugin.value, plugin.name),
+                          'module': modules.get(plugin.value, plugin.module)})
     return sorted(main_list, key=operator.itemgetter("module"))
 
 
