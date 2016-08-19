@@ -51,7 +51,8 @@
     }
 
     .cms-welcome-logo,
-    .cms-welcome-logo:hover {
+    .cms-welcome-logo:hover,
+    .cms-welcome-logo:focus {
         @extend %icon;
         @include icon(logo);
         font-size: 35px;
@@ -62,7 +63,8 @@
             color: black;
             transition: color $speed-base;
         }
-        &:hover:before {
+        &:hover:before,
+        &:focus:before {
             color: $color-primary;
         }
     }
