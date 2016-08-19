@@ -364,8 +364,8 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)
         request = self.get_page_request(page, self.get_nonstaff(), edit=True)
-        self.assertFalse(request.session.get('cms_build', True))
-        self.assertFalse(request.session.get('cms_edit', True))
+        self.assertNotIn('cms_build', request.session)
+        self.assertNotIn('cms_edit', request.session)
 
     def test_hide_toolbar_disabled(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
