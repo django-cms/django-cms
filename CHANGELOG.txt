@@ -16,6 +16,7 @@
 * Improved keyboard navigation
 * Added help modal about available shortcuts
 * Added fuzzy matching to plugin picker
+* Changed the ``downcast_plugins`` utility to return a generator instead of a list
 
 
 === 3.3.2 (unreleased) ===

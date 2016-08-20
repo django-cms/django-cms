@@ -46,6 +46,7 @@ class AliasPlugin(CMSPluginBase):
             plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
             plugins = [instance.plugin] + list(plugins)
             plugins = downcast_plugins(plugins, request=cms_content_renderer.request)
+            plugins = list(plugins)
             plugins[0].parent_id = None
             plugins = build_plugin_tree(plugins)
             context['plugins'] = plugins

@@ -152,6 +152,10 @@ def downcast_plugins(plugins,
     for plugin in plugins:
         plugin_types_map[plugin.plugin_type].append(plugin.pk)
 
+    placeholders = placeholders or []
+    placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
+
+
     for plugin_type, pks in plugin_types_map.items():
         cls = plugin_pool.get_plugin(plugin_type)
         # get all the plugins of type cls.model
@@ -163,17 +167,22 @@ def downcast_plugins(plugins,
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_qs.iterator():
+            placeholder = placeholders_by_id.get(instance.placeholder_id)
+
+            if placeholder:
+                instance.placeholder = placeholder
+
+                if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
+                    placeholder.cache_placeholder = False
+
             plugin_lookup[instance.pk] = instance
-            # cache the placeholder
-            if placeholders:
-                for pl in placeholders:
-                    if instance.placeholder_id == pl.pk:
-                        instance.placeholder = pl
-                        if not cls().get_cache_expiration(
-                                request, instance, pl) and not cls.cache:
-                            pl.cache_placeholder = False
-    # make the equivalent list of qs, but with downcasted instances
-    return [plugin_lookup[plugin.pk] for plugin in plugins if plugin.pk in plugin_lookup]
+
+    for plugin in plugins:
+        # The plugin either has no parent or needs to have a non-ghost parent
+        valid_parent = (not plugin.parent_id or plugin.parent_id in plugin_lookup)
+
+        if valid_parent and plugin.pk in plugin_lookup:
+            yield plugin_lookup[plugin.pk]
 
 
 def reorder_plugins(placeholder, parent_id, language, order):
