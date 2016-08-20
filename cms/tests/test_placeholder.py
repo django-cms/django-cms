@@ -196,7 +196,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
         content_en = _render_placeholder(placeholder_en, context_en)
 
-        self.assertEqual(content_en, '<a href="http://example.com/" >name</a>\n')
+        self.assertEqual(content_en.strip(), '<a href="http://example.com/" >name</a>')
 
     def test_placeholder_render_ghost_plugin_with_child(self):
         """
@@ -235,7 +235,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
         content_en = _render_placeholder(placeholder_en, context_en)
 
-        self.assertEqual(content_en, '<a href="http://example.com/" >valid</a>\n')
+        self.assertEqual(content_en.strip(), '<a href="http://example.com/" >valid</a>')
 
     @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs(self):
