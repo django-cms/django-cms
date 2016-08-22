@@ -107,8 +107,8 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     # It's added on registration. TIL.
     for plugin in plugins:
         main_list.append({'value': plugin.value,
-                          'name': force_text(names.get(plugin.value, plugin.name)),
-                          'module': force_text(modules.get(plugin.value, plugin.module))})
+                          'name': names.get(plugin.value, plugin.name),
+                          'module': modules.get(plugin.value, plugin.module)})
     return sorted(main_list, key=operator.itemgetter("module"))
 
 

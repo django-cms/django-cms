@@ -19,7 +19,13 @@
 * Changed the ``downcast_plugins`` utility to return a generator instead of a list
 
 
-=== 3.3.2 (unreleased) ===
+=== 3.3.3 (unreleased) ===
+
+* Fixed a bug where where the plugin picker would display the plugin names
+  translated in the request language instead of the user's language.
+
+
+=== 3.3.2 (2016-08-11) ===
 
 * Fixed a bug where it wasn't possible to scroll the toolbar menu if scroll
   started on the disabled menu item on small screens.
