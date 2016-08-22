@@ -1140,31 +1140,3 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
-
-
-..  setting:: CMS_UNESCAPED_RENDER_MODEL_TAGS
-
-CMS_UNESCAPED_RENDER_MODEL_TAGS
-===================================
-
-..  versionadded:: 3.2.4
-
-default
-    True
-
-To immediately improve the security of your project and to prepare for
-future releases of django CMS and related addons, the project
-administrator should carefully review each use of the ``render_model``
-template tags provided by django CMS. He or she is encouraged to ensure
-that all content which is rendered to a page using this template tag is
-cleansed of any potentially harmful HTML markup, CSS styles or JavaScript.
-Once the administrator or developer is satisfied that the content is
-clean, he or she can add the "safe" filter parameter to the render_model
-template tag if the content should be rendered without escaping. If there
-is no need to render the content unescaped, no further action
-is required.
-
-Once all template tags have been reviewed and adjusted where necessary,
-the administrator should set ``CMS_UNESCAPED_RENDER_MODEL_TAGS = False``
-in the project settings. At that point, the project is more secure and
-will be ready for any future upgrades.

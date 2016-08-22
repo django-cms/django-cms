@@ -693,10 +693,7 @@ class CMSEditableObject(InclusionTag):
         # content is for non-edit template content.html
         # rendered_content is for edit template plugin.html
         # in this templatetag both hold the same content
-        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            extra_context['content'] = mark_safe(extra_context['content'])
-        else:
-            extra_context['content'] = extra_context['content']
+        extra_context['content'] = extra_context['content']
         extra_context['rendered_content'] = extra_context['content']
         return extra_context
 

@@ -20,15 +20,6 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 
 .. warning::
 
-    By default and for consistency with previous releases, template tags used
-    by this feature mark as safe the content of the rendered
-    model attribute. This may be a security risk if used on fields which may
-    hold non-trusted content. Be aware, and use the template tags accordingly.
-    To change this behaviour, set the setting: :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS` to False.
-
-
-.. warning::
-
     This feature is only partially compatible with django-hvad: using
     ``render_model`` with hvad-translated fields (say
     ``{% render_model object 'translated_field' %}`` returns an error if the
