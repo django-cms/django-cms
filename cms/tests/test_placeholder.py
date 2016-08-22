@@ -18,6 +18,7 @@ from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
@@ -166,6 +167,75 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
+
+    def test_placeholder_render_ghost_plugin(self):
+        """
+        Tests a placeholder won't render a ghost plugin.
+        """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+
+        CMSPlugin.objects.create(
+            language='en',
+            plugin_type='LinkPlugin',
+            position=1,
+            placeholder=placeholder_en,
+            parent=None,
+        )
+
+        add_plugin(
+            placeholder_en,
+            "LinkPlugin",
+            "en",
+            name='name',
+            url='http://example.com/',
+        )
+
+        context_en = SekizaiContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+
+        content_en = _render_placeholder(placeholder_en, context_en)
+
+        self.assertEqual(content_en.strip(), '<a href="http://example.com/" >name</a>')
+
+    def test_placeholder_render_ghost_plugin_with_child(self):
+        """
+        Tests a placeholder won't render a ghost plugin or any of it's children.
+        """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+
+        plugin = CMSPlugin.objects.create(
+            language='en',
+            plugin_type='LinkPlugin',
+            position=1,
+            placeholder=placeholder_en,
+            parent=None,
+        )
+
+        add_plugin(
+            placeholder_en,
+            "LinkPlugin",
+            "en",
+            target=plugin,
+            name='invalid',
+            url='http://example.com/',
+        )
+
+        add_plugin(
+            placeholder_en,
+            "LinkPlugin",
+            "en",
+            name='valid',
+            url='http://example.com/',
+        )
+
+        context_en = SekizaiContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+
+        content_en = _render_placeholder(placeholder_en, context_en)
+
+        self.assertEqual(content_en.strip(), '<a href="http://example.com/" >valid</a>')
 
     @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs(self):
