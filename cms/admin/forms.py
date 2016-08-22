@@ -313,12 +313,12 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(AdvancedSettingsForm, self).clean()
-        language = cleaned_data.get('language')
 
-        if not language:
-            # Fail fast if no language is provided
+        if self._errors:
+            # Fail fast if there's errors in the form
             return cleaned_data
 
+        language = cleaned_data['language']
         # Language has been validated already
         # so we know it exists.
         language_name = get_language_object(

@@ -1144,6 +1144,39 @@ class AdminFormsTests(AdminTestsBase):
             self.assertRedirects(response, redirect_path)
             self.assertEqual(Page.objects.get(pk=page.pk).template, 'nav_playground.html')
 
+    def test_advanced_settings_endpoint_fails_gracefully(self):
+        admin_user = self.get_superuser()
+        site = Site.objects.get_current()
+        page = create_page('Page 1', 'nav_playground.html', 'en')
+        page_data = {
+            'language': 'en',
+            'site': site.pk,
+            'template': 'col_two.html',
+        }
+        path = admin_reverse('cms_page_advanced', args=(page.pk,))
+
+        # It's important to test fields that are validated
+        # automatically by Django vs fields that are validated
+        # via the clean() method by us.
+        # Fields validated by Django will not be in cleaned data
+        # if they have an error so if we rely on these in the clean()
+        # method then an error will be raised.
+
+        # So test that the form short circuits if there's errors.
+        page_data['application_urls'] = 'TestApp'
+        page_data['site'] = '1000'
+
+        with self.login_user_context(admin_user):
+            de_path = path + u"?language=de"
+            response = self.client.post(de_path, page_data)
+            # Assert user is not redirected because there was a form error
+            self.assertEqual(response.status_code, 200)
+
+            page = page.reload()
+            # Make sure no change was made
+            self.assertEqual(page.application_urls, None)
+            self.assertEqual(page.site.pk, site.pk)
+
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
         for placeholder in Placeholder.objects.all():
