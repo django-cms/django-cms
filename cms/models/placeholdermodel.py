@@ -25,6 +25,7 @@ from cms.constants import (
 from cms.utils import get_language_from_request
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import reversion_register
 
 
 @python_2_unicode_compatible
@@ -554,3 +555,6 @@ class Placeholder(models.Model):
                         })
 
         return sorted(list(vary_list))
+
+
+reversion_register(Placeholder)

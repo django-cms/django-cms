@@ -11,6 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
+from cms.utils.helpers import reversion_register
+
 
 # Cannot use contrib.auth.get_user_model() at compile time.
 user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)
@@ -286,3 +288,6 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
+
+
+reversion_register(PagePermission)

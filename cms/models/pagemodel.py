@@ -20,6 +20,7 @@ from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.helpers import reversion_register
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
@@ -1417,3 +1418,20 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             set_xframe_cache(self, xframe_options)
 
         return xframe_options
+
+
+def _reversion():
+    exclude_fields = [
+        'publisher_is_draft',
+        'publisher_public',
+        'publisher_state',
+    ]
+
+    reversion_register(
+        Page,
+        follow=["title_set", "placeholders", "pagepermission_set"],
+        exclude_fields=exclude_fields
+    )
+
+
+_reversion()

@@ -1281,17 +1281,5 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return HttpResponse(json.dumps(results), content_type='application/json')
         return HttpResponseForbidden()
 
-    def post_change_template(self, request, page):
-        pass
-
-    def post_copy_language(self, request, page, source_language, target_language):
-        pass
-
-    def post_delete_translation(self, request, page, language):
-        pass
-
-    def post_move_page(self, request, page):
-        pass
-
 
 admin.site.register(Page, PageAdmin)
