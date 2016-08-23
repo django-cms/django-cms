@@ -2,7 +2,7 @@
 from collections import deque
 
 from classytags.utils import flatten_context
-from django.template import Template, Context
+from django.template import Context
 from django.template.loader import get_template
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
@@ -83,10 +83,13 @@ class ContentRenderer(object):
         return not self.user_is_on_edit_mode()
 
     def get_cached_template(self, template):
-        if isinstance(template, Template):
+        # we check if template quacks like a Template, as generic Template and engine-specific Template
+        # does not share a common ancestor
+        if hasattr(template, 'render'):
             return template
 
         if not template in self._cached_templates:
+            # this always return a enging-specific template object
             self._cached_templates[template] = get_template(template)
         return self._cached_templates[template]
 
@@ -289,8 +292,15 @@ class ContentRenderer(object):
         if not instance or not plugin.render_plugin:
             return ''
 
+        # we'd better pass a flat dict to template.render
+        # as plugin.render can return pretty much any kind of context / dictionary
+        # we'd better flatten it and force to a Context object
+        # flattening the context means that template must be an engine-specific template object
+        # which is guaranteed by get_cached_template if the template returned by
+        # plugin._get_render_template is either a string or an engine-specific template object
         context = PluginContext(context, instance, placeholder)
         context = plugin.render(context, instance, placeholder.slot)
+        context = flatten_context(context)
 
         template = plugin._get_render_template(context, instance, placeholder)
         template = self.get_cached_template(template)

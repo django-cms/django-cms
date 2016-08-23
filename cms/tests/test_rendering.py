@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
-from django.template import Template
 from django.test.utils import override_settings
 from sekizai.context import SekizaiContext
 
@@ -197,9 +196,10 @@ class RenderingTestCase(CMSTestCase):
             return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
 
         t = u'{% load cms_tags %}' + \
-            u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|{{ test_plugin_context_processor }}'
+            u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|' \
+            u'{{ test_plugin_context_processor }}'
         instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
-        instance.render_template = Template(t)
+        instance.render_template = self.load_template_from_string(t)
         context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
                                 self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
         plugin_rendering._standard_processors = {}

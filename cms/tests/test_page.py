@@ -358,10 +358,7 @@ class PagesTestCase(CMSTestCase):
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        try:
-            path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
-        except IndexError:
-            path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
+        path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
         with open(path, 'r') as fobj:
             old = fobj.read()
         try:

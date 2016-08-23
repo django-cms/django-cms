@@ -1,0 +1,6 @@
+-r requirements_base.txt
+https://github.com/django/django/archive/stable/1.10.x.zip
+django-reversion==1.10,<1.11
+https://github.com/KristianOellegaard/django-hvad/archive/master.zip
+django-formtools
+django-debug-toolbar

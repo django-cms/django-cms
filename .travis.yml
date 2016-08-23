@@ -35,6 +35,11 @@ env:
     - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
     - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
     - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
@@ -54,6 +59,7 @@ before_script:
 
 before_install:
   - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
+  - pip install pip>=8.0
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[skip saucelabs\]'; export USE_SAUCE_LABS=$?; true
 
 install:
@@ -85,6 +91,17 @@ notifications:
 
 matrix:
   exclude:
+
+    - python: 3.3
+      env: DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - python: 3.3
+      env: DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.3
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - python: 3.3
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.3
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
     - python: 3.3
       env: DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
@@ -141,10 +158,43 @@ matrix:
       env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
 
   allow_failures:
+
+    - python: 3.5
+      env: DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - python: 3.5
+      env: DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.5
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - python: 3.5
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.5
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+
+    - python: 3.4
+      env: DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - python: 3.4
+      env: DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.4
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - python: 3.4
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.4
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+
+    - python: 2.7
+      env: DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - python: 2.7
+      env: DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 2.7
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - python: 2.7
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 2.7
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+
     - python: 2.7
       env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 2.7
-
       env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
 
     - python: 3.4

@@ -84,7 +84,6 @@ if __name__ == '__main__':
         'reversion',
         'sekizai',
         'hvad',
-        'better_test',
     ] + PLUGIN_APPS
 
     dynamic_configs = {

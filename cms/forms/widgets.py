@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from itertools import chain
-
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
@@ -175,7 +173,7 @@ class UserSelectAdminWidget(Select):
     attribute.
     """
     def render(self, name, value, attrs=None, choices=()):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
@@ -225,13 +223,6 @@ class AppHookSelect(Select):
             force_text(option_label),
         )
 
-    def render_options(self, choices, selected_choices):
-        selected_choices = set(force_text(v) for v in selected_choices)
-        output = []
-        for option_value, option_label in chain(self.choices, choices):
-            output.append(self.render_option(selected_choices, option_value, option_label))
-        return '\n'.join(output)
-
 
 class ApplicationConfigSelect(Select):
     """
@@ -255,7 +246,7 @@ class ApplicationConfigSelect(Select):
         super(ApplicationConfigSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        output = list(super(ApplicationConfigSelect, self).render(name, value, attrs, choices))
+        output = list(super(ApplicationConfigSelect, self).render(name, value, attrs))
         output.append('<script>\n')
         output.append('var apphooks_configuration = {\n')
         for application, cms_app in self.app_configs.items():

@@ -87,7 +87,7 @@ class MixedPlugin(AbstractPluginParent, NonPluginModel):
     mixed = models.CharField('mixed', blank=False, default='test plugin mixed', max_length=32)
 
 
-class LessMixedPlugin(NonPluginModel, CMSPlugin):
+class LessMixedPlugin(CMSPlugin, NonPluginModel):
     """
     Plugin which inherits from two concrete models, one of which is CMSPlugin
     """
