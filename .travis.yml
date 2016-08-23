@@ -59,7 +59,7 @@ before_script:
 
 before_install:
   - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
-  - pip install pip>=8.0
+  - pip install -U pip>=8.0
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[skip saucelabs\]'; export USE_SAUCE_LABS=$?; true
 
 install:
