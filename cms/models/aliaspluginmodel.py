@@ -21,18 +21,26 @@ class AliasPluginModel(CMSPlugin):
         else:
             return force_text(self.alias_placeholder.get_label())
 
-    def is_recursive(self):
+    def get_aliased_placeholder_id(self):
         if self.plugin_id:
-            placeholder = self.plugin.placeholder_id
+            placeholder_id = self.plugin.placeholder_id
         else:
-            placeholder = self.alias_placeholder_id
+            placeholder_id = self.alias_placeholder_id
+        return placeholder_id
 
-        if not placeholder:
+    def is_recursive(self):
+        placeholder_id = self.get_aliased_placeholder_id()
+
+        if not placeholder_id:
             return False
 
         plugins = AliasPluginModel.objects.filter(
             plugin_type='AliasPlugin',
-            placeholder=placeholder,
+            placeholder_id=placeholder_id,
         )
-        plugins = plugins.filter(Q(plugin=self) | Q(alias_placeholder=self.placeholder_id))
+        plugins = plugins.filter(
+            Q(plugin=self) |
+            Q(plugin__placeholder=self.placeholder_id) |
+            Q(alias_placeholder=self.placeholder_id)
+        )
         return plugins.exists()

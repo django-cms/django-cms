@@ -9,7 +9,7 @@ from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
@@ -54,6 +54,7 @@ class AliasPlugin(CMSPluginBase):
             content = cms_content_renderer.render_placeholder(
                 placeholder=instance.alias_placeholder,
                 context=context,
+                editable=False,
             )
             context['content'] = mark_safe(content)
         return context
@@ -80,6 +81,43 @@ class AliasPlugin(CMSPluginBase):
         return [
             url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
+
+    @classmethod
+    def get_empty_change_form_text(cls, obj=None):
+        original = super(AliasPlugin, cls).get_empty_change_form_text(obj=obj)
+
+        if not obj:
+            return original
+
+        instance = obj.get_plugin_instance()[0]
+
+        if not instance:
+            # Ghost plugin
+            return original
+
+        aliased_placeholder_id = instance.get_aliased_placeholder_id()
+
+        if not aliased_placeholder_id:
+            # Corrupt (sadly) Alias plugin
+            return original
+
+        aliased_placeholder = Placeholder.objects.get(pk=aliased_placeholder_id)
+
+        origin_page = aliased_placeholder.page
+
+        if not origin_page:
+            # Placeholder is not attached to a page
+            return original
+
+        # I have a feeling this could fail with a NoReverseMatch error
+        # if this is the case, then it's likely a corruption.
+        page_url = origin_page.get_absolute_url(language=obj.language)
+        page_title = origin_page.get_title(language=obj.language)
+
+        message = ugettext('This is an alias reference, '
+                           'you can edit the content only on the '
+                           '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
+        return message % {'page_url': page_url, 'page_title': page_title}
 
     def create_alias(self, request):
         if not request.user.is_staff:
