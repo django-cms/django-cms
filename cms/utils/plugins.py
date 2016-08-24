@@ -144,9 +144,10 @@ def build_plugin_tree(plugins):
 
 
 def downcast_plugins(plugins,
-                     placeholders=None, select_placeholder=False, request=None):
+                     placeholders=None, request=None, verify_parent=True):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
+    plugin_ids = []
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
@@ -155,14 +156,13 @@ def downcast_plugins(plugins,
     placeholders = placeholders or []
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
 
-
     for plugin_type, pks in plugin_types_map.items():
         cls = plugin_pool.get_plugin(plugin_type)
         # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
 
-        if select_placeholder:
-            plugin_qs = plugin_qs.select_related('placeholder')
+        # Keep track of the plugin ids we've received
+        plugin_ids.extend(plugin_ids)
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
@@ -178,8 +178,9 @@ def downcast_plugins(plugins,
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
+        parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)
         # The plugin either has no parent or needs to have a non-ghost parent
-        valid_parent = (not plugin.parent_id or plugin.parent_id in plugin_lookup)
+        valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
 
         if valid_parent and plugin.pk in plugin_lookup:
             yield plugin_lookup[plugin.pk]
