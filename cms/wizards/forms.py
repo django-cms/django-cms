@@ -52,7 +52,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
             )
         }
         js = (
-            'cms/js/dist/bundle.admin.base.min.js',
+            static_with_version('cms/js/dist/bundle.admin.base.min.js'),
             'cms/js/modules/cms.wizards.js',
         )
 
