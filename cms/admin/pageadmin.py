@@ -631,6 +631,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         can_change_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=current_site(request),
+            use_cache=False,
         )
         return can_change_page
 

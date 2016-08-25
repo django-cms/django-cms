@@ -1168,6 +1168,10 @@ class GlobalPermissionTests(CMSTestCase):
             request.session = {}
             request.current_page = None
 
+            # Refresh internal user cache
+            USERS[0] = self.reload(USERS[0])
+            USERS[1] = self.reload(USERS[1])
+
             # As before, the query count is inflated by doing additional lookups
             # because there's a site param in the request
             with self.assertNumQueries(FuzzyInt(5, 15)):

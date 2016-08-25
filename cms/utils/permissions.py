@@ -138,14 +138,17 @@ def get_user_permission_level(user, site):
 
 def cached_func(func):
     @wraps(func, assigned=available_attrs(func))
-    def wrapper(user, *args, **kwargs):
+    def cached_func(user, *args, **kwargs):
         func_cache_name = '_djangocms_cached_func_%s' % func.__name__
 
         if not hasattr(user, func_cache_name):
             cached_func = lru_cache(maxsize=None)(func)
             setattr(user, func_cache_name, cached_func)
         return getattr(user, func_cache_name)(user, *args, **kwargs)
-    return wrapper
+
+    # Allows us to access the un-cached function
+    cached_func.without_cache = func
+    return cached_func
 
 
 @cached_func
@@ -181,13 +184,19 @@ def get_page_actions_for_user(user, site):
     return actions
 
 
-def has_global_permission(user, site, action):
-    actions = get_global_actions_for_user(user, site)
+def has_global_permission(user, site, action, use_cache=True):
+    if use_cache:
+        actions = get_global_actions_for_user(user, site)
+    else:
+        actions = get_global_actions_for_user.without_cache(user, site)
     return action in actions
 
 
-def has_page_permission(user, page, action):
-    actions = get_page_actions_for_user(user, page.site)
+def has_page_permission(user, page, action, use_cache=True):
+    if use_cache:
+        actions = get_page_actions_for_user(user, page.site)
+    else:
+        actions = get_page_actions_for_user.without_cache(user, page.site)
     return page.pk in actions[action]
 
 
