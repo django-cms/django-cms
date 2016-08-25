@@ -2,10 +2,8 @@
 from contextlib import contextmanager
 import inspect
 from itertools import chain
-import os
 
 from django.conf import settings
-from django.template.base import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
@@ -14,7 +12,8 @@ from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_8
-from cms.utils.compat.dj import is_installed, get_app_paths
+from cms.utils.compat.dj import is_installed
+from cms.utils.conf import DEPRECATED_CMS_SETTINGS
 
 
 SUCCESS = 1
@@ -220,11 +219,6 @@ def check_i18n(output):
                                          "'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
         else:
             section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
-        for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES',
-                           'CMS_FRONTEND_LANGUAGES']:
-            if hasattr(settings, deprecated):
-                section.warn("Deprecated setting %s found. This setting is now handled in the new style "
-                             "CMS_LANGUAGES and can be removed" % deprecated)
 
 
 @define_check
@@ -262,11 +256,16 @@ def check_context_processors(output):
 def check_deprecated_settings(output):
     with output.section("Deprecated settings") as section:
         found = False
-        for deprecated in ['CMS_FLAT_URLS', 'CMS_MODERATOR']:
-            if hasattr(settings, deprecated):
-                section.warn(
-                    "Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
-                found = True
+        for deprecated, new_setting in DEPRECATED_CMS_SETTINGS.items():
+            if not hasattr(settings, deprecated):
+                continue
+            if new_setting:
+                message = "Deprecated setting %s found. This setting has been replaced by %s" % new_setting
+                section.warn(message)
+            else:
+                message = "Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated
+                section.warn(message)
+            found = True
         if not found:
             section.skip("No deprecated settings found")
 
@@ -364,46 +363,6 @@ def check_copy_relations(output):
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
                                    'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
                                    'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
-
-
-def _load_all_templates(directory):
-    """
-    Loads all templates in a directory (recursively) and yields tuples of
-    template tokens and template paths.
-    """
-    if os.path.exists(directory):
-        for name in os.listdir(directory):
-            path = os.path.join(directory, name)
-            if os.path.isdir(path):
-                for template in _load_all_templates(path):
-                    yield template
-            elif path.endswith('.html'):
-                with open(path, 'rb') as fobj:
-                    source = fobj.read().decode(settings.FILE_CHARSET)
-                    if DJANGO_1_8:
-                        lexer = Lexer(source, path)
-                    else:
-                        lexer = Lexer(source)
-                    yield lexer.tokenize(), path
-
-@define_check
-def deprecations(output):
-    # deprecated placeholder_tags scan (1 in 3.1)
-    templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
-    templates_dirs.extend(
-        [os.path.join(path, 'templates') for path in get_app_paths()]
-    )
-    with output.section('Usage of deprecated placeholder_tags') as section:
-        for template_dir in templates_dirs:
-            for tokens, path in _load_all_templates(template_dir):
-                for token in tokens:
-                    if token.token_type == TOKEN_BLOCK:
-                        bits = token.split_contents()
-                        if bits[0] == 'load' and 'placeholder_tags' in bits:
-                            section.warn(
-                                'Usage of deprecated template tag library '
-                                'placeholder tags in template %s' % path
-                            )
 
 
 def check(output):

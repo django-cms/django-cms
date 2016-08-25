@@ -438,12 +438,6 @@ Example::
 render_model
 ============
 
-.. warning::
-
-    ``render_model`` marks as safe the content of the rendered model
-    attribute. This may be a security risk if used on fields which may contains
-    non-trusted content. Be aware, and use the template tag accordingly.
-
 ``render_model`` is the way to add frontend editing to any Django model.
 It both renders the content of the given attribute of the model instance and
 makes it clickable to edit the related model.
@@ -494,13 +488,20 @@ This will render to:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, Javascript, and CSS Code Injection.
+
+    To change this behavior, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
 
 .. warning::
 
@@ -569,13 +570,21 @@ method is available; also template tags and filters are available in the block.
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, Javascript, and CSS Code Injection.
+
+    To change this behavior, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
+
 
 .. templatetag:: render_model_icon
 .. versionadded:: 3.0
@@ -628,13 +637,21 @@ It will render to something like:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, Javascript, and CSS Code Injection.
+
+    To change this behavior, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
+
 
 .. templatetag:: render_model_add
 .. versionadded:: 3.0
@@ -683,13 +700,20 @@ It will render to something like:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, Javascript, and CSS Code Injection.
+
+    To change this behavior, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
 
 .. warning::
 

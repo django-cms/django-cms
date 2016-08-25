@@ -28,11 +28,6 @@ class ApphookPool(object):
         if app is None:
             return lambda app: self.register(app, discovering_apps)
 
-        if app.__module__.split('.')[-1] == 'cms_app':
-            warnings.warn('cms_app.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
-                          'please rename it to cms_apps.py', DeprecationWarning)
-
         if self.apphooks and not discovering_apps:
             return app
 
@@ -64,8 +59,6 @@ class ApphookPool(object):
                     pass
 
         else:
-            # FIXME: Remove in 3.4
-            load('cms_app')
             load('cms_apps')
 
         self.discovered = True

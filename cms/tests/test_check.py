@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -53,14 +52,6 @@ class CheckTests(CheckAssertMixin, TestCase):
     def test_test_confs(self):
         self.assertCheck(True, errors=0, warnings=0)
 
-    def test_cms_moderator_deprecated(self):
-        with self.settings(CMS_MODERATOR=True):
-            self.assertCheck(True, warnings=1, errors=0)
-
-    def test_cms_flat_urls_deprecated(self):
-        with self.settings(CMS_FLAT_URLS=True):
-            self.assertCheck(True, warnings=1, errors=0)
-
     def test_no_sekizai(self):
         apps = list(settings.INSTALLED_APPS)
         apps.remove('sekizai')
@@ -84,18 +75,6 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(CMS_LANGUAGES=[('en', 'English')]):
             self.assertRaises(ImproperlyConfigured, self.assertCheck, True, warnings=1, errors=0)
 
-    def test_cms_hide_untranslated_deprecated(self):
-        with self.settings(CMS_HIDE_UNTRANSLATED=True):
-            self.assertCheck(True, warnings=1, errors=0)
-
-    def test_cms_language_fallback_deprecated(self):
-        with self.settings(CMS_LANGUAGE_FALLBACK=True):
-            self.assertCheck(True, warnings=1, errors=0)
-
-    def test_cms_language_conf_deprecated(self):
-        with self.settings(CMS_LANGUAGE_CONF=True):
-            self.assertCheck(True, warnings=1, errors=0)
-
     def test_middlewares(self):
         MIDDLEWARE_CLASSES=[
             'django.middleware.cache.UpdateCacheMiddleware',
@@ -113,14 +92,6 @@ class CheckTests(CheckAssertMixin, TestCase):
         self.assertCheck(True, warnings=0, errors=0)
         with self.settings(MIDDLEWARE_CLASSES=MIDDLEWARE_CLASSES):
             self.assertCheck(False, warnings=0, errors=2)
-
-    def test_cms_site_languages_deprecated(self):
-        with self.settings(CMS_SITE_LANGUAGES=True):
-            self.assertCheck(True, warnings=1, errors=0)
-
-    def test_cms_frontend_languages_deprecated(self):
-        with self.settings(CMS_FRONTEND_LANGUAGES=True):
-            self.assertCheck(True, warnings=1, errors=0)
 
     def test_copy_relations_fk_check(self):
         """
@@ -142,20 +113,6 @@ class CheckTests(CheckAssertMixin, TestCase):
         self.assertCheck(True, warnings=1, errors=0)
         MyPageExtension.copy_relations = copy_rel
 
-    def test_placeholder_tag_deprecation(self):
-        self.assertCheck(True, warnings=0, errors=0)
-        alt_dir = os.path.join(
-            os.path.dirname(__file__),
-            '..',
-            'test_utils',
-            'project',
-            'alt_templates'
-        )
-        NEWTEMPLATES = deepcopy(settings.TEMPLATES)
-        NEWTEMPLATES[0]['DIRS'] = [alt_dir]
-        with self.settings(TEMPLATES=NEWTEMPLATES, CMS_TEMPLATES=[]):
-            self.assertCheck(True, warnings=1, errors=0)
-
     def test_non_numeric_site_id(self):
         self.assertCheck(True, warnings=0, errors=0)
         with self.settings(SITE_ID='broken'):
@@ -167,23 +124,21 @@ class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
     def test_check_plugin_instances(self):
         self.assertCheck(True, warnings=0, errors=0 )
 
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp", "treebeard"]
-        with self.settings(INSTALLED_APPS=apps):
-            placeholder = Placeholder.objects.create(slot="test")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            add_plugin(placeholder, "LinkPlugin", "en",
-                       name="A Link", url="https://www.django-cms.org")
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, "LinkPlugin", "en",
+                   name="A Link", url="https://www.django-cms.org")
 
-            # create a CMSPlugin with an unsaved instance
-            instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
-            instanceless_plugin.save()
+        # create a CMSPlugin with an unsaved instance
+        instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
+        instanceless_plugin.save()
 
-            self.assertCheck(False, warnings=0, errors=2)
+        self.assertCheck(False, warnings=0, errors=2)
 
-            # create a bogus CMSPlugin to simulate one which used to exist but
-            # is no longer installed
-            bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
-            bogus_plugin.save()
+        # create a bogus CMSPlugin to simulate one which used to exist but
+        # is no longer installed
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+        bogus_plugin.save()
 
-            self.assertCheck(False, warnings=0, errors=3)
+        self.assertCheck(False, warnings=0, errors=3)

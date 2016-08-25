@@ -1117,51 +1117,34 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 <h1>{% render_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
 {% endblock content %}
 '''
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=True):
-            request = self.get_page_request(page, user, edit=True)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                '<h1>'
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '{4}'
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '</h1>'.format(
-                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2),
-                    )
-                )
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<h1>'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            '{4}'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            '</h1>'.format(
+                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-            request = self.get_page_request(page, user, edit=True)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                '<h1>'
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '{4}'
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '</h1>'.format(
-                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
-
-        # Test with setting=False, but use "filter" parameter to include "safe"
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-            template_text = '''{% extends "base.html" %}
+        template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "char_1" "" "" "truncatewords:2|safe" %}</h1>
 {% endblock content %}
 '''
-            request = self.get_page_request(page, user, edit=True)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                '<h1>'
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '{4}'
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '</h1>'.format(
-                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<h1>'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            '{4}'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            '</h1>'.format(
+                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
     def test_setting_override(self):
         template_text = '''{% extends "base.html" %}
@@ -1178,31 +1161,16 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4")
         ex1.save()
 
-        # With CMS override settings (True) (assert that the resulting output is NOT escaped)
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=True):
-            request = self.get_page_request(page, user, edit=True)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                '<h1>'
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '{4}'
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '</h1>'.format(
-                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
-
-        # With CMS override settings (False) (assert that the resulting output IS escaped)
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-            request = self.get_page_request(page, user, edit=True)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(
-                response,
-                '<h1>'
-                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '{4}'
-                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                '</h1>'.format(
-                    'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<h1>'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            '{4}'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+            '</h1>'.format(
+                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
     def test_filters_date(self):
         # Ensure we have a consistent testing env...
@@ -1220,52 +1188,37 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 <h1>{% render_model instance "date_field" %}</h1>
 {% endblock content %}
 '''
-            with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=True):
-                request = self.get_page_request(page, user, edit=True)
-                response = detail_view(request, ex1.pk, template_string=template_text)
-                self.assertContains(
-                    response,
-                    '<h1>'
-                    '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                    '{4}'
-                    '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                    '</h1>'.format(
-                        'placeholderapp', 'example1', 'date_field', ex1.pk,
-                        ex1.date_field.strftime("%Y-%m-%d")))
 
-            with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-                request = self.get_page_request(page, user, edit=True)
-                response = detail_view(request, ex1.pk, template_string=template_text)
-                self.assertContains(
-                    response,
-                    '<h1>'
-                    '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                    '{4}'
-                    '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                    '</h1>'.format(
-                        'placeholderapp', 'example1', 'date_field', ex1.pk,
-                        ex1.date_field.strftime("%b. %d, %Y")))
+            request = self.get_page_request(page, user, edit=True)
+            response = detail_view(request, ex1.pk, template_string=template_text)
+            self.assertContains(
+                response,
+                '<h1>'
+                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+                '{4}'
+                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+                '</h1>'.format(
+                    'placeholderapp', 'example1', 'date_field', ex1.pk,
+                    ex1.date_field.strftime("%b. %d, %Y")))
 
-            # Test with setting=False, but use "filter" parameter to add "safe"
-            with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-                template_text = '''{% extends "base.html" %}
+            template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" "safe" %}</h1>
 {% endblock content %}
 '''
-                request = self.get_page_request(page, user, edit=True)
-                response = detail_view(request, ex1.pk, template_string=template_text)
-                self.assertContains(
-                    response,
-                    '<h1>'
-                    '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                    '{4}'
-                    '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-                    '</h1>'.format(
-                        'placeholderapp', 'example1', 'date_field', ex1.pk,
-                        ex1.date_field.strftime("%Y-%m-%d")))
+            request = self.get_page_request(page, user, edit=True)
+            response = detail_view(request, ex1.pk, template_string=template_text)
+            self.assertContains(
+                response,
+                '<h1>'
+                '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+                '{4}'
+                '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
+                '</h1>'.format(
+                    'placeholderapp', 'example1', 'date_field', ex1.pk,
+                    ex1.date_field.strftime("%Y-%m-%d")))
 
             template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -1299,31 +1252,23 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 <h1>{% render_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
 {% endblock content %}
 '''
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=True):
-            request = self.get_page_request(page, user, edit=False)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(response,
-                                '<h1>%s</h1>' % truncatewords(ex1.char_1, 2))
 
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-            request = self.get_page_request(page, user, edit=False)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(response,
-                                '<h1>%s</h1>' % truncatewords(escape(ex1.char_1), 2))
+        request = self.get_page_request(page, user, edit=False)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response,
+                            '<h1>%s</h1>' % truncatewords(escape(ex1.char_1), 2))
 
-        # Test with setting=False, but use "filter" parameter to add "safe"
-        with self.settings(CMS_UNESCAPED_RENDER_MODEL_TAGS=False):
-            template_text = '''{% extends "base.html" %}
+        template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "char_1" "" "" 'truncatewords:2|safe' "" "" %}</h1>
 {% endblock content %}
 '''
-            request = self.get_page_request(page, user, edit=False)
-            response = detail_view(request, ex1.pk, template_string=template_text)
-            self.assertContains(response,
-                                '<h1>%s</h1>' % truncatewords(ex1.char_1, 2))
+        request = self.get_page_request(page, user, edit=False)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(response,
+                            '<h1>%s</h1>' % truncatewords(ex1.char_1, 2))
 
     def test_no_cms(self):
         user = self.get_staff()

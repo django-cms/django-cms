@@ -192,14 +192,29 @@ class RenderingTestCase(CMSTestCase):
         Tests that default plugin context processors are working, that plugin processors and plugin context processors
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
+        from djangocms_text_ckeditor.cms_plugins import TextPlugin
+        from cms.plugin_pool import plugin_pool
+
+        instance = CMSPlugin.objects.all()[0].get_plugin_instance()[0]
+
+        load_from_string = self.load_template_from_string
+
+        @plugin_pool.register_plugin
+        class ProcessorTestPlugin(TextPlugin):
+            name = "Test Plugin"
+
+            def get_render_template(self, context, instance, placeholder):
+                t = u'{% load cms_tags %}' + \
+                    u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|' \
+                    u'{{ test_plugin_context_processor }}'
+                return load_from_string(t)
+
         def test_passed_plugin_context_processor(instance, placeholder, context):
             return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
 
-        t = u'{% load cms_tags %}' + \
-            u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|' \
-            u'{{ test_plugin_context_processor }}'
-        instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
-        instance.render_template = self.load_template_from_string(t)
+        instance.plugin_type = 'ProcessorTestPlugin'
+        instance._inst = instance
+
         context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
                                 self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
         plugin_rendering._standard_processors = {}
@@ -207,10 +222,13 @@ class RenderingTestCase(CMSTestCase):
         content_renderer = self.get_content_renderer()
         c = content_renderer.render_plugins([instance], context, self.test_placeholders['main'])
         r = "".join(c)
-        self.assertEqual(r, u'1|' + self.test_data[
-            'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
-                            self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' + self.test_data[
-                                'text_main'] + '|main|original_context_var_ok')
+        expected = (
+            self.test_data['text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
+            self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' +
+            self.test_data['text_main'] + '|main|original_context_var_ok'
+        )
+        expected = u'1|' + expected
+        self.assertEqual(r, expected)
         plugin_rendering._standard_processors = {}
 
     def test_placeholder(self):

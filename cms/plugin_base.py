@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import re
-import warnings
 
 from django.shortcuts import render_to_response
 
@@ -15,7 +14,7 @@ from django.utils.encoding import force_text, python_2_unicode_compatible, smart
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.exceptions import SubClassNeededError, Deprecated
+from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
 from cms.utils import get_cms_setting
 
@@ -115,7 +114,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     parent_classes = None
 
     disable_child_plugins = False
-    disable_child_plugin = False  # DEPRECATED: REMOVE IN CMS v3.3
 
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
@@ -145,12 +143,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         self._cms_initial_attributes = {}
 
     def _get_render_template(self, context, instance, placeholder):
-        if getattr(instance, 'render_template', False):
-            warnings.warn('CMSPlugin.render_template attribute is deprecated '
-                          'and it will be removed in version 3.2; please move'
-                          'template in plugin classes', DeprecationWarning)
-            template = getattr(instance, 'render_template', False)
-        elif hasattr(self, 'get_render_template'):
+        if hasattr(self, 'get_render_template'):
             template = self.get_render_template(context, instance, placeholder)
         elif getattr(self, 'render_template', False):
             template = getattr(self, 'render_template', False)
@@ -470,21 +463,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     def __str__(self):
         return self.name
-
-    # ===============
-    # Deprecated APIs
-    # ===============
-
-    @property
-    def pluginmedia(self):
-        raise Deprecated(
-            "CMSPluginBase.pluginmedia is deprecated in favor of django-sekizai"
-        )
-
-    def get_plugin_media(self, request, context, plugin):
-        raise Deprecated(
-            "CMSPluginBase.get_plugin_media is deprecated in favor of django-sekizai"
-        )
 
 
 class PluginMenuItem(object):

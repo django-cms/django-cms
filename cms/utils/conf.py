@@ -66,7 +66,6 @@ DEFAULTS = {
     'TOOLBAR_HIDE': False,
     'INTERNAL_IPS': [],
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
-    'UNESCAPED_RENDER_MODEL_TAGS': True,
     'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',

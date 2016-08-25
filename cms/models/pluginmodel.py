@@ -562,58 +562,18 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return data
 
     def get_add_url(self):
-        if self.add_url:
-            warnings.warn(
-                'The add_url property is deprecated, '
-                'and it will be removed in version 3.4; '
-                'please use the get_add_url method instead.',
-                DeprecationWarning
-            )
-            return self.add_url
         return self.placeholder.get_add_url()
 
     def get_edit_url(self):
-        if self.edit_url:
-            warnings.warn(
-                'The edit_url property is deprecated, '
-                'and it will be removed in version 3.4; '
-                'please use the get_edit_url method instead.',
-                DeprecationWarning
-            )
-            return self.edit_url
         return self.placeholder.get_edit_url(self.pk)
 
     def get_delete_url(self):
-        if self.delete_url:
-            warnings.warn(
-                'The delete_url property is deprecated, '
-                'and it will be removed in version 3.4; '
-                'please use the get_delete_url method instead.',
-                DeprecationWarning
-            )
-            return self.delete_url
         return self.placeholder.get_delete_url(self.pk)
 
     def get_move_url(self):
-        if self.move_url:
-            warnings.warn(
-                'The move_url property is deprecated, '
-                'and it will be removed in version 3.4; '
-                'please use the get_move_url method instead.',
-                DeprecationWarning
-            )
-            return self.move_url
         return self.placeholder.get_move_url()
 
     def get_copy_url(self):
-        if self.copy_url:
-            warnings.warn(
-                'The copy_url property is deprecated, '
-                'and it will be removed in version 3.4; '
-                'please use the get_copy_url method instead.',
-                DeprecationWarning
-            )
-            return self.copy_url
         return self.placeholder.get_copy_url()
 
     @property
