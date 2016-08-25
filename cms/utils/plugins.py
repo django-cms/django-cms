@@ -144,7 +144,7 @@ def build_plugin_tree(plugins):
 
 
 def downcast_plugins(plugins,
-                     placeholders=None, request=None):
+                     placeholders=None, select_placeholder=False, request=None):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
 
@@ -162,6 +162,9 @@ def downcast_plugins(plugins,
         cls = plugin_pool.get_plugin(plugin_type)
         # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
+
+        if select_placeholder:
+            plugin_qs = plugin_qs.select_related('placeholder')
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
