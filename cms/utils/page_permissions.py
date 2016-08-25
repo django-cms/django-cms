@@ -44,22 +44,27 @@ def _get_draft_placeholders(page):
     return Placeholder.objects.filter(page__pk=page.publisher_public_id)
 
 
-def _get_page_ids_for_action(user, site, action, check_global=True):
+def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=True):
     if user.is_superuser or not get_cms_setting('PERMISSION'):
         # got superuser, or permissions aren't enabled?
         # just return grant all mark
         return GRANT_ALL_PERMISSIONS
 
-    # read from cache if possible
-    cached = get_permission_cache(user, action)
+    if use_cache:
+        # read from cache if possible
+        cached = get_permission_cache(user, action)
+        get_page_actions = get_page_actions_for_user
+    else:
+        cached = None
+        get_page_actions = get_page_actions_for_user.without_cache
 
     if cached is not None:
         return cached
 
-    if check_global and has_global_permission(user, site, action=action):
+    if check_global and has_global_permission(user, site, action=action, use_cache=use_cache):
         return GRANT_ALL_PERMISSIONS
 
-    page_actions = get_page_actions_for_user(user, site)
+    page_actions = get_page_actions(user, site)
     page_ids = list(page_actions[action])
     set_permission_cache(user, action, page_ids)
     return page_ids
@@ -278,11 +283,12 @@ def user_can_recover_all_pages(user, site):
 
 
 @permission_pre_checks(action='change_page')
-def user_can_change_at_least_one_page(user, site):
+def user_can_change_at_least_one_page(user, site, use_cache=True):
     page_ids = get_change_id_list(
         user=user,
         site=site,
-        check_global=True
+        check_global=True,
+        use_cache=use_cache,
     )
     return page_ids == GRANT_ALL_PERMISSIONS or bool(page_ids)
 
@@ -312,7 +318,7 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
-def get_add_id_list(user, site, check_global=True):
+def get_add_id_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has add page rights or the string
     "All" if the user has all rights.
@@ -322,11 +328,12 @@ def get_add_id_list(user, site, check_global=True):
         site=site,
         action='add_page',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_change_id_list(user, site, check_global=True):
+def get_change_id_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has edit rights or the string "All" if
     the user has all rights.
@@ -336,11 +343,12 @@ def get_change_id_list(user, site, check_global=True):
         site=site,
         action='change_page',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_change_advanced_settings_id_list(user, site, check_global=True):
+def get_change_advanced_settings_id_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user can change advanced settings or the
     string "All" if the user has all rights.
@@ -350,11 +358,12 @@ def get_change_advanced_settings_id_list(user, site, check_global=True):
         site=site,
         action='change_page_advanced_settings',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_change_permissions_id_list(user, site, check_global=True):
+def get_change_permissions_id_list(user, site, check_global=True, use_cache=True):
     """Give a list of page where the user can change permissions.
     """
     page_ids = _get_page_ids_for_action(
@@ -362,11 +371,12 @@ def get_change_permissions_id_list(user, site, check_global=True):
         site=site,
         action='change_page_permissions',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_delete_id_list(user, site, check_global=True):
+def get_delete_id_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has delete rights or the string "All" if
     the user has all rights.
@@ -376,11 +386,12 @@ def get_delete_id_list(user, site, check_global=True):
         site=site,
         action='delete_page',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_move_page_id_list(user, site, check_global=True):
+def get_move_page_id_list(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can move.
     """
     page_ids = _get_page_ids_for_action(
@@ -388,11 +399,12 @@ def get_move_page_id_list(user, site, check_global=True):
         site=site,
         action='move_page',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_publish_id_list(user, site, check_global=True):
+def get_publish_id_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has publish rights or the string "All" if
     the user has all rights.
@@ -402,11 +414,12 @@ def get_publish_id_list(user, site, check_global=True):
         site=site,
         action='publish_page',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
 
-def get_view_id_list(user, site, check_global=True):
+def get_view_id_list(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can view.
     """
     page_ids = _get_page_ids_for_action(
@@ -414,6 +427,7 @@ def get_view_id_list(user, site, check_global=True):
         site=site,
         action='view_page',
         check_global=check_global,
+        use_cache=use_cache,
     )
     return page_ids
 
