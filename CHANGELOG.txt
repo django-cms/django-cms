@@ -25,6 +25,7 @@
   translated in the request language instead of the user's language.
 * Fixed a bug which raised an exception when the ``AdvancedSettingsForm``
   failed validation on certain fields.
+* Fixed a bug with widgets not initialising correctly sometimes
 
 
 === 3.3.2 (2016-08-11) ===
