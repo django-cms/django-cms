@@ -1126,19 +1126,6 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '{4}'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'.format(
-                'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2),
-                )
-            )
-
-        request = self.get_page_request(page, user, edit=True)
-        response = detail_view(request, ex1.pk, template_string=template_text)
-        self.assertContains(
-            response,
-            '<h1>'
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            '{4}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            '</h1>'.format(
                 'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(escape(ex1.char_1), 2)))
 
         template_text = '''{% extends "base.html" %}
