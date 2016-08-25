@@ -144,7 +144,7 @@ def build_plugin_tree(plugins):
 
 
 def downcast_plugins(plugins,
-                     placeholders=None, request=None, verify_parent=True):
+                     placeholders=None, request=None):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
     plugin_ids = []
