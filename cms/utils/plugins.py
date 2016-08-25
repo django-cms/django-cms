@@ -147,13 +147,13 @@ def downcast_plugins(plugins,
                      placeholders=None, select_placeholder=False, request=None):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
+    plugin_ids = []
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
+        # Keep track of the plugin ids we've received
+        plugin_ids.append(plugin.pk)
         plugin_types_map[plugin.plugin_type].append(plugin.pk)
-
-    # Keep track of the plugin ids we've received
-    plugin_ids = list(plugin_types_map.values())
 
     placeholders = placeholders or []
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
