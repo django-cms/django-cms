@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
