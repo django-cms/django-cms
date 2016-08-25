@@ -27,6 +27,29 @@ DEFAULT_PLUGIN_PROCESSORS = (
 )
 
 
+class RenderedPlaceholder(object):
+    __slots__ = ('placeholder', 'language', 'site_id', 'cached', 'editable')
+
+    def __init__(self, placeholder, language, site_id, cached=False, editable=False):
+        self.placeholder = placeholder
+        self.language = language
+        self.site_id = site_id
+        self.cached = cached
+        self.editable = editable
+
+    def __eq__(self, other):
+        # The same placeholder rendered with different
+        # parameters is considered the same.
+        # This behavior is compatible with previous djangoCMS releases.
+        return self.placeholder == other.placeholder
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.placeholder)
+
+
 class ContentRenderer(object):
 
     def __init__(self, request):
@@ -102,7 +125,10 @@ class ContentRenderer(object):
         return self._rendered_plugins_by_placeholder.get(placeholder.pk, blank)
 
     def get_rendered_placeholders(self):
-        return self._rendered_placeholders
+        return [r.placeholder for r in self._rendered_placeholders]
+
+    def get_rendered_editable_placeholders(self):
+        return [r.placeholder for r in self._rendered_placeholders if r.editable]
 
     def get_rendered_static_placeholders(self):
         return self._rendered_static_placeholders
@@ -203,15 +229,23 @@ class ContentRenderer(object):
         else:
             toolbar_content = ''
 
-        if placeholder not in self._rendered_placeholders:
+        rendered_placeholder = RenderedPlaceholder(
+            placeholder=placeholder,
+            language=language,
+            site_id=site_id,
+            cached=use_cache,
+            editable=editable,
+        )
+
+        if rendered_placeholder not in self._rendered_placeholders:
             # First time this placeholder is rendered
             if not self.toolbar._cache_disabled:
                 # The toolbar middleware needs to know if the response
                 # is to be cached.
                 # Set the _cache_disabled flag to the value of cache_placeholder
                 # only if the flag is False (meaning cache is enabled).
-                self.toolbar._cache_disabled = not placeholder.cache_placeholder
-            self._rendered_placeholders.append(placeholder)
+                self.toolbar._cache_disabled = not use_cache
+            self._rendered_placeholders.append(rendered_placeholder)
 
         context.pop()
         return mark_safe(toolbar_content + placeholder_content)

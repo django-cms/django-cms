@@ -64,7 +64,7 @@ class PlaceholderToolbar(CMSToolbar):
 
     def init_placeholders(self):
         content_renderer = self.toolbar.content_renderer
-        self.placeholders = content_renderer.get_rendered_placeholders()
+        self.placeholders = content_renderer.get_rendered_editable_placeholders()
         self.statics = content_renderer.get_rendered_static_placeholders()
 
     def populate(self):
@@ -269,7 +269,7 @@ class PageToolbar(CMSToolbar):
 
     def init_placeholders(self):
         content_renderer = self.toolbar.content_renderer
-        self.placeholders = content_renderer.get_rendered_placeholders()
+        self.placeholders = content_renderer.get_rendered_editable_placeholders()
         self.statics = content_renderer.get_rendered_static_placeholders()
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 

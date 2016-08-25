@@ -17,6 +17,11 @@
 * Added help modal about available shortcuts
 * Added fuzzy matching to plugin picker
 * Changed the ``downcast_plugins`` utility to return a generator instead of a list
+* Fixed a bug that caused an aliased placeholder to show in structure mode.
+* Fixed a bug which prevented aliased content from showing correctly without
+  publishing the page first.
+* Added help text to an ``Alias`` plugin change form when attached to a page
+  to show the content editor where the content is aliased from.
 
 
 === 3.3.3 (unreleased) ===

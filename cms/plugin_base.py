@@ -12,7 +12,7 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import SubClassNeededError, Deprecated
@@ -344,11 +344,18 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             return []  # if plugin has inlines but no own fields return empty fieldsets to remove empty white fieldset
 
         try:  # if all fieldsets are empty (assuming there is only one fieldset then) add description
-            fieldsets[0][1]['description'] = _('There are no further settings for this plugin. Please press save.')
+            fieldsets[0][1]['description'] = self.get_empty_change_form_text(obj=obj)
         except KeyError:
             pass
-
         return fieldsets
+
+    @classmethod
+    def get_empty_change_form_text(cls, obj=None):
+        """
+        Returns the text displayed to the user when editing a plugin
+        that requires no configuration.
+        """
+        return ugettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
     def get_child_class_overrides(cls, slot, page):
