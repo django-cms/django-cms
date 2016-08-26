@@ -22,6 +22,10 @@
   publishing the page first.
 * Added help text to an ``Alias`` plugin change form when attached to a page
   to show the content editor where the content is aliased from.
+* Removed revision support from djangoCMS core.
+  As a result both ``CMS_MAX_PAGE_HISTORY_REVERSIONS`` and ``CMS_MAX_PAGE_PUBLISH_REVERSIONS``
+  settings are no longer supported, as well as the ``with_revision`` parameter
+  in ``cms.api.create_page`` and ``cms.api.create_title``.
 
 
 === 3.3.3 (unreleased) ===

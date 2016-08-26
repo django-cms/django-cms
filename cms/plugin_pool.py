@@ -14,8 +14,9 @@ from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
 from cms.utils.django_load import load
-from cms.utils.helpers import reversion_register, normalize_name
+from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import is_installed
+from cms.utils.helpers import normalize_name
 
 
 class PluginPool(object):
@@ -120,13 +121,13 @@ class PluginPool(object):
                                     dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
+
         if is_installed('reversion'):
             from cms.utils.reversion_hacks import RegistrationError
             try:
                 reversion_register(plugin.model)
             except RegistrationError:
                 pass
-
         return plugin
 
     def unregister_plugin(self, plugin):

@@ -85,7 +85,6 @@ indicated with an asterisk *****).
 * django CMS version: ``stable``
 * Django version: ``stable``
 * Activate Django I18N / L10N setting: ``yes``
-* Install and configure reversion support: ``yes``
 * Languages to enable. Option can be provided multiple times, or as a comma separated list: ``en,
   de`` *****
 * Optional default time zone: ``America/Chicago``

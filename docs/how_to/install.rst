@@ -76,21 +76,6 @@ File and image handling
 .. _django-filer plugins for django CMS: https://github.com/stefanfoulis/cmsplugin-filer
 .. _Pillow: https://github.com/python-imaging/Pillow
 
-Revision management
--------------------
-
-* `django-reversion`_ 1.10 to support versions of your content
-
-  .. note::
-
-    As of django CMS 3.0.x, only the most recent 10 published revisions are
-    saved. You can change this behaviour if required with
-    :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`. Be aware that saved revisions
-    will cause your database size to increase.
-
-.. _django-reversion: https://github.com/etianen/django-reversion
-.. _Compatible Django Versions: https://django-reversion.readthedocs.io/en/latest/django-versions.html
-
 
 .. _installing-in-a-virtualenv-using-pip:
 
@@ -149,7 +134,6 @@ django CMS and its dependencies:
     Pillow>=2
     django-filer==0.9.9
     cmsplugin-filer==0.10.1
-    django-reversion==1.8.5
 
 .. note::
 
@@ -375,11 +359,6 @@ the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/`
 relative to :setting:`django:MEDIA_ROOT`) is writeable by the user under which Django
 will be running. If you have opted for django-filer there is a similar requirement
 for its configuration.
-
-If you want versioning of your content you should also install `django-reversion`_
-and add it to :setting:`django:INSTALLED_APPS`:
-
-* ``'reversion'``
 
 You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_CLASSES`
 at the right position::

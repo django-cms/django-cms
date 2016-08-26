@@ -3,10 +3,8 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.shortcuts import get_object_or_404
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.timezone import now
@@ -15,7 +13,7 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from cms import constants
 from cms.cache.page import set_xframe_cache, get_xframe_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
+from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager
 from cms.models.metaclasses import PageMetaClass
 from cms.publisher.errors import PublisherCantPublish
@@ -320,6 +318,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
+        return moved_page
 
     def _copy_titles(self, target, language, published):
         """
@@ -906,20 +905,22 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                 page.publish(language)
 
-    def revert(self, language):
-        """Revert the draft version to the same state as the public version
+    def reset_to_public(self, language):
         """
-        # Revert can only be called on draft pages
+        Resets the draft version to the same state as the public version
+        """
+        # reset_to_public can only be called on draft pages
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
+
         if not self.publisher_public:
             raise PublicVersionNeeded('A public version of this page is needed')
+
         public = self.publisher_public
         public._copy_titles(self, language, public.is_published(language))
         public._copy_contents(self, language)
         public._copy_attributes(self)
         self.title_set.filter(language=language).update(publisher_state=PUBLISHER_STATE_DEFAULT, published=True)
-        self.revision_id = 0
         self._publisher_keep_state = True
         self.save()
 
@@ -971,52 +972,51 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     # ## Title object access
 
-    def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_title_obj(self, language=None, fallback=True, force_reload=False):
         """Helper function for accessing wanted / current title.
         If wanted title doesn't exists, EmptyTitle instance will be returned.
         """
-        language = self._get_title_cache(language, fallback, version_id, force_reload)
+        language = self._get_title_cache(language, fallback, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]
         from cms.models.titlemodels import EmptyTitle
 
         return EmptyTitle(language)
 
-    def get_title_obj_attribute(self, attrname, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_title_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.
         """
         try:
-            attribute = getattr(self.get_title_obj(
-                language, fallback, version_id, force_reload), attrname)
+            attribute = getattr(self.get_title_obj(language, fallback, force_reload), attrname)
             return attribute
         except AttributeError:
             return None
 
-    def get_path(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_path(self, language=None, fallback=True, force_reload=False):
         """
         get the path of the page depending on the given language
         """
-        return self.get_title_obj_attribute("path", language, fallback, version_id, force_reload)
+        return self.get_title_obj_attribute("path", language, fallback, force_reload)
 
-    def get_slug(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_slug(self, language=None, fallback=True, force_reload=False):
         """
         get the slug of the page depending on the given language
         """
-        return self.get_title_obj_attribute("slug", language, fallback, version_id, force_reload)
+        return self.get_title_obj_attribute("slug", language, fallback, force_reload)
 
-    def get_title(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_title(self, language=None, fallback=True, force_reload=False):
         """
         get the title of the page depending on the given language
         """
-        return self.get_title_obj_attribute("title", language, fallback, version_id, force_reload)
+        return self.get_title_obj_attribute("title", language, fallback, force_reload)
 
-    def get_menu_title(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_menu_title(self, language=None, fallback=True, force_reload=False):
         """
         get the menu title of the page depending on the given language
         """
-        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, version_id, force_reload)
+        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, force_reload)
         if not menu_title:
-            return self.get_title(language, True, version_id, force_reload)
+            return self.get_title(language, True, force_reload)
         return menu_title
 
     def get_placeholders(self):
@@ -1062,46 +1062,47 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             return title.menu_title
         return title.slug
 
-    def get_changed_date(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_changed_date(self, language=None, fallback=True, force_reload=False):
         """
         get when this page was last updated
         """
         return self.changed_date
 
-    def get_changed_by(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_changed_by(self, language=None, fallback=True, force_reload=False):
         """
         get user who last changed this page
         """
         return self.changed_by
 
-    def get_page_title(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_page_title(self, language=None, fallback=True, force_reload=False):
         """
         get the page title of the page depending on the given language
         """
-        page_title = self.get_title_obj_attribute("page_title", language, fallback, version_id, force_reload)
+        page_title = self.get_title_obj_attribute("page_title", language, fallback, force_reload)
+
         if not page_title:
-            return self.get_title(language, True, version_id, force_reload)
+            return self.get_title(language, True, force_reload)
         return page_title
 
-    def get_meta_description(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_meta_description(self, language=None, fallback=True, force_reload=False):
         """
         get content for the description meta tag for the page depending on the given language
         """
-        return self.get_title_obj_attribute("meta_description", language, fallback, version_id, force_reload)
+        return self.get_title_obj_attribute("meta_description", language, fallback, force_reload)
 
-    def get_application_urls(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_application_urls(self, language=None, fallback=True, force_reload=False):
         """
         get application urls conf for application hook
         """
         return self.application_urls
 
-    def get_redirect(self, language=None, fallback=True, version_id=None, force_reload=False):
+    def get_redirect(self, language=None, fallback=True, force_reload=False):
         """
         get redirect
         """
-        return self.get_title_obj_attribute("redirect", language, fallback, version_id, force_reload)
+        return self.get_title_obj_attribute("redirect", language, fallback, force_reload)
 
-    def _get_title_cache(self, language, fallback, version_id, force_reload):
+    def _get_title_cache(self, language, fallback, force_reload):
         if not language:
             language = get_language()
         load = False
@@ -1115,30 +1116,21 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     if lang in self.title_cache:
                         return lang
             load = True
+
         if load:
             from cms.models.titlemodels import Title
 
-            if version_id:
-                from cms.utils.reversion_hacks import Version
-
-                version = get_object_or_404(Version, pk=version_id)
-                revs = [related_version.object_version for related_version in version.revision.version_set.all()]
-                for rev in revs:
-                    obj = rev.object
-                    if obj.__class__ == Title:
-                        self.title_cache[obj.language] = obj
+            titles = Title.objects.filter(page=self)
+            for title in titles:
+                self.title_cache[title.language] = title
+            if language in self.title_cache:
+                return language
             else:
-                titles = Title.objects.filter(page=self)
-                for title in titles:
-                    self.title_cache[title.language] = title
-                if language in self.title_cache:
-                    return language
-                else:
-                    if fallback:
-                        fallback_langs = i18n.get_fallback_languages(language)
-                        for lang in fallback_langs:
-                            if lang in self.title_cache:
-                                return lang
+                if fallback:
+                    fallback_langs = i18n.get_fallback_languages(language)
+                    for lang in fallback_langs:
+                        if lang in self.title_cache:
+                            return lang
         return language
 
     def get_template(self):
@@ -1426,113 +1418,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             set_xframe_cache(self, xframe_options)
 
         return xframe_options
-
-    def undo(self):
-        """
-        Revert the current page to the previous revision
-        """
-        from cms.utils.reversion_hacks import reversion, Revision
-
-        # Get current reversion version by matching the reversion_id for the page
-        versions = reversion.get_for_object(self)
-        if self.revision_id:
-            current_revision = Revision.objects.get(pk=self.revision_id)
-        else:
-            try:
-                current_version = versions[0]
-            except IndexError as e:
-                e.message = "no current revision found"
-                raise
-            current_revision = current_version.revision
-        try:
-            previous_version = versions.filter(revision__pk__lt=current_revision.pk)[0]
-        except IndexError as e:
-            e.message = "no previous revision found"
-            raise
-        previous_revision = previous_version.revision
-
-        clean = self._apply_revision(previous_revision)
-        return Page.objects.get(pk=self.pk), clean
-
-    def redo(self):
-        """
-        Revert the current page to the next revision
-        """
-        from cms.utils.reversion_hacks import reversion, Revision
-
-        # Get current reversion version by matching the reversion_id for the page
-        versions = reversion.get_for_object(self)
-        if self.revision_id:
-            current_revision = Revision.objects.get(pk=self.revision_id)
-        else:
-            try:
-                current_version = versions[0]
-            except IndexError as e:
-                e.message = "no current revision found"
-                raise
-            current_revision = current_version.revision
-        try:
-            previous_version = versions.filter(revision__pk__gt=current_revision.pk).order_by('pk')[0]
-        except IndexError as e:
-            e.message = "no next revision found"
-            raise
-        next_revision = previous_version.revision
-
-        clean = self._apply_revision(next_revision)
-        return Page.objects.get(pk=self.pk), clean
-
-    def _apply_revision(self, target_revision, set_dirty=False):
-        """
-        Revert to a specific revision
-        """
-        from cms.models.pluginmodel import CMSPlugin
-        from cms.utils.page_resolver import is_valid_url
-
-        # Get current titles
-        old_titles = list(self.title_set.all())
-
-        # remove existing plugins / placeholders in the current page version
-        placeholder_ids = self.placeholders.all().values_list('pk', flat=True)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
-        for plugin in plugins:
-            plugin._no_reorder = True
-            plugin.delete()
-        self.placeholders.all().delete()
-
-        # populate the page status data from the target version
-        target_revision.revert(delete=True)
-        rev_page = get_object_or_404(Page, pk=self.pk)
-        rev_page.revision_id = target_revision.pk
-        rev_page.publisher_public_id = self.publisher_public_id
-        rev_page.save()
-
-        # cleanup placeholders
-        new_placeholders = rev_page.placeholders.all()
-        slots = {}
-        for new_ph in new_placeholders:
-            if not new_ph.slot in slots:
-                slots[new_ph.slot] = new_ph
-            else:
-                if new_ph in placeholder_ids:
-                    new_ph.delete()
-                elif slots[new_ph.slot] in placeholder_ids:
-                    slots[new_ph.slot].delete()
-
-        # check reverted titles for slug collisions
-        new_titles = rev_page.title_set.all()
-        clean = True
-        for title in new_titles:
-            try:
-                is_valid_url(title.path, rev_page)
-            except ValidationError:
-                for old_title in old_titles:
-                    if old_title.language == title.language:
-                        title.slug = old_title.slug
-                        title.save()
-                        clean = False
-            if set_dirty:
-                self.set_publisher_state(title.language, PUBLISHER_STATE_DIRTY)
-        return clean
 
 
 def _reversion():

@@ -1,11 +1,9 @@
 import sys
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.template import TemplateDoesNotExist
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -15,21 +13,18 @@ from menus.menu_pool import menu_pool
 from cms.api import (
     generate_valid_slug,
     create_page,
-    create_title,
     _verify_plugin_type,
     assign_user_to_page,
     publish_page,
 )
 from cms.apphook_pool import apphook_pool
-from cms.constants import REVISION_INITIAL_COMMENT, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
-from cms.models.titlemodels import Title
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.plugin_base import CMSPluginBase
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
-from cms.utils.reversion_hacks import Revision
 
 
 def _grant_page_permission(user, codename):
@@ -248,75 +243,3 @@ class PythonAPITests(CMSTestCase):
         page = page.reload()
         self.assertTrue(page.is_published('en'))
         self.assertEqual(page.changed_by, user.get_username())
-
-    def test_create_with_revision(self):
-        page_c_type = ContentType.objects.get_for_model(Page)
-
-        user = get_user_model().objects.create_user(
-            username='user',
-            email='user@django-cms.org',
-            password='user',
-        )
-
-        page_attrs = self._get_default_create_page_arguments()
-        page_attrs['language'] = 'en'
-        page_attrs['created_by'] = user
-        page_attrs['with_revision'] = True
-
-        page = create_page(**page_attrs)
-
-        latest_revision = Revision.objects.latest('pk')
-        versions = (
-            latest_revision
-            .version_set
-            .filter(content_type=page_c_type, object_id_int=page.pk)
-        )
-
-        # assert a new version for the page has been created
-        self.assertEqual(1, versions.count())
-
-        # assert revision comment was set correctly
-        self.assertEqual(
-            latest_revision.comment,
-            REVISION_INITIAL_COMMENT,
-        )
-
-        # assert revision user was set correctly
-        self.assertEqual(
-            latest_revision.user_id,
-            user.pk,
-        )
-
-        title_c_type = ContentType.objects.get_for_model(Title)
-        title = create_title('de', 'test de', page, with_revision=True)
-
-        latest_revision = Revision.objects.latest('pk')
-        versions = (
-            latest_revision
-            .version_set
-            .filter(content_type=title_c_type, object_id_int=title.pk)
-        )
-
-        # assert a new version for the title has been created
-        self.assertEqual(1, versions.count())
-
-    def test_create_with_revision_fail(self):
-        # tests that we're unable to create a page or title
-        # through the api with the revision option if reversion
-        # is not installed.
-        page_attrs = self._get_default_create_page_arguments()
-        page_attrs['language'] = 'en'
-        page_attrs['with_revision'] = True
-
-        apps = list(settings.INSTALLED_APPS)
-        apps.remove('reversion')
-
-        with self.settings(INSTALLED_APPS=apps):
-            with self.assertRaises(ImproperlyConfigured):
-                create_page(**page_attrs)
-
-        page = create_page(**page_attrs)
-
-        with self.settings(INSTALLED_APPS=apps):
-            with self.assertRaises(ImproperlyConfigured):
-                create_title('de', 'test de', page, with_revision=True)

@@ -333,11 +333,11 @@ class PagesTestCase(CMSTestCase):
         page = page_a.publisher_public
         self.assertRaises(PublicIsUnmodifiable, page.copy_page, 3, 1)
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
-        self.assertRaises(PublicIsUnmodifiable, page.revert, 'en')
+        self.assertRaises(PublicIsUnmodifiable, page.reset_to_public, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
 
         self.assertTrue(page.get_draft_object().publisher_is_draft)
-        self.assertRaises(PublicVersionNeeded, page_b.revert, 'en')
+        self.assertRaises(PublicVersionNeeded, page_b.reset_to_public, 'en')
 
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")

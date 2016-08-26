@@ -7,11 +7,11 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
-from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
@@ -33,7 +33,6 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
 from cms.utils.conf import get_cms_setting
-from cms.utils.compat.dj import is_installed
 from cms.utils.i18n import get_language_list
 from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
@@ -64,18 +63,6 @@ def generate_valid_slug(source, parent, language):
     return slug
 
 
-def _create_revision(obj, user=None, message=None):
-    from cms.utils.helpers import make_revision_with_plugins
-    from cms.utils.reversion_hacks import create_revision
-
-    with create_revision():
-        make_revision_with_plugins(
-            obj=obj,
-            user=user,
-            message=message,
-        )
-
-
 def _verify_apphook(apphook, namespace):
     """
     Verifies the apphook given is valid and returns the normalized form (name)
@@ -104,12 +91,11 @@ def _verify_apphook(apphook, namespace):
     return apphook_name
 
 
-def _verify_revision_support():
-    if not is_installed('reversion'):
-        raise ImproperlyConfigured(
-            "You have requested to create a revision "
-            "but the reversion app is not in settings.INSTALLED_APPS"
-        )
+def _raise_revision_warning():
+    warnings.warn('Revision support has been removed from the core.'
+                  'As a result the with_revision parameter is no longer '
+                  'supported and will be removed in version 3.5',
+                  UserWarning)
 
 
 def _verify_plugin_type(plugin_type):
@@ -147,16 +133,14 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False):
+                xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=None):
     """
     Create a CMS Page and it's title for the given language
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    if with_revision:
-        # fail fast if revision is requested
-        # but not enabled on the project.
-        _verify_revision_support()
+    if with_revision in (True, False):
+        _raise_revision_warning()
 
     # ugly permissions hack
     if created_by and isinstance(created_by, get_user_model()):
@@ -262,15 +246,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if published:
         page.publish(language)
 
-    if with_revision:
-        from cms.constants import REVISION_INITIAL_COMMENT
-
-        _create_revision(
-            obj=page,
-            user=_thread_locals.user,
-            message=REVISION_INITIAL_COMMENT,
-        )
-
     del _thread_locals.user
 
     page = page.reload()
@@ -297,10 +272,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
     # validate language:
     assert language in get_language_list(page.site_id)
 
-    if with_revision:
-        # fail fast if revision is requested
-        # but not enabled on the project.
-        _verify_revision_support()
+    if with_revision in (True, False):
+        _raise_revision_warning()
 
     # set default slug:
     if not slug:
@@ -320,9 +293,6 @@ def create_title(language, title, page, menu_title=None, slug=None,
         title.has_url_overwrite = True
         title.path = overwrite_url
         title.save()
-
-    if with_revision:
-        _create_revision(obj=page)
     return title
 
 

@@ -1,6 +1,5 @@
 -r requirements_base.txt
 Django>=1.9,<1.10
-django-reversion==1.10,<1.11
 django-hvad==1.5
 django-formtools
 django-debug-toolbar

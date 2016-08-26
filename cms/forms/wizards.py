@@ -7,7 +7,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import (
-    ugettext,
     ugettext_lazy as _,
     get_language,
 )
@@ -23,7 +22,6 @@ from cms.utils.page_permissions import (
     user_can_add_page,
     user_can_add_subpage,
 )
-from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 
 try:
@@ -251,18 +249,6 @@ class CreateCMSPageForm(BaseCMSPageForm):
         # is it home? publish it right away
         if not self.page and page.is_home:
             page.publish(self.language_code)
-
-        if is_installed('reversion'):
-            from cms.utils.helpers import make_revision_with_plugins
-            from cms.constants import REVISION_INITIAL_COMMENT
-            from cms.utils.reversion_hacks import create_revision
-
-            with create_revision():
-                make_revision_with_plugins(
-                    obj=page,
-                    user=self.user,
-                    message=ugettext(REVISION_INITIAL_COMMENT),
-                )
         return page
 
 

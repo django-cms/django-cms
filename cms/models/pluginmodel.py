@@ -611,6 +611,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         """
         return None
 
+
 reversion_register(CMSPlugin)
 
 
