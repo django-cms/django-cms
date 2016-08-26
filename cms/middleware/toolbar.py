@@ -77,8 +77,10 @@ class ToolbarMiddleware(object):
             if build in request.GET and not request.session.get('cms_build', False):
                 request.session['cms_build'] = True
         else:
-            request.session['cms_build'] = False
-            request.session['cms_edit'] = False
+            if request.session.get('cms_build'):
+                request.session['cms_build'] = False
+            if request.session.get('cms_edit'):
+                request.session['cms_edit'] = False
         if request.user.is_staff:
             try:
                 request.cms_latest_entry = LogEntry.objects.filter(
