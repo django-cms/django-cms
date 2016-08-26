@@ -16,7 +16,7 @@ https://github.com/divio/djangocms-text-ckeditor/archive/master.zip
 -e git+git://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
 -e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
 -e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
--e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
+djangocms-video==1.1.0
 -e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
 https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
 https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
@@ -28,4 +28,4 @@ pyenchant
 # required to run the server for integration tests
 djangocms-helper
 djangocms-grid
-aldryn_bootstrap3
+aldryn-bootstrap3
