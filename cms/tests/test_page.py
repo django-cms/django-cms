@@ -21,7 +21,7 @@ from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title, publish_page
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title, EmptyTitle
@@ -767,6 +767,122 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page2.get_path(), '')
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data3['slug'])
+
+    def test_move_page_regression_5640(self):
+        # ref: https://github.com/divio/django-cms/issues/5640
+        alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
+        beta = create_page("Beta", "nav_playground.html", "en", published=False)
+        alpha.move_page(beta, position='right')
+        alpha = alpha.reload()
+        beta = beta.reload()
+
+        self.assertEqual(beta.path, '0003')
+        # Draft
+        self.assertEqual(alpha.path, '0004')
+        # Public
+        self.assertEqual(alpha.publisher_public.path, '0005')
+
+    def test_move_page_regression_nested_5640(self):
+        # ref: https://github.com/divio/django-cms/issues/5640
+        alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
+        beta = create_page("Beta", "nav_playground.html", "en", published=False)
+        gamma = create_page("Gamma", "nav_playground.html", "en", published=False)
+        delta = create_page("Delta", "nav_playground.html", "en", published=True)
+        theta = create_page("Theta", "nav_playground.html", "en", published=True)
+
+        beta.move_page(alpha, position='last-child')
+        gamma.move_page(beta.reload(), position='last-child')
+        delta.move_page(gamma.reload(), position='last-child')
+        theta.move_page(delta.reload(), position='last-child')
+
+        alpha = alpha.reload()
+        beta = beta.reload()
+        gamma = gamma.reload()
+        delta = delta.reload()
+        theta = theta.reload()
+
+        tree = [
+            (alpha, '0001'),
+            (beta, '00010001'),
+            (gamma, '000100010001'),
+            (delta, '0001000100010001'),
+            (theta, '00010001000100010001'),
+            (alpha.publisher_public, '0002'),
+            (delta.publisher_public, '0006'),
+            (theta.publisher_public, '00060001'),
+        ]
+
+        for page, path in tree:
+            self.assertEqual(page.path, path)
+
+    def test_move_page_regression_5643(self):
+        # ref: https://github.com/divio/django-cms/issues/5643
+        alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
+        beta = create_page("Beta", "nav_playground.html", "en", published=False)
+        gamma = create_page("Gamma", "nav_playground.html", "en", published=False)
+        delta = create_page("Delta", "nav_playground.html", "en", published=True)
+        theta = create_page("Theta", "nav_playground.html", "en", published=True)
+
+        beta.move_page(alpha, position='last-child')
+        gamma.move_page(beta.reload(), position='last-child')
+        delta.move_page(gamma.reload(), position='last-child')
+        theta.move_page(delta.reload(), position='last-child')
+
+        tree = [
+            (alpha, PUBLISHER_STATE_DEFAULT),
+            (beta, PUBLISHER_STATE_DIRTY),
+            (gamma, PUBLISHER_STATE_DIRTY),
+            (delta, PUBLISHER_STATE_PENDING),
+            (theta, PUBLISHER_STATE_PENDING),
+        ]
+
+        for page, state in tree:
+            self.assertEqual(page.get_publisher_state('en'), state)
+
+    def test_publish_page_regression_5642(self):
+        # ref: https://github.com/divio/django-cms/issues/5642
+        alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
+        beta = create_page("Beta", "nav_playground.html", "en", published=False)
+        gamma = create_page("Gamma", "nav_playground.html", "en", published=False)
+        delta = create_page("Delta", "nav_playground.html", "en", published=True)
+        theta = create_page("Theta", "nav_playground.html", "en", published=True)
+
+        beta.move_page(alpha, position='last-child')
+        gamma.move_page(beta.reload(), position='last-child')
+        delta.move_page(gamma.reload(), position='last-child')
+        theta.move_page(delta.reload(), position='last-child')
+
+        beta.publish('en')
+
+        # The delta and theta pages should remain pending publication
+        # because gamma is still unpublished
+
+        self.assertTrue(beta.is_published('en'))
+        self.assertEqual(beta.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT)
+
+        self.assertFalse(gamma.is_published('en'))
+        self.assertEqual(gamma.get_publisher_state('en'), PUBLISHER_STATE_DIRTY)
+
+        self.assertTrue(delta.is_published('en'))
+        self.assertEqual(delta.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
+
+        self.assertTrue(theta.is_published('en'))
+        self.assertEqual(theta.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
+
+        gamma.publish('en')
+
+        gamma = gamma.reload()
+        delta = delta.reload()
+        theta = theta.reload()
+
+        self.assertTrue(gamma.is_published('en'))
+        self.assertEqual(gamma.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT)
+
+        self.assertTrue(delta.is_published('en'))
+        self.assertEqual(delta.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT)
+
+        self.assertTrue(theta.is_published('en'))
+        self.assertEqual(theta.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT)
 
     def test_move_page_integrity(self):
         superuser = self.get_superuser()
