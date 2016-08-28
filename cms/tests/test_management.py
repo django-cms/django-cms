@@ -81,6 +81,42 @@ class ManagementTestCase(CMSTestCase):
         self.assertEqual(page1.depth, 1)
         self.assertEqual(page1.numchild, 0)
 
+    def test_fix_tree_regression_5641(self):
+        # ref: https://github.com/divio/django-cms/issues/5641
+        alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
+        beta = create_page("Beta", "nav_playground.html", "en", published=False)
+        gamma = create_page("Gamma", "nav_playground.html", "en", published=False)
+        delta = create_page("Delta", "nav_playground.html", "en", published=True)
+        theta = create_page("Theta", "nav_playground.html", "en", published=True)
+
+        beta.move_page(alpha, position='last-child')
+        gamma.move_page(beta.reload(), position='last-child')
+        delta.move_page(gamma.reload(), position='last-child')
+        theta.move_page(delta.reload(), position='last-child')
+
+        out = StringIO()
+        management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
+
+        alpha = alpha.reload()
+        beta = beta.reload()
+        gamma = gamma.reload()
+        delta = delta.reload()
+        theta = theta.reload()
+
+        tree = [
+            (alpha, '0001'),
+            (beta, '00010001'),
+            (gamma, '000100010001'),
+            (delta, '0001000100010001'),
+            (theta, '00010001000100010001'),
+            (alpha.publisher_public, '0002'),
+            (delta.publisher_public, '0006'),
+            (theta.publisher_public, '00060001'),
+        ]
+
+        for page, path in tree:
+            self.assertEqual(page.path, path)
+
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
         with apphooks(SampleApp):
