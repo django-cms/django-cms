@@ -290,6 +290,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 moved_page
                 .parent
                 .title_set
+                .exclude(publisher_state=PUBLISHER_STATE_PENDING)
                 .values_list('language', 'published')
             )
             parent_titles_by_language = dict(parent_titles)
@@ -303,12 +304,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 if parent_is_published and published:
                     # this looks redundant but it's necessary
                     # for all the descendants of the page being
-                    # copied to be set to the correct state.
+                    # moved to be set to the correct state.
                     moved_page.mark_as_published(language)
                     moved_page.mark_descendants_as_published(language)
                 elif published:
                     # page is published but it's parent is not
-                    # mark the page being copied (source) as "pending"
+                    # mark the page being moved (source) as "pending"
                     moved_page.mark_as_pending(language)
                     # mark all descendants of source as "pending"
                     moved_page.mark_descendants_pending(language)
@@ -675,7 +676,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         if not self.pk:
             self.save()
-            # be sure we have the newest data including mptt
+
+        # be sure we have the newest data including tree information
         p = Page.objects.get(pk=self.pk)
         self.path = p.path
         self.depth = p.depth
@@ -693,15 +695,25 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             public_page.publisher_public = self
             public_page.publisher_is_draft = False
 
-            # Ensure that the page is in the right position and save it
-            self._publisher_save_public(public_page)
-            public_page = public_page.reload()
-            published = public_page.parent_id is None or public_page.parent.is_published(language)
+            # Sets the tree attributes and saves the public page
+            public_page = self._publisher_save_public(public_page)
+
             if not public_page.pk:
                 public_page.save()
+
+            if not public_page.parent_id:
+                # If we're publishing a page with no parent
+                # automatically set it's status to published
+                published = True
+            else:
+                # The page has a parent so we fetch the published
+                # status of the parent page.
+                published = public_page.parent.is_published(language)
+
             # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
+
             # trigger home update
             public_page.save()
             # invalidate the menu for this site
@@ -844,7 +856,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # List of published draft pages
         publish_set = list(
             self.get_descendants()
-            .filter(title_set__published=True, title_set__language=language)
+            .filter(
+                title_set__published=True,
+                parent__title_set__published=True,
+                title_set__language=language
+            )
             .select_related('publisher_public', 'publisher_public__parent')
             .order_by('depth', 'path')
         )
@@ -1303,72 +1319,55 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         """
         if self.parent_id and self.parent.publisher_public_id:
-            assert self.parent_id == self.parent.pk
             public_parent = Page.objects.get(pk=self.parent.publisher_public_id)
+        elif not self.parent_id:
+            # The draft page (self) is in the root
+            # so move the public page (obj) to be a sibling
+            # of the draft page (self).
+            # This keeps the tree paths consistent by making sure
+            # the public page (obj) has a greater path than
+            # the draft page.
+            obj.parent = None
+            obj.save()
+            obj = obj.move(self, pos="right")
+            return obj
         else:
             public_parent = None
-        filters = dict(publisher_public__isnull=False)
-        if public_parent:
-            filters['publisher_public__parent__in'] = [public_parent]
-        else:
-            filters['publisher_public__parent__isnull'] = True
-        prev_sibling = self.get_previous_filtered_sibling(**filters)
-        public_prev_sib = (prev_sibling.publisher_public if prev_sibling else None)
 
-        if not self.publisher_public_id:  # first time published
-            # is there anybody on left side?
-            if not self.parent_id:
-                obj.parent_id = None
-                self.add_sibling(pos='right', instance=obj)
-            else:
-                if public_prev_sib:
-                    obj.parent_id = public_prev_sib.parent_id
-                    public_prev_sib.add_sibling(pos='right', instance=obj)
-                else:
-                    if public_parent:
-                        obj.parent_id = public_parent.pk
-                        obj.parent = public_parent
-                        obj = obj.add_root(instance=obj)
-                        obj = obj.move(target=public_parent, pos='first-child')
-        else:
-            # check if object was moved / structural tree change
+        obj.parent = public_parent
+        obj.save()
+
+        if not public_parent:
+            return obj
+
+        # The draft page (self) has been moved under
+        # another page.
+        # Or is already inside another page and it's been moved
+        # to a different location in the same page tree.
+        prev_sibling = self.get_previous_filtered_sibling(
+            publisher_public__isnull=False,
+            publisher_public__parent=public_parent,
+        )
+
+        if prev_sibling:
             prev_public_sibling = obj.get_previous_filtered_sibling()
-            if self.depth != obj.depth or \
-                            public_parent != obj.parent or \
-                            public_prev_sib != prev_public_sibling:
-                if public_prev_sib:
-                    # We've got a sibling on the left side (previous)
-                    obj.parent_id = public_prev_sib.parent_id
-                    obj.save()
+            sibling_changed = prev_sibling.publisher_public != prev_public_sibling
+        else:
+            prev_public_sibling = None
+            sibling_changed = False
 
-                    if obj.parent_id:
-                        # The draft page (self) has been moved under
-                        # another page.
-                        # So move the live page (obj) to be a sibling
-                        # of the public closest sibling (public_prev_sib).
-                        obj = obj.move(public_prev_sib, pos="right")
-                    else:
-                        # The draft page (self) has been moved to the root
-                        # so move the public page (obj) to be a sibling
-                        # of the draft page (self).
-                        # This keeps the tree paths consistent by making sure
-                        # the public page (obj) has a greater path than
-                        # the draft page.
-                        obj = obj.move(self, pos="right")
-                elif public_parent:
-                    # move as a first child to parent
-                    obj.parent_id = public_parent.pk
-                    obj.save()
-                    obj = obj.move(target=public_parent, pos='first-child')
-                else:
-                    # it is a move from the right side or just save
-                    next_sibling = self.get_next_filtered_sibling(**filters)
-                    if next_sibling and next_sibling.publisher_public_id:
-                        obj.parent_id = next_sibling.parent_id
-                        obj.save()
-                        obj = obj.move(next_sibling.publisher_public, pos="left")
+        first_time_published = not self.publisher_public_id
+        parent_change = public_parent != obj.parent
+        tree_change = self.depth != obj.depth or sibling_changed
+
+        if first_time_published or parent_change or tree_change:
+            if prev_public_sibling:
+                # We use a sibling on the left side of the current page
+                # to make sure the live page is inserted in the same position
+                # on the tree relative to it's parent (draft or live).
+                obj = obj.move(prev_sibling.publisher_public, pos="right")
             else:
-                obj.save()
+                obj = obj.move(target=public_parent, pos='first-child')
         return obj
 
     def move(self, target, pos=None):
