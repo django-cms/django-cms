@@ -1,0 +1,20 @@
+{
+    "latest": {
+        "version": "3.4.0",
+        "url": "http://docs.django-cms.org/en/release-3.4.x/upgrade/3.4.0.html"
+    },
+    "patches": [
+        {
+            "version": "3.3.2",
+            "url": "http://docs.django-cms.org/en/release-3.3.x/upgrade/3.3.2.html"
+        },
+        {
+            "version": "3.2.6",
+            "url": "http://docs.django-cms.org/en/release-3.2.x/upgrade/3.2.6.html"
+        },
+        {
+            "version": "3.1.6",
+            "url": "http://docs.django-cms.org/en/release-3.1.x/upgrade/3.1.6.html"
+        }
+    ]
+}
