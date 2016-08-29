@@ -20,7 +20,7 @@ What's new in 3.4
   combination of ``template`` tags and JavaScript is used to add event handlers
   and plugin data directly to the plugin markup. This fixes most of the
   rendering issues caused by the extra markup.
-* Changed cache-busting implementation, which is now handled by a path change,
+* Changed asset cache-busting implementation, which is now handled by a path change,
   rather than the ``GET`` parameter.
 * Added the option to copy pages in the page tree using the drag and drop
   interface.
@@ -109,8 +109,7 @@ you'll have to adapt your code to match the new rendering mechanism.
 
 To render a plugin programmatically, you will need a context and request object.
 
-.. warning:: Manual plugin rendering is not a public API, and as such it's
-subject to change without notice.
+.. warning:: Manual plugin rendering is not a public API, and as such it's subject to change without notice.
 
          ::
 
@@ -125,11 +124,10 @@ subject to change without notice.
                  context['request'] = request
                  return renderer.render_plugin(plugin, context)
 
-Like a plugin, to render a plugin programmatically, you will need a context and request object.
+Like a plugin, to render a placeholder programmatically, you will need a context and request object.
 
 
-.. warning:: Manual plugin rendering is not a public API, and as such it's
-subject to change without notice.
+.. warning:: Manual placeholder rendering is not a public API, and as such it's subject to change without notice.
 
              ::
 
