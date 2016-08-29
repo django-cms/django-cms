@@ -65,8 +65,7 @@ understand the decisions taken by the project.
 Release schedule
 ****************
 
-The `roadmap <https://github.com/divio/django-cms/wiki/Roadmap>`_ can be found on our GitHub wiki
-page.
+The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website.
 
 We are planning releases according to **key principles and aims**. Issues within milestones are
 therefore subject to change.
