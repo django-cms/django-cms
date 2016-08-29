@@ -34,24 +34,24 @@ Model Relationship Back-References and Django 1.9
 =================================================
 
 Django 1.9 is lot stricter about collisions in the ``related_names`` of
-relationship fields than previous versions of Django. This has brought to light
-issues in django CMS relating to the private field ``CMSPlugin.cmsplugin_ptr``.
+relationship fields than previous versions of Django. This has brought to light
+issues in django CMS relating to the private field ``CMSPlugin.cmsplugin_ptr``.
 The issue becomes apparent when multiple packages are installed that provide
 plugins with the same model class name. A good example would be if you have the
-package ``djangocms-file`` installed, which has a poorly named CMSPlugin model
+package ``djangocms-file`` installed, which has a poorly named CMSPlugin model
 subclass called ``File``, then any other package that has a plugin with a
-field named "file" would most likely cause an issue. Considering that
+field named "file" would most likely cause an issue. Considering that
 ``djangocms-file`` is a very common plugin to use and a field name of "file" is
-not uncommon in other plugins, this is less than ideal.
+not uncommon in other plugins, this is less than ideal.
 
-Fortunately, developers can correct these issues in their own projects while
-they await improvements in django CMS. There is an internal field that is
-created when instantiating plugins: ``CMSPlugin.cmsplugin_ptr``. This private
-field is declared in the CMSPlugin base class and is populated on instantiation
+Fortunately, developers can correct these issues in their own projects while
+they await improvements in django CMS. There is an internal field that is
+created when instantiating plugins: ``CMSPlugin.cmsplugin_ptr``. This private
+field is declared in the CMSPlugin base class and is populated on instantiation
 using the lower-cased model name of the CMSPlugin subclass that is
 being registered.
 
-A subclass to ``CMSPlugin`` can declare their own ``cmsplugin_ptr`` field to
+A subclass to ``CMSPlugin`` can declare their own ``cmsplugin_ptr`` field to
 immediately fix this issue. The easiest solution is to declare this field with a
 ``related_name`` of "+". In typical Django fashion, this will suppress the
 back-reference and prevent any collisions. However, if the back-reference is
@@ -81,7 +81,7 @@ Please note that CMSPlugin.cmsplugin_ptr will remain a private field.
 Notice of Upcoming Change in 3.3
 ================================
 
-As outlined in the section immediately above, the pattern currently used to
+As outlined in the section immediately above, the pattern currently used to
 derive a ``related_name`` for the private field ``CMSPlugin.cmsplugin_ptr`` may
 result in frequent collisions. In django CMS 3.3, this string-template will be
 changed to utilise both the ``app_label`` and the model class name. In the
