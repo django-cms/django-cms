@@ -258,7 +258,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None,
-                 parent=None, overwrite_url=None, with_revision=False):
+                 parent=None, overwrite_url=None, with_revision=None):
     """
     Create a title.
 
