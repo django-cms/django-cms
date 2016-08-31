@@ -16,12 +16,15 @@ class FixTreeCommand(SubcommandsCommand):
         """
         self.stdout.write('fixing page tree')
         Page.fix_tree()
+
+        root_draft_pages = Page.objects.filter(
+            publisher_is_draft=True,
+            parent__isnull=True,
+        )
+
         last = None
 
-        root_draft_pages = Page.objects.drafts().all_root()
-
         try:
-            # Get the first draft root page (parentless)
             first = root_draft_pages.order_by('path')[0]
         except IndexError:
             first = None
@@ -29,19 +32,16 @@ class FixTreeCommand(SubcommandsCommand):
         for page in root_draft_pages.order_by('site__pk', 'path'):
             if last:
                 last = last.reload()
+                page = page.reload()
                 page.move(target=last, pos='right')
             elif first and first.pk != page.pk:
                 page.move(target=first, pos='left')
             last = page.reload()
 
-        root_public_pages = (
-            Page
-            .objects
-            .public()
-            .all_root()
-            .select_related('publisher_public')
-            .order_by('publisher_public__path')
-        )
+        root_public_pages = Page.objects.filter(
+            publisher_is_draft=False,
+            parent__isnull=True,
+        ).order_by('publisher_public__path')
 
         # Filter out any root public pages whose draft page
         # has a parent.
@@ -53,8 +53,9 @@ class FixTreeCommand(SubcommandsCommand):
         )
 
         for page in root_public_pages:
-            draft = page.publisher_public
-            page.move(target=draft, pos='right')
+            page = page.reload()
+            public = page.publisher_public
+            page.move(target=public, pos='right')
 
         self.stdout.write('fixing plugin tree')
         CMSPlugin.fix_tree()
