@@ -146,10 +146,10 @@ def get_templates():
         config_path = os.path.join(tpldir, '__init__.py')
         # Try to load templates list and names from the template module
         # If module file is not present skip configuration and just dump the filenames as templates
-        if config_path:
+        try:
             template_module = load_from_file(config_path)
             templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
-        else:
+        except FileNotFoundError:
             templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
