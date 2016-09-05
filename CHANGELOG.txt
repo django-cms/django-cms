@@ -42,6 +42,7 @@
   parent to a published page.
 * Fixed a bug where moving a published page under a page marked as pending publishing
   is left as published instead of being marked as pending publishing.
+* Fixed AttributeError when using ``create_page`` in management command
 
 
 === 3.3.2 (2016-08-11) ===
