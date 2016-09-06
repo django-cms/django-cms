@@ -560,7 +560,19 @@ class ViewRestrictionInlineAdminForm(BasePermissionAdminForm):
 class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
     class Meta:
-        fields = '__all__'
+        fields = [
+            'user',
+            'group',
+            'can_add',
+            'can_change',
+            'can_delete',
+            'can_publish',
+            'can_change_advanced_settings',
+            'can_change_permissions',
+            'can_move_page',
+            'can_view',
+            'sites',
+        ]
         model = GlobalPagePermission
 
 

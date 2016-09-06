@@ -191,27 +191,6 @@ class GlobalPagePermission(AbstractPagePermission):
     def __str__(self):
         return "%s :: GLOBAL" % self.audience
 
-    def clean(self):
-        super(GlobalPagePermission, self).clean()
-
-        can_recover = self.can_add and self.can_change
-
-        if self.can_recover_page and not can_recover:
-            message = _("Users can't recover pages without permissions to "
-                        "create and modify pages. Add & Edit permissions required.")
-            raise ValidationError(message)
-
-    @classmethod
-    def get_all_permissions(cls):
-        perms = super(GlobalPagePermission, cls).get_all_permissions()
-        return perms + ['can_recover_page']
-
-    @classmethod
-    def get_permissions_by_action(cls):
-        perms_by_action = super(GlobalPagePermission, cls).get_permissions_by_action()
-        perms_by_action['recover_page'] = ['can_add', 'can_change', 'can_recover_page']
-        return perms_by_action
-
 
 @python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):

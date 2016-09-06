@@ -240,9 +240,6 @@ class GlobalPagePermissionManager(BasicPagePermissionManager):
         queries = [Q(**{perm: True}) for perm in perms]
         return queryset.filter(functools.reduce(operator.or_, queries)).exists()
 
-    def get_with_recover_permissions(self, user, site_id):
-        return self.get_with_permission(user, site_id, 'can_recover_page')
-
 
 class PagePermissionManager(BasicPagePermissionManager):
     """Page permission manager accessible under objects.
