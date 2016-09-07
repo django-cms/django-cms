@@ -995,7 +995,8 @@ var PageTree = new Class({
         } else if (node.id === '#') {
             return false;
         }
-        return Boolean(node.li_attr['data-' + permission + '-permission']);
+
+        return node.li_attr['data-' + permission + '-permission'] === 'true';
     }
 });
 
