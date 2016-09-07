@@ -43,6 +43,7 @@
 * Fixed a bug where moving a published page under a page marked as pending publishing
   is left as published instead of being marked as pending publishing.
 * Fixed AttributeError when using ``create_page`` in management command
+* Fixed a bug in getting the language from current request which can cause error 500
 
 
 === 3.3.2 (2016-08-11) ===

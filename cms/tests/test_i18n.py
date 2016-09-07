@@ -6,7 +6,7 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils import i18n
+from cms.utils import i18n, get_language_from_request
 
 
 @override_settings(
@@ -371,3 +371,39 @@ class TestLanguageFallbacks(CMSTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')
+
+
+@override_settings(
+    LANGUAGE_CODE='en',
+    LANGUAGES=(('fr', 'French'),
+               ('en', 'English'),
+               ('de', 'German'),
+               ('es', 'Spanish')),
+    CMS_LANGUAGES={
+        1: [{'code' : 'en',
+             'name': 'English',
+             'public': False},
+            {'code': 'fr',
+             'name': 'French',
+             'public': True},
+        ],
+        'default': {
+            'fallbacks': ['en', 'fr'],
+            'redirect_on_fallback': False,
+            'public': True,
+            'hide_untranslated': False,
+        }
+    },
+    SITE_ID=1,
+)
+class TestGetLanguageFromRequest(CMSTestCase):
+
+    def test_get_language_from_request_does_not_return_empty_string_from_post(self):
+        request = self.get_request(language='en', post_data={
+            'language': '',
+        })
+        self.assertEqual(get_language_from_request(request), 'en')
+
+    def test_get_language_from_request_does_not_return_empty_string_from_get(self):
+        request = self.get_request('/en/?language=', language='en')
+        self.assertEqual(get_language_from_request(request), 'en')
