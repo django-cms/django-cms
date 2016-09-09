@@ -49,7 +49,9 @@ class TreePublishRow(Tag):
                 cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
                 text = _("published")
         else:
-            if language in page.languages:
+            page_languages = page.get_languages()
+
+            if language in page_languages:
                 public_pending = page.publisher_public_id and page.publisher_public.get_publisher_state(
                         language) == PUBLISHER_STATE_PENDING
                 if public_pending or page.get_publisher_state(
@@ -75,7 +77,9 @@ def is_published(page, language):
     if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
         return True
     else:
-        if language in page.languages and page.publisher_public_id and page.publisher_public.get_publisher_state(
+        page_languages = page.get_languages()
+
+        if language in page_languages and page.publisher_public_id and page.publisher_public.get_publisher_state(
                 language) == PUBLISHER_STATE_PENDING:
             return True
         return False
