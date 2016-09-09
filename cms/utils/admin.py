@@ -76,6 +76,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
         'filtered': filtered,
         'metadata': metadata,
         'preview_language': language,
+        'page_languages': page.get_languages(),
         'has_change_permission': page.has_change_permission(request),
         'has_publish_permission': page.has_publish_permission(request),
         'has_delete_permission': page.has_delete_permission(request),

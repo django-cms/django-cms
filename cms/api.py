@@ -14,6 +14,7 @@ from django.core.exceptions import FieldError
 from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
@@ -154,6 +155,7 @@ def can_change_page(request):
 # Public API
 #===============================================================================
 
+@transaction.atomic
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, apphook_namespace=None, redirect=None, meta_description=None,
                 created_by='python-api', parent=None,
@@ -257,6 +259,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
+
+    # This saves the page
     page = page.add_root(instance=page)
 
     if parent:
@@ -289,6 +293,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     return page.reload()
 
 
+@transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None,
                  parent=None, overwrite_url=None, with_revision=False):
@@ -334,6 +339,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     return title
 
 
+@transaction.atomic
 def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
