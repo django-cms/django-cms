@@ -16,7 +16,6 @@ from cms.api import generate_valid_slug
 from cms.constants import PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
-from cms.models.titlemodels import EmptyTitle
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.compat.dj import is_installed
@@ -144,16 +143,6 @@ class BaseCMSPageForm(forms.Form):
 
 
 class CreateCMSPageForm(BaseCMSPageForm):
-
-    @staticmethod
-    def create_page_titles(page, title, languages):
-        # Import here due to potential circular dependency issues
-        from cms.api import create_title
-
-        for language in languages:
-            title_obj = page.get_title_obj(language=language, fallback=False)
-            if isinstance(title_obj, EmptyTitle):
-                create_title(language, title, page)
 
     @staticmethod
     def get_placeholder(page, slot=None):
