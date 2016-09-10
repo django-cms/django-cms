@@ -603,6 +603,14 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             delattr(self, '_publisher_keep_state')
         return super(Page, self).save_base(*args, **kwargs)
 
+    def update(self, refresh=False, **fields):
+        cls = self.__class__
+        cls.objects.filter(pk=self.pk).update(**fields)
+
+        if refresh:
+            return self.reload()
+        return
+
     def is_new_dirty(self):
         if self.pk:
             fields = [
@@ -955,6 +963,15 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             return sorted(self.languages.split(','))
         else:
             return []
+
+    def update_languages(self, languages):
+        languages = ",".join(languages)
+        # Update current instance
+        self.languages = languages
+        # Commit. It's important to not call save()
+        # we'd like to commit only the languages field and without
+        # any kind of signals.
+        self.update(languages=languages)
 
     def get_descendants(self, include_self=False):
         """

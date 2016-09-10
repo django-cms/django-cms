@@ -44,6 +44,8 @@
   is left as published instead of being marked as pending publishing.
 * Fixed AttributeError when using ``create_page`` in management command
 * Fixed a bug in getting the language from current request which can cause error 500
+* API functions are now atomic by design (use the @atomic decorator)
+* Fixed a bug where a ``Page`` was created with it's languages field set to ``None``.
 
 
 === 3.3.2 (2016-08-11) ===

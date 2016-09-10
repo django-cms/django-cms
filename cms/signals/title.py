@@ -29,17 +29,16 @@ def update_title(title):
 def pre_save_title(instance, raw, **kwargs):
     """Save old state to instance and setup path
     """
-    if instance.page.languages:
-        languages = instance.page.languages.split(',')
-    else:
-        languages = []
-    if not instance.language in languages:
-        languages.append(instance.language)
-        instance.page.languages = ",".join(languages)
-        instance.page._publisher_keep_state = True
-        instance.page.save(no_signals=True)
-    if not instance.page.publisher_is_draft:
-        menu_pool.clear(instance.page.site_id)
+    page = instance.page
+    page_languages = page.get_languages()
+
+    if not instance.language in page_languages:
+        page_languages.append(instance.language)
+        page.update_languages(page_languages)
+
+    if not page.publisher_is_draft:
+        menu_pool.clear(page.site_id)
+
     if instance.pk and not hasattr(instance, "tmp_path"):
         instance.tmp_path = None
         try:
@@ -81,15 +80,13 @@ def post_save_title(instance, raw, created, **kwargs):
 def pre_delete_title(instance, **kwargs):
     """Save old state to instance and setup path
     """
-    if instance.page.languages:
-        languages = instance.page.languages.split(',')
-    else:
-        languages = []
-    if instance.language in languages:
-        languages.remove(instance.language)
-        instance.page.languages = ",".join(languages)
-        instance.page._publisher_keep_state = True
-        instance.page.save(no_signals=True)
+    page = instance.page
+    page_languages = page.get_languages()
+
+    if instance.language in page_languages:
+        page_languages.remove(instance.language)
+        page.update_languages(page_languages)
+
     if instance.publisher_is_draft:
         instance.page.mark_descendants_pending(instance.language)
 

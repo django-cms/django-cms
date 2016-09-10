@@ -3,6 +3,7 @@
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
+from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
@@ -206,6 +207,32 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             url = page.get_absolute_url('en')
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+
+    def test_wizard_create_atomic(self):
+        # Ref: https://github.com/divio/django-cms/issues/5652
+        # We'll simulate a scenario where a user creates a page with an
+        # invalid template which causes Django to throw an error when the
+        # template is scanned for placeholders and thus short circuits the
+        # creation mechanism.
+        superuser = self.get_superuser()
+        data = {
+            'title': 'page 1',
+            'slug': 'page_1',
+            'page_type': None,
+        }
+        form = CreateCMSPageForm(data=data)
+        form.page = None
+        form.language_code = 'en'
+        form.user = superuser
+
+        self.assertTrue(form.is_valid())
+        self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
+
+        with self.settings(CMS_TEMPLATES=[("col_invalid.html", "notvalid")]):
+            self.assertRaises(TemplateSyntaxError, form.save)
+            # The template raised an exception which should cause the database to roll back
+            # instead of committing a page in a partial state.
+            self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
     def test_wizard_content_placeholder_setting(self):
         """
