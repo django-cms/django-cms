@@ -6,13 +6,14 @@
 # Translators:
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Daniel Braun <dbraun86@gmail.com>, 2013
+# fishfurbanter <fishfurbanter@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 12:21-0400\n"
-"PO-Revision-Date: 2016-08-09 11:43+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2016-09-12 10:52-0400\n"
+"PO-Revision-Date: 2016-09-07 13:39+0000\n"
+"Last-Translator: fishfurbanter <fishfurbanter@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/divio/django-cms/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,19 +21,19 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/cms/js/dist/3.4.0dev1/bundle.admin.changeform.min.js:1
+#: static/cms/js/dist/3.4.0rc1/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:72
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "האם אתה בטוח שברצונך לשנות כרטיסיות מבלי לשמור את העמוד?"
 
-#: static/cms/js/dist/3.4.0dev1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.0rc1/bundle.admin.widget.min.js:3
 msgid "show"
-msgstr ""
+msgstr "הצג"
 
-#: static/cms/js/dist/3.4.0dev1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.0rc1/bundle.admin.widget.min.js:3
 msgid "hide"
-msgstr ""
+msgstr "הסתר"
 
-#: static/cms/js/dist/3.4.0dev1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.0rc1/bundle.admin.widget.min.js:3
 msgid "toggle"
-msgstr ""
+msgstr "החלף מצב"

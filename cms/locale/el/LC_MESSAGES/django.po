@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 12:21-0400\n"
-"PO-Revision-Date: 2016-08-29 16:22+0000\n"
+"POT-Creation-Date: 2016-09-12 10:52-0400\n"
+"PO-Revision-Date: 2016-09-12 14:52+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Greek (http://www.transifex.com/divio/django-cms/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -39,11 +39,11 @@ msgstr "Γλώσσα"
 msgid "The current language of the content fields."
 msgstr "Η επιλεγμένη γλώσσα των πεδίων περιεχομένου"
 
-#: admin/forms.py:88 forms/wizards.py:57
+#: admin/forms.py:88 forms/wizards.py:56
 msgid "Page type"
 msgstr "Τύπος σελίδας"
 
-#: admin/forms.py:89 forms/wizards.py:50
+#: admin/forms.py:89 forms/wizards.py:49
 msgid "Title"
 msgstr "Τίτλος"
 
@@ -51,7 +51,7 @@ msgstr "Τίτλος"
 msgid "The default title"
 msgstr "Προεπιλεγμένος τίτλος"
 
-#: admin/forms.py:91 forms/wizards.py:53
+#: admin/forms.py:91 forms/wizards.py:52
 msgid "Slug"
 msgstr "Slug"
 
@@ -170,18 +170,18 @@ msgstr "χρήστης"
 msgid "can_view"
 msgstr ""
 
-#: admin/forms.py:572 admin/forms.py:578 admin/forms.py:582
+#: admin/forms.py:584 admin/forms.py:590 admin/forms.py:594
 #: templates/admin/cms/page/change_form.html:11
 #: templates/admin/cms/usersettings/change_form.html:33
 #: templatetags/cms_tags.py:583
 msgid "Add"
 msgstr "Προσθήκη"
 
-#: admin/forms.py:573 admin/forms.py:579 admin/forms.py:583
+#: admin/forms.py:585 admin/forms.py:591 admin/forms.py:595
 msgid "Change"
 msgstr "Αλλαγή"
 
-#: admin/forms.py:574 admin/forms.py:580 admin/forms.py:584
+#: admin/forms.py:586 admin/forms.py:592 admin/forms.py:596
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
@@ -193,56 +193,56 @@ msgstr "Αλλαγή"
 msgid "Delete"
 msgstr "Διαγραφή"
 
-#: admin/forms.py:602 models/permissionmodels.py:85
+#: admin/forms.py:614 models/permissionmodels.py:85
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:607 models/permissionmodels.py:90
+#: admin/forms.py:619 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
 
-#: admin/forms.py:612
+#: admin/forms.py:624
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
 
-#: admin/forms.py:617
+#: admin/forms.py:629
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:624
+#: admin/forms.py:636
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:629
+#: admin/forms.py:641
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:748
+#: admin/forms.py:760
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr ""
 
-#: admin/forms.py:765 admin/pageadmin.py:761 admin/placeholderadmin.py:319
+#: admin/forms.py:777 admin/pageadmin.py:761 admin/placeholderadmin.py:319
 msgid "Language must be set to a supported language!"
 msgstr "Η γλώσσα πρέπει τεθεί σε κάποια που υποστηρίζεται!"
 
-#: admin/forms.py:771
+#: admin/forms.py:783
 msgid "Parent plugin language must be same as language!"
 msgstr ""
 
-#: admin/forms.py:776
+#: admin/forms.py:788
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
@@ -452,7 +452,7 @@ msgstr ""
 msgid "placeholder"
 msgstr ""
 
-#: admin/useradmin.py:122 models/permissionmodels.py:227
+#: admin/useradmin.py:122 models/permissionmodels.py:206
 msgid "Page permissions"
 msgstr "Δικαιώματα σελίδας"
 
@@ -498,7 +498,7 @@ msgstr ""
 msgid "Structure"
 msgstr "Δομή"
 
-#: cms_toolbars.py:98 forms/wizards.py:59
+#: cms_toolbars.py:98 forms/wizards.py:58
 msgid "Content"
 msgstr "Περιεχόμενο"
 
@@ -592,7 +592,7 @@ msgid "Pages"
 msgstr "Σελίδες"
 
 #: cms_toolbars.py:488 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:61 tests/test_wizards.py:84
+#: tests/test_wizards.py:62 tests/test_wizards.py:85
 msgid "Page"
 msgstr "Σελίδα"
 
@@ -678,26 +678,26 @@ msgstr "Επιλέξτε έγκυρη σελίδα"
 msgid "Add Another"
 msgstr "Προσθήκη και άλλου"
 
-#: forms/wizards.py:51
+#: forms/wizards.py:50
 msgid "Provide a title for the new page."
 msgstr ""
 
-#: forms/wizards.py:54
+#: forms/wizards.py:53
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
 
-#: forms/wizards.py:60
+#: forms/wizards.py:59
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 
-#: forms/wizards.py:154 migrations/0001_initial.py:134 models/pagemodel.py:123
-#: models/permissionmodels.py:221 models/titlemodels.py:29
+#: forms/wizards.py:143 migrations/0001_initial.py:134 models/pagemodel.py:123
+#: models/permissionmodels.py:200 models/titlemodels.py:29
 #: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "σελίδα"
 
-#: forms/wizards.py:192
+#: forms/wizards.py:181
 msgid "User does not have permission to add page."
 msgstr ""
 
@@ -837,7 +837,7 @@ msgstr ""
 msgid "site"
 msgstr "ιστότοπος"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:220
+#: migrations/0001_initial.py:132 models/permissionmodels.py:199
 #: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "Χορήγηση σε"
@@ -902,11 +902,11 @@ msgstr "όριο σελίδας όταν είναι οραό από το μεν�
 msgid "pages"
 msgstr "σελίδες"
 
-#: models/pagemodel.py:1071 templates/admin/cms/page/tree/legend.html:33
+#: models/pagemodel.py:1088 templates/admin/cms/page/tree/legend.html:33
 msgid "Empty"
 msgstr "Κενό"
 
-#: models/pagemodel.py:1189
+#: models/pagemodel.py:1206
 msgid "default"
 msgstr "εξ' ορισμού"
 
@@ -983,35 +983,29 @@ msgstr "Δικαίωμα σε όλη τη σελίδα"
 msgid "Pages global permissions"
 msgstr "Δικαιώματα σε όλες τις σελίδες"
 
-#: models/permissionmodels.py:200
-msgid ""
-"Users can't recover pages without permissions to create and modify pages. "
-"Add & Edit permissions required."
-msgstr ""
-
-#: models/permissionmodels.py:226
+#: models/permissionmodels.py:205
 msgid "Page permission"
 msgstr "Δικαίωμα σελίδας"
 
-#: models/permissionmodels.py:241
+#: models/permissionmodels.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "Το δικαίωμα προσθήκης σελίδας απαιτεί πρόσβαση στις υποσελίδες, αλλιώς η σελίδα που προστέθηκε δεν μπορεί να τροποποιηθεί από τον δημιουργό της."
 
-#: models/permissionmodels.py:277
+#: models/permissionmodels.py:256
 msgid "User (page)"
 msgstr "Χρήστης (σελίδα)"
 
-#: models/permissionmodels.py:278
+#: models/permissionmodels.py:257
 msgid "Users (page)"
 msgstr "Χρήστες (σελίδα)"
 
-#: models/permissionmodels.py:288
+#: models/permissionmodels.py:267
 msgid "User group (page)"
 msgstr "Ομάδα χρηστών (σελίδα)"
 
-#: models/permissionmodels.py:289
+#: models/permissionmodels.py:268
 msgid "User groups (page)"
 msgstr "Ομάδες χρηστών (σελίδα)"
 
@@ -1863,15 +1857,15 @@ msgstr "αδημοσίευτες αλλαγές"
 msgid "published"
 msgstr "δημοσιευμένο"
 
-#: templatetags/cms_admin.py:58
+#: templatetags/cms_admin.py:60
 msgid "unpublished parent"
 msgstr ""
 
-#: templatetags/cms_admin.py:61
+#: templatetags/cms_admin.py:63
 msgid "unpublished"
 msgstr "αδημοσίευτο"
 
-#: templatetags/cms_admin.py:64
+#: templatetags/cms_admin.py:66
 msgid "no content"
 msgstr "χωρίς περιεχόμενο"
 
@@ -2065,7 +2059,7 @@ msgstr ""
 msgid "Inherit the template of the nearest ancestor"
 msgstr ""
 
-#: tests/test_wizards.py:73
+#: tests/test_wizards.py:74
 msgid "UserSettings"
 msgstr ""
 
