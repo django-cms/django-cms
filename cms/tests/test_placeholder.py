@@ -624,6 +624,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_de = title_de.page.placeholders.get(slot='col_left')
         add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
 
+        context_en = SekizaiContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_de = SekizaiContext()
+        context_de['request'] = self.get_request(language="de", page=page_en)
+
         conf = {
             'col_left': {
                 'untranslated': True,
@@ -632,19 +637,25 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         }
         # configure untranslated
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            context_en = SekizaiContext()
-            context_en['request'] = self.get_request(language="en", page=page_en)
-            context_de = SekizaiContext()
-            context_de['request'] = self.get_request(language="de", page=page_en)
-
             ## English page should have the text plugin
             content_en = _render_placeholder(placeholder_en, context_en)
             self.assertRegexpMatches(content_en, "^en body$")
-
             ## Deutsch page have text due to untranslated
             content_de = _render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^en body$")
             self.assertEqual(len(content_de), 7)
+
+            del(placeholder_en._plugins_cache)
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            # add another
+            add_plugin(placeholder_en, TextPlugin, 'de', body='de body')
+
+            # both should have both
+            content_de = _render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "^en bodyde body$")
+            content_en = _render_placeholder(placeholder_en, context_en)
+            self.assertRegexpMatches(content_en, "^en bodyde body$")
 
     def test_plugins_prepopulate(self):
         """ Tests prepopulate placeholder configuration """
