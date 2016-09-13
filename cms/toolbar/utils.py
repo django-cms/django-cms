@@ -1,6 +1,5 @@
 import json
 
-from django.template.defaultfilters import escapejs
 from django.utils.encoding import force_text
 from django.utils.six import text_type
 from django.utils.translation import ugettext
@@ -10,7 +9,7 @@ from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 
 def get_placeholder_toolbar_js(placeholder, request_language,
                                render_language, allowed_plugins=None):
-    label = escapejs(placeholder.get_label() or '')
+    label = placeholder.get_label() or ''
     help_text = ugettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
     ) % {'placeholder_label': label}
@@ -32,7 +31,7 @@ def get_placeholder_toolbar_js(placeholder, request_language,
 
 
 def get_plugin_toolbar_js(plugin, request_language, children=None, parents=None):
-    plugin_name = escapejs(plugin.get_plugin_name())
+    plugin_name = plugin.get_plugin_name()
     help_text = ugettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': plugin_name}

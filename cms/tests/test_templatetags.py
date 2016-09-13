@@ -302,6 +302,32 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
                 start_tag = tag_format.format(plugin.pk)
                 self.assertIn(start_tag, output)
 
+    def test_render_placeholder_toolbar_js_escaping(self):
+        page = self._getfirst()
+        request = self.get_request(language='en', page=page)
+        renderer = self.get_content_renderer(request)
+        placeholder = page.placeholders.get(slot='body')
+
+        conf = {placeholder.slot: {'name': 'Content-with-dash'}}
+
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            content = render_placeholder_toolbar_js(
+                placeholder,
+                render_language='en',
+                content_renderer=renderer,
+            )
+
+        expected_bits = [
+            '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
+            '"name": "Content-with-dash"',
+            '"placeholder_id": "{}"'.format(placeholder.pk),
+            '"plugin_language": "en"',
+            '"page_language": "en"',
+        ]
+
+        for bit in expected_bits:
+            self.assertIn(bit, content)
+
     def test_render_placeholder_toolbar_js_with_no_plugins(self):
         page = self._getfirst()
         request = self.get_request(language='en', page=page)
