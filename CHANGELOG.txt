@@ -1,4 +1,4 @@
-=== 3.4.0 (unreleased) ===
+=== 3.4.0 (2016-09-14) ===
 
 * Changed the way CMS plugins are rendered. The div with `cms-plugin` class is
   no longer rendered around every CMS plugin, instead a combination of `template`
