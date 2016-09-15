@@ -188,6 +188,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
+    cmsplugin_hidden = models.BooleanField('Hide plugin contents', default=False)
     child_plugin_instances = None
     translatable_content_excluded_fields = []
 
@@ -251,7 +252,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
-        if not context or not 'cms_content_renderer' in context:
+        if not context or not 'cms_content_renderer' in context or self.cmsplugin_hidden:
             return ''
 
         if not isinstance(placeholder, Placeholder):
