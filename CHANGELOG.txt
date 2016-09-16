@@ -1,3 +1,9 @@
+=== 3.4.1 (Unreleased) ===
+
+* Fixed a regression when static placeholder was uneditable if it was present
+  on the page multiple times
+
+
 === 3.4.0 (2016-09-14) ===
 
 * Changed the way CMS plugins are rendered. The div with `cms-plugin` class is

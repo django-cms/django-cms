@@ -107,7 +107,9 @@ var Plugin = new Class({
         var wrapper = $('.' + container);
         var contents;
 
-        if (wrapper.length > 1) {
+        // have to check for cms-plugin, there can be a case when there are multiple
+        // static placeholders, there could be multiple wrappers on same page
+        if (wrapper.length > 1 && container.match(/cms-plugin/)) {
             var templateStart = $('.cms-plugin-start.' + container);
             var className = templateStart.attr('class').replace('cms-plugin-start', '');
 
