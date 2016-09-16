@@ -34,7 +34,6 @@ _django_permissions_by_action = {
     'delete_page_translation': [PAGE_CHANGE_CODENAME, PAGE_DELETE_CODENAME],
     'move_page': [PAGE_CHANGE_CODENAME],
     'publish_page': [PAGE_CHANGE_CODENAME, PAGE_PUBLISH_CODENAME],
-    'recover_page': [PAGE_ADD_CODENAME, PAGE_CHANGE_CODENAME],
 }
 
 
@@ -274,12 +273,6 @@ def user_can_view_page(user, page):
 @cached_func
 def user_can_change_all_pages(user, site):
     return has_global_permission(user, site, action='change_page')
-
-
-@permission_pre_checks(action='recover_page')
-@cached_func
-def user_can_recover_all_pages(user, site):
-    return has_global_permission(user, site, action='recover_page')
 
 
 @permission_pre_checks(action='change_page')

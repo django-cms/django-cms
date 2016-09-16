@@ -60,7 +60,7 @@
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
-                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %}">
+                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page_languages %} target="_top"{% endif %}">
                         <span class="sr-only">{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
                     </a>
                 </div>
@@ -76,7 +76,7 @@
                         <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
                             class="cms-pagetree-dropdown-trigger js-cms-pagetree-dropdown-trigger"
                             {# INFO: delegate click event to parent window when in sideframe #}
-                            {% if lang in page.languages %} target="_top"{% endif %}>
+                            {% if lang in page_languages %} target="_top"{% endif %}>
                             {# INFO: renders <span class="{cls}" title="{title}"></span> #}
                             {% tree_publish_row page lang %}
                         </a>
@@ -90,7 +90,7 @@
                                     </a>
                                 </li>
                                 {# hide if page is empty #}
-                                {% if lang in page.languages %}
+                                {% if lang in page_languages %}
                                     {% if page|all_ancestors_are_published:lang %}
                                         {% if page|is_dirty:lang or not page|is_published:lang %}
                                             <li>

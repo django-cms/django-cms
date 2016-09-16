@@ -118,8 +118,6 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
         search_fields.append("user__%s" % field)
     search_fields.append('group__name')
 
-    exclude = []
-
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
 

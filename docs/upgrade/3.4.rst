@@ -65,6 +65,14 @@ Then run::
 Backward incompatible changes
 *****************************
 
+Apphooks & Toolbars
+===================
+
+As per our deprecation policy we've now removed the backwards compatible shim
+for ``cms_app.py`` and ``cms_toolbar.py``.
+If you have not done so already, please rename these to ``cms_apps.py`` and ``cms_toolbars.py``.
+
+
 Permissions
 ===========
 
@@ -85,6 +93,7 @@ Functions removed:
  * ``load_view_restrictions``
  * ``get_any_page_view_permissions``
 
+
 The following methods were changed to require a user parameter instead of a request:
 
  * ``Page.has_view_permission``
@@ -98,6 +107,30 @@ The following methods were changed to require a user parameter instead of a requ
  * ``Page.has_move_page_permission``
 
 These are also deprecated in favor of their counterparts in ``cms.utils.page_permissions``.
+
+To keep consistency with both django CMS permissions and Django permissions,
+we've modified the vanilla permissions system (``CMS_PERMISSIONS = False``)
+to require users to have certain Django permissions to perform an action.
+
+Here's an overview:
+
+============ ==================================
+Action       Permission required
+============ ==================================
+Add Page     Can Add Page & Can Change Page
+Change Page  Can Change Page
+Delete Page  Can Change Page & Can Delete Page
+Move Page    Can Change Page
+Publish Page Can Change Page & Can Publish Page
+============ ==================================
+
+This change will only affect non-superuser staff members.
+
+.. warning::
+
+    If you have a custom ``Page`` extension with a configured toolbar,
+    please see the updated :ref:`example <complete_toolbar_api>`.
+    It uses the new permission internals.
 
 
 Manual plugin rendering

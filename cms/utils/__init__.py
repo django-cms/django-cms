@@ -52,20 +52,20 @@ def get_language_from_request(request, current_page=None):
         language = get_language_code(language)
         if not language in get_language_list(site_id):
             language = None
-    if language is None:
+    if not language:
         language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
     if language:
         if not language in get_language_list(site_id):
             language = None
 
-    if language is None and current_page:
+    if not language and current_page:
         # in last resort, get the first language available in the page
         languages = current_page.get_languages()
 
         if len(languages) > 0:
             language = languages[0]
 
-    if language is None:
+    if not language:
         # language must be defined in CMS_LANGUAGES, so check first if there
         # is any language with LANGUAGE_CODE, otherwise try to split it and find
         # best match

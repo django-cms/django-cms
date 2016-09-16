@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from menus.menu_pool import menu_pool
@@ -211,6 +211,27 @@ class PythonAPITests(CMSTestCase):
         page = create_page(**page_attrs)
         self.assertTrue(page.get_title_obj_attribute('has_url_overwrite'))
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')
+
+    def test_create_page_atomic(self):
+        # Ref: https://github.com/divio/django-cms/issues/5652
+        # We'll simulate a scenario where a user creates a page with an
+        # invalid template which causes Django to throw an error when the
+        # template is scanned for placeholders and thus short circuits the
+        # creation mechanism.
+        page_attrs = self._get_default_create_page_arguments()
+
+        # It's important to use TEMPLATE_INHERITANCE_MAGIC to avoid the cms
+        # from loading the template before saving and triggering the template error
+        # Instead, we delay the loading of the template until after the save is executed.
+        page_attrs["template"] = TEMPLATE_INHERITANCE_MAGIC
+
+        self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
+
+        with self.settings(CMS_TEMPLATES=[("col_invalid.html", "notvalid")]):
+            self.assertRaises(TemplateSyntaxError, create_page, **page_attrs)
+            # The template raised an exception which should cause the database to roll back
+            # instead of committing a page in a partial state.
+            self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
     def test_create_reverse_id_collision(self):
         create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 12:21-0400\n"
-"PO-Revision-Date: 2016-08-29 16:22+0000\n"
+"POT-Creation-Date: 2016-09-12 10:52-0400\n"
+"PO-Revision-Date: 2016-09-12 14:53+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -39,11 +39,11 @@ msgstr "اللغة"
 msgid "The current language of the content fields."
 msgstr "اللغة الحالية لحقول المحتوى."
 
-#: admin/forms.py:88 forms/wizards.py:57
+#: admin/forms.py:88 forms/wizards.py:56
 msgid "Page type"
 msgstr "نوع الصفحة"
 
-#: admin/forms.py:89 forms/wizards.py:50
+#: admin/forms.py:89 forms/wizards.py:49
 msgid "Title"
 msgstr "العنوان"
 
@@ -51,7 +51,7 @@ msgstr "العنوان"
 msgid "The default title"
 msgstr "العنوان الإفتراضي"
 
-#: admin/forms.py:91 forms/wizards.py:53
+#: admin/forms.py:91 forms/wizards.py:52
 msgid "Slug"
 msgstr "Slug"
 
@@ -170,18 +170,18 @@ msgstr "مستخدم"
 msgid "can_view"
 msgstr "يستطيع_المشاهدة"
 
-#: admin/forms.py:572 admin/forms.py:578 admin/forms.py:582
+#: admin/forms.py:584 admin/forms.py:590 admin/forms.py:594
 #: templates/admin/cms/page/change_form.html:11
 #: templates/admin/cms/usersettings/change_form.html:33
 #: templatetags/cms_tags.py:583
 msgid "Add"
 msgstr "أضف"
 
-#: admin/forms.py:573 admin/forms.py:579 admin/forms.py:583
+#: admin/forms.py:585 admin/forms.py:591 admin/forms.py:595
 msgid "Change"
 msgstr "تعديل"
 
-#: admin/forms.py:574 admin/forms.py:580 admin/forms.py:584
+#: admin/forms.py:586 admin/forms.py:592 admin/forms.py:596
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
@@ -193,56 +193,56 @@ msgstr "تعديل"
 msgid "Delete"
 msgstr "حذف"
 
-#: admin/forms.py:602 models/permissionmodels.py:85
+#: admin/forms.py:614 models/permissionmodels.py:85
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:607 models/permissionmodels.py:90
+#: admin/forms.py:619 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
 
-#: admin/forms.py:612
+#: admin/forms.py:624
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
 
-#: admin/forms.py:617
+#: admin/forms.py:629
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:624
+#: admin/forms.py:636
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:629
+#: admin/forms.py:641
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:748
+#: admin/forms.py:760
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr ""
 
-#: admin/forms.py:765 admin/pageadmin.py:761 admin/placeholderadmin.py:319
+#: admin/forms.py:777 admin/pageadmin.py:761 admin/placeholderadmin.py:319
 msgid "Language must be set to a supported language!"
 msgstr "يجب تحديد لغة مدعومة!"
 
-#: admin/forms.py:771
+#: admin/forms.py:783
 msgid "Parent plugin language must be same as language!"
 msgstr "يجب أن تكون اللغة الرئيسية للملحق نفس اللغة!"
 
-#: admin/forms.py:776
+#: admin/forms.py:788
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
@@ -452,7 +452,7 @@ msgstr "العنصر النائب \"%(obj)s\" تم حذفه بنجاح."
 msgid "placeholder"
 msgstr "مكان محجوز"
 
-#: admin/useradmin.py:122 models/permissionmodels.py:227
+#: admin/useradmin.py:122 models/permissionmodels.py:206
 msgid "Page permissions"
 msgstr "حقوق الصفخة"
 
@@ -498,7 +498,7 @@ msgstr ""
 msgid "Structure"
 msgstr "الهيكل"
 
-#: cms_toolbars.py:98 forms/wizards.py:59
+#: cms_toolbars.py:98 forms/wizards.py:58
 msgid "Content"
 msgstr "المحتوى"
 
@@ -592,7 +592,7 @@ msgid "Pages"
 msgstr "الصفحات"
 
 #: cms_toolbars.py:488 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:61 tests/test_wizards.py:84
+#: tests/test_wizards.py:62 tests/test_wizards.py:85
 msgid "Page"
 msgstr "الصفحة"
 
@@ -678,26 +678,26 @@ msgstr "حدد صفحة صحيحة"
 msgid "Add Another"
 msgstr "إضافة آخر"
 
-#: forms/wizards.py:51
+#: forms/wizards.py:50
 msgid "Provide a title for the new page."
 msgstr ""
 
-#: forms/wizards.py:54
+#: forms/wizards.py:53
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
 
-#: forms/wizards.py:60
+#: forms/wizards.py:59
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 
-#: forms/wizards.py:154 migrations/0001_initial.py:134 models/pagemodel.py:123
-#: models/permissionmodels.py:221 models/titlemodels.py:29
+#: forms/wizards.py:143 migrations/0001_initial.py:134 models/pagemodel.py:123
+#: models/permissionmodels.py:200 models/titlemodels.py:29
 #: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "صفحة"
 
-#: forms/wizards.py:192
+#: forms/wizards.py:181
 msgid "User does not have permission to add page."
 msgstr ""
 
@@ -837,7 +837,7 @@ msgstr "اسم مثيل التطبيق"
 msgid "site"
 msgstr "الموقع"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:220
+#: migrations/0001_initial.py:132 models/permissionmodels.py:199
 #: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "السماح عند"
@@ -902,11 +902,11 @@ msgstr "الحدود عندما تكون هذه الصفحة مرئية فى ا�
 msgid "pages"
 msgstr "الصفحات"
 
-#: models/pagemodel.py:1071 templates/admin/cms/page/tree/legend.html:33
+#: models/pagemodel.py:1088 templates/admin/cms/page/tree/legend.html:33
 msgid "Empty"
 msgstr "فارغ"
 
-#: models/pagemodel.py:1189
+#: models/pagemodel.py:1206
 msgid "default"
 msgstr "الإفتراضي"
 
@@ -983,35 +983,29 @@ msgstr "صلاحية الصفحة العامة"
 msgid "Pages global permissions"
 msgstr "صلاحيات الصفحة العامة"
 
-#: models/permissionmodels.py:200
-msgid ""
-"Users can't recover pages without permissions to create and modify pages. "
-"Add & Edit permissions required."
-msgstr ""
-
-#: models/permissionmodels.py:226
+#: models/permissionmodels.py:205
 msgid "Page permission"
 msgstr "صلاحيات الصفحة"
 
-#: models/permissionmodels.py:241
+#: models/permissionmodels.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "تصريح إضافة الصفحة مطلوب أيضا للولوج للصفحات الفرعية، و إلا لا يمكن تعديل الصفحة من قبل المنشئ"
 
-#: models/permissionmodels.py:277
+#: models/permissionmodels.py:256
 msgid "User (page)"
 msgstr "المستخدم (الصفحة)"
 
-#: models/permissionmodels.py:278
+#: models/permissionmodels.py:257
 msgid "Users (page)"
 msgstr "المستخدمين (الصفحة)"
 
-#: models/permissionmodels.py:288
+#: models/permissionmodels.py:267
 msgid "User group (page)"
 msgstr "مجموعة المستخدم (الصفحة)"
 
-#: models/permissionmodels.py:289
+#: models/permissionmodels.py:268
 msgid "User groups (page)"
 msgstr "مجموعات المستخدم (الصفحة)"
 
@@ -1867,15 +1861,15 @@ msgstr "إلغاء نشر التغييرات"
 msgid "published"
 msgstr "منشور"
 
-#: templatetags/cms_admin.py:58
+#: templatetags/cms_admin.py:60
 msgid "unpublished parent"
 msgstr "إلغاء نشر الأب"
 
-#: templatetags/cms_admin.py:61
+#: templatetags/cms_admin.py:63
 msgid "unpublished"
 msgstr "التراجع عن النشر"
 
-#: templatetags/cms_admin.py:64
+#: templatetags/cms_admin.py:66
 msgid "no content"
 msgstr "لا محتوى"
 
@@ -2069,7 +2063,7 @@ msgstr "شكرا لك لقضائك وقت مميز مع الموقع اليوم.
 msgid "Inherit the template of the nearest ancestor"
 msgstr "نسخ القالب من أقرب آب"
 
-#: tests/test_wizards.py:73
+#: tests/test_wizards.py:74
 msgid "UserSettings"
 msgstr ""
 

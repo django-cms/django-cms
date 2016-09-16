@@ -268,6 +268,8 @@ Complete toolbar API
 
 The example above uses the :ref:`simplified_extension_toolbar`.
 
+.. _complete_toolbar_api:
+
 If you need complete control over the layout of your extension toolbar items you can still use the
 low-level API to edit the toolbar according to your needs::
 
@@ -275,7 +277,7 @@ low-level API to edit the toolbar according to your needs::
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar_base import CMSToolbar
     from cms.utils import get_cms_setting
-    from cms.utils.permissions import has_page_change_permission
+    from cms.utils.page_permissions import user_can_change_page
     from django.core.urlresolvers import reverse, NoReverseMatch
     from django.utils.translation import ugettext_lazy as _
     from .models import IconExtension
@@ -291,14 +293,7 @@ low-level API to edit the toolbar according to your needs::
                 # Nothing to do
                 return
 
-            # check global permissions if CMS_PERMISSION is active
-            if get_cms_setting('PERMISSION'):
-                has_global_current_page_change_permission = has_page_change_permission(self.request)
-            else:
-                has_global_current_page_change_permission = False
-                # check if user has page edit permission
-            can_change = self.request.current_page and self.request.current_page.has_change_permission(self.request)
-            if has_global_current_page_change_permission or can_change:
+            if user_can_change_page(user=self.request.user, page=self.page):
                 try:
                     icon_extension = IconExtension.objects.get(extended_object_id=self.page.id)
                 except IconExtension.DoesNotExist:

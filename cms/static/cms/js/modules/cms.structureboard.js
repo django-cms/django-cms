@@ -180,12 +180,14 @@ var StructureBoard = new Class({
 
         // keyboard handling
         // only if there is a structure / content switcher
-        if (that.ui.toolbarModeSwitcher.length) {
+        if (that.ui.toolbarModeSwitcher.length && that.ui.toolbarModeSwitcher.is(':visible')) {
             keyboard.setContext('cms');
-            keyboard.bind('space', function () {
+            keyboard.bind('space', function (e) {
+                e.preventDefault();
                 that._toggleStructureBoard();
             });
-            keyboard.bind('shift+space', function () {
+            keyboard.bind('shift+space', function (e) {
+                e.preventDefault();
                 that._toggleStructureBoard({ useHoveredPlugin: true });
             });
         }
@@ -227,6 +229,11 @@ var StructureBoard = new Class({
      * @returns {Boolean|void}
      */
     _showAndHighlightPlugin: function _showAndHighlightPlugin() {
+        // cancel show if live modus is active
+        if (CMS.config.mode === 'live') {
+            return false;
+        }
+
         if (!CMS.API.Tooltip) {
             return false;
         }
@@ -264,6 +271,11 @@ var StructureBoard = new Class({
      * @returns {Boolean|void}
      */
     _hideAndHighlightPlugin: function _hideAndHighlightPlugin() {
+        // cancel show if live modus is active
+        if (CMS.config.mode === 'live') {
+            return false;
+        }
+
         var dragitem = [];
         var HIGHLIGHT_TIMEOUT = 10;
 

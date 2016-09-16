@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
@@ -125,6 +126,7 @@ def _verify_plugin_type(plugin_type):
 # Public API
 #===============================================================================
 
+@transaction.atomic
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, apphook_namespace=None, redirect=None, meta_description=None,
                 created_by='python-api', parent=None,
@@ -141,14 +143,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     """
     if with_revision in (True, False):
         _raise_revision_warning()
-
-    # ugly permissions hack
-    if created_by and isinstance(created_by, get_user_model()):
-        _thread_locals.user = created_by
-
-        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
-    else:
-        _thread_locals.user = None
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
@@ -205,6 +199,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
     else:
         application_urls = None
 
+    # ugly permissions hack
+    if created_by and isinstance(created_by, get_user_model()):
+        _thread_locals.user = created_by
+        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+    else:
+        _thread_locals.user = None
+
     if reverse_id:
         if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
@@ -227,6 +228,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
+
+    # This saves the page
     page = page.add_root(instance=page)
 
     if parent:
@@ -256,6 +259,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     return page
 
 
+@transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None,
                  parent=None, overwrite_url=None, with_revision=None):
@@ -296,6 +300,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     return title
 
 
+@transaction.atomic
 def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """

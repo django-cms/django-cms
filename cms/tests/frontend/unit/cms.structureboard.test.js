@@ -296,6 +296,12 @@ describe('CMS.StructureBoard', function () {
                 expect(board.show).not.toHaveBeenCalled();
             });
 
+            it('returns false if in live mode', function () {
+                CMS.config.mode = 'live';
+                expect(board._showAndHighlightPlugin()).toEqual(false);
+                expect(board.show).not.toHaveBeenCalled();
+            });
+
             it('returns false if no plugin is hovered', function () {
                 CMS.API.Tooltip.domElem.is = function () {
                     return false;
@@ -325,6 +331,12 @@ describe('CMS.StructureBoard', function () {
             });
 
             it('returns false if no plugin is hovered', function () {
+                expect(board._hideAndHighlightPlugin()).toEqual(false);
+                expect(board.hide).not.toHaveBeenCalled();
+            });
+
+            it('returns false if in live mode', function () {
+                CMS.config.mode = 'live';
                 expect(board._hideAndHighlightPlugin()).toEqual(false);
                 expect(board.hide).not.toHaveBeenCalled();
             });
@@ -685,6 +697,8 @@ describe('CMS.StructureBoard', function () {
 
         it('sets up shortcuts to toggle board', function () {
             spyOn(board, '_toggleStructureBoard');
+            var preventDefaultSpySpace = jasmine.createSpy();
+            var preventDefaultSpyShiftSpace = jasmine.createSpy();
 
             expect(keyboard.bind).toHaveBeenCalledTimes(2);
             expect(keyboard.bind).toHaveBeenCalledWith('space', jasmine.any(Function));
@@ -692,15 +706,54 @@ describe('CMS.StructureBoard', function () {
 
             var calls = keyboard.bind.calls.all();
 
-            calls[0].args[1]();
+            calls[0].args[1]({ preventDefault: preventDefaultSpySpace });
             expect(board._toggleStructureBoard).toHaveBeenCalledTimes(1);
             expect(board._toggleStructureBoard).toHaveBeenCalledWith();
+            expect(preventDefaultSpySpace).toHaveBeenCalledTimes(1);
+            expect(preventDefaultSpyShiftSpace).not.toHaveBeenCalled();
 
-            calls[1].args[1]();
+            calls[1].args[1]({ preventDefault: preventDefaultSpyShiftSpace });
             expect(board._toggleStructureBoard).toHaveBeenCalledTimes(2);
             expect(board._toggleStructureBoard).toHaveBeenCalledWith({
                 useHoveredPlugin: true
             });
+            expect(preventDefaultSpySpace).toHaveBeenCalledTimes(1);
+            expect(preventDefaultSpyShiftSpace).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not setup key binds if toggler is not availabe', function () {
+            keyboard.bind.calls.reset();
+            board.ui.toolbarModeSwitcher.remove();
+
+            CMS.StructureBoard._initializeGlobalHandlers();
+            board = new CMS.StructureBoard();
+            spyOn(board, 'show').and.callFake(function () {
+                CMS.settings.mode = 'structure';
+            });
+            spyOn(board, 'hide').and.callFake(function () {
+                CMS.settings.mode = 'edit';
+            });
+
+            expect(keyboard.bind).not.toHaveBeenCalled();
+        });
+
+        it('does not setup key binds if toggler is not visible (there are no placeholders)', function () {
+            keyboard.bind.calls.reset();
+
+            board.ui.placeholders.remove();
+            board.ui.toolbarModeSwitcher.hide();
+            CMS.StructureBoard._initializeGlobalHandlers();
+            board = new CMS.StructureBoard();
+
+            spyOn(board, 'show').and.callFake(function () {
+                CMS.settings.mode = 'structure';
+            });
+            spyOn(board, 'hide').and.callFake(function () {
+                CMS.settings.mode = 'edit';
+            });
+
+            expect(keyboard.bind).not.toHaveBeenCalled();
+            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
         });
     });
 

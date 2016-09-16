@@ -9,13 +9,14 @@
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011,2013-2014
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
+# Niklas Jerva <niklas.jerva@gmail.com>, 2016
 # paitsi <jiippana@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 12:21-0400\n"
-"PO-Revision-Date: 2016-08-29 16:22+0000\n"
+"POT-Creation-Date: 2016-09-12 10:52-0400\n"
+"PO-Revision-Date: 2016-09-12 14:52+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Finnish (http://www.transifex.com/divio/django-cms/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -37,11 +38,11 @@ msgstr "Kieli"
 msgid "The current language of the content fields."
 msgstr "Sisältökenttien nykyinen kieli."
 
-#: admin/forms.py:88 forms/wizards.py:57
+#: admin/forms.py:88 forms/wizards.py:56
 msgid "Page type"
 msgstr "Sivutyyppi"
 
-#: admin/forms.py:89 forms/wizards.py:50
+#: admin/forms.py:89 forms/wizards.py:49
 msgid "Title"
 msgstr "Otsikko"
 
@@ -49,7 +50,7 @@ msgstr "Otsikko"
 msgid "The default title"
 msgstr "Oletusotsikko"
 
-#: admin/forms.py:91 forms/wizards.py:53
+#: admin/forms.py:91 forms/wizards.py:52
 msgid "Slug"
 msgstr "URL-otsikko"
 
@@ -76,7 +77,7 @@ msgstr "Yliajaa selaimen ylälaidassa ja kirjanmerkeissä näytettävän tekstin
 
 #: admin/forms.py:98
 msgid "Description meta tag"
-msgstr ""
+msgstr "Kuvauksen meta tag"
 
 #: admin/forms.py:100
 msgid "A description of the page used by search engines."
@@ -108,11 +109,11 @@ msgstr "Jätä tämä kenttä tyhjäksi jos halutaan käyttää oletuspolkua."
 
 #: admin/forms.py:219
 msgid "X Frame Options"
-msgstr ""
+msgstr "X Frame valinnat"
 
 #: admin/forms.py:220
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "Voidaanko tämä sivu upottaa muihin sivuihin tai sivustoihin"
 
 #: admin/forms.py:225
 msgid "Redirect"
@@ -128,23 +129,23 @@ msgstr "Aloita kirjoittaminen..."
 
 #: admin/forms.py:236
 msgid "Application configurations"
-msgstr ""
+msgstr "Ohjelman asetukset"
 
 #: admin/forms.py:242
 msgid "Language independent options"
-msgstr ""
+msgstr "Kielestä riippumattomat asetukset"
 
 #: admin/forms.py:340
 #, python-format
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr ""
+msgstr "Ole hyvä ja luo %(language)s käännössivu ennen lisäasetuksien muokkaamista."
 
 #: admin/forms.py:348
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Ole hyvä ja aseta %(language)s lyhytosoite ennen lisäasetuksien muokkaamista."
 
 #: admin/forms.py:359
 msgid "A page with this reverse URL id exists already."
@@ -152,11 +153,11 @@ msgstr "Sivu tällä käänteisellä URL tunnuksella on jo olemassa."
 
 #: admin/forms.py:376
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "Kyseisellä konfiguraatiolla oleva ohjelma on jo olemassa."
 
 #: admin/forms.py:384 admin/forms.py:395
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "Saman niminen ohjelma on jo olemassa."
 
 #: admin/forms.py:465 admin/forms.py:537 migrations/0001_initial.py:72
 #: migrations/0001_initial.py:135 models/permissionmodels.py:58
@@ -166,20 +167,20 @@ msgstr "käyttäjä"
 
 #: admin/forms.py:542
 msgid "can_view"
-msgstr ""
+msgstr "voi_katsella"
 
-#: admin/forms.py:572 admin/forms.py:578 admin/forms.py:582
+#: admin/forms.py:584 admin/forms.py:590 admin/forms.py:594
 #: templates/admin/cms/page/change_form.html:11
 #: templates/admin/cms/usersettings/change_form.html:33
 #: templatetags/cms_tags.py:583
 msgid "Add"
 msgstr "Lisää"
 
-#: admin/forms.py:573 admin/forms.py:579 admin/forms.py:583
+#: admin/forms.py:585 admin/forms.py:591 admin/forms.py:595
 msgid "Change"
 msgstr "Muokkaa"
 
-#: admin/forms.py:574 admin/forms.py:580 admin/forms.py:584
+#: admin/forms.py:586 admin/forms.py:592 admin/forms.py:596
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
@@ -191,56 +192,56 @@ msgstr "Muokkaa"
 msgid "Delete"
 msgstr "Poista"
 
-#: admin/forms.py:602 models/permissionmodels.py:85
+#: admin/forms.py:614 models/permissionmodels.py:85
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:607 models/permissionmodels.py:90
+#: admin/forms.py:619 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
 msgstr ""
 
-#: admin/forms.py:612
+#: admin/forms.py:624
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
 msgstr ""
 
-#: admin/forms.py:617
+#: admin/forms.py:629
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:624
+#: admin/forms.py:636
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:629
+#: admin/forms.py:641
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
 msgstr ""
 
-#: admin/forms.py:748
+#: admin/forms.py:760
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr ""
 
-#: admin/forms.py:765 admin/pageadmin.py:761 admin/placeholderadmin.py:319
+#: admin/forms.py:777 admin/pageadmin.py:761 admin/placeholderadmin.py:319
 msgid "Language must be set to a supported language!"
 msgstr "Kielen tulee olla tuettu!"
 
-#: admin/forms.py:771
+#: admin/forms.py:783
 msgid "Parent plugin language must be same as language!"
 msgstr "Isäntäliitännäisen kielen tulee vastata aktiivista kieltä!"
 
-#: admin/forms.py:776
+#: admin/forms.py:788
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
@@ -450,7 +451,7 @@ msgstr "Sisältöpaikka \"%(obj)s\" tyhjennettiin."
 msgid "placeholder"
 msgstr "sisältöpaikka"
 
-#: admin/useradmin.py:122 models/permissionmodels.py:227
+#: admin/useradmin.py:122 models/permissionmodels.py:206
 msgid "Page permissions"
 msgstr "Sivun oikeudet"
 
@@ -496,7 +497,7 @@ msgstr ""
 msgid "Structure"
 msgstr "Rakenne"
 
-#: cms_toolbars.py:98 forms/wizards.py:59
+#: cms_toolbars.py:98 forms/wizards.py:58
 msgid "Content"
 msgstr "Sisältö"
 
@@ -590,7 +591,7 @@ msgid "Pages"
 msgstr "Sivut"
 
 #: cms_toolbars.py:488 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:61 tests/test_wizards.py:84
+#: tests/test_wizards.py:62 tests/test_wizards.py:85
 msgid "Page"
 msgstr "Sivu"
 
@@ -676,26 +677,26 @@ msgstr "Valitse kelvollinen sivu"
 msgid "Add Another"
 msgstr "Lisää uusi"
 
-#: forms/wizards.py:51
+#: forms/wizards.py:50
 msgid "Provide a title for the new page."
 msgstr ""
 
-#: forms/wizards.py:54
+#: forms/wizards.py:53
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
 
-#: forms/wizards.py:60
+#: forms/wizards.py:59
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 
-#: forms/wizards.py:154 migrations/0001_initial.py:134 models/pagemodel.py:123
-#: models/permissionmodels.py:221 models/titlemodels.py:29
+#: forms/wizards.py:143 migrations/0001_initial.py:134 models/pagemodel.py:123
+#: models/permissionmodels.py:200 models/titlemodels.py:29
 #: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "sivu"
 
-#: forms/wizards.py:192
+#: forms/wizards.py:181
 msgid "User does not have permission to add page."
 msgstr ""
 
@@ -835,7 +836,7 @@ msgstr ""
 msgid "site"
 msgstr "sivusto"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:220
+#: migrations/0001_initial.py:132 models/permissionmodels.py:199
 #: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "Myönnä oikeus"
@@ -900,11 +901,11 @@ msgstr "rajoita tämän sivun näkyvyyttä valikossa"
 msgid "pages"
 msgstr "sivut"
 
-#: models/pagemodel.py:1071 templates/admin/cms/page/tree/legend.html:33
+#: models/pagemodel.py:1088 templates/admin/cms/page/tree/legend.html:33
 msgid "Empty"
 msgstr "Tyhjä"
 
-#: models/pagemodel.py:1189
+#: models/pagemodel.py:1206
 msgid "default"
 msgstr "oletus"
 
@@ -981,35 +982,29 @@ msgstr "Sivun globaali käyttöoikeus"
 msgid "Pages global permissions"
 msgstr "Sivujen globaalit käyttöoikeudet"
 
-#: models/permissionmodels.py:200
-msgid ""
-"Users can't recover pages without permissions to create and modify pages. "
-"Add & Edit permissions required."
-msgstr ""
-
-#: models/permissionmodels.py:226
+#: models/permissionmodels.py:205
 msgid "Page permission"
 msgstr "Sivun käyttöoikeus"
 
-#: models/permissionmodels.py:241
+#: models/permissionmodels.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja ei voi muokata sitä myöhemmin."
 
-#: models/permissionmodels.py:277
+#: models/permissionmodels.py:256
 msgid "User (page)"
 msgstr "Käyttäjä (sivu)"
 
-#: models/permissionmodels.py:278
+#: models/permissionmodels.py:257
 msgid "Users (page)"
 msgstr "Käyttäjät (sivu)"
 
-#: models/permissionmodels.py:288
+#: models/permissionmodels.py:267
 msgid "User group (page)"
 msgstr "Käyttäjäryhmä (sivu)"
 
-#: models/permissionmodels.py:289
+#: models/permissionmodels.py:268
 msgid "User groups (page)"
 msgstr "Käyttäjäryhmät (sivu)"
 
@@ -1861,15 +1856,15 @@ msgstr "julkaisemattomia muutoksia"
 msgid "published"
 msgstr "julkaistu"
 
-#: templatetags/cms_admin.py:58
+#: templatetags/cms_admin.py:60
 msgid "unpublished parent"
 msgstr "julkaisematon isäntäsivu"
 
-#: templatetags/cms_admin.py:61
+#: templatetags/cms_admin.py:63
 msgid "unpublished"
 msgstr "julkaisematon"
 
-#: templatetags/cms_admin.py:64
+#: templatetags/cms_admin.py:66
 msgid "no content"
 msgstr "ei sisältöä"
 
@@ -2063,7 +2058,7 @@ msgstr ""
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Peri lähimmän vanhemman asettelu"
 
-#: tests/test_wizards.py:73
+#: tests/test_wizards.py:74
 msgid "UserSettings"
 msgstr ""
 

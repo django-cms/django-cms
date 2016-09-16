@@ -34,8 +34,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 12:21-0400\n"
-"PO-Revision-Date: 2016-08-29 16:22+0000\n"
+"POT-Creation-Date: 2016-09-12 10:52-0400\n"
+"PO-Revision-Date: 2016-09-12 14:53+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -57,11 +57,11 @@ msgstr "Langue"
 msgid "The current language of the content fields."
 msgstr "La langue actuelle des champs de contenu."
 
-#: admin/forms.py:88 forms/wizards.py:57
+#: admin/forms.py:88 forms/wizards.py:56
 msgid "Page type"
 msgstr "Type de page"
 
-#: admin/forms.py:89 forms/wizards.py:50
+#: admin/forms.py:89 forms/wizards.py:49
 msgid "Title"
 msgstr "Titre"
 
@@ -69,7 +69,7 @@ msgstr "Titre"
 msgid "The default title"
 msgstr "Le titre par défaut"
 
-#: admin/forms.py:91 forms/wizards.py:53
+#: admin/forms.py:91 forms/wizards.py:52
 msgid "Slug"
 msgstr "Slug"
 
@@ -188,18 +188,18 @@ msgstr "utilisateur"
 msgid "can_view"
 msgstr "peut_voir"
 
-#: admin/forms.py:572 admin/forms.py:578 admin/forms.py:582
+#: admin/forms.py:584 admin/forms.py:590 admin/forms.py:594
 #: templates/admin/cms/page/change_form.html:11
 #: templates/admin/cms/usersettings/change_form.html:33
 #: templatetags/cms_tags.py:583
 msgid "Add"
 msgstr "Ajouter"
 
-#: admin/forms.py:573 admin/forms.py:579 admin/forms.py:583
+#: admin/forms.py:585 admin/forms.py:591 admin/forms.py:595
 msgid "Change"
 msgstr "Modifier"
 
-#: admin/forms.py:574 admin/forms.py:580 admin/forms.py:584
+#: admin/forms.py:586 admin/forms.py:592 admin/forms.py:596
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
@@ -211,56 +211,56 @@ msgstr "Modifier"
 msgid "Delete"
 msgstr "Supprimer"
 
-#: admin/forms.py:602 models/permissionmodels.py:85
+#: admin/forms.py:614 models/permissionmodels.py:85
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas créer de page s'il n'a pas l'autorisation de modifier la page créée. La permission de modifier est requise."
 
-#: admin/forms.py:607 models/permissionmodels.py:90
+#: admin/forms.py:619 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
-
-#: admin/forms.py:612
-msgid ""
-"Users can't set page permissions without permissions to change a page. Edit "
-"permissions required."
-msgstr ""
-
-#: admin/forms.py:617
-msgid ""
-"Users can't delete page permissions without permissions to change a page. "
-"Edit permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas supprimer une page s'il n'a pas l'autorisation de modifier la page. La permission de modifier est requise."
 
 #: admin/forms.py:624
 msgid ""
-"Users can't create page permissions without permissions to change the "
-"created permission. Edit permissions required."
-msgstr ""
+"Users can't set page permissions without permissions to change a page. Edit "
+"permissions required."
+msgstr "Un utilisateur ne peut pas définir les permissions liées aux pages s'il n'a pas l'autorisation de modifier des pages. La permission de modifier est requise."
 
 #: admin/forms.py:629
 msgid ""
+"Users can't delete page permissions without permissions to change a page. "
+"Edit permissions required."
+msgstr "Un utilisateur ne peut pas supprimer les permissions liées aux pages s'il n'a pas l'autorisation de modifier des pages. La permission de modifier est requise."
+
+#: admin/forms.py:636
+msgid ""
+"Users can't create page permissions without permissions to change the "
+"created permission. Edit permissions required."
+msgstr "Un utilisateur ne peut pas créer de permissions liées aux pages s'il n'a pas l'autorisation de modifier les permissions crées. La permission de modifier est requise."
+
+#: admin/forms.py:641
+msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas supprimer les permissions liées aux pages s'il n'a pas l'autorisation de modifier les permissions. La permission de modifier est requise."
 
-#: admin/forms.py:748
+#: admin/forms.py:760
 #, python-format
 msgid "Invalid plugin type '%s'"
 msgstr "Type de greffon invalide : « %s »"
 
-#: admin/forms.py:765 admin/pageadmin.py:761 admin/placeholderadmin.py:319
+#: admin/forms.py:777 admin/pageadmin.py:761 admin/placeholderadmin.py:319
 msgid "Language must be set to a supported language!"
 msgstr "Une langue disponible doit être sélectionnée !"
 
-#: admin/forms.py:771
+#: admin/forms.py:783
 msgid "Parent plugin language must be same as language!"
 msgstr "Le greffon parent doit être dans la langue sélectionnée !"
 
-#: admin/forms.py:776
+#: admin/forms.py:788
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Le texte de substitution du greffon parent doit être identique au texte de substitution !"
@@ -379,7 +379,7 @@ msgstr "Êtes-vous sûr(e) ?"
 #, python-format
 #| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "Vous n'êtes pas autorisé·e à voir la page « %(title)s »"
 
 #: admin/pageadmin.py:1087
 msgid "You do not have permission to change this page's in_navigation status"
@@ -425,7 +425,7 @@ msgstr "Vous n'avez pas la permission de modifier ce greffon"
 #: admin/placeholderadmin.py:506
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Vous n'avez pas l'autorisation de coller ce greffon"
 
 #: admin/placeholderadmin.py:553
 msgid "You have no permission to move this plugin"
@@ -470,7 +470,7 @@ msgstr "La zone « %(obj)s » a été vidé avec succès."
 msgid "placeholder"
 msgstr "zone"
 
-#: admin/useradmin.py:122 models/permissionmodels.py:227
+#: admin/useradmin.py:122 models/permissionmodels.py:206
 msgid "Page permissions"
 msgstr "Permissions relatives à la page"
 
@@ -510,13 +510,13 @@ msgstr "Créer un alias"
 msgid ""
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-msgstr ""
+msgstr "Ceci est une référence liée ; le contenu ne peut être modifié que sur la page <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
 #: cms_toolbars.py:97
 msgid "Structure"
 msgstr "Structure"
 
-#: cms_toolbars.py:98 forms/wizards.py:59
+#: cms_toolbars.py:98 forms/wizards.py:58
 msgid "Content"
 msgstr "Contenu"
 
@@ -610,7 +610,7 @@ msgid "Pages"
 msgstr "Pages"
 
 #: cms_toolbars.py:488 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:61 tests/test_wizards.py:84
+#: tests/test_wizards.py:62 tests/test_wizards.py:85
 msgid "Page"
 msgstr "Page"
 
@@ -696,26 +696,26 @@ msgstr "Choisissez une page valide"
 msgid "Add Another"
 msgstr "Ajouter"
 
-#: forms/wizards.py:51
+#: forms/wizards.py:50
 msgid "Provide a title for the new page."
 msgstr "Fournit un titre à la nouvelle page."
 
-#: forms/wizards.py:54
+#: forms/wizards.py:53
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Laissez vide pour un slug automatique, ou écrasez si nécessaire."
 
-#: forms/wizards.py:60
+#: forms/wizards.py:59
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr "Facultatif. Si indiqué, sera automatiquement ajouté dans un nouveau greffon texte."
 
-#: forms/wizards.py:154 migrations/0001_initial.py:134 models/pagemodel.py:123
-#: models/permissionmodels.py:221 models/titlemodels.py:29
+#: forms/wizards.py:143 migrations/0001_initial.py:134 models/pagemodel.py:123
+#: models/permissionmodels.py:200 models/titlemodels.py:29
 #: test_utils/project/sampleapp/ns_urls.py:8
 msgid "page"
 msgstr "page"
 
-#: forms/wizards.py:192
+#: forms/wizards.py:181
 msgid "User does not have permission to add page."
 msgstr "L'utilisateur n'a pas la permission d'ajouter la page."
 
@@ -855,7 +855,7 @@ msgstr "nom d'instance de l'application"
 msgid "site"
 msgstr "site"
 
-#: migrations/0001_initial.py:132 models/permissionmodels.py:220
+#: migrations/0001_initial.py:132 models/permissionmodels.py:199
 #: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "S'applique sur"
@@ -920,11 +920,11 @@ msgstr "limite quand cette page est visible dans le menu"
 msgid "pages"
 msgstr "pages"
 
-#: models/pagemodel.py:1071 templates/admin/cms/page/tree/legend.html:33
+#: models/pagemodel.py:1088 templates/admin/cms/page/tree/legend.html:33
 msgid "Empty"
 msgstr "Vide"
 
-#: models/pagemodel.py:1189
+#: models/pagemodel.py:1206
 msgid "default"
 msgstr "par défaut"
 
@@ -959,31 +959,31 @@ msgstr "restriction de vue client"
 #: models/permissionmodels.py:79
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "Veuillez sélectionner un utilisateur ou un groupe."
 
 #: models/permissionmodels.py:95
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas publier une page s'il n'a pas l'autorisation de modifier la page. La permission de modifier est requise."
 
 #: models/permissionmodels.py:100
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas modifier les paramètres avancés d'une page s'il n'a pas l'autorisation de modifier la page. La permission de modifier est requise."
 
 #: models/permissionmodels.py:105
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas modifier les permissions liées à une page s'il n'a pas l'autorisation de modifier la page. La permission de modifier est requise."
 
 #: models/permissionmodels.py:110
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Un utilisateur ne peut pas déplacer une page s'il n'a pas l'autorisation de modifier la page. La permission de modifier est requise."
 
 #: models/permissionmodels.py:175
 msgid "can recover any deleted page"
@@ -1001,35 +1001,29 @@ msgstr "Permissions globales de la page"
 msgid "Pages global permissions"
 msgstr "Permissions globales des pages"
 
-#: models/permissionmodels.py:200
-msgid ""
-"Users can't recover pages without permissions to create and modify pages. "
-"Add & Edit permissions required."
-msgstr ""
-
-#: models/permissionmodels.py:226
+#: models/permissionmodels.py:205
 msgid "Page permission"
 msgstr "Permissions de la page"
 
-#: models/permissionmodels.py:241
+#: models/permissionmodels.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "La permission d'ajouter une page nécessite aussi l'accès aux descendants, sinon les pages ajoutées ne pourront pas être modifiées par leur créateur."
 
-#: models/permissionmodels.py:277
+#: models/permissionmodels.py:256
 msgid "User (page)"
 msgstr "Utilisateur (page)"
 
-#: models/permissionmodels.py:278
+#: models/permissionmodels.py:257
 msgid "Users (page)"
 msgstr "Utilisateurs (page)"
 
-#: models/permissionmodels.py:288
+#: models/permissionmodels.py:267
 msgid "User group (page)"
 msgstr "Groupe d'utilisateurs (page)"
 
-#: models/permissionmodels.py:289
+#: models/permissionmodels.py:268
 msgid "User groups (page)"
 msgstr "Groupes d'utilisateurs (page)"
 
@@ -1730,61 +1724,61 @@ msgstr "Le formulaire n'a pas pu être chargé. Veuillez vérifier que le serveu
 
 #: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Shortcuts"
-msgstr ""
+msgstr "Raccourcis"
 
 #: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Afficher cette fenêtre d'aide"
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "Fermer/annuler"
 
 #: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Mode structure"
 
 #: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Passer en mode structure et surligner le greffon pointé"
 
 #: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "Ouvrir le formulaire « Créer »"
 
 #: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Donner le focus à la barre d'outils"
 
 #: templates/cms/toolbar/toolbar_javascript.html:71
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Donner le focus aux blocs"
 
 #: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Se déplacer vers l'élément suivant/précédent"
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
 #| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Donner le focus aux greffons de bloc"
 
 #: templates/cms/toolbar/toolbar_javascript.html:83
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "Modifier le greffon"
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
 #| msgid "not in menu"
 msgid "Open actions menu"
-msgstr ""
+msgstr "Ouvrir le menu d'actions"
 
 #: templates/cms/toolbar/toolbar_javascript.html:95
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Développer/réduire"
 
 #: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
@@ -1881,15 +1875,15 @@ msgstr "modifications non publiées"
 msgid "published"
 msgstr "publié(e)"
 
-#: templatetags/cms_admin.py:58
+#: templatetags/cms_admin.py:60
 msgid "unpublished parent"
 msgstr "parent non publié"
 
-#: templatetags/cms_admin.py:61
+#: templatetags/cms_admin.py:63
 msgid "unpublished"
 msgstr "non publié(e)"
 
-#: templatetags/cms_admin.py:64
+#: templatetags/cms_admin.py:66
 msgid "no content"
 msgstr "aucun contenu"
 
@@ -2083,7 +2077,7 @@ msgstr "Merci d'avoir partagé un moment privilégié avec le site web aujourd'h
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Hériter du modèle du parent le plus proche"
 
-#: tests/test_wizards.py:73
+#: tests/test_wizards.py:74
 msgid "UserSettings"
 msgstr "Paramètres des utilisateurs"
 
@@ -2091,13 +2085,13 @@ msgstr "Paramètres des utilisateurs"
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Ajouter le greffon au bloc « %(placeholder_label)s »"
 
 #: toolbar/utils.py:37
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Ajouter le greffon à %(plugin_name)s"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."

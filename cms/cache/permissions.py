@@ -7,7 +7,7 @@ from cms.utils import get_cms_setting
 PERMISSION_KEYS = [
     'add_page', 'change_page', 'change_page_advanced_settings',
     'change_page_permissions', 'delete_page', 'move_page',
-    'publish_page', 'recover_page', 'view_page',
+    'publish_page', 'view_page',
 ]
 
 
