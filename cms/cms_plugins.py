@@ -39,7 +39,7 @@ class AliasPlugin(CMSPluginBase):
         context = super(AliasPlugin, self).render(context, instance, placeholder)
         cms_content_renderer = context.get('cms_content_renderer')
 
-        if not cms_content_renderer or instance.is_recursive():
+        if not cms_content_renderer or instance.is_recursive() or instance.cmsplugin_hidden:
             return context
 
         if instance.plugin_id:
