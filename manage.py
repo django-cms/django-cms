@@ -5,6 +5,8 @@ import sys
 
 import app_manage
 
+from cms.utils.compat import DJANGO_1_9
+
 gettext = lambda s: s
 
 
@@ -139,6 +141,25 @@ if __name__ == '__main__':
     else:
         SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
+    MIDDLEWARES = [
+        'django.middleware.cache.UpdateCacheMiddleware',
+        'django.middleware.http.ConditionalGetMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
+    ]
+    if not DJANGO_1_9:
+        dynamic_configs['MIDDLEWARE'] = MIDDLEWARES
+    else:
+        dynamic_configs['MIDDLEWARE_CLASSES'] = MIDDLEWARES
     app_manage.main(
         ['cms', 'menus'],
         app_manage.Argument(
@@ -180,21 +201,6 @@ if __name__ == '__main__':
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
         PLUGIN_APPS=PLUGIN_APPS,
-        MIDDLEWARE_CLASSES=[
-            'django.middleware.cache.UpdateCacheMiddleware',
-            'django.middleware.http.ConditionalGetMiddleware',
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'cms.middleware.language.LanguageCookieMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-            'django.middleware.cache.FetchFromCacheMiddleware',
-        ],
         INSTALLED_APPS=INSTALLED_APPS,
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
         INTERNAL_IPS=['127.0.0.1'],

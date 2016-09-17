@@ -51,8 +51,7 @@ class CacheTestCase(CMSTestCase):
 
     def test_cache_placeholder(self):
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
 
         placeholder = page1.placeholders.filter(slot="body")[0]
         add_plugin(placeholder, "TextPlugin", 'en', body="English")
@@ -82,14 +81,21 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
+        overrides = dict(
+            CMS_PAGE_CACHE=False
+        )
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 10)):
                 self.client.get('/en/')
 
-        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
+        overrides['CMS_PLACEHOLDER_CACHE'] = False
+        with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(7, 14)):
                 self.client.get('/en/')
 
@@ -114,9 +120,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.CacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             # Request the page without the 'no-cache' plugin
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
@@ -192,9 +201,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.CacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
@@ -230,9 +242,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.CacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
@@ -264,9 +279,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.CacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
@@ -311,9 +329,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.CacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
@@ -368,11 +389,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.CacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        # from django.core.cache import cache; cache.clear()
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):  # noqa
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
@@ -389,9 +411,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
@@ -465,9 +490,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
@@ -529,9 +557,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+        overrides = dict()
+        if getattr(settings, 'MIDDLEWARE', None):
+            overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
+        else:
+            overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        with self.settings(**overrides):
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
             self.assertTrue(page_cache_setting)
