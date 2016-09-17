@@ -173,8 +173,8 @@ Like a plugin, to render a placeholder programmatically, you will need a context
                      # Avoid errors if plugin require a request object
                      # when rendering.
                      context['request'] = request
-                     content = content_renderer.render_placeholder(
+                     content = renderer.render_placeholder(
                         placeholder,
                         context=context,
-                    )
-                    return content
+                     )
+                     return content
