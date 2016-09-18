@@ -314,6 +314,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     def _check_unique_namespace_instance(self, namespace):
         return Page.objects.filter(
             publisher_is_draft=True,
+            site_id=self.instance.site_id,
             application_namespace=namespace
         ).exclude(pk=self.instance.pk).exists()
 
