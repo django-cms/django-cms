@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.utils.functional import SimpleLazyObject
 
+from cms.utils.compat.dj import MiddlewareMixin
+
 
 def get_page(request):
     from cms.appresolver import applications_page_check
@@ -15,7 +17,7 @@ def get_page(request):
     return request._current_page_cache
 
 
-class CurrentPageMiddleware(object):
+class CurrentPageMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request.current_page = SimpleLazyObject(lambda: get_page(request))
         return None

@@ -7,6 +7,12 @@ from django.utils.encoding import (  # nopyflakes
     force_text as force_unicode, python_2_unicode_compatible,
 )
 
+try:
+    from django.utils.deprecation import MiddlewareMixin
+except ImportError:
+    class MiddlewareMixin(object): pass
+
+
 # TODO: move these helpers out of compat?
 def is_installed(app_name):
     return apps.is_installed(app_name)
