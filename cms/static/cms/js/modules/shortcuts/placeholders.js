@@ -1,4 +1,4 @@
-var keyboard = require('keyboardjs');
+var keyboard = require('../keyboard');
 var $ = require('jquery');
 
 require('../jquery.trap');
