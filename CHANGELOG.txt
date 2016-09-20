@@ -3,6 +3,8 @@
 * Fixed a regression when static placeholder was uneditable if it was present
   on the page multiple times
 * Removed globally unique constraint for Apphook configs.
+* Fixed a bug when keyboard shortcuts were triggered when form fields were
+  focused
 
 
 === 3.4.0 (2016-09-14) ===

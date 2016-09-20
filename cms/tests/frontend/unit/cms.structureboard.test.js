@@ -3,7 +3,7 @@ var CMS = require('../../../static/cms/js/modules/cms.base');
 var StructureBoard = require('../../../static/cms/js/modules/cms.structureboard');
 var Plugin = require('../../../static/cms/js/modules/cms.plugins');
 var $ = require('jquery');
-var keyboard = require('keyboardjs');
+var keyboard = require('../../../static/cms/js/modules/keyboard');
 
 window.CMS = window.CMS || CMS;
 CMS.StructureBoard = StructureBoard;
