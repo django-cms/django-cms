@@ -240,6 +240,7 @@ var StructureBoard = new Class({
 
         var tooltip = CMS.API.Tooltip.domElem;
         var HIGHLIGHT_TIMEOUT = 10;
+        var DRAGGABLE_HEIGHT = 50; // it's not precisely 50, but it fits
 
         if (!tooltip.is(':visible')) {
             return false;
@@ -249,15 +250,17 @@ var StructureBoard = new Class({
         var draggable = $('.cms-draggable-' + pluginId);
 
         // expand necessary parents
+        $(document).data('expandmode', false);
         draggable.parents('.cms-draggable').find(
             '> .cms-dragitem-collapsable:not(".cms-dragitem-expanded") > .cms-dragitem-text').trigger('click');
 
         this.show();
 
         setTimeout(function () {
-            var position = draggable.position().top;
+            var offsetParent = draggable.offsetParent();
+            var position = draggable.position().top + offsetParent.scrollTop();
 
-            draggable.offsetParent().scrollTop(position - window.innerHeight / 2);
+            draggable.offsetParent().scrollTop(position - window.innerHeight / 2 + DRAGGABLE_HEIGHT);
 
             Plugin._highlightPluginStructure(draggable.find('.cms-dragitem:first'));
         }, HIGHLIGHT_TIMEOUT);
