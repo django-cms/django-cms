@@ -7,7 +7,7 @@ var Class = require('classjs');
 var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var ChangeTracker = require('./cms.changetracker');
-var keyboard = require('keyboardjs');
+var keyboard = require('./keyboard');
 var previousKeyboardContext;
 var previouslyFocusedElement;
 

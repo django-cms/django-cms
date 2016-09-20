@@ -7,7 +7,7 @@ var Class = require('classjs');
 var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var Plugin = require('./cms.plugins');
-var keyboard = require('keyboardjs');
+var keyboard = require('./keyboard');
 
 require('./jquery.ui.custom');
 require('./jquery.ui.touchpunch');
