@@ -5,6 +5,8 @@
 * Removed globally unique constraint for Apphook configs.
 * Fixed a bug when keyboard shortcuts were triggered when form fields were
   focused
+* Fixed a bug when ``shift + space`` shortcut wouldn't correctly highlight a
+  plugin in the structure board
 
 
 === 3.4.0 (2016-09-14) ===
