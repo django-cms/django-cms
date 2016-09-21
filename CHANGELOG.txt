@@ -7,6 +7,8 @@
   focused
 * Fixed a bug when ``shift + space`` shortcut wouldn't correctly highlight a
   plugin in the structure board
+* Fixed a bug when plugins that have top-level svg element would break
+  structure board
 
 
 === 3.4.0 (2016-09-14) ===
