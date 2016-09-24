@@ -11,6 +11,8 @@
   structure board
 * Fixed a bug where output from the ``show_admin_menu_for_pages`` template tag
   was escaped in Django 1.9
+* Fixed a bug where plugins would be rendered as editable if toolbar was shown
+  but user was not in edit mode.
 
 
 === 3.4.0 (2016-09-14) ===

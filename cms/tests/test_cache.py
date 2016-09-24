@@ -73,6 +73,7 @@ class CacheTestCase(CMSTestCase):
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
         request.toolbar.edit_mode = True
+        request.toolbar.show_toolbar = True
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
         with self.assertNumQueries(3):
             self.render_template_obj(template, {}, request)
