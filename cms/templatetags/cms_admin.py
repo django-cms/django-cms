@@ -28,9 +28,14 @@ def show_admin_menu_for_pages(context, pages):
     else:
         filtered = False
 
-    site = context['cms_current_site']
-    language = context['preview_language']
-    return render_admin_rows(request, pages=pages, site=site, filtered=filtered, language=language)
+    content = render_admin_rows(
+        request,
+        pages=pages,
+        site=context['cms_current_site'],
+        filtered=filtered,
+        language=context['preview_language'],
+    )
+    return mark_safe(content)
 
 
 class TreePublishRow(Tag):
