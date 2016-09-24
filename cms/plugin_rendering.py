@@ -96,7 +96,7 @@ class ContentRenderer(object):
         return self.get_cached_template('cms/toolbar/dragbar.html')
 
     def user_is_on_edit_mode(self):
-        return self.toolbar.edit_mode or self.toolbar.show_toolbar
+        return self.toolbar.edit_mode and self.toolbar.show_toolbar
 
     def placeholder_cache_is_enabled(self):
         if not get_cms_setting('PLACEHOLDER_CACHE'):
@@ -139,7 +139,7 @@ class ContentRenderer(object):
         from cms.utils.plugins import get_plugins
 
         language = language or self.request_language
-        editable = editable and self.toolbar.edit_mode
+        editable = editable and self.user_is_on_edit_mode()
 
         if use_cache and not editable and placeholder.cache_placeholder:
             use_cache = self.placeholder_cache_is_enabled()
