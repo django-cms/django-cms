@@ -1,0 +1,29 @@
+.. _upgrade-to-3.3.3:
+
+###################
+3.3.3 release notes
+###################
+
+*******************
+What's new in 3.3.3
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug where where the plugin picker would display the plugin names
+  translated in the request language instead of the user's language.
+* Fixed a bug which raised an exception when the ``AdvancedSettingsForm``
+  failed validation on certain fields.
+* Fixed a bug with widgets not initialising correctly sometimes
+* Fixed a tree corruption when moving a published page under a published one.
+* Fixed a tree corruption caused by ``fix-tree`` when an unpublished page is parent
+  to a published page.
+* Fixed an error when publishing a page that has an unpublished child page who is
+  parent to a published page.
+* Fixed a bug where moving a published page under a page marked as pending publishing
+  is left as published instead of being marked as pending publishing.
+* Fixed AttributeError when using ``create_page`` in management command
+* Fixed a bug in getting the language from current request which can cause error 500
+* API functions are now atomic by design (use the @atomic decorator)
+* Fixed a bug where a ``Page`` was created with it's languages field set to ``None``.
