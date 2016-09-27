@@ -1911,18 +1911,23 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
         );
     });
 
+    // turns out that offset calculation will be off by toolbar height if
+    // position is set to "relative" on html element.
+    var html = $('html');
+    var htmlMargin = html.css('position') === 'relative' ? parseInt($('html').css('margin-top'), 10) : 0;
+
     coordinates.left = Math.min.apply(null, positions.map(function (pos) {
         return pos.x1;
     }));
     coordinates.top = Math.min.apply(null, positions.map(function (pos) {
         return pos.y1;
-    }));
+    })) - htmlMargin;
     coordinates.width = Math.max.apply(null, positions.map(function (pos) {
         return pos.x2;
     })) - coordinates.left;
     coordinates.height = Math.max.apply(null, positions.map(function (pos) {
         return pos.y2;
-    })) - coordinates.top;
+    })) - coordinates.top - htmlMargin;
 
     win.scrollTop(coordinates.top - win.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
 
