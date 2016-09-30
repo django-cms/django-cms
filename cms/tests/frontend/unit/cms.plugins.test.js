@@ -48,6 +48,7 @@ describe('CMS.Plugin', function () {
 
     afterEach(function () {
         Plugin.aliasPluginDuplicatesMap = {};
+        Plugin.staticPlaceholderDuplicatesMap = {};
         $(document).off('dblclick.cms.plugin pointerover.cms.plugin pointerout.cms.plugin');
     });
 
@@ -282,15 +283,34 @@ describe('CMS.Plugin', function () {
             expect(Plugin.prototype._setGeneric).not.toHaveBeenCalled();
         });
 
+        it('doesnt reset the ui if the same placeholder is initialized twice (static placeholders)', function () {
+            spyOn(Plugin.prototype, '_setPlugin');
+            spyOn(Plugin.prototype, '_setPlaceholder');
+            spyOn(Plugin.prototype, '_setGeneric');
+            expect(Plugin.staticPlaceholderDuplicatesMap[placeholder1.options.placeholder_id]).toEqual(true);
+
+            new CMS.Plugin('cms-placeholder-1', {
+                type: 'placeholder',
+                placeholder_id: 1
+            });
+
+            expect(Plugin.staticPlaceholderDuplicatesMap[placeholder1.options.placeholder_id]).toEqual(true);
+            expect(Plugin.prototype._setPlugin).not.toHaveBeenCalled();
+            expect(Plugin.prototype._setPlaceholder).not.toHaveBeenCalled();
+            expect(Plugin.prototype._setGeneric).not.toHaveBeenCalled();
+        });
+
         it('checks if pasting into this plugin is allowed', function () {
             spyOn(CMS.Plugin.prototype, '_checkIfPasteAllowed');
             Plugin.aliasPluginDuplicatesMap = {};
+            Plugin.staticPlaceholderDuplicatesMap = {};
 
             plugin1 = new CMS.Plugin('cms-plugin-1', {
                 type: 'plugin',
                 plugin_id: 1
             });
             expect(CMS.Plugin.prototype._checkIfPasteAllowed.calls.count()).toEqual(1);
+
             placeholder1 = new CMS.Plugin('cms-placeholder-1', {
                 type: 'placeholder',
                 placeholder_id: 1
