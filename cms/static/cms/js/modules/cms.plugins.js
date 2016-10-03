@@ -73,12 +73,16 @@ var Plugin = new Class({
         if (Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
             return;
         }
+        if (Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id]) {
+            return;
+        }
 
         Plugin._initializeDragItemsStates();
 
         // determine type of plugin
         switch (this.options.type) {
             case 'placeholder': // handler for placeholder bars
+                Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id] = true;
                 this.ui.container.data('cms', this.options);
                 this._setPlaceholder();
                 this._collapsables();
@@ -1942,6 +1946,8 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
 
 
 Plugin.aliasPluginDuplicatesMap = {};
+Plugin.staticPlaceholderDuplicatesMap = {};
+
 
 // istanbul ignore next
 Plugin._initializeTree = function _initializeTree() {
