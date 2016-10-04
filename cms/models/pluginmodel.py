@@ -252,7 +252,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return self._inst, plugin
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
-        if not context or not 'cms_content_renderer' in context or self.cmsplugin_hidden:
+        if not context or not 'cms_content_renderer' in context:
             return ''
 
         if not isinstance(placeholder, Placeholder):
