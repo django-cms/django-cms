@@ -1,4 +1,4 @@
-=== 3.3.3 (unreleased) ===
+=== 3.3.3 (2016-10-04) ===
 
 * Fixed a bug where where the plugin picker would display the plugin names
   translated in the request language instead of the user's language.
