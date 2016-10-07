@@ -82,7 +82,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                     )
                 ]
         else:
-            new_plugin.fieldsets = [(None, {'fields': ('cmsplugin_hidden',)})] + list(new_plugin.fieldsets)
+            new_plugin.fieldsets = list(new_plugin.fieldsets) + [(None, {'fields': ('cmsplugin_hidden',)})]
         # Set default name
         if not new_plugin.name:
             new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
