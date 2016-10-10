@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from unittest import expectedFailure
 
 from django.template import Template
 
@@ -141,10 +140,7 @@ class AliasTestCase(CMSTestCase):
             editable_placeholders = content_renderer.get_rendered_editable_placeholders()
             self.assertNotIn(source_placeholder,editable_placeholders)
 
-    @expectedFailure
     def test_alias_from_page_change_form_text(self):
-        # FIXME: because of the addition of cmsplugin_hidden, the condition
-        # for displaying the 'empty fieldset' text is never reached.
         superuser = self.get_superuser()
         api.create_page(
             "Home",
@@ -195,10 +191,7 @@ class AliasTestCase(CMSTestCase):
                         'target="_parent">Source</a> page.')
             self.assertContains(response, expected)
 
-    @expectedFailure
     def test_alias_from_generic_change_form_text(self):
-        # FIXME: because of the addition of cmsplugin_hidden, the condition
-        # for displaying the 'empty fieldset' text is never reached.
         superuser = self.get_superuser()
 
         source_placeholder = self._get_example_obj().placeholder
@@ -217,27 +210,6 @@ class AliasTestCase(CMSTestCase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
             expected = 'There are no further settings for this plugin. Please press save.'
-            self.assertContains(response, expected)
-
-    def test_alias_has_hide_field_in_change_form(self):
-        superuser = self.get_superuser()
-
-        source_placeholder = self._get_example_obj().placeholder
-        target_placeholder = self._get_example_obj().placeholder
-
-        alias = api.add_plugin(
-            target_placeholder,
-            'AliasPlugin',
-            'en',
-            alias_placeholder=source_placeholder,
-        )
-
-        endpoint = self.get_admin_url(Example1, 'edit_plugin', alias.pk)
-
-        with self.login_user_context(superuser):
-            response = self.client.get(endpoint)
-            self.assertEqual(response.status_code, 200)
-            expected = 'Hide plugin contents'
             self.assertContains(response, expected)
 
     def test_move_and_delete_plugin_alias(self):

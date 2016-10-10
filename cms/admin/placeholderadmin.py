@@ -758,4 +758,7 @@ class PlaceholderAdminMixin(object):
         plugin.cmsplugin_hidden = not plugin.cmsplugin_hidden
         plugin.save()
 
-        return HttpResponse(json.dumps({'reload': True}), content_type='application/json')
+        return HttpResponse(
+            json.dumps({'reload': True}),
+            content_type='application/json'
+        )

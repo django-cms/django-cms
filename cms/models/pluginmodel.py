@@ -188,7 +188,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
-    cmsplugin_hidden = models.BooleanField('Hide plugin contents', default=False)
+    cmsplugin_hidden = models.BooleanField('Hide plugin contents', default=False, editable=False)
     child_plugin_instances = None
     translatable_content_excluded_fields = []
 
