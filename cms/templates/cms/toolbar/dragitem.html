@@ -6,6 +6,7 @@
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
 
     <div class="cms-dragitem cms-dragitem-handler
+        {% if plugin.cmsplugin_hidden %} cmsplugin-hidden{% endif %}
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
