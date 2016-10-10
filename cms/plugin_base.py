@@ -462,11 +462,14 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return [
             PluginMenuItem(
-                name='Unhide' if hidden else 'Hide',
+                name='Show' if hidden else 'Hide',
                 url=admin_reverse('cms_page_hide_plugin'),
                 data={
                     'plugin_id': plugin.pk,
                     'csrfmiddlewaretoken': get_token(request),
+                },
+                attributes={
+                    'cms-icon': 'eye',
                 }
             )
         ]
