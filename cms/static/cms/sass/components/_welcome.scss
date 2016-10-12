@@ -50,22 +50,19 @@
         }
     }
 
-    .cms-welcome-logo,
-    .cms-welcome-logo:hover,
-    .cms-welcome-logo:focus {
-        @extend %icon;
-        @include icon(logo);
-        font-size: 35px;
-        text-decoration: none;
-        margin: 50px auto 30px;
-        color: $gray;
-        &:before {
-            color: black;
-            transition: color $speed-base;
-        }
-        &:hover:before,
-        &:focus:before {
-            color: $color-primary;
+    .cms-welcome-logo {
+        &,
+        &:hover,
+        &:focus {
+            display: inline-block;
+            background-image: url('../../fonts/src/logo.svg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 35px;
+            width: 200px;
+            font-size: 35px;
+            text-decoration: none;
+            margin: 50px auto 30px;
         }
     }
 
