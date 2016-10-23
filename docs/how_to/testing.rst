@@ -97,9 +97,7 @@ it or the context provided to its template::
                 MyPlugin,
                 'en',
             )
-            context = {
-                'cms_content_renderer': ContentRenderer(request=RequestFactory())
-            }
-            html = model_instance.render_plugin(context)
+            renderer = ContentRenderer(request=RequestFactory())
+            html = renderer.render_plugin(model_instance, {})
             self.assertEqual(html, '<strong>Test</strong>')
 
