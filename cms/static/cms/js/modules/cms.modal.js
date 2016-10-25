@@ -799,7 +799,7 @@ var Modal = new Class({
 
                 if (item.is('a')) {
                     that._loadIframe({
-                        url: item.prop('href'),
+                        url: Helpers.updateUrlWithPath(item.prop('href')),
                         name: title
                     });
                 }

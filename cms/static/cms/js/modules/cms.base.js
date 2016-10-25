@@ -608,8 +608,21 @@ CMS.API.Helpers = {
      */
     _getWindow: function () {
         return window;
-    }
+    },
 
+    /**
+     * We need to update the url with cms_path param for undo/redo
+     *
+     * @function updateUrlWithPath
+     * @private
+     * @param {String} url url
+     * @returns {String} modified url
+     */
+    updateUrlWithPath: function (url) {
+        var path = window.location.pathname;
+
+        return this.makeURL(url, ['cms_path=' + encodeURIComponent(path)]);
+    }
 };
 
 // shorthand for jQuery(document).ready();

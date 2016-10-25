@@ -209,14 +209,14 @@ describe('CMS.Clipboard', function () {
         it('makes a request to the API', function () {
             clipboard.clear();
             expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
-                url: 'clear-clipboard',
+                url: 'clear-clipboard?cms_path=%2Fcontext.html',
                 post: '{ "csrfmiddlewaretoken": "test_csrf" }',
                 callback: undefined
             });
 
             clipboard.clear($.noop);
             expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
-                url: 'clear-clipboard',
+                url: 'clear-clipboard?cms_path=%2Fcontext.html',
                 post: '{ "csrfmiddlewaretoken": "test_csrf" }',
                 callback: $.noop
             });

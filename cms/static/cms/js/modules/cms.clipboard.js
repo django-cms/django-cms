@@ -141,7 +141,7 @@ var Clipboard = new Class({
 
         // redirect to ajax
         CMS.API.Toolbar.openAjax({
-            url: CMS.config.clipboard.url,
+            url: Helpers.updateUrlWithPath(CMS.config.clipboard.url),
             post: post,
             callback: callback
         });
