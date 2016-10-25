@@ -329,9 +329,9 @@ var Toolbar = new Class({
 
             // in case the button has a data-rel attribute
             if (btn.find('a').attr('data-rel')) {
-                btn.on(that.click, function (e) {
+                btn.find('a').on(that.click, function (e) {
                     e.preventDefault();
-                    that._delegate($(this).find('a'));
+                    that._delegate($(this));
                 });
             } else {
                 btn.find('a').on(that.click, function (e) {
@@ -660,7 +660,7 @@ var Toolbar = new Class({
                 });
 
                 modal.open({
-                    url: el.attr('href'),
+                    url: Helpers.updateUrlWithPath(el.attr('href')),
                     title: el.data('name')
                 });
                 break;
