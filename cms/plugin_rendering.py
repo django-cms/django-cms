@@ -254,7 +254,7 @@ class ContentRenderer(object):
         current_page = self.current_page
 
         if not current_page:
-            return
+            return ''
 
         content = self._render_page_placeholder(
             context=context,
