@@ -1,3 +1,8 @@
+=== 3.4.2 (unreleased) ===
+
+* Fixed a bug with `text-transform` styles on inputs affecting CMS login
+
+
 === 3.4.1 (2016-10-04) ===
 
 * Fixed a regression when static placeholder was uneditable if it was present
