@@ -417,6 +417,7 @@
         border: 1px solid $login-form-input-border;
         border-radius: $login-form-input-border-radius;
         box-shadow: 0 1px 0 $white;
+        text-transform: none;
 
         &:focus {
             transition: outline 0.2s;
