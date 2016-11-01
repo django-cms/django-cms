@@ -1,3 +1,8 @@
+=== 3.3.4 (unreleased) ===
+
+* Fixed a bug which prevented certain migrations from running in a multi-db setup.
+
+
 === 3.3.3 (2016-10-04) ===
 
 * Fixed a bug where where the plugin picker would display the plugin names
