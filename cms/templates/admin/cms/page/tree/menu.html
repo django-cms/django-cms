@@ -6,10 +6,10 @@
     {% if page.pk in open_nodes %} jstree-open{% elif children %} jstree-closed{% endif %}
     {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
     {% if page.level == 0 %} cms-tree-node-top{% endif %}
-    {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
+    {% if filtered %} cms-tree-node-filtered{% endif %}
     {% if has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     "
-    {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
+    {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
     data-slug="{{ page.get_slug }}"
     data-move-permission="{{ has_move_page_permission|yesno:"true,false" }}"
