@@ -125,7 +125,7 @@ def render_admin_rows(request, pages, site, filtered=False, language=None):
             'site_languages': languages,
             'open_nodes': open_nodes,
             'cms_current_site': site,
-            'is_popup': IS_POPUP_VAR in request.GET
+            'is_popup': (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET)
         }
         return template.render(context)
 
