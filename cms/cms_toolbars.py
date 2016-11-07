@@ -444,7 +444,7 @@ class PageToolbar(CMSToolbar):
             if copy:
                 copy_plugins_menu = language_menu.get_or_create_menu('{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins'))
                 title = _('from %s')
-                question = _('Are you sure you want copy all plugins from %s?')
+                question = _('Are you sure you want to copy all plugins from %s?')
                 page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
                 for code, name in copy:
                     copy_plugins_menu.add_ajax_item(
