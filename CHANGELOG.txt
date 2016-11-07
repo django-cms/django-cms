@@ -3,6 +3,9 @@
 * Fixed a bug with `text-transform` styles on inputs affecting CMS login
 * Fixed a typo in the confirmation message for copying plugins from different
   language
+* Fixed a bug which prevented certain migrations from running in a multi-db setup.
+* Fixed a regression which prevented the ``Page`` model from rendering correctly
+  when used in a ``raw_id_field``.
 
 
 === 3.4.1 (2016-10-04) ===
