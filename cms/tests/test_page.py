@@ -288,8 +288,6 @@ class PagesTestCase(CMSTestCase):
         superuser = self.get_superuser()
         self.assertEqual(Page.objects.all().count(), 0)
         with self.login_user_context(superuser):
-            response = self.client.get(self.get_pages_root())
-            self.assertEqual(response.status_code, 404)
             page = create_page('test page 1', "nav_playground.html", "en")
             page.publish('en')
             response = self.client.get(self.get_pages_root())

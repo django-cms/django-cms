@@ -1,3 +1,9 @@
+=== 3.5.0 (unreleased) ===
+
+* Fixed a bug which prevented users from seeing the welcome screen when debug is
+  turned off.
+
+
 === 3.4.4 (unreleased) ===
 
 * Fixed a bug where canceling the publishing dialog wasn't respected.

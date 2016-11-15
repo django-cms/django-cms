@@ -32,18 +32,24 @@ class ViewTests(CMSTestCase):
     def setUp(self):
         clear_url_caches()
 
+    def test_welcome_screen_debug_on(self):
+        with self.settings(DEBUG=True):
+            response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.template_name, 'cms/welcome.html')
+
+    def test_welcome_screen_debug_off(self):
+        with self.settings(DEBUG=False):
+            response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.template_name, 'cms/welcome.html')
+
     def test_handle_no_page(self):
         """
         Test handle nopage correctly works with DEBUG=True
         """
-        request = self.get_request('/')
-        slug = ''
-        self.assertRaises(Http404, _handle_no_page, request, slug)
-        with self.settings(DEBUG=True):
-            request = self.get_request('/en/')
-            slug = ''
-            response = _handle_no_page(request, slug)
-            self.assertEqual(response.status_code, 200)
+        request = self.get_request('/not-existing/')
+        self.assertRaises(Http404, _handle_no_page, request)
 
     def test_apphook_not_hooked(self):
         """

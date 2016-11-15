@@ -25,7 +25,7 @@ def render_page(request, page, current_language, slug):
     context['has_view_permissions'] = user_can_view_page(request.user, page)
 
     if not context['has_view_permissions']:
-        return _handle_no_page(request, slug)
+        return _handle_no_page(request)
 
     response = TemplateResponse(request, template_name, context)
     response.add_post_render_callback(set_page_cache)
@@ -51,13 +51,7 @@ def render_page(request, page, current_language, slug):
     return response
 
 
-def _handle_no_page(request, slug):
-    context = {}
-    context['cms_version'] = __version__
-    context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-
-    if not slug and settings.DEBUG:
-        return TemplateResponse(request, "cms/welcome.html", context)
+def _handle_no_page(request):
     try:
         #add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
@@ -67,3 +61,11 @@ def _handle_no_page(request, slug):
         raise exc
     raise Http404('CMS Page not found: %s' % request.path)
 
+
+def _render_welcome_page(request):
+    context = {
+        'cms_version': __version__,
+        'cms_edit_on': get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'),
+        'django_debug': settings.DEBUG,
+    }
+    return TemplateResponse(request, "cms/welcome.html", context)

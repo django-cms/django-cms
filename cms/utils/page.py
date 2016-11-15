@@ -1,11 +1,28 @@
 # -*- coding: utf-8 -*-
+import re
+
 from django.conf import settings
 from django.db.models import Q
-import re
+from django.contrib.sites.models import Site
+
 from cms.exceptions import NoHomeFound
+
 
 APPEND_TO_SLUG = "-copy"
 COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d+)*)?$')
+
+
+def get_pages_queryset(site=None, draft=True):
+    from cms.models import Page
+
+    if not site:
+        site = Site.objects.get_current()
+
+    if draft:
+        queryset = Page.objects.drafts()
+    else:
+        queryset = Page.objects.public()
+    return queryset.filter(site=site)
 
 
 def is_valid_page_slug(page, parent, lang, slug, site, path=None):
