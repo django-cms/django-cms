@@ -158,7 +158,7 @@ class TitleManager(PublisherManager):
                 else:
                     data['has_url_overwrite'] = False
                 for field in advanced_fields:
-                    value = cleaned_data.get(field, None)
+                    value = cleaned_data.get(field) or None
                     data[field] = value
             return self.create(**data)
         for name in base_fields:
@@ -172,7 +172,7 @@ class TitleManager(PublisherManager):
                 obj.path = overwrite_url
             for field in advanced_fields:
                 if field in form.base_fields:
-                    value = cleaned_data.get(field, None)
+                    value = cleaned_data.get(field) or None
                     setattr(obj, field, value)
         obj.save()
         return obj
