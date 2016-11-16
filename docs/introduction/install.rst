@@ -49,11 +49,12 @@ Create a new directory to work in, and ``cd`` into it::
 
 Run it to create a new Django project called ``mysite``::
 
-    djangocms -f -p . mysite
+    djangocms -w -f -p . mysite
 
 This means:
 
 * run the django CMS installer
+* use wizard mode (``-w``) - **required for this tutorial**
 * install Django Filer too (``-f``) - **required for this tutorial**
 * use the current directory as the parent of the new project directory (``-p .``)
 * call the new project directory ``mysite``
