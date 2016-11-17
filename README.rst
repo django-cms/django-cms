@@ -17,9 +17,9 @@ django CMS
 
 Open source enterprise content management system based on the Django framework.
 
-.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
+.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
    :target: http://demo.django-cms.org/
-   :alt: Try demo with Aldryn Cloud
+   :alt: Try demo with Divio Cloud
 
 .. ATTENTION::
 
