@@ -190,7 +190,7 @@ Example::
     CMS_PLACEHOLDER_CONF = {
         None: {
             "plugins": ['TextPlugin'],
-            'exclude_plugins': ['InheritPlugin'],
+            'excluded_plugins': ['InheritPlugin'],
         }
         'content': {
             'plugins': ['TextPlugin', 'PicturePlugin'],
