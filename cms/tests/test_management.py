@@ -110,12 +110,83 @@ class ManagementTestCase(CMSTestCase):
             (delta, '0001000100010001'),
             (theta, '00010001000100010001'),
             (alpha.publisher_public, '0002'),
-            (delta.publisher_public, '0006'),
-            (theta.publisher_public, '00060001'),
+            (delta.publisher_public, '0003'),
+            (theta.publisher_public, '00030001'),
         ]
 
         for page, path in tree:
             self.assertEqual(page.path, path)
+
+    def test_fix_tree_regression_5752(self):
+        # ref: https://github.com/divio/django-cms/issues/5752
+        # Draft tree
+        #   Home
+        #       Alpha
+        #       Beta
+        #       Delta
+
+        home = create_page("Home", "nav_playground.html", "en", published=True)
+        alpha = create_page(
+            "Alpha",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home.reload(),
+        )
+        beta = create_page(
+            "Beta",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home.reload(),
+        )
+        delta = create_page(
+            "Delta",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home.reload(),
+        )
+
+        self.assertEqual(home.path, '0001')
+        self.assertEqual(alpha.path, '00010001')
+        self.assertEqual(beta.path, '00010002')
+        self.assertEqual(delta.path, '00010003')
+
+        # Public tree (corrupted)
+        #   Home
+        #       Delta
+        #       Beta
+        #       Alpha
+
+        delta.publisher_public.move(
+            target=home.publisher_public.reload(),
+            pos='first-child',
+        )
+        beta.publisher_public.move(
+            target=delta.publisher_public.reload(),
+            pos='right',
+        )
+        alpha.publisher_public.move(
+            target=beta.publisher_public.reload(),
+            pos='right',
+        )
+
+        # We corrupted the public tree above and now assert that is correctly
+        # corrupted.
+        self.assertEqual(home.publisher_public.reload().path, '0002')
+        self.assertEqual(delta.publisher_public.reload().path, '00020001')
+        self.assertEqual(beta.publisher_public.reload().path, '00020002')
+        self.assertEqual(alpha.publisher_public.reload().path, '00020003')
+
+        out = StringIO()
+        management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
+
+        # fix-tree should fix the public tree to match the draft tree
+        self.assertEqual(home.publisher_public.reload().path, '0002')
+        self.assertEqual(alpha.publisher_public.reload().path, '00020001')
+        self.assertEqual(beta.publisher_public.reload().path, '00020002')
+        self.assertEqual(delta.publisher_public.reload().path, '00020003')
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
