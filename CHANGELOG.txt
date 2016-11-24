@@ -1,5 +1,6 @@
 === 3.4.2 (unreleased) ===
 
+* Escaped strings in ``close_frame`` JS template.
 * Fixed a bug with `text-transform` styles on inputs affecting CMS login
 * Fixed a typo in the confirmation message for copying plugins from different
   language
