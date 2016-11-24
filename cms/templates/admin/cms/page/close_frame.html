@@ -21,10 +21,10 @@ window.CMS || window.parent.CMS || document.write(
         // Do NOT move this!!!
         Window.CMS.API.Helpers.dataBridge = {
             'plugin_id': '{{ plugin_id|unlocalize }}',
-            'plugin_type': '{{ type }}',
-            'plugin_name': '{{ name }}',
-            'plugin_icon': '{{ icon }}',
-            'plugin_desc': '{{ alt }}'
+            'plugin_type': '{% filter escapejs %}{{ type }}{% endfilter %}',
+            'plugin_name': '{% filter escapejs %}{{ name }}{% endfilter %}',
+            'plugin_icon': '{% filter escapejs %}{{ icon }}{% endfilter %}',
+            'plugin_desc': '{% filter escapejs %}{{ alt }}{% endfilter %}'
         };
 
         Window.CMS.$(document).ready(function () {
