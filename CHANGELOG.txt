@@ -1,5 +1,6 @@
 === 3.4.1 (Unreleased) ===
 
+* Escaped strings in JS templates.
 * Fixed a regression when static placeholder was uneditable if it was present
   on the page multiple times
 
