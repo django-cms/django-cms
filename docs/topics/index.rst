@@ -18,4 +18,6 @@ concerned with explaining *how to do things* than with helping you understand
     i18n
     permissions
     commonly_used_plugins
+    developing_addons
+    developing_projects
     searchdocs
