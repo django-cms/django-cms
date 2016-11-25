@@ -152,7 +152,7 @@ class PlaceholderAdminMixin(object):
 
     def get_urls(self):
         """
-        Register the plugin specific urls (add/edit/copy/remove/move)
+        Register the plugin specific urls (add/edit/copy/remove/move/hide)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
@@ -163,6 +163,7 @@ class PlaceholderAdminMixin(object):
             pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
             pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
+            pat(r'hide-plugin/$', self.hide_plugin),
         ]
         return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
 
@@ -743,3 +744,21 @@ class PlaceholderAdminMixin(object):
         }
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
+
+    @method_decorator(require_POST)
+    @xframe_options_sameorigin
+    def hide_plugin(self, request):
+        try:
+            plugin_id = get_int(request.POST.get('plugin_id'))
+        except TypeError:
+            raise RuntimeError("'plugin_id' is a required parameter.")
+
+        plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
+
+        plugin.cmsplugin_hidden = not plugin.cmsplugin_hidden
+        plugin.save()
+
+        return HttpResponse(
+            json.dumps({'reload': True}),
+            content_type='application/json'
+        )

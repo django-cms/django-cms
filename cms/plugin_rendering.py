@@ -339,7 +339,13 @@ class ContentRenderer(object):
         template = plugin._get_render_template(context, instance, placeholder)
         template = self.get_cached_template(template)
 
-        content = template.render(context)
+        # The basic content of the visible plugin is given by rendering its
+        # template. If the plugin is to be hidden, this step must be halted
+        # and an empty string supplied as the content.
+        if instance.cmsplugin_hidden:
+            content = ''
+        else:
+            content = template.render(context)
 
         for processor in iterload_objects(get_cms_setting('PLUGIN_PROCESSORS')):
             content = processor(instance, placeholder, content, context)

@@ -623,6 +623,27 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
+    def test_hide_plugin(self):
+        page = self.get_page()
+        source, target = list(page.placeholders.all())[:2]
+        plugin = add_plugin(source, 'TextPlugin', 'en', body='test', cmsplugin_hidden=True)
+
+        expected = {
+            'reload': True
+        }
+
+        admin_user = self.get_admin()
+        with self.login_user_context(admin_user):
+            request = self.get_request(post_data={'plugin_id': plugin.pk})
+            response = self.admin_class.hide_plugin(request)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
+
+            updated = CMSPlugin.objects.get(pk=plugin.pk)
+            self.assertFalse(updated.cmsplugin_hidden)
+
+
     def test_move_language(self):
         page = self.get_page()
         source, target = list(page.placeholders.all())[:2]

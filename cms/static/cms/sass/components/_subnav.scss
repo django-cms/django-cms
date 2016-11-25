@@ -131,6 +131,9 @@
             &[data-cms-icon=bin] {
                 @include icon(bin);
             }
+            &[data-cms-icon=eye] {
+                @include icon(eye);
+            }
             &[href*=alias_plugin] {
                 @include icon(alias);
             }

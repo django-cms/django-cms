@@ -8,6 +8,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.middleware.csrf import get_token
 from django.template.defaultfilters import force_escape
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
@@ -17,6 +18,7 @@ from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
 from cms.utils import get_cms_setting
+from cms.utils.urlutils import admin_reverse
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
@@ -456,7 +458,21 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         pass
 
     def get_extra_local_plugin_menu_items(self, request, plugin):
-        pass
+        hidden = plugin.cmsplugin_hidden
+
+        return [
+            PluginMenuItem(
+                name='Show' if hidden else 'Hide',
+                url=admin_reverse('cms_page_hide_plugin'),
+                data={
+                    'plugin_id': plugin.pk,
+                    'csrfmiddlewaretoken': get_token(request),
+                },
+                attributes={
+                    'cms-icon': 'eye',
+                }
+            )
+        ]
 
     def __repr__(self):
         return smart_str(self.name)
