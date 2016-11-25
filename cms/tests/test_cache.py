@@ -484,6 +484,54 @@ class CacheTestCase(CMSTestCase):
                     response = self.client.get('/en/')
                 self.assertEqual(response.status_code, 200)
 
+    def test_no_page_cache_on_toolbar_edit(self):
+        with self.settings(CMS_PAGE_CACHE=True):
+            # Create a test page
+            page1 = create_page('test page 1', 'nav_playground.html', 'en')
+
+            # Add some content
+            placeholder = page1.placeholders.filter(slot="body")[0]
+            add_plugin(placeholder, "TextPlugin", 'en', body="English")
+            add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+
+            # Publish
+            page1.publish('en')
+
+            # Set edit mode
+            session = self.client.session
+            session['cms_edit'] = True
+            session.save()
+
+            # Make an initial ?edit request
+            with self.assertNumQueries(FuzzyInt(1, 24)):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+
+            # Disable edit mode
+            session = self.client.session
+            session['cms_edit'] = False
+            session.save()
+
+            # Set the cache
+            with self.assertNumQueries(FuzzyInt(1, 24)):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+
+            # Assert cached content was used
+            with self.assertNumQueries(0):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+
+            # Set edit mode once more
+            session = self.client.session
+            session['cms_edit'] = True
+            session.save()
+
+            # Assert no cached content was used
+            with self.assertNumQueries(FuzzyInt(1, 24)):
+                response = self.client.get('/en/?edit')
+            self.assertEqual(response.status_code, 200)
+
     def test_invalidate_restart(self):
 
         # Ensure that we're testing in an environment WITHOUT the MW cache...
