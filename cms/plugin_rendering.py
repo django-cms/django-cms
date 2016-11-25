@@ -191,8 +191,14 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", flatten_context(context))
     changes = watcher.get_changes()
-    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
-        set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes})
+    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
+        for p in plugins:
+            if not use_cache:
+                break
+            instance, plugin = p.get_plugin_instance()
+            use_cache = plugin.get_use_cache(context, instance, placeholder)
+        if use_cache:
+            set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes})
     context.pop()
     return result
 

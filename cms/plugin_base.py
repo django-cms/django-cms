@@ -329,6 +329,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             reload_required = options.get('requires_reload', False)
         return reload_required
 
+    def get_use_cache(self, context, instance, placeholder):
+        return self.cache
+
     def get_plugin_urls(self):
         """
         Return URL patterns for which the plugin wants to register
