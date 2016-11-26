@@ -20,7 +20,7 @@ from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.django_load import iterload_objects
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
- 
+
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
@@ -284,6 +284,7 @@ class ContentRenderer(object):
             page=current_page,
             editable=True,
             nodelist=nodelist,
+            inherit=inherit
         )
 
         if content or not current_page.parent_id:
@@ -514,7 +515,7 @@ class ContentRenderer(object):
             raise PlaceholderNotFound(message)
         return placeholder
 
-    def _render_page_placeholder(self, context, slot, page, editable=True, nodelist=None):
+    def _render_page_placeholder(self, context, slot, page, editable=True, nodelist=None, inherit=False):
         """
         Renders a placeholder attached to a page.
         """
@@ -525,6 +526,7 @@ class ContentRenderer(object):
                 return nodelist.render(context)
             return ''
 
+        placeholder.is_inherit = inherit
         content = self.render_placeholder(
             placeholder,
             context=context,
