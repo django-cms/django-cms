@@ -8,9 +8,6 @@
 
 <fieldset class="module aligned">
     {% for field in form.visible_fields %}
-    {{ field.is_checkbox }}
-    {{ field.field.is_checkbox }}
-    {{ is_checkbox }}
         <div class="form-row {{ field.name }}{% if field.errors %} errors{% endif %}">
             {% if field.errors %}
                 <ul class="errorlist">
