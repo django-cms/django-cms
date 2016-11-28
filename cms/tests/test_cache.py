@@ -3,6 +3,7 @@
 import time
 
 from django.conf import settings
+from django.contrib.messages import get_messages
 from django.template import Context
 
 from sekizai.context import SekizaiContext
@@ -417,6 +418,7 @@ class CacheTestCase(CMSTestCase):
             overrides['MIDDLEWARE'] = [mw for mw in settings.MIDDLEWARE if mw not in exclude]
         else:
             overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+        overrides['MESSAGE_STORAGE'] = 'django.contrib.messages.storage.session.SessionStorage'
         with self.settings(**overrides):
 
             # Silly to do these tests if this setting isn't True
@@ -449,6 +451,30 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(0):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
+
+            #
+            # Test that a message should prevent cache to be retrieved
+            #
+            messages = get_messages(request)
+            messages.add(40, 'this is a django.contrib.message message')
+            messages.update(response)
+            request.session.save()
+
+            #import ipdb; ipdb.set_trace()
+            with self.assertNumQueries(FuzzyInt(1, 20)):
+                response = self.client.get('/en/')
+
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'this is a django.contrib.message message')
+
+            #
+            # Test that subsequent requests of the same page are still cached by
+            # asserting that they require fewer queries.
+            #
+            with self.assertNumQueries(0):
+                response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, 'this is a django.contrib.message message')
 
             #
             # Test that the cache is invalidated on unpublishing the page

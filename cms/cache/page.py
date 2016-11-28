@@ -14,9 +14,14 @@ from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_cms_setting
 from cms.utils.helpers import get_timezone_name
+from django.contrib.messages import get_messages
 
 
 def _page_cache_key(request):
+    # do not store nor retrieve page in cache if some messages are going to be displayed
+    messages = get_messages(request)
+    if len(messages) or getattr(messages, 'used', False) or getattr(messages, 'added_new', False):
+        return None
     #md5 key of current path
     cache_key = "%s:%d:%s" % (
         get_cms_setting("CACHE_PREFIX"),
@@ -68,8 +73,8 @@ def set_page_cache(response):
             get_cms_setting('CACHE_DURATIONS')['content'],
             min_placeholder_ttl
         )
-
-        if ttl > 0:
+        page_cache_key = _page_cache_key(request)
+        if ttl > 0 and page_cache_key is not None:
             # Adds expiration, etc. to headers
             patch_response_headers(response, cache_timeout=ttl)
             patch_vary_headers(response, sorted(vary_cache_on_set))
@@ -79,7 +84,7 @@ def set_page_cache(response):
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
             cache.set(
-                _page_cache_key(request),
+                page_cache_key,
                 (
                     response.content,
                     response._headers,
@@ -95,7 +100,12 @@ def set_page_cache(response):
 
 def get_page_cache(request):
     from django.core.cache import cache
-    return cache.get(_page_cache_key(request), version=_get_cache_version())
+    page_cache_key = _page_cache_key(request)
+    if page_cache_key is None:
+        return None
+    else:
+        return cache.get(page_cache_key,
+                         version=_get_cache_version())
 
 
 def get_xframe_cache(page):
