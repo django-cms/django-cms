@@ -539,6 +539,15 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(t, self.test_page6)
         self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
 
+    def test_inherit_placeholder_override(self):
+        # Tests that the user can override the inherited content
+        # in a placeholder by adding plugins to the inherited placeholder.
+        t = u'{% load cms_tags %}' + \
+            u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
+        # a page whose parent has 'main' placeholder inherits from the parent, not ancestors
+        r = self.render(t, self.test_page5)
+        self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
+
     def test_render_placeholder_toolbar(self):
         placeholder = Placeholder()
         placeholder.slot = 'test'

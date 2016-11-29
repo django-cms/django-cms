@@ -264,6 +264,9 @@ class ContentRenderer(object):
             nodelist=nodelist,
         )
 
+        if content:
+            return content
+
         # don't display inherited plugins in edit mode, so that the user doesn't
         # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
         # there for possible enhancements
