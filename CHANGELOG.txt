@@ -11,6 +11,7 @@
   was set to ``True`` and an anon user had ``cms_edit`` set to ``True`` on their session.
 * Fixed a regression which prevented users from overriding content in an inherited
   placeholder.
+* Added official support for Django 1.10.
 
 
 === 3.4.1 (2016-10-04) ===

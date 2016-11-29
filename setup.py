@@ -21,10 +21,11 @@ CLASSIFIERS = [
     'Framework :: Django',
     'Framework :: Django :: 1.8',
     'Framework :: Django :: 1.9',
+    'Framework :: Django :: 1.10',
 ]
 
 INSTALL_REQUIREMENTS = [
-    'Django>=1.8,<1.10',
+    'Django>=1.8,<1.11',
     'django-classy-tags>=0.7.2',
     'django-formtools>=1.0',
     'django-treebeard>=4.0.1',
