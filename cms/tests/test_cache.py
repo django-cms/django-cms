@@ -460,7 +460,6 @@ class CacheTestCase(CMSTestCase):
             messages.update(response)
             request.session.save()
 
-            #import ipdb; ipdb.set_trace()
             with self.assertNumQueries(FuzzyInt(1, 20)):
                 response = self.client.get('/en/')
 
