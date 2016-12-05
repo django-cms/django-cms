@@ -1215,12 +1215,13 @@ Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
         }
     }).on('keyup.cms.submit', function (e) {
         if (mac) {
-            if (e.keyCode === KEYS.CMD_LEFT || e.keyCode === KEYS.CMD_RIGHT) {
+            if (e.keyCode === KEYS.CMD_LEFT ||
+                e.keyCode === KEYS.CMD_RIGHT ||
+                e.keyCode === KEYS.CMD_FIREFOX) {
                 cmdPressed = false;
             }
         }
     });
-
 };
 
 module.exports = Modal;
