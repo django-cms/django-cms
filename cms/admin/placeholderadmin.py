@@ -741,5 +741,4 @@ class PlaceholderAdminMixin(object):
             "opts": opts,
             "app_label": app_label,
         }
-        return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
-                                current_app=self.admin_site.name)
+        return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
