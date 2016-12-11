@@ -19,6 +19,8 @@
   when changing the value of the overwrite url field.
 * Adjusted ajax calls triggered when performing a placeholder operation (add plugin, etc..) to include
   a GET query called cms_path. This query points to the path where the operation originates from.
+* Added a deprecation warning to method ``render_plugin()`` in class ``CMSPluginBase``.
+* Since ``get_parent_classes()`` became a classmethod, do not instantiate plugin before invocation.
 
 
 === 3.4.1 (2016-10-04) ===
