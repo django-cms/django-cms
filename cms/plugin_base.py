@@ -411,8 +411,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 # Plugin has no parent restrictions or
                 # Current plugin (self) is a configured parent
                 child_classes.append(plugin_class.__name__)
-            else:
-                continue
+
         return child_classes
 
     @classmethod
