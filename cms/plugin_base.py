@@ -168,7 +168,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if cls.get_require_parent(slot, page):
             return True
 
-        allowed_parents = cls().get_parent_classes(slot, page) or []
+        allowed_parents = cls().get_parent_classes(slot, page)
         return bool(allowed_parents)
 
     @classmethod
