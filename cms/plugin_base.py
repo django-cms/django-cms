@@ -406,8 +406,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            allowed_parents = plugin_class.get_parent_classes(slot, page) or []
-
+            allowed_parents = plugin_class.get_parent_classes(slot, page)
             if not allowed_parents or plugin_type in allowed_parents:
                 # Plugin has no parent restrictions or
                 # Current plugin (self) is a configured parent
