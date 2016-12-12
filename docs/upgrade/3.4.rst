@@ -43,6 +43,8 @@ What's new in 3.4
   As a result both ``CMS_MAX_PAGE_HISTORY_REVERSIONS`` and ``CMS_MAX_PAGE_PUBLISH_REVERSIONS``
   settings are no longer supported, as well as the ``with_revision`` parameter
   in ``cms.api.create_page`` and ``cms.api.create_title``.
+* In ``cms.plugin_base.CMSPluginBase`` methods ``get_child_classes`` and ``get_parent_classes`` now
+  are implemented as a ``@classmethod``.
 
 .. _backward_incompatible_3.4:
 
