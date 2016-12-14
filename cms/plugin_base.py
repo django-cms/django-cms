@@ -116,6 +116,12 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     disable_child_plugins = False
 
+    cache_child_classes = True
+    cache_parent_classes = True
+    # Warning: setting ``cache_child_classes`` and/or ``cache_parent_classes`` to False, may have
+    # a serious performance impact, because their child-parent-relation must be recomputed each
+    # time the plugin tree is rendered.
+
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
 
@@ -170,7 +176,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if cls.get_require_parent(slot, page):
             return True
 
-        allowed_parents = cls().get_parent_classes(slot, page)
+        allowed_parents = cls.get_parent_classes(slot, page)
         return bool(allowed_parents)
 
     @classmethod
@@ -403,7 +409,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return plugin_pool.get_all_plugins()
 
     @classmethod
-    def get_child_classes(cls, slot, page):
+    def get_child_classes(cls, slot, page, instance=None):
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
@@ -429,7 +435,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            allowed_parents = plugin_class.get_parent_classes(slot, page)
+            allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
             if not allowed_parents or plugin_type in allowed_parents:
                 # Plugin has no parent restrictions or
                 # Current plugin (self) is a configured parent
@@ -438,7 +444,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return child_classes
 
     @classmethod
-    def get_parent_classes(cls, slot, page):
+    def get_parent_classes(cls, slot, page, instance=None):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = page and page.get_template() or None

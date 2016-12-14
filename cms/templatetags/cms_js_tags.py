@@ -45,10 +45,20 @@ def render_placeholder_toolbar_js(placeholder, render_language, content_renderer
     )
 
     def _render_plugin_js(plugin):
+        try:
+            child_classes = plugin_children[plugin.plugin_type]
+        except KeyError:
+            child_classes = plugin.get_plugin_class().get_child_classes(slot=slot, page=page, instance=plugin)
+
+        try:
+            parent_classes = plugin_parents[plugin.plugin_type]
+        except KeyError:
+            parent_classes = plugin.get_plugin_class().get_parent_classes(slot=slot, page=page, instance=plugin)
+
         content = get_toolbar_js(
             plugin,
-            children=plugin_children[plugin.plugin_type],
-            parents=plugin_parents[plugin.plugin_type],
+            children=child_classes,
+            parents=parent_classes,
         )
         return content
 
