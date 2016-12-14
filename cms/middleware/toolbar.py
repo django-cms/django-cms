@@ -11,7 +11,7 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import MiddlewareMixin
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
-from menus.menu_pool import menu_pool
+
 
 get_request_ip = get_request_ip_resolver()
 
@@ -64,14 +64,10 @@ class ToolbarMiddleware(MiddlewareMixin):
                 request.user.is_staff or (anonymous_on and request.user.is_anonymous())
         ):
             if edit_on in request.GET and not request.session.get('cms_edit', False):
-                if not request.session.get('cms_edit', False):
-                    menu_pool.clear()
                 request.session['cms_edit'] = True
                 if request.session.get('cms_build', False):
                     request.session['cms_build'] = False
             if edit_off in request.GET and request.session.get('cms_edit', True):
-                if request.session.get('cms_edit', True):
-                    menu_pool.clear()
                 request.session['cms_edit'] = False
                 if request.session.get('cms_build', False):
                     request.session['cms_build'] = False

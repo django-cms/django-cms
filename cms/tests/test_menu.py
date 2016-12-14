@@ -223,7 +223,8 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
 
     def test_show_submenu_nephews(self):
-        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        page_2 = self.get_page(2)
+        context = self.get_context(path=page_2.get_absolute_url(), page=page_2)
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 1 %}")
         tpl.render(context)
         nodes = context["children"]
@@ -241,7 +242,8 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[1].children[0].children), 1)
 
     def test_show_submenu_template_root_level_none_no_nephew_limit(self):
-        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        root = self.get_page(1)
+        context = self.get_context(path=root.get_absolute_url(), page=root)
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 100 %}")
         tpl.render(context)
         nodes = context["children"]
@@ -295,7 +297,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), len(self.get_all_pages()))
 
     def test_show_menu(self):
-        context = self.get_context()
+        root = self.get_page(1)
+        context = self.get_context(page=root)
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
@@ -338,6 +341,58 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl.render(context)
         self.assertEqual(CacheKey.objects.count(), 1)
 
+    def test_menu_cache_draft_only(self):
+        # Tests that the cms uses a separate cache for draft & live
+        public_page = self.get_page(1)
+        draft_page = public_page.publisher_public
+        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        edit_off_path = public_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        superuser = self.get_superuser()
+
+        # Prime the public menu cache
+        with self.login_user_context(superuser):
+            context = self.get_context(path=edit_off_path, page=public_page)
+            context['request'].session['cms_edit'] = False
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        # This should prime the draft menu cache
+        with self.login_user_context(superuser):
+            context = self.get_context(path=edit_on_path, page=draft_page)
+            context['request'].session['cms_edit'] = True
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        # All nodes should be draft nodes
+        node_ids = [node.id for node in context['children']]
+        page_count = Page.objects.drafts().filter(pk__in=node_ids).count()
+
+        self.assertEqual(len(node_ids), page_count, msg='Not all pages in the draft menu are draft')
+
+    def test_menu_cache_live_only(self):
+        # Tests that the cms uses a separate cache for draft & live
+        public_page = self.get_page(1)
+        draft_page = public_page.publisher_public
+        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        edit_off_path = public_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        superuser = self.get_superuser()
+
+        # Prime the draft menu cache
+        with self.login_user_context(superuser):
+            context = self.get_context(path=edit_on_path, page=draft_page)
+            context['request'].session['cms_edit'] = True
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        # This should prime the public menu cache
+        with self.login_user_context(superuser):
+            context = self.get_context(path=edit_off_path, page=public_page)
+            context['request'].session['cms_edit'] = False
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        # All nodes should be public nodes
+        node_ids = [node.id for node in context['children']]
+        page_count = Page.objects.public().filter(pk__in=node_ids).count()
+
+        self.assertEqual(len(node_ids), page_count, msg='Not all pages in the public menu are public')
+
     def test_menu_keys_duplicate_truncates(self):
         """
         When two objects with the same characteristics are present in the
@@ -352,7 +407,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(CacheKey.objects.count(), 1)
 
     def test_only_active_tree(self):
-        context = self.get_context()
+        context = self.get_context(page=self.get_page(1))
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context)
@@ -360,7 +415,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[1].children), 0)
         self.assertEqual(len(nodes[0].children), 1)
         self.assertEqual(len(nodes[0].children[0].children), 1)
-        context = self.get_context(path=self.get_page(4).get_absolute_url())
+
+        page_4 = self.get_page(4)
+        context = self.get_context(path=page_4.get_absolute_url(), page=page_4)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -368,7 +425,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes[0].children), 0)
 
     def test_only_one_active_level(self):
-        context = self.get_context()
+        context = self.get_context(page=self.get_page(1))
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 1 %}")
         tpl.render(context)
@@ -397,7 +454,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(node.children), 0)
 
     def test_only_level_one_active(self):
-        context = self.get_context()
+        context = self.get_context(page=self.get_page(1))
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 0 100 %}")
         tpl.render(context)
@@ -417,7 +474,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(node.children), 1)
 
     def test_show_submenu(self):
-        context = self.get_context()
+        context = self.get_context(page=self.get_page(1))
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
@@ -432,7 +489,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), 1)
         self.assertEqual(len(nodes[0].children), 0)
 
-        context = self.get_context(path=self.get_page(3).get_absolute_url())
+        page_3 = self.get_page(3)
+        context = self.get_context(path=page_3.get_absolute_url(), page=page_3)
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 1 %}")
         tpl.render(context)
         nodes = context["children"]
@@ -444,7 +502,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # should include P3 as well
         self.assertEqual(len(nodes[0].children), 1)
 
-        context = self.get_context(path=self.get_page(2).get_absolute_url())
+        page_2 = self.get_page(2)
+        context = self.get_context(path=page_2.get_absolute_url(), page=page_2)
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 0 %}")
         tpl.render(context)
         nodes = context["children"]
@@ -454,7 +513,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertTrue(nodes[0].children[0].selected)
 
     def test_show_submenu_template_root_level_none(self):
-        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        root = self.get_page(1)
+        context = self.get_context(path=root.get_absolute_url(), page=root)
         tpl = Template("{% load menu_tags %}{% show_sub_menu 100 None 1 %}")
         tpl.render(context)
         nodes = context["children"]
@@ -466,7 +526,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertTrue(nodes[0].children)
 
     def test_show_breadcrumb(self):
-        context = self.get_context(path=self.get_page(3).get_absolute_url())
+        page_3 = self.get_page(3)
+        context = self.get_context(path=self.get_page(3).get_absolute_url(), page=page_3)
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context)
         nodes = context['ancestors']
@@ -489,7 +550,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page1.in_navigation = False
         page1.save()
         page2 = self.get_page(2)
-        context = self.get_context(path=page2.get_absolute_url())
+        context = self.get_context(path=page2.get_absolute_url(), page=page2)
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context)
         nodes = context['ancestors']
@@ -593,7 +654,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tag parameters are "1 XXX XXX XXX"
         """
         page6 = self.get_page(6)
-        context = self.get_context(page6.get_absolute_url())
+        context = self.get_context(page6.get_absolute_url(), page=page6)
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
@@ -601,7 +662,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), number_of_p6_children)
 
         page7 = self.get_page(7)
-        context = self.get_context(page7.get_absolute_url())
+        context = self.get_context(page7.get_absolute_url(), page=page7)
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
@@ -618,7 +679,10 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         parent = Page.objects.drafts().get(title_set__title='P3')
         invisible_page = create_page("invisible", "nav_playground.html", "en",
             parent=parent, published=True, in_navigation=False)
-        context = self.get_context(path=invisible_page.get_absolute_url())
+        context = self.get_context(
+            path=invisible_page.get_absolute_url(),
+            page=invisible_page.publisher_public,
+        )
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context)
         nodes = context['ancestors']
@@ -855,7 +919,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         """
         aaa = self.get_page('aaa')
         # root is NOT a soft root
-        context = self.get_context(aaa.get_absolute_url())
+        context = self.get_context(aaa.get_absolute_url(), page=aaa)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context)
         hard_root = context['children']
@@ -880,7 +944,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         root.soft_root = True
         root.save()
         aaa = self.get_page('aaa')
-        context = self.get_context(aaa.get_absolute_url())
+        context = self.get_context(aaa.get_absolute_url(), page=aaa)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context)
         soft_root = context['children']
@@ -916,7 +980,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
     def test_show_submenu(self):
         page = self.get_page(6)
         subpage = self.get_page(8)
-        context = self.get_context(page.get_absolute_url())
+        context = self.get_context(page.get_absolute_url(), page=page)
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
         tpl.render(context)
@@ -927,7 +991,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
     def test_show_submenu_num_queries(self):
         page = self.get_page(6)
         subpage = self.get_page(8)
-        context = self.get_context(page.get_absolute_url())
+        context = self.get_context(page.get_absolute_url(), page=page)
 
         # test standard show_menu
         with self.assertNumQueries(8):
@@ -998,10 +1062,13 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             'in_navigation': True,
         }
         a = create_page('A', reverse_id='a', **stdkwargs)
+        a_public = a.publisher_public
         b = create_page('B', parent=a, soft_root=True, **stdkwargs)
+        b_public = b.publisher_public
         c = create_page('C', parent=b, **stdkwargs)
+        c_public = c.publisher_public
 
-        context = self.get_context(a.get_absolute_url())
+        context = self.get_context(a.get_absolute_url(), page=a_public)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1017,7 +1084,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(c_node.id, c.publisher_public.pk)
         self.assertEqual(len(c_node.children), 0)
 
-        context = self.get_context(b.get_absolute_url())
+        context = self.get_context(b.get_absolute_url(), page=b_public)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1030,7 +1097,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(c_node.id, c.publisher_public.pk)
         self.assertEqual(len(c_node.children), 0)
 
-        context = self.get_context(c.get_absolute_url())
+        context = self.get_context(c.get_absolute_url(), page=c_public)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1043,7 +1110,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(c_node.id, c.publisher_public.pk)
         self.assertEqual(len(c_node.children), 0)
 
-        context = self.get_context(a.get_absolute_url())
+        context = self.get_context(a.get_absolute_url(), page=a_public)
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1056,7 +1123,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(c_node.id, c.publisher_public.pk)
         self.assertEqual(len(c_node.children), 0)
 
-        context = self.get_context(b.get_absolute_url())
+        context = self.get_context(b.get_absolute_url(), page=b_public)
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1069,7 +1136,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(c_node.id, c.publisher_public.pk)
         self.assertEqual(len(c_node.children), 0)
 
-        context = self.get_context(c.get_absolute_url())
+        context = self.get_context(c.get_absolute_url(), page=c_public)
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1511,7 +1578,7 @@ class SoftrootTests(CMSTestCase):
         djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
         create_page("People", parent=home, **stdkwargs)
         # On Projects
-        context = self.get_context(projects.get_absolute_url())
+        context = self.get_context(projects.get_absolute_url(), page=projects.publisher_public)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']
@@ -1554,7 +1621,7 @@ class SoftrootTests(CMSTestCase):
         djangoshop = create_page("django Shop", parent=projects, **stdkwargs)
         create_page("People", parent=home, **stdkwargs)
         # On django CMS
-        context = self.get_context(djangocms.get_absolute_url())
+        context = self.get_context(djangocms.get_absolute_url(), page=djangocms.publisher_public)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
         nodes = context['children']

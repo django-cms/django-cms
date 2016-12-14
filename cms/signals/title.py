@@ -2,7 +2,6 @@
 
 from cms.models import Title, Page
 from cms.signals.apphook import apphook_pre_title_checker, apphook_post_title_checker, apphook_post_delete_title_checker
-from menus.menu_pool import menu_pool
 
 
 def update_title_paths(instance, **kwargs):
@@ -35,9 +34,6 @@ def pre_save_title(instance, raw, **kwargs):
     if not instance.language in page_languages:
         page_languages.append(instance.language)
         page.update_languages(page_languages)
-
-    if not page.publisher_is_draft:
-        menu_pool.clear(page.site_id)
 
     if instance.pk and not hasattr(instance, "tmp_path"):
         instance.tmp_path = None
