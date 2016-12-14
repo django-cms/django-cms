@@ -29,6 +29,11 @@ class Modifier(object):
 
 class NavigationNode(object):
 
+    selected = None
+    sibling = False
+    ancestor = False
+    descendant = False
+
     def __init__(self, title, url, id, parent_id=None, parent_namespace=None,
                  attr=None, visible=True):
         self.children = []  # do not touch
@@ -62,3 +67,7 @@ class NavigationNode(object):
             return [self.parent] + self.parent.get_ancestors()
         else:
             return []
+
+    def is_selected(self, request):
+        node_abs_url = self.get_absolute_url()
+        return node_abs_url == request.path
