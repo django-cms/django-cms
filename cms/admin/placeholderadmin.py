@@ -283,7 +283,6 @@ class PlaceholderAdminMixin(object):
         plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
 
         if parent:
-            plugin.position = CMSPlugin.objects.filter(parent=parent).count()
             plugin.parent_id = parent.pk
         plugin.save()
         self.post_add_plugin(request, placeholder, plugin)

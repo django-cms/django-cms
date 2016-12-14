@@ -8,7 +8,7 @@ import warnings
 from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db import models
+from django.db import models, transaction
 from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
@@ -234,6 +234,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         instance, plugin = self.get_plugin_instance()
         return force_text(plugin.icon_alt(instance)) if instance else u''
 
+    @transaction.atomic
     def save(self, no_signals=False, *args, **kwargs):
         if not self.depth:
             if self.parent_id or self.parent:
@@ -250,18 +251,15 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
 
+    @transaction.atomic
     def move(self, target, pos=None):
+        from cms.utils.plugins import reorder_plugins
         super(CMSPlugin, self).move(target, pos)
         self = self.reload()
-        try:
-            new_pos = max(CMSPlugin.objects.filter(parent_id=self.parent_id,
-                                                   placeholder_id=self.placeholder_id,
-                                                   language=self.language).exclude(pk=self.pk).order_by('depth', 'path').values_list('position', flat=True)) + 1
-        except ValueError:
-            # This is the first plugin in the set
-            new_pos = 0
-        self.position = new_pos
-        self.save()
+        plugins = CMSPlugin.objects.filter(
+            parent_id=self.parent_id, placeholder_id=self.placeholder_id, language=self.language
+        ).order_by('path').values_list('pk', flat=True)
+        reorder_plugins(self.placeholder, self.parent_id, self.language, plugins)
         return self.reload()
 
     def set_base_attr(self, plugin):
@@ -269,6 +267,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                      'numchild', 'pk', 'position']:
             setattr(plugin, attr, getattr(self, attr))
 
+    @transaction.atomic
     def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
         """
         Copy this plugin and return the new plugin.
