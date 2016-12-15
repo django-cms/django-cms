@@ -6,7 +6,9 @@ from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
+from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
+from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 
@@ -30,6 +32,19 @@ from cms.utils.compat.dj import installed_apps
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request
 from cms.utils.urlutils import admin_reverse
+
+
+class PageTreeParser(Parser):
+
+    def handle_starttag(self, tag, attrs):
+        # We have to strip out attributes from the <li>
+        # tags in order to compare the values only
+        # Otherwise we'd have to include all attributes
+        # which in this case is not optimal because there's too many
+        # and would require us to hardcode a bunch of stuff here
+        if tag == 'li':
+            attrs = []
+        Parser.handle_starttag(self, tag, attrs)
 
 
 class PageTestBase(CMSTestCase):
@@ -746,6 +761,102 @@ class PageTest(PageTestBase):
                 form_url=form_url)
             self.assertTrue('form_url' in response.context_data)
             self.assertEqual(response.context_data['form_url'], form_url)
+
+    def _parse_page_tree(self, response):
+        content = response.content
+        content = content.decode(response.charset)
+
+        def _parse_html(html):
+            parser = PageTreeParser()
+            parser.feed(html)
+            parser.close()
+            document = parser.root
+            document.finalize()
+            # Removing ROOT element if it's not necessary
+            if len(document.children) == 1:
+                if not isinstance(document.children[0], six.string_types):
+                    document = document.children[0]
+            return document
+
+        try:
+            dom = _parse_html(content)
+        except HTMLParseError as e:
+            standardMsg = '%s\n%s' % ("Response's content is not valid HTML", e.msg)
+            self.fail(self._formatMessage(None, standardMsg))
+        return dom
+
+    def test_page_get_tree_endpoint_flat(self):
+        superuser = self.get_superuser()
+        endpoint = admin_reverse('get_tree')
+
+        create_page('Home', 'nav_playground.html', 'en')
+        alpha = create_page('Alpha', 'nav_playground.html', 'en')
+        create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+        create_page('Gamma', 'nav_playground.html', 'en')
+
+        tree = (
+            '<li>\nHome\n</li>'
+            '<li>\nAlpha\n</li>'
+            '<li>\nGamma\n</li>'
+        )
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+            parsed = self._parse_page_tree(response)
+            content = force_text(parsed)
+            self.assertIn(tree, content)
+            self.assertNotIn('<li>\nBeta\n</li>', content)
+
+    def test_page_get_tree_endpoint_nested(self):
+        superuser = self.get_superuser()
+        endpoint = admin_reverse('get_tree')
+
+        create_page('Home', 'nav_playground.html', 'en')
+        alpha = create_page('Alpha', 'nav_playground.html', 'en')
+        create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+        gamma = create_page('Gamma', 'nav_playground.html', 'en')
+        create_page('Delta', 'nav_playground.html', 'en', parent=gamma)
+        create_page('Theta', 'nav_playground.html', 'en')
+
+        tree = (
+            '<li>\nHome\n</li>'
+            '<li>\nAlpha'
+            '<ul>\n<li>\nBeta\n</li>\n</ul>\n</li>'
+            '<li>\nGamma'
+            '<ul>\n<li>\nDelta\n</li>\n</ul>\n</li>'
+            '<li>\nTheta\n</li>'
+        )
+
+        data = {
+            'openNodes[]': [alpha.pk, gamma.pk]
+        }
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint, data=data)
+            self.assertEqual(response.status_code, 200)
+            parsed = self._parse_page_tree(response)
+            content = force_text(parsed)
+            self.assertIn(tree, content)
+
+    def test_page_changelist_search(self):
+        superuser = self.get_superuser()
+        endpoint = self.get_admin_url(Page, 'changelist')
+
+        create_page('Home', 'nav_playground.html', 'en')
+        alpha = create_page('Alpha', 'nav_playground.html', 'en')
+        create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+        create_page('Gamma', 'nav_playground.html', 'en')
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint, data={'q': 'alpha'})
+            self.assertEqual(response.status_code, 200)
+            parsed = self._parse_page_tree(response)
+            content = force_text(parsed)
+            self.assertIn('<li>\nAlpha\n</li>', content)
+            self.assertNotIn('<li>\nHome\n</li>', content)
+            self.assertNotIn('<li>\nBeta\n</li>', content)
+            self.assertNotIn('<li>\nGamma\n</li>', content)
 
     def test_global_limit_on_plugin_move(self):
         admin = self.get_admin()

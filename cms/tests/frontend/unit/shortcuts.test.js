@@ -3,7 +3,7 @@ var initShortcuts = require('../../../static/cms/js/modules/shortcuts');
 var initHelpModal = require('../../../static/cms/js/modules/shortcuts/help');
 var initCreateModal = require('../../../static/cms/js/modules/shortcuts/create-modal');
 var $ = require('jquery');
-var keyboard = require('keyboardjs');
+var keyboard = require('../../../static/cms/js/modules/keyboard');
 var Modal = require('../../../static/cms/js/modules/cms.modal');
 
 var CMS = window.CMS || {};

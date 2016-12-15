@@ -1,4 +1,4 @@
-var keyboard = require('keyboardjs');
+var keyboard = require('../keyboard');
 var tmpl = require('../tmpl');
 var Modal = require('../cms.modal');
 var template = require('./help.html');

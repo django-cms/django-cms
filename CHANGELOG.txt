@@ -1,7 +1,37 @@
-=== 3.4.1 (Unreleased) ===
+=== 3.4.2 (unreleased) ===
+
+* Escaped strings in ``close_frame`` JS template.
+* Fixed a bug with `text-transform` styles on inputs affecting CMS login
+* Fixed a typo in the confirmation message for copying plugins from different
+  language
+* Fixed a bug which prevented certain migrations from running in a multi-db setup.
+* Fixed a regression which prevented the ``Page`` model from rendering correctly
+  when used in a ``raw_id_field``.
+* Fixed a regression which caused the CMS to cache the toolbar when ``CMS_PAGE_CACHE``
+  was set to ``True`` and an anon user had ``cms_edit`` set to ``True`` on their session.
+* Fixed a regression which prevented users from overriding content in an inherited
+  placeholder.
+* Added official support for Django 1.10.
+* Fixed a bug where plugin save would incorrectly be triggered on pressing
+  command and then enter in Firefox.
+
+
+=== 3.4.1 (2016-10-04) ===
 
 * Fixed a regression when static placeholder was uneditable if it was present
   on the page multiple times
+* Removed globally unique constraint for Apphook configs.
+* Fixed a bug when keyboard shortcuts were triggered when form fields were
+  focused
+* Fixed a bug when ``shift + space`` shortcut wouldn't correctly highlight a
+  plugin in the structure board
+* Fixed a bug when plugins that have top-level svg element would break
+  structure board
+* Fixed a bug where output from the ``show_admin_menu_for_pages`` template tag
+  was escaped in Django 1.9
+* Fixed a bug where plugins would be rendered as editable if toolbar was shown
+  but user was not in edit mode.
+* Fixed css reset issue with shortcuts modal
 
 
 === 3.4.0 (2016-09-14) ===

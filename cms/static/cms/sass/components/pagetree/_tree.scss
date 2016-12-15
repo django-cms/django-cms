@@ -47,7 +47,7 @@
 // CONTAINER
 // general container around the jstree or elements
 .cms-pagetree-root.filtered {
-    min-height: auto;
+    min-height: 0;
     // important is to fight with admin-style
     padding: 0 !important;
     box-shadow: $pagetree-box-shadow !important;

@@ -68,9 +68,11 @@ it or the context provided to its template::
 
 
     from django.test import TestCase
+    from django.test.client import RequestFactory
 
     from cms.api import add_plugin
     from cms.models import Placeholder
+    from cms.plugin_rendering import ContentRenderer
 
     from myapp.cms_plugins import MyPlugin
     from myapp.models import MyappPlugin
@@ -95,6 +97,7 @@ it or the context provided to its template::
                 MyPlugin,
                 'en',
             )
-            html = model_instance.render_plugin({})
+            renderer = ContentRenderer(request=RequestFactory())
+            html = renderer.render_plugin(model_instance, {})
             self.assertEqual(html, '<strong>Test</strong>')
 

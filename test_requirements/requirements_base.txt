@@ -2,7 +2,7 @@ coverage==4.2
 python-coveralls==2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==3.3
-https://github.com/fladi/django-treebeard/archive/django-1.10.zip
+django-treebeard>=4.1
 argparse
 dj-database-url
 djangocms-admin-style>=1.0

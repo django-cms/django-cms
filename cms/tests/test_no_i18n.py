@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches
 from django.template import Template
@@ -18,36 +19,38 @@ from cms.test_utils.testcases import (CMSTestCase,
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting
 
-
-@override_settings(
+overrides = dict(
     LANGUAGE_CODE='en-us',
     LANGUAGES=[],
     CMS_LANGUAGES={},
     USE_I18N=False,
     ROOT_URLCONF='cms.test_utils.project.urls_no18n',
-    MIDDLEWARE_CLASSES=[
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.cache.FetchFromCacheMiddleware',
-        'cms.middleware.user.CurrentUserMiddleware',
-        'cms.middleware.page.CurrentPageMiddleware',
-        'cms.middleware.toolbar.ToolbarMiddleware',
-    ],
     TEMPLATE_CONTEXT_PROCESSORS=[
-        "django.contrib.auth.context_processors.auth",
+        'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
-        "django.core.context_processors.debug",
-        "django.core.context_processors.request",
-        "django.core.context_processors.media",
+        'django.core.context_processors.debug',
+        'django.core.context_processors.request',
+        'django.core.context_processors.media',
         'django.core.context_processors.csrf',
-        "cms.context_processors.cms_settings",
-        "sekizai.context_processors.sekizai",
-        "django.core.context_processors.static",
+        'cms.context_processors.cms_settings',
+        'sekizai.context_processors.sekizai',
+        'django.core.context_processors.static',
     ],
 )
+overrides['MIDDLEWARE' if getattr(settings, 'MIDDLEWARE', None) else 'MIDDLEWARE_CLASSES'] = [
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+]
+
+
+@override_settings(**overrides)
 class TestNoI18N(CMSTestCase):
 
     def setUp(self):
@@ -112,23 +115,24 @@ class TestNoI18N(CMSTestCase):
             self.assertEqual(url, "%s" % path)
 
     def test_url_redirect(self):
-        with self.settings(
+        overrides = dict(
             USE_I18N=True,
-            MIDDLEWARE_CLASSES=[
-                'django.contrib.sessions.middleware.SessionMiddleware',
-                'django.contrib.auth.middleware.AuthenticationMiddleware',
-                'django.contrib.messages.middleware.MessageMiddleware',
-                'django.middleware.csrf.CsrfViewMiddleware',
-                'django.middleware.locale.LocaleMiddleware',
-                'django.middleware.common.CommonMiddleware',
-                'django.middleware.cache.FetchFromCacheMiddleware',
-                'cms.middleware.user.CurrentUserMiddleware',
-                'cms.middleware.page.CurrentPageMiddleware',
-                'cms.middleware.toolbar.ToolbarMiddleware',
-            ],
             CMS_LANGUAGES={1: []},
             LANGUAGES=[('en-us', 'English')],
-        ):
+        )
+        overrides['MIDDLEWARE' if getattr(settings, 'MIDDLEWARE', None) else 'MIDDLEWARE_CLASSES'] = [
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+        ]
+        with self.settings(**overrides):
             create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
             response = self.client.get('/', follow=False)
             self.assertTrue(response['Location'].endswith("/foobar/"))

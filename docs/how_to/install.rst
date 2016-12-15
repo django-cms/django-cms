@@ -22,9 +22,9 @@ Requirements
 ************
 
 * `Python`_ 2.7, 3.3, 3.4 or 3.5.
-* `Django`_ 1.8.x, 1.9.x
+* `Django`_ 1.8.x, 1.9.x, 1.10.x
 * `django-classy-tags`_ 0.7.0 or higher
-* `django-treebeard`_ 4.0
+* `django-treebeard`_ 4.x
 * `django-sekizai`_ 0.8.2 or higher
 * `djangocms-admin-style`_ 1.0 or higher
 * An installed and working instance of one of the databases listed in the

@@ -11,7 +11,15 @@ var nextUntil = function nextUntil(element, until) {
     var next = [];
     var el = element;
 
-    while (el.nextSibling && !(el.nextSibling.className && el.nextSibling.className.match(new RegExp(until)))) {
+    while (
+        el.nextSibling &&
+        !(
+            el.nextSibling.className &&
+            // in case it's and svg element, it's `className` is not a string
+            typeof el.nextSibling.className === 'string' &&
+            el.nextSibling.className.match(new RegExp(until))
+        )
+    ) {
         el = el.nextSibling;
         next.push(el);
     }

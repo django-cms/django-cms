@@ -7,7 +7,7 @@ var Class = require('classjs');
 var Helpers = require('./cms.base').API.Helpers;
 var KEYS = require('./cms.base').KEYS;
 var ChangeTracker = require('./cms.changetracker');
-var keyboard = require('keyboardjs');
+var keyboard = require('./keyboard');
 var previousKeyboardContext;
 var previouslyFocusedElement;
 
@@ -1215,12 +1215,13 @@ Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
         }
     }).on('keyup.cms.submit', function (e) {
         if (mac) {
-            if (e.keyCode === KEYS.CMD_LEFT || e.keyCode === KEYS.CMD_RIGHT) {
+            if (e.keyCode === KEYS.CMD_LEFT ||
+                e.keyCode === KEYS.CMD_RIGHT ||
+                e.keyCode === KEYS.CMD_FIREFOX) {
                 cmdPressed = false;
             }
         }
     });
-
 };
 
 module.exports = Modal;

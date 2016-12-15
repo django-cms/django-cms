@@ -465,6 +465,47 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = self.render_template_obj(template, {'plugin': plugin}, request)
         self.assertIn('<b>Test</b>', output)
 
+    def test_render_plugin_editable(self):
+        from django.core.cache import cache
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        placeholder = page.placeholders.all()[0]
+        plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+        template = "{% load cms_tags %}{% render_plugin plugin %}"
+        request = RequestFactory().get('/')
+        user = self._create_user("admin", True, True)
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = True
+        request.toolbar.show_toolbar = True
+        output = self.render_template_obj(template, {'plugin': plugin}, request)
+        expected = (
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>'
+            '<b>Test</b>'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'
+        )
+        self.assertEqual(output, expected.format(plugin.pk))
+
+    def test_render_plugin_not_editable(self):
+        from django.core.cache import cache
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        placeholder = page.placeholders.all()[0]
+        plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+        template = "{% load cms_tags %}{% render_plugin plugin %}"
+        request = RequestFactory().get('/')
+        user = self._create_user("admin", True, True)
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = False
+        request.toolbar.show_toolbar = True
+        output = self.render_template_obj(template, {'plugin': plugin}, request)
+        self.assertEqual('<b>Test</b>', output)
+
     def test_render_plugin_no_context(self):
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')

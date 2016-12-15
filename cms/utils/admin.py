@@ -2,6 +2,7 @@
 import json
 from collections import defaultdict
 
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -114,7 +115,7 @@ def render_admin_rows(request, pages, site, filtered=False, language=None):
             'filtered': filtered,
             'metadata': metadata,
             'page_languages': page.get_languages(),
-            'preview_language': language,
+            'preview_language': lang,
             'has_add_page_permission': user_can_add(user, target=page),
             'has_change_permission': user_can_change(user, page),
             'has_change_advanced_settings_permission': user_can_change_advanced_settings(user, page),
@@ -124,6 +125,7 @@ def render_admin_rows(request, pages, site, filtered=False, language=None):
             'site_languages': languages,
             'open_nodes': open_nodes,
             'cms_current_site': site,
+            'is_popup': (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET)
         }
         return template.render(context)
 

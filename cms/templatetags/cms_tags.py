@@ -156,7 +156,7 @@ class PageUrl(AsTag):
         return ''
 
 
-register.tag(PageUrl)
+register.tag('page_url', PageUrl)
 register.tag('page_id_url', PageUrl)
 
 
@@ -225,7 +225,7 @@ class Placeholder(Tag):
         return self.kwargs['name'].var.value.strip('"').strip("'")
 
 
-register.tag(Placeholder)
+register.tag('placeholder', Placeholder)
 
 
 class RenderPlugin(Tag):
@@ -248,7 +248,7 @@ class RenderPlugin(Tag):
         return content
 
 
-register.tag(RenderPlugin)
+register.tag('render_plugin', RenderPlugin)
 
 
 class RenderPluginBlock(InclusionTag):
@@ -275,7 +275,8 @@ class RenderPluginBlock(InclusionTag):
         context['plugin'] = plugin
         return context
 
-register.tag(RenderPluginBlock)
+
+register.tag('render_plugin_block', RenderPluginBlock)
 
 
 @register.simple_tag(takes_context=True)
@@ -385,7 +386,7 @@ class PageAttribute(AsTag):
         return ''
 
 
-register.tag(PageAttribute)
+register.tag('page_attribute', PageAttribute)
 
 
 def _show_placeholder_by_id(context, placeholder_name, reverse_id,
@@ -500,7 +501,8 @@ class CMSToolbar(RenderBlock):
         # return the toolbar content and the content below
         return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
 
-register.tag(CMSToolbar)
+
+register.tag('cms_toolbar', CMSToolbar)
 
 
 class CMSEditableObject(InclusionTag):
@@ -744,7 +746,8 @@ class CMSEditableObject(InclusionTag):
         extra_context['render_model'] = True
         return extra_context
 
-register.tag(CMSEditableObject)
+
+register.tag('render_model', CMSEditableObject)
 
 
 class CMSEditableObjectIcon(CMSEditableObject):
@@ -773,7 +776,9 @@ class CMSEditableObjectIcon(CMSEditableObject):
         extra_context = self._get_empty_context(context, **kwargs)
         extra_context['render_model_icon'] = True
         return extra_context
-register.tag(CMSEditableObjectIcon)
+
+
+register.tag('render_model_icon', CMSEditableObjectIcon)
 
 
 class CMSEditableObjectAdd(CMSEditableObject):
@@ -805,7 +810,9 @@ class CMSEditableObjectAdd(CMSEditableObject):
                                                 view_method, editmode=False)
         extra_context['render_model_add'] = True
         return extra_context
-register.tag(CMSEditableObjectAdd)
+
+
+register.tag('render_model_add', CMSEditableObjectAdd)
 
 
 class CMSEditableObjectAddBlock(CMSEditableObject):
@@ -855,7 +862,9 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
                                                 editmode=False, **kwargs)
         extra_context['render_model_add'] = True
         return extra_context
-register.tag(CMSEditableObjectAddBlock)
+
+
+register.tag('render_model_add_block', CMSEditableObjectAddBlock)
 
 
 class CMSEditableObjectBlock(CMSEditableObject):
@@ -907,7 +916,9 @@ class CMSEditableObjectBlock(CMSEditableObject):
         extra_context['instance'] = kwargs.get('instance')
         extra_context['render_model_block'] = True
         return extra_context
-register.tag(CMSEditableObjectBlock)
+
+
+register.tag('render_model_block', CMSEditableObjectBlock)
 
 
 class StaticPlaceholderNode(Tag):
@@ -950,7 +961,9 @@ class StaticPlaceholderNode(Tag):
             nodelist=nodelist,
         )
         return content
-register.tag(StaticPlaceholderNode)
+
+
+register.tag('static_placeholder', StaticPlaceholderNode)
 
 
 class RenderPlaceholder(AsTag):
@@ -1001,7 +1014,8 @@ class RenderPlaceholder(AsTag):
     def get_value(self, context, **kwargs):
         return self._get_value(context, **kwargs)
 
-register.tag(RenderPlaceholder)
+
+register.tag('render_placeholder', RenderPlaceholder)
 
 
 class RenderUncachedPlaceholder(RenderPlaceholder):
@@ -1016,7 +1030,8 @@ class RenderUncachedPlaceholder(RenderPlaceholder):
         kwargs['nocache'] = True
         return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
 
-register.tag(RenderUncachedPlaceholder)
+
+register.tag('render_uncached_placeholder', RenderUncachedPlaceholder)
 
 NULL = object()
 
@@ -1064,4 +1079,5 @@ class CMSAdminURL(AsTag):
     def get_value(self, context, viewname, args, kwargs):
         return admin_reverse(viewname, args=args, kwargs=kwargs)
 
-register.tag(CMSAdminURL)
+
+register.tag('cms_admin_url', CMSAdminURL)

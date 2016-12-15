@@ -4,9 +4,10 @@ permission system.
 
 This middleware is required only when CMS_PERMISSION = True.
 """
+from cms.utils.compat.dj import MiddlewareMixin
 
 
-class CurrentUserMiddleware(object):
+class CurrentUserMiddleware(MiddlewareMixin):
     def process_request(self, request):
         from cms.utils.permissions import set_current_user
 

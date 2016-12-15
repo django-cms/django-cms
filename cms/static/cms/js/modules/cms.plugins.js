@@ -73,12 +73,16 @@ var Plugin = new Class({
         if (Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
             return;
         }
+        if (Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id]) {
+            return;
+        }
 
         Plugin._initializeDragItemsStates();
 
         // determine type of plugin
         switch (this.options.type) {
             case 'placeholder': // handler for placeholder bars
+                Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id] = true;
                 this.ui.container.data('cms', this.options);
                 this._setPlaceholder();
                 this._collapsables();
@@ -1911,18 +1915,23 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
         );
     });
 
+    // turns out that offset calculation will be off by toolbar height if
+    // position is set to "relative" on html element.
+    var html = $('html');
+    var htmlMargin = html.css('position') === 'relative' ? parseInt($('html').css('margin-top'), 10) : 0;
+
     coordinates.left = Math.min.apply(null, positions.map(function (pos) {
         return pos.x1;
     }));
     coordinates.top = Math.min.apply(null, positions.map(function (pos) {
         return pos.y1;
-    }));
+    })) - htmlMargin;
     coordinates.width = Math.max.apply(null, positions.map(function (pos) {
         return pos.x2;
     })) - coordinates.left;
     coordinates.height = Math.max.apply(null, positions.map(function (pos) {
         return pos.y2;
-    })) - coordinates.top;
+    })) - coordinates.top - htmlMargin;
 
     win.scrollTop(coordinates.top - win.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
 
@@ -1937,6 +1946,8 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
 
 
 Plugin.aliasPluginDuplicatesMap = {};
+Plugin.staticPlaceholderDuplicatesMap = {};
+
 
 // istanbul ignore next
 Plugin._initializeTree = function _initializeTree() {

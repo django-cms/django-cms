@@ -68,7 +68,7 @@ class CMSToolbar(ToolbarAPIMixin):
         # This attribute is modified by the placeholder rendering
         # mechanism in case a placeholder rendered by the current
         # request cannot be cached.
-        self._cache_disabled = self.edit_mode
+        self._cache_disabled = self.edit_mode or self.show_toolbar
 
         with force_language(self.language):
             try:
@@ -404,7 +404,7 @@ class EmptyToolbar(object):
     is_staff = False
     edit_mode = False
     show_toolbar = False
-    _cache_disabled = False
+    _cache_disabled = True
 
     def __init__(self, request):
         self.request = request

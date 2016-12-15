@@ -1847,6 +1847,29 @@ describe('CMS.Modal', function () {
             expect(spy).toHaveBeenCalledTimes(3);
         });
 
+        it('does not trigger modal action if cmd enter was pressed on mac through subsequent keystrokes', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+        });
+
         it('does not trigger modal action if cmd+enter is pressed on win', function () {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);

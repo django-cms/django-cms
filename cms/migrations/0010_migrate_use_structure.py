@@ -1,28 +1,39 @@
 # -*- coding: utf-8 -*-
 import warnings
+import functools
 
 from django.conf import settings
 from django.db import models, migrations
 
+
+def _get_manager(model, db_alias):
+    return model.objects.db_manager(db_alias)
+
+
 def forwards(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+
+    get_manager = functools.partial(_get_manager, db_alias=db_alias)
+
     ContentType = apps.get_model('contenttypes', 'ContentType')
     Permission = apps.get_model('auth', 'Permission')
     Group = apps.get_model('auth', 'Group')
     user_model = apps.get_model(settings.AUTH_USER_MODEL)
     ph_model = apps.get_model('cms', 'Placeholder')
     page_model = apps.get_model('cms', 'Page')
+
     try:
-        ph_ctype = ContentType.objects.get_for_model(ph_model)
-        page_ctype = ContentType.objects.get_for_model(page_model)
-        permission, __ = Permission.objects.get_or_create(
+        ph_ctype = get_manager(ContentType).get_for_model(ph_model)
+        page_ctype = get_manager(ContentType).get_for_model(page_model)
+        permission, __ = get_manager(Permission).get_or_create(
             codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
-        page_permission, __ = Permission.objects.get_or_create(
+        page_permission, __ = get_manager(Permission).get_or_create(
             codename='change_page', content_type=page_ctype, name=u'Can change page'
         )
-        for user in user_model.objects.filter(is_superuser=False, is_staff=True):
+        for user in get_manager(user_model).filter(is_superuser=False, is_staff=True):
             if user.user_permissions.filter(codename='change_page', content_type_id=page_ctype.pk).exists():
                 user.user_permissions.add(permission.pk)
-        for group in Group.objects.all():
+        for group in get_manager(Group).all():
             if page_permission in group.permissions.all():
                 group.permissions.add(permission.pk)
     except Exception:
@@ -30,18 +41,26 @@ def forwards(apps, schema_editor):
 
 
 def backwards(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+
+    get_manager = functools.partial(_get_manager, db_alias=db_alias)
+
     ContentType = apps.get_model('contenttypes', 'ContentType')
     Permission = apps.get_model('auth', 'Permission')
     Group = apps.get_model('auth', 'Group')
     user_model = apps.get_model(settings.AUTH_USER_MODEL)
     ph_model = apps.get_model('cms', 'Placeholder')
-    ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
+    ph_ctype = get_manager(ContentType).get(
+        app_label=ph_model._meta.app_label,
+        model=ph_model._meta.model_name,
+    )
+
     try:
-        permission, __ = Permission.objects.get_or_create(
+        permission, __ = get_manager(Permission).get_or_create(
             codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
-        for user in user_model.objects.filter(is_superuser=False, is_staff=True):
+        for user in get_manager(user_model).filter(is_superuser=False, is_staff=True):
             user.user_permissions.remove(permission.pk)
-        for group in Group.objects.all():
+        for group in get_manager(Group).all():
             if permission in group.permissions.all():
                 group.permissions.remove(permission.pk)
     except Exception:

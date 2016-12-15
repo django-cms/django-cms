@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-12 10:52-0400\n"
+"POT-Creation-Date: 2016-09-29 08:26-0400\n"
 "PO-Revision-Date: 2016-08-09 11:43+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Latvian (http://www.transifex.com/divio/django-cms/language/lv/)\n"
@@ -19,19 +19,19 @@ msgstr ""
 "Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
 
-#: static/cms/js/dist/3.4.0rc1/bundle.admin.changeform.min.js:1
+#: static/cms/js/dist/3.4.0/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:72
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Vai jūs esat pārliecināts, ka gribat mainīt cilnes, bez lapas saglabāšanas?"
 
-#: static/cms/js/dist/3.4.0rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.0/bundle.admin.widget.min.js:3
 msgid "show"
 msgstr ""
 
-#: static/cms/js/dist/3.4.0rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.0/bundle.admin.widget.min.js:3
 msgid "hide"
 msgstr ""
 
-#: static/cms/js/dist/3.4.0rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.0/bundle.admin.widget.min.js:3
 msgid "toggle"
 msgstr ""

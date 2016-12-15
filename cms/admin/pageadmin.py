@@ -367,10 +367,8 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             context = {
                 'page': obj,
                 'CMS_PERMISSION': get_cms_setting('PERMISSION'),
-                'ADMIN_MEDIA_URL': settings.STATIC_URL,
                 'can_change': self.has_change_permission(request, obj=obj),
                 'can_change_permissions': self.has_change_permissions_permission(request, obj=obj),
-                'current_site_id': settings.SITE_ID,
             }
             context.update(extra_context or {})
             extra_context = self.update_language_tab_context(request, obj, context)
