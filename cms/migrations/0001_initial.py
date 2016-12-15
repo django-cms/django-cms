@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 
 from cms.models import ACCESS_CHOICES, Page
 from cms.utils.conf import get_cms_setting
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from django.conf import settings
 from django.db import models, migrations
 import django.utils.timezone
 from django.utils.translation import ugettext_lazy as _
 
 template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+
+template_default = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
 
 class Migration(migrations.Migration):
@@ -91,7 +94,7 @@ class Migration(migrations.Migration):
                 ('soft_root', models.BooleanField(db_index=True, default=False, help_text='All ancestors will not be displayed in the navigation', verbose_name=_('soft root'))),
                 ('reverse_id', models.CharField(db_index=True, max_length=40, verbose_name=_('id'), null=True, help_text='A unique identifier that is used with the page_url templatetag for linking to this page', blank=True)),
                 ('navigation_extenders', models.CharField(db_index=True, max_length=80, blank=True, verbose_name=_('attached menu'), null=True)),
-                ('template', models.CharField(max_length=100, default='INHERIT', help_text='The template used to render the content.', verbose_name=_('template'), choices=template_choices)),
+                ('template', models.CharField(max_length=100, default=template_default, help_text='The template used to render the content.', verbose_name=_('template'), choices=template_choices)),
                 ('login_required', models.BooleanField(default=False, verbose_name=_('login required'))),
                 ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name=_('menu visibility'), null=True, choices=Page.LIMIT_VISIBILITY_IN_MENU_CHOICES, help_text='limit when this page is visible in the menu', blank=True)),
                 ('is_home', models.BooleanField(db_index=True, default=False, editable=False)),
