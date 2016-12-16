@@ -31,7 +31,8 @@ Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application.
             'polls',
             'polls_cms_integration',
         )
-        watch_models = [Poll,]
+
+        watch_models = [Poll]
 
         def populate(self):
             if not self.is_current_app:
@@ -59,24 +60,19 @@ Create a new ``cms_toolbars.py`` file in your Polls/CMS Integration application.
 What this all means
 ===================
 
-
-``CMSToolbar`` sub-classes must implement a ``populate()`` method. The ``populate()`` method will only be called if the
-current user is a staff user. The ``populate()`` method is what actually manages the toolbar - it:
-
-* checks whether we're in a page belonging to this application
-* ... if so, it creates a menu, if one's not already there
-* adds a menu item to list all polls in the overlay
-* adds a menu item to add a new poll as a modal window
-
-We also provide:
-
-* ``watch_models``, which allows the frontend editor to redirect the user to the model instance
-  ``get_absolute_url`` whenever an instance is created or saved through the frontend editor
-  (see :ref:`url_changes` for details)
-* ``supported_apps``, a list of application names in which the toolbar should be active. Usually you don't need to set
-  ``supported_apps``. However, in our case there's a small complication: the views for the Polls application are in
-  ``polls``, but our ``cms_toolbars.py`` is in the ``polls_cms_integration`` application - we want the toolbar to be
-  available in both of these.
+* ``supported_apps`` is a list of application names in which the toolbar should be active. Usually you don't need to set
+  ``supported_apps`` - the appropriate application will be detected automatically. In this case (since the views for
+  the Polls application are in ``polls``, while our ``cms_toolbars.py`` is in the ``polls_cms_integration``
+  application) we need to specify both explicitly.
+* ``watch_models`` allows the frontend editor to redirect the user to the model instance
+  ``get_absolute_url`` whenever an instance of this model is created or saved through the frontend editor
+  (see :ref:`url_changes` for details).
+* The ``populate()`` method, which poulates the toolbar menu with nodes, will only be called if the current user is a
+  staff user. In this case it:
+    * checks whether we're in a page belonging to this application, using ``self.is_current_app``
+    * ... if so, it creates a menu, if one's not already there (``self.toolbar.get_or_create_menu()``)
+    * adds a menu item to list all polls in the overlay (``add_sideframe_item()``)
+    * adds a menu item to add a new poll as a modal window (``add_modal_item()``)
 
 
 **************
