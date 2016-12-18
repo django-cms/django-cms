@@ -226,6 +226,67 @@ class PageTest(PageTestBase):
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'changed title')
 
+    def test_edit_page_sets_publisher_dirty(self):
+        """
+        Test that setting and changing a value for a title/page field
+        will cause the title to be marked as dirty (pending changes).
+        """
+        superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            page_data = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+        page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+
+        basic_fields = {
+            'title': ('new title', 'new title 2'),
+            'slug': ('new-slug', 'new-slug-2'),
+            'page_title': ('new page title', 'new page title 2'),
+            'menu_title': ('new menu title', 'new menu title 2'),
+            'meta_description': ('new menu description', 'new menu description 2'),
+        }
+        advanced_fields = {
+            'overwrite_url': ('title-override', 'title-override-2'),
+            'redirect': ('/title-redirect/', '/title-redirect-2/'),
+        }
+
+        set_message = 'setting field {} is not updating publisher status'
+        change_message = 'changing field {} is not updating publisher status'
+
+        with self.login_user_context(superuser):
+            endpoint = self.get_admin_url(Page, 'change', page.pk)
+
+            for field, values in basic_fields.items():
+                # Set the initial value
+                page_data[field] = values[0]
+                self.client.post(endpoint, page_data)
+                self.assertTrue(page.reload().is_dirty('en'), set_message.format(field))
+
+                # Reset the publisher dirty status
+                page.reload().publish('en')
+
+                # Change the initial value=
+                page_data[field] = values[1]
+                self.client.post(endpoint, page_data)
+                self.assertTrue(page.reload().is_dirty('en'), change_message.format(field))
+
+            endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+
+            for field, values in advanced_fields.items():
+                # Set the initial value
+                page_data[field] = values[0]
+                self.client.post(endpoint, page_data)
+                self.assertTrue(page.reload().is_dirty('en'), set_message.format(field))
+
+                # Reset the publisher dirty status
+                page.reload().publish('en')
+
+                # Change the initial value
+                page_data[field] = values[1]
+                self.client.post(endpoint, page_data)
+                self.assertTrue(page.reload().is_dirty('en'), change_message.format(field))
+
     def test_moderator_edit_page_redirect(self):
         """
         Test that a page can be edited multiple times with moderator
