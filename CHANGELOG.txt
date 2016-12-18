@@ -1,6 +1,8 @@
 === 3.3.4 (unreleased) ===
 
 * Fixed a bug which prevented certain migrations from running in a multi-db setup.
+* Fixed a bug which prevented the page from being marked as dirty (pending changes)
+  when changing the value of the overwrite url field.
 
 
 === 3.3.3 (2016-10-04) ===
