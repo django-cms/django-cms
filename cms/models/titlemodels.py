@@ -14,6 +14,18 @@ from cms.utils.helpers import reversion_register
 
 @python_2_unicode_compatible
 class Title(models.Model):
+    # These are the fields whose values are compared when saving
+    # a Title object to know if it has changed.
+    editable_fields = [
+        'title',
+        'slug',
+        'redirect',
+        'page_title',
+        'menu_title',
+        'meta_description',
+        'has_url_overwrite',
+    ]
+
     language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
     page_title = models.CharField(_("title"), max_length=255, blank=True, null=True,
@@ -86,27 +98,33 @@ class Title(models.Model):
 
         if self.publisher_is_draft and not keep_state and self.is_new_dirty():
             self.publisher_state = PUBLISHER_STATE_DIRTY
+
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        ret = super(Title, self).save_base(*args, **kwargs)
-        return ret
+        return super(Title, self).save_base(*args, **kwargs)
 
     def is_new_dirty(self):
-        if self.pk:
-            fields = [
-                'title', 'page_title', 'menu_title', 'meta_description', 'slug', 'has_url_overwrite', 'redirect'
-            ]
-            try:
-                old_title = Title.objects.get(pk=self.pk)
-            except Title.DoesNotExist:
+        if not self.pk:
+            return True
+
+        try:
+            old_title = Title.objects.get(pk=self.pk)
+        except Title.DoesNotExist:
+            return True
+
+        for field in self.editable_fields:
+            old_val = getattr(old_title, field)
+            new_val = getattr(self, field)
+            if not old_val == new_val:
                 return True
-            for field in fields:
-                old_val = getattr(old_title, field)
-                new_val = getattr(self, field)
-                if not old_val == new_val:
-                    return True
-            return False
-        return True
+
+        if old_title.path != self.path and self.has_url_overwrite:
+            # path is handled individually because its a special field.
+            # The path field is both an internal and user facing field,
+            # as such we can't mark the title as dirty on any change,
+            # instead we need to check if the url overwrite flag is set.
+            return True
+        return False
 
 
 class EmptyTitle(object):
