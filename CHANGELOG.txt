@@ -28,6 +28,8 @@
   CMSPlugin model.
 * Deprecated ``frontend_edit_template`` of CMSPluginBase.
 * Introduced placeholder operation signals.
+* The ``post_`` methods in ```PlaceholderAdminMixin`` have been deprecated in favor of
+  placeholder operation signals.
 
 
 === 3.4.1 (2016-10-04) ===

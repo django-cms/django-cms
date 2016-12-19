@@ -227,30 +227,22 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         '''
         Given a plugin instance (usually as a CMSPluginBase), this method
         returns a tuple containing:
-
             instance - The instance AS THE APPROPRIATE SUBCLASS OF
                        CMSPluginBase and not necessarily just 'self', which is
                        often just a CMSPluginBase,
-
             plugin   - the associated plugin class instance (subclass
                        of CMSPlugin)
         '''
         plugin = self.get_plugin_class_instance(admin)
-        if hasattr(self, "_inst"):
-            return self._inst, plugin
-        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
-            # (if self is actually a subclass, getattr below would break)
-            try:
-                instance = plugin.model.objects.get(cmsplugin_ptr=self)
-                instance._render_meta = self._render_meta
-            except (AttributeError, ObjectDoesNotExist):
-                instance = None
-        else:
-            instance = self
-        self._inst = instance
-        return self._inst, plugin
 
-    def get_bound_plugin(self, admin=None):
+        try:
+            instance = self.get_bound_plugin()
+        except ObjectDoesNotExist:
+            instance = None
+            self._inst = None
+        return (instance, plugin)
+
+    def get_bound_plugin(self):
         """
         Returns an instance of the plugin model
         configured for this plugin type.
@@ -260,7 +252,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
         plugin = self.get_plugin_class()
 
-        if plugin.model != CMSPlugin:
+        if plugin.model != self.__class__:
             self._inst = plugin.model.objects.get(cmsplugin_ptr=self)
             self._inst._render_meta = self._render_meta
         else:
@@ -291,11 +283,11 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     def refresh_from_db(self, *args, **kwargs):
         super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
 
+        # Delete this internal cache to let the cms populate it
+        # on demand.
         try:
             del self._inst
         except AttributeError:
-            # Delete this internal cache to let the cms populate it
-            # on demand.
             pass
 
     def get_media_path(self, filename):
