@@ -17,6 +17,8 @@
 * fix template inheritance setting creates spurious migration (see #3479)
 * Fixed a bug which prevented the page from being marked as dirty (pending changes)
   when changing the value of the overwrite url field.
+* Adjusted ajax calls triggered when performing a placeholder operation (add plugin, etc..) to include
+  a GET query called cms_path. This query points to the path where the operation originates from.
 
 
 === 3.4.1 (2016-10-04) ===
