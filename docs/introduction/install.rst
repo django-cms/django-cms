@@ -77,24 +77,17 @@ Windows users may need to do a little extra to make sure Python files are associ
     assoc .py=Python.file
     ftype Python.File="C:\Users\Username\workspace\demo\env\Scripts\python.exe" "%1" %*
 
-For the purposes of this tutorial, it's recommended that you answer the
-installer's questions as follows (where we suggest something different from the default, it's
-indicated with an asterisk *****).
+By default, the installer runs in `Batch mode
+<https://djangocms-installer.readthedocs.io/en/latest/usage.html#batch-mode-default>`_, and sets up your new project
+with some default values.
 
-* Database configuration (in URL format): ``sqlite://localhost/project.db``
-* django CMS version: ``stable``
-* Django version: ``stable``
-* Activate Django I18N / L10N setting: ``yes``
-* Languages to enable. Option can be provided multiple times, or as a comma separated list: ``en,
-  de`` *****
-* Optional default time zone: ``America/Chicago``
-* Activate Django time zone support: ``yes``
-* Activate CMS permission management: ``yes``
-* Use Twitter Bootstrap Theme: ``yes`` *****
-* Use custom template set: ``no``
-* Load a starting page with examples after installation: ``yes`` *****
+Later, you may wish to manage some of these yourself, in which case you need to run it in `Wizard mode
+<https://djangocms-installer.readthedocs.io/en/latest/usage.html#wizard-mode>`_. The default in *Batch mode* is to set
+up an English-only project, which will be sufficient for the purposes of this tutorial. You can of course simply edit
+the new project's ``settings.py`` file at any time to change or add site languages or amend other settings.
 
-Create a Django admin user when invited.
+The installer creates an admin user for you, with username/password ``admin``/``admin``.
+
 
 Start up the runserver
 ======================
