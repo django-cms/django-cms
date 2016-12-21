@@ -12,6 +12,9 @@
 * Fixed a regression which prevented users from overriding content in an inherited
   placeholder.
 * Added official support for Django 1.10.
+* Added a deprecation warning to method ``render_plugin()`` in class ``CMSPluginBase``.
+* Since ``get_parent_classes()`` became a classmethod, do not instantiate plugin before invocation.
+* Removed a few confusing and useless code parts.
 
 
 === 3.4.1 (2016-10-04) ===
