@@ -69,10 +69,11 @@ What this all means
   (see :ref:`url_changes` for details).
 * The ``populate()`` method, which poulates the toolbar menu with nodes, will only be called if the current user is a
   staff user. In this case it:
-    * checks whether we're in a page belonging to this application, using ``self.is_current_app``
-    * ... if so, it creates a menu, if one's not already there (``self.toolbar.get_or_create_menu()``)
-    * adds a menu item to list all polls in the overlay (``add_sideframe_item()``)
-    * adds a menu item to add a new poll as a modal window (``add_modal_item()``)
+
+  * checks whether we're in a page belonging to this application, using ``self.is_current_app``
+  * ... if so, it creates a menu, if one's not already there (``self.toolbar.get_or_create_menu()``)
+  * adds a menu item to list all polls in the overlay (``add_sideframe_item()``)
+  * adds a menu item to add a new poll as a modal window (``add_modal_item()``)
 
 
 **************
