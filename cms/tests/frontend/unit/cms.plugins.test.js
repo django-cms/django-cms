@@ -494,10 +494,16 @@ describe('CMS.Plugin', function () {
             });
 
             expect(fakeModal.open).toHaveBeenCalledWith({
-                url: '/en/admin/cms/page/add-plugin/' +
-                     '?placeholder_id=1&plugin_type=TextPlugin&plugin_language=&plugin_parent=12',
+                url: jasmine.any(String),
                 title: 'Text plugin'
             });
+
+            expect(fakeModal.open.calls.mostRecent().args[0].url).toMatch('/en/admin/cms/page/add-plugin?');
+            expect(fakeModal.open.calls.mostRecent().args[0].url).toMatch('placeholder_id=1');
+            expect(fakeModal.open.calls.mostRecent().args[0].url).toMatch('plugin_type=TextPlugin');
+            expect(fakeModal.open.calls.mostRecent().args[0].url).toMatch('plugin_language=');
+            expect(fakeModal.open.calls.mostRecent().args[0].url).toMatch('plugin_parent=12');
+            expect(fakeModal.open.calls.mostRecent().args[0].url).toMatch('cms_path=');
         });
 
         it('opens the modal with correct url', function () {
@@ -513,7 +519,7 @@ describe('CMS.Plugin', function () {
 
             expect(fakeModal.open).toHaveBeenCalledWith({
                 url: '/en/admin/cms/page/add-plugin/' +
-                     '?placeholder_id=1&plugin_type=TextPlugin&plugin_language=',
+                     '?placeholder_id=1&plugin_type=TextPlugin&cms_path=%2Fcontext.html&plugin_language=',
                 title: 'Text plugin'
             });
         });
@@ -655,7 +661,7 @@ describe('CMS.Plugin', function () {
         it('makes a request to the API', function () {
             expect(plugin.copyPlugin(plugin.options)).toEqual(undefined);
             var request = jasmine.Ajax.requests.mostRecent();
-            expect(request.url).toEqual('/en/admin/cms/page/copy-plugins/');
+            expect(request.url).toEqual('/en/admin/cms/page/copy-plugins/?cms_path=%2Fcontext.html');
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
                 source_placeholder_id: ['1'],
@@ -810,17 +816,10 @@ describe('CMS.Plugin', function () {
                 states: []
             };
             spyOn(CMS.API.Helpers, 'reloadBrowser');
-            jasmine.Ajax.install();
 
             $(function () {
                 CMS.API.Messages = new CMS.Messages();
                 spyOn(CMS.API.Messages, 'open');
-
-                CMS.API.Clipboard = new CMS.Clipboard();
-                spyOn(CMS.API.Clipboard, 'clear').and.callFake(function (callback) {
-                    CMS.API.locked = false; // it happens as part of CMS.API.Toolbar.openAjax
-                    callback();
-                });
 
                 plugin = new CMS.Plugin('cms-plugin-1', {
                     type: 'plugin',
@@ -842,28 +841,28 @@ describe('CMS.Plugin', function () {
 
         afterEach(function () {
             fixture.cleanup();
-            jasmine.Ajax.uninstall();
         });
 
         it('makes a request to the API', function () {
-            expect(plugin.cutPlugin()).toEqual(undefined);
-            var request = jasmine.Ajax.requests.mostRecent();
-            expect(request.url).toEqual('/en/admin/cms/page/move-plugin/');
-            expect(request.method).toEqual('POST');
-            expect(request.data()).toEqual({
-                'placeholder_id': ['clipboardId'],
-                'plugin_id': ['1'],
-                'plugin_language': ['en'],
-                'plugin_parent': [''],
-                'plugin_order[]': ['1'],
-                'csrfmiddlewaretoken': ['CSRF_TOKEN']
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success();
             });
-            CMS.API.locked = false;
-        });
+            expect(plugin.cutPlugin()).toEqual(undefined);
 
-        it('clears the clipboard before making the request', function () {
-            plugin.cutPlugin();
-            expect(CMS.API.Clipboard.clear).toHaveBeenCalled();
+            expect($.ajax).toHaveBeenCalledWith({
+                url: '/en/admin/cms/page/move-plugin/?cms_path=%2Fcontext.html',
+                type: 'POST',
+                data: {
+                    placeholder_id: 'clipboardId',
+                    plugin_id: 1,
+                    plugin_language: 'en',
+                    plugin_parent: '',
+                    plugin_order: [1],
+                    csrfmiddlewaretoken: 'CSRF_TOKEN'
+                },
+                success: jasmine.any(Function),
+                error: jasmine.any(Function)
+            });
             CMS.API.locked = false;
         });
 
@@ -920,27 +919,13 @@ describe('CMS.Plugin', function () {
         it('does not make a request if CMS.API is locked', function () {
             CMS.API.locked = true;
             expect(plugin.cutPlugin()).toEqual(false);
-            expect(CMS.API.Clipboard.clear).not.toHaveBeenCalled();
             expect(jasmine.Ajax.requests.count()).toEqual(0);
-            CMS.API.locked = false;
-        });
-
-        it('does not make a request if CMS.API is locked after clearing the clipboard', function () {
-            CMS.API.Clipboard.clear.and.callFake(function (callback) {
-                CMS.API.locked = true;
-                expect(callback()).toEqual(false);
-            });
-            spyOn($, 'ajax');
-            expect(plugin.cutPlugin()).toEqual(undefined);
-            expect(CMS.API.Clipboard.clear).toHaveBeenCalled();
-            expect(jasmine.Ajax.requests.count()).toEqual(0);
-            expect($.ajax).not.toHaveBeenCalled();
             CMS.API.locked = false;
         });
 
         it('locks the CMS.API before making the request', function () {
             CMS.API.locked = false;
-            CMS.API.Clipboard.clear.and.callFake($.noop);
+            spyOn($, 'ajax');
             plugin.cutPlugin();
             expect(CMS.API.locked).toEqual(true);
             CMS.API.locked = false;
@@ -1176,7 +1161,7 @@ describe('CMS.Plugin', function () {
             CMS.API.locked = false;
             expect(plugin.movePlugin()).toEqual(undefined);
             var request = jasmine.Ajax.requests.mostRecent();
-            expect(request.url).toEqual('/en/admin/cms/page/move-plugin/');
+            expect(request.url).toEqual('/en/admin/cms/page/move-plugin/?cms_path=%2Fcontext.html');
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
                 'placeholder_id': ['1'],
@@ -1542,7 +1527,7 @@ describe('CMS.Plugin', function () {
             spyOn(plugin, 'editPlugin');
             plugin.editPluginPostAjax({}, { url: 'test-url', breadcrumb: 'whatever' });
             expect(plugin.editPlugin).toHaveBeenCalledWith(
-                'test-url',
+                'test-url?cms_path=%2Fcontext.html',
                 'Test Text Plugin',
                 'whatever'
             );
@@ -1746,7 +1731,7 @@ describe('CMS.Plugin', function () {
             link.trigger(plugin.click);
             expect(plugin.editPlugin).toHaveBeenCalledTimes(1);
             expect(plugin.editPlugin).toHaveBeenCalledWith(
-                'edit_plugin_url',
+                'edit_plugin_url?cms_path=%2Fcontext.html',
                 'MockPlugin',
                 'MockBreadcrumb'
             );
@@ -1829,7 +1814,7 @@ describe('CMS.Plugin', function () {
 
             expect(plugin.deletePlugin).toHaveBeenCalledTimes(1);
             expect(plugin.deletePlugin).toHaveBeenCalledWith(
-                'DELETE_URL',
+                'DELETE_URL?cms_path=%2Fcontext.html',
                 'MockPlugin',
                 'Breadcrumb'
             );

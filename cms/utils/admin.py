@@ -115,7 +115,7 @@ def render_admin_rows(request, pages, site, filtered=False, language=None):
             'filtered': filtered,
             'metadata': metadata,
             'page_languages': page.get_languages(),
-            'preview_language': language,
+            'preview_language': lang,
             'has_add_page_permission': user_can_add(user, target=page),
             'has_change_permission': user_can_change(user, page),
             'has_change_advanced_settings_permission': user_can_change_advanced_settings(user, page),

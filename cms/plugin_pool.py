@@ -196,9 +196,9 @@ class PluginPool(object):
         return sorted(plugins, key=attrgetter('module'))
 
     def get_text_enabled_plugins(self, placeholder, page):
-        plugins = self.get_all_plugins(placeholder, page)
-        plugins += self.get_all_plugins(placeholder, page, 'text_only_plugins')
-        return sorted((p for p in set(plugins) if p.text_enabled),
+        plugins = set(self.get_all_plugins(placeholder, page))
+        plugins.update(self.get_all_plugins(placeholder, page, 'text_only_plugins'))
+        return sorted((p for p in plugins if p.text_enabled),
                       key=attrgetter('module', 'name'))
 
     def get_plugin(self, name):
