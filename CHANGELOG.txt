@@ -30,6 +30,7 @@
 * Introduced placeholder operation signals.
 * The ``post_`` methods in ```PlaceholderAdminMixin`` have been deprecated in favor of
   placeholder operation signals.
+* Re-introduced the "Revert to live" menu option.
 
 
 === 3.4.1 (2016-10-04) ===
