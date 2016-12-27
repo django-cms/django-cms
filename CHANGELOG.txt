@@ -3,6 +3,9 @@
 * Fixed a bug which prevented certain migrations from running in a multi-db setup.
 * Fixed a bug which prevented the page from being marked as dirty (pending changes)
   when changing the value of the overwrite url field.
+* Fixed a bug where the page tree would not update correctly when a sibling page was moved
+  from left to right or right to left.
+* Improved the ``fix-tree`` command to also fix non-root nodes (pages).
 
 
 === 3.3.3 (2016-10-04) ===
