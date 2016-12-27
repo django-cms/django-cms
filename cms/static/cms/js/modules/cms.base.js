@@ -619,7 +619,8 @@ CMS.API.Helpers = {
      * @returns {String} modified url
      */
     updateUrlWithPath: function (url) {
-        var path = window.location.pathname;
+        var win = this._getWindow();
+        var path = win.location.pathname + win.location.search;
 
         return this.makeURL(url, ['cms_path=' + encodeURIComponent(path)]);
     }
