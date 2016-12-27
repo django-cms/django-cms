@@ -14,13 +14,16 @@
 * Added official support for Django 1.10.
 * Fixed a bug where plugin save would incorrectly be triggered on pressing
   command and then enter in Firefox.
-* fix template inheritance setting creates spurious migration (see #3479)
+* Fixed a bug where template inheritance setting creates spurious migration (see #3479)
 * Fixed a bug which prevented the page from being marked as dirty (pending changes)
   when changing the value of the overwrite url field.
 * Adjusted ajax calls triggered when performing a placeholder operation (add plugin, etc..) to include
   a GET query called cms_path. This query points to the path where the operation originates from.
 * Added a deprecation warning to method ``render_plugin()`` in class ``CMSPluginBase``.
 * Since ``get_parent_classes()`` became a classmethod, do not instantiate plugin before invocation.
+* Fixed a bug where the page tree would not update correctly when a sibling page was moved
+  from left to right or right to left.
+* Improved the ``fix-tree`` command to also fix non-root nodes (pages).
 
 
 === 3.4.1 (2016-10-04) ===

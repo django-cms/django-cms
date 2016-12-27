@@ -1303,29 +1303,50 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 raise PublisherCantPublish
         return True
 
-    def get_previous_filtered_sibling(self, **filters):
+    def get_filtered_siblings(self, **filters):
         filters.update({
             'publisher_is_draft': self.publisher_is_draft
         })
         filters.update({
             'site__id': self.site_id
         })
+        return self.get_siblings().filter(**filters)
+
+    def get_previous_filtered_sibling(self, **filters):
+        siblings = self.get_filtered_siblings(path__lt=self.path, **filters)
+
         try:
-            return self.get_siblings().filter(path__lt=self.path, **filters).reverse()[0]
+            sibling = siblings.reverse()[0]
         except IndexError:
-            return None
+            sibling = None
+        return sibling
+
+    def get_left_sibling_pk(self):
+        siblings = self.get_filtered_siblings(path__lt=self.path)
+
+        try:
+            sibling = siblings.values_list('pk', flat=True).reverse()[0]
+        except IndexError:
+            sibling = None
+        return sibling
 
     def get_next_filtered_sibling(self, **filters):
-        filters.update({
-            'publisher_is_draft': self.publisher_is_draft
-        })
-        filters.update({
-            'site__id': self.site_id
-        })
+        siblings = self.get_filtered_siblings(path__gt=self.path, **filters)
+
         try:
-            return self.get_siblings().filter(path__gt=self.path, **filters)[0]
+            sibling = siblings[0]
         except IndexError:
-            return None
+            sibling = None
+        return sibling
+
+    def get_right_sibling_pk(self):
+        siblings = self.get_filtered_siblings(path__gt=self.path)
+
+        try:
+            sibling = siblings.values_list('pk', flat=True)[0]
+        except IndexError:
+            sibling = None
+        return sibling
 
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides
@@ -1357,32 +1378,43 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if not public_parent:
             return obj
 
-        # The draft page (self) has been moved under
-        # another page.
+        # The draft page (self) has been moved under another page.
         # Or is already inside another page and it's been moved
         # to a different location in the same page tree.
-        prev_sibling = self.get_previous_filtered_sibling(
-            publisher_public__isnull=False,
+
+        # The sibling page on the left side of the draft page being moved (self)
+        left_sibling = self.get_previous_filtered_sibling(
             publisher_public__parent=public_parent,
         )
 
-        if prev_sibling:
-            prev_public_sibling = obj.get_previous_filtered_sibling()
-            sibling_changed = prev_sibling.publisher_public != prev_public_sibling
+        # The sibling page on the right side of the draft page being moved (self)
+        right_sibling = self.get_next_filtered_sibling(
+            publisher_public__parent=public_parent,
+        )
+
+        if left_sibling:
+            left_public_sibling_pk = obj.get_left_sibling_pk()
+            left_sibling_changed = left_sibling.publisher_public_id != left_public_sibling_pk
         else:
-            prev_public_sibling = None
-            sibling_changed = False
+            left_sibling_changed = False
+
+        if right_sibling:
+            right_public_sibling_pk = obj.get_right_sibling_pk()
+            right_sibling_changed = right_sibling.publisher_public_id != right_public_sibling_pk
+        else:
+            right_sibling_changed = False
 
         first_time_published = not self.publisher_public_id
         parent_change = public_parent != obj.parent
-        tree_change = self.depth != obj.depth or sibling_changed
+        tree_change = self.depth != obj.depth or left_sibling_changed or right_sibling_changed
 
         if first_time_published or parent_change or tree_change:
-            if prev_public_sibling:
-                # We use a sibling on the left side of the current page
-                # to make sure the live page is inserted in the same position
-                # on the tree relative to it's parent (draft or live).
-                obj = obj.move(prev_sibling.publisher_public, pos="right")
+            if left_sibling:
+                # Moving sibling page from left to right
+                obj = obj.move(left_sibling.publisher_public, pos="right")
+            elif right_sibling:
+                # Moving sibling page from right to left
+                obj = obj.move(right_sibling.publisher_public, pos="left")
             else:
                 obj = obj.move(target=public_parent, pos='first-child')
         return obj

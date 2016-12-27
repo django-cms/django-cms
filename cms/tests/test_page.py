@@ -340,6 +340,74 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(page.get_draft_object().publisher_is_draft)
         self.assertRaises(PublicVersionNeeded, page_b.reset_to_public, 'en')
 
+    def test_move_page_regression_left_to_right_5752(self):
+        # ref: https://github.com/divio/django-cms/issues/5752
+        # Tests tree integrity when moving sibling pages from left
+        # to right under the same parent.
+        home = create_page("Home", "nav_playground.html", "en", published=True)
+        alpha = create_page(
+            "Alpha",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home,
+        )
+        beta = create_page(
+            "Beta",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home,
+        )
+        beta.move_page(alpha, position='left')
+
+        alpha.refresh_from_db()
+        beta.refresh_from_db()
+
+        # Draft
+        self.assertEqual(home.path, '0001')
+        self.assertEqual(beta.path, '00010001')
+        self.assertEqual(alpha.path, '00010002')
+
+        # Public
+        self.assertEqual(home.publisher_public.path, '0002')
+        self.assertEqual(beta.publisher_public.path, '00020001')
+        self.assertEqual(alpha.publisher_public.path, '00020002')
+
+    def test_move_page_regression_right_to_left_5752(self):
+        # ref: https://github.com/divio/django-cms/issues/5752
+        # Tests tree integrity when moving sibling pages from right
+        # to left under the same parent.
+        home = create_page("Home", "nav_playground.html", "en", published=True)
+        alpha = create_page(
+            "Alpha",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home,
+        )
+        beta = create_page(
+            "Beta",
+            "nav_playground.html",
+            "en",
+            published=True,
+            parent=home,
+        )
+        beta.move_page(alpha, position='left')
+
+        alpha.refresh_from_db()
+        beta.refresh_from_db()
+
+        # Draft
+        self.assertEqual(home.path, '0001')
+        self.assertEqual(beta.path, '00010001')
+        self.assertEqual(alpha.path, '00010002')
+
+        # Public
+        self.assertEqual(home.publisher_public.path, '0002')
+        self.assertEqual(beta.publisher_public.path, '00020001')
+        self.assertEqual(alpha.publisher_public.path, '00020002')
+
     def test_move_page_regression_5640(self):
         # ref: https://github.com/divio/django-cms/issues/5640
         alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
