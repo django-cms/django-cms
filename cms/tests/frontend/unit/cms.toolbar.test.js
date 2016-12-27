@@ -903,7 +903,9 @@ describe('CMS.Toolbar', function () {
             });
             fakeWindow = {
                 location: {
-                    href: ''
+                    href: '',
+                    pathname: '/context.html',
+                    search: ''
                 }
             };
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
