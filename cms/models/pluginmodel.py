@@ -252,9 +252,10 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         warnings.warn(
-            "Method `render_plugin` will be removed in django-CMS 3.5",
+            "Method `render_plugin` will be removed in django CMS 3.5",
             PendingDeprecationWarning
         )
+
         if not context or not 'cms_content_renderer' in context:
             return ''
 

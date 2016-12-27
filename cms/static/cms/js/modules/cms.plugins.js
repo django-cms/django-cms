@@ -15,7 +15,7 @@ require('../polyfills/array.prototype.findindex');
 var doc;
 var clipboard;
 var clipboardDraggable;
-var path = window.location.pathname;
+var path = window.location.pathname + window.location.search;
 
 /**
  * Class for handling Plugins / Placeholders or Generics.

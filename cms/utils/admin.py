@@ -105,7 +105,7 @@ def render_admin_rows(request, pages, site, filtered=False, language=None):
         if filtered:
             children = page.children.none()
         else:
-            children = page.children.all()
+            children = page.get_children()
 
         context = {
             'request': request,
