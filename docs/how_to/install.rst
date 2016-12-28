@@ -413,8 +413,18 @@ Add::
 
 to ``INSTALLED_APPS``.
 
-Add ``THUMBNAIL_HIGH_RESOLUTION = True`` to your settings. The `Django Filer documentation
-<https://django-filer.readthedocs.io>`_ provides much more configuration information.
+You also need to add::
+
+    THUMBNAIL_HIGH_RESOLUTION = True
+
+    THUMBNAIL_PROCESSORS = (
+        'easy_thumbnails.processors.colorspace',
+        'easy_thumbnails.processors.autocrop',
+        'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+        'easy_thumbnails.processors.filters'
+    )
+
+The `Django Filer documentation <https://django-filer.readthedocs.io>`_ provides much more configuration information.
 
 New database tables will need to be created for Django Filer and Easy Thumbnails, so run migrations::
 
