@@ -109,9 +109,8 @@ Example::
 
     {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
 
-Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and ``SITE_ID``
-:ref:`*must* be set <configure-django-cms>` in ``settings.py`` for this (not to mention other
-aspects of django CMS) to work correctly.
+Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and
+``SITE_ID`` *must* be set in ``settings.py`` for this (not to mention other aspects of django CMS) to work correctly.
 
 .. templatetag:: render_placeholder
 
