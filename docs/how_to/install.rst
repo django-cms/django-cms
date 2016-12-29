@@ -437,7 +437,7 @@ New database tables will need to be created for Django Filer and Easy Thumbnails
 Django CMS CKEditor
 ===================
 
-`Django CMS CKEditor`_ is the default text editor for django CMS. for a WYSIWYG editor 2.8.1 or higher
+`Django CMS CKEditor`_ is the default text editor for django CMS.
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
