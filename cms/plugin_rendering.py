@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import warnings
+
 from collections import deque
 
 from classytags.utils import flatten_context
@@ -379,6 +381,10 @@ class ContentRenderer(object):
         except AttributeError:
             content = output % {'pk': instance.pk, 'content': content}
         else:
+            warnings.warn(
+                "Attribute `frontend_edit_template` will be removed in django CMS 3.5",
+                PendingDeprecationWarning
+            )
             content = template.render(context)
 
         plugin_type = instance.plugin_type
