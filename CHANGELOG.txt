@@ -24,6 +24,9 @@
 * Fixed a bug where the page tree would not update correctly when a sibling page was moved
   from left to right or right to left.
 * Improved the ``fix-tree`` command to also fix non-root nodes (pages).
+* Removed the deprecated ``add_url()``, ``edit_url()``, ``move_url()``, ``delete_url()``, ``copy_url()`` properties of
+  CMSPlugin model.
+* Deprecated ``frontend_edit_template`` of CMSPluginBase.
 
 
 === 3.4.1 (2016-10-04) ===
