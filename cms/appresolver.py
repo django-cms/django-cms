@@ -16,12 +16,12 @@ from cms.models.pagemodel import Page
 from cms.utils.compat import DJANGO_1_8, DJANGO_1_9
 from cms.utils.i18n import get_language_list
 
-APP_RESOLVERS = []
+APP_RESOLVERS = {}
 
 
 def clear_app_resolvers():
     global APP_RESOLVERS
-    APP_RESOLVERS = []
+    APP_RESOLVERS = {}
 
 
 def applications_page_check(request, current_page=None, path=None):
@@ -38,7 +38,12 @@ def applications_page_check(request, current_page=None, path=None):
     for lang in get_language_list():
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
-    for resolver in APP_RESOLVERS:
+    try:
+        current_site = Site.objects.get_current(request)
+    except Site.DoesNotExist:
+        return None
+
+    for resolver in APP_RESOLVERS.get(current_site, []):
         try:
             page_id = resolver.resolve_page_id(path)
             # yes, it is application page
@@ -218,6 +223,11 @@ def _get_app_patterns():
         current_site = None
     included = []
 
+    # If APP_RESOLVERS is loaded,
+    if APP_RESOLVERS.get(current_site, []):
+        return APP_RESOLVERS.get(current_site, [])
+    else:
+        APP_RESOLVERS[current_site] = []
     # we don't have a request here so get_page_queryset() can't be used,
     # so use public() queryset.
     # This can be done because url patterns are used just in frontend
@@ -265,5 +275,5 @@ def _get_app_patterns():
 
             resolver.url_patterns_dict[lang] = current_patterns
         app_patterns.append(resolver)
-        APP_RESOLVERS.append(resolver)
+        APP_RESOLVERS[current_site].append(resolver)
     return app_patterns
