@@ -34,6 +34,7 @@ _django_permissions_by_action = {
     'delete_page_translation': [PAGE_CHANGE_CODENAME, PAGE_DELETE_CODENAME],
     'move_page': [PAGE_CHANGE_CODENAME],
     'publish_page': [PAGE_CHANGE_CODENAME, PAGE_PUBLISH_CODENAME],
+    'revert_page_to_live': [PAGE_CHANGE_CODENAME]
 }
 
 
@@ -165,6 +166,30 @@ def user_can_delete_page_translation(user, page, language):
         page=page,
         user=user,
         action='delete_page_translation',
+    )
+
+    if not has_perm:
+        return False
+
+    placeholders = (
+        _get_draft_placeholders(page)
+        .filter(cmsplugin__language=language)
+        .distinct()
+    )
+
+    for placeholder in placeholders.iterator():
+        if not placeholder.has_delete_plugins_permission(user, [language]):
+            return False
+    return True
+
+
+@permission_pre_checks(action='revert_page_to_live')
+@cached_func
+def user_can_revert_page_to_live(user, page, language):
+    has_perm = has_generic_permission(
+        page=page,
+        user=user,
+        action='change_page',
     )
 
     if not has_perm:

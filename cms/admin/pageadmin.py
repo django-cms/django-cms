@@ -105,6 +105,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
+            pat(r'^([0-9]+)/([a-z\-]+)/revert-to-live/$', self.revert_to_live),
             pat(r'^add-page-type/$', self.add_page_type),
             pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
@@ -607,6 +608,17 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return False
         return page_permissions.user_can_publish_page(request.user, page=obj)
 
+    def has_revert_to_live_permission(self, request, language, obj=None):
+        if not obj:
+            return False
+
+        has_perm = page_permissions.user_can_revert_page_to_live(
+            request.user,
+            page=obj,
+            language=language,
+        )
+        return has_perm
+
     def get_placeholder_template(self, request, placeholder):
         page = placeholder.page
 
@@ -893,6 +905,26 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         except ValidationError:
             exc = sys.exc_info()[1]
             return jsonify_request(HttpResponseBadRequest(exc.messages))
+
+    @require_POST
+    @transaction.atomic
+    def revert_to_live(self, request, page_id, language):
+        """
+        Resets the draft version of the page to match the live one
+        """
+        page = get_object_or_404(self.model, id=page_id)
+
+        # ensure user has permissions to publish this page
+        if not self.has_revert_to_live_permission(request, language, obj=page):
+            return HttpResponseForbidden(force_text(_("You do not have permission to revert this page.")))
+
+        page.revert_to_live(language)
+
+        messages.info(request, _('"%s" was reverted to the live version.') % page)
+
+        path = page.get_absolute_url(language=language)
+        path = '%s?%s' % (path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+        return HttpResponseRedirect(path)
 
     @require_POST
     @transaction.atomic

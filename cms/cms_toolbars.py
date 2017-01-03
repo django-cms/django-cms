@@ -607,6 +607,21 @@ class PageToolbar(CMSToolbar):
                     on_success=refresh,
                 )
 
+            # revert to live
+            current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
+            revert_action = admin_reverse('cms_page_revert_to_live', args=(self.page.pk, self.current_lang))
+            revert_question = _('Are you sure you want to revert to live?')
+            # Only show this action if the page has pending changes and a public version
+            is_enabled = self.page.is_dirty(self.current_lang) and self.page.publisher_public
+            current_page_menu.add_ajax_item(
+                _('Revert to live'),
+                action=revert_action,
+                question=revert_question,
+                disabled=not is_enabled,
+                on_success=refresh,
+                extra_classes=('cms-toolbar-revert',),
+            )
+
             # last break
             current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
 
