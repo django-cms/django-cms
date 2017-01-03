@@ -228,7 +228,7 @@ Also add::
 to the list.
 
 You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not absolutely necessary, but it's
-:ref:`useful <reloading_apphooks>`. It needs to be as close to the start of the list as possible.
+:ref:`useful <reloading_apphooks>`. If included, should be at the start of the list.
 
 
 Context processors
@@ -303,14 +303,14 @@ template:
 This is worth explaining in a little detail:
 
 * ``{% load cms_tags sekizai_tags %}`` loads the template tag libraries we use in the template.
-* ``{% page_attribute "page_title" %}`` extracts the page's ``page_title`` attribute.
-* ``{% render_block "css" %}`` and ``{% render_block "js" %}`` are template tags that load blocks of HTML defined by
-  Django applications. django CMS defines blocks for CSS and JavaScript, and requires these two Sekizai tags. We
+* ``{% page_attribute "page_title" %}`` extracts the page's ``page_title`` :ttag:`attribute <page_attribute>`.
+* ``{% render_block "css" %}`` and ``{% render_block "js" %}`` are Sekizai template tags that load blocks of HTML
+  defined by Django applications. django CMS defines blocks for CSS and JavaScript, and requires these two tags. We
   recommended placing ``{% render_block "css" %}`` just before the ``</head>`` tag, and and ``{% render_block "js" %}``
   tag just before the ``</body>``.
-* ``{% cms_toolbar %}`` renders the django CMS toolbar.
-* ``{% placeholder "content" %}`` defines a placeholder, where plugins can be inserted. A template needs at least one
-  ``{% placeholder %}`` template tag to be useful for django CMS. The name of the placeholder is simply a
+* ``{% cms_toolbar %}`` renders the :ttag:`django CMS toolbar <cms_toolbar>`.
+* ``{% placeholder "content" %}`` defines a :ttag:`placeholder`, where plugins can be inserted. A template needs at
+  least one ``{% placeholder %}`` template tag to be useful for django CMS. The name of the placeholder is simply a
   descriptive one, for your reference.
 
 Django needs to be know where to look for its templates, so add ``templates`` to the ``TEMPLATES['DIRS']`` list:
@@ -389,7 +389,9 @@ Django Filer
 ============
 
 `Django Filer`_ provides file and image management. Many other applications also rely on Django Filer - it's very
-unusual to have a django CMS site that does *not* run Django Filer.
+unusual to have a django CMS site that does *not* run Django Filer. The configuration in this section will get you
+started, but you should refer to the `Django Filer documentation <https://django-filer.readthedocs.io>`_ for more
+comprehensive configuration information.
 
 .. _Django Filer: https://github.com/stefanfoulis/django-filer
 
@@ -423,8 +425,6 @@ You also need to add::
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters'
     )
-
-The `Django Filer documentation <https://django-filer.readthedocs.io>`_ provides much more configuration information.
 
 New database tables will need to be created for Django Filer and Easy Thumbnails, so run migrations::
 
