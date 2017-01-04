@@ -123,7 +123,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     action_options = {
         PLUGIN_MOVE_ACTION: {
-            'requires_reload': True
+            'requires_reload': False
         },
         PLUGIN_COPY_ACTION: {
             'requires_reload': True
