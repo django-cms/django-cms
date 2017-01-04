@@ -68,7 +68,7 @@ Documentation
 
 We maintain documentation for several versions of the project. Key versions are:
 
-* `stable <http://http://docs.django-cms.org>`_ (default), for the **current release** version
+* `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
 * `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **release-3.4.x branch**
 * `develop <http://docs.django-cms.org/en/develop/>`_, representing the latest build of the **develop branch**
 
