@@ -43,8 +43,7 @@ objects. See :doc:`/how_to/toolbar`.
 .. warning:: Upgrading from previous versions
 
     3.0 now requires the ``django.contrib.messages`` application for the
-    toolbar to work. See :ref:`Enable messages <enable-messages>` for how to
-    enable it.
+    toolbar to work.
 
 New Page Types
 ==============

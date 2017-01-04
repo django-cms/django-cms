@@ -94,9 +94,8 @@ Example::
 
 .. note::
 
-    All templates defined in :setting:`CMS_TEMPLATES` **must** contain at least
-    the ``js`` and ``css`` sekizai namespaces. For more information, see
-    :ref:`sekizai-namespaces`.
+    All templates defined in :setting:`CMS_TEMPLATES` **must** contain at least the ``js`` and ``css`` sekizai
+    namespaces. For an example, see :ref:`basic_template`.
 
 .. note::
 

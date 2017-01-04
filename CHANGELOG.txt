@@ -32,6 +32,7 @@
   placeholder operation signals.
 * Re-introduced the "Revert to live" menu option.
 * Added support for django-reversion >= 2 (see #5830)
+* Rewrote manual installation how-to documentation
 
 
 === 3.4.1 (2016-10-04) ===

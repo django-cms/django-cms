@@ -20,7 +20,18 @@ can be switched for another at any time.
 
 You'll find the site's templates in ``mysite/templates``.
 
-If you didn't change the automatically-created home page's template, it's ``feature.html``.
+If you didn't change the automatically-created home page's template, it's ``fullwidth.html``, the first one listed in
+the project's ``settings.py`` ``CMS_TEMPLATES`` tuple:
+
+..  code-block:: python
+    :emphasize-lines: 3
+
+    CMS_TEMPLATES = (
+        ## Customize this
+        ('fullwidth.html', 'Fullwidth'),
+        ('sidebar_left.html', 'Sidebar Left'),
+        ('sidebar_right.html', 'Sidebar Right')
+    )
 
 
 ************
@@ -32,35 +43,27 @@ be filled with content from the database when the page is rendered. This
 content is edited using django CMS's frontend editing mechanism, using Django
 template tags.
 
-You can see them in ``feature.html``: ``{% placeholder "feature" %}`` and ``{%
-placeholder "content" %}``.
+``fullwidth.html`` contains a single placehilder, ``{% placeholder "content" %}``.
 
 You'll also see ``{% load cms_tags %}`` in that file - ``cms_tags`` is the
 required template tag library.
 
-If you're not already familiar with Django template tags, you can find out more
-in the `Django documentation
+If you're not already familiar with Django template tags, you can find out more in the `Django documentation
 <https://docs.djangoproject.com/en/dev/topics/templates/>`_.
 
-Add a new placeholder ``{% placeholder "splashbox" %}`` to the template's HTML structure. You can
-add it anywhere, for example:
+Add a couple of new placeholders, ``{% placeholder "feature" %}`` and ``{% placeholder "splashbox" %}`` to the
+template's HTML structure. You can add them anywhere, for example:
 
 .. code-block:: html+django
-   :emphasize-lines: 8-10
+   :emphasize-lines: 2,4
 
     {% block content %}
-        <div class="jumbotron">
-            {% placeholder "feature" %}
-        </div>
-        <div>
-            {% placeholder "content" %}
-        </div>
-        <div>
-            {% placeholder "splashbox" %}
-        </div>
+        {% placeholder "feature" %}
+        {% placeholder "content" %}
+        {% placeholder "splashbox" %}
     {% endblock content %}
 
-If you switch to *Structure* mode, you'll see the new placeholder available for use.
+If you switch to *Structure* mode, you'll see the new placeholders available for use.
 
 .. image:: /introduction/images/new-placeholder.png
    :alt: the new 'splashbox' placeholder

@@ -109,11 +109,10 @@ Example::
 
     {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
 
-Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and ``SITE_ID``
-:ref:`*must* be set <configure-django-cms>` in ``settings.py`` for this (not to mention other
-aspects of django CMS) to work correctly.
+Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and
+``SITE_ID`` *must* be set in ``settings.py`` for this (not to mention other aspects of django CMS) to work correctly.
 
-.. templatetag:: render_placeholder
+..  templatetag:: render_placeholder
 
 render_placeholder
 ==================
@@ -152,7 +151,7 @@ render only the English (``en``) plugins:
     When used in this manner, the placeholder will not be displayed for
     editing when the CMS is in edit mode.
 
-.. templatetag:: render_uncached_placeholder
+..  templatetag:: render_uncached_placeholder
 
 render_uncached_placeholder
 ===========================
@@ -174,7 +173,7 @@ Example::
     {% render_uncached_placeholder mymodel_instance.my_placeholder language 'en' %}
 
 
-.. templatetag:: show_placeholder
+..  templatetag:: show_placeholder
 
 show_placeholder
 ================
@@ -197,7 +196,7 @@ Examples::
     {% show_placeholder "teaser" request.current_page.get_root %}
 
 
-.. templatetag:: show_uncached_placeholder
+..  templatetag:: show_uncached_placeholder
 
 show_uncached_placeholder
 =========================
@@ -217,7 +216,7 @@ Example::
     {% show_uncached_placeholder "footer" "footer_container_page" %}
 
 
-.. templatetag:: page_lookup
+..  templatetag:: page_lookup
 
 page_lookup
 ===========
@@ -259,7 +258,7 @@ inherit the content of its root-level ancestor::
     {% endplaceholder %}
 
 
-.. templatetag:: page_url
+..  templatetag:: page_url
 
 
 page_url
@@ -301,7 +300,7 @@ Example::
     {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
 
 
-.. templatetag:: page_attribute
+..  templatetag:: page_attribute
 
 page_attribute
 ==============
@@ -349,7 +348,7 @@ Example::
         {% page_attribute "page_title" "my_page_reverse_id" as title %}
         <a href="/mypage/">{{ title }}</a>
 
-.. templatetag:: render_plugin
+..  templatetag:: render_plugin
 .. versionadded:: 2.4
 
 render_plugin
@@ -378,7 +377,7 @@ Normally the children of plugins can be accessed via the ``child_plugins`` attri
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
 .. versionadded:: 3.0
-.. templatetag:: render_plugin_block
+..  templatetag:: render_plugin_block
 
 render_plugin_block
 ===================
@@ -432,7 +431,7 @@ Example::
     </div>
     {% endblock %}
 
-.. templatetag:: render_model
+..  templatetag:: render_model
 .. versionadded:: 3.0
 
 render_model
@@ -512,7 +511,7 @@ This will render to:
     As a workaround ``render_model_icon`` can be used instead.
 
 
-.. templatetag:: render_model_block
+..  templatetag:: render_model_block
 .. versionadded:: 3.0
 
 render_model_block
@@ -586,7 +585,7 @@ method is available; also template tags and filters are available in the block.
     if the content should be rendered without escaping.
 
 
-.. templatetag:: render_model_icon
+..  templatetag:: render_model_icon
 .. versionadded:: 3.0
 
 
@@ -653,7 +652,7 @@ It will render to something like:
     if the content should be rendered without escaping.
 
 
-.. templatetag:: render_model_add
+..  templatetag:: render_model_add
 .. versionadded:: 3.0
 
 
@@ -725,7 +724,7 @@ It will render to something like:
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
-.. templatetag:: render_model_add_block
+..  templatetag:: render_model_add_block
 .. versionadded:: 3.1
 
 render_model_add_block
@@ -778,7 +777,7 @@ It will render to something like:
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
 
-.. templatetag:: page_language_url
+..  templatetag:: page_language_url
 
 
 page_language_url
@@ -796,7 +795,7 @@ function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
 
-.. templatetag:: language_chooser
+..  templatetag:: language_chooser
 
 
 language_chooser
@@ -829,6 +828,9 @@ the URL changes based on the language, you will need to set a ``language_changer
 function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
+
+
+..  templatetag:: cms_toolbar
 
 *********************
 Toolbar template tags
