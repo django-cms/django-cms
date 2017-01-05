@@ -1014,7 +1014,8 @@ CMS_TOOLBAR_HIDE
 default
     ``False``
 
-If True, the toolbar is hidden in the pages out django CMS.
+If True, the toolbar is not displayed in pages that use the ``{% cms_toolbar %}`` template tag if they are not
+actually being handled by a django CMS view.
 
 .. versionchanged:: 3.2.1: CMS_APP_NAME has been removed as it's no longer required.
 
