@@ -912,13 +912,37 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """
         Resets the draft version of the page to match the live one
         """
-        page = get_object_or_404(self.model, id=page_id)
+        page = get_object_or_404(
+            self.model,
+            pk=page_id,
+            publisher_is_draft=True,
+            title_set__language=language,
+        )
 
         # ensure user has permissions to publish this page
         if not self.has_revert_to_live_permission(request, language, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to revert this page.")))
 
+        translation = page.get_title_obj(language=language)
+        operation_token = self._send_pre_page_operation(
+            request,
+            operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
+            obj=page,
+            translation=translation,
+        )
+
         page.revert_to_live(language)
+
+        # Fetch updated translation
+        translation.refresh_from_db()
+
+        self._send_post_page_operation(
+            request,
+            operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
+            token=operation_token,
+            obj=page,
+            translation=translation,
+        )
 
         messages.info(request, _('"%s" was reverted to the live version.') % page)
 
@@ -933,9 +957,9 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         try:
             page = Page.objects.get(
-                id=page_id,
-                title_set__language=language,
+                pk=page_id,
                 publisher_is_draft=True,
+                title_set__language=language,
             )
         except Page.DoesNotExist:
             page = None
