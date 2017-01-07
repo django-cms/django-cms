@@ -1014,11 +1014,15 @@ CMS_TOOLBAR_HIDE
 default
     ``False``
 
-If True, the toolbar is not displayed in pages that use the ``{% cms_toolbar %}`` template tag if they are not
-actually being handled by a django CMS view.
+By default, the django CMS toolbar is displayed to logged-in admin users on all pages that use the ``{% cms_toolbar
+%}`` template tag. Its appearance can be optionally restricted to django CMS pages only (technically, pages that are
+published by a django CMS view).
+
+When this is set to ``True``, all other pages will no longer display the toolbar. This includes pages with apphooks
+applied to them, as they are handled by the other application's views, and not django CMS's.
+
 
 .. versionchanged:: 3.2.1: CMS_APP_NAME has been removed as it's no longer required.
-
 
 CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
