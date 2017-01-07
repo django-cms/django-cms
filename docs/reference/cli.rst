@@ -228,7 +228,7 @@ Maintenance and repair
 Occasionally, the pages and plugins tree can become corrupted.
 Typical symptoms include problems when trying to copy or delete plugins or pages.
 
-This commands will fix small corruptions by rebuilding the tree.
+This command will fix small corruptions by rebuilding the tree.
 
 .. _fix-mptt:
 
