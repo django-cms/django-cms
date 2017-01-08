@@ -1016,7 +1016,7 @@ default
 
 By default, the django CMS toolbar is displayed to logged-in admin users on all pages that use the ``{% cms_toolbar
 %}`` template tag. Its appearance can be optionally restricted to django CMS pages only (technically, pages that are
-published by a django CMS view).
+rendered by a django CMS view).
 
 When this is set to ``True``, all other pages will no longer display the toolbar. This includes pages with apphooks
 applied to them, as they are handled by the other application's views, and not django CMS's.
