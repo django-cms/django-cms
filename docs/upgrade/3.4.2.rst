@@ -55,8 +55,8 @@ Deprecations
 
 * Removed the deprecated ``add_url()``, ``edit_url()``, ``move_url()``, ``delete_url()``, ``copy_url()`` properties of
   CMSPlugin model.
-* Added a deprecation warning to method ``render_plugin()`` in class ``CMSPluginBase``.
-* Deprecated ``frontend_edit_template`` of CMSPluginBase.
+* Added a deprecation warning to method ``render_plugin()`` in class ``CMSPlugin``.
+* Deprecated ``frontend_edit_template`` attribute of ``CMSPluginBase``.
 * The ``post_`` methods in ```PlaceholderAdminMixin`` have been deprecated in favor of
   placeholder operation signals.
 
