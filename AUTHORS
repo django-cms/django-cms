@@ -21,7 +21,7 @@ Current and previous core designers:
 * Matthias Nüesch
 
 
-Contributors (based on gitlog, 491 unique authors):
+Contributors (based on gitlog, 497 unique authors):
 
 * A. Bram Neijt
 * aaloy
@@ -114,6 +114,7 @@ Contributors (based on gitlog, 491 unique authors):
 * Craig de Stigter
 * Craig Ricciuto
 * creakings
+* cworth-gh
 * Damian Moore
 * Damir Arbula
 * DamirArbula
@@ -196,6 +197,7 @@ Contributors (based on gitlog, 491 unique authors):
 * Germano Gabbianelli
 * Gilles Lenfant
 * Gleb Chipiga
+* Gokmen Gorgen
 * Gregory Klupar
 * guandalino
 * Hamish Downer
@@ -318,8 +320,10 @@ Contributors (based on gitlog, 491 unique authors):
 * mbouchar
 * mcosta
 * meers
+* meomap
 * Mel Collins
 * MerLex
+* Michal Danilak
 * Michael P. Jung
 * Michael Thornhill
 * Mike Dory
@@ -343,6 +347,7 @@ Contributors (based on gitlog, 491 unique authors):
 * nsh
 * o-zander
 * ojii
+* Oliver Thane
 * Oliver Zander
 * Olivier Larchevêque
 * Olivier Le Brouster
@@ -478,6 +483,7 @@ Contributors (based on gitlog, 491 unique authors):
 * Tom S
 * Tom V
 * Tom Wardill
+* thomas-d
 * Ulrich Petri
 * unknown
 * User
