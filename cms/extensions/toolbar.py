@@ -9,43 +9,6 @@ from django.core.urlresolvers import NoReverseMatch
 
 
 class ExtensionToolbar(CMSToolbar):
-    """
-    ExtensionToolbar provides utility functions to handle much of the boilerplate involved in creating a toolbar for
-    PageExtension and TitleExtension.
-
-    The basic implementation of an extension toolbar using this class is::
-
-        @toolbar_pool.register
-        class SampleExtension(ExtensionToolbar):
-            model = ExtModel  # The PageExtension / TitleExtension you are working with
-
-            def populate(self):
-                current_page_menu = self._setup_extension_toolbar()
-                if current_page_menu:
-                    position = 0
-                    page_extension, url = self.get_page_extension_admin()
-                    if url:
-                        current_page_menu.add_modal_item('Item label', url=url,
-                                                         disabled=not self.toolbar.edit_mode,
-                                                         position=position)
-
-    For TitleExtension use ``get_title_extension_admin`` and cycle on the resulting title extensions and urls
-
-        @toolbar_pool.register
-        class SampleExtension(ExtensionToolbar):
-            model = ExtModel  # The PageExtension / TitleExtension you are working with
-
-            def populate(self):
-                current_page_menu = self._setup_extension_toolbar()
-                if current_page_menu:
-                    position = 0
-                    urls = self.get_title_extension_admin()
-                    for title_extension, url in urls:
-                        current_page_menu.add_modal_item('Item label', url=url,
-                                                         disabled=not self.toolbar.edit_mode,
-                                                         position=position)
-
-    """
     model = None
     page = None
 

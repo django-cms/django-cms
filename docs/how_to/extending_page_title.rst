@@ -1,13 +1,10 @@
 #################################
-Extending the page & title models
+Extending the Page & Title models
 #################################
 
-.. versionadded:: 3.0
-
-You can extend the page and title models with your own fields (e.g. adding
-an icon for every page) by using the extension models:
-``cms.extensions.PageExtension`` and ``cms.extensions.TitleExtension``,
-respectively.
+You can extend the :class:`cms.models.Page` and :class:`cms.models.Title` models with your own fields (e.g. adding an
+icon for every page) by using the extension models: ``cms.extensions.PageExtension`` and
+``cms.extensions.TitleExtension``, respectively.
 
 
 ************************
@@ -15,15 +12,13 @@ Title vs Page extensions
 ************************
 
 The difference between a **page extension** and a **title extension** is related to the difference
-between the ``Page`` and ``Title`` models.
+between the :class:`cms.models.Page` and :class:`cms.models.Title` models.
 
-Titles support pages by providing a storage mechanism, amongst other things, for language-specific
-properties of ``Pages``. So, if you find that you need to extend the page model in a
-language-specific manner - for example, if you need to create language-specific keywords for each
-language of your pages - then you may need to use a ``TitleExtension``.
+* ``PageExtension``: use to add fields that should have **the same values** for the different language versions of a
+  page - for example, an icon.
+* ``TitleExtension``: use to add fields that should have **language-specific values** for different language versions
+  of a page - for example, keywords.
 
-On the other hand if the extension you'd like to create is the same for all of the different
-languages of the page, then you may be fine using a ``PageExtension``.
 
 ***************************
 Implement a basic extension
@@ -35,13 +30,15 @@ Three basic steps are required:
 * add the extension *admin*
 * add a toolbar menu item for the extension
 
-The model
-=========
 
-To add a field to the page model, create a class that inherits from
-``cms.extensions.PageExtension``. Make sure to import the
-``cms.extensions.PageExtension`` model. Your class should live in one of your
-apps' ``models.py`` (or module).
+Page model extension example
+============================
+
+The model
+---------
+
+To add a field to the Page model, create a class that inherits from ``cms.extensions.PageExtension``. Your class should
+live in one of your applications' ``models.py`` (or module).
 
 .. note::
 
@@ -55,7 +52,6 @@ Finally, you'll need to register the model using ``extension_pool``.
 Here's a simple example which adds an ``icon`` field to the page::
 
     from django.db import models
-
     from cms.extensions import PageExtension
     from cms.extensions.extension_pool import extension_pool
 
@@ -63,13 +59,14 @@ Here's a simple example which adds an ``icon`` field to the page::
     class IconExtension(PageExtension):
         image = models.ImageField(upload_to='icons')
 
+
     extension_pool.register(IconExtension)
 
 Of course, you will need to make and run a migration for this new model.
 
 
 The admin
-=========
+---------
 
 To make your extension editable, you must first create an admin class that
 sub-classes ``cms.extensions.PageExtensionAdmin``. This admin handles page
@@ -99,9 +96,6 @@ Since PageExtensionAdmin inherits from ``ModelAdmin``, you'll be able to use the
 normal set of Django ``ModelAdmin`` properties appropriate to your
 needs.
 
-Once you've registered your admin class, a new model will appear in the top-
-level admin list.
-
 .. note::
 
     Note that the field that holds the relationship between the extension and a
@@ -110,7 +104,7 @@ level admin list.
 
 
 The toolbar item
-================
+----------------
 
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page.
@@ -118,7 +112,10 @@ associate each instance of the extension model with a page.
 To add toolbar items for your extension create a file named ``cms_toolbars.py``
 in one of your apps, and add the relevant menu entries for the extension on each page.
 
-Here's a simple version for our example::
+Here's a simple version for our example. This example adds a node to the existing *Page* menu, called *Page icon*. When
+selected, it will open a modal dialog in which the *Page icon* field can be edited.
+
+::
 
     from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
@@ -134,37 +131,113 @@ Here's a simple version for our example::
         def populate(self):
             # setup the extension toolbar with permissions and sanity checks
             current_page_menu = self._setup_extension_toolbar()
+
             # if it's all ok
             if current_page_menu:
                 # retrieves the instance of the current extension (if any) and the toolbar item URL
                 page_extension, url = self.get_page_extension_admin()
                 if url:
-                    # adds a toolbar item
+                    # adds a toolbar item in position 0 (at the top of the menu)
                     current_page_menu.add_modal_item(_('Page Icon'), url=url,
-                        disabled=not self.toolbar.edit_mode)
+                        disabled=not self.toolbar.edit_mode, position=0)
 
-.. note::
 
-    For a title extension, the ``populate()`` method above would need to loop over the titles for
-    the page::
+Title model extension example
+=============================
+
+In this example, we'll create a ``Rating`` extension field, that can be applied to each ``Title``, in other words, to
+each language version of each ``Page``.
+
+..  note::
+
+    Please refer to the more detailed discussion above of the Page model extension example, and in particular to the
+    special **notes**.
+
+
+The model
+---------
+
+::
+
+    from django.db import models
+    from cms.extensions import TitleExtension
+    from cms.extensions.extension_pool import extension_pool
+
+
+    class RatingExtension(TitleExtension):
+        rating = models.IntegerField()
+
+
+    extension_pool.register(RatingExtension)
+
+
+The admin
+---------
+
+::
+
+    from django.contrib import admin
+    from cms.extensions import TitleExtensionAdmin
+    from .models import RatingExtension
+
+
+    class RatingExtensionAdmin(TitleExtensionAdmin):
+        pass
+
+
+    admin.site.register(RatingExtension, RatingExtensionAdmin)
+
+
+The toolbar item
+----------------
+
+In this example, we need to loop over the titles for the page, and populate the menu with those.
+
+::
+
+    from cms.toolbar_pool import toolbar_pool
+    from cms.extensions.toolbar import ExtensionToolbar
+    from django.utils.translation import ugettext_lazy as _
+    from .models import RatingExtension
+    from cms.utils import get_language_list  # needed to get the page's languages
+    @toolbar_pool.register
+    class RatingExtensionToolbar(ExtensionToolbar):
+        # defines the model for the current toolbar
+        model = RatingExtension
 
         def populate(self):
             # setup the extension toolbar with permissions and sanity checks
             current_page_menu = self._setup_extension_toolbar()
+
             # if it's all ok
             if current_page_menu and self.toolbar.edit_mode:
-                # create a sub menu
-                position = 0
-                sub_menu = self._get_sub_menu(current_page_menu, 'submenu_label', 'Submenu', position)
-                # retrieves the instances of the current title extension (if any) and the toolbar item URL
-                urls = self.get_title_extension_admin()
-                # cycle through the title list
-                for title_extension, url in urls:
-                    # adds toolbar items
-                    sub_menu.add_modal_item('icon for title %s' % self._get_page().get_title(),
-                                            url=url, disabled=not self.toolbar.edit_mode)
+                # create a sub menu labelled "Ratings" at position 1 in the menu
+                sub_menu = self._get_sub_menu(
+                    current_page_menu, 'submenu_label', 'Ratings', position=1
+                    )
 
-    Otherwise, the implementation is similar.
+                # retrieves the instances of the current title extension (if any)
+                # and the toolbar item URL
+                urls = self.get_title_extension_admin()
+
+                # we now also need to get the titleset (i.e. different language titles)
+                # for this page
+                page = self._get_page()
+                titleset = page.title_set.filter(language__in=get_language_list(page.site_id))
+
+                # create a 3-tuple of (title_extension, url, title)
+                nodes = [(title_extension, url, title.title) for (
+                    (title_extension, url), title) in zip(urls, titleset)
+                    ]
+
+                # cycle through the list of nodes
+                for title_extension, url, title in nodes:
+
+                    # adds toolbar items
+                    sub_menu.add_modal_item(
+                        'Rate %s' % title, url=url, disabled=not self.toolbar.edit_mode
+                        )
+
 
 
 ****************
@@ -208,10 +281,10 @@ above.
 Title extensions
 ----------------
 
-In order to access to a title extension within a template, get the ``Title`` object using
-``request.current_page.get_title_obj``, for example:
+In order to retrieve a title extension within a template, get the ``Title`` object using
+``request.current_page.get_title_obj``. Using the example above, we could use::
 
-    {{ request.current_page.get_title_obj.your_title_extension }}
+    {{ request.current_page.get_title_obj.ratingextension.rating }}
 
 
 With menus

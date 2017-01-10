@@ -110,8 +110,6 @@ django CMS is a well-tested CMS platform that powers sites both large and
 small. Here are a few of the key features:
 
 * robust internationalisation (i18n) support for creating multilingual sites
-* virtually unlimited undo history, allowing editors to revert to a previous
-  version
 * front-end editing, providing rapid access to the content management interface
 * support for a variety of editors with advanced text editing features.
 * a flexible plugins system that lets developers put powerful tools at the
