@@ -118,7 +118,7 @@ Create a new ``polls_cms_integration`` application
 So far, however, the polls application has been integrated into the project, but not into django CMS
 itself.
 
-If you're already familiar with the CMS for a little, you'll have
+If you're already familiar with the CMS a little, you'll have
 encountered django CMS *Plugins* - the objects you can place into placeholders on
 your pages: "Text", "Image" and so forth.
 
