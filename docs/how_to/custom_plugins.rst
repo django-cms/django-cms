@@ -459,19 +459,8 @@ variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
 block.super }}`` to inherit the existing items that were in the parent
 template.
 
-Or: ``cms/templates/admin/cms/page/plugin/change_form.html`` extends Django's
-own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
-and your plugin admin might require something newer. In this case, in your
-custom ``change_form_template`` you could do something like::
-
-    {% block jquery %}
-        <script type="text/javascript" src="///ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
-    {% endblock jquery %}``
-
-to override the ``{% block jquery %}``.
 
 .. _custom-plugins-handling-media:
-
 
 Handling media
 ==============
