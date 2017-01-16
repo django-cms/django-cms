@@ -52,7 +52,7 @@ Code of conduct
 
 django CMS is governed by a `Code of Conduct
 <http://docs.django-cms.org/en/stable/contributing/code_of_conduct.html>`_. All participants in our community and its
-various forums are expect to abide by it.
+various forums are expected to abide by it.
 
 
 *********
