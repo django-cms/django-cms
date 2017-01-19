@@ -227,28 +227,37 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         '''
         Given a plugin instance (usually as a CMSPluginBase), this method
         returns a tuple containing:
-
             instance - The instance AS THE APPROPRIATE SUBCLASS OF
                        CMSPluginBase and not necessarily just 'self', which is
                        often just a CMSPluginBase,
-
             plugin   - the associated plugin class instance (subclass
                        of CMSPlugin)
         '''
         plugin = self.get_plugin_class_instance(admin)
+
+        try:
+            instance = self.get_bound_plugin()
+        except ObjectDoesNotExist:
+            instance = None
+            self._inst = None
+        return (instance, plugin)
+
+    def get_bound_plugin(self):
+        """
+        Returns an instance of the plugin model
+        configured for this plugin type.
+        """
         if hasattr(self, "_inst"):
-            return self._inst, plugin
-        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
-            # (if self is actually a subclass, getattr below would break)
-            try:
-                instance = plugin.model.objects.get(cmsplugin_ptr=self)
-                instance._render_meta = self._render_meta
-            except (AttributeError, ObjectDoesNotExist):
-                instance = None
+            return self._inst
+
+        plugin = self.get_plugin_class()
+
+        if plugin.model != self.__class__:
+            self._inst = plugin.model.objects.get(cmsplugin_ptr=self)
+            self._inst._render_meta = self._render_meta
         else:
-            instance = self
-        self._inst = instance
-        return self._inst, plugin
+            self._inst = self
+        return self._inst
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         warnings.warn(
@@ -270,6 +279,16 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             placeholder=placeholder,
         )
         return content
+
+    def refresh_from_db(self, *args, **kwargs):
+        super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
+
+        # Delete this internal cache to let the cms populate it
+        # on demand.
+        try:
+            del self._inst
+        except AttributeError:
+            pass
 
     def get_media_path(self, filename):
         pages = self.placeholder.page_set.all()
@@ -580,41 +599,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def get_copy_url(self):
         return self.placeholder.get_copy_url()
-
-    @property
-    def add_url(self):
-        """
-        Returns a custom url to add plugin instances
-        """
-        return None
-
-    @property
-    def edit_url(self):
-        """
-        Returns a custom url to edit plugin instances
-        """
-        return None
-
-    @property
-    def move_url(self):
-        """
-        Returns a custom url to move plugin instances
-        """
-        return None
-
-    @property
-    def delete_url(self):
-        """
-        Returns a custom url to delete plugin instances
-        """
-        return None
-
-    @property
-    def copy_url(self):
-        """
-        Returns a custom url to copy plugin instances
-        """
-        return None
 
 
 reversion_register(CMSPlugin)

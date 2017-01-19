@@ -28,6 +28,49 @@ post_unpublish = Signal(providing_args=["instance", "language"])
 # fired if a public page with an apphook is added or changed
 urls_need_reloading = Signal(providing_args=[])
 
+# *disclaimer*
+# The generic object operation signals are very likely to change
+# as their usage evolves.
+# As a result, rely on these at your own risk
+pre_obj_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "token",
+        "obj",
+    ]
+)
+
+post_obj_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "token",
+        "obj",
+    ]
+)
+
+pre_placeholder_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "language",
+        "token",
+        "origin",
+    ]
+)
+
+post_placeholder_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "language",
+        "token",
+        "origin",
+    ]
+)
+
+
 ################### apphook reloading ###################
 
 if settings.DEBUG:

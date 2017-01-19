@@ -33,15 +33,18 @@ def get_languages(site_id=None):
     return result
 
 
-def get_language_code(language_code):
+def get_language_code(language_code, site_id=None):
     """
     Returns language code while making sure it's in LANGUAGES
     """
     if not language_code:
         return None
-    languages = get_language_list()
+
+    languages = get_language_list(site_id)
+
     if language_code in languages: # direct hit
         return language_code
+
     for lang in languages:
         if language_code.split('-')[0] == lang: # base language hit
             return lang

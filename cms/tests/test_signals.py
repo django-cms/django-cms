@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -10,28 +8,8 @@ from cms.api import create_page
 from cms.models import UrlconfRevision
 from cms.signals import urls_need_reloading
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
-from cms.test_utils.util.context_managers import apphooks
+from cms.test_utils.util.context_managers import apphooks, signal_tester
 from cms.test_utils.testcases import CMSTestCase
-
-
-class SignalTester(object):
-    def __init__(self):
-        self.call_count = 0
-        self.calls = []
-
-    def __call__(self, *args, **kwargs):
-        self.call_count += 1
-        self.calls.append((args, kwargs))
-
-
-@contextmanager
-def signal_tester(signal):
-    env = SignalTester()
-    signal.connect(env, weak=True)
-    try:
-        yield env
-    finally:
-        signal.disconnect(env, weak=True)
 
 
 class SignalTests(TestCase):

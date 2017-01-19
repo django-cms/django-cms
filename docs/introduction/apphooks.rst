@@ -38,6 +38,10 @@ This is a very basic example of an apphook for a django CMS application:
 
     apphook_pool.register(PollsApphook)  # register the application
 
+
+What this all means
+===================
+
 In the ``PollsApphook`` class, we have done several key things:
 
 * The ``app_name`` attribute gives the system a way to refer to the apphook - see :ref:`multi_apphook` for details

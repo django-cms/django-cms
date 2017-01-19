@@ -37,8 +37,7 @@ django CMS documentation
 Overview
 ********
 
-django CMS is a modern web publishing platform built with `Django
-<https://djangoproject.com/>`_, the web application framework "for
+django CMS is a modern web publishing platform built with `Django`_, the web application framework "for
 perfectionists with deadlines".
 
 django CMS offers out-of-the-box support for the common features you'd expect
@@ -50,8 +49,8 @@ create a site that is tailored to their precise needs.
 
 .. rst-class:: column column2
 
-:ref:`tutorials`
-=================
+:ref:`tutorials` - start here
+=============================
 
 For the new django CMS developer, from installation to creating your own addon applications.
 
@@ -111,8 +110,6 @@ django CMS is a well-tested CMS platform that powers sites both large and
 small. Here are a few of the key features:
 
 * robust internationalisation (i18n) support for creating multilingual sites
-* virtually unlimited undo history, allowing editors to revert to a previous
-  version
 * front-end editing, providing rapid access to the content management interface
 * support for a variety of editors with advanced text editing features.
 * a flexible plugins system that lets developers put powerful tools at the
@@ -128,16 +125,29 @@ consider django CMS:
 * a healthy, active and supportive developer community
 * a strong culture of good code, including an emphasis on automated testing
 
-*************
-Release Notes
-*************
 
-This document refers to version |release|
+.. _requirements:
 
-.. warning::
-    Version 3.0 introduces some significant changes that **require** action if
-    you are upgrading from a previous version. Please refer to
-    :ref:`Upgrading from previous versions <upgrade-to-3.0>`
+***********************************************
+Software version requirements and release notes
+***********************************************
+
+This document refers to version |release|.
+
+This release requires:
+
+* `Python`_ versions 2.7, 3.3, 3.4 or 3.5
+* `Django`_ versions 1.8.x, 1.9.x
+
+.. _Python: https://www.python.org
+.. _Django: https://www.djangoproject.com
+
+
+See the repository's ``setup.py`` for more specific details of dependencies, or the :ref:`release-notes` for
+information about what is required or has changed in particular versions of the CMS.
+
+The :ref:`installation how-to guide <installation>` provides an overview of other packages required in a django CMS
+project.
 
 
 *****************

@@ -69,6 +69,8 @@ Attempting to apply it a second times will cause an error. See :ref:`multi_appho
 instances.
 
 
+.. _reloading_apphooks:
+
 Loading new and re-configured apphooks
 ======================================
 

@@ -109,7 +109,9 @@ CMSPluginBase Attributes and Methods Reference
 
     ..  attribute:: frontend_edit_template
 
-        Default: ``cms/toolbar/placeholder_wrapper.html``
+        *This attribute is deprecated and will be removed in 3.5.*
+
+        Default: ``cms/toolbar/plugin.html``
 
         The template used for wrapping the plugin in frontend editing.
 
@@ -556,61 +558,6 @@ CMSPlugin Attributes and Methods Reference
 
         Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
         logic in a custom view.
-
-
-    ..  method:: add_url()
-
-        Returns the URL to call to add a plugin instance; useful to implement plugin-specific
-        logic in a custom view.
-
-        This property is now deprecated. Will be removed in 3.4.
-        Use the ``get_add_url`` method instead.
-
-        Default: None (``cms_page_add_plugin`` view is used)
-
-
-    ..  method:: edit_url()
-
-        Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
-        logic in a custom view.
-
-        This property is now deprecated. Will be removed in 3.4.
-        Use the ``get_edit_url`` method instead.
-
-        Default: None (``cms_page_edit_plugin`` view is used)
-
-
-    ..  method:: move_url()
-
-        Returns the URL to call to move a plugin instance; useful to implement plugin-specific
-        logic in a custom view.
-
-        This property is now deprecated. Will be removed in 3.4.
-        Use the ``get_move_url`` method instead.
-
-        Default: None (``cms_page_move_plugin`` view is used)
-
-
-    ..  method:: delete_url()
-
-        Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
-        logic in a custom view.
-
-        This property is now deprecated. Will be removed in 3.4.
-        Use the ``get_delete_url`` method instead.
-
-        Default: None (``cms_page_delete_plugin`` view is used)
-
-
-    ..  method:: copy_url()
-
-        Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
-        logic in a custom view.
-
-        This property is now deprecated. Will be removed in 3.4.
-        Use the ``get_copy_url`` method instead.
-
-        Default: None (``cms_page_copy_plugins`` view is used)
 
 
 ..  class:: cms.plugin_pool.PluginPool

@@ -56,14 +56,27 @@ More information on `our website <http://www.django-cms.org>`_.
 Requirements
 ************
 
-django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
+See the `Python/Django requirements for the current release version
+<http://docs.django-cms.org/en/stable/#software-version-requirements-and-release-notes>`_ in our documentation.
+
+See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
+<http://docs.django-cms.org/en/stable/how-to/install.html>`_
 
 *************
 Documentation
 *************
 
-Please head over to our `documentation <http://docs.django-cms.org/>`_ for all
-the details on how to install, extend and use the django CMS.
+We maintain documentation for several versions of the project. Key versions are:
+
+* `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
+* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **release-3.4.x branch**
+* `develop <http://docs.django-cms.org/en/develop/>`_, representing the latest build of the **develop branch**
+
+For more information about our branch policy, see `Branches
+<http://docs.django-cms.org/en/stable/contributing/development-policies.html>`_.
+
+Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
+
 
 ********
 Tutorial

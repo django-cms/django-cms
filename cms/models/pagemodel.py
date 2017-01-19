@@ -321,6 +321,29 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         invalidate_cms_page_cache()
         return moved_page
 
+    def revert_to_live(self, language):
+        """Revert the draft version to the same state as the public version
+        """
+        if not self.publisher_is_draft:
+            # Revert can only be called on draft pages
+            raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
+
+        if not self.publisher_public:
+            raise PublicVersionNeeded('A public version of this page is needed')
+
+        public = self.publisher_public
+        public._copy_titles(self, language, public.is_published(language))
+        public._copy_contents(self, language)
+        public._copy_attributes(self)
+
+        self.title_set.filter(language=language).update(
+            publisher_state=PUBLISHER_STATE_DEFAULT,
+            published=True,
+        )
+
+        self._publisher_keep_state = True
+        self.save()
+
     def _copy_titles(self, target, language, published):
         """
         Copy all the titles to a new page (which must have a pk).
@@ -1002,6 +1025,10 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     def has_cached_descendants(self):
         return hasattr(self, "_cached_descendants")
+
+    def set_translations_cache(self):
+        translations = self.title_set.all()
+        self._title_cache = {trans.language: trans for trans in translations.iterator()}
 
     # ## Title object access
 

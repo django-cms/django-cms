@@ -5,7 +5,7 @@ from django.template import Template
 
 from cms import api
 from cms.cms_plugins import AliasPlugin
-from cms.models import Page, Placeholder, AliasPluginModel
+from cms.models import Placeholder, AliasPluginModel
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -181,7 +181,7 @@ class AliasTestCase(CMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
-        endpoint = self.get_admin_url(Page, 'edit_plugin', alias.pk)
+        endpoint = self.get_change_plugin_uri(alias)
 
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
@@ -204,7 +204,7 @@ class AliasTestCase(CMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
-        endpoint = self.get_admin_url(Example1, 'edit_plugin', alias.pk)
+        endpoint = self.get_change_plugin_uri(alias, container=Example1)
 
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
@@ -240,23 +240,25 @@ class AliasTestCase(CMSTestCase):
             self.assertEqual(len(clipboard.get_plugins_list()), 1)
             alias_plugin = clipboard.get_plugins_list()[0]
 
+            copy_endpoint = self.get_copy_plugin_uri(alias_plugin)
+
             #
             # Test moving it from the clipboard to the page's placeholder...
             #
-            response = self.client.post(admin_reverse('cms_page_copy_plugins'), data={
+            response = self.client.post(copy_endpoint, data={
                 'source_placeholder_id': clipboard.pk,
                 'source_plugin': alias_plugin.pk,
                 'source_language': 'en',
                 'target_placeholder_id': ph_en.pk,
                 'target_language': 'en',
-                # 'target_plugin_id': 0,
             })
             self.assertEqual(response.status_code, 200)
 
             #
             # Now, test deleting the copy still on the clipboard...
             #
-            response = self.client.post(admin_reverse('cms_page_delete_plugin', args=[alias_plugin.pk]), data={})
+            delete_endpoint = self.get_delete_plugin_uri(alias_plugin)
+            response = self.client.post(delete_endpoint, data={})
             self.assertEqual(response.status_code, 200)
 
     def test_context_menus(self):

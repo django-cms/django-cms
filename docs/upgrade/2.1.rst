@@ -50,7 +50,7 @@ The following changes will need to be made in your ``settings.py`` file::
 
 .. note::
 
-    PROJECT_PATH is the absolute path to your project.  See :ref:`configure-django-cms` for instructions on how to set PROJECT_PATH.
+    PROJECT_PATH is the absolute path to your project.
 
 **Remove** the following from ``TEMPLATE_CONTEXT_PROCESSORS``:
 
