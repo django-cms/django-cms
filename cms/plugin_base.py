@@ -116,8 +116,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     disable_child_plugins = False
 
-    child_plugins_cache = True
-    parent_plugins_cache = True
+    cache_child_classes = True
+    cache_parent_classes = True
 
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
