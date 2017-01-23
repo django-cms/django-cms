@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-09 13:23-0500\n"
+"POT-Creation-Date: 2017-01-23 14:02-0500\n"
 "PO-Revision-Date: 2016-08-11 18:30+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"
@@ -21,19 +21,19 @@ msgstr ""
 "Language: pl\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.changeform.min.js:1
+#: static/cms/js/dist/3.4.2/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:72
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Czy na pewno chcesz zmienić zakładkę nie zapisując wcześniej strony?"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
 msgid "show"
 msgstr "pokaż"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
 msgid "hide"
 msgstr "ukryj"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
 msgid "toggle"
 msgstr "przełącz"

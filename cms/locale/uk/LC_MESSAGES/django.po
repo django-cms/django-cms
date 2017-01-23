@@ -16,6 +16,7 @@
 # panasoft <cc072aa3@opayq.com>, 2014-2016
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # roman_grankin <grankin.roman@hotmail.com>, 2014
+# Volodymyr Vakulenko <wowkalucky@gmail.com>, 2017
 # Vusheslavov Eduard <vey@live.ru>, 2014
 # yakky <i.spalletti@nephila.it>, 2015
 # Maxym Lynnyk <yakudzam@gmail.com>, 2013
@@ -23,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-09 13:23-0500\n"
-"PO-Revision-Date: 2017-01-09 17:49+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2017-01-23 14:01-0500\n"
+"PO-Revision-Date: 2017-01-19 14:16+0000\n"
+"Last-Translator: Volodymyr Vakulenko <wowkalucky@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -148,12 +149,12 @@ msgstr "Незалежні від мови налаштування"
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr ""
+msgstr "Будь ласка, створіть переклад сторінки для мови %(language)s перед редагуванням її розширених налаштувань."
 
 #: admin/forms.py:349
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Будь ласка, встановіть слаґ для мови %(language)s перед редагуванням її розширених налаштувань."
 
 #: admin/forms.py:360
 msgid "A page with this reverse URL id exists already."
@@ -204,42 +205,42 @@ msgstr "Видалити"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Користувачу не дозволено створювати сторінки без дозволу на зміну вже створених сторінок. Змініть відповідні дозволи."
 
 #: admin/forms.py:620 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Користувачу не дозволено видаляти сторінки без дозволу на зміну сторінок. Змініть відповідні дозволи."
 
 #: admin/forms.py:625
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Користувачу не дозволено змінювати дозволи сторінки без дозволу змінювати сторінку. Змініть відповідні дозволи."
 
 #: admin/forms.py:630
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Користувачі не мають дозволу видаляти дозволи сторінок без дозволу змінювати сторінки. Змініть відповідні дозволи."
 
 #: admin/forms.py:637
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Користувачі не можуть створювати дозволи сторінки без дозволу змінювати дозволи, що вже існують. Змініть відповідні дозволи."
 
 #: admin/forms.py:642
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Користувачі не можуть видаляти дозволи сторінки без дозволу змінювати дозволи сторінки. Змініть відповідні дозволи."
 
 #: admin/forms.py:761
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Невірний тип плагіну '%s'"
 
 #: admin/forms.py:778 admin/pageadmin.py:826 admin/placeholderadmin.py:413
 msgid "Language must be set to a supported language!"
@@ -252,14 +253,14 @@ msgstr "Батьківка мова розширення повинна бути
 #: admin/forms.py:789
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Заповнювач батьківського плагіна повинен бути таким же як сам заповнювач!"
 
 #: admin/pageadmin.py:292
 #, python-format
 msgid ""
 "Please create the %(language)s page translation before editing it's advanced"
 " settings."
-msgstr ""
+msgstr "Будь ласка, створіть переклад для мови %(language)s перед редагуванням її розширених налаштувань."
 
 #: admin/pageadmin.py:301 templates/admin/cms/page/submit_row.html:10
 msgid "Advanced Settings"
@@ -316,12 +317,12 @@ msgstr "Ви не маєте дозволу для копіювання дани
 #: admin/pageadmin.py:924
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
-msgstr ""
+msgstr "У Вас немає дозволу на відновлення цієї сторінки."
 
 #: admin/pageadmin.py:947
 #, python-format
 msgid "\"%s\" was reverted to the live version."
-msgstr ""
+msgstr "\"%s\" було відновлено до поточної версії."
 
 #: admin/pageadmin.py:974
 msgid "You do not have permission to publish this page"
@@ -379,7 +380,7 @@ msgstr "Ви впевнені?"
 #, python-format
 #| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "У Вас немає дозволу на перегляд сторінки \"%(title)s\""
 
 #: admin/pageadmin.py:1253
 msgid "You do not have permission to change this page's in_navigation status"
@@ -417,7 +418,7 @@ msgstr "У Вас немає дозволу додавати розширенн�
 #: admin/placeholderadmin.py:526
 #| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "У Вас немає дозволу на копіювання цього заповнювача."
 
 #: admin/placeholderadmin.py:631
 msgid "Plugin not found"
@@ -429,7 +430,7 @@ msgstr "У Вас немає прав для реданування цього �
 
 #: admin/placeholderadmin.py:735
 msgid "order parameter references plugins in different trees"
-msgstr ""
+msgstr "параметр сортування за порядком вказує на плагіни різних дерев"
 
 #: admin/placeholderadmin.py:747
 msgid "parent must be in the same placeholder"
@@ -442,12 +443,12 @@ msgstr "породжувач мусить бути на тій самій мов
 #: admin/placeholderadmin.py:878
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "У Вас немає дозволу на вставку цього плагіну"
 
 #: admin/placeholderadmin.py:938
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "У Вас немає дозволу на вставку цього заповнювача"
 
 #: admin/placeholderadmin.py:992
 msgid "You have no permission to move this plugin"
@@ -456,7 +457,7 @@ msgstr "У Вас немає дозволу на переміщення цьог
 #: admin/placeholderadmin.py:1087
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "У Вас немає дозволу вірізати цей плагін"
 
 #: admin/placeholderadmin.py:1150 admin/placeholderadmin.py:1159
 msgid "You do not have permission to delete this plugin"
@@ -500,7 +501,7 @@ msgstr "Керування дозволами для сторінки"
 #: apphook_pool.py:97
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "Знайдено не зареєстрований apphook \"%r\""
 
 #: apps.py:9 templates/cms/toolbar/items/logo.html:2
 #: templates/cms/welcome.html:6 templates/cms/welcome.html.py:22
@@ -525,7 +526,7 @@ msgstr "Створити псевдонім"
 msgid ""
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-msgstr ""
+msgstr "Це альтернативне посилання, Ви можете редагувати лише на <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> сторінці."
 
 #: cms_toolbars.py:97
 msgid "Structure"
@@ -585,7 +586,7 @@ msgstr "Вийти"
 #: cms_toolbars.py:367
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Опублікувати зміни"
 
 #: cms_toolbars.py:369
 msgid "Publish page now"
@@ -598,28 +599,28 @@ msgstr "Налаштування сторінки"
 #: cms_toolbars.py:430
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
-msgstr ""
+msgstr "Додати Переклад"
 
 #: cms_toolbars.py:437
 #| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
-msgstr ""
+msgstr "Видалити Переклад"
 
 #: cms_toolbars.py:445
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Копіювати усі плагіни"
 
 #: cms_toolbars.py:446
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "з %s"
 
 #: cms_toolbars.py:447
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Ви впевнені, що бажаєте скопіювати усі плагіни з %s?"
 
 #: cms_toolbars.py:473
 msgid "Pages"
@@ -633,7 +634,7 @@ msgstr "Сторінка"
 #: cms_toolbars.py:513
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "Створити Сторінку"
 
 #: cms_toolbars.py:518
 msgid "New Page"
@@ -726,7 +727,7 @@ msgstr "Вкажіть назву для нової сторінки"
 
 #: forms/wizards.py:53
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "Залиште порожнім для автоматичного слагу або вкажіть самостійно."
 
 #: forms/wizards.py:59
 msgid ""
@@ -983,31 +984,31 @@ msgstr "обмеження перегляду зовнішнього інтер�
 #: models/permissionmodels.py:79
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "Будь-ласка, оберіть користувача або групу."
 
 #: models/permissionmodels.py:95
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Користувачі не можуть публікувати сторінку без дозволу на зміну сторінки. Змініть відповідні дозволи."
 
 #: models/permissionmodels.py:100
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "Користувачі не можуть змінювати розширені налаштування сторінки без дозволу на зміну сторінки. Змініть відповідні дозволи."
 
 #: models/permissionmodels.py:105
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Користувачі не можуть змінювати дозволи сторінки без дозволу на зміну сторінки. Змініть відповідні дозволи."
 
 #: models/permissionmodels.py:110
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Користувачі не можуть переміщувати сторінку без дозволу на зміну сторінки. Змініть відповідні дозволи."
 
 #: models/permissionmodels.py:175
 msgid "can recover any deleted page"
@@ -1173,7 +1174,7 @@ msgstr "Типовий"
 #, python-format
 #| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" було змінено успішно."
 
 #: plugin_base.py:374
 msgid "There are no further settings for this plugin. Please press save."
@@ -1353,12 +1354,12 @@ msgstr "обмежено"
 #: templates/admin/cms/page/tree/actions_dropdown.html:71
 #: templates/admin/cms/page/tree/actions_dropdown.html:74
 msgid "Yes"
-msgstr ""
+msgstr "Так"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:71
 #: templates/admin/cms/page/tree/actions_dropdown.html:76
 msgid "No"
-msgstr ""
+msgstr "Ні"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:80
 msgid "last change by"
@@ -1366,7 +1367,7 @@ msgstr "в останнє змінено"
 
 #: templates/admin/cms/page/tree/actions_dropdown.html:86
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
 #: templates/admin/cms/page/tree/base.html:5
 msgid "List of pages"
@@ -1381,11 +1382,11 @@ msgstr "Пошук"
 #: templates/admin/cms/page/tree/base.html:46
 #| msgid "Page Title"
 msgid "Page Tree"
-msgstr ""
+msgstr "Дерево Сторінок"
 
 #: templates/admin/cms/page/tree/base.html:52
 msgid "Reset filter"
-msgstr ""
+msgstr "Зняти фільтр"
 
 #: templates/admin/cms/page/tree/base.html:109
 #, python-format
@@ -1393,7 +1394,7 @@ msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr ""
+msgstr "\n                                                Відновити видалене: %(name)s\n                                            "
 
 #: templates/admin/cms/page/tree/base.html:131
 #, python-format
@@ -1401,18 +1402,18 @@ msgid ""
 "\n"
 "                                New %(name)s\n"
 "                            "
-msgstr ""
+msgstr "\n                                Нова %(name)s\n                            "
 
 #: templates/admin/cms/page/tree/base.html:143
 #| msgid "in navigation"
 msgid "Main Navigation"
-msgstr ""
+msgstr "Головне Меню"
 
 #: templates/admin/cms/page/tree/base.html:148
 #: templates/admin/cms/page/tree/menu.html:198
 #| msgid "Actions"
 msgid "Options"
-msgstr ""
+msgstr "Опції"
 
 #: templates/admin/cms/page/tree/base.html:186
 msgid "Successfully moved"
@@ -1424,13 +1425,13 @@ msgstr "Зміни в межах дерева можуть потребуват�
 
 #: templates/admin/cms/page/tree/base.html:188
 msgid "Error:"
-msgstr ""
+msgstr "Помилка:"
 
 #: templates/admin/cms/page/tree/base.html:189
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
-msgstr ""
+msgstr "Ця сторінка не може бути скопійована через наявність додатку, що прикріплений до неї. Дивіться розширені налаштування сторінки для управління цим додатком (apphook)."
 
 #: templates/admin/cms/page/tree/base.html:190
 msgid "Are you sure you want to § this page?"
@@ -1438,16 +1439,16 @@ msgstr "Ви впевнені, що хочете § цю сторінку?"
 
 #: templates/admin/cms/page/tree/base.html:191
 msgid "Reload"
-msgstr ""
+msgstr "Перезавантажити"
 
 #: templates/admin/cms/page/tree/base.html:193
 #| msgid "New Page"
 msgid "New node"
-msgstr ""
+msgstr "Новий пункт"
 
 #: templates/admin/cms/page/tree/base.html:194
 msgid "nodes"
-msgstr ""
+msgstr "пункти"
 
 #: templates/admin/cms/page/tree/base.html:205
 msgid "View"
@@ -1469,7 +1470,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Поки що жодної сторінки.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Додати сторінку</a> негайно.\n                        "
 
 #: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
@@ -1486,47 +1487,47 @@ msgstr "Закрити"
 
 #: templates/admin/cms/page/tree/legend.html:7
 msgid "Legend"
-msgstr ""
+msgstr "Легенда"
 
 #: templates/admin/cms/page/tree/legend.html:15
 #| msgid "published"
 msgid "Published"
-msgstr ""
+msgstr "Опубліковано"
 
 #: templates/admin/cms/page/tree/legend.html:21
 #| msgid "Change"
 msgid "Changed"
-msgstr ""
+msgstr "Змінено"
 
 #: templates/admin/cms/page/tree/legend.html:27
 #| msgid "unpublished"
 msgid "Unpublished"
-msgstr ""
+msgstr "Неопубліковано"
 
 #: templates/admin/cms/page/tree/legend.html:39
 #| msgid "in menu"
 msgid "In menu"
-msgstr ""
+msgstr "В меню"
 
 #: templates/admin/cms/page/tree/legend.html:45
 #| msgid "not in menu"
 msgid "Not in menu"
-msgstr ""
+msgstr "Не в меню"
 
 #: templates/admin/cms/page/tree/legend.html:51
 #| msgid "New page"
 msgid "View page"
-msgstr ""
+msgstr "Перегляд сторінки"
 
 #: templates/admin/cms/page/tree/legend.html:63
 #: templates/admin/cms/page/tree/menu.html:34
 #| msgid "softroot"
 msgid "Softroot"
-msgstr ""
+msgstr "Softroot"
 
 #: templates/admin/cms/page/tree/legend.html:69
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
 #: templates/admin/cms/page/tree/menu.html:46
 #, python-format
@@ -1537,11 +1538,11 @@ msgstr "Програма: %(apphook)s"
 #, python-format
 #| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
-msgstr ""
+msgstr "Переглянути сторінку мовою: %(language)s "
 
 #: templates/admin/cms/page/tree/menu.html:89
 msgid "Preview"
-msgstr ""
+msgstr "Попередній перегляд"
 
 #: templates/admin/cms/page/tree/menu.html:99
 msgid "Publish"
@@ -1553,7 +1554,7 @@ msgstr "Зняти з публікації"
 
 #: templates/admin/cms/page/tree/menu.html:116
 msgid "Configure"
-msgstr ""
+msgstr "Налаштувати"
 
 #: templates/admin/cms/page/tree/menu.html:141
 msgid "in menu"
@@ -1567,7 +1568,7 @@ msgstr "не у меню"
 #: templates/admin/cms/page/tree/menu.html:173
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "Налаштування сторінки (SHIFT для розширених налаштувань)"
 
 #: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
@@ -1626,11 +1627,11 @@ msgstr "Буфер обміну порожній."
 
 #: templates/cms/toolbar/dragitem.html:37
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "Цей плагін не може бути вкладеним."
 
 #: templates/cms/toolbar/dragitem.html:38
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "Цей плагін не може вміщати вкладені плагіни."
 
 #: templates/cms/toolbar/dragitem_menu.html:5
 msgid "Available plugins"
@@ -1639,20 +1640,20 @@ msgstr "Доступні плагіни"
 #: templates/cms/toolbar/items/live_draft.html:6
 #| msgid "View published"
 msgid "View published page"
-msgstr ""
+msgstr "Переглянути опубліковану сторінку"
 
 #: templates/cms/toolbar/items/live_draft.html:11
 #| msgid "Edit this Page"
 msgid "Edit page"
-msgstr ""
+msgstr "Редагувати сторінку"
 
 #: templates/cms/toolbar/items/login.html:16
 msgid "Login"
-msgstr ""
+msgstr "Увійти"
 
 #: templates/cms/toolbar/plugin.html:22
 msgid "Add plugin to"
-msgstr ""
+msgstr "Додати плагін до"
 
 #: templates/cms/toolbar/toolbar.html:12
 msgid "Double-click to edit"
@@ -1660,11 +1661,11 @@ msgstr "Двічі клацніть, щоб редагувати"
 
 #: templates/cms/toolbar/toolbar.html:13
 msgid "Tap to edit"
-msgstr ""
+msgstr "Тацьніть для редагування"
 
 #: templates/cms/toolbar/toolbar.html:28
 msgid "More"
-msgstr ""
+msgstr "Більше"
 
 #: templates/cms/toolbar/toolbar.html:42
 msgid "Toggle toolbar"
@@ -1672,19 +1673,19 @@ msgstr "Перемикання панелі інструментів"
 
 #: templates/cms/toolbar/toolbar.html:60
 msgid "Click to go back"
-msgstr ""
+msgstr "Клікніть для повернення"
 
 #: templates/cms/toolbar/toolbar.html:61
 msgid "Click to go forward"
-msgstr ""
+msgstr "Клікніть для переходу вперед"
 
 #: templates/cms/toolbar/toolbar.html:78
 msgid "Minimize"
-msgstr ""
+msgstr "Згорнути"
 
 #: templates/cms/toolbar/toolbar.html:79
 msgid "Maximize"
-msgstr ""
+msgstr "Розгорнути"
 
 #: templates/cms/toolbar/toolbar.html:101
 msgid "Drop a plugin here"
@@ -1704,7 +1705,7 @@ msgstr "Це було перенапрвлено на:"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
-msgstr ""
+msgstr "Версія, що знаходиться у розробці з використанням django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 
 #: templates/cms/toolbar/toolbar_javascript.html:26
 msgid "Cancel"
@@ -1717,7 +1718,7 @@ msgstr "Сталася помилка:"
 #: templates/cms/toolbar/toolbar_javascript.html:28
 #| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
-msgstr ""
+msgstr "Дія успішна... перезавантаження."
 
 #: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Are you sure you want to delete this plugin?"
@@ -1729,81 +1730,81 @@ msgstr "Ви впевнені, що ви хочете опублікувати �
 
 #: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Плагін буде додано сюди"
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "У Вас є зміни, що не збережені."
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Ви певні, що бажаєте знехтувати цими змінами?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:34
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "Форма не може бути завантажена. Будь ласка, перевірте, чи наразі запущений сервер."
 
 #: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Shortcuts"
-msgstr ""
+msgstr "Гарячі клавіші"
 
 #: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Достати цей діалог допомоги"
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "Закрити/відмінити"
 
 #: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Переключити в режим структури"
 
 #: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Переключити в режим структури і підсвічувати плагіни"
 
 #: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "Відкрити діалог \"Створити\""
 
 #: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Зфокусувати на Панелі"
 
 #: templates/cms/toolbar/toolbar_javascript.html:71
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Зфоркусувати на заповнювачах"
 
 #: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Перемістити до наступного/попереднього елемента"
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
 #| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Зфокусувати на плагінах заповнювача"
 
 #: templates/cms/toolbar/toolbar_javascript.html:83
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "Редагувати плагін"
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
 #| msgid "not in menu"
 msgid "Open actions menu"
-msgstr ""
+msgstr "Відкрити меню дій"
 
 #: templates/cms/toolbar/toolbar_javascript.html:95
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Розгорнути/згорнути"
 
 #: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
@@ -1816,15 +1817,15 @@ msgstr "Ця сторінка має неопубліковані зміни."
 
 #: templates/cms/welcome.html:19
 msgid "Installation successful!"
-msgstr ""
+msgstr "Інсталяція відбулася успішно!"
 
 #: templates/cms/welcome.html:30
 msgid "Add your first page"
-msgstr ""
+msgstr "Додайте вашу першу сторінку"
 
 #: templates/cms/welcome.html:32
 msgid "Please log in"
-msgstr ""
+msgstr "Будь ласка, увійдіть в обліковий запис"
 
 #: templates/cms/welcome.html:36
 #, python-format
@@ -1832,7 +1833,7 @@ msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr ""
+msgstr "\n                    Вітаємо у django CMS версії <strong>%(cms_version)s</strong>!\n                "
 
 #: templates/cms/welcome.html:43
 #, python-format
@@ -1840,7 +1841,7 @@ msgid ""
 "\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr ""
+msgstr "\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Додайте першу сторінку</a> в систему для продовження.\n                    "
 
 #: templates/cms/welcome.html:47
 #, python-format
@@ -1849,19 +1850,19 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr ""
+msgstr "\n                        Виглядає як у Вас відключено JavaScript тож, будь ласка, \n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">додайте сторінку</a> вручну.\n                    "
 
 #: templates/cms/welcome.html:56
 msgid "Installation Notes"
-msgstr ""
+msgstr "Нотатки з інсталяції"
 
 #: templates/cms/welcome.html:59
 msgid "Support"
-msgstr ""
+msgstr "Підтримка"
 
 #: templates/cms/welcome.html:60
 msgid "Documentation"
-msgstr ""
+msgstr "Документація"
 
 #: templates/cms/welcome.html:62
 msgid ""
@@ -1874,23 +1875,23 @@ msgid ""
 "                    haven't added any pages yet.\n"
 "                </p>\n"
 "            "
-msgstr ""
+msgstr "\n                <p class=\"cms-welcome-notes\">Якщо Ви не бачите логотип django CMS угорі, впевніться, що підключили <code>static/cms</code> директорію до ваших файлів статики.</p>\n                <p class=\"cms-welcome-notes\">Ви спостерігаєте це повідомлення, бо маєте\n                    <code>DEBUG = True</code> у файлі налаштувань django й не додали ще жодної сторінки.\n                </p>\n            "
 
 #: templates/cms/welcome.html:84
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Вітаємо у django CMS"
 
 #: templates/cms/wizards/create.html:25
 msgid "Back"
-msgstr ""
+msgstr "Назад"
 
 #: templates/cms/wizards/start.html:15
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "Будь ласка, оберіть опцію нижче для переходу до наступного кроку."
 
 #: templates/cms/wizards/start.html:30
 msgid "Next"
-msgstr ""
+msgstr "Далі"
 
 #: templatetags/cms_admin.py:52
 msgid "unpublished changes"
@@ -1943,7 +1944,7 @@ msgstr "ім'я користувача"
 #: test_utils/project/customuserapp/models.py:40
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "Обов'язково. 300 символів або менше. Літери, числа and @/./+/-/_ символи"
 
 #: test_utils/project/customuserapp/models.py:43
 msgid "Enter a valid username."
@@ -2034,11 +2035,11 @@ msgstr "Батьківській додаток"
 
 #: test_utils/project/sampleapp/cms_apps.py:55
 msgid "Child app"
-msgstr ""
+msgstr "Дочірній додаток"
 
 #: test_utils/project/sampleapp/cms_apps.py:62
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "Змінна urls-menus App"
 
 #: test_utils/project/sampleapp/cms_menus.py:17
 msgid "sample root page"
@@ -2071,7 +2072,7 @@ msgstr "Статичне меню3"
 #: test_utils/project/sampleapp/cms_menus.py:61
 #| msgid "Static Menu"
 msgid "Static Menu4"
-msgstr ""
+msgstr "Статичне Меню4"
 
 #: test_utils/project/sampleapp/cms_toolbars.py:22
 #: test_utils/project/sampleapp/views.py:30
@@ -2100,7 +2101,7 @@ msgstr "Дякуємо за якісно проведений час з веб-�
 
 #: tests/test_templates.py:52 utils/conf.py:157
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "Успадкувати шаблон від найближчого пращура"
 
 #: tests/test_wizards.py:74
 msgid "UserSettings"
@@ -2110,13 +2111,13 @@ msgstr "Користувацькі Налаштування"
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Додати плагін до заповнювача \"%(placeholder_label)s\""
 
 #: toolbar/utils.py:36
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Додати плагін до %(plugin_name)s"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
@@ -2156,14 +2157,14 @@ msgstr "Це місце заповнення вже має максимальн�
 #: utils/request_ip_resolvers.py:24
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "Не можу знайти вказаний CMS_REQUEST_IP_RESOLVER модуль: \"{0}\"."
 
 #: utils/request_ip_resolvers.py:28
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
-msgstr ""
+msgstr "Не можу знайти вказану CMS_REQUEST_IP_RESOLVER функцію: \"{0}\" in module \"{1}\"."
 
 #: wizards/wizard_base.py:91
 #, python-format
@@ -2173,7 +2174,7 @@ msgstr "Додати новий %s екземпляр."
 #: wizards/wizard_pool.py:79
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "Помічник вже було зареєстровано для моделі: %s"
 
 #~ msgid "Add page permission also requires edit page permission."
 #~ msgstr "Add page permission also requires edit page permission."

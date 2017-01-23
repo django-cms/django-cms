@@ -9,6 +9,7 @@
 # angularcircle, 2012
 # ar4s <arkadiusz.adamski@gmail.com>, 2014-2015
 # Arkadiusz Błasiak <ares1112@gmail.com>, 2015
+# filip klosowski <filip@geoida.pl>, 2017
 # Jakub Paczkowski <jakub@paczkowski.eu>, 2013
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-09 13:23-0500\n"
-"PO-Revision-Date: 2017-01-09 17:49+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2017-01-23 14:01-0500\n"
+"PO-Revision-Date: 2017-01-18 01:18+0000\n"
+"Last-Translator: filip klosowski <filip@geoida.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -322,12 +323,12 @@ msgstr "Nie masz uprawnień aby skopiować te wtyczki."
 #: admin/pageadmin.py:924
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
-msgstr ""
+msgstr "Nie masz uprawnień do przywrócenia tej strony"
 
 #: admin/pageadmin.py:947
 #, python-format
 msgid "\"%s\" was reverted to the live version."
-msgstr ""
+msgstr "\"%s\" została przywrócona do wersji live"
 
 #: admin/pageadmin.py:974
 msgid "You do not have permission to publish this page"
@@ -423,7 +424,7 @@ msgstr "Nie masz uprawnień aby dodać wtyczkę"
 #: admin/placeholderadmin.py:526
 #| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Nie masz uprawnień, aby skopiować ten placeholder"
 
 #: admin/placeholderadmin.py:631
 msgid "Plugin not found"
@@ -431,7 +432,7 @@ msgstr "Nie znaleziono wtyczki"
 
 #: admin/placeholderadmin.py:639
 msgid "You do not have permission to edit this plugin"
-msgstr "Nie masz uprawnień aby edytować tą wtyczkę"
+msgstr "Nie masz uprawnień aby edytować tę wtyczkę"
 
 #: admin/placeholderadmin.py:735
 msgid "order parameter references plugins in different trees"
@@ -453,7 +454,7 @@ msgstr "Nie masz uprawnień, by wkleić ten plugin"
 #: admin/placeholderadmin.py:938
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Nie masz uprawnień, by wkleić symbol zastępczy"
 
 #: admin/placeholderadmin.py:992
 msgid "You have no permission to move this plugin"
@@ -462,7 +463,7 @@ msgstr "Nie masz uprawnień aby przenieść ta wtyczkę"
 #: admin/placeholderadmin.py:1087
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "Nie mas zuprawnień, aby wyciąć tę wtyczkę"
 
 #: admin/placeholderadmin.py:1150 admin/placeholderadmin.py:1159
 msgid "You do not have permission to delete this plugin"
@@ -625,7 +626,7 @@ msgstr "od %s"
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Czy na pewno skopiować wszystkie wtyczki z %s?"
 
 #: cms_toolbars.py:473
 msgid "Pages"
@@ -989,31 +990,31 @@ msgstr "Ograniczenia dostępu"
 #: models/permissionmodels.py:79
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "Proszę wybrać grupę lub użytkownika"
 
 #: models/permissionmodels.py:95
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Użytkownicy bez uprawnień do wprowadzania zmian nie mogą publikować stron. Wymagana zmiana uprawnień."
 
 #: models/permissionmodels.py:100
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "Użytkownicy bez uprawnień do wprowadzania zmian nie mogą zmieniać zaawansowanych ustawień strony.Wymagana zmiana uprawnień."
 
 #: models/permissionmodels.py:105
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Użytkownicy bez uprawnień do wprowadzania zmian nie mogą zmieniać uprawnień dla strony. Wymagana zmiana uprawnień."
 
 #: models/permissionmodels.py:110
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Użytkownicy bez uprawnień do wprowadzania zmian nie mogą przenosić stron. Wymagana zmiana uprawnień."
 
 #: models/permissionmodels.py:175
 msgid "can recover any deleted page"
@@ -1755,20 +1756,20 @@ msgstr "Formularz nie mógł zostać wczytany. Prosimy sprawdź, czy serwer dzia
 
 #: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Shortcuts"
-msgstr ""
+msgstr "Skróty"
 
 #: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Wyświetl okno pomocy"
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "Zamknij/Anuluj"
 
 #: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Włącz tryb struktury"
 
 #: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode and highlight hovered-over plugin"
@@ -1776,7 +1777,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "Otwór okno \"Utwórz\""
 
 #: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Focus on Toolbar"
@@ -1789,7 +1790,7 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Przejdź do następnego/poprzedniego elementu"
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
 #| msgid "Add plugin to placeholder"
@@ -1799,7 +1800,7 @@ msgstr ""
 #: templates/cms/toolbar/toolbar_javascript.html:83
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "Edytuj wtyczkę"
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
 #| msgid "not in menu"
@@ -1809,7 +1810,7 @@ msgstr ""
 #: templates/cms/toolbar/toolbar_javascript.html:95
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Zwiń/Rozwiń"
 
 #: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
@@ -2122,7 +2123,7 @@ msgstr ""
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Dodaj wtyczkę do %(plugin_name)s"
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
