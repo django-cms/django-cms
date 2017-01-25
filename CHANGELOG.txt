@@ -1,4 +1,4 @@
-=== 3.4.2 (unreleased) ===
+=== 3.4.2 (2017-01-23) ===
 
 * Escaped strings in ``close_frame`` JS template.
 * Fixed a bug with `text-transform` styles on inputs affecting CMS login

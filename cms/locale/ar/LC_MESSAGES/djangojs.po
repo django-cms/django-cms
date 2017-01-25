@@ -6,13 +6,14 @@
 # Translators:
 # Abdelkader Maarouf <dep2g2@gmail.com>, 2015
 # Ahmed H <info@draco-003.com>, 2013
+# Bashar Ghadanfar <10.tens@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-09 13:23-0500\n"
-"PO-Revision-Date: 2016-08-09 11:43+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2017-01-23 14:02-0500\n"
+"PO-Revision-Date: 2017-01-21 19:55+0000\n"
+"Last-Translator: Bashar Ghadanfar <10.tens@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,19 +21,19 @@ msgstr ""
 "Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.changeform.min.js:1
+#: static/cms/js/dist/3.4.2/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:72
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "هل أنت متأكد من الإنتقال الى jfويب أخر دون حفظ الصفحة أولاً؟"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
 msgid "show"
-msgstr ""
+msgstr "إظهار"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
 msgid "hide"
-msgstr ""
+msgstr "إخفاء"
 
-#: static/cms/js/dist/3.4.2rc1/bundle.admin.widget.min.js:3
+#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
 msgid "toggle"
-msgstr ""
+msgstr "مناوبة"

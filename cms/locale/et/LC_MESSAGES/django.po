@@ -6,14 +6,14 @@
 # Translators:
 # Martin Pajuste <martinpajuste@gmail.com>, 2012,2015-2016
 # Martin Pajuste <martinpajuste@gmail.com>, 2012
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-09 13:23-0500\n"
-"PO-Revision-Date: 2017-01-09 17:49+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2017-01-23 14:01-0500\n"
+"PO-Revision-Date: 2017-01-09 20:02+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -342,7 +342,7 @@ msgstr ""
 
 #: admin/pageadmin.py:1124
 msgid "You do not have permission to change this page"
-msgstr ""
+msgstr "Puuduvad õigused käesoleva lehe muutmiseks"
 
 #: admin/pageadmin.py:1128
 #, python-format
@@ -586,7 +586,7 @@ msgstr "Lehekülje seadistused"
 #: cms_toolbars.py:430
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
-msgstr ""
+msgstr "Lisa tõlge"
 
 #: cms_toolbars.py:437
 #| msgid "Delete %(language)s Translation"
@@ -706,7 +706,7 @@ msgstr "Vali korrektne lehekülg"
 
 #: forms/widgets.py:266
 msgid "Add Another"
-msgstr ""
+msgstr "Lisa veel üks"
 
 #: forms/wizards.py:50
 msgid "Provide a title for the new page."
@@ -729,7 +729,7 @@ msgstr "lehekülg"
 
 #: forms/wizards.py:181
 msgid "User does not have permission to add page."
-msgstr ""
+msgstr "Kasutajal puudub õigus lehe lisamiseks."
 
 #: migrations/0001_initial.py:29 migrations/0001_initial.py:63
 #: migrations/0001_initial.py:86 migrations/0001_initial.py:126
