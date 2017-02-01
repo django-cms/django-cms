@@ -43,7 +43,7 @@ be filled with content from the database when the page is rendered. This
 content is edited using django CMS's frontend editing mechanism, using Django
 template tags.
 
-``fullwidth.html`` contains a single placehilder, ``{% placeholder "content" %}``.
+``fullwidth.html`` contains a single placeholder, ``{% placeholder "content" %}``.
 
 You'll also see ``{% load cms_tags %}`` in that file - ``cms_tags`` is the
 required template tag library.
