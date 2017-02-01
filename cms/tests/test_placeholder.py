@@ -26,7 +26,6 @@ from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
     Example1,
-    MultilingualExample1,
     TwoPlaceholderExample,
 )
 from cms.test_utils.project.sampleapp.models import Category
@@ -34,7 +33,6 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
@@ -1001,55 +999,3 @@ class PlaceholderConfTests(TestCase):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
-
-
-class PlaceholderI18NTest(CMSTestCase):
-
-    def _get_url(self, app, model, pk):
-        if DJANGO_1_8:
-            return '/de/admin/%s/%s/%d/' % (app, model, pk)
-        else:
-            return '/de/admin/%s/%s/%d/change/' % (app, model, pk)
-
-    def _testuser(self):
-        User = get_user_model()
-        u = User(is_staff=True, is_active=True, is_superuser=True)
-        setattr(u, u.USERNAME_FIELD, "test")
-        u.set_password("test")
-        u.save()
-        return u
-
-    def test_hvad_tabs(self):
-        ex = MultilingualExample1.objects.language('en').create(char_1='one', char_2='two')
-        self._testuser()
-        self.client.login(username='test', password='test')
-
-        response = self.client.get(self._get_url('placeholderapp', 'multilingualexample1', ex.pk))
-        self.assertContains(response, '<input type="hidden" class="language_button selected" name="de" />')
-
-    def test_no_tabs(self):
-        ex = Example1.objects.create(
-            char_1='one',
-            char_2='two',
-            char_3='one',
-            char_4='two',
-        )
-        self._testuser()
-        self.client.login(username='test', password='test')
-
-        response = self.client.get(self._get_url('placeholderapp', 'example1', ex.pk))
-        self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
-
-    def test_placeholder_tabs(self):
-        ex = TwoPlaceholderExample.objects.create(
-            char_1='one',
-            char_2='two',
-            char_3='one',
-            char_4='two',
-        )
-        self._testuser()
-        self.client.login(username='test', password='test')
-
-        response = self.client.get(self._get_url('placeholderapp', 'twoplaceholderexample', ex.pk))
-        self.assertNotContains(response,
-                               """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
