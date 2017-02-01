@@ -50,12 +50,44 @@ casper.test.begin('Publishing a page with publish button', function (test) {
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
         // clicking on 'Publish page now' button
-        .waitForSelector('.cms-toolbar-expanded', function () {
-            // handles confirm popup
-            this.setFilter('page.confirm', function () {
-                return true;
+        .waitForSelector('.cms-toolbar-expanded')
+        .wait(1000, function () {
+            // handle cancel - nothing should happen
+            this.evaluate(function () {
+                // have to reset secureConfirm to return static value
+                // because whatever filters i set in casper js - they will
+                // be ignored because it's too fast. and if it's too fast -
+                // the code assumes it to be true because it thinks that
+                // the browser's "do not show this message again" was used
+                CMS.API.Helpers.secureConfirm = function () {
+                    return false;
+                };
+
+                CMS.$('body').append('<div class="test-succeded"></div>');
+
+                CMS.$(window).on('beforeunload', function (e) {
+                    e.preventDefault();
+
+                    CMS.$('.test-succeeded').remove();
+                });
+            });
+        })
+        .then(function () {
+            this.click('.cms-btn-publish');
+        })
+        .wait(5000, function () {
+            var didTestSucceed = this.evaluate(function () {
+                return CMS.$('.test-succeded').length;
             });
 
+            test.assertEquals(didTestSucceed, 1, 'Nothing happened');
+        })
+        .thenEvaluate(function () {
+            CMS.API.Helpers.secureConfirm = function () {
+                return true;
+            };
+        })
+        .then(function () {
             this.click('.cms-btn-publish');
         })
         // wait until it successfully publishes

@@ -1,6 +1,6 @@
 === 3.4.3 (unreleased) ===
 
-<new-entries-start-here>
+* Fixed a bug where canceling the publishing dialog wasn't respected.
 
 
 === 3.4.2 (2017-01-23) ===
