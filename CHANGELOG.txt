@@ -1,3 +1,8 @@
+=== 3.4.3 (unreleased) ===
+
+<new-entries-start-here>
+
+
 === 3.4.2 (2017-01-23) ===
 
 * Escaped strings in ``close_frame`` JS template.
