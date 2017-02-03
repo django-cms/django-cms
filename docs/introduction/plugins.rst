@@ -229,8 +229,7 @@ The template
 The ``render_template`` attribute in the plugin class is required, and tells the plugin which
 :attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>` to use when rendering.
 
-In this case the template needs to be at ``polls_cms_integration
-/templates/polls_cms_integration/poll_plugin.html`` and should look something like this:
+In this case the template needs to be at ``polls_cms_integration/templates/polls_cms_integration/poll_plugin.html`` and should look something like this:
 
 .. code-block:: html+django
 
