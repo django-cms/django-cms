@@ -343,6 +343,7 @@ var Toolbar = new Class({
             btn.find('.cms-publish-page').on(that.click, function (e) {
                 if (!Helpers.secureConfirm(CMS.config.lang.publish)) {
                     e.preventDefault();
+                    e.stopImmediatePropagation();
                 }
             });
 
