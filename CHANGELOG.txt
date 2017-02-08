@@ -1,6 +1,7 @@
 === 3.4.3 (unreleased) ===
 
 * Fixed a bug where canceling the publishing dialog wasn't respected.
+* Fixed a bug when after authentication us redirected on wrong url (site have only one language)
 
 
 === 3.4.2 (2017-01-23) ===
