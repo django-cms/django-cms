@@ -12,7 +12,8 @@ To enable features 1. and 2., ``settings.py`` requires::
 
     CMS_PERMISSION = True
 
-The third one is controlled by the "**Can use Structure mode**" Django permission.
+The third is controlled by the "**Can use Structure mode**" Django permission.
+
 
 *****************
 View restrictions
@@ -27,6 +28,21 @@ This setting decides if pages without any view restrictions are:
 
 * viewable by everyone -- including anonymous users (*all*)
 * viewable by staff users only (*staff*)
+
+
+Redirecting to a login page
+===========================
+
+If an anonymous user tries to load a page that requires the user to be logged in, the browser will redirect the user to
+a login page.
+
+Note that this is not set up by default in Django - you will need to:
+
+* Ensure that your ``urls.py`` :ref:`includes Django's authentication views <django:using-the-views>`
+  (``django.contrib.auth.urls``).
+* Create a ``registration/login.html`` login template (:ref:`an example is provided in Django's documentation
+  <django:all-authentication-views>`).
+
 
 ****************
 Page permissions
