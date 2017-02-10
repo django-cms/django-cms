@@ -785,9 +785,9 @@ page_language_url
 
 Returns the URL of the current page in an other language::
 
-    {% page_language_url de %}
-    {% page_language_url fr %}
-    {% page_language_url en %}
+    {% page_language_url "de" %}
+    {% page_language_url "fr" %}
+    {% page_language_url "en" %}
 
 If the current URL has no CMS Page and is handled by a navigation extender and
 the URL changes based on the language, you will need to set a ``language_changer``
