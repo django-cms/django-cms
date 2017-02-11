@@ -844,14 +844,17 @@ describe('CMS.Toolbar', function () {
 
         it('attaches a handler to publish page button', function () {
             spyOn($, 'ajax');
-            spyOn($.Event.prototype, 'preventDefault');
+            spyOn($.Event.prototype, 'preventDefault').and.callThrough();
+            spyOn($.Event.prototype, 'stopImmediatePropagation').and.callThrough();
             spyOn(CMS.API.Helpers, 'secureConfirm').and.returnValues(false, true);
 
             var publishButton = toolbar.ui.buttons.eq(3).find('.cms-publish-page');
             publishButton.trigger(toolbar.click);
-            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(2); // two handlers on same button
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
+            expect($.Event.prototype.stopImmediatePropagation).toHaveBeenCalledTimes(1);
             publishButton.trigger(toolbar.click);
-            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(3); // one handler on same button
+            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(2);
+            expect($.Event.prototype.stopImmediatePropagation).toHaveBeenCalledTimes(1);
         });
 
         it('attaches a handler to publish button');
