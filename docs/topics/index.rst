@@ -17,5 +17,6 @@ concerned with explaining *how to do things* than with helping you understand
     multiple_languages
     i18n
     permissions
+    complex_plugins
     commonly_used_plugins
     searchdocs
