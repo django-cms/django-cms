@@ -84,7 +84,7 @@ and submit a response.
 Improve the templates for Polls
 ===============================
 
-You'll have noticed that the in the Polls application we only have minimal templates, and no navigation or styling.
+You'll have noticed that in the Polls application we only have minimal templates, and no navigation or styling.
 
 Our django CMS pages on the other hand have access to a number of default templates in the project, all of which
 extend one called ``base.html``. So, let's improve this by overriding the polls application's base template.
