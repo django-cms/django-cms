@@ -116,11 +116,11 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     disable_child_plugins = False
 
+    # Warning: setting these to False, may have a serious performance impact,
+    # because their child-parent-relation must be recomputed each
+    # time the plugin tree is rendered.
     cache_child_classes = True
     cache_parent_classes = True
-    # Warning: setting ``cache_child_classes`` and/or ``cache_parent_classes`` to False, may have
-    # a serious performance impact, because their child-parent-relation must be recomputed each
-    # time the plugin tree is rendered.
 
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
