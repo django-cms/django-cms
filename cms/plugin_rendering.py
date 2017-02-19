@@ -393,17 +393,19 @@ class ContentRenderer(object):
         parents_cache = placeholder_cache.setdefault('plugin_parents', {})
         children_cache = placeholder_cache.setdefault('plugin_children', {})
 
-        if plugin_type not in parents_cache:
+        if plugin_class.cache_parent_classes and plugin_type not in parents_cache:
             parent_classes = plugin_class.get_parent_classes(
                 slot=placeholder.slot,
                 page=self.current_page,
+                instance=instance,
             )
             parents_cache[plugin_type] = parent_classes or []
 
-        if plugin_type not in children_cache:
+        if plugin_class.cache_child_classes and plugin_type not in children_cache:
             child_classes = plugin_class.get_child_classes(
                 slot=placeholder.slot,
                 page=self.current_page,
+                instance=instance,
             )
             children_cache[plugin_type] = child_classes or []
         return content
