@@ -354,16 +354,25 @@ class PageToolbar(CMSToolbar):
         # only do dirty lookups if publish permission is granted else button isn't added anyway
         if self.toolbar.edit_mode and self.has_publish_permission():
             classes = list(classes or [])
+            language = self.current_lang
             pk = self.page.pk if self.page else 0
 
-            dirty = (bool(self.dirty_statics) or
-                     (self.page and (self.page.is_dirty(self.current_lang) or
-                                     self.page_is_pending(self.page, self.current_lang))))
+            if self.page:
+                if self.dirty_statics:
+                    # There's dirty static placeholders on this page.
+                    # Only show the page as dirty (publish button) if the page
+                    # translation has been configured.
+                    dirty = self.page.title_set.filter(language=language).exists()
+                else:
+                    dirty = (self.page.is_dirty(language) or
+                             self.page_is_pending(self.page, language))
+            else:
+                dirty = bool(self.dirty_statics)
 
             if dirty:
                 classes.append('cms-btn-publish-active')
 
-            if self.dirty_statics or (self.page and self.page.is_published(self.current_lang)):
+            if self.dirty_statics or (self.page and self.page.is_published(language)):
                 title = _('Publish page changes')
             else:
                 title = _('Publish page now')
@@ -377,8 +386,8 @@ class PageToolbar(CMSToolbar):
             if self.in_apphook():
                 params['redirect'] = self.request.path_info
 
-            with force_language(self.current_lang):
-                url = admin_reverse('cms_page_publish_page', args=(pk, self.current_lang))
+            with force_language(language):
+                url = admin_reverse('cms_page_publish_page', args=(pk, language))
 
             url = add_url_parameters(url, params)
 
