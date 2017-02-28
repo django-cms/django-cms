@@ -1,0 +1,31 @@
+.. _upgrade-to-3.0.13:
+
+####################
+3.0.13 release notes
+####################
+
+********************
+What's new in 3.0.13
+********************
+
+Bug Fixes
+=========
+
+* Numerous documentation including installation and tutorial updates
+* Numerous improvements to translations
+* Improves reliability of apphooks
+* Improves reliability of Advanced Settings on page when using apphooks
+* Allow page deletion after template removal
+* Improves upstream caching accuracy
+* Improves CMSAttachMenu registration
+* Improves handling of mis-typed URLs
+* Improves redirection as a result of changes to page slugs, etc.
+* Improves performance of "watched models"
+* Improves frontend performance relating to re-sizing the sideframe
+* Corrects an issue where items might not be visible in structure mode menus
+* Limits version of django-mptt used in CMS for 3.0.x
+* Prevent accidental upgrades to Django 1.8, which is not yet supported
+
+Many thanks community members who have submitted issue reports and especially to
+these GitHub users who have also submitted pull requests: elpaso, jedie, jrief,
+jsma, treavis.

@@ -1,0 +1,45 @@
+.cms-shortcuts {
+    padding: 0 20px;
+
+    h2 {
+        padding-top: 20px;
+        padding-left: 3px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    margin-bottom: 20px;
+}
+
+.cms-shortcut {
+    clear: both;
+}
+
+.cms-shortcut-key-wrapper {
+    width: 100px;
+    text-align: right;
+    vertical-align: top;
+    padding-bottom: 5px;
+    white-space: nowrap;
+}
+.cms-shortcut-key {
+    display: inline-block;
+    background-color: $gray-lightest;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-family: 'Operator Mono', 'Menlo', 'Monaco', 'Consolas', 'monospace';
+    background: #eff0f2;
+    border-radius: 4px;
+    border-top: 1px solid #f5f5f5;
+    box-shadow:
+        inset 0 0 25px #e8e8e8,
+        0 1px 0 #c3c3c3,
+        0 2px 0 #c9c9c9,
+        0 2px 3px #333;
+    text-shadow: 0px 1px 0px #f5f5f5;
+}
+
+.cms-shortcut-desc {
+    padding: 3px 5px;
+    width: 100%;
+    padding-bottom: 5px;
+}

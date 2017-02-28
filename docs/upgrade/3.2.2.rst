@@ -1,0 +1,110 @@
+.. _upgrade-to-3.2.2:
+
+###################
+3.2.2 release notes
+###################
+
+*******************
+What's new in 3.2.2
+*******************
+
+Improvements
+============
+
+- Substantial "under-the-hood" improvements to the page tree resulting in
+  significant reduction of page-tree reloads and generally cleaner code
+- Update jsTree version to 3.2.1 with slight adaptations to the page tree
+- Improve the display and usability of the language menu, especially in cases
+  where there are many languages
+- Documentation improvements
+
+
+Bug Fixes
+=========
+
+- Fix an issue relating to search fields in plugins
+- Fix an issue where the app-resolver would trigger locales into migrations
+- Fix cache settings
+- Fix ToolbarMiddleware.is_cms_request logic
+- Fix numerous Django 1.9 deprecations
+- Numerous other improvements to overall stability and code quality
+
+
+Model Relationship Back-References and Django 1.9
+=================================================
+
+Django 1.9 is lot stricter about collisions in the ``related_names`` of
+relationship fields than previous versions of Django. This has brought to light
+issues in django CMS relating to the private field ``CMSPlugin.cmsplugin_ptr``.
+The issue becomes apparent when multiple packages are installed that provide
+plugins with the same model class name. A good example would be if you have the
+package ``djangocms-file`` installed, which has a poorly named CMSPlugin model
+subclass called ``File``, then any other package that has a plugin with a
+field named "file" would most likely cause an issue. Considering that
+``djangocms-file`` is a very common plugin to use and a field name of "file" is
+not uncommon in other plugins, this is less than ideal.
+
+Fortunately, developers can correct these issues in their own projects while
+they await improvements in django CMS. There is an internal field that is
+created when instantiating plugins: ``CMSPlugin.cmsplugin_ptr``. This private
+field is declared in the CMSPlugin base class and is populated on instantiation
+using the lower-cased model name of the CMSPlugin subclass that is
+being registered.
+
+A subclass to ``CMSPlugin`` can declare their own ``cmsplugin_ptr`` field to
+immediately fix this issue. The easiest solution is to declare this field with a
+``related_name`` of "+". In typical Django fashion, this will suppress the
+back-reference and prevent any collisions. However, if the back-reference is
+required for some reason (very rare), then we recommend using the pattern
+``%(app_label)s_%(class_name)s``. In fact, in version 3.3 of django CMS, this is
+precisely the string-template that the reference setup will use to create the
+name. Here's an example:
+
+.. code-block:: python
+
+    class MyPlugin(CMSPlugin):
+        class Meta:
+            app_label = 'my_package'
+
+        cmsplugin_ptr = models.OneToOneField(
+            CMSPlugin,
+            related_name='my_package_my_plugin',
+            parent_link=True
+        )
+
+        # other fields, etc.
+        # ...
+
+Please note that CMSPlugin.cmsplugin_ptr will remain a private field.
+
+
+Notice of Upcoming Change in 3.3
+================================
+
+As outlined in the section immediately above, the pattern currently used to
+derive a ``related_name`` for the private field ``CMSPlugin.cmsplugin_ptr`` may
+result in frequent collisions. In django CMS 3.3, this string-template will be
+changed to utilise both the ``app_label`` and the model class name. In the
+majority of cases, this will not affect developers or users, but if your
+project uses these back-references for some reason, please be aware of this
+change and plan accordingly.
+
+
+Treebeard corruption
+====================
+
+Prior to 3.2.1 moving or pasting nested plugins could lead to some non-fatal
+tree corruptions, raising an error when adding plugins under the newly
+pasted plugins.
+
+To fix these problems, upgrade to 3.2.1 or later and then run
+``manage.py cms fix-tree`` command to repair the tree.
+
+
+DjangoCMS Text CKEditor
+=======================
+
+Action required
+---------------
+CMS 3.2.2 is not compatible with djangocms-text-ckeditor < 2.8.1.
+If you're using djangocms-text-ckeditor, please upgrade to 2.8.1 or up.

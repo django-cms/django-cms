@@ -4,22 +4,21 @@ from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
-from cms.plugin_rendering import render_placeholder
-from cms.utils.plugins import downcast_plugins, build_plugin_tree
-from django.conf.urls import patterns, url
-from django.core.urlresolvers import reverse
+from cms.utils.urlutils import admin_reverse
+from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
     name = _("Placeholder")
-    parent_classes = [0]  # so you will not be able to add it something
+    parent_classes = ['0']  # so you will not be able to add it something
     #require_parent = True
     render_plugin = False
     admin_preview = False
+    system = True
 
     model = PlaceholderReference
 
@@ -32,19 +31,31 @@ class AliasPlugin(CMSPluginBase):
     allow_children = False
     model = AliasPluginModel
     render_template = "cms/plugins/alias.html"
+    system = True
 
     def render(self, context, instance, placeholder):
-        context['instance'] = instance
-        context['placeholder'] = placeholder
+        from cms.utils.plugins import downcast_plugins, build_plugin_tree
+
+        context = super(AliasPlugin, self).render(context, instance, placeholder)
+        cms_content_renderer = context.get('cms_content_renderer')
+
+        if not cms_content_renderer or instance.is_recursive():
+            return context
+
         if instance.plugin_id:
-            plugins = instance.plugin.get_descendants(include_self=True).order_by('placeholder', 'tree_id', 'level',
-                                                                                  'position')
-            plugins = downcast_plugins(plugins)
+            plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
+            plugins = [instance.plugin] + list(plugins)
+            plugins = downcast_plugins(plugins, request=cms_content_renderer.request)
+            plugins = list(plugins)
             plugins[0].parent_id = None
             plugins = build_plugin_tree(plugins)
             context['plugins'] = plugins
         if instance.alias_placeholder_id:
-            content = render_placeholder(instance.alias_placeholder, context)
+            content = cms_content_renderer.render_placeholder(
+                placeholder=instance.alias_placeholder,
+                context=context,
+                editable=False,
+            )
             context['content'] = mark_safe(content)
         return context
 
@@ -52,7 +63,7 @@ class AliasPlugin(CMSPluginBase):
         return [
             PluginMenuItem(
                 _("Create Alias"),
-                reverse("admin:cms_create_alias"),
+                admin_reverse("cms_create_alias"),
                 data={'plugin_id': plugin.pk, 'csrfmiddlewaretoken': get_token(request)},
             )
         ]
@@ -61,17 +72,52 @@ class AliasPlugin(CMSPluginBase):
         return [
             PluginMenuItem(
                 _("Create Alias"),
-                reverse("admin:cms_create_alias"),
+                admin_reverse("cms_create_alias"),
                 data={'placeholder_id': placeholder.pk, 'csrfmiddlewaretoken': get_token(request)},
             )
         ]
 
     def get_plugin_urls(self):
-        urlpatterns = [
+        return [
             url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
-        urlpatterns = patterns('', *urlpatterns)
-        return urlpatterns
+
+    @classmethod
+    def get_empty_change_form_text(cls, obj=None):
+        original = super(AliasPlugin, cls).get_empty_change_form_text(obj=obj)
+
+        if not obj:
+            return original
+
+        instance = obj.get_plugin_instance()[0]
+
+        if not instance:
+            # Ghost plugin
+            return original
+
+        aliased_placeholder_id = instance.get_aliased_placeholder_id()
+
+        if not aliased_placeholder_id:
+            # Corrupt (sadly) Alias plugin
+            return original
+
+        aliased_placeholder = Placeholder.objects.get(pk=aliased_placeholder_id)
+
+        origin_page = aliased_placeholder.page
+
+        if not origin_page:
+            # Placeholder is not attached to a page
+            return original
+
+        # I have a feeling this could fail with a NoReverseMatch error
+        # if this is the case, then it's likely a corruption.
+        page_url = origin_page.get_absolute_url(language=obj.language)
+        page_title = origin_page.get_title(language=obj.language)
+
+        message = ugettext('This is an alias reference, '
+                           'you can edit the content only on the '
+                           '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
+        return message % {'page_url': page_url, 'page_title': page_title}
 
     def create_alias(self, request):
         if not request.user.is_staff:
@@ -92,11 +138,11 @@ class AliasPlugin(CMSPluginBase):
                 placeholder = Placeholder.objects.get(pk=pk)
             except Placeholder.DoesNotExist:
                 return HttpResponseBadRequest("placeholder with id %s not found." % pk)
-            if not placeholder.has_change_permission(request):
+            if not placeholder.has_change_permission(request.user):
                 return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
         clipboard = request.toolbar.clipboard
         clipboard.cmsplugin_set.all().delete()
-        language = request.LANGUAGE_CODE
+        language = get_language()
         if plugin:
             language = plugin.language
         alias = AliasPluginModel(language=language, placeholder=clipboard, plugin_type="AliasPlugin")

@@ -1,0 +1,71 @@
+.. _upgrade-to-3.1.1:
+
+###################
+3.1.1 release notes
+###################
+
+*******************
+What's new in 3.1.1
+*******************
+
+* Add Django 1.8 support
+* Tutorial updates and improvements
+* Add copy_site command
+* Add setting to disable toolbar for anonymous users
+* Add setting to hide toolbar when a URL is not handled by django CMS
+* Add editor configuration
+
+Bug Fixes
+=========
+
+* Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability.
+* Fix issue with causes menu classes to be duplicated in advanced settings
+* Fix issue with breadcrumbs not showing
+* Fix issues with show_menu template tags
+* Fix an error in placeholder cache
+* Fix get_language_from_request if POST and GET exists
+* Minor documentation fixes
+* Revert whitespace clean-up on flash player to fix it
+* Correctly restore previous status of drag bars
+* Fix an issue related to "Empty all" Placeholder feature
+* Fix plugin sorting in Python 3
+* Fix language-related issues when retrieving page URL
+* Fix search results number and items alignment in page changelist
+* Preserve information regarding the current view when applying the CMS decorator
+* Fix errors with toolbar population
+* Fix error with watch_models type
+* Fix error with plugin breadcrumbs order
+* Change the label "Save and close" to "Save as draft"
+* Fix X-Frame-Options on top-level pages
+* Fix order of which application URLs are injected into ``urlpatterns``
+* Fix delete non existing page language
+* Fix language fallback for nested plugins
+* Fix render_model template tag doesn't show correct change list
+* Fix Scanning for placeholders fails on include tags with a variable as an argument
+* Fix handling of plugin position attribute
+* Fix for some structureboard issues
+* Pin South version to 1.0.2
+* Pin html5lib version to 0.999 until a current bug is fixed
+* Make shift tab work correctly in sub-menu
+* Fix language chooser template
+
+
+Potentially backward incompatible changes
+==========================================
+
+The order in which the applications are injected is now based on the page depth, if you
+use nested apphooks, you might want to check that this does not change the behaviour
+of your applications depending on applications urlconf greediness.
+
+
+Thanks
+======
+
+Many thanks community members who have submitted issue reports and especially to
+these GitHub users who have also submitted pull requests: astagi, dirtycoder, doctormo,
+douwevandermeij, driesdesmet, furiousdave, ldgarcia, maqnouch, nikolas, northben,
+olarcheveque, pa0lin082, peterfarrell, sam-m888, sephii, stefanw, timgraham, vstoykov.
+
+A special thank you to vad and nostalgiaz for their support on Django 1.8 support
+
+A special thank to Matt Wilkes and Sylvain Fankhauser for reporting the security issue.

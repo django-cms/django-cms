@@ -1,0 +1,33 @@
+{% extends "cms/wizards/base.html" %}
+{% load i18n cms_wizard_tags %}
+
+{% block wizard %}
+    <h1>{% trans "Create" %}</h1>
+
+    <form action="{% url 'cms_wizard_create' %}" method="post" class="modal-body">
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {{ form.page }}
+        {{ form.language }}
+
+        {% if form.errors %}
+            <p class="errornote">
+                {% trans "Please choose an option from below to proceed to the next step." %}
+            </p>
+        {% endif %}
+
+        <div class="choice-wrapper">
+            {% for entry in form.entry %}
+                {% cms_wizard entry.choice_value as wizard %}
+                <label tabindex="0" class="choice{% if forloop.first %} active{% endif %}">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}"{% if forloop.first %} checked{% endif %}>
+                    <strong>{{ wizard.get_title }}</strong>
+                    <span class="info">{{ wizard.get_description }}</span>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Next' %}" class="default cms-btn cms-btn-action" name="_continue">
+        </div>
+    </form>
+{% endblock %}

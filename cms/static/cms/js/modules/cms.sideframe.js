@@ -1,366 +1,455 @@
-/*##################################################|*/
-/* #CMS# */
-(function($) {
-// CMS.$ will be passed for $
-$(document).ready(function () {
-	/*!
-	 * Sideframe
-	 * Controls a cms specific sideframe
-	 */
-	CMS.Sideframe = new CMS.Class({
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
-		implement: [CMS.API.Helpers],
+var $ = require('jquery');
+var Class = require('classjs');
+var Helpers = require('./cms.base').API.Helpers;
+var KEYS = require('./cms.base').KEYS;
 
-		options: {
-			'onClose': false,
-			'sideframeDuration': 300,
-			'sideframeWidth': 320,
-			'urls': {
-				'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
-			}
-		},
+/**
+ * The sideframe is triggered via API calls from the backend either
+ * through the toolbar navigation or from plugins. The APIs only allow to
+ * open a url within the sideframe.
+ *
+ * @class Sideframe
+ * @namespace CMS
+ * @uses CMS.API.Helpers
+ */
+var Sideframe = new Class({
 
-		initialize: function (options) {
-			this.options = $.extend(true, {}, this.options, options);
-			this.config = CMS.config;
-			this.settings = CMS.settings;
+    options: {
+        onClose: false,
+        sideframeDuration: 300
+    },
 
-			// elements
-			this.sideframe = $('.cms_sideframe');
-			this.body = $('html');
+    initialize: function initialize(options) {
+        this.options = $.extend(true, {}, this.options, options);
 
-			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
-			this.enforceReload = false;
+        // elements
+        this._setupUI();
 
-			// if the modal is initialized the first time, set the events
-			if(!this.sideframe.data('ready')) this._events();
+        // states and events
+        this.click = 'click.cms.sideframe';
+        this.pointerDown = 'pointerdown.cms.sideframe contextmenu.cms.sideframe';
+        this.pointerUp = 'pointerup.cms.sideframe pointercancel.cms.sideframe';
+        this.pointerMove = 'pointermove.cms.sideframe';
+        this.enforceReload = false;
+        this.settingsRefreshTimer = 600;
+    },
 
-			// ready sideframe
-			this.sideframe.data('ready', true);
-		},
+    /**
+     * Stores all jQuery references within `this.ui`.
+     *
+     * @method _setupUI
+     * @private
+     */
+    _setupUI: function _setupUI() {
+        var sideframe = $('.cms-sideframe');
 
-		// initial methods
-		_events: function () {
-			var that = this;
+        this.ui = {
+            sideframe: sideframe,
+            body: $('html'),
+            window: $(window),
+            dimmer: sideframe.find('.cms-sideframe-dimmer'),
+            close: sideframe.find('.cms-sideframe-close'),
+            frame: sideframe.find('.cms-sideframe-frame'),
+            shim: sideframe.find('.cms-sideframe-shim'),
+            historyBack: sideframe.find('.cms-sideframe-history .cms-icon-arrow-back'),
+            historyForward: sideframe.find('.cms-sideframe-history .cms-icon-arrow-forward')
+        };
+    },
 
-			// attach close event
-			this.sideframe.find('.cms_sideframe-close').bind(this.click, function () {
-				that.close(true);
-			});
+    /**
+     * Sets up all the event handlers, such as closing and resizing.
+     *
+     * @method _events
+     * @private
+     */
+    _events: function _events() {
+        var that = this;
 
-			// attach hide event
-			this.sideframe.find('.cms_sideframe-hide').bind(this.click, function () {
-				if($(this).hasClass('cms_sideframe-hidden')) {
-					that.settings.sideframe.hidden = false;
-					that._show(that.settings.sideframe.position || that.options.sideframeWidth, true);
-				} else {
-					that.settings.sideframe.hidden = true;
-					that._hide();
-				}
-				that.settings = that.setSettings(that.settings);
-			});
+        // we need to set the history state on event creation
+        // to ensure we start with clean states in new instances
+        this.history = {
+            back: [],
+            forward: []
+        };
 
-			// attach maximize event
-			this.sideframe.find('.cms_sideframe-maximize').bind(this.click, function () {
-				if($(this).hasClass('cms_sideframe-minimize')) {
-					that.settings.sideframe.maximized = false;
-					that._minimize();
-				} else {
-					that.settings.sideframe.maximized = true;
-					that.settings.sideframe.hidden = false;
-					that._maximize();
-				}
-				that.settings = that.setSettings(that.settings);
-			});
+        this.ui.close.off(this.click).on(this.click, function () {
+            that.close();
+        });
 
-			this.sideframe.find('.cms_sideframe-resize').bind('mousedown', function (e) {
-				e.preventDefault();
-				that._startResize();
-			});
+        // close sideframe when clicking on the dimmer
+        this.ui.dimmer.off(this.click).on(this.click, function () {
+            that.close();
+        });
 
-			// stopper events
-			$(document).bind('mouseup.cms', function () {
-				that._stopResize();
-			});
-		},
+        // attach events to the back button
+        this.ui.historyBack.off(this.click).on(this.click, function () {
+            if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
+                return false;
+            }
+            that._goToHistory('back');
+        });
 
-		// public methods
-		open: function (url, animate) {
-			// prepare iframe
-			var that = this;
-			var language = 'language=' + CMS.config.request.language;
-			var page_id = 'page_id=' + CMS.config.request.page_id;
-			var holder = this.sideframe.find('.cms_sideframe-frame');
-			var initialized = false;
+        // attach events to the forward button
+        this.ui.historyForward.off(this.click).on(this.click, function () {
+            if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
+                return false;
+            }
+            that._goToHistory('forward');
+        });
+    },
 
-			// push required params if defined
-			// only apply params on tree view
-			if(url.indexOf(CMS.config.request.tree) >= 0) {
-				var params = [];
-				if(CMS.config.request.language) params.push(language);
-				if(CMS.config.request.page_id) params.push(page_id);
-				url = this._url(url, params);
-			}
+    /**
+     * Opens a given url within a sideframe.
+     *
+     * @method open
+     * @chainable
+     * @param {Object} opts
+     * @param {String} opts.url url to render iframe
+     * @param {Boolean} [opts.animate] should sideframe be animated
+     * @returns {Class} this
+     */
+    open: function open(opts) {
+        if (!(opts && opts.url)) {
+            throw new Error('The arguments passed to "open" were invalid.');
+        }
 
-			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
-				iframe.hide();
-			var width = this.settings.sideframe.position || this.options.sideframeWidth;
+        var url = opts.url;
+        var animate = opts.animate;
 
-			// attach load event to iframe
-			iframe.bind('load', function () {
-				var contents = iframe.contents();
+        // setup internals
+        var language = 'language=' + CMS.config.request.language;
+        var page_id = 'page_id=' + CMS.config.request.page_id;
+        var params = [];
 
-				// after iframe is loaded append css
-				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
-				// remove loader
-				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
-				// than show
-				iframe.show();
+        // We have to rebind events every time we open a sideframe
+        // because the event handlers contain references to the instance
+        // and since we reuse the same markup we need to update
+        // that instance reference every time.
+        this._events();
 
-				// add debug infos
-				if(that.config.debug) iframe.contents().find('body').addClass('cms_debug');
+        // show dimmer even before iframe is loaded
+        this.ui.dimmer.show();
+        this.ui.frame.addClass('cms-loader');
 
-				// save url in settings
-				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
-				that.settings = that.setSettings(that.settings);
+        // istanbul ignore else: always show loader
+        if (CMS.API && CMS.API.Toolbar) {
+            CMS.API.Toolbar.showLoader();
+        }
 
-				// bind extra events
-				contents.find('body').bind(that.click, function () {
-					$(document).trigger(that.click);
-				});
+        // we need to modify the url appropriately to pass
+        // language and page to the params
+        if (url.indexOf(CMS.config.request.tree) >= 0) {
+            if (CMS.config.request.language) {
+                params.push(language);
+            }
+            if (CMS.config.request.page_id) {
+                params.push(page_id);
+            }
+        }
 
-				// attach reload event
-				if(initialized) that.reloadBrowser(false, false, true);
-				initialized = true;
+        url = Helpers.makeURL(url, params);
 
-				// adding django hacks
-				contents.find('.viewsitelink').attr('target', '_top');
-			});
+        // load the iframe
+        this._content(url);
 
-			// cancel animation if sideframe is already shown
-			if(this.sideframe.is(':visible')) {
-				// sideframe is already open
-				insertHolder(iframe);
-				// reanimate the frame
-				if(this.sideframe.outerWidth() < width) {
-					// The user has performed an action that requires the
-					// sideframe to be shown, this intent outweighs any
-					// previous intent to minimize the frame.
-					this.settings.sideframe.hidden = false;
-					this._show(width, animate);
-				}
-			} else {
-				// load iframe after frame animation is done
-				setTimeout(function () {
-					insertHolder(iframe);
-				}, this.options.sideframeDuration);
-				// display the frame
-				this._show(width, animate);
-			}
+        // The user has performed an action that requires the
+        // sideframe to be shown, this intent outweighs any
+        // previous intent to minimize the frame.
+        CMS.settings.sideframe.hidden = false;
 
-			function insertHolder(iframe) {
-				// show iframe after animation
-				that.sideframe.find('.cms_sideframe-frame').addClass('cms_loader');
-				holder.html(iframe);
-			}
-		},
+        // show iframe
+        this._show(animate);
 
-		close: function () {
-			this._hide(true);
+        return this;
+    },
 
-			// remove url in settings
-			this.settings.sideframe = {
-				'url': null,
-				'hidden': false,
-				'maximized': false,
-				'width': this.options.sideframeWidth
-			};
+    /**
+     * Handles content replacement mechanisms.
+     *
+     * @method _content
+     * @private
+     * @param {String} url valid uri to pass on the iframe
+     */
+    _content: function _content(url) {
+        var that = this;
+        var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
+        var holder = this.ui.frame;
+        var contents;
+        var body;
+        var iOS = (/iPhone|iPod|iPad/).test(navigator.userAgent);
 
-			// resets
-			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').show();
+        // istanbul ignore next
+        /**
+         * On iOS iframes do not respect the size set in css or attributes, and
+         * is always matching the content. However, if you first load the page
+         * with one amount of content (small) and then from there you'd go to a page
+         * with lots of content (long, scroll requred) it won't be scrollable, because
+         * iframe would retain the size of previous page. When this happens we
+         * need to rerender the iframe (that's why we are animating the width here, so far
+         * that was the only reliable way). But after that if you try to scroll the iframe
+         * which height was just adjusted it will hide completely from the screen
+         * (this is an iOS glitch, the content would still be there and in fact it would
+         * be usable, but just not visible). To get rid of that we bring up the shim element
+         * up and down again and this fixes the glitch. (same shim we use for resizing the sideframe)
+         *
+         * It is not recommended to expose it and use it on other devices rather than iOS ones.
+         *
+         * @function forceRerenderOnIOS
+         * @private
+         */
+        function forceRerenderOnIOS() {
+            var w = that.ui.sideframe.width();
 
-			// update settings
-			this.settings = this.setSettings(this.settings);
+            that.ui.sideframe.animate({ width: w + 1 }, 0);
+            setTimeout(function () {
+                that.ui.sideframe.animate({ width: w }, 0);
+                // eslint-disable-next-line no-magic-numbers
+                that.ui.shim.css('z-index', 20);
+                setTimeout(function () {
+                    that.ui.shim.css('z-index', 1);
+                }, 0);
+            }, 0);
+        }
 
-			// handle refresh option
-			this.reloadBrowser(this.options.onClose, false, true);
-		},
+        // attach load event to iframe
+        iframe.hide().on('load', function () {
+            // check if iframe can be accessed
+            try {
+                iframe.contents();
+            } catch (error) {
+                CMS.API.Messages.open({
+                    message: '<strong>' + error + '</strong>',
+                    error: true
+                });
+                that.close();
+                return;
+            }
 
-		// private methods
-		_show: function (width, animate) {
-			// add class
-			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
-			
-			// make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
-			this.sideframe.show();
+            contents = iframe.contents();
+            body = contents.find('body');
 
-			// check if sideframe should be hidden
-			if(this.settings.sideframe.hidden) this._hide();
+            // inject css class
+            body.addClass('cms-admin cms-admin-sideframe');
 
-			// check if sideframe should be maximized
-			if(this.settings.sideframe.maximized) this._maximize();
+            // remove loader
+            that.ui.frame.removeClass('cms-loader');
+            // than show
+            iframe.show();
 
-			// otherwise do normal behaviour
-			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				if(animate) {
-					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
-					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
-				} else {
-					this.sideframe.animate({ 'width': width }, 0);
-					this.body.animate({ 'margin-left': width }, 0);
-					// reset width if larger than available space
-					if(width >= $(window).width()) {
-						this.sideframe.animate({ 'width': $(window).width() - 20 }, 0);
-						this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
-					}
-				}
-				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
-			}
+            // istanbul ignore if: force style recalculation on iOS
+            if (iOS) {
+                forceRerenderOnIOS();
+            }
 
-			// lock toolbar, set timeout to make sure CMS.API is ready
-			setTimeout(function () {
-				CMS.API.Toolbar._lock(true);
-				CMS.API.Toolbar._showToolbar(true);
-			}, 100);
-		},
+            // add debug infos
+            if (CMS.config.debug) {
+                body.addClass('cms-debug');
+            }
 
-		_hide: function (close) {
-			// add class
-			this.sideframe.find('.cms_sideframe-hide').addClass('cms_sideframe-hidden');
+            // save url in settings
+            CMS.settings.sideframe.url = iframe[0].contentWindow.location.href;
+            CMS.settings = Helpers.setSettings(CMS.settings);
 
-			var duration = this.options.sideframeDuration;
-			// remove the iframe
-			if(close && this.sideframe.width() <= 0) duration = 0;
-			if(close) this.sideframe.find('iframe').remove();
-			this.sideframe.animate({ 'width': 0 }, duration, function () {
-				if(close) $(this).hide();
-			});
-			this.body.animate({ 'margin-left': 0 }, duration);
-			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
+            // This essentially hides the toolbar dropdown when
+            // click happens inside of a sideframe iframe
+            contents.on(that.click, function () {
+                // using less specific namespace event because
+                // toolbar dropdowns closing handlers are attached to `click.cms.toolbar`
+                $(document).trigger('click.cms');
+            });
 
-			// lock toolbar, set timeout to make sure CMS.API is ready
-			setTimeout(function () {
-				CMS.API.Toolbar._lock(false);
-			}, 100);
-		},
+            // attach close event
+            body.on('keydown.cms', function (e) {
+                if (e.keyCode === KEYS.ESC) {
+                    that.close();
+                }
+            });
 
-		_minimize: function () {
-			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').show();
+            // adding django hacks
+            contents.find('.viewsitelink').attr('target', '_top');
 
-			// hide scrollbar
-			this.preventScroll(false);
+            // update history
+            that._addToHistory(this.contentWindow.location.href);
+        });
 
-			// reset to first state
-			this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
+        // clear the frame (removes all the handlers)
+        holder.empty();
+        // inject iframe
+        holder.html(iframe);
+    },
 
-			// remove event
-			$(window).unbind('resize.cms.sideframe');
-		},
+    /**
+     * Animation helper for opening the sideframe.
+     *
+     * @method _show
+     * @private
+     * @param {Number} [animate] Animation duration
+     */
+    _show: function _show(animate) {
+        var that = this;
+        var width = '95%';
 
-		_maximize: function () {
-			var that = this;
+        this.ui.sideframe.show();
 
-			this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').hide();
+        // otherwise do normal behaviour
+        if (animate) {
+            this.ui.sideframe.animate({
+                width: width,
+                overflow: 'visible'
+            }, this.options.sideframeDuration);
+        } else {
+            this.ui.sideframe.css('width', width);
+        }
 
-			// reset scrollbar
-			this.preventScroll(true);
+        // istanbul ignore else: always trigger API handlers
+        if (CMS.API && CMS.API.Toolbar) {
+            // FIXME: initialization needs to be done after our libs are loaded
+            CMS.API.Toolbar.open();
+            CMS.API.Toolbar.hideLoader();
+            CMS.API.Toolbar._lock(true);
+        }
 
-			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
-			// do custom animation
-			this.sideframe.animate({ 'width': $(window).width() }, 0);
-			this.body.animate({ 'margin-left': 0 }, 0);
-			// invert icon position
-			this.sideframe.find('.cms_sideframe-btn').css('right', -2);
-			// attach resize event
-			$(window).bind('resize.cms.sideframe', function () {
-				that.sideframe.css('width', $(window).width());
-			});
-		},
+        // add esc close event
+        this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
+            if (e.keyCode === KEYS.ESC) {
+                that.options.onClose = null;
+                that.close();
+            }
+        });
 
-		_startResize: function () {
-			var that = this;
-			var outerOffset = 20;
-			var timer = function () {};
-			// this prevents the iframe from being focusable
-			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
+        // disable scrolling for touch
+        this.ui.body.addClass('cms-prevent-scrolling');
+        Helpers.preventTouchScrolling($(document), 'sideframe');
+    },
 
-			$(document).bind('mousemove.cms', function (e) {
-				if(e.clientX <= 320) e.clientX = 320;
-				if(e.clientX >= $(window).width() - outerOffset) e.clientX = $(window).width() - outerOffset;
+    /**
+     * Closes the current instance.
+     *
+     * @method close
+     */
+    close: function close() {
+        // hide dimmer immediately
+        this.ui.dimmer.hide();
 
-				that.sideframe.css('width', e.clientX);
-				that.body.css('margin-left', e.clientX);
+        // update settings
+        CMS.settings.sideframe = {
+            url: null,
+            hidden: false
+        };
+        CMS.settings = Helpers.setSettings(CMS.settings);
 
-				// update settings
-				that.settings.sideframe.position = e.clientX;
+        // check for reloading
+        Helpers.reloadBrowser(this.options.onClose, false, true);
 
-				// save position
-				clearTimeout(timer);
-				timer = setTimeout(function () {
-					that.settings = that.setSettings(that.settings);
-				}, 500);
-			});
-		},
+        // trigger hide animation
+        this._hide({
+            duration: this.options.sideframeDuration / 2
+        });
+    },
 
-		_stopResize: function () {
-			this.sideframe.find('.cms_sideframe-shim').css('z-index', 1);
+    /**
+     * Animation helper for closing the iframe.
+     *
+     * @method _hide
+     * @private
+     * @param {Object} [opts]
+     * @param {Number} [opts.duration=this.options.sideframeDuration] animation duration
+     */
+    _hide: function _hide(opts) {
+        var duration = this.options.sideframeDuration;
 
-			$(document).unbind('mousemove.cms');
-		},
+        if (opts && typeof opts.duration === 'number') {
+            duration = opts.duration;
+        }
 
-		_url: function (url, params) {
-			var arr = [];
-			var keys = [];
-			var values = [];
-			var tmp = '';
-			var urlArray = [];
-			var urlParams = [];
-			var origin = url;
+        this.ui.sideframe.animate({ width: 0 }, duration, function () {
+            $(this).hide();
+        });
+        this.ui.frame.removeClass('cms-loader');
 
-			// return url if there is no param
-			if(!(url.split('?').length <= 1 || window.JSON === undefined)) {
-				// setup local vars
-				urlArray = url.split('?');
-				urlParams = urlArray[1].split('&');
-				origin = urlArray[0];
-			}
+        // istanbul ignore else
+        if (CMS.API && CMS.API.Toolbar) {
+            CMS.API.Toolbar._lock(false);
+        }
 
-			// loop through the available params
-			$.each(urlParams, function (index, param) {
-				arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
-			});
-			// loop through the new params
-			$.each(params, function (index, param) {
-				arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
-			});
+        this.ui.body.off('keydown.cms.close');
 
-			// merge manually because jquery...
-			$.each(arr, function (index, item) {
-				var i = $.inArray(item.param, keys);
+        // enable scrolling again
+        this.ui.body.removeClass('cms-prevent-scrolling');
+        Helpers.allowTouchScrolling($(document), 'sideframe');
+    },
 
-				if(i === -1) {
-					keys.push(item.param);
-					values.push(item.value);
-				} else {
-					values[i] = item.value;
-				}
-			});
+    /**
+     * Retrieves the history states from `this.history`.
+     *
+     * @method _goToHistory
+     * @private
+     * @param {String} type can be either `back` or `forward`
+     */
+    _goToHistory: function _goToHistory(type) {
+        var iframe = this.ui.frame.find('iframe');
+        var tmp;
 
-			// merge new url
-			$.each(keys, function (index, key) {
-				tmp += '&' + key + '=' + values[index];
-			});
-			tmp = tmp.replace('&', '?');
-			url = origin + tmp;
+        if (type === 'back') {
+            // remove latest entry (which is the current site)
+            this.history.forward.push(this.history.back.pop());
+            iframe.attr('src', this.history.back[this.history.back.length - 1]);
+        }
 
-			return url;
-		}
+        if (type === 'forward') {
+            tmp = this.history.forward.pop();
+            this.history.back.push(tmp);
+            iframe.attr('src', tmp);
+        }
 
-	});
+        this._updateHistoryButtons();
+    },
 
+    /**
+     * Stores the history states in `this.history`.
+     *
+     * @method _addToHistory
+     * @private
+     * @param {String} url url to be stored in `this.history.back`
+     */
+    _addToHistory: function _addToHistory(url) {
+        // we need to update history first
+        this.history.back.push(url);
+
+        // and then set local variables
+        var length = this.history.back.length;
+
+        // check for duplicates
+        if (this.history.back[length - 1] === this.history.back[length - 2]) {
+            this.history.back.pop();
+        }
+
+        this._updateHistoryButtons();
+    },
+
+    /**
+     * Sets the correct states for the history UI elements.
+     *
+     * @method _updateHistoryButtons
+     * @private
+     */
+    _updateHistoryButtons: function _updateHistoryButtons() {
+        if (this.history.back.length > 1) {
+            this.ui.historyBack.removeClass('cms-icon-disabled');
+        } else {
+            this.ui.historyBack.addClass('cms-icon-disabled');
+        }
+
+        if (this.history.forward.length >= 1) {
+            this.ui.historyForward.removeClass('cms-icon-disabled');
+        } else {
+            this.ui.historyForward.addClass('cms-icon-disabled');
+        }
+    }
 });
-})(CMS.$);
+
+module.exports = Sideframe;

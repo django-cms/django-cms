@@ -1,12 +1,15 @@
 import uuid
 
-from cms.utils.compat.dj import python_2_unicode_compatible
-from cms.utils.copy_plugins import copy_plugins_to
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+
 from cms.models.fields import PlaceholderField
+from cms.utils.copy_plugins import copy_plugins_to
 
 
 def static_slotname(instance):
@@ -47,7 +50,11 @@ class StaticPlaceholder(models.Model):
         unique_together = (('code', 'site'),)
 
     def __str__(self):
-        return self.name
+        return self.get_name()
+
+    def get_name(self):
+        return self.name or self.code or six.text_type(self.pk)
+    get_name.short_description = _(u'static placeholder name')
 
     def clean(self):
         # TODO: check for clashes if the random code is already taken
@@ -74,12 +81,11 @@ class StaticPlaceholder(models.Model):
         if request.user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        return request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
 
     def has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
+        return request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts)) and \
                request.user.has_perm(opts.app_label + '.' + 'publish_page')
-

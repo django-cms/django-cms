@@ -1,6 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('cms.test_utils.project.placeholderapp.views',
-    url(r'^detail/(?P<pk>[0-9]+)/$', 'detail_view_multi', name="detail_multi"),
-    url(r'^$', 'list_view_multi', name="list_multi"),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^detail/(?P<pk>[0-9]+)/$', views.detail_view_multi, name="detail_multi"),
+    url(r'^$', views.list_view_multi, name="list_multi"),
+]

@@ -1,12 +1,12 @@
 from cms.models.fields import PlaceholderField
-from cms.utils.compat.dj import python_2_unicode_compatible
 from django.core.urlresolvers import reverse
 from django.db import models
-from mptt.models import MPTTModel
+from django.utils.encoding import python_2_unicode_compatible
+from treebeard.mp_tree import MP_Node
 
 
 @python_2_unicode_compatible
-class Category(MPTTModel):
+class Category(MP_Node):
     parent = models.ForeignKey('self', blank=True, null=True)
     name = models.CharField(max_length=20)
     description = PlaceholderField('category_description', 600)

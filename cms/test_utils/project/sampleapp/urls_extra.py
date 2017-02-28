@@ -1,9 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-"""
-Also used in cms.tests.ApphooksTestCase
-"""
+from . import views
 
-urlpatterns = patterns('cms.test_utils.project.sampleapp.views',
-    url(r'extra_2/$', 'extra_view', {'message': 'test included urlconf'}, name='extra_second'),
-)
+urlpatterns = [
+    url(r'extra_2/$', views.extra_view, {'message': 'test included urlconf'}, name='extra_second'),
+]

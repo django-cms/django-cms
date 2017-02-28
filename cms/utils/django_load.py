@@ -7,12 +7,13 @@ ANY changes to this file, be it upstream fixes or changes for the cms *must* be
 documented clearly within this file with comments.
 
 For documentation on how to use the functions described in this file, please
-refer to http://django-load.readthedocs.org/en/latest/index.html.
+refer to https://django-load.readthedocs.io/en/latest/index.html.
 """
 import imp
 import traceback # changed
+from importlib import import_module
 
-from django.utils.importlib import import_module
+from django.utils.six.moves import filter, map
 
 from .compat.dj import installed_apps
 
@@ -25,7 +26,7 @@ def get_module(app, modname, verbose, failfast):
     # the module *should* exist - raise an error if it doesn't
     app_mod = import_module(app)
     try:
-        imp.find_module(modname, app_mod.__path__)
+        imp.find_module(modname, app_mod.__path__ if hasattr(app_mod, '__path__') else None)
     except ImportError:
         # this ImportError will be due to the module not existing
         # so here we can silently ignore it.  But an ImportError
@@ -65,10 +66,8 @@ def iterload(modname, verbose=False, failfast=False):
 
     If failfast is True, import errors will not be surpressed.
     """
-    for app in installed_apps():
-        module = get_module(app, modname, verbose, failfast)
-        if module:
-            yield module
+    return filter(None, (get_module(app, modname, verbose, failfast)
+                         for app in installed_apps()))
 
 def load_object(import_path):
     """
@@ -98,17 +97,13 @@ def iterload_objects(import_paths):
     """
     Load a list of objects.
     """
-    for import_path in import_paths:
-        yield load_object(import_path)
+    return map(load_object, import_paths)
 
 def get_subclasses(c):
     """
     Get all subclasses of a given class
     """
-    subclasses = c.__subclasses__()
-    for d in list(subclasses):
-        subclasses.extend(get_subclasses(d))
-    return subclasses
+    return c.__subclasses__() + sum(map(get_subclasses, c.__subclasses__()), [])
 
 def load_from_file(module_path):
     """

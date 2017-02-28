@@ -9,7 +9,7 @@ PAPER         =
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -n -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 .PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
 
@@ -25,6 +25,7 @@ help:
 	@echo "  changes   to make an overview of all changed/added/deprecated items"
 	@echo "  linkcheck to check all external links for integrity"
 	@echo "  doctest   to run all doctests embedded in the documentation (if enabled)"
+	@echo "  spelling  to check for typos in documentation"
 
 clean:
 	-rm -rf build/*
@@ -86,3 +87,30 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) build/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in build/doctest/output.txt."
+
+spelling:
+	. $(VENV); $(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) build/spelling
+	@echo
+	@echo "Check finished. Wrong words can be found in " \
+		"build/spelling/output.txt."
+
+################################################################################
+VENV = env/bin/activate
+PORT = 8001
+# CORE COMMANDS
+install:
+	@echo "... setting up virtualenv"
+	virtualenv env
+	. $(VENV); pip install -r requirements.txt
+	. $(VENV); sphinx-build . build/html
+	@echo "\n" \
+	      "-------------------------------------------------------------------------------------------------- \n" \
+		    "* watch, build and serve the documentation: make run \n" \
+		    "* check spelling: make spelling \n" \
+		    "\n" \
+				"enchant must be installed in order for pyenchant (and therefore spelling checks) to work. See \n" \
+				"http://docs.django-cms.org/en/latest/contributing/documentation.html#install-the-spelling-software \n" \
+	      "-------------------------------------------------------------------------------------------------- \n" \
+
+run:
+	. $(VENV); sphinx-autobuild $(ALLSPHINXOPTS) build/html --host 0.0.0.0 --port $(PORT)

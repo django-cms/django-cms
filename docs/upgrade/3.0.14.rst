@@ -1,0 +1,49 @@
+.. _upgrade-to-3.0.14:
+
+####################
+3.0.14 release notes
+####################
+
+********************
+What's new in 3.0.14
+********************
+
+Bug Fixes
+=========
+
+* Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability.
+* Fix issue with causes menu classes to be duplicated in advanced settings
+* Fix issue with breadcrumbs not showing
+* Fix issues with show_menu template tags
+* Minor documentation fixes
+* Fix an issue related to "Empty all" Placeholder feature
+* Fix plugin sorting in Python 3
+* Fix search results number and items alignment in page changelist
+* Preserve information regarding the current view when applying the CMS decorator
+* Fix X-Frame-Options on top-level pages
+* Fix order of which application URLs are injected into ``urlpatterns``
+* Fix delete non existing page language
+* Fix language fallback for nested plugins
+* Fix render_model template tag doesn't show correct change list
+* Fix Scanning for placeholders fails on include tags with a variable as an argument
+* Pin South version to 1.0.2
+* Pin html5lib version to 0.999 until a current bug is fixed
+* Fix language chooser template
+
+
+Potentially backward incompatible changes
+==========================================
+
+The order in which the applications are injected is now based on the page depth, if you
+use nested apphooks, you might want to check that this does not change the behaviour
+of your applications depending on applications urlconf greediness.
+
+
+Thanks
+======
+
+Many thanks community members who have submitted issue reports and especially to
+these GitHub users who have also submitted pull requests: douwevandermeij, furiousdave,
+nikolas, olarcheveque, sephii, vstoykov.
+
+A special thank to Matt Wilkes and Sylvain Fankhauser for reporting the security issue.

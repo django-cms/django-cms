@@ -1,0 +1,95 @@
+//##############################################################################
+// PLUGIN PICKER
+
+// Add plugins modal
+.cms-plugin-picker {
+    display: none;
+
+    .cms-submenu-item.cms-submenu-item-title {
+        // only works in FF/iOS for the moment
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: $white;
+    }
+    .cms-submenu-item a,
+    span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: $submenu-item-font-size;
+        line-height: $submenu-item-height + 6px;
+        text-align: left;
+        min-height: $submenu-item-height + 6px;
+        padding: 0 $submenu-item-padding-horizontal;
+    }
+
+    .cms-submenu-item a {
+        color: $black;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+        &:hover {
+            color: $color-primary;
+            border-top: 1px solid $color-primary;
+            border-bottom: 1px solid $color-primary;
+        }
+        &:focus {
+            color: $submenu-item-hover-color;
+            background: $color-primary;
+            border-top: 1px solid $color-primary;
+            border-bottom: 1px solid $color-primary;
+        }
+    }
+    .cms-submenu-item span {
+        color: $black;
+        font-weight: bold;
+        border-bottom: 1px solid $gray-lighter;
+        cursor: default;
+    }
+}
+
+.cms-modal-markup .cms-plugin-picker {
+    display: block;
+}
+
+.cms-quicksearch {
+    display: none;
+    position: relative;
+    height: $quicksearch-height;
+    border-bottom: 1px solid $gray-lighter;
+    cursor: default;
+}
+.cms-quicksearch label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+.cms-quicksearch input {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0 $padding-large;
+    border: none;
+    background-color: $gray-lightest;
+    // has to be -webkit, otherwise autoprefixer
+    // won't add it and radius will not be reset on iOS
+    -webkit-border-radius: 0;
+    appearance: none;
+}
+
+.cms-modal-markup .cms-quicksearch {
+    display: block;
+}
+
+.cms-add-plugin-placeholder {
+    position: relative;
+    z-index: z(structure, content, empty, addplugin);
+    color: $color-primary;
+    line-height: 44px;
+    padding-left: 20px;
+    border: 2px solid $color-primary;
+    border-radius: $border-radius-base;
+    background-color: mix(white, $color-primary, 90%);
+}

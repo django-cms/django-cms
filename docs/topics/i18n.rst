@@ -1,0 +1,139 @@
+####################
+Internationalisation
+####################
+
+
+*****************
+Multilingual URLs
+*****************
+
+If you use more than one language, django CMS urls, *including the admin URLS*, need to be
+referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see
+the official `Django documentation
+<https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns>`_
+on the subject.
+
+Here's an example of `urls.py`::
+
+    from django.conf import settings
+    from django.conf.urls import include, url
+    from django.contrib import admin
+    from django.conf.urls.i18n import i18n_patterns
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+    admin.autodiscover()
+
+    urlpatterns = [
+        url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
+    ]
+
+    urlpatterns += staticfiles_urlpatterns()
+
+    # note the django CMS URLs included via i18n_patterns
+    urlpatterns += i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^', include('cms.urls')),
+    )
+
+
+.. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
+
+***************
+Language Cookie
+***************
+
+If a user comes back to a previously visited page, the language will be same since his last visit.
+
+By default if someone visits a page at `http://www.mysite.fr/` django determines the language as follow:
+
+- language in URL
+- language in session
+- language in cookie
+- language in from browser
+- LANGUAGE_CODE from settings
+
+More in-depth documentation about this is available at
+https://docs.djangoproject.com/en/dev/topics/i18n/translation/#how-django-discovers-language-preference
+
+When visiting a page that is only English and French with a German browser, the language from LANGUAGE_CODE will be used.
+If this is English, but the visitor only speaks French, the visitor will have to switch the language.
+Visiting the same page now again after some time, will show it in English again, because the browser session which was
+used to store the language selection doesn't exist any more. To prevent this issue, a middleware exists which stores the
+language selection in a cookie. Add the following middleware to `MIDDLEWARE_CLASSES`:
+
+    `cms.middleware.language.LanguageCookieMiddleware`
+
+****************
+Language Chooser
+****************
+
+The :ttag:`language_chooser` template tag will display a language chooser for the
+current page. You can modify the template in ``menu/language_chooser.html`` or
+provide your own template if necessary.
+
+Example:
+
+.. code-block:: html+django
+
+    {% load menu_tags %}
+    {% language_chooser "myapp/language_chooser.html" %}
+
+
+
+If you are in an apphook and have a detail view of an object you can
+set an object to the toolbar in your view. The cms will call ``get_absolute_url`` in
+the corresponding language for the language chooser:
+
+Example:
+
+.. code-block:: html+django
+
+    class AnswerView(DetailView):
+        def get(self, *args, **kwargs):
+            self.object = self.get_object()
+            if hasattr(self.request, 'toolbar'):
+                self.request.toolbar.set_object(self.object)
+            response = super(AnswerView, self).get(*args, **kwargs)
+            return response
+
+
+With this you can more easily control what url will be returned on the language chooser.
+
+.. note::
+
+    If you have a multilingual objects be sure that you return the right url if you don't have
+    a translation for this language in ``get_absolute_url``
+
+*****************
+page_language_url
+*****************
+
+This template tag returns the URL of the current page in another language.
+
+Example:
+
+.. code-block:: html+django
+
+    {% page_language_url "de" %}
+
+
+*****************
+hide_untranslated
+*****************
+
+If you add a default directive to your :setting:`CMS_LANGUAGES` with a :setting:`hide_untranslated` to ``False``
+all pages will be displayed in all languages even if they are
+not translated yet.
+
+If `hide_untranslated`  is ``True`` in your :setting:`CMS_LANGUAGES`
+and you are on a page that doesn't yet have an English translation and you view
+the German version then the language chooser will redirect to ``/``. The same
+goes for urls that are not handled by the cms and display a language chooser.
+
+********************************************
+Automated slug generation Unicode characters
+********************************************
+
+If your site has languages which use non-ASCII character sets, you might want
+to enable :setting:`CMS_UNIHANDECODE_HOST` and :setting:`CMS_UNIHANDECODE_VERSION`
+to get automated slugs for those languages too.

@@ -1,0 +1,25 @@
+.. _upgrade-to-3.0.10:
+
+####################
+3.0.10 release notes
+####################
+
+********************
+What's new in 3.0.10
+********************
+
+* Improved Python 3 compatibility
+* Improved the behaviour when changing the operator's language
+* Numerous documentation updates
+
+Bug Fixes
+=========
+
+* Revert a change that caused an issue with saving plugins in some browsers
+* Fix an issue where URLs were not refreshed when a page slug changes
+* Fix an issue with FR translations
+* Fixed an issue preventing the correct rendering of custom contextual menu items for plugins
+* Fixed an issue relating to recovering deleted pages
+* Fixed an issue that caused the uncached placeholder tag to display cached content
+* Fixed an issue where extra slashed would appear in apphooked URLs when APPEND_SLASH=False
+* Fixed issues relating to the logout function

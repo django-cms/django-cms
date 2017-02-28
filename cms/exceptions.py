@@ -21,6 +21,7 @@ class AppAlreadyRegistered(Exception):
 class ToolbarAlreadyRegistered(Exception):
     pass
 
+
 class ToolbarNotRegistered(Exception):
     pass
 
@@ -47,7 +48,7 @@ class PermissionsException(Exception):
 
 
 class NoPermissionsException(PermissionsException):
-    """Can be fired when some violate action is performed on permission system. 
+    """Can be fired when some violate action is performed on permission system.
     """
 
 
@@ -81,4 +82,3 @@ class PluginConsistencyError(Exception): pass
 
 
 class PlaceholderNotFound(Exception): pass
-

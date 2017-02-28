@@ -1,125 +1,245 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_static admin_list cms_admin cms_js_tags %}
+{% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags cms_static cms_tags %}
 
+{# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
-{% block bodyclass %}change-list{% endblock %}
-
-{% if not is_popup %}{% block breadcrumbs %}
-<div class="breadcrumbs">
-	<a href="../../">{% trans "Home" %}</a> &rsaquo;
-	<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
-    {% if request.REQUEST.q %}
-    &rsaquo; {% trans "Search" %}
-    {% endif %}
-</div>
-{% endblock %}{% endif %}
-
+{% block bodyclass %}{{ block.super }} change-list cms-pagetree-wrapper{% endblock %}
 {% block coltype %}flex{% endblock %}
-{% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />
-<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" />
-<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" />
-{% if cl.is_filtered %}
-<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" />
-{% endif %}
-{% endblock extrastyle %}
+{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+{% block pagination %}{% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
-{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}"></script>{% endblock jquery %}
-<script src="{% static "cms/js/libs/class.min.js" %}"></script>
-<!-- load jstree -->
-<script src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
-<script src="{% static "cms/js/jstree/tree_component.js" %}"></script>
-<!-- load changelist -->
-<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}"></script>
-<script src="{% static "cms/js/modules/cms.base.js" %}"></script>
-<script src="{% static "cms/js/modules/cms.changelist.js" %}"></script>
-<script>
-(function($) {
-// CMS.$ will be passed for $
-$(document).ready(function () {
-	// bind csrf token to the header
-	CMS.API.Helpers.csrf('{{ csrf_token }}');
-
-	// initialize tree
-	new CMS.TreeManager({
-		'settings': {
-			'permission': {{ CMS_PERMISSION|js }},
-			'debug': {{ DEBUG|js }},
-			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
-		},
-		'lang': {
-			'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
-			'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
-			'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
-			'publish': '{% filter escapejs %}{% trans "Are you sure you want to %s this page?" %}{% endfilter %}'
-		}
-	});
-});
-})(CMS.$);
-</script>
+    {{ block.super }}
+    {# INFO: we need to add styles here instead of "extrastyle" to avoid conflicts with adminstyle #}
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}">
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.pagetree.css' %}">
+    <script src="{% static_with_version 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
+    <script src="{% static_with_version 'cms/js/dist/bundle.admin.pagetree.min.js' %}"></script>
 {% endblock extrahead %}
 
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs cms-pagetree-breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+            <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
+            {{ opts.verbose_name_plural|capfirst|escape }}
+            {# TODO might remove this or add reset #}
+            {% if request.GET.q or request.POST.q %}
+            &rsaquo; {% trans "Search" %}
+            {% endif %}
+        </div>
+    {% endblock %}
+{% endif %}
+
+{% block content_title %}{% endblock %}
+
 {% block content %}
+    {% spaceless %}
+    <div id="content-main">
+        <div class="cms-pagetree-root module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+            <div class="cms-pagetree cms-pagetree-header">
+                <div class="cms-pagetree-header-cell cms-pagetree-header-cell-fluid">
+                    <div class="cms-pagetree-header-row cms-pagetree-search-container">
+                        <div class="cms-pagetree-header-cell">
+                            <div class="cms-pagetree-header-title">
+                                <h1>
+                                    {% trans "Page Tree" %} <span>({{ cl.current_site.name }})</span>
+                                </h1>
+                            </div>
 
-<div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
+                            {% if cl.is_filtered or request.GET.q %}
+                                {# INFO: show reset button when filtering is active #}
+                                <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-cell cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
+                            {% endif %}
+                        </div>
+                        <div class="cms-pagetree-header-cell cms-pagetree-header-cell-search">
+                            {# INFO: visible search field with filtering #}
+                            <form method="get" class="cms-pagetree-header-search js-cms-pagetree-header-search">
+                                <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
+                                <div class="cms-pagetree-header-filter">
+                                    <input type="text" size="40" name="q" id="field-searchbar" value="{{ request.GET.q }}" placeholder="{% trans "Search" %}">
+                                    {% if cl.has_filters %}
+                                        <div class="cms-pagetree-header-filter-trigger js-cms-pagetree-header-filter-trigger">
+                                            <a href="#"><span class="cms-icon cms-icon-arrow"></span></a>
+                                        </div>
+                                        <div class="cms-pagetree-header-filter-container js-cms-pagetree-header-filter-container">
+                                            {% for spec in cl.filter_specs %}
+                                                {% clean_admin_list_filter cl spec %}
+                                            {% endfor %}
+                                            <a href="#" class="cms-pagetree-header-search-close js-cms-pagetree-header-search-close">
+                                                <span class="cms-icon cms-icon-close"></span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="cms-pagetree-header-search-btn">
+                                    <span class="cms-icon cms-icon-search"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
-{% block object-tools %}
+                <div class="cms-pagetree-header-cell cms-pagetree-header-body">
+                    {# INFO: hidden search field with dynamic content #}
+                    <div class="js-cms-pagetree-header-search-copy cms-hidden">
+                        {% search_form cl %}
+                    </div>
+                    <div class="cms-clear-mobile"></div>
 
-	<ul class="object-tools">
-		{% if has_recover_permission %}
-			<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
-		{% endif %}
-		{% if has_add_permission %}
-		<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
-		{% endif %}
-	</ul>
+                    {# INFO: dropdown for changing sites and recover deleted pages #}
+                    <div class="cms-pagetree-sites-list cms-pagetree-dropdown js-cms-pagetree-dropdown">
+                        <a href="#" class="cms-pagetree-dropdown-trigger js-cms-pagetree-dropdown-trigger">
+                            <span class="cms-icon cms-icon-squares"></span>
+                        </a>
+                        <div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-condensed cms-pagetree-dropdown-menu-arrow-top-right js-cms-pagetree-dropdown-menu">
+                            <ul class="cms-pagetree-dropdown-menu-inner">
+                                <li>
+                                    <span class="label">{% trans "Sites" %}</span>
+                                </li>
+                                {% for site in cl.sites %}
+                                    <li{% if site.pk == cl.current_site.pk %} class="active"{% endif %}>
+                                        <a href="#{{ site.pk }}" class="js-cms-pagetree-site-trigger" data-id="{{ site.pk }}">{{ site.name }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% if has_recover_permission %}
+                                    <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
+                                    <li>
+                                        <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
+                                            {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
+                                                Restore deleted {{ name }}
+                                            {% endblocktrans %}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {# INFO: hidden site form when using the dropdown site switcher #}
+                        <form method="post" class="js-cms-pagetree-site-form cms-hidden">
+                            <select name="site__exact">
+                                {% for site in cl.sites %}
+                                    <option value="{{ site.pk }}">{{ site.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% csrf_token %}
+                        </form>
+                    </div>
 
-	<div id="loader-message">{% trans "Loading..." %}</div>
+                    {# INFO: "new page" button #}
+                    {% if has_add_permission %}
+                        <a href="{% url opts|admin_urlname:'add' %}" class="cms-pagetree-header-create cms-btn cms-btn-toolbar cms-btn-action">
+                            {% blocktrans with cl.opts.verbose_name|title as name %}
+                                New {{ name }}
+                            {% endblocktrans %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
 
-{% endblock %}
-<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-{% block search %}
+            <div class="clear"></div>
 
-<form action="." method="post">
-{% if cl.has_access_to_multiple_sites %}
-	<div id="site-selector">{% trans "Pages on:" %}
-		<select id="site-select" name="site__exact">
-			{% for site in cl.sites %}
-			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>
-			{% endfor %}
-		</select>
-		<input type="hidden" id="site-copy" name="copy" />
-		{% csrf_token %}
-	</div>
-{% else %}
-	<input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
-{% endif %}
-</form>
+            <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+                <div class="cms-pagetree cms-pagetree-section">
+                    <h2>{% trans "Main Navigation" %}</h2>
+                    <div class="cms-pagetree-section-nav">
+                        {% if has_add_permission %}
+                            <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
+                                <a href="#root" data-id="#root" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                                    <span class="sr-only">{% trans "Options" %}</span>
+                                </a>
 
-{% search_form cl %}
-{% endblock %}
-{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+                                <div class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
+                                    <ul class="cms-pagetree-dropdown-menu-inner">
+                                        <li>
+                                            <a href="#" data-id="#root" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
+                                                <span class="cms-icon cms-icon-alias"></span>
+                                                <span>{% trans "Paste" %}</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
 
-{% block filters %}
-{% if cl.has_filters %}
-<a href="#" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
-<div id="changelist-filter" style="display:none;">
-<h2>{% trans 'Filter' %}</h2>
-{% for spec in cl.filter_specs %}
-	{% clean_admin_list_filter cl spec %}
-{% endfor %}
-</div>
-{% endif %}
-{% endblock %}
+                {# INFO: javascript is loaded from cms.pagetree.js #}
+                {% if cl.items %}
+                    <div class="cms-pagetree cms-pagetree-container">
+                        <div class="cms-pagetree-jstree js-cms-pagetree" data-json='{
+                            "urls": {
+                                "tree": "{% url 'admin:get_tree' %}",
+                                "move": "./{id}/move-page/",
+                                "copy": "./{id}/copy-page/",
+                                "copyPermission": "./{id}/dialog/copy/",
+                                "theme": "{% static 'cms/css/' %}"
+                            },
+                            "csrf": "{{ csrf_token }}",
+                            "static": "{{ STATIC_URL }}",
+                            "permission": {{ CMS_PERMISSION|bool }},
+                            "debug": {{ DEBUG|bool }},
+                            "filtered": {% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %},
+                            "site": {{ cl.current_site.pk }},
+                            "hasAddRootPermission": {{ has_add_permission|yesno:"true,false" }},
+                            "lang": {
+                                "code": "{{ preview_language|lower }}",
+                                "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
+                                "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
+                                "error": "{% filter escapejs %}{% trans "Error:" %}{% endfilter %}",
+                                "apphook": "{% filter escapejs %}{% trans "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks." %}{% endfilter %}",
+                                "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
+                                "reload": "{% trans "Reload" %}",
+                                "loading": "{% trans "Loading..." %}",
+                                "newNode": "{% trans 'New node' %}",
+                                "nodes": "{% trans 'nodes' %}"
+                            },
+                            "columns": [{
+                                "title": "&nbsp;",
+                                "key": "",
+                                "width": "100%"
+                            }, {
+                                "title": "&nbsp;",
+                                "key": "view",
+                                "cls": "jstree-grid-cell-regular-options"
+                            }, {
+                                "title": "{{ _('View')|escapejs }}",
+                                "key": "preview"
+                            }, {% for lang in site_languages %}{
+                                "title": "<a href=\"{% url 'admin:cms_page_changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
+                                "key": "{{ lang }}"
+                            }, {% endfor %} {
+                                "title": "{{ _('Menu')|escapejs }}",
+                                "key": "menu"
+                            }, {
+                                "title": "&nbsp;",
+                                "key": "options"
+                            }]
+                        }' data-settings-url="{% cms_admin_url "cms_usersettings_session_store" %}">
+                            <ul>
+                                {% if cl.is_filtered or request.GET.q %}
+                                    {# INFO: load html data source when filtering #}
+                                    {% show_admin_menu_for_pages cl.items %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% include "admin/cms/page/tree/legend.html" %}
+                {% else %}
+                    {# INFO: show add a page button when there are no items #}
+                    <div class="cms-pagetree cms-pagetree-empty">
+                        {% url opts|admin_urlname:'add' as add_url %}
+                        {% blocktrans %}
+                            <em>There is no page around yet.</em>
+                            <br>
+                            <a href="{{ add_url }}" class="addlink">Add page</a> now.
+                        {% endblocktrans %}
+                    </div>
+                {% endif %}
+            </form>
 
-{% include "admin/cms/page/tree/base_header.html" %}
-
-</div>
-</div>
-
-<div id="dialogs"></div>
-
-{% endblock %}
+            {# INFO: used when copying nodes #}
+            <div class="cms-tree-dialog js-cms-tree-dialog"></div>
+        </div>
+    </div>
+    {% endspaceless %}
+{% endblock content %}

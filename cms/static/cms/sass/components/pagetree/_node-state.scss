@@ -1,0 +1,44 @@
+.cms-pagetree-node-state {
+    box-sizing: border-box;
+    display: inline-block;
+    width: $pagetree-lang-size;
+    height: $pagetree-lang-size;
+    border-radius: 100%;
+    // will change according to states
+    border: 2px solid $white;
+    background: $white;
+    vertical-align: top;
+}
+.cms-pagetree-node-state {
+    &-empty {
+        border-color: $gray-light;
+        background-color: $white;
+    }
+    &-unpublished,
+    &-unpublished-parent {
+        border-color: $gray-light;
+        background-color: $gray-light;
+    }
+    &-published {
+        border-color: $color-success;
+        background-color: $color-success;
+    }
+    &-dirty {
+        animation: pulsate 2.5s ease-out infinite;
+        border-color: $color-primary;
+        background-color: $color-primary;
+    }
+}
+
+// animation for publishing
+@keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}

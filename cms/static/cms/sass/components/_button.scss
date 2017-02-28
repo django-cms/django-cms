@@ -1,0 +1,14 @@
+//##############################################################################
+// BUTTONS
+$pagetree: false !default;
+
+.cms-btn {
+    @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, $pagetree);
+}
+
+.cms-btn-action {
+    @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, $pagetree);
+}
+.cms-btn-caution {
+    @include button-variant($btn-caution-color, $btn-caution-bgcolor, $btn-caution-border, $pagetree);
+}

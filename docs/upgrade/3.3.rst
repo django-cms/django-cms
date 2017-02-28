@@ -1,0 +1,155 @@
+.. _upgrade-to-3.3:
+
+#################
+3.3 release notes
+#################
+
+django CMS 3.3 has been planned largely as a consolidation release, to build on the progress made
+in 3.2 and pave the way for the future ones.
+
+The largest major change is dropped support for Django 1.6 and 1.7, and Python 2.6 followed
+by major code cleanup to remove compatibility shims.
+
+.. _whats_new_3.3:
+
+*****************
+What's new in 3.3
+*****************
+
+* Removed support for Django 1.6, 1.7 and python 2.6
+* Changed the default value of CMSPlugin.position to 0 instead of null
+* Refactored the language menu to allow for better integration with many languages
+* Refactored management commands completely for better consistency
+* Fixed "failed to load resource" for favicon on welcome screen
+* Changed behaviour of toolbar CSS classes: ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding`` and ``cms-toolbar-collapsing`` classes
+  are added at the beginning of their respective animations.
+* Added unit tests for CMS JavaScript files
+* Added frontend integration tests (written with Casper JS)
+* Removed frontend integration tests (written with Selenium)
+* Added the ability to declare cache expiration periods on a per-plugin basis
+* Improved UI of page tree
+* Improved UI in various minor ways
+* Added a new setting CMS_INTERNAL_IPS for defining a set of IP addresses for which
+  the toolbar will appear for authorized users. If left unset, retains the
+  existing behavior of allowing toolbar for authorized users at any IP address.
+* Changed behaviour of sideframe; is no longer resizable, opens to 90% of the screen or 100% on
+  small screens.
+* Removed some unnecessary reloads after closing sideframe.
+* Added the ability to make pagetree actions work on currently picked language
+* Removed deprecated CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE setting
+* Introduced the method ``get_cache_expiration`` on CMSPluginBase to be used
+  by plugins for declaring their rendered content's period of validity.
+* Introduced the method ``get_vary_cache_on`` on CMSPluginBase to be used
+  by plugins for declaring ``VARY`` headers.
+* Improved performance of plugin moving; no longer saves all plugins inside the placeholder.
+* Fixed breadcrumbs of recently moved plugin reflecting previous position in
+  the tree
+* Refactored plugin adding logic to no longer create the plugin before the user submits the form.
+* Improved the behaviour of the placeholder cache
+* Improved fix-tree command to sort by position and path when rebuilding positions.
+* Fixed several regressions and tree corruptions on page move.
+* Added new class method on CMSPlugin ``requires_parent_plugin``
+* Fixed behaviour of ``get_child_classes``; now correctly calculates child classes when not
+  configured in the placeholder.
+* Removed internal ``ExtraMenuItems`` tag.
+* Removed internal ``PluginChildClasses`` tag.
+* Modified RenderPlugin tag; no longer renders the ``content.html`` template
+  and instead just returns the results.
+* Added a ``get_cached_template`` method to the ``Toolbar()`` main class to reuse loaded templates per request. It
+  works like Django's cached template loader, but on a request basis.
+* Added a new method ``get_urls()`` on the appbase class to get CMSApp.urls, to allow passing a page object to it.
+* Changed JavaScript linting from JSHint and JSCS to ESLint
+* Fixed a bug when it was possible to drag plugin into clipboard
+* Fixed a bug where clearing clipboard was closing any open modal
+* Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
+* Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
+* Deprecated the old-style wizard-related settings
+* Improved documentation further
+* Improved handling of uninstalled apphooks
+* Fixed toolbar placement when foundation is installed
+* Fixed an issue which could lead to an apphook without a slug
+* Fixed numerous frontend issues
+* Added contribution policies documentation
+* Corrected an issue where someone could see and use the internal placeholder plugin in the structure board
+* Fixed a regression where the first page created was not automatically published
+* Corrected the instructions for using the ``delete-orphaned-plugins`` command
+* Re-pinned django-treebeard to >=4.0.1
+
+.. _backward_incompatible_3.3:
+
+****************
+Upgrading to 3.3
+****************
+
+A database migration is required because the default value of CMSPlugin.position was set to 0 instead of null.
+
+Please make sure that your current database is consistent and in a healthy state,
+and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate
+    python manage.py cms fix-tree
+
+
+Deprecation of Old-Style Page Wizard Settings
+=============================================
+
+In this release, we introduce a new naming scheme for the Page Wizard settings
+that better reflects that they effect the CMS's Page Wizards, rather than all
+wizards. This will also allow future settings for different wizards with a
+smaller chance of confusion or naming-collision.
+
+This release simultaneously deprecates the old naming scheme for these settings.
+Support for the old naming scheme will be dropped in version 3.5.0.
+
+Action Required
+---------------
+
+Developers using any of the following settings in their projects should rename
+them as follows at their earliest convenience. ::
+
+    CMS_WIZARD_DEFAULT_TEMPLATE => CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+    CMS_WIZARD_CONTENT_PLUGIN => CMS_PAGE_WIZARD_CONTENT_PLUGIN
+    CMS_WIZARD_CONTENT_PLUGIN_BODY => CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+    CMS_WIZARD_CONTENT_PLACEHOLDER => CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+
+The CMS will accept both-schemes until 3.5.0 when support for the old scheme
+will be dropped. During this transition period, the CMS prefers the new-style
+naming if both schemes are used in a project's settings.
+
+
+*****************************
+Backward incompatible changes
+*****************************
+
+Management commands
+===================
+
+Management commands uses now argparse instead of optparse, following the Django deprecation
+of the latter API.
+
+The commands behaviour has remained untouched.
+
+Detailed changes:
+
+ * commands now use argparse subcommand API which leads to slightly different help output
+   and other internal differences. If you use the commands by using Django's ``call_command``
+   function you will have to adapt the command invocation to reflect this.
+ * some commands have been rename replacing underscores with hyphens for consistency
+ * all arguments are now non-positional. If you use the commands by using Django's
+   ``call_command`` function you will have to adapt the command invocation to reflect this.
+
+
+Signature changes
+=================
+
+The signatures of the toolbar methods ``get_or_create_menu`` have a new kwarg
+``disabled`` *inserted* (not appended). This was done to maintain consistency with
+other, existing toolbar methods. The signatures are now:
+
+ * ``cms.toolbar.items.Menu.get_or_create_menu(key, verbose_name, disabled=False, side=LEFT, position=None)``
+ * ``cms.toolbar.toolbar.CMSToolbar.get_or_create_menu(key, verbose_name=None, disabled=False, side=LEFT, position=None)``
+
+It should only affect developers who use kwargs as positional args.

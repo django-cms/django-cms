@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import six
-from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms.fields import EMPTY_VALUES
-from cms.models.pagemodel import Page
-from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
+from django.utils.translation import ugettext_lazy as _
+
 from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
+from cms.models.pagemodel import Page
 
 
 class SuperLazyIterator(object):
@@ -32,12 +33,14 @@ class PageSelectFormField(forms.MultiValueField):
     }
 
     def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
-                 required=True, widget=None, to_field_name=None, *args, **kwargs):
+                 required=True, widget=None, to_field_name=None, limit_choices_to=None,
+                  *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
         site_choices = SuperLazyIterator(get_site_choices)
         page_choices = SuperLazyIterator(get_page_choices)
+        self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
         fields = (
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
@@ -56,6 +59,22 @@ class PageSelectFormField(forms.MultiValueField):
             return Page.objects.get(pk=page_id)
         return None
 
+    def has_changed(self, initial, data):
+        is_empty = data and (len(data) >= 2 and data[1] in [None, ''])
+
+        if isinstance(self.widget, RelatedFieldWidgetWrapper):
+            self.widget.decompress = self.widget.widget.decompress
+
+        if is_empty and initial is None:
+            # when empty data will have [u'1', u'', u''] as value
+            # this will cause django to always return True because of the '1'
+            # so we simply follow django's default behavior when initial is None and data is "empty"
+            data = ['' for x in range(0, len(data))]
+        return super(PageSelectFormField, self).has_changed(initial, data)
+
+    def _has_changed(self, initial, data):
+        return self.has_changed(initial, data)
+
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget
 
@@ -68,5 +87,5 @@ class PageSmartLinkField(forms.CharField):
 
     def widget_attrs(self, widget):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)
-        attrs.update({'placeholder_text': six.text_type(self.placeholder_text)})
+        attrs.update({'placeholder_text': self.placeholder_text})
         return attrs

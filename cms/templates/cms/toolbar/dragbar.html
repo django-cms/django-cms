@@ -1,26 +1,34 @@
 {% load i18n l10n cms_tags %}
-{% load url from future %}
 
-<div class="cms_dragbar cms_dragbar-{{ placeholder.pk|unlocalize }}">
-	{% language request.toolbar.toolbar_language %}
-	<div class="cms_submenu">
-		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
-		<div class="cms_submenu-dropdown">
-			<div class="cms_submenu-item cms_submenu-item-title"><span>{% trans "Settings" %}</span></div>
-			<div class="cms_submenu-item"><a data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
-			{% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
-				<div class="cms_submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
-			{% endif %}{% endfor %}
-			<div class="cms_submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
-            {% extra_menu_items placeholder %}
-			{% plugin_child_classes placeholder %}
-		</div>
-	</div>
-	{% endlanguage %}
+<div class="cms-dragbar cms-dragbar-{{ placeholder.pk|unlocalize }}">
+    {% language request.toolbar.toolbar_language %}
+    <div class="cms-submenu-btn cms-submenu-add cms-btn">
+        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
+    </div>
+    <div class="cms-submenu-settings cms-submenu-btn cms-btn"></div>
+    <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
+        <div class="cms-dropdown-inner">
+            <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
+            {% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
+                <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
+            {% endif %}{% endfor %}
+            <div class="cms-submenu-item"><a data-cms-icon="paste" data-rel="paste" href="#">{% trans "Paste" %}</a></div>
+            <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+            {% render_extra_menu_items placeholder %}
+        </div>
+    </div>
+    <div class="cms-plugin-picker" data-touch-action="pan-y">
+        <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
+        {# plugin child classes here #}
+    </div>
+    {% endlanguage %}
 
-	<div class="cms_dragbar-title">{{ placeholder.get_label }}</div>
-</div>
-
-<div class="cms_dragbar-empty-wrapper">
-	<div class="cms_droppable cms_dragbar-empty">{% trans "Drop a plugin here" %}</div>
+    <div class="cms-dragbar-title">
+        {{ placeholder.get_label }}
+        {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{% trans 'This is a static placeholder' %}"><span class="cms-icon cms-icon-pin cms-dragarea-static-icon"></span></span>{% endif %}
+        <span class="cms-dragbar-toggler">
+            <a href="#" class="cms-dragbar-expand-all" tabindex="-1">{% trans "Expand all" %}</a>
+            <a href="#" class="cms-dragbar-collapse-all" tabindex="-1">{% trans "Collapse all" %}</a>
+        </span>
+    </div>
 </div>

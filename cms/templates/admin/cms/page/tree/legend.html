@@ -1,0 +1,76 @@
+{% load i18n %}
+{% spaceless %}
+<div class="cms-pagetree cms-pagetree-section cms-pagetree-section-condensed cms-pagetree-legend">
+    <span class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
+        <div class="js-cms-pagetree-dropdown-trigger cms-pagetree-legend-title-wrap">
+            <span class="cms-icon cms-icon-info"></span>
+            <span class="cms-pagetree-legend-title">{% trans "Legend" %}</span>
+        </div>
+
+        <div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-condensed cms-pagetree-dropdown-menu-arrow-right-bottom js-cms-pagetree-dropdown-menu">
+            <ul class="cms-pagetree-dropdown-menu-inner">
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-pagetree-node-state cms-pagetree-node-state-published"></span>
+                        <span>{% trans "Published" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-pagetree-node-state cms-pagetree-node-state-dirty"></span>
+                        <span>{% trans "Changed" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-pagetree-node-state cms-pagetree-node-state-unpublished"></span>
+                        <span>{% trans "Unpublished" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-pagetree-node-state cms-pagetree-node-state-empty"></span>
+                        <span>{% trans "Empty" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-check-square"></span>
+                        <span>{% trans "In menu" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-minus-square"></span>
+                        <span>{% trans "Not in menu" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-eye"></span>
+                        <span>{% trans "View page" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-home"></span>
+                        <span>{% trans "Home" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-sitemap"></span>
+                        <span>{% trans "Softroot" %}</span>
+                    </span>
+                </li>
+                <li>
+                    <span class="cms-pagetree-dropdown-item">
+                        <span class="cms-icon cms-icon-puzzle"></span>
+                        <span>{% trans "Apphook" %}</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </span>
+</div>
+{% endspaceless %}

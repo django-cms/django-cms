@@ -1,0 +1,43 @@
+.. _upgrade-to-3.1.5:
+
+###################
+3.1.5 release notes
+###################
+
+*******************
+What's new in 3.1.5
+*******************
+
+Bug Fixes
+=========
+
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+- Improve CMSPluginBase.render documentation
+- Fix CMSEditableObject context generation which generates to errors with django-classy-tags 0.7.1
+- Fix error in toolbar when LocaleMiddleware is not used
+- Move templates validation in app.ready
+- Fix ExtensionToolbar when language is removed but titles still exists
+- Fix pages menu missing on fresh install 3.1
+- Fix incorrect language on placeholder text for redirect field
+- Fix PageSelectWidget JS syntax
+- Fix redirect when disabling toolbar
+- Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
+
+Treebeard corruption
+====================
+
+Prior to 3.1.5 moving or pasting nested plugins would lead to some non-fatal tree corruptions,
+raising an error when adding plugins under the newly pasted plugins.
+
+To fix these problems, upgrade to 3.1.5 and then run ``manage.py cms fix-tree`` command to
+repair the tree.
+
+
+DjangoCMS Text CKEditor
+=======================
+
+Action required
+---------------
+CMS 3.1.5 is not compatible with djangocms-text-ckeditor < 2.7.1.
+If you're using djangocms-text-ckeditor, please upgrade to 2.7.1 or up.
+Keep in mind that djangocms-text-ckeditor >= 2.8 is compatible only with

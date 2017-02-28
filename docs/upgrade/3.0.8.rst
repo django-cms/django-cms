@@ -1,0 +1,37 @@
+.. _upgrade-to-3.0.8:
+
+###################
+3.0.8 release notes
+###################
+
+*******************
+What's new in 3.0.8
+*******************
+
+* Add :setting:`require_parent <CMS_PLACEHOLDER_CONF>` option to ``CMS_PLACEHOLDER_CONF``
+
+Bug Fixes
+=========
+
+* Fix django-mptt version dependency to be PEP440 compatible
+* Fix some Django 1.4 compatibility issues
+* Add toolbar sanity check
+* Fix behaviour with CMSPluginBase.get_render_template()
+* Fix issue on django >= 1.6 with page form fields.
+* Resolve jQuery namespace issues in admin page tree and change form
+* Fix issues for PageField in Firefox/Safari
+* Fix some Python 3.4 compatibility issue when using proxy modules
+* Fix corner case in plugin copy
+* Documentation fixes
+* Minor code clean-ups
+
+.. warning:: Fix for plugin copy patches a reference leak in
+             ``cms.models.pluginmodel.CMSPlugin.copy_plugins``, which caused the
+             original plugin object to be modified in memory. The fixed code
+             leaves the original unaltered and returns a modified copy.
+
+             Custom plugins that called ``cms.utils.plugins.copy_plugins_to`` or
+             ``cms.models.pluginmodel.CMSPlugin.copy_plugins`` may have relied on the
+             incorrect behaviour. Check your code for calls to these methods. Correctly
+             implemented calls should expect the original plugin instance to remain
+             unaltered.

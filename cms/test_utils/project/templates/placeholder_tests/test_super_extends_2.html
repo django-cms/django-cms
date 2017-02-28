@@ -1,0 +1,8 @@
+{% extends "placeholder_tests/test_super_extends_1.html" %}
+{% load cms_tags %}
+
+{% comment %}
+This template extends one that contains a block called "one", but doesn't itself
+define that block. The bug causes the block to be copied from the parent
+template when rendering this one, resulting in the word "whee" being added twice.
+{% endcomment %}

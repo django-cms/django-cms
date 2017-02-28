@@ -1,38 +1,63 @@
 # -*- coding: utf-8 -*-
-from cms.models.placeholderpluginmodel import PlaceholderReference
-from django.contrib.admin.helpers import AdminForm
-from django.utils.decorators import method_decorator
 import json
 
+from django.conf.urls import url
+from django.contrib.admin.helpers import AdminForm
+from django.contrib.admin.utils import get_deleted_objects
+from django.core.exceptions import PermissionDenied
+from django.db import router, transaction
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseRedirect,
+)
+from django.shortcuts import get_list_or_404, get_object_or_404, render
+from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
+from django.utils.encoding import force_text
+from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
+from django.views.decorators.http import require_POST
+
+from cms.admin.forms import PluginAddValidationForm
+from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION, SLUG_REGEXP
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
+from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_cms_setting
-from cms.utils.compat.dj import force_unicode
-from cms.utils.plugins import requires_reload, has_reached_plugin_limit
-from django.contrib.admin import ModelAdmin
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
-from django.template.defaultfilters import force_escape, escapejs
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from django.views.decorators.http import require_POST
-import warnings
-from django.template.response import TemplateResponse
+from cms.utils import (
+    copy_plugins,
+    get_cms_setting,
+    get_language_from_request,
+)
+from cms.utils.i18n import get_language_list, force_language
+from cms.utils.plugins import (
+    requires_reload,
+    has_reached_plugin_limit,
+    reorder_plugins
+)
+from cms.utils.urlutils import admin_reverse
 
-from django.contrib.admin.util import get_deleted_objects
-from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.db import router
-from django.http import HttpResponseRedirect
+_no_default = object()
 
-from cms.utils import copy_plugins, permissions, get_language_from_request
-from cms.utils.i18n import get_language_list
-from cms.utils.transaction import wrap_transaction
+
+def get_int(int_str, default=_no_default):
+    """
+    For convenience a get-like method for taking the int() of a string.
+    :param int_str: the string to convert to integer
+    :param default: an optional value to return if ValueError is raised.
+    :return: the int() of «int_str» or «default» on exception.
+    """
+    if default == _no_default:
+        return int(int_str)
+    else:
+        try:
+            return int(int_str)
+        except ValueError:
+            return default
 
 
 class FrontendEditableAdminMixin(object):
@@ -42,15 +67,11 @@ class FrontendEditableAdminMixin(object):
         """
         Register the url for the single field edit view
         """
-        from django.conf.urls import patterns, url
-
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
-
-        url_patterns = patterns(
-            '',
-            pat(r'edit-field/([0-9]+)/([a-z\-]+)/$', self.edit_field),
-        )
+        url_patterns = [
+            pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
+        ]
         return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
 
     def _get_object_for_single_field(self, object_id, language):
@@ -71,16 +92,17 @@ class FrontendEditableAdminMixin(object):
         if not fields:
             context = {
                 'opts': opts,
-                'message': force_unicode(_("Field %s not found")) % raw_fields
+                'message': force_text(_("Field %s not found")) % raw_fields
             }
-            return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
-        if not request.user.has_perm("%s_change" % self.model._meta.module_name):
+            return render(request, 'admin/cms/page/plugin/error_form.html', context)
+        if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
+                                                             self.model._meta.model_name)):
             context = {
                 'opts': opts,
-                'message': force_unicode(_("You do not have permission to edit this item"))
+                'message': force_text(_("You do not have permission to edit this item"))
             }
-            return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
-            # Dinamically creates the form class with only `field_name` field
+            return render(request, 'admin/cms/page/plugin/error_form.html', context)
+            # Dynamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
@@ -113,77 +135,81 @@ class FrontendEditableAdminMixin(object):
             context.update({
                 'cancel': True,
             })
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
-        return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
+        return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
 class PlaceholderAdminMixin(object):
+
+    def _get_attached_admin(self, placeholder):
+        model = placeholder._get_attached_model()
+
+        if not model:
+            return
+        return self.admin_site._registry.get(model)
+
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
-        from django.conf.urls import patterns, url
-
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
-
-        url_patterns = patterns(
-            '',
+        url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
-            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
+            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
+            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
-        )
+        ]
         return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
 
     def has_add_plugin_permission(self, request, placeholder, plugin_type):
-        if not permissions.has_plugin_permission(request.user, plugin_type, "add"):
-            return False
-        if not placeholder.has_add_permission(request):
-            return False
-        return True
-
-    def has_copy_plugin_permission(self, request, source_placeholder, target_placeholder, plugins):
-        if not source_placeholder.has_add_permission(request) or not target_placeholder.has_add_permission(
-                request):
-            return False
-        for plugin in plugins:
-            if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "add"):
-                return False
-        return True
+        return placeholder.has_add_plugin_permission(request.user, plugin_type)
 
     def has_change_plugin_permission(self, request, plugin):
-        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
-            return False
-        if not plugin.placeholder.has_change_permission(request):
-            return False
-        return True
-
-    def has_move_plugin_permission(self, request, plugin, target_placeholder):
-        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "change"):
-            return False
-        if not target_placeholder.has_change_permission(request):
-            return False
-        return True
+        placeholder = plugin.placeholder
+        return placeholder.has_change_plugin_permission(request.user, plugin)
 
     def has_delete_plugin_permission(self, request, plugin):
-        if not permissions.has_plugin_permission(request.user, plugin.plugin_type, "delete"):
-            return False
         placeholder = plugin.placeholder
-        if not placeholder.has_delete_permission(request):
-            return False
-        return True
+        return placeholder.has_delete_plugin_permission(request.user, plugin)
 
-    def has_clear_placeholder_permission(self, request, placeholder):
-        if not placeholder.has_delete_permission(request):
-            return False
-        return True
+    def has_copy_plugins_permission(self, request, plugins):
+        # Plugins can only be copied to the clipboard
+        placeholder = request.toolbar.clipboard
+        return placeholder.has_add_plugins_permission(request.user, plugins)
 
-    def post_add_plugin(self, request, placeholder, plugin):
+    def has_copy_from_clipboard_permission(self, request, placeholder, plugins):
+        return placeholder.has_add_plugins_permission(request.user, plugins)
+
+    def has_copy_from_placeholder_permission(self, request, source_placeholder, target_placeholder, plugins):
+        if not source_placeholder.has_add_plugins_permission(request.user, plugins):
+            return False
+        return target_placeholder.has_add_plugins_permission(request.user, plugins)
+
+    def has_move_plugin_permission(self, request, plugin, target_placeholder):
+        placeholder = plugin.placeholder
+        return placeholder.has_move_plugin_permission(request.user, plugin, target_placeholder)
+
+    def has_clear_placeholder_permission(self, request, placeholder, language=None):
+        if language:
+            languages = [language]
+        else:
+            # fetch all languages this placeholder contains
+            # based on it's plugins
+            languages = (
+                placeholder
+                .cmsplugin_set
+                .values_list('language', flat=True)
+                .distinct()
+                .order_by()
+            )
+        return placeholder.has_clear_permission(request.user, languages)
+
+    def post_add_plugin(self, request, plugin):
         pass
 
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
@@ -204,78 +230,71 @@ class PlaceholderAdminMixin(object):
     def get_placeholder_template(self, request, placeholder):
         pass
 
-    @method_decorator(require_POST)
     @xframe_options_sameorigin
     def add_plugin(self, request):
         """
-        POST request should have the following data:
+        Shows the add plugin form and saves it on POST.
 
-        - placeholder_id
-        - plugin_type
-        - plugin_language
-        - plugin_parent (optional)
+        Requires the following GET parameters:
+            - placeholder_id
+            - plugin_type
+            - plugin_language
+            - plugin_parent (optional)
+            - plugin_position (optional)
         """
-        plugin_type = request.POST['plugin_type']
+        form = PluginAddValidationForm(request.GET)
 
-        placeholder_id = request.POST.get('placeholder_id', None)
-        parent_id = request.POST.get('parent_id', None)
-        if parent_id:
-            warnings.warn("parent_id is deprecated and will be removed in 3.1, use plugin_parent instead",
-                          DeprecationWarning)
-        if not parent_id:
-            parent_id = request.POST.get('plugin_parent', None)
-        placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+        if not form.is_valid():
+            # list() is necessary for python 3 compatibility.
+            # errors is s dict mapping fields to a list of errors
+            # for that field.
+            error = list(form.errors.values())[0][0]
+            return HttpResponseBadRequest(force_text(error))
+
+        plugin_data = form.cleaned_data
+        placeholder = plugin_data['placeholder_id']
+        plugin_type = plugin_data['plugin_type']
+
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
-            return HttpResponseForbidden(force_unicode(_('You do not have permission to add a plugin')))
-        parent = None
-        language = request.POST.get('plugin_language') or get_language_from_request(request)
-        try:
-            has_reached_plugin_limit(placeholder, plugin_type, language,
-                                     template=self.get_placeholder_template(request, placeholder))
-        except PluginLimitReached as er:
-            return HttpResponseBadRequest(er)
-            # page add-plugin
-        if not parent_id:
+            message = force_text(_('You do not have permission to add a plugin'))
+            return HttpResponseForbidden(message)
 
-            position = request.POST.get('plugin_order',
-                                        CMSPlugin.objects.filter(language=language, placeholder=placeholder).count())
-        # in-plugin add-plugin
-        else:
-            parent = get_object_or_404(CMSPlugin, pk=parent_id)
-            placeholder = parent.placeholder
-            position = request.POST.get('plugin_order',
-                                        CMSPlugin.objects.filter(language=language, parent=parent).count())
-            # placeholder (non-page) add-plugin
-
-        # Sanity check to make sure we're not getting bogus values from JavaScript:
-        if settings.USE_I18N:
-            if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
-                return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))
-            if parent and parent.language != language:
-                return HttpResponseBadRequest(force_unicode(_("Parent plugin language must be same as language!")))
-        else:
-            language = settings.LANGUAGE_CODE
-        plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
+        parent = plugin_data.get('plugin_parent')
 
         if parent:
-            plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-            plugin.insert_at(parent, position='last-child', save=False)
-        plugin.save()
-        self.post_add_plugin(request, placeholder, plugin)
-        response = {
-            'url': force_unicode(
-                reverse("admin:%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
-                        args=[plugin.pk])),
-            'delete': force_unicode(
-                reverse("admin:%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
-                        args=[plugin.pk])),
-            'breadcrumb': plugin.get_breadcrumb(),
+            position = parent.cmsplugin_set.count()
+        else:
+            position = CMSPlugin.objects.filter(
+                parent__isnull=True,
+                language=plugin_data['plugin_language'],
+                placeholder=placeholder,
+            ).count()
+
+        plugin_data['position'] = position
+
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        plugin_instance = plugin_class(plugin_class.model, self.admin_site)
+
+        # Setting attributes on the form class is perfectly fine.
+        # The form class is created by modelform factory every time
+        # this get_form() method is called.
+        plugin_instance._cms_initial_attributes = {
+            'language': plugin_data['plugin_language'],
+            'placeholder': plugin_data['placeholder_id'],
+            'parent': plugin_data.get('plugin_parent', None),
+            'plugin_type': plugin_data['plugin_type'],
+            'position': plugin_data['position'],
         }
-        return HttpResponse(json.dumps(response), content_type='application/json')
+
+        response = plugin_instance.add_view(request)
+
+        if request.method == "POST" and plugin_instance.object_successfully_changed:
+            self.post_add_plugin(request, plugin_instance.saved_object)
+        return response
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
-    @wrap_transaction
+    @transaction.atomic
     def copy_plugins(self, request):
         """
         POST request should have the following data:
@@ -295,8 +314,12 @@ class PlaceholderAdminMixin(object):
         target_plugin_id = request.POST.get('target_plugin_id', None)
         source_placeholder = get_object_or_404(Placeholder, pk=source_placeholder_id)
         target_placeholder = get_object_or_404(Placeholder, pk=target_placeholder_id)
+
         if not target_language or not target_language in get_language_list():
-            return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))
+            return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
+
+        copy_to_clipboard = target_placeholder.pk == request.toolbar.clipboard.pk
+
         if source_plugin_id:
             source_plugin = get_object_or_404(CMSPlugin, pk=source_plugin_id)
             reload_required = requires_reload(PLUGIN_COPY_ACTION, [source_plugin])
@@ -306,19 +329,37 @@ class PlaceholderAdminMixin(object):
                 plugins = inst.placeholder_ref.get_plugins_list()
             else:
                 plugins = list(
-                    source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
-                                                            rght__lte=source_plugin.rght).order_by('tree_id', 'level',
-                                                                                                   'position'))
+                    source_placeholder.get_plugins().filter(
+                        path__startswith=source_plugin.path,
+                        depth__gte=source_plugin.depth).order_by('path')
+                )
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level',
-                                                                                           'position'))
+                source_placeholder.get_plugins(language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
-        if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
-            return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
-        if target_placeholder.pk == request.toolbar.clipboard.pk and not source_plugin_id and not target_plugin_id:
-            # if we copy a whole placeholder to the clipboard create PlaceholderReference plugin instead and fill it
-            # the content of the source_placeholder.
+
+        if copy_to_clipboard:
+            has_permissions = self.has_copy_plugins_permission(request, plugins)
+        else:
+            # Plugins are being copied from a placeholder in another language
+            # using the "Copy from language" placeholder action.
+            # Check if the user can copy plugins from source placeholder to
+            # target placeholder.
+            has_permissions = self.has_copy_from_placeholder_permission(
+                request,
+                source_placeholder,
+                target_placeholder,
+                plugins,
+            )
+
+        if not has_permissions:
+            return HttpResponseForbidden(force_text(
+                _('You do not have permission to copy these plugins.')))
+
+        if copy_to_clipboard and not source_plugin_id and not target_plugin_id:
+            # if we copy a whole placeholder to the clipboard create
+            # PlaceholderReference plugin instead and fill it the content of the
+            # source_placeholder.
             ref = PlaceholderReference()
             ref.name = source_placeholder.get_label()
             ref.plugin_type = "PlaceholderPlugin"
@@ -327,182 +368,321 @@ class PlaceholderAdminMixin(object):
             ref.save()
             ref.copy_from(source_placeholder, source_language)
         else:
-            copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
-        plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
-            'tree_id', 'level', 'position')
+            copy_plugins.copy_plugins_to(
+                plugins, target_placeholder, target_language, target_plugin_id)
+
+        plugin_list = CMSPlugin.objects.filter(
+                language=target_language,
+                placeholder=target_placeholder
+            ).order_by('path')
         reduced_list = []
+
         for plugin in plugin_list:
             reduced_list.append(
                 {
                     'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
-                    'position': plugin.position, 'desc': force_unicode(plugin.get_short_description()),
+                    'position': plugin.position, 'desc': force_text(plugin.get_short_description()),
                     'language': plugin.language, 'placeholder_id': plugin.placeholder_id
                 }
             )
+
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
+
+        # When this is executed we are in the admin class of the source placeholder
+        # It can be a page or a model with a placeholder field.
+        # Because of this we need to get the admin class instance of the
+        # target placeholder and call post_copy_plugins() on it.
+        # By doing this we make sure that both the source and target are
+        # informed of the operation.
+        target_placeholder_admin = self._get_attached_admin(target_placeholder)
+
+        if (target_placeholder_admin and
+                target_placeholder_admin.model != self.model):
+            target_placeholder_admin.post_copy_plugins(
+                request,
+                source_placeholder=source_placeholder,
+                target_placeholder=target_placeholder,
+                plugins=plugins,
+            )
+
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
-        plugin_id = int(plugin_id)
-        cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
-
-        instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
-        if not self.has_change_plugin_permission(request, cms_plugin):
-            return HttpResponseForbidden(force_unicode(_("You do not have permission to edit this plugin")))
-        plugin_admin.cms_plugin_instance = cms_plugin
         try:
-            plugin_admin.placeholder = cms_plugin.placeholder
-        except Placeholder.DoesNotExist:
-            pass
-        if request.method == "POST":
-            # set the continue flag, otherwise will plugin_admin make redirect to list
-            # view, which actually doesn't exists
-            request.POST['_continue'] = True
-        if request.POST.get("_cancel", False):
-            # cancel button was clicked
-            context = {
-                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-                'plugin': cms_plugin,
-                'is_popup': True,
-                "type": cms_plugin.get_plugin_name(),
-                'plugin_id': plugin_id,
-                'icon': force_escape(escapejs(cms_plugin.get_instance_icon_src())),
-                'alt': force_escape(escapejs(cms_plugin.get_instance_icon_alt())),
-                'cancel': True,
-            }
-            instance = cms_plugin.get_plugin_instance()[0]
-            if instance:
-                context['name'] = force_unicode(instance)
-            else:
-                # cancelled before any content was added to plugin
-                cms_plugin.delete()
-                context.update({
-                    "deleted": True,
-                    'name': force_unicode(cms_plugin),
-                })
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+            plugin_id = int(plugin_id)
+        except ValueError:
+            return HttpResponseNotFound(force_text(_("Plugin not found")))
 
-        if not instance:
-            # instance doesn't exist, call add view
-            response = plugin_admin.add_view(request)
-        else:
-            # already saved before, call change view
-            # we actually have the instance here, but since i won't override
-            # change_view method, is better if it will be loaded again, so
-            # just pass id to plugin_admin
-            response = plugin_admin.change_view(request, str(plugin_id))
-        if request.method == "POST" and plugin_admin.object_successfully_changed:
-            self.post_edit_plugin(request, plugin_admin.saved_object)
-            saved_object = plugin_admin.saved_object
-            context = {
-                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-                'plugin': saved_object,
-                'is_popup': True,
-                'name': force_unicode(saved_object),
-                "type": saved_object.get_plugin_name(),
-                'plugin_id': plugin_id,
-                'icon': force_escape(saved_object.get_instance_icon_src()),
-                'alt': force_escape(saved_object.get_instance_icon_alt()),
-            }
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+        queryset = CMSPlugin.objects.values_list('plugin_type', flat=True)
+        plugin_type = get_list_or_404(queryset, pk=plugin_id)[0]
+        # CMSPluginBase subclass
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        # CMSPluginBase subclass instance
+        plugin_instance = plugin_class(plugin_class.model, self.admin_site)
+        # CMSPlugin subclass instance
+        obj = get_object_or_404(plugin_class.model, pk=plugin_id)
+
+        if not self.has_change_plugin_permission(request, obj):
+            return HttpResponseForbidden(force_text(_("You do not have permission to edit this plugin")))
+
+        response = plugin_instance.change_view(request, str(plugin_id))
+
+        if request.method == "POST" and plugin_instance.object_successfully_changed:
+            self.post_edit_plugin(request, plugin_instance.saved_object)
         return response
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
     def move_plugin(self, request):
         """
+        Performs a move or a "paste" operation (when «move_a_copy» is set)
+
         POST request with following parameters:
-        -plugin_id
-        -placeholder_id
-        -plugin_language (optional)
-        -plugin_parent (optional)
-        -plugin_order (array, optional)
+        - plugin_id
+        - placeholder_id
+        - plugin_language (optional)
+        - plugin_parent (optional)
+        - plugin_order (array, optional)
+        - move_a_copy (Boolean, optional) (anything supplied here except a case-
+                                        insensitive "false" is True)
+        NOTE: If move_a_copy is set, the plugin_order should contain an item
+              '__COPY__' with the desired destination of the copied plugin.
         """
-        plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-        placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
-        parent_id = request.POST.get('plugin_parent', None)
+        # plugin_id and placeholder_id are required, so, if nothing is supplied,
+        # an ValueError exception will be raised by get_int().
+        try:
+            plugin_id = get_int(request.POST.get('plugin_id'))
+        except TypeError:
+            raise RuntimeError("'plugin_id' is a required parameter.")
+
+        plugin = (
+            CMSPlugin
+            .objects
+            .select_related('placeholder')
+            .get(pk=plugin_id)
+        )
+
+        try:
+            placeholder_id = get_int(request.POST.get('placeholder_id'))
+        except TypeError:
+            raise RuntimeError("'placeholder_id' is a required parameter.")
+        except ValueError:
+            raise RuntimeError("'placeholder_id' must be an integer string.")
+        placeholder = Placeholder.objects.get(pk=placeholder_id)
+        # The rest are optional
+        parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         language = request.POST.get('plugin_language', None)
+        move_a_copy = request.POST.get('move_a_copy', False)
+        move_a_copy = (move_a_copy and move_a_copy != "0" and
+                       move_a_copy.lower() != "false")
+
+        source_language = plugin.language
         source_placeholder = plugin.placeholder
-        if not parent_id:
-            parent_id = None
-        else:
-            parent_id = int(parent_id)
+
         if not language and plugin.language:
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
-        if not self.has_move_plugin_permission(request, plugin, placeholder):
-            return HttpResponseForbidden(force_unicode(_("You have no permission to move this plugin")))
-        if plugin.parent_id != parent_id:
-            if parent_id:
-                parent = CMSPlugin.objects.get(pk=parent_id)
-                if parent.placeholder_id != placeholder.pk:
-                    return HttpResponseBadRequest(force_unicode('parent must be in the same placeholder'))
-                if parent.language != language:
-                    return HttpResponseBadRequest(force_unicode('parent must be in the same language as plugin_language'))
-            else:
-                parent = None
-            plugin.move_to(parent, position='last-child')
-        if not placeholder == source_placeholder:
+
+        if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
-                has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
+                has_reached_plugin_limit(placeholder, plugin.plugin_type,
+                                         plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
 
-        plugin.save()
-        for child in plugin.get_descendants(include_self=True):
-            child.placeholder = placeholder
-            child.language = language
-            child.save()
-        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder, language=language).order_by('position')
-        x = 0
-        for level_plugin in plugins:
-            if order:
-                x = 0
-                found = False
-                for pk in order:
-                    if level_plugin.pk == int(pk):
-                        level_plugin.position = x
-                        level_plugin.save()
-                        found = True
-                        break
-                    x += 1
-                if not found:
-                    return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
+        if move_a_copy:  # "paste"
+            if plugin.plugin_type == "PlaceholderPlugin":
+                parent_id = None
+                inst = plugin.get_plugin_instance()[0]
+                plugins = inst.placeholder_ref.get_plugins()
             else:
-                level_plugin.position = x
-                level_plugin.save()
-                x += 1
-        self.post_move_plugin(request, source_placeholder, placeholder, plugin)
-        json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+                plugins = [plugin] + list(plugin.get_descendants())
+
+            if not self.has_copy_from_clipboard_permission(request, placeholder, plugins):
+                return HttpResponseForbidden(
+                    force_text(_("You have no permission to paste this plugin")))
+
+            new_plugins = copy_plugins.copy_plugins_to(
+                plugins,
+                placeholder,
+                language,
+                parent_plugin_id=parent_id,
+            )
+
+            top_plugins = []
+            top_parent = new_plugins[0][0].parent_id
+            for new_plugin, old_plugin in new_plugins:
+                if new_plugin.parent_id == top_parent:
+                    # NOTE: There is no need to save() the plugins here.
+                    new_plugin.position = old_plugin.position
+                    top_plugins.append(new_plugin)
+
+            # Creates a list of string PKs of the top-level plugins ordered by
+            # their position.
+            top_plugins_pks = [str(p.pk) for p in sorted(
+                top_plugins, key=lambda x: x.position)]
+
+            if parent_id:
+                parent = CMSPlugin.objects.get(pk=parent_id)
+
+                for plugin in top_plugins:
+                    plugin.parent = parent
+                    plugin.placeholder = placeholder
+                    plugin.language = language
+                    plugin.save()
+
+            # If an ordering was supplied, we should replace the item that has
+            # been copied with the new copy
+            if order:
+                if '__COPY__' in order:
+                    copy_idx = order.index('__COPY__')
+                    del order[copy_idx]
+                    order[copy_idx:0] = top_plugins_pks
+                else:
+                    order.extend(top_plugins_pks)
+
+            # Set the plugin variable to point to the newly created plugin.
+            plugin = new_plugins[0][0]
+        else:
+            # Regular move
+            if not self.has_move_plugin_permission(request, plugin, placeholder):
+                return HttpResponseForbidden(
+                    force_text(_("You have no permission to move this plugin")))
+
+            plugin_data = {
+                'language': language,
+                'placeholder': placeholder,
+            }
+
+            if parent_id:
+                if plugin.parent_id != parent_id:
+                    parent = CMSPlugin.objects.get(pk=parent_id)
+                    if parent.placeholder_id != placeholder.pk:
+                        return HttpResponseBadRequest(force_text(
+                            _('parent must be in the same placeholder')))
+                    if parent.language != language:
+                        return HttpResponseBadRequest(force_text(
+                            _('parent must be in the same language as '
+                              'plugin_language')))
+                    plugin = plugin.update(refresh=True, parent=parent, **plugin_data)
+                    plugin = plugin.move(parent, pos='last-child')
+                else:
+                    plugin = plugin.update(refresh=True, **plugin_data)
+            else:
+                target = CMSPlugin.get_last_root_node()
+                plugin = plugin.update(refresh=True, parent=None, **plugin_data)
+                plugin = plugin.move(target, pos='right')
+
+            # Update all children to match the parent's
+            # language and placeholder
+            plugin.get_descendants().update(**plugin_data)
+
+        if order:
+            # order should be a list of plugin primary keys
+            # it's important that the plugins being referenced
+            # are all part of the same tree.
+            order = [int(pk) for pk in order]
+            plugins_in_tree = CMSPlugin.objects.filter(
+                parent=parent_id,
+                placeholder=placeholder,
+                language=language,
+                pk__in=order,
+            )
+
+            if len(order) != plugins_in_tree.count():
+                # Seems like order does not match the tree on the db
+                message = _('order parameter references plugins in different trees')
+                return HttpResponseBadRequest(force_text(message))
+
+        # Mark the target placeholder as dirty
+        placeholder.mark_as_dirty(language)
+
+        if placeholder != source_placeholder:
+            # Plugin is being moved or copied into a separate placeholder
+            # Mark source placeholder as dirty
+            source_placeholder.mark_as_dirty(source_language)
+
+        reorder_plugins(placeholder, parent_id, language, order)
+
+        # When this is executed we are in the admin class of the source placeholder
+        # It can be a page or a model with a placeholder field.
+        # Because of this we need to get the admin class instance of the
+        # target placeholder and call post_move_plugin() on it.
+        # By doing this we make sure that both the source and target are
+        # informed of the operation.
+        target_placeholder_admin = self._get_attached_admin(placeholder)
+
+        if move_a_copy:  # "paste"
+            plugins = list(plugin.get_tree())
+            self.post_copy_plugins(request, source_placeholder, placeholder, plugins)
+
+            if (target_placeholder_admin and
+                    target_placeholder_admin.model != self.model):
+                target_placeholder_admin.post_copy_plugins(
+                    request,
+                    source_placeholder=source_placeholder,
+                    target_placeholder=placeholder,
+                    plugins=plugins,
+                )
+        else:
+            self.post_move_plugin(request, source_placeholder, placeholder, plugin)
+
+            if (target_placeholder_admin and
+                    target_placeholder_admin.model != self.model):
+                target_placeholder_admin.post_move_plugin(
+                    request,
+                    source_placeholder=source_placeholder,
+                    target_placeholder=placeholder,
+                    plugin=plugin,
+                )
+
+        try:
+            language = request.toolbar.toolbar_language
+        except AttributeError:
+            language = get_language_from_request(request)
+
+        with force_language(language):
+            plugin_urls = plugin.get_action_urls()
+
+        json_response = {
+            'urls': plugin_urls,
+            'reload': move_a_copy or requires_reload(
+                PLUGIN_MOVE_ACTION, [plugin])
+        }
+        return HttpResponse(
+            json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):
-        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
+        plugin = get_object_or_404(
+            CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
         if not self.has_delete_plugin_permission(request, plugin):
-            return HttpResponseForbidden(force_unicode(_("You do not have permission to delete this plugin")))
+            return HttpResponseForbidden(force_text(
+                _("You do not have permission to delete this plugin")))
         plugin_cms_class = plugin.get_plugin_class()
         plugin_class = plugin_cms_class.model
         opts = plugin_class._meta
         using = router.db_for_write(plugin_class)
         app_label = opts.app_label
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
+        deleted_objects, __, perms_needed, protected = get_deleted_objects(
             [plugin], opts, request.user, self.admin_site, using)
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied(_("You do not have permission to delete this plugin"))
-            obj_display = force_unicode(plugin)
+            obj_display = force_text(plugin)
             self.log_deletion(request, plugin, obj_display)
+
             plugin.delete()
+
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
-                'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
+                'name': force_text(opts.verbose_name), 'obj': force_text(obj_display)})
             self.post_delete_plugin(request, plugin)
-            return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
-        plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
+        plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": plugin_name}
         else:
@@ -517,31 +697,36 @@ class PlaceholderAdminMixin(object):
             "opts": opts,
             "app_label": app_label,
         }
-        return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
-                                current_app=self.admin_site.name)
+        request.current_app = self.admin_site.name
+        return TemplateResponse(
+            request, "admin/cms/page/plugin/delete_confirmation.html", context
+        )
 
     @xframe_options_sameorigin
     def clear_placeholder(self, request, placeholder_id):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        if not self.has_clear_placeholder_permission(request, placeholder):
-            return HttpResponseForbidden(force_unicode(_("You do not have permission to clear this placeholder")))
         language = request.GET.get('language', None)
+
+        if not self.has_clear_placeholder_permission(request, placeholder, language):
+            return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
+
         plugins = placeholder.get_plugins(language)
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
+        deleted_objects, __, perms_needed, protected = get_deleted_objects(
             plugins, opts, request.user, self.admin_site, using)
-        obj_display = force_unicode(placeholder)
+
+        obj_display = force_text(placeholder)
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
-                return HttpResponseForbidden(force_unicode(_("You do not have permission to clear this placeholder")))
+                return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
             self.log_deletion(request, placeholder, obj_display)
-            placeholder.clear()
+            placeholder.clear(language)
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
-                'obj': force_unicode(obj_display)})
+                'obj': force_text(obj_display)})
             self.post_clear_placeholder(request, placeholder)
-            return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": obj_display}
         else:
@@ -558,17 +743,3 @@ class PlaceholderAdminMixin(object):
         }
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
-
-
-class PlaceholderAdmin(PlaceholderAdminMixin, ModelAdmin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class PlaceholderAdmin is deprecated and will be removed in 3.1. "
-            "Instead, combine PlaceholderAdminMixin with admin.ModelAdmin.", DeprecationWarning)
-        super(PlaceholderAdmin, self).__init__(*args, **kwargs)
-
-
-class FrontendEditableAdmin(FrontendEditableAdminMixin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class FrontendEditableAdmin is deprecated and will be removed in 3.1. "
-            "Instead, use FrontendEditableAdminMixin.", DeprecationWarning)
-        super(FrontendEditableAdmin, self).__init__(*args, **kwargs)

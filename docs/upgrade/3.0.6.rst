@@ -1,0 +1,56 @@
+.. _upgrade-to-3.0.6:
+
+###################
+3.0.6 release notes
+###################
+
+*******************
+What's new in 3.0.6
+*******************
+
+Django 1.7 support
+==================
+
+As of version 3.0.6 django CMS supports Django 1.7.
+
+Currently our migrations for Django 1.7 are in ``cms/migrations_django`` to
+allow better backward compatibility; in future releases the Django migrations
+will be moved to the standard ``migrations`` directory, with the South
+migrations in ``south_migrations``.
+
+To support the current arrangement you need to add the following to your
+``settings``::
+
+    MIGRATION_MODULES = {
+        'cms': 'cms.migrations_django',
+        'menus': 'menus.migrations_django',
+    }
+
+.. warning:: **Applications migrations**
+
+    **Any** application that defines a django CMS plugin or a model that uses a
+    PlaceholderField or depends in any way on django CMS models **must** also
+    provide Django 1.7 migrations.
+
+Extended Custom User Support
+============================
+
+If you are using custom user models and use ``CMS_PERMISSION = True`` then be
+sure to check that ``PageUserAdmin`` and ``PageUserGroup`` is still in working
+order.
+
+The ``PageUserAdmin`` class now extends dynamically from the admin class that
+handles the user model. This allows us to use the same ``search_fields`` and
+filters in ``PageUserAdmin`` as in the custom user model admin.
+
+``CMSPlugin.get_render_template``
+=================================
+
+A new method on plugins, that returns the template during the render phase,
+allowing you to change the template based on any plugin attribute or context
+status. See :doc:`/how_to/custom_plugins` for more.
+
+Simplified toolbar API for page extensions
+==========================================
+
+A simpler, more compact way to extend the toolbar for page extensions: :ref:`simplified_extension_toolbar`.

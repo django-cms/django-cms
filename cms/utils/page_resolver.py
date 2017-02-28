@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
-from cms.utils.moderator import use_draft
 import re
-
 
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.utils import timezone
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 from cms.models.pagemodel import Page
-from cms.utils.compat.dj import force_unicode, is_installed
-from cms.utils.compat.urls import unquote
-from cms.utils.urlutils import any_path_re
+from cms.utils.compat.dj import is_installed
+from cms.utils.moderator import use_draft
+from cms.utils.urlutils import any_path_re, admin_reverse
+from cms.utils.page_permissions import user_can_change_page
+
 
 ADMIN_PAGE_RE_PATTERN = r'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
@@ -29,7 +33,7 @@ def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
     """ Returns a queryset of pages corresponding to the path given
     """
     if is_installed('django.contrib.admin'):
-        admin_base = reverse('admin:index')
+        admin_base = admin_reverse('index')
 
         # Check if this is called from an admin request
         if path.startswith(admin_base):
@@ -77,16 +81,16 @@ def get_page_from_path(path, preview=False, draft=False):
 def get_page_from_request(request, use_path=None):
     """
     Gets the current page from a request object.
-    
+
     URLs can be of the following form (this should help understand the code):
     http://server.whatever.com/<some_path>/"pages-root"/some/page/slug
-    
+
     <some_path>: This can be anything, and should be stripped when resolving
-        pages names. This means the CMS is not installed at the root of the 
+        pages names. This means the CMS is not installed at the root of the
         server's URLs.
     "pages-root" This is the root of Django urls for the CMS. It is, in essence
         an empty page slug (slug == '')
-        
+
     The page slug can then be resolved to a Page model object
     """
 
@@ -100,11 +104,11 @@ def get_page_from_request(request, use_path=None):
     if use_path is not None:
         path = use_path
     else:
-        path = request.path
+        path = request.path_info
         pages_root = unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
         if is_installed('django.contrib.admin'):
-            admin_base = reverse('admin:index')
+            admin_base = admin_reverse('index')
         else:
             admin_base = None
         if path.startswith(pages_root) and (not admin_base or not path.startswith(admin_base)):
@@ -114,8 +118,18 @@ def get_page_from_request(request, use_path=None):
             path = path[:-1]
 
     page = get_page_from_path(path, preview, draft)
-    if draft and page and not page.has_change_permission(request):
+
+    if draft and page and not user_can_change_page(request.user, page):
         page = get_page_from_path(path, preview, draft=False)
+
+    # For public pages we check if any parent is hidden due to published dates
+    # In this case the selected page is not reachable
+    if page and not draft:
+        ancestors = page.get_ancestors().filter(
+            Q(publication_date__gt=timezone.now()) | Q(publication_end_date__lt=timezone.now()),
+        )
+        if ancestors.exists():
+            page = None
 
     request._current_page_cache = page
     return page
@@ -147,8 +161,8 @@ def is_valid_url(url, instance, create_links=True, site=None):
                 if create_links:
                     # Format return message with page url
                     url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' % {
-                        'page_url': reverse('admin:cms_page_changelist'), 'pk': page.pk,
-                        'page_title': force_unicode(page),
+                        'page_url': admin_reverse('cms_page_changelist'), 'pk': page.pk,
+                        'page_title': force_text(page),
                     })
                 else:
                     # Just return the page name

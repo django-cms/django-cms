@@ -4,9 +4,13 @@
 - Build newest english translation (django-admin.py makemessages -l en)
 - Build newest english JS translations (django-admin.py makemessages -l en -d djangojs)
 - Pull translations (tx pull -f -a)
-- Compile translations (django-manage.py compilemessages)
+- Compile translations (django-admin.py compilemessages)
+- Make sure icons are recreated in the new place (gulp icons)
+- Make sure CSS files are compiled from latest sass source (gulp sass)
+- Make sure JS files are bundled and minified propery from latest source (gulp bundle)
+- Make sure to remove JS, CSS and font files from the older version of CMS
 - Check CHANGELOG that all closed PRs are present.
-- Prepare blog post
+- Prepare blog post, including "Release" tag
 - update AUTHORS file (python develop.py authors)
 - Make a release commit
 - Tag release commit
@@ -20,7 +24,7 @@
 - Publish blog post
 - Tweet blog post
 - Post notice on django-users, django-cms and django-cms-developers mailing lists
-- Update IRC channel topic
+- Update IRC channel topic (/topic this is the new topic)
 - Add current version to RTD versions.
 - Set new version as default version on RTD
 - Make sure tutorials on the website still work

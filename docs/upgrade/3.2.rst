@@ -1,0 +1,259 @@
+.. _upgrade-to-3.2:
+
+#################
+3.2 release notes
+#################
+
+django CMS 3.2 introduces touch-screen support, significant improvements to the structure-board,
+and numerous other updates and fixes for the frontend. Behind the scenes, auto-reloading following
+apphook configuration changes will make life simpler for all users.
+
+.. warning:: Upgrading from previous versions
+
+    3.2 introduces some changes that **require** action if you are upgrading
+    from a previous version. Please read :ref:`upgrade-guide-3.2` for a step-by-step guide to the
+    process of upgrading from 3.1 to 3.2.
+
+
+*****************
+What's new in 3.2
+*****************
+
+* :ref:`new welcome page <create-first-page>` to help new users
+* touch-screen support for most editing interfaces, for sizes from small tablets to table-top
+  devices
+* enhanced and polished user interface
+* much-needed improvements to the structure-board
+* enhancements to components such as the pop-up plugin editor, sideframe (now called the *overlay*)
+  and the toolbar
+* significant speed improvements on loading, HTTP requests and file sizes
+* restarts are no longer required when changing apphook configurations
+* a new content wizard system, adaptable to arbitrary content types
+
+
+******************************
+Changes that require attention
+******************************
+
+Touch interface support
+=======================
+
+For general information about touch interface support, see the :ref:`touch screen device notes
+<touch>` in the documentation.
+
+.. important::
+
+    These notes about touch interface support apply only to the **django CMS admin and editing
+    interfaces**. The visitor-facing published site is **wholly independent** of this, and the
+    responsibility of the site developer. A good site should already work well for its visitors,
+    whatever interface they use!
+
+Numerous aspects of the CMS and its interface have been updated to work well with touch-screen
+devices. There are some restrictions and warnings that need to be borne in mind.
+
+
+Device support
+--------------
+
+Smaller devices such as most phones are too small to be adequately usable. For example, your Apple
+Watch is sadly unlikely to provide a very good django CMS editing experience.
+
+Older devices will often lack the performance to support a usefully responsive frontend
+editing/administration interface.
+
+There are some device-specific issues still to be resolved. Some of these relate to the CKEditor
+(the default django CMS text editor). We will continue to work on these and they will be addressed
+in a future release.
+
+See :ref:`device-support` for information about devices that have been tested and confirmed to
+work well, and about known issues affecting touch-screen device support.
+
+
+Feedback required
+-----------------
+
+We've tested the CMS interface extensively, but will be very keen to have feedback from other users
+- device reports, bug reports and general suggestions and opinions are very welcome.
+
+
+Bug-fixes
+=========
+
+* An issue in which ``{% placeholder %}`` template tags ignored the ``lang`` parameter has been
+  fixed.
+
+  However this may affect the behaviour of your templates, as now a previously-ignored
+  parameter will be recognised. If you used the ``lang`` parameter in these template tags you may
+  be affected: check the behaviour of your templates after upgrading.
+
+
+Content wizards
+===============
+
+:doc:`/reference/wizards` can help simplify production of content, and can be created to handle
+non-CMS content too.
+
+For a quick introduction to using a wizard as a content editor, see the :ref:`user tutorial
+<create-first-page>`.
+
+
+
+Renaming cms_app, cms_toolbar, menu modules
+===========================================
+
+``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` have been renamed to
+``cms_apps.py``, ``cms_toolbars.py`` and ``cms_menus.py`` for consistency.
+
+Old names are still supported but deprecated; support will be removed in 3.4.
+
+
+Action required
+---------------
+
+In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
+``cms_toolbar.py`` to ``cms_toolbars.py`` and ``menu.py`` to ``cms_menus.py``.
+
+
+New ``ApphookReloadMiddleware``
+===============================
+
+Until now, changes to apphooks have required a restart of the server in order to take effect. A new
+optional middleware class, :ref:`ApphookReloadMiddleware`, makes this automatic.
+
+
+For developers
+==============
+
+Various improvements have been implemented to make developing with and for django CMS easier. These
+include:
+
+* improvements to frontend code, to comply better with `aldryn-boilerplate-bootstrap3
+  <https://github.com/aldryn/aldryn-boilerplate-bootstrap3>`_
+
+* changes to directory structure for frontend related components such as JavaScript and SASS.
+
+* We no longer use ``develop.py``; we now use ``manage.py`` for all development tasks. See
+  :ref:`contributing_patch` for examples.
+
+* We've moved our ``widgets.py`` JavaScript to ``static/cms/js/widgets``.
+
+
+Code formatting
+---------------
+
+We've switched from tabs (in some places) to four spaces *everywhere*. See :ref:`contributing-code`
+for more on formatting.
+
+
+gulp.js
+-------
+
+We now use :ref:`gulp.js <js_linting>` for linting, compressing and bundling of frontend files.
+
+
+Sass-related changes
+--------------------
+
+We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for building static
+files (this only affects frontend developers *of* django CMS - contributors to it, not other users
+or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
+
+
+``.editorconfig`` file
+----------------------
+
+We've added a ``.editorconfig`` (at the root of the project) to provide cues to text editors.
+
+
+Automated spelling checks for documentation
+-------------------------------------------
+
+Documentation is now checked for spelling. A ``make spelling`` command is available now when
+working on documentation, and our `Travis Continuous Integration server
+<https://travis-ci.org/divio/django-cms>`_ also runs these checks.
+
+See the :ref:`spelling` section in the documentation.
+
+
+New structure board
+===================
+
+The structure board is cleaner and easier to understand. It now displays its elements in a tree,
+rather than in a series of nested boxes.
+
+You can optionally enable the old appearance and behaviour with the
+``CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE`` setting (this option will be removed in 3.3).
+
+
+Replaced the sideframe with an overlay
+======================================
+
+The sideframe that could be expanded and collapsed to reveal a view of the admin and other controls
+has been replaced by a simpler and more elegant *overlay* mechanism.
+
+The API documentation still refers to the ``sideframe``, because it is invoked in the same way, and
+what has changed is merely the behaviour in the user's browser.
+
+In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
+
+
+New startup page
+================
+
+A new startup mode makes it easier for users (especially new users) to dive straight into editing
+when launching a new site. See the :ref:`user-tutorial` for more.
+
+
+************
+Known issues
+************
+
+The `sub-pages of a page with an apphook will be unreachable
+<https://github.com/divio/django-cms/issues/4758>`_ (``404 page not found``), due to internal URL
+resolution mechanisms in the CMS. Though it's unlikely that most users will need sub-pages of this
+kind (typically, an apphooked page will create its own sub-pages) this issue will be addressed in a
+forthcoming release.
+
+
+*****************************
+Backward-incompatible changes
+*****************************
+
+See the :ref:`Frontend code <contributing_frontend>` documentation.
+
+There are no other known backward-incompatible changes.
+
+
+.. _upgrade-guide-3.2:
+
+*******************************
+Upgrading django CMS 3.1 to 3.2
+*******************************
+
+Please note any changes that require action above, and take action accordingly.
+
+A database migration is required (a new model, ``UrlconfRevision`` has been added as part of the
+apphook reload mechanism):
+
+Note also that any third-party applications you update may have their own migrations, so as always,
+before upgrading, please make sure that your current database is consistent and in a healthy state,
+and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate
+
+to migrate.
+
+Otherwise django CMS 3.2 represents a fairly easy upgrade path.
+
+********************
+Pending deprecations
+********************
+
+In django CMS 3.3:
+
+    Django 1.6, 1.7 and Python 2.6 will no longer be supported. If you still using these versions,
+    you are strongly encouraged to begin exploring the upgrade process to a newer version.
+
+    The ``CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE`` setting will be removed.

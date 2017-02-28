@@ -1,4 +1,6 @@
 from cms.models import Page, Title
+from cms.utils.page_permissions import user_can_change_page
+
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.core.exceptions import PermissionDenied
@@ -19,17 +21,23 @@ class PageExtensionAdmin(ExtensionAdmin):
             page = Page.objects.get(pk=request.GET['extended_object'])
         else:
             page = obj.extended_object
-        if not page.has_change_permission(request):
+        if not user_can_change_page(request.user, page):
             raise PermissionDenied()
         super(PageExtensionAdmin, self).save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
-        if not obj.extended_object.has_change_permission(request):
+        if not obj.extended_object.has_change_permission(request.user):
             raise PermissionDenied()
         obj.delete()
 
-    def queryset(self, request):
-        return super(PageExtensionAdmin, self).queryset(request).filter(extended_object__publisher_is_draft=True)
+    def get_model_perms(self, request):
+        """
+        Return empty perms dict thus hiding the model from admin index.
+        """
+        return {}
+
+    def get_queryset(self, request):
+        return super(PageExtensionAdmin, self).get_queryset(request).filter(extended_object__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
@@ -43,7 +51,7 @@ class PageExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=page)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(extension.pk,),
                                             current_app=self.admin_site.name)
                 return HttpResponseRedirect(change_url)
@@ -60,17 +68,25 @@ class TitleExtensionAdmin(ExtensionAdmin):
             title = Title.objects.get(pk=request.GET['extended_object'])
         else:
             title = obj.extended_object
-        if not title.page.has_change_permission(request):
+        if not user_can_change_page(request.user, page=title.page):
             raise PermissionDenied()
         super(TitleExtensionAdmin, self).save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
-        if not obj.extended_object.page.has_change_permission(request):
+        page = obj.extended_object.page
+
+        if not user_can_change_page(request.user, page):
             raise PermissionDenied()
         obj.delete()
 
-    def queryset(self, request):
-        return super(TitleExtensionAdmin, self).queryset(request).filter(extended_object__page__publisher_is_draft=True)
+    def get_model_perms(self, request):
+        """
+        Return empty perms dict thus hiding the model from admin index.
+        """
+        return {}
+
+    def get_queryset(self, request):
+        return super(TitleExtensionAdmin, self).get_queryset(request).filter(extended_object__page__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
@@ -84,11 +100,10 @@ class TitleExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=title)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(extension.pk,),
                                             current_app=self.admin_site.name)
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
         return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)
-

@@ -1,0 +1,30 @@
+.. _upgrade-to-3.0.7:
+
+###################
+3.0.7 release notes
+###################
+
+*******************
+What's new in 3.0.7
+*******************
+
+* Numerous updates to the documentation
+* Numerous updates to the tutorial
+* Updates to better support South 1.0
+* Adds some new, user-facing documentation
+
+Bug Fixes
+=========
+
+* Fixes an issue with ``placeholderadmin`` permissions
+* Numerous fixes for minor issues with the frontend UI
+* Fixes issue where the CMS would not reload pages properly if the URL contained a `#` symbol
+* Fixes an issue relating to `limit_choices_to` in `forms.MultiValueFields`
+* Fixes `PageField` to work in Django 1.7 environments
+
+Project & Community Governance
+==============================
+
+* Updates to community and project governance documentation
+* Added list of retired core developers
+* Added branch policy documentation

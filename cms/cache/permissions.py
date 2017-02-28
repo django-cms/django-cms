@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth import get_user_model
+
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_user_model
 
 
 PERMISSION_KEYS = [
-    'can_change', 'can_add', 'can_delete',
-    'can_change_advanced_settings', 'can_publish',
-    'can_change_permissions', 'can_move_page',
-    'can_moderate', 'can_view']
+    'add_page', 'change_page', 'change_page_advanced_settings',
+    'change_page_permissions', 'delete_page', 'move_page',
+    'publish_page', 'view_page',
+]
 
 
 def get_cache_key(user, key):
@@ -15,15 +16,18 @@ def get_cache_key(user, key):
     return "%s:permission:%s:%s" % (
         get_cms_setting('CACHE_PREFIX'), username, key)
 
-def get_cache_version_key():
+
+def get_cache_permission_version_key():
     return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'),)
 
-def get_cache_version():
+
+def get_cache_permission_version():
     from django.core.cache import cache
-    version = cache.get(get_cache_version_key())
-    if version is None:
+    try:
+        version = int(cache.get(get_cache_permission_version_key()))
+    except Exception:
         version = 1
-    return version
+    return int(version)
 
 
 def get_permission_cache(user, key):
@@ -31,7 +35,7 @@ def get_permission_cache(user, key):
     Helper for reading values from cache
     """
     from django.core.cache import cache
-    return cache.get(get_cache_key(user, key), version=get_cache_version())
+    return cache.get(get_cache_key(user, key), version=get_cache_permission_version())
 
 
 def set_permission_cache(user, key, value):
@@ -43,8 +47,8 @@ def set_permission_cache(user, key, value):
     # store this key, so we can clean it when required
     cache_key = get_cache_key(user, key)
     cache.set(cache_key, value,
-            get_cms_setting('CACHE_DURATIONS')['permissions'],
-            version=get_cache_version())
+              get_cms_setting('CACHE_DURATIONS')['permissions'],
+              version=get_cache_permission_version())
 
 
 def clear_user_permission_cache(user):
@@ -53,14 +57,14 @@ def clear_user_permission_cache(user):
     """
     from django.core.cache import cache
     for key in PERMISSION_KEYS:
-        cache.delete(get_cache_key(user, key), version=get_cache_version())
+        cache.delete(get_cache_key(user, key), version=get_cache_permission_version())
 
 
 def clear_permission_cache():
     from django.core.cache import cache
-    version = get_cache_version()
+    version = get_cache_permission_version()
     if version > 1:
-        cache.incr(get_cache_version_key())
+        cache.incr(get_cache_permission_version_key())
     else:
-        cache.set(get_cache_version_key(), 2,
-                get_cms_setting('CACHE_DURATIONS')['permissions'])
+        cache.set(get_cache_permission_version_key(), 2,
+                  get_cms_setting('CACHE_DURATIONS')['permissions'])

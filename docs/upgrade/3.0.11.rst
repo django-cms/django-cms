@@ -1,0 +1,36 @@
+.. _upgrade-to-3.0.11:
+
+####################
+3.0.11 release notes
+####################
+
+********************
+What's new in 3.0.11
+********************
+
+* Core support for multiple instances of the same apphooked application
+* The template tag ``render_model_add`` can now accept a model class as well as a
+  model instance
+
+Bug Fixes
+=========
+
+* Fixes an issue with reverting to Live mode when moving plugins
+* Fixes a missing migration issue
+* Fixes an issue when using the PageField widget
+* Fixes an issue where duplicate page slugs is not prevented in some cases
+* Fixes an issue where copying a page didn't copy its extensions
+* Fixes an issue where translations where broken when operating on a page
+* Fixes an edge-case SQLite issue under Django 1.7
+* Fixes an issue where a confirmation dialog shows only some of the plugins to
+  be deleted when using the "Empty All" context-menu item
+* Fixes an issue where deprecated ``mimetype`` was used instead of ``contenttype``
+* Fixes an issue where ``cms check`` erroneous displays warnings when a plugin
+  uses class inheritance
+* Documentation updates
+
+
+Other
+=====
+
+* Updated test CI coverage

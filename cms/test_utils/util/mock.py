@@ -7,7 +7,7 @@ class AttributeObject(object):
         self.kwargs = kwargs
         for key, value in kwargs.items():
             setattr(self, key, value)
-    
+
     def __repr__(self):
         return '<AttributeObject: %r>' % self.kwargs
 

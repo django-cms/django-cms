@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
 import os
-import pprint
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.utils.six.moves.urllib.parse import urljoin
 
 from cms import constants
-from cms.exceptions import CMSDeprecationWarning
-from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
 
 
-class VERIFIED: pass # need a unique identifier for CMS_LANGUAGES
+class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def default(name):
@@ -35,12 +31,13 @@ def default(name):
 
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
+    'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
+    'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
     'RAW_ID_USERS': False,
     'PUBLIC_FOR': 'all',
-    'CONTENT_CACHE_DURATION': 60,
     'APPHOOKS': [],
     'TOOLBARS': [],
     'SITE_CHOICES_CACHE_KEY': 'CMS:site_choices',
@@ -59,18 +56,32 @@ DEFAULTS = {
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'MAX_PAGE_PUBLISH_REVERSIONS': 10,
     'MAX_PAGE_HISTORY_REVERSIONS': 15,
+    'TOOLBAR_ANONYMOUS_ON': True,
     'TOOLBAR_URL__EDIT_ON': 'edit',
     'TOOLBAR_URL__EDIT_OFF': 'edit_off',
     'TOOLBAR_URL__BUILD': 'build',
+    'TOOLBAR_URL__DISABLE': 'toolbar_off',
+    'ADMIN_NAMESPACE': 'admin',
+    'APP_NAME': None,
+    'TOOLBAR_HIDE': False,
+    'INTERNAL_IPS': [],
+    'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
+    'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
+    'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
+    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
+    'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
 }
 
 
 def get_cache_durations():
-    return {
-        'menus': getattr(settings, 'MENU_CACHE_DURATION', 60 * 60),
-        'content': get_cms_setting('CONTENT_CACHE_DURATION'),
+    """
+    Returns the setting: CMS_CACHE_DURATIONS or the defaults.
+    """
+    return getattr(settings, 'CMS_CACHE_DURATIONS', {
+        'menus': 60 * 60,
+        'content': 60,
         'permissions': 60 * 60,
-    }
+    })
 
 
 @default('CMS_MEDIA_ROOT')
@@ -98,6 +109,11 @@ def get_toolbar_url__build():
     return get_cms_setting('TOOLBAR_URL__BUILD')
 
 
+@default('CMS_TOOLBAR_URL__DISABLE')
+def get_toolbar_url__disable():
+    return get_cms_setting('TOOLBAR_URL__DISABLE')
+
+
 def get_templates():
     from cms.utils.django_load import load_from_file
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
@@ -110,8 +126,11 @@ def get_templates():
         # valid templates directory. Here we mimick what the filesystem and
         # app_directories template loaders do
         prefix = ''
-        # Relative to TEMPLATE_DIRS for filesystem loader
-        for basedir in settings.TEMPLATE_DIRS:
+        # Relative to TEMPLATE['DIRS'] for filesystem loader
+
+        path = [template['DIRS'][0] for template in settings.TEMPLATES]
+
+        for basedir in path:
             if tpldir.find(basedir) == 0:
                 prefix = tpldir.replace(basedir + os.sep, '')
                 break
@@ -135,14 +154,19 @@ def get_templates():
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _(constants.TEMPLATE_INHERITANCE_LABEL)))
+        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
 
-def _ensure_languages_settings_new(languages):
+def _ensure_languages_settings(languages):
     valid_language_keys = ['code', 'name', 'fallbacks', 'hide_untranslated', 'redirect_on_fallback', 'public']
     required_language_keys = ['code', 'name']
     simple_defaults = ['public', 'redirect_on_fallback', 'hide_untranslated']
+
+    if not isinstance(languages, dict):
+        raise ImproperlyConfigured(
+            "CMS_LANGUAGES must be a dictionary with site IDs and 'default'"
+            " as keys. Please check the format.")
 
     defaults = languages.pop('default', {})
     default_fallbacks = defaults.get('fallbacks')
@@ -157,7 +181,7 @@ def _ensure_languages_settings_new(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, six.integer_types):
+        if site != hash(site):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -191,73 +215,23 @@ def _ensure_languages_settings_new(languages):
             lang_code != language_object['code']]
 
     languages['default'] = defaults
+    languages[VERIFIED] = True  # this will be busted by @override_settings and cause a re-check
 
     return languages
 
 
-def _get_old_language_conf(code, name, template):
-    language = template.copy()
-    language['code'] = code
-    language['name'] = name
-    default_fallbacks = dict(settings.CMS_LANGUAGES).keys()
-    if hasattr(settings, 'CMS_LANGUAGE_FALLBACK'):
-        if settings.CMS_LANGUAGE_FALLBACK:
-            if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-                language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-            else:
-                language['fallbacks'] = default_fallbacks
-        else:
-            language['fallbacks'] = []
-    else:
-        if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-            language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-        else:
-            language['fallbacks'] = default_fallbacks
-    if hasattr(settings, 'CMS_FRONTEND_LANGUAGES'):
-        language['public'] = code in settings.CMS_FRONTEND_LANGUAGES
-    return language
-
-
-def _translate_legacy_languages_settings(languages):
-    new_languages = {}
-    lang_template = {'fallbacks': [], 'public': True, 'redirect_on_fallback': True,
-        'hide_untranslated': getattr(settings, 'CMS_HIDE_UNTRANSLATED', False)}
-    codes = dict(languages)
-    for site, site_languages in getattr(settings, 'CMS_SITE_LANGUAGES', {1: languages}).items():
-        new_languages[site] = []
-        for site_language in site_languages:
-            if site_language in codes:
-                new_languages[site].append(_get_old_language_conf(site_language, codes[site_language], lang_template))
-
-    pp = pprint.PrettyPrinter(indent=4)
-    warnings.warn("CMS_LANGUAGES has changed in django-cms 2.4\n"
-                  "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(new_languages),
-                  CMSDeprecationWarning)
-    new_languages['default'] = lang_template.copy()
-    return new_languages
-
-
-def _ensure_languages_settings(languages):
-    if isinstance(languages, dict):
-        verified_languages = _ensure_languages_settings_new(languages)
-    else:
-        verified_languages = _translate_legacy_languages_settings(languages)
-    verified_languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
-    return verified_languages
-
-
 def get_languages():
-    if not isinstance(settings.SITE_ID, six.integer_types):
+    if settings.SITE_ID != hash(settings.SITE_ID):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
     if not settings.USE_I18N:
         return _ensure_languages_settings(
             {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
-    if not settings.LANGUAGE_CODE in dict(settings.LANGUAGES):
+    if settings.LANGUAGE_CODE not in dict(settings.LANGUAGES):
         raise ImproperlyConfigured(
-                        'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
-                    )
+            'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
+        )
     languages = getattr(settings, 'CMS_LANGUAGES', {
         settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
     })
@@ -287,14 +261,26 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
     'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
     'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
+    'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
+}
+
+DEPRECATED_CMS_SETTINGS = {
+    # Old CMS_WIZARD_* settings to be removed in v3.5.0
+    'PAGE_WIZARD_DEFAULT_TEMPLATE': 'WIZARD_DEFAULT_TEMPLATE',
+    'PAGE_WIZARD_CONTENT_PLUGIN': 'WIZARD_CONTENT_PLUGIN',
+    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'WIZARD_CONTENT_PLUGIN_BODY',
+    'PAGE_WIZARD_CONTENT_PLACEHOLDER': 'WIZARD_CONTENT_PLACEHOLDER',
 }
 
 
 def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
-    else:
-        return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+    elif name in DEPRECATED_CMS_SETTINGS:
+        new_setting = 'CMS_%s' % name
+        old_setting = 'CMS_%s' % DEPRECATED_CMS_SETTINGS[name]
+        return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
+    return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
 
 
 def get_site_id(site):

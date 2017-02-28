@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load admin_static cms_static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+{% endblock %}
+
+{% block bodyclass %}cms-admin cms-admin-modal{% endblock %}
+
+{% block content %}
+    <div class="cms-content-wizard">
+        {% block wizard %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static_with_version "cms/js/dist/bundle.admin.base.min.js" %}" type="text/javascript"></script>
+    <script type="text/javascript">
+        if (!window.jQuery) {
+            window.jQuery = CMS.$;
+            window.$ = window.jQuery;
+        }
+    </script>
+    {{ form.media }}
+{% endblock %}

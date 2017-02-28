@@ -4,9 +4,9 @@ from collections import defaultdict
 
 from django.template.loader import render_to_string
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
-from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 
 
@@ -37,7 +37,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
     RIGHT = RIGHT
-    
+
     def __init__(self):
         self.items = []
         self.menus = {}
@@ -207,14 +207,15 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
     sub_level = True
     active = False
 
-    def __init__(self, name, csrf_token, side=LEFT):
+    def __init__(self, name, csrf_token, disabled=False, side=LEFT):
         ToolbarAPIMixin.__init__(self)
         BaseItem.__init__(self, side)
         self.name = name
+        self.disabled = disabled
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % force_unicode(self.name)
+        return '<Menu:%s>' % force_text(self.name)
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -222,11 +223,16 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         return item
 
     def get_items(self):
-        return self.items
+        items = self.items
+        for item in items:
+            if hasattr(item, 'disabled'):
+                item.disabled = self.disabled or item.disabled
+        return items
 
     def get_context(self):
         return {
             'active': self.active,
+            'disabled': self.disabled,
             'items': self.get_items(),
             'title': self.name,
             'sub_level': self.sub_level
@@ -236,10 +242,10 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
 class Menu(SubMenu):
     sub_level = False
 
-    def get_or_create_menu(self, key, verbose_name, side=LEFT, position=None):
+    def get_or_create_menu(self, key, verbose_name, disabled=False, side=LEFT, position=None):
         if key in self.menus:
             return self.menus[key]
-        menu = SubMenu(verbose_name, self.csrf_token, side=side)
+        menu = SubMenu(verbose_name, self.csrf_token, disabled=disabled, side=side)
         self.menus[key] = menu
         self.add_item(menu, position=position)
         return menu
@@ -257,7 +263,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % force_unicode(self.name)
+        return '<LinkItem:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -269,12 +275,13 @@ class LinkItem(BaseItem):
         }
 
 
-class SideframeItem(BaseItem):
-    template = "cms/toolbar/items/item_sideframe.html"
+class FrameItem(BaseItem):
+    # Be sure to define the correct template
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT):
-        super(SideframeItem, self).__init__(side)
-        self.name = "%s ..." % force_unicode(name)
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None, on_close=None, side=LEFT):
+        super(FrameItem, self).__init__(side)
+        self.name = "%s..." % force_text(name)
         self.url = url
         self.active = active
         self.disabled = disabled
@@ -282,7 +289,8 @@ class SideframeItem(BaseItem):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % force_unicode(self.name)
+        # Should be overridden
+        return '<FrameItem:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -295,11 +303,18 @@ class SideframeItem(BaseItem):
         }
 
 
-class ModalItem(SideframeItem):
+class SideframeItem(FrameItem):
+    template = "cms/toolbar/items/item_sideframe.html"
+
+    def __repr__(self):
+        return '<SideframeItem:%s>' % force_text(self.name)
+
+
+class ModalItem(FrameItem):
     template = "cms/toolbar/items/item_modal.html"
 
     def __repr__(self):
-        return '<ModalItem:%s>' % force_unicode(self.name)
+        return '<ModalItem:%s>' % force_text(self.name)
 
 
 class AjaxItem(BaseItem):
@@ -320,7 +335,7 @@ class AjaxItem(BaseItem):
         self.on_success = on_success
 
     def __repr__(self):
-        return '<AjaxItem:%s>' % force_unicode(self.name)
+        return '<AjaxItem:%s>' % force_text(self.name)
 
     def get_context(self):
         data = {}
@@ -337,8 +352,6 @@ class AjaxItem(BaseItem):
             'question': self.question,
             'on_success': self.on_success
         }
-
-
 
 
 class Break(BaseItem):
@@ -370,7 +383,7 @@ class Button(BaseButton):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<Button:%s>' % force_unicode(self.name)
+        return '<Button:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -394,7 +407,7 @@ class ModalButton(Button):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<ModalButton:%s>' % force_unicode(self.name)
+        return '<ModalButton:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -411,7 +424,7 @@ class SideframeButton(ModalButton):
     template = "cms/toolbar/items/button_sideframe.html"
 
     def __repr__(self):
-        return '<SideframeButton:%s>' % force_unicode(self.name)
+        return '<SideframeButton:%s>' % force_text(self.name)
 
 
 class ButtonList(BaseItem):
@@ -443,6 +456,16 @@ class ButtonList(BaseItem):
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
         item = ModalButton(name, url,
+                      active=active,
+                      disabled=disabled,
+                      extra_classes=extra_classes,
+                      on_close=on_close,
+        )
+        self.buttons.append(item)
+        return item
+
+    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
+        item = SideframeButton(name, url,
                       active=active,
                       disabled=disabled,
                       extra_classes=extra_classes,

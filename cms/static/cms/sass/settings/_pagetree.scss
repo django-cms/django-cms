@@ -1,0 +1,56 @@
+// #############################################################################
+// SETTINGS
+
+$pagetree-mobile: $screen-mobile + 200px;
+$pagetree-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+$pagetree-border: 1px solid $gray-lighter;
+
+// top header area
+$pagetree-header-background: $gray-super-lightest;
+$pagetree-header-height: 36px;
+$pagetree-header-padding: 15px 20px;
+$pagetree-header-space: 10px;
+$pagetree-header-search-width: 220px;
+$pagetree-header-filter-height: 400px;
+
+// dropdown
+$pagetree-dropdown-padding-horizontal: 15px;
+
+// menu sections
+$pagetree-section-padding: 15px 20px;
+$pagetree-section-padding-condensed: 10px 20px;
+$pagetree-section-height: 15px;
+$pagetree-section-border: 1px solid $gray-lighter;
+
+// jstree main container
+$pagetree-jstree-header-height: 24px;
+$pagetree-bottom-offset: 25px;
+$pagetree-cell-height: 46px;
+
+// general paddings for elements
+$pagetree-jstree-header-padding: 3px 6px;
+$pagetree-anchor-padding: 12px 25px;
+$pagetree-anchor-padding-with-icon: 12px 25px 12px 45px;
+$pagetree-nesting-padding: 20px;
+$pagetree-cell-padding: 7px 8px;
+
+// marker used for positioning when moving nodes
+$pagetree-marker-size: 6px;
+
+$pagetree-icon-size: 18px;
+$pagetree-icon-offset: 5px;
+$pagetree-icon-padding: 0 3px;
+
+$pagetree-lang-size: 16px;
+
+$pagetree-tooltip-min-width: 130px;
+$pagetree-tooltip-offset: 30px;
+$pagetree-tooltip-header-padding: 2px 10px;
+$pagetree-tooltip-anchor-padding: 10px;
+
+$pagetree-search-width: 175px;
+
+// used for copy and paste
+$pagetree-dimmer: $sideframe-dimmer;
+
+$pagetree-cell-inner-height: $pagetree-cell-height - 2 * nth($pagetree-cell-padding, 1);

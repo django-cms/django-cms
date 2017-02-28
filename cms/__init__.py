@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '3.0.4.dev1'
+
+__version__ = '3.4.0'
 
 default_app_config = 'cms.apps.CMSConfig'

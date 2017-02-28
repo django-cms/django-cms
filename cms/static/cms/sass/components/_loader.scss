@@ -1,0 +1,10 @@
+//##############################################################################
+// LOADER
+
+.cms-loader {
+    background: $loader-bgcolor url("../../img/loader.gif?uf5b664wnc") no-repeat center center !important;
+    @include print-and-retina() {
+        background-image: url("../../img/loader@2x.gif?uf5b664wnc") !important;
+        background-size: 32px !important;
+    }
+}

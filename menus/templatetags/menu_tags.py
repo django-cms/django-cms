@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.utils.i18n import force_language, get_language_objects
-from cms.utils.compat.dj import force_unicode
-from cms.utils.compat.urls import unquote
 from django import template
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.encoding import force_text
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
@@ -18,7 +16,8 @@ from menus.utils import DefaultLanguageChanger
 register = template.Library()
 
 
-class NOT_PROVIDED: pass
+class NOT_PROVIDED:
+    pass
 
 
 def cut_after(node, levels, removed):
@@ -64,11 +63,11 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             final.append(node)
             node.parent = None
         if not node.ancestor and not node.selected and not node.descendant:
-            # cut inactive nodes to extra_inactive, but not of descendants of 
+            # cut inactive nodes to extra_inactive, but not of descendants of
             # the selected node
             cut_after(node, extra_inactive, removed)
         if node.level > to_level and node.parent:
-            # remove nodes that are too deep, but not nodes that are on 
+            # remove nodes that are too deep, but not nodes that are on
             # from_level (local root nodes)
             remove(node, removed)
         if node.selected:
@@ -128,9 +127,14 @@ class ShowMenu(InclusionTag):
         if next_page:
             children = next_page.children
         else:
-        #new menu... get all the data so we can save a lot of queries
-            nodes = menu_pool.get_nodes(request, namespace, root_id)
-            if root_id: # find the root id and cut the nodes
+            # new menu... get all the data so we can save a lot of queries
+            menu_renderer = context.get('cms_menu_renderer')
+
+            if not menu_renderer:
+                menu_renderer = menu_pool.get_renderer(request)
+
+            nodes = menu_renderer.get_nodes(namespace, root_id)
+            if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
@@ -143,16 +147,16 @@ class ShowMenu(InclusionTag):
                 else:
                     nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
-            children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
+            children = menu_renderer.apply_modifiers(children, namespace, root_id, post_cut=True)
 
         try:
-            context.update({'children': children,
-                'template': template,
-                'from_level': from_level,
-                'to_level': to_level,
-                'extra_inactive': extra_inactive,
-                'extra_active': extra_active,
-                'namespace': namespace})
+            context['children'] = children
+            context['template'] = template
+            context['from_level'] = from_level
+            context['to_level'] = to_level
+            context['extra_inactive'] = extra_inactive
+            context['extra_active'] = extra_active
+            context['namespace'] = namespace
         except:
             context = {"template": template}
         return context
@@ -206,7 +210,13 @@ class ShowSubMenu(InclusionTag):
             request = context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
-        nodes = menu_pool.get_nodes(request)
+
+        menu_renderer = context.get('cms_menu_renderer')
+
+        if not menu_renderer:
+            menu_renderer = menu_pool.get_renderer(request)
+
+        nodes = menu_renderer.get_nodes()
         children = []
         # adjust root_level so we cut before the specified level, not after
         include_root = False
@@ -232,17 +242,15 @@ class ShowSubMenu(InclusionTag):
                         # if root_level was 0 we need to give the menu the entire tree
                     # not just the children
                 if include_root:
-                    children = menu_pool.apply_modifiers([node], request, post_cut=True)
+                    children = menu_renderer.apply_modifiers([node], post_cut=True)
                 else:
-                    children = menu_pool.apply_modifiers(children, request, post_cut=True)
-        context.update({
-            'children': children,
-            'template': template,
-            'from_level': 0,
-            'to_level': 0,
-            'extra_inactive': 0,
-            'extra_active': 0
-        })
+                    children = menu_renderer.apply_modifiers(children, post_cut=True)
+        context['children'] = children
+        context['template'] = template
+        context['from_level'] = 0
+        context['to_level'] = 0
+        context['extra_inactive'] = 0
+        context['extra_active'] = 0
         return context
 
 
@@ -252,9 +260,9 @@ register.tag(ShowSubMenu)
 class ShowBreadcrumb(InclusionTag):
     """
     Shows the breadcrumb from the node that has the same url as the current request
-    
+
     - start level: after which level should the breadcrumb start? 0=home
-    - template: template used to render the breadcrumb 
+    - template: template used to render the breadcrumb
     """
     name = 'show_breadcrumb'
     template = 'menu/dummy.html'
@@ -280,14 +288,23 @@ class ShowBreadcrumb(InclusionTag):
         except:
             only_visible = bool(only_visible)
         ancestors = []
-        nodes = menu_pool.get_nodes(request, breadcrumb=True)
-        selected = None
+
+        menu_renderer = context.get('cms_menu_renderer')
+
+        if not menu_renderer:
+            menu_renderer = menu_pool.get_renderer(request)
+
+        nodes = menu_renderer.get_nodes(breadcrumb=True)
+
+        # Find home
         home = None
-        for node in nodes:
-            if node.selected:
-                selected = node
-            if node.get_absolute_url() == unquote(reverse("pages-root")):
-                home = node
+        root_url = unquote(reverse("pages-root"))
+        home = next((node for node in nodes if node.get_absolute_url() == root_url), None)
+
+        # Find selected
+        selected = None
+        selected = next((node for node in nodes if node.selected), None)
+
         if selected and selected != home:
             node = selected
             while node:
@@ -301,8 +318,8 @@ class ShowBreadcrumb(InclusionTag):
             ancestors = ancestors[start_level:]
         else:
             ancestors = []
-        context.update({'ancestors': ancestors,
-            'template': template})
+        context['ancestors'] = ancestors
+        context['template'] = template
         return context
 
 
@@ -315,11 +332,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return force_unicode(ugettext(language))
+        return force_text(ugettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return force_unicode(ugettext(language))
+    return force_text(ugettext(language))
 
 
 def _short_language_marker(language, lang_code):
@@ -369,11 +386,9 @@ class LanguageChooser(InclusionTag):
         for lang in get_language_objects(site.pk):
             if lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
-        context.update({
-            'languages': languages,
-            'current_language': current_lang,
-            'template': template,
-        })
+        context['languages'] = languages
+        context['current_language'] = current_lang
+        context['template'] = template
         return context
 
 

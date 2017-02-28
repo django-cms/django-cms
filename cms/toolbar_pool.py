@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.datastructures import SortedDict
 
 
 class ToolbarPool(object):
     def __init__(self):
-        self.toolbars = SortedDict()
+        self.toolbars = OrderedDict()
         self._discovered = False
         self.force_register = False
 
@@ -23,11 +24,11 @@ class ToolbarPool(object):
                 self.register(cls)
                 self.force_register = False
         else:
-            load('cms_toolbar')
+            load('cms_toolbars')
         self._discovered = True
 
     def clear(self):
-        self.toolbars = SortedDict()
+        self.toolbars = OrderedDict()
         self._discovered = False
 
     def register(self, toolbar):
@@ -55,11 +56,8 @@ class ToolbarPool(object):
         return self.toolbars
 
     def get_watch_models(self):
-        models = []
-        for toolbar in self.toolbars.values():
-            if hasattr(toolbar, 'watch_models'):
-                models += toolbar.watch_models
-        return models
+        return sum((list(getattr(tb, 'watch_models', []))
+                    for tb in self.toolbars.values()), [])
 
 
 toolbar_pool = ToolbarPool()

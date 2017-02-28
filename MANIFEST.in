@@ -10,3 +10,4 @@ recursive-include menus/templates *
 recursive-include stacks/templates *
 recursive-include docs *
 recursive-exclude * *.pyc
+recursive-exclude * *.scssc

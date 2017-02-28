@@ -1,0 +1,36 @@
+//##############################################################################
+// RESET
+
+.cms-reset {
+    div,
+    p,
+    a,
+    a:hover,
+    a:active,
+    a:focus,
+    ul,
+    li,
+    form,
+    fieldset,
+    label,
+    input,
+    textarea,
+    h1,
+    h2,
+    h3 {
+        color: #222;
+        font: normal #{$font-size-normal}/#{$line-height-normal} Helvetica,Arial,sans-serif;
+        text-align: left;
+        text-decoration: none;
+        box-sizing: border-box;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        border: none;
+        outline: none;
+        list-style-type: none;
+        list-style-image: none;
+        background: none;
+        transition: none;
+    }
+}

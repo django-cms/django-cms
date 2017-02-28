@@ -1,0 +1,16 @@
+.. _upgrade-to-3.0.9:
+
+###################
+3.0.9 release notes
+###################
+
+*******************
+What's new in 3.0.9
+*******************
+
+Bug Fixes
+=========
+
+* Revert a change that caused a regression in toolbar login
+* Fix an error in a translated phrase
+* Fix error when moving items in the page tree

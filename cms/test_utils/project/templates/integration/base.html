@@ -1,0 +1,40 @@
+{% load cms_tags static menu_tags sekizai_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}This is my new project home page{% endblock title %}</title>
+    <!-- required for "mobile" -->
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    {% render_block "css" %}
+    <style type="text/css">
+        .nav {
+            padding-left: 0;
+        }
+        .nav li {
+            display: inline;
+            list-style-type: none;
+            padding-right: 20px;
+        }
+        html, body {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+{% cms_toolbar %}
+<div style="max-width: 940px; margin:0 auto">
+    <ul class="nav">
+        {% show_menu 0 100 100 100 %}
+    </ul>
+    {% block content %}{% endblock content %}
+</div>
+<div class="additional-content">
+    {% block additional_content %}{% endblock %}
+</div>
+{% render_block "js" %}
+{% with_data "js-script" as jsset %}
+    {% for js in jsset %}<script type="text/javascript" src="{% static js %}"></script>{% endfor %}
+{% end_with_data %}
+{% render_block "js_end" %}
+</body>
+</html>

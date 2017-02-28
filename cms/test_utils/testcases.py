@@ -4,42 +4,64 @@ import sys
 import warnings
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.forms.models import model_to_dict
+from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.utils.http import urlencode
+from django.utils.timezone import now
 from django.utils.translation import activate
+from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
+from cms.api import create_page
+from cms.plugin_rendering import ContentRenderer
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext,
-    SettingsOverride)
-from cms.utils.compat.dj import get_user_model
-from cms.utils.compat.urls import urljoin, unquote
+from cms.models.permissionmodels import (
+    GlobalPagePermission,
+    PagePermission,
+    PageUser,
+)
+from cms.test_utils.util.context_managers import UserLoginContext
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.permissions import set_current_user
+from cms.utils.urlutils import admin_reverse
 
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
-URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
+URL_CMS_PAGE_CHANGE_BASE = urljoin(URL_CMS_PAGE, "%d/")
+if DJANGO_1_8:
+    URL_CMS_PAGE_CHANGE = URL_CMS_PAGE_CHANGE_BASE
+else:
+    URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
 URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
 URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
+URL_CMS_PAGE_PERMISSIONS = urljoin(URL_CMS_PAGE, "%d/permissions/")
+URL_CMS_PAGE_PUBLISHED = urljoin(URL_CMS_PAGE, "published-pages/")
+URL_CMS_PAGE_MOVE = urljoin(URL_CMS_PAGE, "%d/move-page/")
+URL_CMS_PAGE_COPY = urljoin(URL_CMS_PAGE, "%d/copy-page/")
 URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
-URL_CMS_PAGE_CHANGE_TEMPLATE = URL_CMS_PAGE_CHANGE + "change_template/"
-URL_CMS_PAGE_PUBLISH = URL_CMS_PAGE_CHANGE + "%s/publish/"
-URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
+URL_CMS_PAGE_CHANGE_TEMPLATE = urljoin(URL_CMS_PAGE_CHANGE, "change-template/")
+URL_CMS_PAGE_PUBLISH = urljoin(URL_CMS_PAGE_CHANGE_BASE, "%s/publish/")
+URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE, "edit-plugin/")
 URL_CMS_PLUGIN_MOVE = urljoin(URL_CMS_PAGE, "move-plugin/")
+URL_CMS_PLUGIN_PAGE_MOVE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "move-plugin/")
+URL_CMS_PLUGIN_PAGE_ADD = urljoin(URL_CMS_PAGE_CHANGE_BASE, "add-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE, "delete-plugin/")
-URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
-
-URL_CMS_PAGE_HISTORY = urljoin(URL_CMS_PAGE_CHANGE, "history/%d/")
-URL_CMS_PLUGIN_HISTORY_EDIT = urljoin(URL_CMS_PAGE_HISTORY, "edit-plugin/")
+URL_CMS_PLUGIN_DELETE = urljoin(URL_CMS_PAGE, "delete-plugin/%s/")
+URL_CMS_PLUGINS_COPY = urljoin(URL_CMS_PAGE, "copy-plugins/")
+URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translation/")
+URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
 class _Warning(object):
@@ -89,12 +111,10 @@ class BaseCMSTestCase(object):
         self.create_fixtures()
         activate("en")
 
-
     def create_fixtures(self):
         pass
 
     def _post_teardown(self):
-        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
         cache.clear()
         super(BaseCMSTestCase, self)._post_teardown()
@@ -102,6 +122,51 @@ class BaseCMSTestCase(object):
 
     def login_user_context(self, user):
         return UserLoginContext(self, user)
+
+    def get_permission(self, codename):
+        return Permission.objects.get(codename=codename)
+
+    def add_permission(self, user, codename):
+        user.user_permissions.add(self.get_permission(codename))
+
+    def remove_permission(self, user, codename):
+        user.user_permissions.remove(Permission.objects.get(codename=codename))
+
+    def add_global_permission(self, user, **kwargs):
+        options = {
+            'can_add': False,
+            'can_change': False,
+            'can_delete': False,
+            'can_change_advanced_settings': False,
+            'can_publish': False,
+            'can_change_permissions': False,
+            'can_move_page': False,
+            'can_recover_page': False,
+            'user': user,
+        }
+        options.update(**kwargs)
+
+        gpp = GlobalPagePermission.objects.create(**options)
+        gpp.sites = Site.objects.all()
+        return gpp
+
+    def add_page_permission(self, user, page, **kwargs):
+        options = {
+            'can_add': False,
+            'can_change': False,
+            'can_delete': False,
+            'can_change_advanced_settings': False,
+            'can_publish': False,
+            'can_change_permissions': False,
+            'can_move_page': False,
+            'page': page,
+            'user': user,
+        }
+        options.update(**kwargs)
+
+        pp = PagePermission.objects.create(**options)
+        pp.sites = Site.objects.all()
+        return pp
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):
@@ -116,7 +181,7 @@ class BaseCMSTestCase(object):
         """
         User = get_user_model()
 
-        fields = dict(email=username + '@django-cms.org',
+        fields = dict(email=username + '@django-cms.org', last_login=now(),
                       is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
         )
 
@@ -168,8 +233,30 @@ class BaseCMSTestCase(object):
         This is a non superuser staff
         """
         staff = self._create_user("staff", is_staff=True, is_superuser=False,
-                                  add_permissions=True)
+                                  add_default_permissions=True)
         return staff
+
+    def get_standard_user(self):
+        """
+        Used in security tests
+        """
+        standard = self._create_user("standard", is_staff=False, is_superuser=False)
+        return standard
+
+    def get_staff_page_user(self, created_by=None):
+        if not created_by:
+            created_by = self.get_superuser()
+
+        parent_link_field = list(PageUser._meta.parents.values())[0]
+        user = self._create_user(
+            'perms-testuser',
+            is_staff=True,
+            is_superuser=False,
+        )
+        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data[parent_link_field.name] = user
+        data['created_by'] = created_by
+        return PageUser.objects.create(**data)
 
     def get_new_page_data(self, parent_id=''):
         page_data = {
@@ -190,7 +277,6 @@ class BaseCMSTestCase(object):
         self.counter += 1
         return page_data
 
-
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
                                    template='nav_playground.html', ):
@@ -204,7 +290,6 @@ class BaseCMSTestCase(object):
         }
         self.counter = self.counter + 1
         return page_data
-
 
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
@@ -221,14 +306,13 @@ class BaseCMSTestCase(object):
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
 
-
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in qs.order_by('tree_id', 'lft'):
+        for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-            page.pk, page.lft, page.rght, page.tree_id))
+            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -255,11 +339,11 @@ class BaseCMSTestCase(object):
             return
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
-    def copy_page(self, page, target_page):
+    def copy_page(self, page, target_page, position=0):
         from cms.utils.page import get_available_slug
 
         data = {
-            'position': 'last-child',
+            'position': position,
             'target': target_page.pk,
             'site': 1,
             'copy_permissions': 'on',
@@ -268,14 +352,13 @@ class BaseCMSTestCase(object):
 
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEqual(response.status_code, 200)
-        # Altered to reflect the new django-js jsonified response messages
-        expected = {"status": 200, "content": "ok"}
-        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
-
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-
-        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
+        parent = target_page
+        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=parent)
+        # Altered to reflect the new django-js jsonified response messages
+        expected = {"id": copied_page.pk}
+        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
         return copied_page
 
     def move_page(self, page, target_page, position="first-child"):
@@ -300,7 +383,12 @@ class BaseCMSTestCase(object):
         context = {}
         request = self.get_request(path, page=page)
         context['request'] = request
+        context['cms_content_renderer'] = self.get_content_renderer(request=request)
         return Context(context)
+
+    def get_content_renderer(self, request=None):
+        request = request or self.get_request()
+        return ContentRenderer(request)
 
     def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
         factory = RequestFactory()
@@ -350,15 +438,10 @@ class BaseCMSTestCase(object):
         if page.parent:
             self.assertEqual(page.parent_id, public_page.parent.publisher_draft.id)
 
-        self.assertEqual(page.level, public_page.level)
+        self.assertEqual(page.depth, public_page.depth)
 
-        # TODO: add check for siblings
-        draft_siblings = list(page.get_siblings(True).filter(
-            publisher_is_draft=True
-        ).order_by('tree_id', 'parent', 'lft'))
-        public_siblings = list(public_page.get_siblings(True).filter(
-            publisher_is_draft=False
-        ).order_by('tree_id', 'parent', 'lft'))
+        draft_siblings = list(Page.objects.filter(parent_id=page.parent_id, publisher_is_draft=True).order_by('path'))
+        public_siblings = list(Page.objects.filter(parent_id=public_page.parent_id, publisher_is_draft=False).order_by('path'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
@@ -385,6 +468,53 @@ class BaseCMSTestCase(object):
 
     assertWarns = failUnlessWarns
 
+    def load_template_from_string(self, template):
+        return engines['django'].from_string(template)
+
+    def render_template_obj(self, template, context, request):
+        template_obj = self.load_template_from_string(template)
+        return template_obj.render(context, request)
+
+    def apphook_clear(self):
+        from cms.apphook_pool import apphook_pool
+        for name, label in list(apphook_pool.get_apphooks()):
+            if apphook_pool.apps[name].__class__.__module__ in sys.modules:
+                del sys.modules[apphook_pool.apps[name].__class__.__module__]
+        apphook_pool.clear()
+
+    def get_admin_url(self, model, action, *args):
+        opts = model._meta
+        url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
+        return admin_reverse(url_name, args=args)
+
+    def get_permissions_test_page(self):
+        admin = self.get_superuser()
+        create_page(
+            "home",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+            published=True,
+        )
+        page = create_page(
+            "permissions",
+            "nav_playground.html",
+            "en",
+            created_by=admin,
+            published=True,
+            reverse_id='permissions',
+        )
+        return page
+
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en'):
+        endpoint = placeholder.get_add_url()
+        uri = endpoint + '?' + urlencode({
+            'plugin_type': plugin_type,
+            'placeholder_id': placeholder.pk,
+            'plugin_language': language,
+        })
+        return uri
+
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
     pass
@@ -392,22 +522,3 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
-
-
-class SettingsOverrideTestCase(CMSTestCase):
-    settings_overrides = {}
-
-    def _pre_setup(self):
-        self._enter_settings_override()
-        super(SettingsOverrideTestCase, self)._pre_setup()
-
-    def _enter_settings_override(self):
-        self._settings_ctx_manager = SettingsOverride(**self.settings_overrides)
-        self._settings_ctx_manager.__enter__()
-
-    def _post_teardown(self):
-        super(SettingsOverrideTestCase, self)._post_teardown()
-        self._exit_settings_override()
-
-    def _exit_settings_override(self):
-        self._settings_ctx_manager.__exit__(None, None, None)

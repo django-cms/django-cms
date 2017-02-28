@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
-import warnings
+from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import url, patterns, include
-from django.contrib.formtools.wizard.views import normalize_name
-from django.db import connection
+from django.conf.urls import url, include
 from django.db.models import signals
-from django.db.models.fields.related import ManyToManyField
-from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
-from cms.utils.django_load import load, get_subclasses
+from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register
-from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode, is_installed
+from cms.utils.compat.dj import is_installed
+from cms.utils.helpers import normalize_name
 
 
 class PluginPool(object):
+
     def __init__(self):
         self.plugins = {}
         self.discovered = False
@@ -31,19 +29,73 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
-        self.discovered = True
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
+        self.discovered = True
 
     def clear(self):
         self.discovered = False
         self.plugins = {}
         self.patched = False
 
+    def validate_templates(self, plugin=None):
+        """
+        Plugins templates are validated at this stage
+
+        """
+        if plugin:
+            plugins = [plugin]
+        else:
+            plugins = self.plugins.values()
+        for plugin in plugins:
+            if (plugin.render_plugin and not type(plugin.render_plugin) == property
+                    or hasattr(plugin.model, 'render_template')
+                    or hasattr(plugin, 'get_render_template')):
+                if (plugin.render_template is None and
+                        not hasattr(plugin, 'get_render_template')):
+                    raise ImproperlyConfigured(
+                        "CMS Plugins must define a render template, "
+                        "a get_render_template method or "
+                        "set render_plugin=False: %s" % plugin
+                    )
+                # If plugin class defines get_render_template we cannot
+                # statically check for valid template file as it depends
+                # on plugin configuration and context.
+                # We cannot prevent developer to shoot in the users' feet
+                elif not hasattr(plugin, 'get_render_template'):
+                    from django.template import loader
+
+                    template = plugin.render_template
+                    if isinstance(template, six.string_types) and template:
+                        try:
+                            loader.get_template(template)
+                        except TemplateDoesNotExist as e:
+                            # Note that the template loader will throw
+                            # TemplateDoesNotExist if the plugin's render_template
+                            # does in fact exist, but it includes a template that
+                            # doesn't.
+                            if six.text_type(e) == template:
+                                raise ImproperlyConfigured(
+                                    "CMS Plugins must define a render template (%s) that exists: %s"
+                                    % (plugin, template)
+                                )
+                            else:
+                                pass
+                        except TemplateSyntaxError:
+                            pass
+            else:
+                if plugin.allow_children:
+                    raise ImproperlyConfigured(
+                        "CMS Plugins can not define render_plugin=False and allow_children=True: %s"
+                        % plugin
+                    )
+
     def register_plugin(self, plugin):
         """
         Registers the given plugin(s).
+
+        Static sanity checks is also performed.
 
         If a plugin is already registered, this will raise PluginAlreadyRegistered.
         """
@@ -52,33 +104,6 @@ class PluginPool(object):
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
                 % plugin
             )
-        if plugin.render_plugin and not type(plugin.render_plugin) == property or hasattr(plugin.model, 'render_template'):
-            if plugin.render_template is None and not hasattr(plugin.model, 'render_template'):
-                raise ImproperlyConfigured(
-                    "CMS Plugins must define a render template or set render_plugin=False: %s"
-                    % plugin
-                )
-            else:
-                from django.template import loader
-
-                template = hasattr(plugin.model,
-                                   'render_template') and plugin.model.render_template or plugin.render_template
-                if isinstance(template, six.string_types) and template:
-                    try:
-                        loader.get_template(template)
-                    except TemplateDoesNotExist:
-                        raise ImproperlyConfigured(
-                            "CMS Plugins must define a render template (%s) that exist: %s"
-                            % (plugin, template)
-                        )
-                    except TemplateSyntaxError:
-                        pass
-        else:
-            if plugin.allow_children:
-                raise ImproperlyConfigured(
-                    "CMS Plugins can not define render_plugin=False and allow_children=True: %s"
-                    % plugin
-                )
         plugin_name = plugin.__name__
         if plugin_name in self.plugins:
             raise PluginAlreadyRegistered(
@@ -96,15 +121,14 @@ class PluginPool(object):
                                     dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
+
         if is_installed('reversion'):
-            try:
-                from reversion.registration import RegistrationError
-            except ImportError:
-                from reversion.revisions import RegistrationError
+            from cms.utils.reversion_hacks import RegistrationError
             try:
                 reversion_register(plugin.model)
             except RegistrationError:
                 pass
+        return plugin
 
     def unregister_plugin(self, plugin):
         """
@@ -132,105 +156,50 @@ class PluginPool(object):
         """
         if self.patched:
             return
-        table_names = connection.introspection.table_names()
-        subs = get_subclasses(CMSPlugin)
-        for model in subs:
-            if not model._meta.abstract:
-
-                splitter = '%s_' % model._meta.app_label
-                table_name = model._meta.db_table
-
-                #
-                # Checks to see if this plugin's model's table's name is
-                # properly named with the app_label as the prefix (not
-                # 'cmsplugin')
-                #
-                if (table_name not in table_names and splitter in table_name):
-                    proper_table_name = table_name
-                    splitted = table_name.split(splitter, 1)
-                    bad_table_name = 'cmsplugin_%s' % splitted[1]
-                    if bad_table_name in table_names:
-                        model._meta.db_table = bad_table_name
-                        warnings.warn(
-                            'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
-
-                for att_name in model.__dict__.keys():
-                    att = model.__dict__[att_name]
-
-                    #
-                    # Checks to see if this plugin's model contains an M2M
-                    # field, whose 'through' table is properly named with the
-                    # app_label as the prefix (and not 'cmsplugin')
-                    #
-                    if isinstance(att, ManyToManyField):
-                        table_name = att.rel.through._meta.db_table
-                        if (table_name not in table_names and splitter in table_name):
-                            proper_table_name = table_name
-                            splitted = proper_table_name.split(splitter, 1)
-                            bad_table_name = 'cmsplugin_%s' % splitted[1]
-                            if bad_table_name in table_names:
-                                att.rel.through._meta.db_table = bad_table_name
-                                warnings.warn(
-                                    'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                        bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
-
-                    #
-                    # Checks to see if this plugin's model contains an M2M
-                    # field, whose 'through' table is properly named with the
-                    # app_label as the prefix (and not 'cmsplugin')
-                    #
-                    elif isinstance(att, ReverseManyRelatedObjectsDescriptor):
-                        table_name = att.through._meta.db_table
-                        if (table_name not in table_names and splitter in table_name):
-                            proper_table_name = table_name
-                            splitted = proper_table_name.split(splitter, 1)
-                            bad_table_name = 'cmsplugin_%s' % splitted[1]
-                            if bad_table_name in table_names:
-                                att.through._meta.db_table = bad_table_name
-                                warnings.warn(
-                                    'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                        bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
-
         self.patched = True
 
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
+        from cms.utils.placeholder import get_placeholder_conf
+
         self.discover_plugins()
         self.set_plugin_meta()
-        plugins = list(self.plugins.values())
-        plugins.sort(key=lambda obj: force_unicode(obj.name))
-        final_plugins = []
+        plugins = sorted(self.plugins.values(), key=attrgetter('name'))
         template = page and page.get_template() or None
+
         allowed_plugins = get_placeholder_conf(
             setting_key,
             placeholder,
             template,
         ) or ()
-        for plugin in plugins:
-            include_plugin = False
-            if placeholder and not plugin.require_parent:
-                include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
-            if plugin.page_only and not include_page_only:
-                include_plugin = False
-            if include_plugin:
-                final_plugins.append(plugin)
+        excluded_plugins = get_placeholder_conf(
+            'excluded_plugins',
+            placeholder,
+            template,
+        ) or ()
 
-        if final_plugins or placeholder:
-            plugins = final_plugins
+        if not include_page_only:
+            # Filters out any plugin marked as page only because
+            # the include_page_only flag has been set to False
+            plugins = (plugin for plugin in plugins if not plugin.page_only)
 
-        # plugins sorted by modules
-        plugins = sorted(plugins, key=lambda obj: force_unicode(obj.module))
-        return plugins
+        if allowed_plugins:
+            # Check that plugins are in the list of the allowed ones
+            plugins = (plugin for plugin in plugins if plugin.__name__ in allowed_plugins)
+
+        if excluded_plugins:
+            # Check that plugins are not in the list of the excluded ones
+            plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
+
+        if placeholder:
+            # Filters out any plugin that requires a parent or has set parent classes
+            plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
+        return sorted(plugins, key=attrgetter('module'))
 
     def get_text_enabled_plugins(self, placeholder, page):
         plugins = self.get_all_plugins(placeholder, page)
         plugins += self.get_all_plugins(placeholder, page, 'text_only_plugins')
-        final = []
-        for plugin in plugins:
-            if plugin.text_enabled:
-                if plugin not in final:
-                    final.append(plugin)
-        return final
+        return sorted((p for p in set(plugins) if p.text_enabled),
+                      key=attrgetter('module', 'name'))
 
     def get_plugin(self, name):
         """
@@ -251,16 +220,20 @@ class PluginPool(object):
             url_patterns = []
             for plugin in self.get_all_plugins():
                 p = plugin()
-                slug = slugify(force_unicode(normalize_name(p.__class__.__name__)))
-                url_patterns += patterns('',
-                                         url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
-                )
+                slug = slugify(force_text(normalize_name(p.__class__.__name__)))
+                url_patterns += [
+                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                ]
         finally:
             # Reactivate translation
             activate(lang)
 
         return url_patterns
 
+    def get_system_plugins(self):
+        self.discover_plugins()
+        self.set_plugin_meta()
+        return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
+
 
 plugin_pool = PluginPool()
-

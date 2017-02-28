@@ -1,0 +1,344 @@
+.. _upgrade-to-3.1:
+
+#################
+3.1 release notes
+#################
+
+django CMS 3.1 has been planned largely as a consolidation release, to build on the progress made
+in 3.0 and establish a safe, solid base for more ambitious work in the future.
+
+In this release we have tried to maintain maximum backwards-compatibility, particularly for
+third-party applications, and endeavoured to identify and tidy loose ends in the system wherever
+possible.
+
+.. warning:: Upgrading from previous versions
+
+    3.1 introduces some changes that **require** action if you are upgrading
+    from a previous version. Please read :ref:`upgrade-guide-3.1` for a step-by-step guide to the
+    process of upgrading from 3.0 to 3.1.
+
+*****************
+What's new in 3.1
+*****************
+
+Switch from MPTT to MP
+======================
+
+Since django CMS 2.0 we have relied on MPTT (Modified Pre-order Tree Traversal) for efficiently
+handling tree structures in the database.
+
+In 3.1, `Django MPTT <https://github.com/django-mptt/django-mptt>`_ has been replaced by
+`django-treebeard <https://github.com/tabo/django-treebeard>`_, to improve performance and
+reliability.
+
+Over the years MPTT has proved not to be fast enough for big tree operations (>1000 pages); tree
+corruption, because of transactional errors, has also been a problem.
+
+django-treebeard uses MP (Materialised Path). MP is more efficient and has more error resistance
+then MPTT. It should make working with and using django CMS better - faster and reliable.
+
+Other than this, end users should not notice any changes.
+
+.. note:: User feedback required
+
+    We require as much feedback as possible about the performance of django-treebeard in this
+    release. Please let us know your experiences with it, especially if you encounter any problems.
+
+.. note:: Backward incompatible change
+
+    While most of the low-level interface is very similar between ``django-mptt`` and
+    ``django-treebeard`` they are not exactly the same. If any custom code needs to make use of the
+    low-level interfaces of the page or plugins tree, please see the `django-treebeard
+    documentation <https://tabo.pe/projects/django-treebeard/docs/2.0/>`_ for information
+    on how to use equivalent calls in ``django-treebeard``.
+
+.. note:: Handling plugin data migrations
+
+    Please check :ref:`plugin-datamigrations-3.1` for information on how to create
+    migrations compatible with django CMS 3.0 and 3.1
+
+
+Action required
+---------------
+
+Run :ref:`manage.py cms fix-mptt <fix-mptt>` before you upgrade.
+
+Developers who use django CMS will need to run the schema and data migrations that are part of this
+release. Developers of third-party applications that relied on the Django MPTT that shipped with
+django CMS are advised to update their own applications so that they install it independently.
+
+Dropped support for Django 1.4 and 1.5
+======================================
+
+Starting from version 3.1, django CMS runs on Django 1.6 (specifically, 1.6.9 and later) and 1.7.
+
+.. warning:: Django security support
+
+    Django 1.6 support is provided as an interim measure only. In accordance with the `Django
+    Project's security policies <https://docs.djangoproject.com/en/dev/internals/security/>`_, 1.6
+    no longer receives security updates from the Django Project team. Projects running on Django
+    1.6 have known vulnerabilities, so you are advised to upgrade your installation to 1.7 or 1.8
+    as soon as possible.
+
+Action required
+---------------
+
+If you're still on an earlier version, you will need to install a newer one, and make sure that
+your third-party applications are also up-to-date with it before attempting to upgrade django CMS.
+
+South is now an optional dependency
+===================================
+
+As Django South is now required for Django 1.6 only, it's marked as an optional dependency.
+
+Action required
+---------------
+
+To install South along with django CMS use ``pip install django-cms[south]``.
+
+Changes to PlaceholderAdmin.add_plugin
+======================================
+
+Historically, when a plugin was added to django CMS, a POST request was made to
+the ``PlaceholderAdmin.add_plugin`` endpoint (and going back into very ancient
+history before ``PlaceholderAdmin`` existed, it was ``PageAdmin.add_plugin``).
+This would create an instance of ``CMSPlugin``, but not an instance of the
+actual plugin model itself. It would then let the user agent edit the created
+plugin, which when saved would put the database back in to a consistent state,
+with a plugin instance connected to the otherwise empty and meaningless
+``CMSPlugin``.
+
+In some cases, "ghost plugins" would be created, if the process of creating the
+plugin instance failed or were interrupted, for example by the broswer window's
+being closed.
+
+This would leave orphaned ``CMSPlugin`` instances in the database without any
+data. This could result pages not working at all, due to the resulting database
+inconsistencies.
+
+This issue has now been solved. Calling ``CMSPluginBase.add_plugin`` with a
+GET request now serves the form for creating a new instance of a plugin. Then on
+submitting that form via POST, the plugin is created in its entirety, ensuring
+a consistent database and an end to ghost plugins.
+
+However, to solve it some backwards incompatible changes to **non-documented
+APIs** that developers might have used have had to be made.
+
+CMSPluginBase permission hooks
+------------------------------
+
+Until now, ``CMSPluginBase.has_delete_permission``,
+``CMSPluginBase.has_change_permission`` and
+``CMSPluginBase.has_add_permission`` were handled by a single method, which
+used an undocumented and unreliable property on ``CMSPluginBase`` instances
+(or subclasses thereof) to handle permission management.
+
+In 3.1, ``CMSPluginBase.has_add_permission`` is its own method that implements
+proper permission checking for adding plugins.
+
+If you want to work with those APIs, see the `Django documentation`_ for more
+on the permission methods.
+
+
+CMSPluginBase.get_form
+----------------------
+
+Prior to 3.1, this method would only ever be called with an actual instance
+available.
+
+As of 3.1, this method will be called without an instance (the ``obj`` argument
+to the method will be ``None``) if the form is used to add a plugin, rather
+than editing it. Again, this is in line with how Django's ``ModelAdmin`` works.
+
+If you need access to the ``Placeholder`` object to which the plugin will be
+added, the ``request`` object is *guaranteed* to have a ``placeholder_id`` key
+in ``request.GET``, which is the primary key of the ``Placeholder`` object to
+which the plugin will be added. Similarly, ``plugin_language`` in
+``request.GET`` holds the language code of the plugin to be added.
+
+CMSPlugin.add_view
+------------------
+
+This method used to never be called, but as of 3.1 it will be. Should you need
+to hook into this method, you may want to use the
+``CMSPluginBase.add_view_check_request`` method to verify that a request made to
+this view is valid. This method will perform integrity and permission checks
+for the GET parameters of the request.
+
+
+Migrations moved
+================
+
+Migrations directories have been renamed to conform to the new standard layout:
+
+ * Django 1.7 migrations: in the default ``cms/migrations`` and ``menus/migrations`` directories
+ * South migrations: in the ``cms/south_migrations`` and ``menus/south_migrations`` directories
+
+Action required
+---------------
+
+South 1.0.2 or newer is required to handle the new layout correctly, so make sure you have that
+installed.
+
+If you are upgrading from django CMS 3.0.x running on Django 1.7 you need to remove the old
+migration path from `MIGRATION_MODULES
+<https://docs.djangoproject.com/en/1.7/ref/settings/#migration-modules>`_ settings.
+
+Plugins migrations moving process
+=================================
+
+Core plugins are being changed to follow the new convention for the migration modules, starting
+with **djangocms_text_ckeditor** 2.5 released together with django CMS 3.1.
+
+Action required
+---------------
+
+Check the readme file of each plugin when upgrading to know the actions required.
+
+Structure mode permission
+=========================
+
+A new :doc:`Can use Structure mode* permission </topics/permissions>` has been added.
+
+Without this permission, a non-superuser will no longer have access to structure mode. This makes
+possible a more strict workflow, in which certain users are able to edit content but not structure.
+
+This change includes a data migration that adds the new permission to any staff user or group with
+``cms.change_page`` permission.
+
+Action required
+---------------
+
+You may need to adjust these permissions once you have completed migrating your database.
+
+Note that if you have existing users in your database, but are installing django CMS and running
+its migrations for the first time, you will need to grant them these permissions - they will not
+acquire them automatically.
+
+Simplified loading of view restrictions in the menu
+===================================================
+
+The system that loads page view restrictions into the menu has been improved, simplifying the
+queries that are generated, in order to make it faster.
+
+.. note:: User feedback required
+
+    We require as much feedback as possible about the performance of this feature in this
+    release. Please let us know your experiences with it, especially if you encounter any problems.
+
+Toolbar API extension
+=====================
+
+The toolbar API has been extended to permit more powerful use of it in future development,
+including the use of "clipboard-like" items.
+
+For an example of how this can be used, see the new
+`Aldryn Blueprint <https://github.com/aldryn/aldryn-blueprint/>`_ application.
+
+Per-namespace apphook configuration
+===================================
+
+django CMS provides a new API to define namespaced :doc:`Apphook </how_to/apphooks>` configurations.
+
+`Aldryn Apphooks Config <https://github.com/aldryn/aldryn-apphooks-config>`_ has
+been created and released as a standard implementation to take advantage
+of this, but other implementations can be developed.
+
+Improvements to the toolbar user interface
+==========================================
+
+Some minor changes have been implemented to improve the toolbar user interface.
+The old **Draft/Live** switch has been replaced to achieve a more clear
+distinction between page states, and **Edit** and **Save as draft** buttons are now
+available in the toolbar to control the page editing workflow.
+
+Placeholder language fallback default to True
+=============================================
+
+``language_fallback`` in :setting:`CMS_PLACEHOLDER_CONF` is ``True`` by default.
+
+
+New template tags
+=================
+
+``render_model_add_block``
+--------------------------
+
+The family of :ref:`render_model <render_model_templatetags>` template tags that allow Django
+developers to make any Django model editable in the frontend has been extended with
+:ttag:`render_model_add_block`, which can offer arbitrary markup as the *Edit* icon (rather than
+just an image as previously).
+
+``render_plugin_block``
+-----------------------
+
+Some user interfaces have some plugins hidden from display in edit/preview mode.
+:ttag:`render_plugin_block` provides a way to expose them for editing, and also more generally
+provides an alternative means of triggering a plugin's change form.
+
+Plugin table naming
+===================
+
+Old-style plugin table names (for example, ``cmsplugin_<plugin name>`` are no longer
+supported. Relevant code has been removed.
+
+Action required
+---------------
+
+Any plugin table name must be migrated to the standard (``<application name>_<table name>`` layout.
+
+``cms.context_processors.media`` replaced by ``cms.context_processors.cms_settings``
+====================================================================================
+
+Action required
+---------------
+
+Replace the ``cms.context_processors.media`` with ``cms.context_processors.cms_settings`` in
+``settings.py``.
+
+
+.. _upgrade-guide-3.1:
+
+*******************************
+Upgrading django CMS 3.0 to 3.1
+*******************************
+
+Preliminary steps
+=================
+
+Before upgrading, please make sure that your current database is consistent and in a healthy state.
+
+To ensure this, run two commands:
+
+* ``python manage.py cms delete_orphaned_plugins``
+* ``python manage.py cms fix-mptt``
+
+**Make a copy of the database before proceeding further.**
+
+Settings update
+===============
+
+* Change ``cms.context_processors.media`` to ``cms.context_processors.cms_settings`` in
+  ``TEMPLATE_CONTEXT_PROCESSORS``.
+* Add ``treebeard`` to ``INSTALLED_APPS``, and remove ``mptt`` if not required by other
+  applications.
+* If using Django 1.7 remove ``cms`` and ``menus`` from ``MIGRATION_MODULES`` to support
+  the new migration layout.
+* If migrating from Django 1.6 and below to Django 1.7, remove ``south`` from ``installed_apps``.
+* Eventually set ``language_fallback`` to ``False`` in :setting:`CMS_PLACEHOLDER_CONF` if you do
+  not want language fallback behaviour for placeholders.
+
+Update the database
+===================
+
+* Rename plugin table names, to conform to the new naming scheme (see above). **Be warned** that not
+  all third-party plugin applications may provide these migrations - in this case you will need to
+  rename the table manually. Following the upgrade, django CMS will look for the tables for these
+  plugins under their new name, and will report that they don't exist if it can't find them.
+* The migration for MPTT to ``django-treebeard`` is handled by the django CMS migrations,
+  thus apply migrations to update your database::
+
+    python manage.py migrate
+
+
+.. _Django documentation: https://docs.djangoproject.com/en/1.8/ref/contrib/admin/#django.contrib.admin.ModelAdmin.has_add_permission

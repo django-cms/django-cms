@@ -65,43 +65,30 @@ def get_language_list(site_id=None):
     """
     :return: returns a list of iso2codes for this site
     """
-    if not settings.USE_I18N:
-        return [settings.LANGUAGE_CODE]
-    languages = []
-    for language in get_languages(site_id):
-        languages.append(language['code'])
-    return languages
+    return ([lang['code'] for lang in get_languages(site_id)] if settings.USE_I18N
+            else [settings.LANGUAGE_CODE])
 
 
 def get_language_tuple(site_id=None):
     """
     :return: returns an list of tuples like the old CMS_LANGUAGES or the LANGUAGES for this site
     """
-    languages = []
-    for language in get_languages(site_id):
-        languages.append((language['code'], language['name']))
-    return languages
+    return [(lang['code'], lang['name']) for lang in get_languages(site_id)]
 
 
 def get_language_dict(site_id=None):
     """
     :return: returns an dict of cms languages
     """
-    languages = {}
-    for language in get_languages(site_id):
-        languages[language['code']] = language['name']
-    return languages
+    return dict(get_language_tuple(site_id))
 
 
 def get_public_languages(site_id=None):
     """
     :return: list of iso2codes of public languages for this site
     """
-    languages = []
-    for language in get_language_objects(site_id):
-        if language.get("public", True):
-            languages.append(language['code'])
-    return languages
+    return [lang['code'] for lang in get_language_objects(site_id)
+            if lang.get('public', True)]
 
 
 def get_language_object(language_code, site_id=None):
@@ -186,7 +173,5 @@ def is_language_prefix_patterns_used():
     Returns `True` if the `LocaleRegexURLResolver` is used
     at root level of the urlpatterns, else it returns `False`.
     """
-    for url_pattern in get_resolver(None).url_patterns:
-        if isinstance(url_pattern, LocaleRegexURLResolver):
-            return True
-    return False
+    return any(isinstance(url_pattern, LocaleRegexURLResolver)
+               for url_pattern in get_resolver(None).url_patterns)

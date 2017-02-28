@@ -1,0 +1,244 @@
+<template class="cms-plugin cms-plugin-start cms-plugin-1"></template>
+    <div class="plugin1"></div>
+<template class="cms-plugin cms-plugin-end cms-plugin-1"></template>
+<template class="cms-plugin cms-plugin-start cms-plugin-2"></template>
+    <div class="plugin2"></div>
+<template class="cms-plugin cms-plugin-end cms-plugin-2"></template>
+
+<div class="cms-placeholder cms-placeholder-1"></div>
+<div class="cms-placeholder cms-placeholder-2"></div>
+<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-33 cms-render-model cms-render-model-block"></template>
+    <div class="generic"></div>
+<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-changelist-33 cms-render-model cms-render-model-block"></template>
+
+<div id="cms-top" class="cms cms-reset">
+    <!-- toolbar elements -->
+    <div class="cms-toolbar">
+        <div class="cms-toolbar-left">
+            <div class="cms-toolbar-item cms-toolbar-item-logo">
+                <a href="/" title="cms_version"><span>django CMS</span></a>
+            </div>
+            <ul class="cms-toolbar-item cms-toolbar-item-navigation">
+                <li class="cms-toolbar-revert cms-toolbar-item-navigation-disabled">
+                    <a href="/en/admin/cms/page/35/en/revert/" data-rel="ajax" data-post="{&quot;csrfmiddlewaretoken&quot;: &quot;1khn7aiSvq3oQxc0iLoM5jsDHRrvRk2R&quot;}" data-text="Are you sure you want to revert to live?" data-on-success="REFRESH_PAGE">
+                        <span>Revert to live<span class="cms-icon cms-icon-arrow"></span></span>
+                    </a>
+                </li>
+                <li class="cms-toolbar-more">
+                    <a href="#">
+                        <span>More...<span class="cms-icon cms-icon-arrow"></span></span>
+                    </a>
+                    <ul data-touch-action="pan-y"></ul>
+                </li>
+            </ul>
+        </div>
+        <div class="cms-toolbar-right">
+            <div class="cms-toolbar-item cms-toolbar-item-buttons">
+                <a href="/en/cms_wizard/create/?page=33&amp;edit" class="cms-btn" data-rel="modal" data-on-close="REFRESH_PAGE">Create</a>
+            </div>
+            <div class="cms-toolbar-item cms-toolbar-item-buttons cms-toolbar-item-cms-mode-switcher">
+                <a href="?build" class="cms-btn">Structure</a>
+                <a href="?edit" class="cms-btn">Content</a>
+            </div>
+            <div class="cms-toolbar-item cms-toolbar-item-buttons cms-toolbar-item-switch-save-edit">
+                <a class="cms-btn cms-btn-switch-save" href="/en/?edit_off"><span>View published</span></a>
+            </div>
+            <!-- usually it is set to display: none by CMS.Toolbar.prototype._initialStates, but for tests purposes this is fine -->
+            <div class="cms-toolbar-item cms-toolbar-item-buttons" style="display: none">
+                <a href="/en/admin/cms/page/33/en/publish/?statics=1" class="cms-btn cms-btn-action cms-btn-publish cms-btn-disabled">Publish changes</a>
+            </div>
+        </div>
+    </div>
+    <div class="cms-toolbar-trigger"><a href="#" title="Toggle toolbar"><span class="cms-icon cms-icon-arrow"></span></a></div>
+
+    <div class="cms-structure">
+        <div class="cms-structure-content" data-touch-action="pan-y">
+            <!-- static placeholder -->
+            <div class="cms-dragarea cms-dragarea-static cms-dragarea-10">
+                <div class="cms-dragbar cms-dragbar-10">
+                    <div class="cms-submenu-btn cms-submenu-add cms-btn">
+                        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Add plugin"></span>
+                    </div>
+                    <div class="cms-submenu-settings cms-submenu-btn cms-btn"></div>
+                    <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
+                        <div class="cms-dropdown-inner">
+                            <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">Copy all</a></div>
+                            <div class="cms-submenu-item cms-submenu-item-disabled"><a data-icon="paste" data-rel="paste" href="#">Paste</a></div>
+                            <div class="cms-submenu-item"><a data-icon="bin" data-rel="modal" href="/en/admin/cms/page/clear-placeholder/1/?language=en" data-name="Feature">Empty all</a></div>
+                            <div class="cms-submenu-item"><a href="/en/admin/cms/page/plugin/alias_plugin/create_alias/" data-rel="ajax" data-post="{&quot;csrfmiddlewaretoken&quot;: &quot;1khn7aiSvq3oQxc0iLoM5jsDHRrvRk2R&quot;, &quot;placeholder_id&quot;: 1}" data-on-success="REFRESH_PAGE">Create Alias</a></div>
+                        </div>
+                    </div>
+                    <div class="cms-plugin-picker" data-touch-action="pan-y">
+                    </div>
+
+                    <div class="cms-dragbar-title">
+                        Static Feature
+                        <span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-tooltip="This is a static placeholder"><span class="cms-icon cms-icon-pin cms-dragarea-static-icon"></span></span>
+                        <span class="cms-dragbar-toggler">
+                            <a href="#" class="cms-dragbar-expand-all">Expand all</a>
+                            <a href="#" class="cms-dragbar-collapse-all">Collapse all</a>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cms-draggables cms-draggables-root">
+                    <div class="cms-draggables-empty">Drop a plugin here</div>
+                </div>
+            </div>
+
+            <!-- placeholder containing 2 plugins -->
+            <div class="cms-dragarea cms-dragarea-1">
+                <div class="cms-dragbar cms-dragbar-1">
+                    <div class="cms-submenu-btn cms-submenu-add cms-btn">
+                        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Add plugin"></span>
+                    </div>
+                    <div class="cms-submenu-settings cms-submenu-btn cms-btn"></div>
+                    <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
+                        <div class="cms-dropdown-inner">
+                            <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">Copy all</a></div>
+                            <div class="cms-submenu-item cms-submenu-item-disabled"><a data-icon="paste" data-rel="paste" href="#">Paste</a></div>
+                            <div class="cms-submenu-item"><a data-icon="bin" data-rel="modal" href="/en/admin/cms/page/clear-placeholder/1/?language=en" data-name="Feature">Empty all</a></div>
+                            <div class="cms-submenu-item"><a href="/en/admin/cms/page/plugin/alias_plugin/create_alias/" data-rel="ajax" data-post="{&quot;csrfmiddlewaretoken&quot;: &quot;1khn7aiSvq3oQxc0iLoM5jsDHRrvRk2R&quot;, &quot;placeholder_id&quot;: 1}" data-on-success="REFRESH_PAGE">Create Alias</a></div>
+                        </div>
+                    </div>
+                    <div class="cms-plugin-picker" data-touch-action="pan-y">
+                        <div class="cms-quicksearch"><label><input type="text" placeholder="Filter plugins..."></label></div>
+                        <div class="cms-submenu-item cms-submenu-item-title"><span>Bootstrap3</span></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3AccordionCMSPlugin">Accordion</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3AlertCMSPlugin">Alert</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3BlockquoteCMSPlugin">Blockquote</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3CarouselCMSPlugin">Carousel</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3FileCMSPlugin">File</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3IconCMSPlugin">Icon</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3ImageCMSPlugin">Image</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3LabelCMSPlugin">Label</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3ButtonCMSPlugin">Link/Button</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3ListGroupCMSPlugin">List Group</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3PanelCMSPlugin">Panel</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3RowCMSPlugin">Row</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3SpacerCMSPlugin">Spacer</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="Bootstrap3WellCMSPlugin">Well</a></div>
+                        <div class="cms-submenu-item cms-submenu-item-title"><span>Generic</span></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="StylePlugin">Style</a></div>
+                        <div class="cms-submenu-item"><a data-rel="add" href="TextPlugin">Text</a></div>
+                    </div>
+
+                    <div class="cms-dragbar-title">
+                        Feature
+
+                        <span class="cms-dragbar-toggler">
+                            <a href="#" class="cms-dragbar-expand-all">Expand all</a>
+                            <a href="#" class="cms-dragbar-collapse-all">Collapse all</a>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cms-draggables cms-draggables-root">
+                    <div class="cms-draggables-empty">Drop a plugin here</div>
+
+                    <div class="cms-draggable cms-draggable-1 cms-draggable-disabled">
+                        <div class="cms-dragitem cms-dragitem-handler">
+                            <div class="cms-submenu-btn cms-submenu-add cms-btn cms-btn-disabled">
+                                <span class="cms-hover-tooltip" data-tooltip="You cannot add plugins to this plugin."></span>
+                            </div>
+                            <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
+                                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Edit"></span>
+                            </div>
+                            <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
+
+                            <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
+                                <div class="cms-dropdown-inner">
+                                    <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">Cut</a></div>
+                                    <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">Copy</a></div>
+                                    <div class="cms-submenu-item cms-submenu-item-disabled">
+                                        <a data-icon="paste" data-rel="paste" href="#">Paste</a>
+                                        <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-empty cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Clipboard is empty."></span>
+                                        <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-restricted cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="This plugin does not allow plugins of this type as nested plugins."></span>
+                                        <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="This plugin cannot have nested plugins."></span>
+                                    </div>
+                                    <div class="cms-submenu-item"><a data-icon="bin" data-rel="delete" href="#">Delete</a></div>
+                                    <div class="cms-submenu-item"><a href="/en/admin/cms/page/plugin/alias_plugin/create_alias/" data-rel="ajax" data-post="{&quot;plugin_id&quot;: 1, &quot;csrfmiddlewaretoken&quot;: &quot;1khn7aiSvq3oQxc0iLoM5jsDHRrvRk2R&quot;}" data-on-success="REFRESH_PAGE">Create Alias</a></div>
+                                </div>
+                            </div>
+
+                            <div class="cms-plugin-picker" data-touch-action="pan-y">
+                            </div>
+
+                            <span class="cms-dragitem-text" title="TextPlugin ID: 1"><strong>Text</strong> random text</span>
+                        </div>
+
+                        <div class="cms-collapsable-container cms-hidden">
+                        </div>
+                    </div>
+
+                    <div class="cms-draggable cms-draggable-2">
+                        <div class="cms-dragitem cms-dragitem-handler">
+                            <div class="cms-submenu-btn cms-submenu-add cms-btn">
+                                <span class="cms-hover-tooltip" data-tooltip="You cannot add plugins to this plugin."></span>
+                            </div>
+                            <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
+                                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Edit"></span>
+                            </div>
+                            <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
+
+                            <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
+                                <div class="cms-dropdown-inner">
+                                    <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">Cut</a></div>
+                                    <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">Copy</a></div>
+                                    <div class="cms-submenu-item cms-submenu-item-disabled">
+                                        <a data-icon="paste" data-rel="paste" href="#">Paste</a>
+                                        <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-empty cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Clipboard is empty."></span>
+                                        <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-restricted cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="This plugin does not allow plugins of this type as nested plugins."></span>
+                                        <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="This plugin cannot have nested plugins."></span>
+                                    </div>
+                                    <div class="cms-submenu-item"><a data-icon="bin" data-rel="delete" href="#">Delete</a></div>
+                                    <div class="cms-submenu-item"><a href="/en/admin/cms/page/plugin/alias_plugin/create_alias/" data-rel="ajax" data-post="{&quot;plugin_id&quot;: 2, &quot;csrfmiddlewaretoken&quot;: &quot;1khn7aiSvq3oQxc0iLoM5jsDHRrvRk2R&quot;}" data-on-success="REFRESH_PAGE">Create Alias</a></div>
+                                </div>
+                            </div>
+
+                            <div class="cms-plugin-picker" data-touch-action="pan-y">
+                            </div>
+
+                            <span class="cms-dragitem-text" title="RandomPlugin ID: 2"><strong>Random</strong> different random text</span>
+                        </div>
+
+                        <div class="cms-collapsable-container cms-draggables cms-hidden">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- empty placeholder -->
+            <div class="cms-dragarea cms-dragarea-2">
+                <div class="cms-dragbar cms-dragbar-2">
+                    <div class="cms-submenu-btn cms-submenu-add cms-btn">
+                        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="Add plugin"></span>
+                    </div>
+                    <div class="cms-submenu-settings cms-submenu-btn cms-btn"></div>
+                    <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
+                        <div class="cms-dropdown-inner">
+                            <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">Copy all</a></div>
+                            <div class="cms-submenu-item cms-submenu-item-disabled"><a data-icon="paste" data-rel="paste" href="#">Paste</a></div>
+                            <div class="cms-submenu-item"><a data-icon="bin" data-rel="modal" href="/en/admin/cms/page/clear-placeholder/2/?language=en" data-name="Content">Empty all</a></div>
+                            <div class="cms-submenu-item"><a href="/en/admin/cms/page/plugin/alias_plugin/create_alias/" data-rel="ajax" data-post="{&quot;csrfmiddlewaretoken&quot;: &quot;1khn7aiSvq3oQxc0iLoM5jsDHRrvRk2R&quot;, &quot;placeholder_id&quot;: 2}" data-on-success="REFRESH_PAGE">Create Alias</a></div>
+                        </div>
+                    </div>
+                    <div class="cms-plugin-picker" data-touch-action="pan-y">
+                    </div>
+                    <div class="cms-dragbar-title">
+                        Content
+
+                        <span class="cms-dragbar-toggler">
+                            <a href="#" class="cms-dragbar-expand-all">Expand all</a>
+                            <a href="#" class="cms-dragbar-collapse-all">Collapse all</a>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cms-draggables cms-draggables-root">
+                    <div class="cms-draggables-empty">Drop a plugin here</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
