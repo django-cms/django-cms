@@ -279,7 +279,7 @@ Menu system classes and function
 
 ..  class:: menus.base.Modifier
 
-    The base class for all menu-modifying classes. A modifier add, removes or changes NavigationNodes in the list.
+    The base class for all menu-modifying classes. A modifier adds, removes or changes NavigationNodes in the list.
 
     ..  method:: modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb)
 
