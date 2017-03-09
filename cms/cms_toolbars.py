@@ -348,17 +348,24 @@ class PageToolbar(CMSToolbar):
         self.add_draft_live()
         self.add_publish_button()
 
+    def has_dirty_objects(self):
+        if self.dirty_statics:
+            return True
+
+        if not self.page:
+            return False
+
+        if self.page.is_dirty(self.current_lang):
+            return True
+        return self.page_is_pending(self.page, self.current_lang)
+
     # Buttons
 
     def add_publish_button(self, classes=('cms-btn-action', 'cms-btn-publish',)):
         # only do dirty lookups if publish permission is granted else button isn't added anyway
         if self.toolbar.edit_mode and self.has_publish_permission():
             classes = list(classes or [])
-            pk = self.page.pk if self.page else 0
-
-            dirty = (bool(self.dirty_statics) or
-                     (self.page and (self.page.is_dirty(self.current_lang) or
-                                     self.page_is_pending(self.page, self.current_lang))))
+            dirty = self.has_dirty_objects()
 
             if dirty:
                 classes.append('cms-btn-publish-active')
@@ -369,21 +376,27 @@ class PageToolbar(CMSToolbar):
                 title = _('Publish page now')
                 classes.append('cms-publish-page')
 
-            params = {}
+            self.toolbar.add_button(
+                name=title,
+                url=self.get_publish_url(),
+                extra_classes=classes,
+                side=self.toolbar.RIGHT,
+                disabled=not dirty,
+            )
 
-            if self.dirty_statics:
-                params['statics'] = ','.join(str(sp.pk) for sp in self.dirty_statics)
+    def get_publish_url(self):
+        pk = self.page.pk if self.page else 0
+        params = {}
 
-            if self.in_apphook():
-                params['redirect'] = self.request.path_info
+        if self.dirty_statics:
+            params['statics'] = ','.join(str(sp.pk) for sp in self.dirty_statics)
 
-            with force_language(self.current_lang):
-                url = admin_reverse('cms_page_publish_page', args=(pk, self.current_lang))
+        if self.in_apphook():
+            params['redirect'] = self.request.path_info
 
-            url = add_url_parameters(url, params)
-
-            self.toolbar.add_button(title, url=url, extra_classes=classes,
-                                    side=self.toolbar.RIGHT, disabled=not dirty)
+        with force_language(self.current_lang):
+            url = admin_reverse('cms_page_publish_page', args=(pk, self.current_lang))
+        return add_url_parameters(url, params)
 
     def add_draft_live(self):
         if self.page:

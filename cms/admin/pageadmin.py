@@ -988,6 +988,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 token=operation_token,
                 obj=page,
                 translation=page.get_title_obj(language=language),
+                successful=all_published,
             )
 
         if statics:
