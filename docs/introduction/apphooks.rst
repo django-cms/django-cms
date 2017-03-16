@@ -35,8 +35,24 @@ This is a very basic example of an apphook for a django CMS application:
         def get_urls(self, page=None, language=None, **kwargs):
             return ["polls.urls"]
 
-
     apphook_pool.register(PollsApphook)  # register the application
+
+
+Instead of defining the URL patterns in another file ``polls/urls.py``, it also is possible
+to return them directly, for instance as:
+
+.. code-block:: python
+
+    from django.conf.urls import url
+    from polls.views import PollListView, PollDetailView
+
+    class PollsApphook(CMSApp):
+        # ...
+        def get_urls(self, page=None, language=None, **kwargs):
+            return [
+                url(r'^$', PollListView.as_view()),
+                url(r'^(?P<slug>[\w-]+)/?$', PollDetailView.as_view()),
+            ]
 
 
 What this all means

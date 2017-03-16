@@ -143,7 +143,7 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
-        self.assertEqual(len(hooks), 7)
+        self.assertEqual(len(hooks), 8)
         self.assertIn(NS_APP_NAME, app_names)
         self.assertIn(APP_NAME, app_names)
         self.apphook_clear()
@@ -549,6 +549,21 @@ class ApphooksTestCase(CMSTestCase):
 
         reverse('sample-root')
         reverse('sample2-root')
+        self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
+    def test_apphooks_return_urls_directly(self):
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = create_page("apphooked3-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True, apphook="SampleApp3")
+        self.assertTrue(page.publish('en'))
+        self.reload_urls()
+
+        path = reverse('sample3-root')
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Sample App 3 Response')
         self.apphook_clear()
 
     def test_apphook_pool_register_returns_apphook(self):

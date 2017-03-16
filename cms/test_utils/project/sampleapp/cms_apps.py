@@ -1,6 +1,8 @@
 from cms.app_base import CMSApp
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu3, StaticMenu4
 from cms.apphook_pool import apphook_pool
+from django.conf.urls import url
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -30,6 +32,21 @@ class SampleApp2(CMSApp):
     menus = [StaticMenu3]
 
 apphook_pool.register(SampleApp2)
+
+
+class SampleApp3(CMSApp):
+    # CMSApp which returns the url directly rather than trough another Python module
+    name = _("Sample App 3")
+
+    def get_urls(self, page=None, language=None, **kwargs):
+        def my_view(request):
+            return HttpResponse("Sample App 3 Response")
+
+        return [
+            url(r'^$', my_view, name='sample3-root'),
+        ]
+
+apphook_pool.register(SampleApp3)
 
 
 class NamespacedApp(CMSApp):
