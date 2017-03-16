@@ -164,7 +164,7 @@ def get_app_urls(urls):
                     "URLConf `%s` has no urlpatterns attribute" % urlconf)
             yield getattr(mod, 'urlpatterns')
         else:
-            yield urlconf
+            yield [urlconf]
 
 
 def get_patterns_for_title(path, title):
