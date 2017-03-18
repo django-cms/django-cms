@@ -22,8 +22,10 @@ have an ``app_name`` attribute::
 
     class MyApphook(CMSApp):
         name = _("My Apphook")
-        urls = ["myapp.urls"]
         app_name = "myapp"
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["myapp.urls"]
 
 The ``app_name`` does three key things:
 
