@@ -42,6 +42,10 @@ from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
 
+def _get_placeholder_slots(template):
+    return [pl.slot for pl in get_placeholders(template)]
+
+
 def _render_placeholder(placeholder, context, **kwargs):
     request = context['request']
     toolbar = get_toolbar_from_request(request)
@@ -61,67 +65,67 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self._login_context.__exit__(None, None, None)
 
     def test_placeholder_scanning_extend(self):
-        placeholders = get_placeholders('placeholder_tests/test_one.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_one.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
 
     def test_placeholder_scanning_sekizai_extend(self):
-        placeholders = get_placeholders('placeholder_tests/test_one_sekizai.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_one_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
 
     def test_placeholder_scanning_include(self):
-        placeholders = get_placeholders('placeholder_tests/test_two.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_two.html')
         self.assertEqual(sorted(placeholders), sorted([u'child', u'three']))
 
     def test_placeholder_scanning_double_extend(self):
-        placeholders = get_placeholders('placeholder_tests/test_three.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_three.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
 
     def test_placeholder_scanning_sekizai_double_extend(self):
-        placeholders = get_placeholders('placeholder_tests/test_three_sekizai.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_three_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
 
     def test_placeholder_scanning_complex(self):
-        placeholders = get_placeholders('placeholder_tests/test_four.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_four.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'child', u'four']))
 
     def test_placeholder_scanning_super(self):
-        placeholders = get_placeholders('placeholder_tests/test_five.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_five.html')
         self.assertEqual(sorted(placeholders), sorted([u'one', u'extra_one', u'two', u'three']))
 
     def test_placeholder_scanning_nested(self):
-        placeholders = get_placeholders('placeholder_tests/test_six.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/test_six.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
         placeholders = self.assertWarns(DuplicatePlaceholderWarning,
                                         'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
-                                        get_placeholders, 'placeholder_tests/test_seven.html')
+                                        _get_placeholder_slots, 'placeholder_tests/test_seven.html')
         self.assertEqual(sorted(placeholders), sorted([u'one']))
 
     def test_placeholder_scanning_extend_outside_block(self):
-        placeholders = get_placeholders('placeholder_tests/outside.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block(self):
-        placeholders = get_placeholders('placeholder_tests/outside_sekizai.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/outside_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
     def test_placeholder_scanning_extend_outside_block_nested(self):
-        placeholders = get_placeholders('placeholder_tests/outside_nested.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/outside_nested.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block_nested(self):
-        placeholders = get_placeholders('placeholder_tests/outside_nested_sekizai.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/outside_nested_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
     def test_placeholder_scanning_var(self):
         t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
-        phs = _scan_placeholders(t.nodelist)
-        self.assertListEqual(sorted(phs), sorted([u'a_placeholder']))
+        phs = sorted(node.get_name() for node in _scan_placeholders(t.nodelist))
+        self.assertListEqual(phs, sorted([u'a_placeholder']))
 
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
-        phs = _scan_placeholders(t.nodelist)
-        self.assertListEqual(sorted(phs), sorted([u'two', u'new_one', u'base_outside']))
+        phs = sorted(node.get_name() for node in _scan_placeholders(t.nodelist))
+        self.assertListEqual(phs, sorted([u'two', u'new_one', u'base_outside']))
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
@@ -283,7 +287,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertContains(response, "CMS.API.Helpers.onPluginSave")
 
     def test_placeholder_scanning_fail(self):
-        self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
+        self.assertRaises(TemplateSyntaxError, _get_placeholder_slots, 'placeholder_tests/test_eleven.html')
 
     def test_placeholder_tag(self):
         request = self.get_request('/', language=settings.LANGUAGES[0][0])
@@ -416,7 +420,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertFalse('extra_width' in context)
 
     def test_placeholder_scanning_nested_super(self):
-        placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
+        placeholders = _get_placeholder_slots('placeholder_tests/nested_super_level1.html')
         self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
 
     def test_placeholder_field_no_related_name(self):
@@ -814,7 +818,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             "test_super_extends_1.html contains a block called 'one', "
             "but _2.html does not.")
 
-        get_placeholders("placeholder_tests/test_super_extends_2.html")
+        _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
         self.assertNotIn('one',
@@ -839,7 +843,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
-        get_placeholders("placeholder_tests/test_super_extends_2.html")
+        _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})

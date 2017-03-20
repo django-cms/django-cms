@@ -29,6 +29,22 @@ DEFAULT_PLUGIN_PROCESSORS = (
 )
 
 
+def _get_page_ancestors(page):
+    """
+    Returns a generator which yields the ancestors for page.
+    """
+    if not page.parent_id:
+        raise StopIteration
+
+    # This is done to fetch one parent at a time vs using the tree
+    # to get all descendants.
+    # The parents have already been loaded by the placeholder pre-loading.
+    yield page.parent
+
+    for ancestor in _get_page_ancestors(page.parent):
+        yield ancestor
+
+
 class RenderedPlaceholder(object):
     __slots__ = ('placeholder', 'language', 'site_id', 'cached', 'editable')
 
@@ -267,7 +283,7 @@ class ContentRenderer(object):
             nodelist=nodelist,
         )
 
-        if content:
+        if content or not current_page.parent_id:
             return content
 
         # don't display inherited plugins in edit mode, so that the user doesn't
@@ -276,22 +292,33 @@ class ContentRenderer(object):
         if not inherit or self.toolbar.edit_mode:
             return content
 
-        pages = list(reversed(current_page.get_cached_ancestors()))
+        if current_page.parent_id not in self._placeholders_by_page_cache:
+            # The placeholder cache is primed when the first placeholder
+            # is loaded. If the current page's parent is not in there,
+            # it means its cache was never primed as it wasn't necessary.
+            return content
 
-        for page in pages:
-            # nodelist is set to None to avoid rendering the nodes inside
-            # a {% placeholder or %} block tag.
-            # When placeholder inheritance is used, we only care about placeholders
-            # with plugins.
-            inherited_content = self._render_page_placeholder(
-                context=context,
-                slot=slot,
-                page=page,
-                nodelist=None,
-                editable=False,
-            )
+        for page in _get_page_ancestors(current_page):
+            page_placeholders = self._placeholders_by_page_cache[page.pk]
 
-            if inherited_content:
+            try:
+                placeholder = page_placeholders[slot]
+            except KeyError:
+                continue
+
+            if getattr(placeholder, '_plugins_cache', None):
+                # nodelist is set to None to avoid rendering the nodes inside
+                # a {% placeholder or %} block tag.
+                # When placeholder inheritance is used, we only care about placeholders
+                # with plugins.
+                inherited_content = self.render_placeholder(
+                    placeholder,
+                    context=context,
+                    page=page,
+                    editable=False,
+                    use_cache=True,
+                    nodelist=None,
+                )
                 return inherited_content
         return content
 
@@ -503,7 +530,7 @@ class ContentRenderer(object):
         )
         return content
 
-    def _preload_placeholders_for_page(self, page):
+    def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
         """
         Populates the internal plugin cache of each placeholder
         in the given page if the placeholder has not been
@@ -512,11 +539,28 @@ class ContentRenderer(object):
         from cms.utils.plugins import assign_plugins
 
         site_id = page.site_id
-        placeholders = page.rescan_placeholders().values()
+
+        if slots:
+            placeholders = page.get_placeholders().filter(slot__in=slots)
+        else:
+            # Creates any placeholders missing on the page
+            placeholders = page.rescan_placeholders().values()
+
+        if inherit:
+            # When the inherit flag is True,
+            # assume all placeholders found are inherited and thus prefetch them.
+            slots_w_inheritance = [pl.slot for pl in placeholders]
+        elif not self.toolbar.edit_mode:
+            # Scan through the page template to find all placeholders
+            # that have inheritance turned on.
+            slots_w_inheritance = [pl.slot for pl in page.get_declared_placeholders() if pl.inherit]
+        else:
+            # Inheritance is turned off on edit-mode
+            slots_w_inheritance = []
 
         if self.placeholder_cache_is_enabled():
             _cached_content = self._get_cached_placeholder_content
-            # Only prefetch placeholder plugins if the placeholder
+            # Only prefetch plugins if the placeholder
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
@@ -532,6 +576,21 @@ class ContentRenderer(object):
                 placeholders=placeholders_to_fetch,
                 template=page.get_template(),
                 lang=self.request_language,
+                is_fallback=inherit,
+            )
+
+        # Inherit only placeholders that have no plugins
+        # or are not cached.
+        placeholders_to_inherit = [
+            pl.slot for pl in placeholders
+            if not getattr(pl, '_plugins_cache', None) and pl.slot in slots_w_inheritance
+        ]
+
+        if placeholders_to_inherit and page.parent_id:
+            self._preload_placeholders_for_page(
+                page=page.parent,
+                slots=placeholders_to_inherit,
+                inherit=True,
             )
 
         # Internal cache mapping placeholder slots

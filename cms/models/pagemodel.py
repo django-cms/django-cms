@@ -1451,21 +1451,23 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Rescan and if necessary create placeholders in the current template.
         """
-        # inline import to prevent circular imports
-        from cms.models.placeholdermodel import Placeholder
-        from cms.utils.placeholder import get_placeholders
+        existing = {}
+        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
 
-        placeholders = get_placeholders(self.get_template())
-        found = {}
         for placeholder in self.placeholders.all():
             if placeholder.slot in placeholders:
-                found[placeholder.slot] = placeholder
-        for placeholder_name in placeholders:
-            if placeholder_name not in found:
-                placeholder = Placeholder.objects.create(slot=placeholder_name)
-                self.placeholders.add(placeholder)
-                found[placeholder_name] = placeholder
-        return found
+                existing[placeholder.slot] = placeholder
+
+        for placeholder in placeholders:
+            if placeholder not in existing:
+                existing[placeholder] = self.placeholders.create(slot=placeholder)
+        return existing
+
+    def get_declared_placeholders(self):
+        # inline import to prevent circular imports
+        from cms.utils.placeholder import get_placeholders
+
+        return get_placeholders(self.get_template())
 
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """

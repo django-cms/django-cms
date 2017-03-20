@@ -223,7 +223,7 @@ def get_plugins_for_page(request, page, lang=None):
         return []
     lang = lang or get_language_from_request(request)
     if not hasattr(page, '_%s_plugins_cache' % lang):
-        slots = get_placeholders(page.get_template())
+        slots = [pl.slot for pl in get_placeholders(page.get_template())]
         setattr(page, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
             placeholder__page=page, placeholder__slot__in=slots, language=lang, parent__isnull=True
         ).order_by('placeholder', 'position').select_related())
