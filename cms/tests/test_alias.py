@@ -112,6 +112,8 @@ class AliasTestCase(CMSTestCase):
             context = self.get_context(path=target_page.get_absolute_url(), page=target_page)
             context['request'].toolbar = CMSToolbar(context['request'])
             context['request'].toolbar.edit_mode = True
+            # This flag is evaluated on init
+            context['cms_content_renderer']._placeholders_are_editable = True
             context[get_varname()] = defaultdict(UniqueSequence)
 
             content_renderer = context['cms_content_renderer']
