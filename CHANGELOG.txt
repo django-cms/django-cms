@@ -15,6 +15,8 @@
 * Fixed an IntegrityError raised when publishing a page with no public version and whose publisher
   state is pending.
 * Fixed an issue with JS not being able to determine correct path to async bundle
+* Fixed a ``DoesNotExist`` db error raised when moving a page marked as published but whose public
+  translation does not exist.
 
 
 === 3.4.3 (2017-04-24) ===

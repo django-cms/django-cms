@@ -16,7 +16,11 @@ from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT,
+    PUBLISHER_STATE_DIRTY,
+    PUBLISHER_STATE_PENDING,
+)
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import PagePermission
@@ -798,6 +802,86 @@ class PageTest(PageTestBase):
                 PUBLISHER_STATE_DEFAULT
             )
 
+    def test_move_page_regression_5900(self):
+        # ref: https://github.com/divio/django-cms/issues/5900
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            page_home = self.get_new_page_data()
+            self.client.post(URL_CMS_PAGE_ADD, page_home)
+
+            # Create parent page
+            page_root = create_page("Parent", 'col_three.html', "de", published=False)
+
+            # Create english translation
+            create_title(
+                "en",
+                "parent-en",
+                page=page_root,
+                slug="parent-en"
+            )
+
+            # Create child pages
+            page_child_1 = create_page(
+                "Child 1",
+                template=constants.TEMPLATE_INHERITANCE_MAGIC,
+                language="de",
+                parent=page_root,
+                published=False
+            )
+
+            # Create english translation
+            create_title(
+                "en",
+                "child-1-en",
+                page=page_child_1,
+                slug="child-1-en"
+            )
+
+            # Try to publish child english translation
+            publish_endpoint = self.get_admin_url(Page, 'publish_page', page_child_1.pk, 'en')
+
+            self.client.post(publish_endpoint)
+
+            self.assertEqual(
+                page_child_1.get_publisher_state("en"),
+                PUBLISHER_STATE_PENDING,
+            )
+
+            # Publish the german translations for both the parent and child pages.
+            # This will create the public versions for both.
+            page_root.publish('de')
+            page_child_1.publish('de')
+
+            # Move page_child_1 to the root
+            data = {
+                "id": page_child_1.pk,
+                "position": "2",
+            }
+
+            response = self.client.post(
+                URL_CMS_PAGE_MOVE % page_child_1.pk,
+                data,
+            )
+            self.assertEqual(response.status_code, 200)
+
+            # Ensure move worked
+            self.assertEqual(page_root.reload().get_descendants().count(), 0)
+
+            # Move page_child_1 under its old parent
+            # page_child_1 does not have a public version of its english translation
+            data = {
+                "id": page_child_1.pk,
+                "target": page_root.pk,
+                "position": "0",
+            }
+            response = self.client.post(
+                URL_CMS_PAGE_MOVE % page_child_1.pk,
+                data,
+            )
+            self.assertEqual(response.status_code, 200)
+
+            # Ensure move worked
+            self.assertEqual(page_root.reload().get_descendants().count(), 1)
 
     def test_edit_page_other_site_and_language(self):
         """

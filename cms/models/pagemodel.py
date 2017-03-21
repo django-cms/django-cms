@@ -819,9 +819,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return True
 
     def mark_as_pending(self, language):
+        assert self.publisher_is_draft
+
         public = self.get_public_object()
 
-        if public:
+        if public and public.get_title_obj(language, fallback=False):
             state = public.get_publisher_state(language)
             # keep the same state
             # only set the page as unpublished
@@ -831,25 +833,21 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 published=False
             )
 
-        draft = self.get_draft_object()
-
-        if draft and draft.is_published(language) and draft.get_publisher_state(
-                language) == PUBLISHER_STATE_DEFAULT:
+        if self.is_published(language) and self.get_publisher_state(language) == PUBLISHER_STATE_DEFAULT:
             # Only change the state if the draft page is published
             # and it's state is the default (0)
-            draft.set_publisher_state(language, state=PUBLISHER_STATE_PENDING)
+            self.set_publisher_state(language, state=PUBLISHER_STATE_PENDING)
 
     def mark_descendants_pending(self, language):
         assert self.publisher_is_draft
 
-        # Go through all children of our public instance
-        public_page = self.publisher_public
+        descendants = self.get_descendants().filter(
+            publisher_public__isnull=False,
+            title_set__language=language,
+        )
 
-        if public_page:
-            descendants = public_page.get_descendants().filter(title_set__language=language)
-
-            for child in descendants:
-                child.mark_as_pending(language)
+        for child in descendants.iterator():
+            child.mark_as_pending(language)
 
     def mark_as_published(self, language):
         from cms.models import Title
