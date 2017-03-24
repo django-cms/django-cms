@@ -740,7 +740,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
                               password=getattr(user, get_user_model().USERNAME_FIELD))
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            response = self.client.get(endpoint)
             for placeholder in page.placeholders.all():
                 self.assertContains(
                     response, '"placeholder_id": "%s"' % placeholder.pk)

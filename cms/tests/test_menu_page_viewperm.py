@@ -70,7 +70,9 @@ class ViewPermissionTests(CMSTestCase):
             'published': True,
             'in_navigation': True,
         }
-        page_a = create_page("page_a", **stdkwargs) # first page slug is /
+        homepage = create_page("page_a", **stdkwargs)
+        Page.set_homepage(homepage)
+
         page_b = create_page("page_b", **stdkwargs)
         page_c = create_page("page_c", **stdkwargs)
         page_d = create_page("page_d", **stdkwargs)
@@ -97,7 +99,7 @@ class ViewPermissionTests(CMSTestCase):
         page_d_d = create_page("page_d_d", parent=page_d, **stdkwargs)
 
         pages = [
-            page_a,
+            homepage,
             page_b,
             page_b_a,
             page_b_b,
@@ -562,13 +564,14 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             'published': True,
             'in_navigation': True,
         }
-        page_1 = create_page("page_1", **stdkwargs) # first page slug is /
-        page_2 = create_page("page_2", parent=page_1, **stdkwargs)
+        homepage = create_page("page_1", **stdkwargs)
+        Page.set_homepage(homepage)
+        page_2 = create_page("page_2", parent=homepage, **stdkwargs)
         page_3 = create_page("page_3", parent=page_2, **stdkwargs)
         page_4 = create_page("page_4", parent=page_3, **stdkwargs)
-        page_5 = create_page("page_5", parent=page_1, **stdkwargs)
+        page_5 = create_page("page_5", parent=homepage, **stdkwargs)
         page_6 = create_page("page_6", parent=page_5, **stdkwargs)
-        return [page_1,
+        return [homepage,
             page_2,
             page_3,
             page_4,

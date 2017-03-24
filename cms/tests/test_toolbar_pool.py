@@ -7,7 +7,6 @@ from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import ToolbarPool, toolbar_pool
-from cms.utils.conf import get_cms_setting
 
 
 class TestToolbar(CMSToolbar):
@@ -57,9 +56,11 @@ class ToolbarPoolTests(CMSTestCase):
         with self.settings(CMS_TOOLBARS=['cms.cms_toolbars.BasicToolbar', 'cms.cms_toolbars.PlaceholderToolbar']):
             toolbar_pool.register(TestToolbar)
             self.assertEqual(len(list(pool.get_toolbars().keys())), 2)
-            api.create_page("home", "simple.html", "en", published=True)
+            page = api.create_page("home", "simple.html", "en", published=True)
+            page_edit_url_on = self.get_edit_on_url(page.get_absolute_url())
+
             with self.login_user_context(self.get_superuser()):
-                response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                response = self.client.get(page_edit_url_on)
                 self.assertEqual(response.status_code, 200)
         toolbar_pool.toolbars = toolbars
 

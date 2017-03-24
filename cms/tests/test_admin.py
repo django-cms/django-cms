@@ -681,6 +681,9 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(Http404, self.admin_class.preview_page, request, 404, "en")
         page = self.get_page()
         page.publish("en")
+
+        Page.set_homepage(page)
+
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
@@ -1218,7 +1221,11 @@ class AdminFormsTests(AdminTestsBase):
         from django.core.cache import cache
 
         cache.clear()
-        create_page('Test', 'static.html', 'en', published=True)
+
+        homepage = create_page('Test', 'static.html', 'en', published=True)
+
+        Page.set_homepage(homepage)
+
         for placeholder in Placeholder.objects.all():
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
 
@@ -1259,6 +1266,7 @@ class AdminFormsTests(AdminTestsBase):
     def test_smart_link_published_pages(self):
         admin, staff_guy = self._get_guys()
         page_url = URL_CMS_PAGE_PUBLISHED  # Not sure how to achieve this with reverse...
+        create_page('home', 'col_two.html', 'en', published=True)
 
         with self.login_user_context(staff_guy):
             multi_title_page = create_page('main_title', 'col_two.html', 'en', published=True,

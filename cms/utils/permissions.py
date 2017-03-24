@@ -11,10 +11,11 @@ from django.db.models import Q
 from django.utils.decorators import available_attrs
 from django.utils.lru_cache import lru_cache
 
-from cms.constants import ROOT_USER_LEVEL
+from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
 from cms.models import (Page, PagePermission, GlobalPagePermission)
 from cms.utils.conf import get_cms_setting
+from cms.utils.page import get_clean_username
 
 
 # thread local support
@@ -34,6 +35,14 @@ def get_current_user():
     Returns current user, or None
     """
     return getattr(_thread_locals, 'user', None)
+
+
+def get_current_user_name():
+    current_user = get_current_user()
+
+    if not current_user:
+        return SCRIPT_USERNAME
+    return get_clean_username(current_user)
 
 
 @contextmanager

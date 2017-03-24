@@ -601,7 +601,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         page = create_page('Test', 'col_two.html', 'en', published=True)
         template = "{% load cms_tags %}{% render_model_add category %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
         request.session = {}
@@ -616,7 +616,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         self.assertIn(expected_end, output)
 
         # Now test that it does NOT render when not in edit mode
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
         request.session = {}
@@ -634,7 +634,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         page = create_page('Test', 'col_two.html', 'en', published=True)
         template = "{% load cms_tags %}{% render_model_add_block category %}wrapped{% endrender_model_add_block %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
         request.session = {}
@@ -651,7 +651,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         self.assertIn(expected_end, output)
 
         # Now test that it does NOT render when not in edit mode
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
         request.session = {}

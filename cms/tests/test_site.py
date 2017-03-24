@@ -55,10 +55,12 @@ class SiteTestCase(CMSTestCase):
 
     def test_site_preview(self):
         page = create_page("page", "nav_playground.html", "de", site=self.site2, published=True)
+        page_edit_url_on = self.get_edit_on_url(page.get_absolute_url('de'))
+
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(admin_reverse('cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response._headers['location'][1], 'http://sample2.com/de/?%s&language=de' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            self.assertEqual(response._headers['location'][1], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
 
     def test_site_publish(self):
         self._login_context.__exit__(None, None, None)

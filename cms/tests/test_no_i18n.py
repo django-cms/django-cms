@@ -129,7 +129,14 @@ class TestNoI18N(CMSTestCase):
             'cms.middleware.toolbar.ToolbarMiddleware',
         ]
         with self.settings(**overrides):
-            create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
+            homepage = create_page(
+                "home",
+                template="col_two.html",
+                language="en-us",
+                published=True,
+                redirect='/foobar/',
+            )
+            Page.set_homepage(homepage)
             response = self.client.get('/', follow=False)
             self.assertTrue(response['Location'].endswith("/foobar/"))
 
@@ -179,4 +186,4 @@ class TestNoI18N(CMSTestCase):
         del request.LANGUAGE_CODE
         toolbar = CMSToolbar(request)
         toolbar.set_object(sub)
-        self.assertEqual(toolbar.get_object_public_url(), '/sub/')
+        self.assertEqual(toolbar.get_object_public_url(), '/test/sub/')

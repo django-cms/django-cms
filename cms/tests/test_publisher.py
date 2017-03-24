@@ -16,7 +16,6 @@ from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 
@@ -329,20 +328,10 @@ class PublisherCommandTests(TestCase):
 
 
 class PublishingTests(TestCase):
+
     def create_page(self, title=None, **kwargs):
         return create_page(title or self._testMethodName,
                            "nav_playground.html", "en", **kwargs)
-
-    def test_publish_home(self):
-        name = self._testMethodName
-        page = self.create_page(name, published=False)
-        self.assertFalse(page.publisher_public_id)
-        self.assertEqual(Page.objects.all().count(), 1)
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response['Location'].endswith("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
 
     def test_publish_single(self):
         name = self._testMethodName
@@ -711,7 +700,7 @@ class PublishingTests(TestCase):
         self.assertFalse(gc2.publisher_public.is_published('en'))
 
     def test_unpublish_with_descendants(self):
-        page = self.create_page("Page", published=True)
+        page = self.create_homepage("Page", "nav_playground.html", "en", published=True)
         child = self.create_page("Child", parent=page, published=True)
         self.create_page("Grandchild", parent=child, published=True)
         page = page.reload()
@@ -834,7 +823,7 @@ class PublishingTests(TestCase):
 
     def test_republish_multiple_root(self):
         # TODO: The paths do not match expected behaviour
-        home = self.create_page("Page", published=True)
+        home = self.create_homepage("Page", "nav_playground.html", "en", published=True)
         other = self.create_page("Another Page", published=True)
         child = self.create_page("Child", published=True, parent=home)
         child2 = self.create_page("Child", published=True, parent=other)
@@ -854,6 +843,8 @@ class PublishingTests(TestCase):
         self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'another-page/child/')
         home = self.reload(home)
         home.unpublish('en')
+        Page.set_homepage(other.reload())
+
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)
@@ -865,14 +856,16 @@ class PublishingTests(TestCase):
 
         self.assertEqual(other.get_absolute_url(), root)
         self.assertEqual(other.get_public_object().get_absolute_url(), root)
-        self.assertEqual(home.get_absolute_url(), root + 'page/')
-        self.assertEqual(home.get_public_object().get_absolute_url(), root + 'page/')
-
-        self.assertEqual(child.get_absolute_url(), root + 'page/child/')
-        self.assertEqual(child.get_public_object().get_absolute_url(), root + 'page/child/')
         self.assertEqual(child2.get_absolute_url(), root + 'child/')
         self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'child/')
+
+        self.assertEqual(home.get_absolute_url(), root + 'page/')
+        self.assertEqual(home.get_public_object().get_absolute_url(), root + 'page/')
+        self.assertEqual(child.get_absolute_url(), root + 'page/child/')
+        self.assertEqual(child.get_public_object().get_absolute_url(), root + 'page/child/')
+
         home.publish('en')
+        Page.set_homepage(home)
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)

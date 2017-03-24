@@ -10,7 +10,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import signals
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.timezone import now as tz_now
 
@@ -21,7 +20,6 @@ from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_cms_setting
@@ -51,7 +49,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_absolute_url(self):
         user = self.get_superuser()
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = self.create_homepage("page", "nav_playground.html", "en", published=True)
         create_title("fr", "french home", page)
         page_2 = create_page("inner", "nav_playground.html", "en", published=True, parent=page)
         create_title("fr", "french inner", page_2)
@@ -167,7 +165,7 @@ class PagesTestCase(CMSTestCase):
             'template': 'nav_playground.html',
 
         }
-        page = create_page(**page_data)
+        page = self.create_homepage(**page_data)
         page = page.reload()
         page.publish('en')
         self.assertEqual(Page.objects.count(), 2)
@@ -199,7 +197,7 @@ class PagesTestCase(CMSTestCase):
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
         self.assertRegexpMatches(page.changed_by, r'V+\.{3} \(id=\d+\)')
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
 
     def test_delete_page_no_template(self):
         page_data = {
@@ -211,11 +209,6 @@ class PagesTestCase(CMSTestCase):
         }
         page = create_page(**page_data)
         page.template = 'no_such_template.html'
-        signals.pre_save.disconnect(pre_save_page, sender=Page, dispatch_uid='cms_pre_save_page')
-        signals.post_save.disconnect(post_save_page, sender=Page, dispatch_uid='cms_post_save_page')
-        page.save(no_signals=True)
-        signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid='cms_pre_save_page')
-        signals.post_save.connect(post_save_page, sender=Page, dispatch_uid='cms_post_save_page')
         page.delete()
 
         self.assertEqual(Page.objects.count(), 0)
@@ -245,7 +238,7 @@ class PagesTestCase(CMSTestCase):
     def test_slug_collisions_api_2(self):
         """ Checks for slug collisions on root (not home) page and a home page child - uses API to create pages
         """
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en',
                             published=True)
         page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
                               published=True, parent=page1, slug="foo")
@@ -284,7 +277,7 @@ class PagesTestCase(CMSTestCase):
         superuser = self.get_superuser()
         self.assertEqual(Page.objects.all().count(), 0)
         with self.login_user_context(superuser):
-            page = create_page('test page 1', "nav_playground.html", "en")
+            page = self.create_homepage('test page 1', "nav_playground.html", "en")
             page.publish('en')
             response = self.client.get(self.get_pages_root())
             self.assertEqual(response.status_code, 200)
@@ -678,7 +671,7 @@ class PagesTestCase(CMSTestCase):
         root.publish('en')
         page = page.reload()
         page.publish('en')
-        request = self.get_request('/en/page')
+        request = self.get_request('/en/root/page')
         found_page = get_page_from_request(request)
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
@@ -720,8 +713,7 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(resp.status_code, 404)
 
     def test_page_urls(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en', published=True)
 
         page2 = create_page('test page 2', 'nav_playground.html', 'en',
                             published=True, parent=page1)
@@ -790,8 +782,7 @@ class PagesTestCase(CMSTestCase):
         self.assertIn('is_draft={}'.format(saved_title.publisher_is_draft), repr(saved_title))
 
     def test_page_overwrite_urls(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en', published=True)
 
         page2 = create_page('test page 2', 'nav_playground.html', 'en',
                             published=True, parent=page1)
@@ -862,7 +853,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_home_slug_not_accessible(self):
         with self.settings(CMS_PERMISSION=False):
-            page = create_page('page', 'nav_playground.html', 'en', published=True)
+            page = self.create_homepage('page', 'nav_playground.html', 'en', published=True)
             self.assertEqual(page.get_absolute_url('en'), '/en/')
             resp = self.client.get('/en/')
             self.assertEqual(resp.status_code, HttpResponse.status_code)

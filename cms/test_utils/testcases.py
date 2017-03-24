@@ -31,6 +31,7 @@ from cms.models.permissionmodels import (
 )
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.compat import DJANGO_1_8
+from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 
@@ -361,6 +362,11 @@ class BaseCMSTestCase(object):
         self.assertEqual(json.loads(response.content.decode('utf8')), expected)
         return copied_page
 
+    def create_homepage(self, *args, **kwargs):
+        homepage = create_page(*args, **kwargs)
+        Page.set_homepage(homepage)
+        return homepage.reload()
+
     def move_page(self, page, target_page, position="first-child"):
         page.move_page(target_page, position)
         return self.reload_page(page)
@@ -616,6 +622,18 @@ class BaseCMSTestCase(object):
             'cms_path': path,
         })
         return endpoint
+
+    def get_edit_on_url(self, url):
+        return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+
+    def get_edit_off_url(self, url):
+        return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+
+    def get_obj_structure_url(self, url):
+        return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__BUILD'))
+
+    def get_toolbar_disable_url(self, url):
+        return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):

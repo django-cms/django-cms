@@ -639,9 +639,14 @@ class PageTest(PageTestBase):
                              self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3[
                                  'slug'] + "/")
 
-            # publish page 1 (becomes home)
+            # Remove home page
             home.delete()
+
+            # Publish page1
             page1.publish('en')
+
+            # Promote page1 to be the new homepage
+            Page.set_homepage(page1)
             public_page1 = page1.publisher_public
             self.assertEqual(page1.get_path(), '')
             self.assertEqual(public_page1.get_path(), '')
@@ -660,13 +665,12 @@ class PageTest(PageTestBase):
                                         {"position": "0"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
-            self.assertEqual(page1.get_path(), page_data1['slug'])
+            self.assertEqual(page1.get_path(), '')
             page2 = Page.objects.get(pk=page2.pk)
-            # Check that page2 is now at the root of the tree
-            self.assertTrue(page2.is_home)
-            self.assertEqual(page2.get_path(), '')
+            self.assertFalse(page2.is_home)
+            self.assertEqual(page2.get_path(), page_data2['slug'])
             page3 = Page.objects.get(pk=page3.pk)
-            self.assertEqual(page3.get_path(), page_data3['slug'])
+            self.assertEqual(page3.get_path(), page_data2['slug'] + "/" + page_data3['slug'])
 
     def test_move_page_integrity(self):
         superuser = self.get_superuser()
