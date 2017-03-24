@@ -7,6 +7,7 @@
 * Fixed error in retrieving placeholder label from configuration.
 * Fixed a bug which caused certain translations to display double escaped text on the page
   list admin view.
+* Adjusted the toolbar javascript template to escape values coming from the request.
 
 
 === 3.4.2 (2017-01-23) ===
