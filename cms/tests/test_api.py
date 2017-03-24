@@ -197,9 +197,9 @@ class PythonAPITests(CMSTestCase):
 
     def test_page_overwrite_url_default(self):
         self.assertEqual(Page.objects.all().count(), 0)
-        home = create_page('home', 'nav_playground.html', 'en', published=True)
+        home = create_page('root', 'nav_playground.html', 'en', published=True)
         self.assertTrue(home.is_published('en', True))
-        self.assertTrue(home.is_home)
+        self.assertFalse(home.is_home)
         page = create_page(**self._get_default_create_page_arguments())
         self.assertFalse(page.is_home)
         self.assertFalse(page.get_title_obj_attribute('has_url_overwrite'))

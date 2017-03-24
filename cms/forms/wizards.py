@@ -247,9 +247,10 @@ class CreateCMSPageForm(BaseCMSPageForm):
                         }
                         add_plugin(**opts)
 
-        # is it home? publish it right away
-        if not self.page and page.is_home:
+        # is it the first page? publish it right away
+        if not self.page and Page.objects.filter(site_id=page.site_id).count() == 1:
             page.publish(self.language_code)
+            Page.set_homepage(page, user=self.user)
         return page
 
 

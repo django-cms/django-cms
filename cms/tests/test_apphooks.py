@@ -148,11 +148,11 @@ class ApphooksTestCase(CMSTestCase):
         self.assertIn(APP_NAME, app_names)
         self.apphook_clear()
 
-    def test_apphook_on_root(self):
+    def test_apphook_on_homepage(self):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        page = create_page("apphooked-page", "nav_playground.html", "en",
-                           created_by=superuser, published=True, apphook="SampleApp")
+        page = self.create_homepage("apphooked-page", "nav_playground.html", "en",
+                                    created_by=superuser, published=True, apphook="SampleApp")
         blank_page = create_page("not-apphooked-page", "nav_playground.html", "en",
                                  created_by=superuser, published=True, apphook="", slug='blankapp')
         english_title = page.title_set.all()[0]
@@ -502,7 +502,7 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2')
     def test_apphook_breaking_under_home_with_new_path_caching(self):
-        home = create_page("home", "nav_playground.html", "en", published=True)
+        home = self.create_homepage("home", "nav_playground.html", "en", published=True)
         child = create_page("child", "nav_playground.html", "en", published=True, parent=home)
         # not-home is what breaks stuff, because it contains the slug of the home page
         not_home = create_page("not-home", "nav_playground.html", "en", published=True, parent=child)
@@ -894,8 +894,7 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
 
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser)
+        page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
         create_title('de', page.get_title(), page)
         page.publish('en')
         page.publish('de')

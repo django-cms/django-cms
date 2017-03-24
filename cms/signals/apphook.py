@@ -30,17 +30,6 @@ def apphook_pre_title_checker(instance, **kwargs):
         instance._old_data = None
 
 
-def apphook_post_page_checker(page):
-    old_page = page.old_page
-    if (old_page and (
-                old_page.application_urls != page.application_urls or old_page.application_namespace != page.application_namespace)) or (
-            not old_page and page.application_urls):
-
-        from cms.cache import invalidate_cms_page_cache
-        invalidate_cms_page_cache()
-        request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
-
-
 def apphook_post_title_checker(instance, **kwargs):
     """
     Check if application_urls and path changed on the instance
@@ -70,17 +59,21 @@ def apphook_post_title_checker(instance, **kwargs):
             instance.slug,
         )
         if old_values != new_values and (old_values[2] or new_values[2]):
-            request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
+            set_restart_trigger()
 
 
 def apphook_post_delete_title_checker(instance, **kwargs):
     """
     Check if this was an apphook
     """
-    from cms.cache import invalidate_cms_page_cache
-    invalidate_cms_page_cache()
+    instance.page.clear_cache()
+
     if instance.page.application_urls:
-        request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
+        set_restart_trigger()
+
+
+def set_restart_trigger():
+    request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
 
 
 def apphook_post_delete_page_checker(instance, **kwargs):
@@ -88,7 +81,7 @@ def apphook_post_delete_page_checker(instance, **kwargs):
     Check if this was an apphook
     """
     if instance.application_urls:
-        request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
+        set_restart_trigger()
 
 # import the logging library
 import logging

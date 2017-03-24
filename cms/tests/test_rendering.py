@@ -193,7 +193,7 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests that the `detail` view is working.
         """
-        response = details(self.get_request(page=self.test_page), '')
+        response = details(self.get_request(page=self.test_page), self.test_page.get_path())
         response.render()
         r = self.strip_rendered(response.content.decode('utf8'))
         self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')

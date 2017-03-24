@@ -4,12 +4,30 @@ import re
 from django.conf import settings
 from django.db.models import Q
 from django.contrib.sites.models import Site
+from django.utils.encoding import force_text
 
+from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.exceptions import NoHomeFound
 
 
 APPEND_TO_SLUG = "-copy"
 COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d+)*)?$')
+
+
+def get_clean_username(user):
+    try:
+        username = force_text(user)
+    except AttributeError:
+        # AnonymousUser may not have USERNAME_FIELD
+        username = "anonymous"
+    else:
+        # limit changed_by and created_by to avoid problems with Custom User Model
+        if len(username) > PAGE_USERNAME_MAX_LENGTH:
+            username = u'{0}... (id={1})'.format(
+                username[:PAGE_USERNAME_MAX_LENGTH - 15],
+                user.pk,
+            )
+    return username
 
 
 def get_pages_queryset(site=None, draft=True):

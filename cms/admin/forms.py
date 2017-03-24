@@ -19,6 +19,7 @@ from cms.models import (CMSPlugin, Page, PagePermission, PageUser, PageUserGroup
                         Placeholder, EmptyTitle, GlobalPagePermission)
 from cms.models.permissionmodels import User
 from cms.plugin_pool import plugin_pool
+from cms.signals.apphook import set_restart_trigger
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.i18n import get_language_list, get_language_object, get_language_tuple
@@ -434,6 +435,24 @@ class AdvancedSettingsForm(forms.ModelForm):
             'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
             'application_urls', 'application_namespace', "xframe_options",
         ]
+
+    def has_changed_apphooks(self):
+        changed_data = self.changed_data
+
+        if 'application_urls' in changed_data:
+            return True
+        return 'application_namespace' in changed_data
+
+    def update_apphooks(self):
+        # User has changed the apphooks on the page.
+        # Update the public version of the page to reflect this change immediately.
+        self.instance.publisher_public.update(
+            application_urls=self.cleaned_data['application_urls'],
+            application_namespace=self.cleaned_data['application_namespace'],
+        )
+
+        # Connects the apphook restart handler to the request finished signal
+        set_restart_trigger()
 
 
 class PagePermissionForm(forms.ModelForm):

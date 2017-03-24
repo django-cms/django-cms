@@ -45,3 +45,9 @@ class PageQuerySet(MP_NodeQuerySet, PublisherQuerySet):
         except IndexError:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home
+
+    def has_apphooks(self):
+        """
+        Returns True if any page on this queryset has an apphook attached.
+        """
+        return self.exclude(application_urls=None).exclude(application_urls='').exists()

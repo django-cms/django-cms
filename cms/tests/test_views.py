@@ -10,7 +10,7 @@ from django.template import Variable
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page
-from cms.models import PagePermission, UserSettings, Placeholder
+from cms.models import Page, PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -61,10 +61,10 @@ class ViewTests(CMSTestCase):
         apphooks = (
             '%s.%s' % (APP_MODULE, APP_NAME),
         )
-        create_page("page2", "nav_playground.html", "en", published=True)
+        page = create_page("page2", "nav_playground.html", "en", published=True)
         with self.settings(CMS_APPHOOKS=apphooks):
             self.apphook_clear()
-            response = self.client.get('/en/')
+            response = self.client.get(page.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.apphook_clear()
 
@@ -101,15 +101,15 @@ class ViewTests(CMSTestCase):
                           redirect=redirect_one)
         three = create_page("three", "nav_playground.html", "en", parent=one,
                             published=True, redirect=redirect_three)
-        url = three.get_slug()
+        url = three.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, url.strip('/'))
+        response = details(request, three.get_path())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_three)
 
     def test_redirect_to_self(self):
         one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect='/')
+                          redirect='/one/')
         url = one.get_absolute_url()
         request = self.get_request(url)
         response = details(request, one.get_path())
@@ -117,37 +117,39 @@ class ViewTests(CMSTestCase):
 
     def test_redirect_to_self_with_host(self):
         one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect='http://testserver/en/')
+                          redirect='http://testserver/en/one/')
         url = one.get_absolute_url()
         request = self.get_request(url)
         response = details(request, one.get_path())
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_with_toolbar(self):
-        create_page("one", "nav_playground.html", "en", published=True,
+        page = create_page("one", "nav_playground.html", "en", published=True,
                     redirect='/en/page2')
+        page_url = page.get_absolute_url()
+        page_edit_on_url = self.get_edit_on_url(page_url)
+
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'This page has no preview')
 
-            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_edit_off_url(page_url))
             self.assertEqual(response.status_code, 302)
 
-            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            response = self.client.get('/en/?%s' % get_cms_setting('TOOLBAR_URL__BUILD'))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_obj_structure_url(page_url))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'This page has no preview')
 
-            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            response = self.client.get('/en/?%s' % get_cms_setting('TOOLBAR_URL__DISABLE'))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_toolbar_disable_url(page_url))
             self.assertEqual(response.status_code, 302)
 
     def test_login_required(self):
-        create_page("page", "nav_playground.html", "en", published=True,
-                    login_required=True)
+        self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
         plain_url = '/accounts/'
         login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
         with self.settings(LOGIN_URL=plain_url + '?signin'):
@@ -164,14 +166,15 @@ class ViewTests(CMSTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
+        page_url = page.get_absolute_url()
         # Anon user
-        response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        response = self.client.get(self.get_edit_on_url(page_url))
         self.assertNotContains(response, "cms_toolbar-item-switch-save-edit", 200)
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(self.get_edit_on_url(page_url))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
         # Admin but with no permission
@@ -179,12 +182,12 @@ class ViewTests(CMSTestCase):
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
         with self.login_user_context(user):
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(self.get_edit_on_url(page_url))
         self.assertNotContains(response, "cms-toolbar-item-switch-save-edit", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(self.get_edit_on_url(page_url))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
     def test_toolbar_switch_urls(self):
@@ -198,6 +201,8 @@ class ViewTests(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", published=True)
         create_title("fr", "french home", page)
         publish_page(page, user, "fr")
+
+        Page.set_homepage(page)
 
         with self.login_user_context(user):
             response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
@@ -231,7 +236,7 @@ class ContextTests(CMSTestCase):
 
         page_template = "nav_playground.html"
         original_context = {'TEMPLATES': settings.TEMPLATES}
-        page = create_page("page", page_template, "en", published=True)
+        page = self.create_homepage("page", page_template, "en", published=True)
         page_2 = create_page("page-2", page_template, "en", published=True,
                              parent=page)
 

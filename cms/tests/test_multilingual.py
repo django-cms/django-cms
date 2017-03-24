@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
-from cms.models import Title, EmptyTitle
+from cms.models import Page, Title, EmptyTitle
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.mock import AttributeObject
@@ -202,6 +202,9 @@ class MultilingualTestCase(CMSTestCase):
             page3.publish('de')
             page3.publish('en')
             page4.publish('de')
+
+            Page.set_homepage(page)
+
             response = self.client.get("/en/")
             self.assertRedirects(response, "/de/")
             response = self.client.get("/en/page2/")
@@ -267,6 +270,8 @@ class MultilingualTestCase(CMSTestCase):
         to English
         '''
         page = create_page("page1", "nav_playground.html", "en")
+        page_path = page.get_path()
+
         with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1:[
@@ -279,7 +284,7 @@ class MultilingualTestCase(CMSTestCase):
             from cms.views import details
 
             def get_path():
-                return '/'
+                return page_path
 
             def is_secure():
                 return False
@@ -292,7 +297,7 @@ class MultilingualTestCase(CMSTestCase):
                 GET=QueryDict('language=x-elvish'),
                 POST=QueryDict(''),
                 session={},
-                path='/',
+                path=page_path,
                 current_page=None,
                 method='GET',
                 COOKIES={},
@@ -303,7 +308,7 @@ class MultilingualTestCase(CMSTestCase):
                 get_host=get_host,
             )
 
-            response = details(request, '')
+            response = details(request, page_path)
             self.assertTrue(isinstance(response, HttpResponseRedirect))
 
     def test_language_fallback(self):
@@ -312,6 +317,9 @@ class MultilingualTestCase(CMSTestCase):
         """
         from cms.views import details
         p1 = create_page("page", "nav_playground.html", "en", published=True)
+
+        Page.set_homepage(p1)
+
         request = self.get_request('/de/', 'de')
         response = details(request, p1.get_path())
         self.assertEqual(response.status_code, 302)
@@ -398,7 +406,8 @@ class MultilingualTestCase(CMSTestCase):
         # add wrong plugin language
         add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")
         page.publish('en')
+        endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)

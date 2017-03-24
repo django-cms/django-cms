@@ -1,21 +1,32 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 from collections import defaultdict
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
 
 from django.utils.encoding import force_text
+from django.utils.lru_cache import lru_cache
 from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
 
-
 from cms.exceptions import PluginLimitReached
-from cms.models import CMSPlugin
+from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (get_placeholder_conf, get_placeholders)
+
+
+@lru_cache()
+def get_plugin_class(plugin_type):
+    return plugin_pool.get_plugin(plugin_type)
+
+
+@lru_cache()
+def get_plugin_model(plugin_type):
+    return get_plugin_class(plugin_type).model
 
 
 def get_plugins(request, placeholder, template, lang=None):
@@ -141,6 +152,72 @@ def build_plugin_tree(plugins):
         parent.child_plugin_instances = children
     return sorted(filterfalse(by_parent_id, cache.values()),
                   key=attrgetter('position'))
+
+
+def copy_plugins_from_placeholder(source, target_placeholder, language):
+    plugins = source.get_plugins_list(language)
+    plugin_pairs = []
+    plugins_by_id = {}
+
+    for source_plugin in get_bound_plugins(plugins):
+        parent = plugins_by_id.get(source_plugin.parent_id)
+        plugin_model = get_plugin_model(source_plugin.plugin_type)
+
+        if plugin_model != CMSPlugin:
+            new_plugin = deepcopy(source_plugin)
+            new_plugin.pk = None
+            new_plugin.id = None
+            new_plugin.language = language
+            new_plugin.placeholder = target_placeholder
+            new_plugin.parent = parent
+            new_plugin.numchild = 0
+        else:
+            new_plugin = plugin_model(
+                language=language,
+                parent=parent,
+                plugin_type=source_plugin.plugin_type,
+                placeholder=target_placeholder,
+                position=source_plugin.position,
+            )
+
+        if parent:
+            new_plugin = parent.add_child(instance=new_plugin)
+        else:
+            new_plugin = CMSPlugin.add_root(instance=new_plugin)
+
+        if plugin_model !=  CMSPlugin:
+            new_plugin.copy_relations(source_plugin)
+            plugin_pairs.append((new_plugin, source_plugin))
+
+        plugins_by_id[source_plugin.pk] = new_plugin
+
+    # Backwards compatibility
+    # This magic is needed for advanced plugins like Text Plugins that can have
+    # nested plugins and need to update their content based on the new plugins.
+    for new_plugin, old_plugin in plugin_pairs:
+        new_plugin.post_copy(old_plugin, plugin_pairs)
+
+
+def get_bound_plugins(plugins):
+    get_plugin = plugin_pool.get_plugin
+    plugin_types_map = defaultdict(list)
+    plugin_lookup = {}
+
+    # make a map of plugin types, needed later for downcasting
+    for plugin in plugins:
+        plugin_types_map[plugin.plugin_type].append(plugin.pk)
+
+    for plugin_type, pks in plugin_types_map.items():
+        plugin_model = get_plugin(plugin_type).model
+        plugin_queryset = plugin_model.objects.filter(pk__in=pks)
+
+        # put them in a map so we can replace the base CMSPlugins with their
+        # downcasted versions
+        for instance in plugin_queryset.iterator():
+            plugin_lookup[instance.pk] = instance
+
+    for plugin in plugins:
+        yield plugin_lookup.get(plugin.pk, plugin)
 
 
 def downcast_plugins(plugins,

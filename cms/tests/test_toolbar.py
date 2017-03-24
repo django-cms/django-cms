@@ -215,28 +215,34 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
 
     def test_markup(self):
-        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         superuser = self.get_superuser()
+
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
         self.assertContains(response, '<div id="cms-top"')
         self.assertContains(response, 'cms.base.css')
 
     def test_markup_generic_module(self):
-        create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         superuser = self.get_superuser()
+
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div class="cms-submenu-item cms-submenu-item-title"><span>Generic</span>')
 
     def test_markup_link_custom_module(self):
         superuser = self.get_superuser()
-        create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response,
@@ -244,9 +250,12 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_markup_menu_items(self):
         superuser = self.get_superuser()
-        create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
+
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
@@ -319,13 +328,14 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_markup_plugin_template(self):
         page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         plugin_1 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
         plugin_2 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
                               plugin_type='TextPlugin', body='text')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         response_text = response.render().rendered_content
         self.assertTrue(re.search('edit_plugin.+/admin/custom/view/%s' % plugin_1.pk, response_text))
@@ -396,22 +406,26 @@ class ToolbarTests(ToolbarTestBase):
         self.assertRedirects(response, page.get_absolute_url(), fetch_redirect_response=False)
 
     def test_show_toolbar_login_anonymous(self):
-        create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'cms-form-login')
 
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
     def test_hide_toolbar_login_anonymous_setting(self):
-        create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'cms-form-login')
 
     def test_hide_toolbar_login_nonstaff(self):
-        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+
         with self.login_user_context(self.get_nonstaff()):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'cms-form-login')
         self.assertNotContains(response, 'cms-toolbar')
@@ -524,9 +538,11 @@ class ToolbarTests(ToolbarTestBase):
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
     def test_placeholder_name(self):
         superuser = self.get_superuser()
-        create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'PPPP')
 
@@ -537,16 +553,17 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.status_code, 200)
 
     def test_remove_lang(self):
-        create_page('test', 'nav_playground.html', 'en', published=True)
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
             self.assertEqual(response.status_code, 200)
             setting = UserSettings.objects.get(user=superuser)
             setting.language = 'it'
             setting.save()
             with self.settings(LANGUAGES=(('en', 'english'),)):
-                response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                response = self.client.get(page_edit_on_url)
                 self.assertEqual(response.status_code, 200)
                 self.assertNotContains(response, '/it/')
 
@@ -615,8 +632,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
-        page = create_page("home", "nav_playground.html", "en",
-                           published=True)
+        page = self.create_homepage("home", "nav_playground.html", "en", published=True)
         resolve_url_on = '%s?%s' % (admin_reverse('cms_page_resolve'),
                                     get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         resolve_url_off = '%s?%s' % (admin_reverse('cms_page_resolve'),
@@ -640,8 +656,7 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.content.decode('utf-8'), '/en/')
 
     def test_page_edit_redirect_editmode(self):
-        page1 = create_page("home", "nav_playground.html", "en",
-                            published=True)
+        page1 = self.create_homepage("home", "nav_playground.html", "en", published=True)
         page2 = create_page("test", "nav_playground.html", "en",
                             published=True)
         page3 = create_page("non-pub", "nav_playground.html", "en",
@@ -1950,7 +1965,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         page.publish('en')
         page.reload()
         request = self.get_page_request(page, user, edit=True)
-        response = details(request, '')
+        response = details(request, page.get_path())
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{0} cms-render-model"></template>'

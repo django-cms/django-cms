@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms.api import add_plugin, create_page
+from cms.api import add_plugin
 from cms.models import Page, Placeholder, UserSettings
 from cms.operations import (
     ADD_PLUGIN,
@@ -44,12 +44,12 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
 
     def setUp(self):
         self._admin_user = self.get_superuser()
-        self._cms_page = create_page(
+        self._cms_page = self.create_homepage(
             "home",
             "nav_playground.html",
             "en",
             created_by=self._admin_user,
-            published=False,
+            published=True,
         )
         self._cms_placeholder = self._cms_page.placeholders.get(slot='body')
 

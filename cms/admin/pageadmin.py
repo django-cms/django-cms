@@ -55,6 +55,7 @@ from cms.constants import (
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.signals import pre_obj_operation, post_obj_operation
+from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import permissions, get_language_from_request, copy_plugins
 from cms.utils import page_permissions
@@ -101,6 +102,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/change-template/$', self.change_template),
+            pat(r'^([0-9]+)/set-home/$', self.set_home),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -190,9 +192,16 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if copy_target:
             extension_pool.copy_extensions(copy_target, obj)
 
-        # is it home? publish it right away
+        # is it the first page? publish it right away
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)
+            Page.set_homepage(obj, user=request.user)
+
+        is_draft_and_has_public = obj.publisher_is_draft and obj.publisher_public_id
+        is_advanced_settings = 'advanced' in request.path_info
+
+        if is_draft_and_has_public and is_advanced_settings and form.has_changed_apphooks():
+            form.update_apphooks()
 
     def get_fieldsets(self, request, obj=None):
         form = self.get_form(request, obj, fields=None)
@@ -664,6 +673,48 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         page.template = to_template
         page.save()
         return HttpResponse(force_text(_("The template was successfully changed")))
+
+    @require_POST
+    @transaction.atomic
+    def set_home(self, request, object_id):
+        page = get_object_or_404(
+            self.model,
+            pk=object_id,
+            publisher_is_draft=True,
+        )
+
+        if not self.has_change_permission(request, page):
+            message = _("You do not have permission to set 'home'")
+            return HttpResponseForbidden(force_text(message))
+
+        if not page.is_potential_home():
+            return HttpResponseBadRequest(force_text(_("The page is not eligible to be home.")))
+
+        old_home = Page.set_homepage(page, user=request.user)
+
+        # Check if one of the affected pages either from the old homepage
+        # or the homepage had an apphook attached
+        if old_home and old_home.publisher_public:
+            apphooks_affected = (
+                old_home.publisher_public
+                .get_descendants(include_self=True)
+                .has_apphooks()
+            )
+        else:
+            apphooks_affected = False
+
+        if not apphooks_affected and page.publisher_public:
+            apphooks_affected = (
+                page.publisher_public
+                .get_descendants(include_self=True)
+                .has_apphooks()
+            )
+
+        if apphooks_affected:
+            # One or more pages affected by this operation was attached to an apphook.
+            # As a result, fire the apphook reload signal to reload the url patterns.
+            set_restart_trigger()
+        return HttpResponse('ok')
 
     @require_POST
     @transaction.atomic
