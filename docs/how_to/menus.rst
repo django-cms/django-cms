@@ -179,7 +179,7 @@ To make your modifier available, it then needs to be registered with
 Now, when a page is loaded and the menu generated, your modifier will
 be able to inspect and modify its nodes.
 
-Here is an example of a simple modifier that places the Page's ``changed_by`` attribute in the corresponding
+Here is an example of a simple modifier that places each Page's ``changed_by`` attribute in the corresponding
 ``NavigationNode``::
 
     from menus.base import Modifier
@@ -193,7 +193,7 @@ Here is an example of a simple modifier that places the Page's ``changed_by`` at
         accessible for the menu system.
         """
         def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
-            # only do something when the menu is already cut
+            # only do something when the menu has already been cut
             if post_cut:
                 # only consider nodes that refer to cms pages
                 # and put them in a dict for efficient access
@@ -238,22 +238,6 @@ of :class:`~menus.base.NavigationNode` instances.
 ``breadcrumb``
   Is this a breadcrumb call rather than a menu call?
 
-
-Note: Navigation modifiers can quickly become a performance bottleneck. Each modifier is called
-multiple times: For the breadcrumb (``breadcrumb=True``),
-for the whole menu tree (``post_cut=False``),
-for the menu tree cut to the visible part (``post_cut=True``) and perhaps for each level
-of the navigation. Performing inefficient operations inside a navigation modifier
-can hence lead to big performance issues.
-Some tips for keeping a modifier implementation fast:
-
-* Specify when exactly the modifier is necessary (in breadcrumb, before or after cut).
-* Only consider nodes and pages relevant for the modification.
-* Perform as less database queries as possible (i.e. not in a loop).
-* In database queries, fetch exactly the attributes you are interested in.
-* If you have multiple modifications to do, try to apply them in the same method.
-
-
 Here is an example of a built-in modifier that marks all node levels::
 
 
@@ -284,3 +268,20 @@ Here is an example of a built-in modifier that marks all node levels::
                 self.mark_levels(child, post_cut)
 
     menu_pool.register_modifier(Level)
+
+Performance issues in menu modifiers
+====================================
+
+Navigation modifiers can quickly become a performance bottleneck. Each modifier is called
+multiple times: For the breadcrumb (``breadcrumb=True``),
+for the whole menu tree (``post_cut=False``),
+for the menu tree cut to the visible part (``post_cut=True``) and perhaps for each level
+of the navigation. Performing inefficient operations inside a navigation modifier
+can hence lead to big performance issues.
+Some tips for keeping a modifier implementation fast:
+
+* Specify when exactly the modifier is necessary (in breadcrumb, before or after cut).
+* Only consider nodes and pages relevant for the modification.
+* Perform as less database queries as possible (i.e. not in a loop).
+* In database queries, fetch exactly the attributes you are interested in.
+* If you have multiple modifications to do, try to apply them in the same method.
