@@ -1,0 +1,51 @@
+{% load i18n staticfiles sekizai_tags cms_tags %}
+
+<div class="djangocms-googlemap js-djangocms-googlemap"
+    data-zoom="{{ instance.zoom }}"
+    data-style="{{ instance.style }}"
+    data-lat="{{ instance.lat|stringformat:"f" }}"
+    data-lng="{{ instance.lng|stringformat:"f" }}"
+    data-zoom-control="{{ instance.zoom_control|lower }}"
+    data-street-view-control="{{ instance.street_view_control|lower }}"
+    data-rotate-control="{{ instance.rotate_control|lower }}"
+    data-scale-control="{{ instance.scale_control|lower }}"
+    data-fullscreen-control="{{ instance.fullscreen_control|lower }}"
+    data-pan-control="{{ instance.pan_control|lower }}"
+    data-double-click-zoom="{{ instance.double_click_zoom|lower }}"
+    data-draggable="{{ instance.draggable|lower }}"
+    data-keyboard-shortcuts="{{ instance.keyboard_shortcuts|lower }}"
+    data-scrollwheel="{{ instance.scrollwheel|lower }}"
+    data-map-type-control="{{ instance.map_type_control }}"
+    {% if instance.title %} title="{{ instance.title }}"{% endif %}
+>
+    <div class="djangocms-googlemap-container js-djangocms-googlemap-container"
+        style="width:{{ instance.width }};height:{{ instance.height }};"></div>
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</div>
+
+{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js{% if googlemap_key %}?key={{ googlemap_key }}{% endif %}" async defer></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'djangocms_googlemap/js/djangocms.googlemap.js' %}" async defer></script>{% endaddtoblock %}
+
+{% comment %}
+    {{ googlemap_key }}
+
+    {{ instance.title }}
+    {{ instance.width }}
+    {{ instance.height }}
+    {{ instance.zoom }}
+    {{ instance.style }}
+
+    {{ instance.map_type_control }}
+    {{ instance.zoom_control }}
+    {{ instance.street_view_control }}
+    {{ instance.rotate_control }}
+    {{ instance.scale_control }}
+    {{ instance.fullscreen_control }}
+    {{ instance.pan_control }}
+    {{ instance.double_click_zoom }}
+    {{ instance.draggable }}
+    {{ instance.keyboard_shortcuts }}
+    {{ instance.scrollwheel }}
+{% endcomment %}
