@@ -8,7 +8,6 @@ INSTALLED_ADDONS = [
     'aldryn-django-cms',
     'aldryn-devsync',
     'djangocms-history',
-    'djangocms-link',
     'djangocms-picture',
     'djangocms-snippet',
     'djangocms-style',
