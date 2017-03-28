@@ -1,0 +1,39 @@
+// #############################################################################
+// FONTS
+
+// there are two options to choose from when integrating fonts:
+// "OPTION 1": importing fonts from an external resource
+// "OPTION 2": hosting the files yourself
+
+// OPTION 1
+// @import url("https://fonts.googleapis.com/css?family=Lobster");
+
+// OPTION 2
+// @font-face {
+//     font-family: "ClearSans";
+//     font-weight: 200;
+//     src: url("../fonts/clearsans/ClearSans-Light.eot?#iefix");
+//     src: url("../fonts/clearsans/ClearSans-Light.eot?#iefix") format("eot"),
+//          url("../fonts/clearsans/ClearSans-Light.woff") format("woff"),
+//          url("../fonts/clearsans/ClearSans-Light.ttf") format("truetype"),
+//          url("../fonts/clearsans/ClearSans-Light.svg#ClearSans-Light") format("svg");
+// }
+//
+// @font-face {
+//     font-family: "ClearSans";
+//     font-weight: 400;
+//     src: url("../fonts/clearsans/ClearSans-Regular.eot?#iefix");
+//     src: url("../fonts/clearsans/ClearSans-Regular.eot?#iefix") format("eot"),
+//          url("../fonts/clearsans/ClearSans-Regular.woff") format("woff"),
+//          url("../fonts/clearsans/ClearSans-Regular.ttf") format("truetype"),
+//          url("../fonts/clearsans/ClearSans-Regular.svg#ClearSans-Light") format("svg");
+// }
+// @font-face {
+//     font-family: "ClearSans";
+//     font-weight: 600;
+//     src: url("../fonts/clearsans/ClearSans-Medium.eot?#iefix");
+//     src: url("../fonts/clearsans/ClearSans-Medium.eot?#iefix") format("eot"),
+//          url("../fonts/clearsans/ClearSans-Medium.woff") format("woff"),
+//          url("../fonts/clearsans/ClearSans-Medium.ttf") format("truetype"),
+//          url("../fonts/clearsans/ClearSans-Medium.svg#ClearSans-Light") format("svg");
+// }

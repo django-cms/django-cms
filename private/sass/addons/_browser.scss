@@ -1,0 +1,69 @@
+// #############################################################################
+// OUTDATED BROWSER
+
+// this addon adds modified styles to the outdated browser script found
+// on outdatedbrowser.com we specifically added changes to class names and
+// removed id references to be more compliant
+
+* html .browser-outdated {
+    position: absolute;
+}
+
+.browser-outdated {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    // do not add paddings or margins on the container
+    width: 100%;
+    height: auto;
+    background-color: $brand-danger;
+
+    h3,
+    p {
+        color: #fff;
+    }
+    .btn-outline {
+        color: #fff;
+        border: 2px solid #fff;
+        &:hover {
+            color: $brand-danger;
+            background: #fff;
+        }
+    }
+
+    .last {
+        position: absolute;
+        top: $line-height-computed / 2;
+        right: $line-height-computed;
+        a {
+            display: inline-block;
+            color: #fff;
+            font-size: 36px;
+            line-height: 1;
+            text-decoration: none;
+        }
+    }
+
+    // add spacer in order for cross styling between noscript and out-of-date
+    .btn-outline,
+    noscript h3 {
+        margin-bottom: $line-height-computed;
+    }
+}
+
+// additionally also implement a warning when JavaScript is disabled
+.noscript .browser-outdated {
+    display: block;
+    p,
+    h3 {
+        display: none;
+    }
+    noscript h3 {
+        display: block;
+    }
+}

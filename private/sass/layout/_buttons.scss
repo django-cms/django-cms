@@ -1,0 +1,36 @@
+// #############################################################################
+// BUTTONS
+
+// all styles related to the button system should be declared within this file
+// apply the "sites/" nesting described within the documentation if the file is
+// getting to large
+
+// BUTTONS/animation
+.btn {
+    transition: background $speed-base;
+}
+
+// BUTTONS/outline
+.btn-outline {
+    border: 1px solid transparent;
+    background: transparent;
+
+    &.btn-default {
+        @include button-variant-outline($btn-default-color, $btn-default-border);
+    }
+    &.btn-primary {
+        @include button-variant-outline($btn-primary-bg, $btn-primary-border);
+    }
+    &.btn-success {
+        @include button-variant-outline($btn-success-bg, $btn-success-border);
+    }
+    &.btn-info {
+        @include button-variant-outline($btn-info-bg, $btn-info-border);
+    }
+    &.btn-warning {
+        @include button-variant-outline($btn-warning-bg, $btn-warning-border);
+    }
+    &.btn-danger {
+        @include button-variant-outline($btn-danger-bg, $btn-danger-border);
+    }
+}

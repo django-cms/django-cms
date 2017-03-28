@@ -1,0 +1,77 @@
+// #############################################################################
+// CUSTOM
+
+// this file is the starting point for custom style and structure
+// feel free to organise your code here as you wish
+// keep in mind that you can use deeper folder nesting for more structure and refinement
+
+// HELPERS/spacer
+.spacer {
+    margin-top: $line-height-computed;
+    margin-bottom: $line-height-computed;
+}
+.spacer-xs {
+    margin-top: $line-height-computed / 2;
+    margin-bottom: $line-height-computed / 2;
+}
+.spacer-sm {
+    margin-top: $line-height-computed / 1.5;
+    margin-bottom: $line-height-computed / 1.5;
+}
+.spacer-md {
+    @extend .spacer;
+}
+.spacer-lg {
+    margin-top: $line-height-computed * 2;
+    margin-bottom: $line-height-computed * 2;
+}
+.spacer-zero {
+    margin: 0;
+}
+.spacer:after,
+.spacer-xs:after,
+.spacer-sm:after,
+.spacer-md:after,
+.spacer-lg:after,
+.spacer-zero:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+// HELPERS/accessibility
+.skip-links {
+    @extend .list-unstyled;
+    position: absolute;
+    top: $navbar-height;
+    right: 0;
+    left: 0;
+    z-index: 9999;
+    a {
+        @extend .sr-only;
+        @extend .sr-only-focusable;
+    }
+}
+
+// HELPERS/colors
+@include bg-variant(".brand-primary", $brand-primary);
+@include bg-variant(".brand-secondary", $brand-secondary);
+@include bg-variant(".brand-success", $brand-success);
+@include bg-variant(".brand-info", $brand-info);
+@include bg-variant(".brand-warning", $brand-warning);
+@include bg-variant(".brand-danger", $brand-danger);
+@include bg-variant(".brand-muted", $text-muted);
+
+@include bg-variant(".brand-gray-darker", $gray-darker);
+@include bg-variant(".brand-gray-dark", $gray-dark);
+@include bg-variant(".brand-gray", $gray);
+@include bg-variant(".brand-gray-light", $gray-light);
+@include bg-variant(".brand-gray-lighter", $gray-lighter);
+
+// HELPERS/styleguide
+.styleguide {
+    padding: $line-height-computed 0;
+}
+.col-linebreak {
+    border-left: 1px dotted $gray-light;
+}

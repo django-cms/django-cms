@@ -1,0 +1,17 @@
+{
+    "presets": ["es2015"],
+    "plugins": ["transform-runtime"],
+    "env": {
+        "test": {
+            "plugins": [
+                [ "__coverage__", { "ignore": "tests/**/*.js" } ],
+                "rewire"
+            ]
+        },
+        "production": {
+            "plugins": [
+                "lodash"
+            ]
+        }
+    }
+}

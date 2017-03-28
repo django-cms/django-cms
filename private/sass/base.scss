@@ -1,0 +1,25 @@
+@charset "utf-8";
+/*
+ * Copyright (c) 2013, Divio AG
+ * Licensed under BSD
+ * http://github.com/divio/djangocms-boilerplate-webpack
+ */
+
+// #############################################################################
+// IMPORTS
+@import "settings/all";
+
+// importin mixins
+@import "mixins/all";
+
+// importing frameworks
+@import "libs/all";
+
+// importing modules
+@import "layout/all";
+
+// importing addons
+@import "addons/all";
+
+// importing sites
+@import "sites/all";

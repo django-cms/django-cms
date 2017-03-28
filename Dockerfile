@@ -8,10 +8,24 @@
 FROM aldryn/base-project:py3-3.23
 # </DOCKER_FROM>
 
-# <NPM>
-# </NPM>
+# <NODE>
+ADD tools/build /stack/boilerplate
+
+ENV NODE_VERSION=0.12.14 \
+    NPM_VERSION=2.15.5
+
+RUN bash /stack/boilerplate/install.sh
+
+ENV NODE_PATH=$NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules \
+    PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+# </NODE>
 
 # <BOWER>
+COPY bower.json .bowerrc /app/
+RUN bower install \
+    --verbose \
+    --allow-root \
+    --config.interactive=false
 # </BOWER>
 
 # <PYTHON>
@@ -26,11 +40,22 @@ RUN pip-reqs compile && \
         --requirement requirements.urls
 # </PYTHON>
 
+# <NPM>
+# package.json is put into / so that mounting /app for local
+# development does not require re-running npm install
+ENV PATH=/node_modules/.bin:$PATH
+RUN npm install -g npm-install-retry
+COPY package.json /
+RUN (cd / && npm-install-retry -- --production && rm -rf /tmp/*)
+# </NPM>
+
 # <SOURCE>
 COPY . /app
 # </SOURCE>
 
 # <GULP>
+ENV GULP_MODE=production
+RUN gulp build; exit 0
 # </GULP>
 
 # <STATIC>

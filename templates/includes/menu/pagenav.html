@@ -1,0 +1,27 @@
+{% load i18n %}
+
+{% if is_paginated %}
+{% if page_obj.has_previous %}<li class="prev"><a href="?{% if query %}q={{ query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">&laquo; {% trans "previous" %}</a></li>{% endif %}
+
+{% if paginator.num_pages > 10 %}
+    {% if page_obj.number > 5 %}<li><a href="?{% if query %}q={{ query }}&amp;{% endif %}page={{ page_obj.number|add:-5 }}">...</a></li>{% endif %}
+    {% for page in paginator.page_range %}
+        {% if page == page_obj.number %}
+            <li class="active"><span>{{ page }}</span></li>
+        {% elif page > page_obj.number|add:-5 and page < page_obj.number|add:5 %}
+            <li><a href="?{% if query %}q={{ query }}&amp;{% endif %}page={{ page }}">{{ page }}</a></li>
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.number < paginator.num_pages|add:-4 %}<li><a href="?{% if query %}q={{ query }}&amp;{% endif %}page={{ page_obj.number|add:5 }}">...</a></li>{% endif %}
+{% else %}
+    {% for page in paginator.page_range %}
+        {% if page == page_obj.number %}
+            <li class="active"><span>{{ page }}</span></li>
+        {% else %}
+            <li><a href="?{% if query %}q={{ query }}&amp;{% endif %}page={{ page }}">{{ page }}</a></li>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if page_obj.has_next %}<li class="next"><a href="?{% if query %}q={{ query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">{% trans "next" %} &raquo;</a></li>{% endif %}
+{% endif %}

@@ -1,0 +1,29 @@
+// #############################################################################
+// PRINT
+
+// this file is intended for all print styles and rules
+// to ensure your website also works when printed
+
+@media print {
+
+    // Defaults
+    a[href]:after {
+        content: "";
+    }
+    #cms_toolbar,
+    .browser-outdated {
+        display: none !important;
+    }
+
+    // Custom
+    .navbar-head {
+        display: block;
+    }
+    .navbar-main {
+        display: none;
+    }
+    .navbar-head .navbar-brand a {
+        text-indent: 0;
+    }
+
+}

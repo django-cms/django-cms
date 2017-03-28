@@ -1,24 +1,41 @@
-# <DEFAULT>  # Warning: text inside the DEFAULT tags is auto-generated. Manual changes will be overwritten.
-# OS generated
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-*~
-
-# Python
 *.pyc
 *.pyo
+*~
+.hg
+.git
+.svn
+.DS_Store
+.settings
+.project
+.pydevproject
+.installed.cfg
+.mr.developer.cfg
+.idea
+.sass-cache
+.eyeglass_cache
+.idea
 
-# Aldryn
-/.env
-/.env-local
-.aldryn
-/data
-/data.tar.gz
-/static_collected
+/tmp
+/env
+/docs/_build
+/docs/env
+
+/src/settings_local*.py
+/requirements_local*.txt
+
 /node_modules
-# </DEFAULT>
+/bower_components
+npm-debug.log
+*.css.map
+/static/css/
+/static/vendor
+/static/docs/
+/static/js/dist/
+
+/tests/coverage
+/tests/integration/index.bundle.js
+
+Gemfile.lock
+.bundle/
+
+/tools/server/env
