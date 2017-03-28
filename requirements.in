@@ -2,4 +2,5 @@
 https://control.divio.com/api/v1/apps/serve/aldryn-addons/1.0.2/24f5d1c8-66fe-43b2-a540-17d61045a72b/aldryn-addons-1.0.2.tar.gz#egg=aldryn-addons==1.0.2
 https://control.divio.com/api/v1/apps/serve/aldryn-django/1.8.17.1/2debc756-f648-4c9a-9150-f7d059482b4a/aldryn-django-1.8.17.1.tar.gz#egg=aldryn-django==1.8.17.1
 https://control.divio.com/api/v1/apps/serve/aldryn-sso/1.1.14/39be82e7-3fc0-4b9a-8635-008e3db27cea/aldryn-sso-1.1.14.tar.gz#egg=aldryn-sso==1.1.14
+https://control.divio.com/api/v1/apps/serve/aldryn-devsync/1.1.2/42c1ce27-4139-4c0d-a2ba-fffe2db318f8/aldryn-devsync-1.1.2.tar.gz#egg=aldryn-devsync==1.1.2
 # </INSTALLED_ADDONS>
