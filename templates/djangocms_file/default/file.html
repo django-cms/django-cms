@@ -1,0 +1,26 @@
+<a href="{{ instance.file_src.url }}"
+    {% if instance.link_target %} target="{{ instance.link_target }}"{% endif %}
+    {% if instance.link_title %} title="{{ instance.link_title }}"{% endif %}
+    {{ instance.attributes_str }}>
+    {% if instance.file_name %}
+        {{ instance.file_name }}
+    {% else %}
+        {{ instance.file_src.label }}
+    {% endif %}
+    {% if instance.show_file_size %}
+        <span>{{ instance.file_src.size|filesizeformat }}</span>
+    {% endif %}
+</a>
+
+{% comment %}
+    # https://github.com/divio/django-filer/blob/master/filer/models/filemodels.py
+    {{ instance.file_src }}
+    {{ instance.file_src.extension }}
+    # Available variables:
+    {{ instance.template }}
+    {{ instance.file_name }}
+    {{ instance.link_target }}
+    {{ instance.link_title }}
+    {{ instance.show_file_size }}
+    {{ instance.attributes_str }}
+{% endcomment %}
