@@ -6,6 +6,7 @@ INSTALLED_ADDONS = [
     'aldryn-django',
     'aldryn-sso',
     'aldryn-devsync',
+    'djangocms-file',
     'djangocms-googlemap',
     'djangocms-link',
     'djangocms-snippet',
