@@ -1,0 +1,17 @@
+{% load i18n cms_tags %}
+
+{% if not disabled %}
+    {% with instance.source_file.extension as ext %}
+        <source src="{{ instance.source_file.url }}" type="video/{{ ext }}" {{ instance.attributes_str }}>
+    {% endwith %}
+{% endif %}
+
+{% comment %}
+    # https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
+    # https://github.com/divio/django-filer/blob/master/filer/models/filemodels.py
+    {{ instance.source_file }}
+    # Available variables:
+    {{ instance.text_title }}
+    {{ instance.text_description }}
+    {{ instance.attributes_str }}
+{% endcomment %}

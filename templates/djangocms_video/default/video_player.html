@@ -1,0 +1,29 @@
+{% load i18n cms_tags %}
+
+{% if instance.embed_link %}
+    {# show iframe if embed_link is provided #}
+    <iframe src="{{ instance.embed_link }}" {{ instance.attributes_str }} frameborder="0" allowfullscreen="true"></iframe>
+    {% with disabled=instance.embed_link %}
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+    {% endwith %}
+{% else %}
+    {# render <source> or <track> plugins #}
+    <video controls {{ instance.attributes_str }}
+        {% if instance.poster %} poster="{{ instance.poster.url }}"{% endif %}>
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+        {% trans "Your browser doesn't support this video format." %}
+    </video>
+{% endif %}
+
+{% comment %}
+    # Available variables:
+    {{ instance.template }}
+    {{ instance.label }}
+    {{ instance.embed_link }}
+    {{ instance.poster }}
+    {{ instance.attributes_str }}
+{% endcomment %}

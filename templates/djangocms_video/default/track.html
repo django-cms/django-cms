@@ -1,0 +1,18 @@
+{% if not disabled %}
+    <track kind="{{ instance.kind }}" src="{{ instance.src.url }}"
+        {% if instance.srclang %} srclang="{{ instance.srclang }}"{% endif %}
+        {% if instance.label %} label="{{ instance.label }}"{% endif %}
+        {% if instance.attributes %} {{ instance.attributes_str }}{% endif %}
+    >
+{% endif %}
+
+{% comment %}
+    # https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track
+    # https://github.com/divio/django-filer/blob/master/filer/models/foldermodels.py
+    {{ instance.src }}
+    # Available variables:
+    {{ instance.kind }}
+    {{ instance.srclang }}
+    {{ instance.label }}
+    {{ instance.attributes_str }}
+{% endcomment %}
