@@ -1,0 +1,16 @@
+web:
+ build: .
+ links:
+  - "db:postgres"
+ ports:
+  - "8000:80"
+ volumes:
+  - ".:/app:rw"
+  - "./data:/data:rw"
+ command: python manage.py runserver 0.0.0.0:80
+ env_file: .env-local
+
+db:
+ image: postgres:9.4
+ volumes:
+  - ".:/app:rw"
