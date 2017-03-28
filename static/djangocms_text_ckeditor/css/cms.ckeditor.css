@@ -1,0 +1,87 @@
+@charset "utf-8";
+/*
+ * @copyright:  https://github.com/divio/djangocms-text-ckeditor
+ */
+
+/* float left with the label */
+.cke_chrome { float:left; width:100%; }
+
+/* special case when inside a text plugin */
+.djangocms_text_ckeditor-text .form-row label { display:none; }
+.djangocms_text_ckeditor-text .cke_chrome { float: none; }
+
+/* insure dialog has relative positioning for absolute positioned content */
+.cms-ckeditor-dialog .cke_dialog {
+    position: fixed !important;
+}
+.cke_dialog_contents_body {
+    position: relative;
+}
+
+/* show cmsplugin label */
+.cke_button__cmsplugins .cke_button_label { padding-left:5px; padding-right:5px;  display:inline; }
+
+/* make dropdow larger */
+.cke_combopanel, .cke_panel { min-width:200px; }
+
+
+/* add / edit plugin modal */
+.cms-ckeditor-dialog .cke_dialog_contents_body {
+    padding: 3px 0 !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents {
+    width: 100% !important;
+    height: 100% !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table {
+    display: block;
+    position: absolute;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table tbody,
+.cms-ckeditor-dialog .cke_dialog_page_contents table tr,
+.cms-ckeditor-dialog .cke_dialog_page_contents table td {
+    display: block;
+    height: 100%;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table .cke_dialog_ui_vbox_child {
+    padding: 0 !important;
+    height: 100%;
+    display: block !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table .cke_dialog_ui_vbox_child iframe {
+    position: static !important;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* scrollable dropdowns on touch */
+.cke_panel {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    height: auto;
+    max-height: 300px;
+}
+.cke_panel .cke_panel_frame {
+    display: block;
+    position: static;
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
+    overflow: hidden !important;
+}
+
+/* cms-resizer */
+.cms-ckeditor-resizer {
+    border: none !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: auto !important;
+    font-size: 12px !important;
+}

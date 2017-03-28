@@ -1,0 +1,94 @@
+{% load i18n l10n admin_static cms_static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static "djangocms_text_ckeditor/css/cms.ckeditor.css" %}" />
+{% endblock %}
+
+{% block extrahead %}
+<script>window.CKEDITOR_BASEPATH = "{{ CKEDITOR_BASEPATH }}";</script>
+<script src="{% static_with_version "cms/js/dist/bundle.admin.base.min.js" %}"></script>
+<script src="{% static "djangocms_text_ckeditor/js/dist/bundle-0cf66229ed.cms.ckeditor.min.js" %}"></script>
+{% endblock %}
+
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+    function initCMSCKEditor{{ ckeditor_function }}() {
+        if ($('.CMS_CKEditor:visible').length > 0) {
+            $('.CMS_CKEditor:visible').each(function() {
+                var editor = $(this);
+
+                if (editor.data('isCKEditorInitialized')) {
+                    return;
+                }
+
+                editor.hide();
+                editor.data('isCKEditorInitialized', true);
+
+                var container = editor.attr('id');
+                CMS.CKEditor.init(container, {{ settings|safe }}, {
+                    'static_url': '{{ STATIC_URL }}djangocms_text_ckeditor',
+                    'add_plugin_url': '{{ placeholder.get_add_url }}',
+                    {% if widget.action_token %}
+                    'action_token': '{{ widget.action_token }}',
+                    {% endif %}
+                    {% if widget.render_plugin_url %}
+                    'render_plugin_url': '{{ widget.render_plugin_url }}',
+                    {% endif %}
+                    {% if widget.cancel_url and widget.action_token %}
+                    'cancel_plugin_url': '{{ widget.cancel_url }}',
+                    {% endif %}
+                    'delete_on_cancel': {{ widget.delete_on_cancel|yesno:"true,false" }},
+                    'placeholder_id': {{ placeholder.pk|default:"''"|unlocalize }},
+                    'plugin_id': {{ plugin_pk|default:"''"|unlocalize }},
+                    'plugin_language': '{{ plugin_language }}',
+                    'lang': {
+                        'toolbar': '{% filter escapejs %}{% trans "CMS Plugins" %}{% endfilter %}',
+                        'add': '{% filter escapejs %}{% trans "Add CMS Plugin" %}{% endfilter %}',
+                        'edit': '{% filter escapejs %}{% trans "Edit CMS Plugin" %}{% endfilter %}',
+                        'aria': '{% filter escapejs %}{% trans "CMS Plugins" %}{% endfilter %}'
+                    },
+                    'plugins': [
+                        {% regroup installed_plugins by module as module_list %}
+                        {% for module in module_list %}
+                            { group: '{% filter escapejs %}{% if module.grouper %}{{ module.grouper|capfirst }}{% else %}{% trans "Standard Plugins" %}{% endif %}{% endfilter %}', items: [
+                                {% for plugin in module.list %}
+                                    { 'title': '{% filter escapejs %}{{ plugin.name }}{% endfilter %}', 'type': '{% filter escapejs %}{{ plugin.value }}{% endfilter %}' }{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            ]}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    ]{% if not placeholder %},
+                    'toolbar': 'HTMLField'
+                    {% endif %}
+                });
+            });
+        }
+    }
+
+    // initialize ckeditor only if the container exists and is ready
+    setTimeout(initCMSCKEditor{{ ckeditor_function }}, 0);
+
+    // initialize ckeditor in admin inline for "add-row" link
+    var addButtons{{ ckeditor_function }} = $('.add-row a');
+    if (addButtons{{ ckeditor_function }}.length > 0) {
+        if (addButtons{{ ckeditor_function }}.data('isInitCMSCKEditor') !== 'yes') {
+
+            addButtons{{ ckeditor_function }}.click(function () {
+                initCMSCKEditor{{ ckeditor_function }}();
+            });
+            addButtons{{ ckeditor_function }}.data('isInitCMSCKEditor', 'yes');
+        }
+    }
+    //initialize ckeditor when a collapsed row is extended
+    $("#{{ ckeditor_selector }}").closest("fieldset.collapse").find("a.collapse-toggle").click(function(e) {
+        var $this = $(this);
+        if (!$this.closest("fieldset").hasClass("collapsed") && $this.data('isInitCMSCKEditor_{{ ckeditor_selector }}') != 'yes') {
+            // Show
+            initCMSCKEditor{{ ckeditor_function }}();
+            $this.data('isInitCMSCKEditor_{{ ckeditor_selector }}', 'yes');
+        }
+    });
+});
+})(CMS.$);
+</script>
