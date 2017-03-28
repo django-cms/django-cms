@@ -1,0 +1,37 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block object-tools %}
+{{ block.super }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js"></script>
+<script>
+django.jQuery(function () {
+    // ace editor cannot be attached directly to a textarea
+    var textarea = django.jQuery('textarea').css('display', 'none');
+    var settings = textarea.data();
+    var div = django.jQuery('<div>', {
+        position: 'absolute',
+        width: '100%',
+        height: textarea.height(),
+        'class': textarea.attr('class')
+    }).insertBefore(textarea);
+
+    // init editor with settings
+    var editor = ace.edit(div[0]);
+    editor.setTheme('ace/theme/' + settings.theme);
+    editor.getSession().setValue(textarea.val());
+    editor.getSession().setMode('ace/mode/' + settings.mode);
+    editor.setOptions({
+        fontSize: '14px',
+        cursorStyle: 'smooth'
+    });
+    editor.renderer.setScrollMargin(5, 5);
+
+    // send data back to textarea when submitting
+    textarea.closest('form').submit(function () {
+        textarea.val(editor.getSession().getValue());
+    })
+});
+</script>
+{% endblock %}
