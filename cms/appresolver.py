@@ -163,6 +163,8 @@ def get_app_urls(urls):
                 raise ImproperlyConfigured(
                     "URLConf `%s` has no urlpatterns attribute" % urlconf)
             yield getattr(mod, 'urlpatterns')
+        elif isinstance(urlconf, (list, tuple)):
+            yield urlconf
         else:
             yield [urlconf]
 
