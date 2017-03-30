@@ -18,14 +18,12 @@ const DEBUG = argv.debug;
 const PROJECT_ROOT = __dirname;
 const PROJECT_PATH = {
     css: PROJECT_ROOT + '/static/css',
-    // docs: PROJECT_ROOT + '/static/docs',
     // fonts: PROJECT_ROOT + '/static/fonts',
     // html: PROJECT_ROOT + '/templates',
     // images: PROJECT_ROOT + '/static/img',
     // icons: PROJECT_ROOT + '/private/icons',
     // js: PROJECT_ROOT + '/static/js',
-    sass: PROJECT_ROOT + '/private/sass',
-    // tests: PROJECT_ROOT + '/tests'
+    sass: PROJECT_ROOT + '/private/sass'
 };
 const PROJECT_PATTERNS = {
     // images: [
@@ -92,13 +90,19 @@ gulp.task('sass:critical', ['sass:compile'], task('sass/critical'));
 gulp.task('sass:rest', ['sass:compile'], task('sass/rest'));
 gulp.task('sass:inline', ['sass:critical'], task('sass/inline'));
 
-// gulp.task('bower', task('bower'));
+/**
+ * Usage:
+ * - "gulp lint" (runs sass and js linter)
+ * - "gulp lint --debug" (switches linters to verbose mode)
+ * - "gulp lint:sass" (runs the linter for sass)
+ * - "gulp lint:javascript" (runs the linter for javascript)
+ */
+gulp.task('lint', ['lint:sass']);
+gulp.task('lint:sass', task('lint/sass'));
 // gulp.task('lint:javascript', task('lint/javascript'));
-// gulp.task('lint', ['lint:javascript']);
-// gulp.task('sass', task('sass'));
+
 // gulp.task('webpack:once', task('webpack/once'));
 // gulp.task('webpack:watch', task('webpack/watch'));
-// gulp.task('build', ['sass', 'webpack:once']);
 //
 // /**
 //  * GULP_MODE === 'production' means we have a limited
@@ -107,17 +111,8 @@ gulp.task('sass:inline', ['sass:critical'], task('sass/inline'));
 //  */
 // if (process.env.GULP_MODE !== 'production') {
 //     gulp.task('images', task('images'));
-//     gulp.task('docs', task('docs'));
 //     gulp.task('preprocess', ['sass', 'images', 'docs']);
 //     gulp.task('icons', task('icons'));
-//
-//     gulp.task('browser', task('browser'));
-//
-//     gulp.task('tests:lint', ['lint:javascript']);
-//     gulp.task('tests:unit', task('tests/unit'));
-//     gulp.task('tests:watch', ['tests:lint'], task('tests/watch'));
-//     gulp.task('tests', ['tests:unit', 'tests:lint']);
-//     gulp.task('tests:integration:webpack', task('tests/webpack'));
 //
 //     // Running integration tests on CI is usually problematic,
 //     // since the environment to test against must be prepared.
@@ -125,11 +120,9 @@ gulp.task('sass:inline', ['sass:critical'], task('sass/inline'));
 //     gulp.task('tests:integration', ['tests:integration:webpack'], task('tests/integration'));
 // }
 //
-gulp.task('default', ['sass']);
+gulp.task('default', ['sass', 'lint']);
 gulp.task('watch', function () {
     // gulp.start('webpack:watch');
-    gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
+    gulp.watch(PROJECT_PATTERNS.sass, ['sass', 'lint']);
     // gulp.watch(PROJECT_PATTERNS.js, ['lint']);
 });
-//
-// gulp.task('default', ['bower', 'sass', 'lint', 'watch']);
