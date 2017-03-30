@@ -986,12 +986,12 @@ Example::
 
     CMS_TOOLBARS = [
         # CMS Toolbars
-        'cms.cms_toolbar.PlaceholderToolbar',
-        'cms.cms_toolbar.BasicToolbar',
-        'cms.cms_toolbar.PageToolbar',
+        'cms.cms_toolbars.PlaceholderToolbar',
+        'cms.cms_toolbars.BasicToolbar',
+        'cms.cms_toolbars.PageToolbar',
 
         # third-party Toolbar
-        'aldryn_blog.cms_toolbar.BlogToolbar',
+        'aldryn_blog.cms_toolbars.BlogToolbar',
     ]
 
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
