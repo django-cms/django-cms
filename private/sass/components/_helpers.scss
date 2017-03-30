@@ -1,9 +1,7 @@
 // #############################################################################
-// CUSTOM
+// HELPERS
 
-// this file is the starting point for custom style and structure
-// feel free to organise your code here as you wish
-// keep in mind that you can use deeper folder nesting for more structure and refinement
+// helper classes for the general layout
 
 // HELPERS/spacer
 .spacer {
@@ -55,7 +53,6 @@
 
 // HELPERS/colors
 @include bg-variant(".brand-primary", $brand-primary);
-@include bg-variant(".brand-secondary", $brand-secondary);
 @include bg-variant(".brand-success", $brand-success);
 @include bg-variant(".brand-info", $brand-info);
 @include bg-variant(".brand-warning", $brand-warning);
@@ -67,11 +64,3 @@
 @include bg-variant(".brand-gray", $gray);
 @include bg-variant(".brand-gray-light", $gray-light);
 @include bg-variant(".brand-gray-lighter", $gray-lighter);
-
-// HELPERS/styleguide
-.styleguide {
-    padding: $line-height-computed 0;
-}
-.col-linebreak {
-    border-left: 1px dotted $gray-light;
-}

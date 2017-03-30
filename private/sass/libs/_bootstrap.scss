@@ -5,6 +5,7 @@
  */
 
 // Core variables and mixins
+/* critical:start */
 @import "bootstrap-sass/bootstrap/variables";
 @import "bootstrap-sass/bootstrap/mixins";
 
@@ -15,6 +16,7 @@
 
 // Core CSS
 @import "bootstrap-sass/bootstrap/scaffolding";
+/* critical:end */
 @import "bootstrap-sass/bootstrap/type";
 @import "bootstrap-sass/bootstrap/code";
 @import "bootstrap-sass/bootstrap/grid";
