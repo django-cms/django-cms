@@ -16,7 +16,7 @@ from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import PagePermission
@@ -126,6 +126,10 @@ class PageTestBase(CMSTestCase):
 
     def get_post_request(self, data):
         return self.get_request(post_data=data)
+
+    def create_page(self, title=None, **kwargs):
+        return create_page(title or self._testMethodName,
+                           "nav_playground.html", "en", **kwargs)
 
 
 class PageTest(PageTestBase):
@@ -712,6 +716,50 @@ class PageTest(PageTestBase):
                 PUBLISHER_STATE_DEFAULT
             )
             self.assertEqual(page_child_2.is_published("en"), True)
+
+    def test_publish_with_pending_unpublished_descendants(self):
+        # ref: https://github.com/divio/django-cms/issues/5900
+        superuser = self.get_superuser()
+
+        # Needed because the first page created is published automatically
+        self.create_page("Home", published=False)
+        ancestor = self.create_page("Ancestor", published=False)
+        parent = self.create_page("Child", published=False, parent=ancestor)
+        child = self.create_page("Child", published=False, parent=parent)
+
+        with self.login_user_context(superuser):
+            response = self.client.post(self.get_admin_url(Page, 'publish_page', child.pk, 'en'))
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(
+                child.reload().get_publisher_state("en"),
+                PUBLISHER_STATE_PENDING
+            )
+
+            response = self.client.post(self.get_admin_url(Page, 'publish_page', parent.pk, 'en'))
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(
+                parent.reload().get_publisher_state("en"),
+                PUBLISHER_STATE_PENDING
+            )
+
+            response = self.client.post(self.get_admin_url(Page, 'publish_page', ancestor.pk, 'en'))
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(
+                ancestor.reload().get_publisher_state("en"),
+                PUBLISHER_STATE_DEFAULT
+            )
+            self.assertEqual(
+                parent.reload().get_publisher_state("en"),
+                PUBLISHER_STATE_DEFAULT
+            )
+            self.assertEqual(
+                child.reload().get_publisher_state("en"),
+                PUBLISHER_STATE_DEFAULT
+            )
+
 
     def test_edit_page_other_site_and_language(self):
         """
