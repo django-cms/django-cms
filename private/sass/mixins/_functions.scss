@@ -6,7 +6,8 @@
 // em calculation
 @function em($target, $context: $font-size) {
     @if $target == 0 {
-        @return 0
+        @return 0;
     }
+
     @return $target / $context + em;
 }

@@ -13,6 +13,7 @@
 
     @return true;
 }
+
 @function map-deep-get($map, $keys...) {
     @each $key in $keys {
         $map: map-get($map, $key);
@@ -20,6 +21,7 @@
 
     @return $map;
 }
+
 @function z($layers...) {
     @if not map-has-nested-keys($z-layers, $layers...) {
         @error "No layer found for `#{inspect($layers...)}`

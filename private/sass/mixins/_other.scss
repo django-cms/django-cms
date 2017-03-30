@@ -6,6 +6,7 @@
 @mixin hide-content() {
     $approximate-em-value: 12px / 1em;
     $wider-than-any-screen: -9999em;
+
     text-indent: $wider-than-any-screen * $approximate-em-value;
     overflow: hidden;
     text-align: left;
@@ -14,6 +15,7 @@
 // outline button mixin which extends bootstrap button-variant
 @mixin button-variant-outline($color, $border, $color-hover: #fff) {
     @include button-variant($color, transparent, $border);
+
     &:hover,
     &:active,
     &.active,
