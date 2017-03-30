@@ -5,6 +5,8 @@
 * Changed the signature for internal ``cms.plugin_base.CMSPluginBase`` methods ``get_child_classes``
   and ``get_parent_classes`` to take an optional ``instance`` parameter.
 * Fixed error in retrieving placeholder label from configuration.
+* Fixed a bug which caused certain translations to display double escaped text on the page
+  list admin view.
 
 
 === 3.4.2 (2017-01-23) ===
