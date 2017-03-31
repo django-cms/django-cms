@@ -20,14 +20,6 @@ ENV NODE_PATH=$NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules \
     PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 # </NODE>
 
-# <BOWER>
-COPY bower.json .bowerrc /app/
-RUN bower install \
-    --verbose \
-    --allow-root \
-    --config.interactive=false
-# </BOWER>
-
 # <PYTHON>
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://wheels.aldryn.net/v1/aldryn-extras+pypi/aldryn-baseproject-py3/+simple/} \
     WHEELSPROXY_URL=${WHEELSPROXY_URL:-https://wheels.aldryn.net/v1/aldryn-extras+pypi/aldryn-baseproject-py3/}

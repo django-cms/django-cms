@@ -8,24 +8,30 @@
     margin-top: $line-height-computed;
     margin-bottom: $line-height-computed;
 }
+
 .spacer-xs {
     margin-top: $line-height-computed / 2;
     margin-bottom: $line-height-computed / 2;
 }
+
 .spacer-sm {
     margin-top: $line-height-computed / 1.5;
     margin-bottom: $line-height-computed / 1.5;
 }
+
 .spacer-md {
     @extend .spacer;
 }
+
 .spacer-lg {
     margin-top: $line-height-computed * 2;
     margin-bottom: $line-height-computed * 2;
 }
+
 .spacer-zero {
     margin: 0;
 }
+
 .spacer:after,
 .spacer-xs:after,
 .spacer-sm:after,
@@ -40,11 +46,13 @@
 // HELPERS/accessibility
 .skip-links {
     @extend .list-unstyled;
+
     position: absolute;
     top: $navbar-height;
     right: 0;
     left: 0;
     z-index: 9999;
+
     a {
         @extend .sr-only;
         @extend .sr-only-focusable;
@@ -58,7 +66,6 @@
 @include bg-variant(".brand-warning", $brand-warning);
 @include bg-variant(".brand-danger", $brand-danger);
 @include bg-variant(".brand-muted", $text-muted);
-
 @include bg-variant(".brand-gray-darker", $gray-darker);
 @include bg-variant(".brand-gray-dark", $gray-dark);
 @include bg-variant(".brand-gray", $gray);

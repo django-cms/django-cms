@@ -10,6 +10,7 @@
     a[href]:after {
         content: "";
     }
+
     #cms_toolbar,
     .browser-outdated {
         display: none !important;
@@ -19,11 +20,12 @@
     .navbar-head {
         display: block;
     }
+
     .navbar-main {
         display: none;
     }
+
     .navbar-head .navbar-brand a {
         text-indent: 0;
     }
-
 }
