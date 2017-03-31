@@ -3,8 +3,11 @@
 // this folder contains required variables for colors, sizes, styles and more
 // add additional files for encapsulated settings
 
+/* critical:start */
+@import "fonts";
 @import "typography";
 @import "header";
+/* critical:end */
 
 // not yet finalised
 @import "browser";
