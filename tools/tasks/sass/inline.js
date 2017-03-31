@@ -1,5 +1,3 @@
-const gulpif = require('gulp-if');
-const gutil = require('gulp-util');
 const checkFileSize = require('gulp-check-filesize');
 
 

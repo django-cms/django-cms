@@ -8,6 +8,7 @@
     "gulp": "^3.9.1",
     "gulp-check-filesize": "^2.0.1",
     "gulp-clean-css": "^3.0.4",
+    "gulp-eslint": "^3.0.1",
     "gulp-header": "^1.8.8",
     "gulp-if": "^2.0.2",
     "gulp-postcss": "^6.4.0",
@@ -16,8 +17,10 @@
     "gulp-sourcemaps": "^2.4.1",
     "gulp-stylelint": "^3.9.0",
     "gutil": "^1.6.4",
+    "jquery": "^3.2.1",
     "minimalist": "^1.0.0",
-    "postcss-critical-split": "^2.5.0"
+    "postcss-critical-split": "^2.5.0",
+    "webpack": "^2.3.2"
   },
   "devDependencies": {}
 }

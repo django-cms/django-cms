@@ -22,8 +22,9 @@ const PROJECT_PATH = {
     // html: PROJECT_ROOT + '/templates',
     // images: PROJECT_ROOT + '/static/img',
     // icons: PROJECT_ROOT + '/private/icons',
-    // js: PROJECT_ROOT + '/static/js',
-    sass: PROJECT_ROOT + '/private/sass'
+    sass: PROJECT_ROOT + '/private/sass',
+    js: PROJECT_ROOT + '/static/js',
+    webpack: PROJECT_ROOT + '/private/js'
 };
 const PROJECT_PATTERNS = {
     // images: [
@@ -31,21 +32,16 @@ const PROJECT_PATTERNS = {
     //     // exclude from preprocessing
     //     '!' + PROJECT_PATH.images + '/dummy/*/**'
     // ],
-    // js: [
-    //     'gulpfile.js',
-    //     './tools/tasks/**/*.js',
-    //     PROJECT_PATH.js + '/**/*.js',
-    //     PROJECT_PATH.tests + '/**/*.js',
-    //     // exclude from linting
-    //     '!' + PROJECT_PATH.js + '/*.min.js',
-    //     '!' + PROJECT_PATH.js + '/**/*.min.js',
-    //     '!' + PROJECT_PATH.js + '/dist/*.js',
-    //     '!' + PROJECT_PATH.tests + '/coverage/**/*',
-    //     '!' + PROJECT_PATH.tests + '/unit/helpers/**/*',
-    //     '!' + PROJECT_PATH.tests + '/integration/*.bundle.js'
-    // ],
+    js: [
+        'gulpfile.js',
+        './tools/tasks/**/*.js',
+        PROJECT_PATH.webpack + '.eslintrc.js',
+        PROJECT_PATH.webpack + '/**/*.js',
+        '!' + PROJECT_PATH.webpack + '/*.min.js',
+        '!' + PROJECT_PATH.webpack + '/**/*.min.js'
+    ],
     css: [
-        PROJECT_PATH.css + '/*.css',
+        PROJECT_PATH.css + '/*base*.css',
         '!' + PROJECT_PATH.css + '/*-critical.css'
     ],
     sass: [
@@ -99,30 +95,21 @@ gulp.task('sass:inline', ['sass:critical'], task('sass/inline'));
  */
 gulp.task('lint', ['lint:sass']);
 gulp.task('lint:sass', task('lint/sass'));
-// gulp.task('lint:javascript', task('lint/javascript'));
+gulp.task('lint:javascript', task('lint/javascript'));
 
-// gulp.task('webpack:once', task('webpack/once'));
+gulp.task('webpack', ['webpack:compile']);
+gulp.task('webpack:compile', task('webpack/compile'));
 // gulp.task('webpack:watch', task('webpack/watch'));
-//
-// /**
-//  * GULP_MODE === 'production' means we have a limited
-//  * subset of tasks, namely sass, bower and lint to
-//  * speed up the deployment / installation process.
-//  */
-// if (process.env.GULP_MODE !== 'production') {
-//     gulp.task('images', task('images'));
-//     gulp.task('preprocess', ['sass', 'images', 'docs']);
-//     gulp.task('icons', task('icons'));
-//
-//     // Running integration tests on CI is usually problematic,
-//     // since the environment to test against must be prepared.
-//     // It is possible, but shouldn't be enforced by default.
-//     gulp.task('tests:integration', ['tests:integration:webpack'], task('tests/integration'));
-// }
-//
+
+/**
+ * process.env.GULP_MODE === 'production' means we have a limited
+ * subset of tasks, namely sass, bower and lint to
+ * speed up the deployment / installation process.
+ */
+gulp.task('build', ['sass', 'webpack:compile']);
 gulp.task('default', ['sass', 'lint']);
 gulp.task('watch', function () {
-    // gulp.start('webpack:watch');
-    gulp.watch(PROJECT_PATTERNS.sass, ['sass', 'lint']);
-    // gulp.watch(PROJECT_PATTERNS.js, ['lint']);
+    // gulp.start('webpack');
+    gulp.watch(PROJECT_PATTERNS.sass, ['sass', 'lint:sass']);
+    gulp.watch(PROJECT_PATTERNS.js, ['lint:javascript']);
 });

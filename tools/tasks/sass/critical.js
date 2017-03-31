@@ -1,7 +1,6 @@
 const cleanCSS = require('gulp-clean-css');
 const criticalSplit = require('postcss-critical-split');
 const gulpif = require('gulp-if');
-const gutil = require('gulp-util');
 const header = require('gulp-header');
 const postcss = require('gulp-postcss');
 const rename = require('gulp-rename')
