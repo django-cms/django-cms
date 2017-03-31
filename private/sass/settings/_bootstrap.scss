@@ -25,14 +25,14 @@ $bootstrap-sass-asset-helper: false;
 //
 //## Gray and brand colors for use across Bootstrap.
 
-$gray-base:              #000;
-$gray-darker:            lighten($gray-base, 13.5%); // #222
-$gray-dark:              lighten($gray-base, 20%);   // #333
-$gray:                   lighten($gray-base, 33.5%); // #555
-$gray-light:             lighten($gray-base, 46.7%); // #777
-$gray-lighter:           lighten($gray-base, 93.5%); // #eee
+$gray-base:             #000;
+$gray-darker:           lighten($gray-base, 13.5%); // #222
+$gray-dark:             #333;
+$gray:                  #666;
+$gray-light:            lighten($gray-base, 46.7%); // #777
+$gray-lighter:          lighten($gray-base, 93.5%); // #eee
 
-$brand-primary:         darken(#428bca, 6.5%); // #337ab7
+$brand-primary:         #007faf;
 $brand-success:         #5cb85c;
 $brand-info:            #5bc0de;
 $brand-warning:         #f0ad4e;
@@ -66,21 +66,21 @@ $font-family-serif:       Georgia, "Times New Roman", Times, serif;
 $font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
 $font-family-base:        $font-family-sans-serif;
 
-$font-size-base:          14px;
-$font-size-large:         ceil(($font-size-base * 1.25)); // ~18px
-$font-size-small:         ceil(($font-size-base * 0.85)); // ~12px
+$font-size-base:          15px;
+$font-size-large:         18px;
+$font-size-small:         12px;
 
-$font-size-h1:            floor(($font-size-base * 2.6)); // ~36px
-$font-size-h2:            floor(($font-size-base * 2.15)); // ~30px
-$font-size-h3:            ceil(($font-size-base * 1.7)); // ~24px
-$font-size-h4:            ceil(($font-size-base * 1.25)); // ~18px
-$font-size-h5:            $font-size-base;
-$font-size-h6:            ceil(($font-size-base * 0.85)); // ~12px
+$font-size-h1:            45px;
+$font-size-h2:            26px;
+$font-size-h3:            22px;
+$font-size-h4:            22px;
+$font-size-h5:            18px;
+$font-size-h6:            15px;
 
 //** Unit-less `line-height` for use in components like buttons.
 $line-height-base:        1.428571429; // 20/14
 //** Computed "line-height" (`font-size` * `line-height`) for use with `margin`, `padding`, etc.
-$line-height-computed:    floor(($font-size-base * $line-height-base)); // ~20px
+$line-height-computed:    22px;
 
 //** By default, this inherits from the `<body>`.
 $headings-font-family:    inherit;
@@ -97,12 +97,12 @@ $headings-color:          inherit;
 
 // [converter] If $bootstrap-sass-asset-helper if used, provide path relative to the assets load path.
 // [converter] This is because some asset helpers, such as Sprockets, do not work with file-relative paths.
-$icon-font-path: if($bootstrap-sass-asset-helper, "bootstrap/", "../fonts/bootstrap/");
+// $icon-font-path: if($bootstrap-sass-asset-helper, "bootstrap/", "../fonts/bootstrap/");
 
 //** File name for all font files.
-$icon-font-name:          "glyphicons-halflings-regular";
+// $icon-font-name:          "glyphicons-halflings-regular";
 //** Element ID within SVG icon file.
-$icon-font-svg-id:        "glyphicons_halflingsregular";
+// $icon-font-svg-id:        "glyphicons_halflingsregular";
 
 
 //== Components

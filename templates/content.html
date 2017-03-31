@@ -15,7 +15,7 @@
                 <h1 class="navbar-brand">
                     <a href="{% url "pages-root" %}">
                         <span class="sr-only">{{ request.site.name }}</span>
-                        <img src="{% static "img/logo-main@print.png" %}" alt="{{ request.site.name }}" />
+                        <img src="{% static "img/logo-divio-white.svg" %}" width="200px" alt="{{ request.site.name }}" />
                     </a>
                 </h1>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".js-navbar-header">
@@ -35,14 +35,10 @@
             <div class="navbar-collapse collapse js-navbar-header">
                 {% block navbar %}
                     <nav class="nav navbar-main navbar-right" id="page-navigation" role="navigation">
-                        <h2 class="sr-only">{% trans "Navigation" %}</h2>
                         {% render_model_block request.current_page "changelist" %}
                             {% with dropdown="true" %}
-                                <ul class="nav navbar-nav">
-                                    {% show_menu 0 1 100 100 "includes/menu/navigation.html" %}
-                                    <li class="divider" role="presentation"><span class="sr-only">{% trans "Separator" %}</span></li>
-                                    {% show_menu_below_id "meta" 0 0 100 100 "includes/menu/navigation.html" %}
-                                    {% language_chooser "includes/menu/langnav.html" "native" %}
+                                <ul class="nav navbar-nav list-inline">
+                                    {% show_menu 0 1 100 100 %}
                                 </ul>
                             {% endwith %}
                         {% endrender_model_block %}
@@ -61,7 +57,7 @@
             <div class="container">
                 <ol class="breadcrumb">
                     {% block extend_breadcrumb %}
-                        {% show_breadcrumb 0 "includes/menu/breadcrumb.html" %}
+                        {% show_breadcrumb 0 %}
                     {% endblock extend_breadcrumb %}
                 </ol>
             </div>
@@ -72,7 +68,6 @@
 {# start: content #}
 <hr class="sr-only" id="page-content" />
 {% block extend_base %}
-    {% block feature %}{% placeholder "feature" %}{% endblock feature %}
     {% block messages %}
         {% include "includes/messages.html" %}
     {% endblock messages %}
@@ -92,11 +87,10 @@
         <h1 class="sr-only" id="page-footer">{% trans "Sitemap" %}</h1>
 
         <div class="container">
-            {% static_placeholder "footer" %}
             {% render_model_block request.current_page "changelist" %}
                 <ul class="list-inline">
                     <li class="pull-right"><a href="#page-top" data-spy="scroll"><span class="fa fa-left fa-arrow-up"></span>{% trans "Back to top" %}</a></li>
-                    {% show_menu_below_id "footer" 0 0 100 100 "includes/menu/navigation.html" %}
+                    {% show_menu_below_id "footer" 0 0 100 100 %}
                 </ul>
             {% endrender_model_block %}
         </div>

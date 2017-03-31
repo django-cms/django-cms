@@ -9,16 +9,11 @@
 /* critical:start */
 @import "bootstrap-sass/bootstrap/variables";
 @import "bootstrap-sass/bootstrap/mixins";
-/* critical:end */
-
-// Reset and dependencies
 @import "bootstrap-sass/bootstrap/normalize";
 @import "bootstrap-sass/bootstrap/print";
-// @import "bootstrap-sass/bootstrap/glyphicons";
-
-// Core CSS
 @import "bootstrap-sass/bootstrap/scaffolding";
 @import "bootstrap-sass/bootstrap/type";
+/* critical:end */
 @import "bootstrap-sass/bootstrap/code";
 @import "bootstrap-sass/bootstrap/grid";
 @import "bootstrap-sass/bootstrap/tables";
