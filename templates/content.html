@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load i18n staticfiles cms_tags menu_tags %}
+
+{% block body_class %}tpl-base{% endblock %}
+
+{# no indent for better readability on extend_root #}
+{% block extend_root %}
+{% block header %}
+    {# DOCS: http://getbootstrap.com/components/#navbar #}
+    <header class="navbar navbar-head">
+        <div class="container">
+            {# INFO: the logo should be placed first for seo reasons #}
+            <div class="navbar-header">
+                {# INFO: the logo should be placed first for seo reasons #}
+                <h1 class="navbar-brand">
+                    <a href="{% url "pages-root" %}">
+                        <span class="sr-only">{{ request.site.name }}</span>
+                        <img src="{% static "img/logo-main@print.png" %}" alt="{{ request.site.name }}" />
+                    </a>
+                </h1>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".js-navbar-header">
+                    {% for row in 123|make_list %}<span class="icon-bar"></span>{% endfor %}
+                </button>
+            </div>
+
+            {# INFO: ensure the anchor names are callable #}
+            <h2 class="sr-only">{% trans "Shortcuts" %}</h2>
+            <ul class="skip-links">
+                <li><a href="{% url "pages-root" %}" title="[Alt + 0]" accesskey="0">{% trans "Go to home" %}</a></li>
+                <li><a href="#page-navigation" title="[Alt + 1]" accesskey="1">{% trans "Jump to navigation" %}</a></li>
+                <li><a href="#page-content" title="[Alt + 2]" accesskey="2">{% trans "Jump to content" %}</a></li>
+                <li><a href="#page-footer" title="[Alt + 3]" accesskey="3">{% trans "Contact" %}</a></li>
+            </ul>
+
+            <div class="navbar-collapse collapse js-navbar-header">
+                {% block navbar %}
+                    <nav class="nav navbar-main navbar-right" id="page-navigation" role="navigation">
+                        <h2 class="sr-only">{% trans "Navigation" %}</h2>
+                        {% render_model_block request.current_page "changelist" %}
+                            {% with dropdown="true" %}
+                                <ul class="nav navbar-nav">
+                                    {% show_menu 0 1 100 100 "includes/menu/navigation.html" %}
+                                    <li class="divider" role="presentation"><span class="sr-only">{% trans "Separator" %}</span></li>
+                                    {% show_menu_below_id "meta" 0 0 100 100 "includes/menu/navigation.html" %}
+                                    {% language_chooser "includes/menu/langnav.html" "native" %}
+                                </ul>
+                            {% endwith %}
+                        {% endrender_model_block %}
+                    </nav>
+                {% endblock navbar %}
+            </div>
+        </div>
+    </header>
+{% endblock header %}
+
+{# DOCS: http://getbootstrap.com/components/#breadcrumbs #}
+{% block breadcrumb %}
+    {% if not request.current_page.is_home %}
+        <nav class="navbar navbar-breadcrumb" role="navigation">
+            <h3 class="sr-only">{% trans "You are here" %}</h3>
+            <div class="container">
+                <ol class="breadcrumb">
+                    {% block extend_breadcrumb %}
+                        {% show_breadcrumb 0 "includes/menu/breadcrumb.html" %}
+                    {% endblock extend_breadcrumb %}
+                </ol>
+            </div>
+        </nav>
+    {% endif %}
+{% endblock breadcrumb %}
+
+{# start: content #}
+<hr class="sr-only" id="page-content" />
+{% block extend_base %}
+    {% block feature %}{% placeholder "feature" %}{% endblock feature %}
+    {% block messages %}
+        {% include "includes/messages.html" %}
+    {% endblock messages %}
+    {% block content %}
+        {% with 960 as width %}
+            <div class="container">
+                {% placeholder "content" %}
+            </div>
+        {% endwith %}
+    {% endblock %}
+{% endblock extend_base %}
+<hr class="sr-only" />
+{# end: content #}
+
+{% block footer %}
+    <footer class="footer" role="contentinfo">
+        <h1 class="sr-only" id="page-footer">{% trans "Sitemap" %}</h1>
+
+        <div class="container">
+            {% static_placeholder "footer" %}
+            {% render_model_block request.current_page "changelist" %}
+                <ul class="list-inline">
+                    <li class="pull-right"><a href="#page-top" data-spy="scroll"><span class="fa fa-left fa-arrow-up"></span>{% trans "Back to top" %}</a></li>
+                    {% show_menu_below_id "footer" 0 0 100 100 "includes/menu/navigation.html" %}
+                </ul>
+            {% endrender_model_block %}
+        </div>
+    </footer>
+{% endblock footer %}
+{% endblock extend_root %}
