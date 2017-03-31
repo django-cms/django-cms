@@ -14,7 +14,6 @@ const gulp = require('gulp');
 
 // #############################################################################
 // SETTINGS
-const DEBUG = argv.debug;
 const PROJECT_ROOT = __dirname;
 const PROJECT_PATH = {
     css: PROJECT_ROOT + '/static/css',
@@ -33,9 +32,10 @@ const PROJECT_PATTERNS = {
     //     '!' + PROJECT_PATH.images + '/dummy/*/**'
     // ],
     js: [
-        'gulpfile.js',
+        './gulpfile.js',
         './tools/tasks/**/*.js',
         PROJECT_PATH.webpack + '.eslintrc.js',
+        PROJECT_PATH.webpack + '*.config.js',
         PROJECT_PATH.webpack + '/**/*.js',
         '!' + PROJECT_PATH.webpack + '/*.min.js',
         '!' + PROJECT_PATH.webpack + '/**/*.min.js'
@@ -109,9 +109,10 @@ gulp.task('webpack:compile', task('webpack/compile'));
  * process.env.GULP_MODE === 'production' means we have a limited
  * subset of tasks to speed up the deployment / installation process.
  */
-gulp.task('build', ['sass', 'webpack']);
 gulp.task('default', ['sass', 'webpack', 'lint']);
 gulp.task('watch', function () {
     gulp.watch(PROJECT_PATTERNS.sass, ['sass', 'lint:sass']);
-    gulp.watch(PROJECT_PATTERNS.webpack, ['webpack', 'lint:javascript']);
+    gulp.watch(PROJECT_PATTERNS.js, ['webpack', 'lint:javascript']);
 });
+// used on the cloud
+gulp.task('build', ['sass', 'webpack']);
