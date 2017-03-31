@@ -10,6 +10,9 @@
 // $bootstrap-sass-asset-helper:
 // (twbs-font-path("") != unquote('twbs-font-path("")'))
 
+// copied directly from _variables.scss
+// updated from Bootstrap v3.3.7 (http://getbootstrap.com)
+
 $bootstrap-sass-asset-helper: false;
 //
 // Variables
@@ -339,7 +342,7 @@ $screen-md-max:              ($screen-lg-min - 1);
 //## Define your custom responsive grid.
 
 //** Number of columns in the grid.
-$grid-columns:              24;
+$grid-columns:              12;
 //** Padding between columns. Gets divided in half for the left and right.
 $grid-gutter-width:         30px;
 // Navbar collapse
