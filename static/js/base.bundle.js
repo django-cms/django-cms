@@ -70,6 +70,9 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
 /*
  * Copyright (c) 2013, Divio AG
  * Licensed under BSD
@@ -97,11 +100,12 @@
 //         lowerThan: 'boxShadow'
 //     });
 // });
-const $ = __webpack_require__(1);
+var $ = __webpack_require__(1);
 
-console.log('hello world')
-console.log($('body'));
+$('body');
 
+// console.log('hello world')
+// console.log($('body'));
 
 /***/ }),
 /* 1 */
