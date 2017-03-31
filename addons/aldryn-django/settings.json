@@ -1,5 +1,4 @@
 {
-    "disable_default_language_prefix": true, 
     "enable_gis": false, 
     "languages": "[\"en\"]", 
     "use_manifeststaticfilesstorage": false
