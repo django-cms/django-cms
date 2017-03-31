@@ -7,7 +7,7 @@ module.exports = function (gulp, opts) {
             .pipe(styleLint({
                 configFile: opts.PROJECT_PATH.sass + '/.stylelintrc.js',
                 reporters: [{
-                    formatter: (opts.DEBUG) ? 'verbose' : 'string',
+                    formatter: (opts.argv.debug) ? 'verbose' : 'string',
                     console: true
                 }]
             }));

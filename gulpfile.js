@@ -65,9 +65,7 @@ function task(id) {
         PROJECT_ROOT: PROJECT_ROOT,
         PROJECT_PATH: PROJECT_PATH,
         PROJECT_PATTERNS: PROJECT_PATTERNS,
-        DEBUG: DEBUG
-        // PORT: PORT,
-        // argv: argv
+        argv: argv
     });
 }
 
@@ -93,23 +91,27 @@ gulp.task('sass:inline', ['sass:critical'], task('sass/inline'));
  * - "gulp lint:sass" (runs the linter for sass)
  * - "gulp lint:javascript" (runs the linter for javascript)
  */
-gulp.task('lint', ['lint:sass']);
+gulp.task('lint', ['lint:sass', 'lint:javascript']);
 gulp.task('lint:sass', task('lint/sass'));
 gulp.task('lint:javascript', task('lint/javascript'));
 
+/**
+ * Usage:
+ * - "gulp webpack" (compiles javascript)
+ * - "gulp webpack --debug" (disables compressions and adds sourcemaps)
+ * - "gulp webpack --watch" (separately watch js instead of gulp watch)
+ * - "gulp webpack:compile" (compiles javascript)
+ */
 gulp.task('webpack', ['webpack:compile']);
 gulp.task('webpack:compile', task('webpack/compile'));
-// gulp.task('webpack:watch', task('webpack/watch'));
 
 /**
  * process.env.GULP_MODE === 'production' means we have a limited
- * subset of tasks, namely sass, bower and lint to
- * speed up the deployment / installation process.
+ * subset of tasks to speed up the deployment / installation process.
  */
-gulp.task('build', ['sass', 'webpack:compile']);
-gulp.task('default', ['sass', 'lint']);
+gulp.task('build', ['sass', 'webpack']);
+gulp.task('default', ['sass', 'webpack', 'lint']);
 gulp.task('watch', function () {
-    // gulp.start('webpack');
     gulp.watch(PROJECT_PATTERNS.sass, ['sass', 'lint:sass']);
-    gulp.watch(PROJECT_PATTERNS.js, ['lint:javascript']);
+    gulp.watch(PROJECT_PATTERNS.webpack, ['webpack', 'lint:javascript']);
 });

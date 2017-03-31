@@ -18,7 +18,7 @@ const eyeglass = new Eyeglass({
 module.exports = function (gulp, opts) {
     return function () {
         return gulp.src(opts.PROJECT_PATTERNS.sass)
-            .pipe(gulpif(opts.DEBUG, sourcemaps.init()))
+            .pipe(gulpif(opts.argv.debug, sourcemaps.init()))
             .pipe(sass(eyeglass.sassOptions()))
             .on('error', function (error) {
                 gutil.log(gutil.colors.red(
@@ -33,7 +33,7 @@ module.exports = function (gulp, opts) {
                     }),
                 ])
             )
-            .pipe(gulpif(opts.DEBUG, sourcemaps.write()))
+            .pipe(gulpif(opts.argv.debug, sourcemaps.write()))
             .pipe(gulp.dest(opts.PROJECT_PATH.css));
     };
 };

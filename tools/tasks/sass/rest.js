@@ -10,7 +10,7 @@ module.exports = function (gulp, opts) {
     return function () {
         // generate sass, optionally with sourcemaps and without cleaned css
         return gulp.src(opts.PROJECT_PATTERNS.css)
-            .pipe(gulpif(opts.DEBUG, sourcemaps.init({ 'loadMaps': true })))
+            .pipe(gulpif(opts.argv.debug, sourcemaps.init({ 'loadMaps': true })))
             .pipe(
                 postcss([
                     criticalSplit({
@@ -18,7 +18,7 @@ module.exports = function (gulp, opts) {
                     })
                 ])
             )
-            .pipe(gulpif(!opts.DEBUG, cleanCSS({
+            .pipe(gulpif(!opts.argv.debug, cleanCSS({
                 rebase: false
             })))
             // this information is added on top of the generated .css file
@@ -28,7 +28,7 @@ module.exports = function (gulp, opts) {
                 '    Edit original files in\n' +
                 '    /private/sass instead\n */ \n\n'
             ))
-            .pipe(gulpif(opts.DEBUG, sourcemaps.write()))
+            .pipe(gulpif(opts.argv.debug, sourcemaps.write()))
             .pipe(gulp.dest(opts.PROJECT_PATH.css));
     };
 };
