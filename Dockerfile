@@ -32,13 +32,21 @@ RUN pip-reqs compile && \
         --requirement requirements.urls
 # </PYTHON>
 
-# <NPM>
+# <NPM update=no>
 # package.json is put into / so that mounting /app for local
 # development does not require re-running npm install
 ENV PATH=/node_modules/.bin:$PATH
+
+# If there is a .cache.node_modules.tar.gz file, copy it in.
+COPY .cache.node_modules.* /
+# Only extract if file not empty
+RUN test -s /.cache.node_modules.tar.gz \
+  && tar xzf /.cache.node_modules.tar.gz -C / \
+  && echo "Extracted .cache.node_modules.tar.gz to /node_modules" \
+  || true
 RUN npm install -g npm-install-retry
 COPY package.json /
-RUN (cd / && npm-install-retry -- --production && rm -rf /tmp/*)
+RUN (cd / && npm prune && npm-install-retry -- --production && rm -rf /tmp/*)
 # </NPM>
 
 # <SOURCE>
