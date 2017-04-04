@@ -1,0 +1,5 @@
+<div class="cms-toolbar-item cms-toolbar-item-buttons {{ extra_classes|join:' ' }}">
+    {% for button in buttons %}
+        {{ button.render }}
+    {% endfor %}
+</div>

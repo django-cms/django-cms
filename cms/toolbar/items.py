@@ -479,3 +479,42 @@ class ButtonList(BaseItem):
             'buttons': self.buttons,
             'extra_classes': self.extra_classes
         }
+
+
+class Dropdown(ButtonList):
+
+    template = "cms/toolbar/items/dropdown.html"
+
+    def __init__(self, *args, **kwargs):
+        super(ButtonList, self).__init__(*args, **kwargs)
+        self.primary_button = None
+
+    def add_primary_button(self, button):
+        self.primary_button = button
+
+    def get_buttons(self):
+        for button in self.buttons:
+            button.is_in_dropdown = True
+            yield button
+
+
+class DropDownToggleButton(BaseButton):
+    template = "cms/toolbar/items/dropdown_button.html"
+
+    def __init__(self, name, active=False, disabled=False,
+                 extra_classes=None):
+        self.name = name
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
+
+    def __repr__(self):
+        return '<DropDownToggleButton:%s>' % force_text(self.name)
+
+    def get_context(self):
+        return {
+            'name': self.name,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
+        }
