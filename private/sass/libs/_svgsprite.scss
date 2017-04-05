@@ -1,28 +1,26 @@
-// https://github.com/jkphl/svg-sprite/blob/master/tmpl/css/sprite.scss
-{{#hasMixin}}@mixin {{mixinName}} {
-	background: url("{{{sprite}}}") no-repeat;
+// https://github.com/shakyShane/gulp-svg-sprites/blob/master/tmpl/sprite.scss
+.<%=common %> {
+    font-size: <%= baseSize %>px;
+
+    &:before {
+        content: ' ';
+        vertical-align: middle;
+        display: inline-block;
+        background-image: url("<%=svgPath%>");
+        background-repeat: no-repeat;
+        background-size: <%= relWidth %>em <%= relHeight %>em;
+    }
+}
+<% _.forEach(svg, function(svgItem) { %>
+.<%=common %>.<%=svgItem.name%> {
+    &:before {
+        background-position: <%= svgItem.relPositionX %>em <%= svgItem.relPositionY %>em;
+        width: <%= svgItem.relWidth %>em;
+        height: <%= svgItem.relHeight %>em;
+    }
 }
 
-{{#hasCommon}}.{{commonName}} {
-	@include {{mixinName}};
+@mixin <%=common %>-<%=svgItem.name%> () {
+    @extend .<%=svgItem.name%>;
 }
-
-{{/hasCommon}}{{/hasMixin}}{{^hasMixin}}{{#hasCommon}}.{{/hasCommon}}{{^hasCommon}}%{{/hasCommon}}{{commonName}} {
-	background: url("{{{sprite}}}") no-repeat;
-}
-
-{{/hasMixin}}{{#shapes}}{{#selector.shape}}{{expression}}{{^last}},
-{{/last}}{{/selector.shape}} {
-	{{^hasCommon}}{{#hasMixin}}@include {{mixinName}};{{/hasMixin}}{{^hasMixin}}@extend %{{commonName}};{{/hasMixin}}
-	{{/hasCommon}}background-position: {{position.relative.xy}};{{#dimensions.inline}}
-	width: {{width.outer}}px;
-	height: {{height.outer}}px;{{/dimensions.inline}}
-}{{#dimensions.extra}}
-
-{{#selector.dimensions}}{{expression}}{{^last}},
-{{/last}}{{/selector.dimensions}} {
-	width: {{width.outer}}px;
-	height: {{height.outer}}px;
-}{{/dimensions.extra}}
-
-{{/shapes}}
+<% }); %>

@@ -110,7 +110,7 @@ gulp.task('webpack:compile', task('webpack/compile'));
  * Usage:
  * - "gulp icons" (compiles to sprites and sass)
  */
-gulp.task('icons', task('icons/svg'));
+gulp.task('icons', task('icons/svgsprite'));
 
 /**
  * process.env.GULP_MODE === 'production' means we have a limited
