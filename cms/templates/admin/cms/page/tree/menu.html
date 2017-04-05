@@ -21,7 +21,7 @@
                     <div class="cms-tree-item cms-tree-item-icons">
                         <div class="cms-tree-item-inner">
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% trans 'Home' %}{% endfilter %}">
+                                data-cms-tooltip="{% autoescape on %}{% trans 'Home' %}{% endautoescape %}">
                                 <span class="cms-icon cms-icon-home"></span>
                             </div>
                         </div>
@@ -31,7 +31,7 @@
                     <div class="cms-tree-item cms-tree-item-icons">
                         <div class="cms-tree-item-inner">
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% trans 'Softroot' %}{% endfilter %}">
+                                data-cms-tooltip="{% autoescape on %}{% trans 'Softroot' %}{% endautoescape %}">
                                 <a href="{% url 'admin:cms_page_advanced' page.id %}">
                                     <span class="cms-icon cms-icon-sitemap"></span>
                                 </a>
@@ -43,7 +43,7 @@
                     <div class="cms-tree-item cms-tree-item-icons">
                         <div class="cms-tree-item-inner">
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endfilter %}">
+                                data-cms-tooltip="{% autoescape on %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endautoescape %}">
                                 <a href="{% url 'admin:cms_page_advanced' page.id %}">
                                     <span class="cms-icon cms-icon-puzzle"></span>
                                 </a>
@@ -59,9 +59,9 @@
             <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
-                <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% filter escapejs %}{% trans "View on site" %}{% endfilter %}">
+                <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page_languages %} target="_top"{% endif %}">
-                        <span class="sr-only">{% filter escapejs %}{% trans "View on site" %}{% endfilter %}</span>
+                        <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
                     </a>
                 </div>
             </div>
@@ -85,8 +85,8 @@
                             <ul class="cms-pagetree-dropdown-menu-inner">
                                 <li>
                                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
-                                        <span class="cms-icon cms-icon-eye" title="{% filter escapejs %}{% blocktrans with lang|upper as language %}Preview this page in {{ language }} {% endblocktrans %}{% endfilter %}"></span>
-                                        <span>{% filter escapejs %}{% trans "Preview" %}{% endfilter %}</span>
+                                        <span class="cms-icon cms-icon-eye" title="{% autoescape on %}{% blocktrans with lang|upper as language %}Preview this page in {{ language }} {% endblocktrans %}{% endautoescape %}"></span>
+                                        <span>{% autoescape on %}{% trans "Preview" %}{% endautoescape %}</span>
                                     </a>
                                 </li>
                                 {# hide if page is empty #}
@@ -96,7 +96,7 @@
                                             <li>
                                                 <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
                                                     <span class="cms-icon cms-icon-check-o"></span>
-                                                    <span>{% filter escapejs %}{% trans "Publish" %}{% endfilter %}</span>
+                                                    <span>{% autoescape on %}{% trans "Publish" %}{% endautoescape %}</span>
                                                 </a>
                                             </li>
                                         {% endif %}
@@ -104,7 +104,7 @@
                                             <li>
                                                 <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
                                                     <span class="cms-icon cms-icon-forbidden"></span>
-                                                    <span>{% filter escapejs %}{% trans "Unpublish" %}{% endfilter %}</span>
+                                                    <span>{% autoescape on %}{% trans "Unpublish" %}{% endautoescape %}</span>
                                                 </a>
                                             </li>
                                         {% endif %}
@@ -113,7 +113,7 @@
                                     <li>
                                         <a href="{% url 'admin:cms_page_change' page.id %}?language={{ lang }}">
                                             <span class="cms-icon cms-icon-cogs"></span>
-                                            <span>{% filter escapejs %}{% trans "Configure" %}{% endfilter %}</span>
+                                            <span>{% autoescape on %}{% trans "Configure" %}{% endautoescape %}</span>
                                         </a>
                                     </li>
                                 {% endif %}
@@ -138,12 +138,12 @@
                     {% endif %}
                         {% if page.in_navigation %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% trans "in menu" %}{% endfilter %}">
+                                data-cms-tooltip="{% autoescape on %}{% trans "in menu" %}{% endautoescape %}">
                                 <span class="cms-icon cms-icon-check-square"></span>
                             </div>
                         {% else %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% filter escapejs %}{% trans "not in menu" %}{% endfilter %}">
+                                data-cms-tooltip="{% autoescape on %}{% trans "not in menu" %}{% endautoescape %}">
                                 <span class="cms-icon cms-icon-minus-square"></span>
                             </div>
                         {% endif %}
@@ -159,7 +159,7 @@
             <div class="cms-tree-item-wrapper">
                 <div class="cms-tree-item cms-tree-item-button">
                     <div{% if has_change_permission and has_change_advanced_settings_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                        data-cms-tooltip="{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}"{% endif %}>
+                        data-cms-tooltip="{% autoescape on %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endautoescape %}"{% endif %}>
                         {% if has_change_permission or has_change_advanced_settings_permission %}
                         <a {% if has_change_permission %}href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" {% endif %}
                             class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
@@ -170,7 +170,7 @@
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled js-cms-tree-advanced-settings cms-icon cms-icon-pencil">
                         {% endif %}
-                            <span class="sr-only">{% filter escapejs %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endfilter %}</span>
+                            <span class="sr-only">{% autoescape on %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endautoescape %}</span>
                         {% if has_change_permission or has_change_advanced_settings_permission %}
                         </a>
                         {% endif %}
@@ -178,14 +178,14 @@
                 </div>
                 <div class="cms-tree-item cms-tree-item-button">
                     <div{% if has_add_page_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                        data-cms-tooltip="{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}"{% endif %}>
+                        data-cms-tooltip="{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}"{% endif %}>
                         {% if has_add_page_permission %}
                             <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"
                                 class="cms-btn cms-btn-default cms-icon cms-icon-plus">
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled cms-icon cms-icon-plus">
                         {% endif %}
-                                <span class="sr-only">{% filter escapejs %}{% trans 'New sub page' %}{% endfilter %}</span>
+                                <span class="sr-only">{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}</span>
                         {% if has_add_page_permission %}
                             </a>
                         {% else %}
@@ -195,7 +195,7 @@
                 </div>
                 <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url 'admin:cms_page_actions_menu' page.id %}">
                     <a data-id="{{ page.pk }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
-                        <span class="sr-only">{% filter escapejs %}{% trans "Options" %}{% endfilter %}</span>
+                        <span class="sr-only">{% autoescape on %}{% trans "Options" %}{% endautoescape %}</span>
                     </a>
 
                     <div class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
@@ -204,40 +204,40 @@
                         {# dummy structure #}
                         <ul class="cms-pagetree-dropdown-menu-inner">
                             <li>
-                                <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% filter escapejs %}{% trans 'Copy' %}{% endfilter %}">
+                                <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% autoescape on %}{% trans 'Copy' %}{% endautoescape %}">
                                     <span class="cms-icon cms-icon-copy"></span>
-                                    <span>{% filter escapejs %}{% trans 'Copy' %}{% endfilter %}<span>
+                                    <span>{% autoescape on %}{% trans 'Copy' %}{% endautoescape %}<span>
                                 </a>
                             </li>
                             <li class="">
-                                <a href="#" class="cms-pagetree-dropdown-item-disabled" title="{% filter escapejs %}{% trans 'Cut' %}{% endfilter %}">
+                                <a href="#" class="cms-pagetree-dropdown-item-disabled" title="{% autoescape on %}{% trans 'Cut' %}{% endautoescape %}">
                                     <span class="cms-icon cms-icon-scissors"></span>
-                                    <span>{% filter escapejs %}{% trans 'Cut' %}{% endfilter %}<span>
+                                    <span>{% autoescape on %}{% trans 'Cut' %}{% endautoescape %}<span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" data-id="{{ page.pk }}" class="cms-pagetree-dropdown-item-disabled">
                                     <span class="cms-icon cms-icon-alias"></span>
-                                    <span>{% filter escapejs %}{% trans "Paste" %}{% endfilter %}</span>
+                                    <span>{% autoescape on %}{% trans "Paste" %}{% endautoescape %}</span>
                                 </a>
                             </li>
                             <li>
-                                <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% filter escapejs %}{% trans 'Delete' %}{% endfilter %}">
+                                <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% autoescape on %}{% trans 'Delete' %}{% endautoescape %}">
                                     <span class="cms-icon cms-icon-bin"></span>
-                                    <span>{% filter escapejs %}{% trans 'Delete' %}...{% endfilter %}</span>
+                                    <span>{% autoescape on %}{% trans 'Delete' %}...{% endautoescape %}</span>
                                 </a>
                             </li>
                             <li>
-                                <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}">
+                                <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% autoescape on %}{% trans "Advanced settings" %}{% endautoescape %}">
                                     <span class="cms-icon cms-icon-cogs"></span>
-                                    <span>{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}</span>
+                                    <span>{% autoescape on %}{% trans "Advanced settings" %}{% endautoescape %}</span>
                                 </a>
                             </li>
                             {% if CMS_PERMISSION %}
                                 <li>
                                     <a href="#" class="cms-pagetree-dropdown-item-disabled">
                                         <span class="cms-icon cms-icon-lock"></span>
-                                        <span>{% filter escapejs %}{% trans "Permissions" %}{% endfilter %}</span>
+                                        <span>{% autoescape on %}{% trans "Permissions" %}{% endautoescape %}</span>
                                     </a>
                                 </li>
                             {% endif %}

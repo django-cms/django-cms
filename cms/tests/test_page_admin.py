@@ -34,7 +34,7 @@ from cms.utils.page_resolver import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
 
-class PageTreeParser(Parser):
+class PageTreeLiParser(Parser):
 
     def handle_starttag(self, tag, attrs):
         # We have to strip out attributes from the <li>
@@ -44,6 +44,16 @@ class PageTreeParser(Parser):
         # and would require us to hardcode a bunch of stuff here
         if tag == 'li':
             attrs = []
+        Parser.handle_starttag(self, tag, attrs)
+
+
+class PageTreeOptionsParser(Parser):
+
+    def handle_starttag(self, tag, attrs):
+        # This parser only cares about the options on the right side
+        # of the page tree for each page.
+        if tag == 'li' and attrs and attrs[-1][0] == 'data-coloptions':
+            attrs = [attrs[-1]]
         Parser.handle_starttag(self, tag, attrs)
 
 
@@ -823,12 +833,12 @@ class PageTest(PageTestBase):
             self.assertTrue('form_url' in response.context_data)
             self.assertEqual(response.context_data['form_url'], form_url)
 
-    def _parse_page_tree(self, response):
+    def _parse_page_tree(self, response, parser_class):
         content = response.content
         content = content.decode(response.charset)
 
         def _parse_html(html):
-            parser = PageTreeParser()
+            parser = parser_class()
             parser.feed(html)
             parser.close()
             document = parser.root
@@ -845,6 +855,26 @@ class PageTest(PageTestBase):
             standardMsg = '%s\n%s' % ("Response's content is not valid HTML", e.msg)
             self.fail(self._formatMessage(None, standardMsg))
         return dom
+
+    def test_page_tree_regression_5892(self):
+        # ref: https://github.com/divio/django-cms/issues/5892
+        # Tests tree integrity when moving sibling pages from right
+        # to left under the same parent.
+        superuser = self.get_superuser()
+
+        create_page('Home', 'nav_playground.html', 'en')
+        alpha = create_page('Alpha', 'nav_playground.html', 'en')
+        create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+        create_page('Gamma', 'nav_playground.html', 'en')
+
+        with self.login_user_context(superuser):
+            with force_language('de'):
+                endpoint = admin_reverse('get_tree')
+                response = self.client.get(endpoint)
+                self.assertEqual(response.status_code, 200)
+                parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
+                content = force_text(parsed)
+                self.assertIn(u'Seiten Einstellungen (Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
@@ -864,7 +894,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
-            parsed = self._parse_page_tree(response)
+            parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_text(parsed)
             self.assertIn(tree, content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
@@ -896,7 +926,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
-            parsed = self._parse_page_tree(response)
+            parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_text(parsed)
             self.assertIn(tree, content)
 
@@ -912,7 +942,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint, data={'q': 'alpha'})
             self.assertEqual(response.status_code, 200)
-            parsed = self._parse_page_tree(response)
+            parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_text(parsed)
             self.assertIn('<li>\nAlpha\n</li>', content)
             self.assertNotIn('<li>\nHome\n</li>', content)

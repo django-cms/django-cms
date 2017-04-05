@@ -63,6 +63,7 @@ class ContentRenderer(object):
         self._rendered_placeholders = deque()
         self._rendered_static_placeholders = deque()
         self._rendered_plugins_by_placeholder = {}
+        self._placeholders_are_editable = self.user_is_on_edit_mode()
 
     @cached_property
     def current_page(self):
@@ -105,7 +106,7 @@ class ContentRenderer(object):
             return False
         if self.request.user.is_staff:
             return False
-        return not self.user_is_on_edit_mode()
+        return not self._placeholders_are_editable
 
     def get_cached_template(self, template):
         # we check if template quacks like a Template, as generic Template and engine-specific Template
@@ -141,7 +142,7 @@ class ContentRenderer(object):
         from cms.utils.plugins import get_plugins
 
         language = language or self.request_language
-        editable = editable and self.user_is_on_edit_mode()
+        editable = editable and self._placeholders_are_editable
 
         if use_cache and not editable and placeholder.cache_placeholder:
             use_cache = self.placeholder_cache_is_enabled()
