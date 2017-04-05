@@ -75,7 +75,7 @@ class Form(forms.BaseForm):
         initial=False,
         help_text=(
             'For example, http://example.com/ rather than '
-            'http://example.com/en/ if en (English) is the default language.'
+            'http://example.com/en/ if en (English) is the default language. '
             'If multiple languages are configured, this option will be ignored '
             'for Django versions prior to 1.10.'
         )
