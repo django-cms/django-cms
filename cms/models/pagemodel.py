@@ -709,10 +709,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.save()
 
         # be sure we have the newest data including tree information
-        p = Page.objects.get(pk=self.pk)
-        self.path = p.path
-        self.depth = p.depth
-        self.numchild = p.numchild
+        self.refresh_from_db()
+
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -889,7 +887,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.get_children()
             .filter(
                 title_set__published=True,
-                parent__title_set__published=True,
                 title_set__language=language
             )
             .select_related('publisher_public', 'publisher_public__parent')
