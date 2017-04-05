@@ -1,4 +1,4 @@
-var eslint = require('gulp-eslint');
+const eslint = require('gulp-eslint');
 
 
 module.exports = function (gulp, opts) {

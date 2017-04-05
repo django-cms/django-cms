@@ -17,11 +17,9 @@ const gulp = require('gulp');
 const PROJECT_ROOT = __dirname;
 const PROJECT_PATH = {
     css: PROJECT_ROOT + '/static/css',
-    // fonts: PROJECT_ROOT + '/static/fonts',
-    // html: PROJECT_ROOT + '/templates',
     // images: PROJECT_ROOT + '/static/img',
-    // icons: PROJECT_ROOT + '/private/icons',
     sass: PROJECT_ROOT + '/private/sass',
+    sprites: PROJECT_ROOT + '/static/sprites',
     js: PROJECT_ROOT + '/static/js',
     webpack: PROJECT_ROOT + '/private/js'
 };
@@ -31,6 +29,9 @@ const PROJECT_PATTERNS = {
     //     // exclude from preprocessing
     //     '!' + PROJECT_PATH.images + '/dummy/*/**'
     // ],
+    svg: [
+        PROJECT_ROOT + '/private/svg/**/*.svg'
+    ],
     js: [
         './gulpfile.js',
         './tools/tasks/**/*.js',
@@ -104,6 +105,12 @@ gulp.task('lint:javascript', task('lint/javascript'));
  */
 gulp.task('webpack', ['webpack:compile']);
 gulp.task('webpack:compile', task('webpack/compile'));
+
+/**
+ * Usage:
+ * - "gulp icons" (compiles to sprites and sass)
+ */
+gulp.task('icons', task('icons/svg'));
 
 /**
  * process.env.GULP_MODE === 'production' means we have a limited
