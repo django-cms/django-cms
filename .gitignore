@@ -16,6 +16,7 @@
 .eyeglass_cache
 .idea
 .cache.node_modules.tar.gz
+*data.tar.gz
 
 /tmp
 /data/
