@@ -723,6 +723,25 @@ describe('cms.base.js', function () {
                 url = CMS.API.Helpers.makeURL('test?param=1&amp;another=2', ['another=3', 'param=4']);
                 expect(url).toEqual('test?param=4&amp;another=3');
             });
+
+            it('understands hashes in the url', function () {
+                var url;
+
+                url = CMS.API.Helpers.makeURL('test#hash', ['param=1', 'another=2']);
+                expect(url).toEqual('test?param=1&amp;another=2#hash');
+
+                url = CMS.API.Helpers.makeURL('test#hash#with#hash', ['param=1', 'another=2']);
+                expect(url).toEqual('test?param=1&amp;another=2#hash#with#hash');
+
+                url = CMS.API.Helpers.makeURL('test#', ['param=1', 'another=2']);
+                expect(url).toEqual('test?param=1&amp;another=2#');
+
+                url = CMS.API.Helpers.makeURL('test#hash&stuff', ['param=1', 'another=2']);
+                expect(url).toEqual('test?param=1&amp;another=2#hash&stuff');
+
+                url = CMS.API.Helpers.makeURL('test#hash&stuff', []);
+                expect(url).toEqual('test#hash&stuff');
+            });
         });
 
         describe('.debounce()', function () {

@@ -326,18 +326,23 @@ var Toolbar = new Class({
         // attach event for first page publish
         this.ui.buttons.each(function () {
             var btn = $(this);
+            var links = btn.find('a');
 
-            // in case the button has a data-rel attribute
-            if (btn.find('a').attr('data-rel')) {
-                btn.find('a').on(that.click, function (e) {
-                    e.preventDefault();
-                    that._delegate($(this));
-                });
-            } else {
-                btn.find('a').on(that.click, function (e) {
-                    e.stopPropagation();
-                });
-            }
+            links.each(function (i, el) {
+                var link = $(el);
+
+                // in case the button has a data-rel attribute
+                if (link.attr('data-rel')) {
+                    link.on(that.click, function (e) {
+                        e.preventDefault();
+                        that._delegate($(this));
+                    });
+                } else {
+                    link.on(that.click, function (e) {
+                        e.stopPropagation();
+                    });
+                }
+            });
 
             // in case of the publish button
             btn.find('.cms-publish-page').on(that.click, function (e) {

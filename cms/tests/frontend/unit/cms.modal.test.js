@@ -1631,7 +1631,7 @@ describe('CMS.Modal', function () {
 
             modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(2) a').trigger(modal.click);
             expect(modal._loadIframe).toHaveBeenCalledWith({
-                url: jasmine.stringMatching(/#go\?cms_path/),
+                url: jasmine.stringMatching(/\?cms_path[^#]*?#go/),
                 name: 'link'
             });
             expect(spy).not.toHaveBeenCalled();
