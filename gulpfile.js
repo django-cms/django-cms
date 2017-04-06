@@ -22,7 +22,7 @@ const PROJECT_PATH = {
     sprites: PROJECT_ROOT + '/static/sprites',
     svg: PROJECT_ROOT + '/private/svg',
     js: PROJECT_ROOT + '/static/js',
-    webpack: PROJECT_ROOT + '/private/js'
+    webpack: PROJECT_ROOT + '/private/js',
 };
 const PROJECT_PATTERNS = {
     // images: [
@@ -31,25 +31,24 @@ const PROJECT_PATTERNS = {
     //     '!' + PROJECT_PATH.images + '/dummy/*/**'
     // ],
     svg: [
-        PROJECT_PATH.svg + '/**/*.svg'
+        PROJECT_PATH.svg + '/**/*.svg',
     ],
     js: [
-        './gulpfile.js',
+        '*.js',
         './tools/tasks/**/*.js',
-        PROJECT_PATH.webpack + '.eslintrc.js',
         PROJECT_PATH.webpack + '*.config.js',
         PROJECT_PATH.webpack + '/**/*.js',
         '!' + PROJECT_PATH.webpack + '/*.min.js',
-        '!' + PROJECT_PATH.webpack + '/**/*.min.js'
+        '!' + PROJECT_PATH.webpack + '/**/*.min.js',
     ],
     css: [
         PROJECT_PATH.css + '/*base*.css',
-        '!' + PROJECT_PATH.css + '/*-critical.css'
+        '!' + PROJECT_PATH.css + '/*-critical.css',
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}',
-        '!' + PROJECT_PATH.sass + '/libs/_svgsprite.scss'
-    ]
+        '!' + PROJECT_PATH.sass + '/libs/_svgsprite.scss',
+    ],
 };
 //
 // var DEFAULT_PORT = 8000;
@@ -68,7 +67,7 @@ function task(id) {
         PROJECT_ROOT: PROJECT_ROOT,
         PROJECT_PATH: PROJECT_PATH,
         PROJECT_PATTERNS: PROJECT_PATTERNS,
-        argv: argv
+        argv: argv,
     });
 }
 
