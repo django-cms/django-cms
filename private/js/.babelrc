@@ -1,5 +1,9 @@
 {
-    "presets": ["env"],
+    "presets": [
+        ["env", {
+            "modules": false
+        }]
+    ],
     "plugins": ["transform-runtime"],
     "env": {
         "production": {
