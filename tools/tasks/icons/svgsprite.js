@@ -10,14 +10,14 @@ module.exports = function (gulp, opts) {
             baseSize: 16,
             preview: false,
             templates: {
-                scss: fs.readFileSync(opts.PROJECT_PATH.sass + '/libs/_svgsprite.scss', 'utf-8')
+                scss: fs.readFileSync(opts.PROJECT_PATH.sass + '/libs/_svgsprite.scss', 'utf-8'),
             },
             selector: 'icon-%f',
             svgPath: '../sprites/icons.svg',
             svg: {
-                sprite: opts.PROJECT_PATH.sprites + '/icons.svg'
+                sprite: opts.PROJECT_PATH.sprites + '/icons.svg',
             },
-            cssFile: opts.PROJECT_PATH.sass + '/components/_icons.scss'
+            cssFile: opts.PROJECT_PATH.sass + '/components/_icons.scss',
         };
 
         return gulp.src(opts.PROJECT_PATTERNS.svg)

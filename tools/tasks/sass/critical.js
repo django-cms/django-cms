@@ -14,15 +14,15 @@ module.exports = function (gulp, opts) {
             .pipe(
                 postcss([
                     criticalSplit({
-                        output: 'critical'
-                    })
+                        output: 'critical',
+                    }),
                 ])
             )
             .pipe(gulpif(!opts.argv.debug, cleanCSS({
-                rebase: false
+                rebase: false,
             })))
             .pipe(rename({
-                suffix: '-critical'
+                suffix: '-critical',
             }))
             .pipe(header(
                 '/*\n    This file is generated.\n' +

@@ -7,7 +7,7 @@ module.exports = function (gulp, opts) {
         var options = {
             interlaced: true,
             optimizationLevel: 5,
-            progressive: true
+            progressive: true,
         };
 
         gulp.src(opts.PROJECT_PATTERNS.images)

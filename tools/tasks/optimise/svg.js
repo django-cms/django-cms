@@ -8,12 +8,12 @@ module.exports = function (gulp, opts) {
             .pipe(imagemin([
                 imagemin.svgo({
                     plugins: [{
-                        removeDimensions: true
-                    }]
+                        removeDimensions: true,
+                    }],
                 })],
                 // options
                 {
-                    verbose: true
+                    verbose: true,
                 }
             ))
             .on('error', function (error) {
