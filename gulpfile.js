@@ -20,6 +20,7 @@ const PROJECT_PATH = {
     // images: PROJECT_ROOT + '/static/img',
     sass: PROJECT_ROOT + '/private/sass',
     sprites: PROJECT_ROOT + '/static/sprites',
+    svg: PROJECT_ROOT + '/private/svg',
     js: PROJECT_ROOT + '/static/js',
     webpack: PROJECT_ROOT + '/private/js'
 };
@@ -30,7 +31,7 @@ const PROJECT_PATTERNS = {
     //     '!' + PROJECT_PATH.images + '/dummy/*/**'
     // ],
     svg: [
-        PROJECT_ROOT + '/private/svg/**/*.svg'
+        PROJECT_PATH.svg + '/**/*.svg'
     ],
     js: [
         './gulpfile.js',
@@ -46,7 +47,8 @@ const PROJECT_PATTERNS = {
         '!' + PROJECT_PATH.css + '/*-critical.css'
     ],
     sass: [
-        PROJECT_PATH.sass + '/**/*.{scss,sass}'
+        PROJECT_PATH.sass + '/**/*.{scss,sass}',
+        '!' + PROJECT_PATH.sass + '/libs/_svgsprite.scss'
     ]
 };
 //
@@ -111,6 +113,14 @@ gulp.task('webpack:compile', task('webpack/compile'));
  * - "gulp icons" (compiles to sprites and sass)
  */
 gulp.task('icons', task('icons/svgsprite'));
+
+/**
+ * Usage:
+ * - "gulp optimise" (runs various optimisation tools)
+ * - "gulp optimise:svg" (ensures svg files are minified and optimised)
+ */
+gulp.task('optimise', ['optimise:svg']);
+gulp.task('optimise:svg', task('optimise/svg'));
 
 /**
  * process.env.GULP_MODE === 'production' means we have a limited

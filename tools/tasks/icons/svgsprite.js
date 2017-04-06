@@ -7,11 +7,12 @@ module.exports = function (gulp, opts) {
     return function () {
         // https://github.com/shakyshane/gulp-svg-sprites
         const config = {
-            // baseSize: 16,
+            baseSize: 16,
             preview: false,
             templates: {
                 scss: fs.readFileSync(opts.PROJECT_PATH.sass + '/libs/_svgsprite.scss', 'utf-8')
             },
+            selector: 'icon-%f',
             svgPath: '../sprites/icons.svg',
             svg: {
                 sprite: opts.PROJECT_PATH.sprites + '/icons.svg'

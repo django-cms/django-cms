@@ -3,10 +3,10 @@
     font-size: <%= baseSize %>px;
 
     &:before {
-        content: ' ';
+        content: '';
         vertical-align: middle;
         display: inline-block;
-        background-image: url("<%=svgPath%>");
+        background-image: url('<%=svgPath%>');
         background-repeat: no-repeat;
         background-size: <%= relWidth %>em <%= relHeight %>em;
     }
@@ -20,7 +20,7 @@
     }
 }
 
-@mixin <%=common %>-<%=svgItem.name%> () {
+@mixin <%=common %>-<%=svgItem.name%>() {
     @extend .<%=svgItem.name%>;
 }
 <% }); %>

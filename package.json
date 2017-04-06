@@ -17,6 +17,7 @@
     "gulp-eslint": "^3.0.1",
     "gulp-header": "^1.8.8",
     "gulp-if": "^2.0.2",
+    "gulp-imagemin": "^3.2.0",
     "gulp-postcss": "^6.4.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
