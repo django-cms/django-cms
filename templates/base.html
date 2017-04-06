@@ -20,13 +20,13 @@
     {% endblock meta_tags %}
     <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
     <!--[if IE]><link rel="shortcut icon" href="{% static 'favicon.ico' %}"><![endif]-->
-    <link rel="stylesheet" href="{% static 'css/base-critical.css' %}">
+    {% include "includes/critical_css.html" %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% render_block "css" %}
     {% block extrahead %}{% endblock %}
     {{ ALDRYN_SNAKE.render_head }}
 </head>
-<body id="page-top" class="noscript lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
+<body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
 {% include "includes/analytics.html" %}
 {% cms_toolbar %}
 

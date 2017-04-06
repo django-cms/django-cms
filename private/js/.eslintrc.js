@@ -9,14 +9,15 @@ module.exports = {
         'browser': true,
         'node': true,
         'jquery': true,
-        'es6': true
+        'es6': true,
     },
     'parserOptions': {
-        'sourceType': 'module'
+        'sourceType': 'module',
     },
     'rules': {
         // 0 = ignore, 1 = warning, 2 = error
         'indent': [2, 4],
-        'quotes': [1, 'single']
-    }
+        'quotes': [1, 'single'],
+        'comma-dangle': [1, 'always-multiline'],
+    },
 }

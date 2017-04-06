@@ -8,5 +8,6 @@ module.exports = function (gulp, opts) {
                 fileSizeLimit: '14336'
             }));
             // TODO add inline script, prevent if debug param is passed
+            // write to includes/critical_css.html
     };
 };

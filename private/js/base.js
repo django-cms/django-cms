@@ -5,9 +5,11 @@
  */
 //
 // import $ from 'jquery';
-// import outdatedBrowser from 'outdatedbrowser';
-// import 'bootstrap-sass';
-// import { noscript } from './addons/utils';
+import outdatedBrowser from 'outdatedbrowser';
+import 'bootstrap-sass';
+import $ from 'jquery';
+import { once } from 'lodash';
+import { noscript } from 'addons/utils';
 //
 // // this should usually be disabled, but sometimes
 // // we rely on jQuery global being available :/
@@ -17,15 +19,25 @@
 // // shorthand for invoking jQuery(document).ready
 // $(function () {
 //     // removes noscript form body
-//     noscript();
+noscript();
 //
 //     // DOCS: https://github.com/burocratik/outdated-browser
-//     outdatedBrowser({
-//         languagePath: '',
-//         lowerThan: 'boxShadow'
-//     });
+outdatedBrowser({
+    languagePath: '',
+    lowerThan: 'boxShadow',
+});
 // });
-const $ = require('jquery');
+
+const x = once(function () {
+    alert('1');
+});
+
+x();
+x();
+x();
+x();
+x();
+x();
 
 $('body');
 
