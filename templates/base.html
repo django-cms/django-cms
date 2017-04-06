@@ -32,7 +32,7 @@
 
 {% block extend_root %}{% endblock %}
 
-<script src="{% static 'js/base.bundle.js' %}"></script>
+<script defer src="{% static 'js/base.bundle.js' %}"></script>
 {% render_block "js" %}
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}
