@@ -63,7 +63,7 @@ CKEDITOR.stylesSet.add('default', [
     { name: 'Pull Left', element: CKEDITOR.allElements, attributes: { class: 'pull-left' }},
     { name: 'Pull Right', element: CKEDITOR.allElements, attributes: { class: 'pull-right' }},
 
-    { name: 'Blockquote Reverse', element: 'blockquote', attributes: { class: 'blockquote-reverse' }}
+    { name: 'Blockquote Reverse', element: 'blockquote', attributes: { class: 'blockquote-reverse' }},
 ]);
 
 /*
