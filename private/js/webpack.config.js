@@ -4,10 +4,18 @@ const webpack = require('webpack');
 
 
 // TODO check if polling is still required https://github.com/divio/djangocms-boilerplate-webpack/blob/master/webpack.config.debug.js#L16
-// TODO check plugin usage
 // TODO path concatination should be path.join
 
 process.env.NODE_ENV = (argv.debug) ? 'development' : 'production';
+
+// Bundle splitting. Don't forget to {% addtoblock "js" %} afterwards
+//
+// plugins.push(
+//     new webpack.optimize.CommonsChunkPlugin({
+//         name: 'base',
+//         chunks: ['base', 'detail'],
+//     })
+// );
 
 // add plugins depending on if we are debugging or not
 if (argv.debug) {
@@ -17,12 +25,22 @@ if (argv.debug) {
             debug: true,
         })
     );
+    plugins.push(
+        new webpack.DefinePlugin({
+            DEBUG: 'true',
+        })
+    );
 } else {
     plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
     plugins.push(
         new webpack.LoaderOptionsPlugin({
             minimize: true,
             debug: false,
+        })
+    );
+    plugins.push(
+        new webpack.DefinePlugin({
+            DEBUG: 'false',
         })
     );
     plugins.push(
@@ -41,9 +59,10 @@ if (argv.debug) {
 }
 
 module.exports = {
-    devtool: argv.debug ? 'eval' : false,
+    devtool: argv.debug ? 'cheap-module-eval-source-map' : false,
     entry: {
         base: __dirname + '/base.js',
+        // detail: __dirname + '/detail.js',
     },
     output: {
         path: __dirname + '/../../static/js/',
@@ -65,6 +84,9 @@ module.exports = {
                 test: /\.js$/,
                 use: [{
                     loader: 'babel-loader',
+                    options: {
+                        retainLines: true,
+                    },
                 }],
                 exclude: /(node_modules|vendor|libs|addons\/jquery.*)/,
                 include: __dirname,

@@ -1,45 +1,9 @@
-/*
- * Copyright (c) 2013, Divio AG
- * Licensed under BSD
- * http://github.com/divio/djangocms-boilerplate-webpack
- */
-//
-// import $ from 'jquery';
+import 'libs/bootstrap';
 import outdatedBrowser from 'outdatedbrowser';
-import 'bootstrap-sass';
-import $ from 'jquery';
-import { once } from 'lodash';
 import { noscript } from 'addons/utils';
-//
-// // this should usually be disabled, but sometimes
-// // we rely on jQuery global being available :/
-// window.$ = window.jQuery = $;
-//
-// // istanbul ignore next
-// // shorthand for invoking jQuery(document).ready
-// $(function () {
-//     // removes noscript form body
+
 noscript();
-//
-//     // DOCS: https://github.com/burocratik/outdated-browser
 outdatedBrowser({
     languagePath: '',
     lowerThan: 'boxShadow',
 });
-// });
-
-const x = once(function () {
-    alert('1');
-});
-
-x();
-x();
-x();
-x();
-x();
-x();
-
-$('body');
-
-// console.log('hello world')
-// console.log($('body'));
