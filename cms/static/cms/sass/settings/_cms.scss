@@ -79,6 +79,10 @@ $z-layers: (
         "shim":         5,
         "dimmer":       1,
     ),
+    "dropdown": (
+        "base":         99999,
+        "backdrop":     99990
+    ),
     "structure": (
         "base":         9999,
         "content": (
@@ -330,6 +334,16 @@ $dropdown-item-icon-position: 14px;
 $dropdown-arrow-side: 10px;
 $dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $dropdown-arrow-side/2;
 
+$dropdown-bg:                  $submenu-dropdown-bgcolor;
+$dropdown-border:              transparent;
+$dropdown-header-color:        $gray;
+$dropdown-link-color:          $submenu-item-color;
+$dropdown-link-hover-color:    $submenu-item-hover-color;
+$dropdown-link-hover-bg:       $color-primary;
+$dropdown-link-active-color:   $submenu-item-hover-color;
+$dropdown-link-active-bg:      $color-primary;
+$dropdown-link-disabled-color: black;
+$dropdown-link-disabled-bg:    white;
 
 //##############################################################################
 // Add plugin
