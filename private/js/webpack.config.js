@@ -1,10 +1,10 @@
 const argv = require('minimist')(process.argv.slice(2));
 const plugins = [];
 const webpack = require('webpack');
+const path = require('path');
 
 
 // TODO check if polling is still required https://github.com/divio/djangocms-boilerplate-webpack/blob/master/webpack.config.debug.js#L16
-// TODO path concatination should be path.join
 
 process.env.NODE_ENV = (argv.debug) ? 'development' : 'production';
 
@@ -61,11 +61,11 @@ if (argv.debug) {
 module.exports = {
     devtool: argv.debug ? 'cheap-module-eval-source-map' : false,
     entry: {
-        base: __dirname + '/base.js',
-        // detail: __dirname + '/detail.js',
+        base: path.join(__dirname, 'base.js'),
+        // detail: path.join(__dirname, 'detail.js'),
     },
     output: {
-        path: __dirname + '/../../static/js/',
+        path: path.join(__dirname, '..', '..', 'static', 'js'),
         filename: '[name].bundle.js',
         publicPath: '/static/',
     },
@@ -75,7 +75,7 @@ module.exports = {
         alias: {
             // make sure that we always use our jquery when loading 3rd party plugins
             jquery: require.resolve('jquery'),
-            outdatedbrowser: __dirname + '/libs/outdatedBrowser.min.js',
+            outdatedbrowser: path.join(__dirname, 'libs', 'outdatedBrowser.min.js'),
         },
     },
     module: {
