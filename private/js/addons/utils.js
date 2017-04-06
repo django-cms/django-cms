@@ -11,7 +11,7 @@ import $ from 'jquery';
  *
  * @property {Boolean} isStorageSupported localstorage availability
  */
-export const isStorageSupported = (function localStorageCheck () {
+export const isStorageSupported = /*#__PURE__*/(function localStorageCheck () {
     var mod = 'modernizr';
 
     try {
