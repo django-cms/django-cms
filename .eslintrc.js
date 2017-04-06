@@ -11,6 +11,7 @@ module.exports = {
         'jquery': true,
         'es6': true,
     },
+    'parser': 'babel-eslint',
     'parserOptions': {
         'sourceType': 'module',
     },
