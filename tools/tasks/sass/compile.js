@@ -11,7 +11,7 @@ const Eyeglass = require('eyeglass').Eyeglass;
 const eyeglass = new Eyeglass({
     importer: function (uri, prev, done) {
         done(sass.compiler.types.NULL);
-    }
+    },
 });
 
 
@@ -29,7 +29,7 @@ module.exports = function (gulp, opts) {
                 postcss([
                     autoprefixer({
                         // browsers are coming from browserslist file
-                        cascade: false
+                        cascade: false,
                     }),
                 ])
             )

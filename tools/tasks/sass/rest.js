@@ -14,12 +14,12 @@ module.exports = function (gulp, opts) {
             .pipe(
                 postcss([
                     criticalSplit({
-                        output: 'rest'
-                    })
+                        output: 'rest',
+                    }),
                 ])
             )
             .pipe(gulpif(!opts.argv.debug, cleanCSS({
-                rebase: false
+                rebase: false,
             })))
             // this information is added on top of the generated .css file
             .pipe(header(

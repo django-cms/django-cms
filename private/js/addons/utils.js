@@ -11,7 +11,7 @@ import $ from 'jquery';
  *
  * @property {Boolean} isStorageSupported localstorage availability
  */
-export const isStorageSupported = (function localStorageCheck () {
+export const isStorageSupported = /*#__PURE__*/(function localStorageCheck () {
     var mod = 'modernizr';
 
     try {
@@ -31,7 +31,7 @@ export const isStorageSupported = (function localStorageCheck () {
  */
 export function noscript () {
     // remove no-js class if javascript is activated
-    $(document.body).removeClass('noscript');
+    $(document.body).removeClass('no-js');
 }
 
 /**

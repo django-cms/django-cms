@@ -1,13 +1,14 @@
 module.exports = {
     // documentation about rules can be found on https://stylelint.io/user-guide/rules/
     // based on https://github.com/stylelint/stylelint-config-standard/blob/master/index.js
+    // configurator avaialble https://maximgatilin.github.io/stylelint-config/
     'rules': {
         'at-rule-empty-line-before': [ 'always', {
             except: [
                 'blockless-after-same-name-blockless',
                 'first-nested',
             ],
-            ignore: ['after-comment'],
+            ignore: ['after-comment', 'inside-block'],
         } ],
         'at-rule-name-case': 'lower',
         'at-rule-name-space-after': 'always-single-line',
@@ -114,6 +115,9 @@ module.exports = {
         'selector-pseudo-element-case': 'lower',
         'selector-pseudo-element-colon-notation': 'single',
         'selector-pseudo-element-no-unknown': true,
+        'selector-no-type': true,
+        'selector-no-vendor-prefix': true,
+        'selector-no-universal': true,
         'selector-type-case': 'lower',
         'selector-type-no-unknown': true,
         'shorthand-property-no-redundant-values': true,
