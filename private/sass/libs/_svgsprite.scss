@@ -1,0 +1,28 @@
+// https://github.com/shakyShane/gulp-svg-sprites/blob/master/tmpl/sprite.scss
+.<%=common %> {
+    font-size: <%= baseSize %>px;
+
+    &:before {
+        content: "";
+        vertical-align: middle;
+        display: inline-block;
+        background-image: url("<%=svgPath%>");
+        background-repeat: no-repeat;
+        background-size: <%= relWidth %>em <%= relHeight %>em;
+    }
+}
+
+@mixin icon($name) {<% _.forEach(svg, function(svgItem) { %>
+    @if $name == "<%=svgItem.name%>" {
+        &:before {
+            width: <%= svgItem.relWidth %>em;
+            height: <%= svgItem.relHeight %>em;
+            background-position: <%= svgItem.relPositionX %><% if (svgItem.relPositionX) { %>em<% } %> <%= svgItem.relPositionY %><% if (svgItem.relPositionY) { %>em<% } %>;
+        }
+    }
+<% }); %>}
+<% _.forEach(svg, function(svgItem) { %>
+.<%=common %>.<%=svgItem.name%> {
+    @include icon(<%=svgItem.name%>);
+}
+<% }); %>

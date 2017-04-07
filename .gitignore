@@ -34,7 +34,7 @@ npm-debug.log
 /static/css/
 /static/vendor
 /static/docs/
-/static/js/dist/
+/static/js/*.bundle.js
 
 /tests/coverage
 /tests/integration/index.bundle.js
