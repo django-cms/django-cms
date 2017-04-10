@@ -1072,7 +1072,7 @@ class AdminFormsTests(AdminTestsBase):
             # reverse_id form row has an errors class. Django's admin avoids
             # collapsing these, so that the error is visible.
             resp = self.client.post(base.URL_CMS_PAGE_ADVANCED_CHANGE % page2.pk, page2_data)
-            self.assertContains(resp, '<div class="form-row errors reverse_id">')
+            self.assertContains(resp, '<div class="form-row errors field-reverse_id">')
 
     def test_advanced_settings_endpoint(self):
         admin_user = self.get_superuser()
