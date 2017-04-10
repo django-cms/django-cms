@@ -3,6 +3,7 @@ from collections import OrderedDict
 from copy import copy
 from datetime import datetime
 from platform import python_version
+import hashlib
 
 import django
 from django import template
@@ -915,6 +916,10 @@ class CMSEditableObjectBlock(CMSEditableObject):
         extra_context = self._get_empty_context(context, **kwargs)
         extra_context['instance'] = kwargs.get('instance')
         extra_context['render_model_block'] = True
+
+        hash = hashlib.new('md5')
+        hash.update(getattr(kwargs.get('instance'), 'edit_url', ''))
+        extra_context['render_model_block_hash'] = hash.hexdigest()
         return extra_context
 
 

@@ -9,6 +9,7 @@
   list admin view.
 * Adjusted the toolbar javascript template to escape values coming from the request.
 * Added Dropdown class to toolbar items
+* Fixed bugs related to multiple render_model_blocks rendered on the same page
 
 
 === 3.4.2 (2017-01-23) ===

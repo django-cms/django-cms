@@ -422,6 +422,14 @@ describe('CMS.Plugin', function () {
                         ' and a text node\n' +
                         '    </cms-plugin>'
                     ]
+                },
+                {
+                    pluginId: 108,
+                    name: 'multiple places markup',
+                    expected: [
+                        '<div class="first-part cms-plugin cms-plugin-108"></div>',
+                        '<div class="second-part cms-plugin cms-plugin-108"></div>'
+                    ]
                 }
             ];
 
