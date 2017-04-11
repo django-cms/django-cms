@@ -116,10 +116,8 @@ describe('CMS.Plugin', function () {
             expect(generic.ui).toEqual(jasmine.any(Object));
 
             expect(plugin1.ui.container).toExist();
-            expect(plugin1.ui.publish).toExist();
             expect(plugin1.ui.save).toExist();
             expect(plugin1.ui.window).toExist();
-            expect(plugin1.ui.revert).toExist();
             expect(plugin1.ui.dragbar).toEqual(null);
             expect(plugin1.ui.draggable).toExist();
             expect(plugin1.ui.draggables).not.toExist();
@@ -128,10 +126,8 @@ describe('CMS.Plugin', function () {
             expect(plugin1.ui.dragitem).toExist();
 
             expect(plugin2.ui.container).toExist();
-            expect(plugin2.ui.publish).toExist();
             expect(plugin2.ui.save).toExist();
             expect(plugin2.ui.window).toExist();
-            expect(plugin2.ui.revert).toExist();
             expect(plugin2.ui.dragbar).toEqual(null);
             expect(plugin2.ui.draggable).toExist();
             expect(plugin2.ui.draggables).toExist();
@@ -140,10 +136,8 @@ describe('CMS.Plugin', function () {
             expect(plugin2.ui.dragitem).toExist();
 
             expect(placeholder1.ui.container).toExist();
-            expect(placeholder1.ui.publish).toExist();
             expect(placeholder1.ui.save).toExist();
             expect(placeholder1.ui.window).toExist();
-            expect(placeholder1.ui.revert).toExist();
             expect(placeholder1.ui.dragbar).toExist();
             expect(placeholder1.ui.draggable.selector).toEqual('.cms-draggable-null');
             expect(placeholder1.ui.draggables).toExist();
@@ -152,10 +146,8 @@ describe('CMS.Plugin', function () {
             expect(placeholder1.ui.dragitem).not.toBeDefined();
 
             expect(generic.ui.container).toExist();
-            expect(generic.ui.publish).toExist();
             expect(generic.ui.save).toExist();
             expect(generic.ui.window).toExist();
-            expect(generic.ui.revert).toExist();
             expect(generic.ui.dragbar).toEqual(null);
             expect(generic.ui.draggable).toEqual(null);
             expect(generic.ui.draggables).toEqual(null);
@@ -1130,8 +1122,13 @@ describe('CMS.Plugin', function () {
                 };
 
                 CMS.API.Toolbar = {
+                    ui: {
+                        revert: $('.cms-toolbar-revert'),
+                        window: $(window)
+                    },
                     showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
+                    hideLoader: jasmine.createSpy(),
+                    onPublishAvailable: spyOn(CMS.Toolbar.prototype, 'onPublishAvailable').and.callThrough()
                 };
 
                 plugin = new CMS.Plugin('cms-plugin-1', {
@@ -1358,14 +1355,15 @@ describe('CMS.Plugin', function () {
             plugin.movePlugin();
         });
 
-        it('triggers window resize', function () {
-            spyOnEvent(window, 'resize');
+        it('triggers onPublishAvailable', function () {
             plugin.movePlugin();
-            expect('resize').toHaveBeenTriggeredOn(window);
+            expect(CMS.API.Toolbar.onPublishAvailable).toHaveBeenCalled();
         });
 
+        // this essentially tests CMS.Toolbar#onPublishAvaiable
         it('shows publish page button optimistically', function () {
             CMS.API.locked = false;
+            plugin.ui.publish = $('.cms-btn-publish');
             expect(plugin.ui.publish).not.toHaveClass('cms-btn-publish-active');
             expect(plugin.ui.publish).toHaveClass('cms-btn-disabled');
             expect(plugin.ui.publish.parent()).not.toBeVisible();
@@ -1377,12 +1375,14 @@ describe('CMS.Plugin', function () {
 
         it('enables "revert to live" button optimistically', function () {
             CMS.API.locked = false;
-            expect(plugin.ui.revert).toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect($('.cms-toolbar-revert')).toHaveClass('cms-toolbar-item-navigation-disabled');
             plugin.movePlugin();
-            expect(plugin.ui.publish).not.toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect($('.cms-btn-publish')).not.toHaveClass('cms-toolbar-item-navigation-disabled');
         });
 
+        // TODO this isn't really desired behaviour
         it('does not hide publish page button if request actually failed', function (done) {
+            plugin.ui.publish = $('.cms-btn-publish');
             spyOn($, 'ajax').and.callFake(function (ajax) {
                 // have to simulate async
                 setTimeout(function () {
@@ -1404,20 +1404,21 @@ describe('CMS.Plugin', function () {
             expect(plugin.ui.publish.parent()).toBeVisible();
         });
 
+        // TODO this isn't really desired behaviour
         it('does not disable "revert to live" button if request actually failed', function (done) {
             spyOn($, 'ajax').and.callFake(function (ajax) {
                 // have to simulate async
                 setTimeout(function () {
                     ajax.error({});
-                    expect(plugin.ui.publish).not.toHaveClass('cms-toolbar-item-navigation-disabled');
+                    expect($('.cms-toolbar-revert')).not.toHaveClass('cms-toolbar-item-navigation-disabled');
                     done();
                 }, 0);
             });
 
             CMS.API.locked = false;
-            expect(plugin.ui.revert).toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect($('.cms-toolbar-revert')).toHaveClass('cms-toolbar-item-navigation-disabled');
             plugin.movePlugin();
-            expect(plugin.ui.publish).not.toHaveClass('cms-toolbar-item-navigation-disabled');
+            expect($('.cms-btn-publish')).not.toHaveClass('cms-toolbar-item-navigation-disabled');
         });
     });
 
@@ -1642,7 +1643,8 @@ describe('CMS.Plugin', function () {
                     showLoader: jasmine.createSpy(),
                     hideLoader: jasmine.createSpy(),
                     _delegate: jasmine.createSpy(),
-                    openAjax: jasmine.createSpy()
+                    openAjax: jasmine.createSpy(),
+                    onPublishAvailable: jasmine.createSpy()
                 };
                 spyOn(CMS.Plugin, '_hideSettingsMenu');
                 done();
@@ -1853,7 +1855,8 @@ describe('CMS.Plugin', function () {
                     showLoader: jasmine.createSpy(),
                     hideLoader: jasmine.createSpy(),
                     _delegate: jasmine.createSpy(),
-                    openAjax: jasmine.createSpy()
+                    openAjax: jasmine.createSpy(),
+                    onPublishAvailable: jasmine.createSpy()
                 };
                 done();
             });

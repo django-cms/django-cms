@@ -149,10 +149,8 @@ var Plugin = new Class({
 
         this.ui = {
             container: contents,
-            publish: $('.cms-btn-publish'),
             save: $('.cms-toolbar-item-switch-save-edit'),
             window: $(window),
-            revert: $('.cms-toolbar-revert'),
             dragbar: null,
             draggable: null,
             draggables: null,
@@ -711,15 +709,7 @@ var Plugin = new Class({
             }
         });
 
-        // show publish / save buttons
-        this.ui.publish
-            .addClass('cms-btn-publish-active')
-            .removeClass('cms-btn-disabled')
-            .parent().show();
-        this.ui.window.trigger('resize');
-
-        // enable revert to live
-        this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');
+        CMS.API.Toolbar.onPublishAvailable();
     },
 
     /**
