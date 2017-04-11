@@ -70,6 +70,49 @@ class PageTestBase(CMSTestCase):
     }
     }
 
+    def _add_plugin_to_page(self, page, plugin_type='LinkPlugin', language='en', publish=True):
+        plugin_data = {
+            'TextPlugin': {'body': 'text'},
+            'LinkPlugin': {'name': 'A Link', 'url': 'https://www.django-cms.org'},
+        }
+        placeholder = page.placeholders.get(slot='body')
+        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
+
+        if publish:
+            page.reload().publish(language)
+        return plugin
+
+    def _translation_exists(self, slug=None, title=None):
+        if not slug:
+            slug = 'permissions-de'
+
+        lookup = Title.objects.filter(slug=slug)
+
+        if title:
+            lookup = lookup.filter(title=title)
+        return lookup.exists()
+
+    def _get_add_plugin_uri(self, page, language='en'):
+        placeholder = page.placeholders.get(slot='body')
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type='LinkPlugin',
+            language=language,
+        )
+        return uri
+
+    def _get_page_data(self, **kwargs):
+        site = Site.objects.get_current()
+        data = {
+            'title': 'permissions',
+            'slug': 'permissions',
+            'language': 'en',
+            'site': site.pk,
+            'template': 'nav_playground.html',
+        }
+        data.update(**kwargs)
+        return data
+
     def get_page(self, parent=None, site=None,
                  language=None, template='nav_playground.html'):
         page_data = self.get_new_page_data_dbfields()
@@ -1003,20 +1046,25 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
+    def test_clear_placeholder_marks_page_as_dirty(self):
+        page = self.get_page()
+        staff_user = self.get_superuser()
+        plugins = [
+            self._add_plugin_to_page(page, 'TextPlugin'),
+            self._add_plugin_to_page(page, 'LinkPlugin'),
+        ]
+        placeholder = plugins[0].placeholder
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
-class PermissionsTestCase(CMSTestCase):
+        with self.login_user_context(staff_user):
+            self.assertEqual(page.reload().get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
+            response = self.client.post(endpoint, {'test': ''})
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(placeholder.get_plugins('en').count(), 0)
+            self.assertEqual(page.reload().get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
-    def _add_plugin_to_page(self, page, plugin_type='LinkPlugin', language='en', publish=True):
-        plugin_data = {
-            'TextPlugin': {'body': 'text'},
-            'LinkPlugin': {'name': 'A Link', 'url': 'https://www.django-cms.org'},
-        }
-        placeholder = page.placeholders.get(slot='body')
-        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
 
-        if publish:
-            page.reload().publish(language)
-        return plugin
+class PermissionsTestCase(PageTestBase):
 
     def _add_translation_to_page(self, page):
         translation = create_title(
@@ -1034,37 +1082,6 @@ class PermissionsTestCase(CMSTestCase):
 
     def _page_permission_exists(self, **kwargs):
         return PagePermission.objects.filter(**kwargs).exists()
-
-    def _translation_exists(self, slug=None, title=None):
-        if not slug:
-            slug = 'permissions-de'
-
-        lookup = Title.objects.filter(slug=slug)
-
-        if title:
-            lookup = lookup.filter(title=title)
-        return lookup.exists()
-
-    def _get_add_plugin_uri(self, page, language='en'):
-        placeholder = page.placeholders.get(slot='body')
-        uri = self.get_add_plugin_uri(
-            placeholder=placeholder,
-            plugin_type='LinkPlugin',
-            language=language,
-        )
-        return uri
-
-    def _get_page_data(self, **kwargs):
-        site = Site.objects.get_current()
-        data = {
-            'title': 'permissions',
-            'slug': 'permissions',
-            'language': 'en',
-            'site': site.pk,
-            'template': 'nav_playground.html',
-        }
-        data.update(**kwargs)
-        return data
 
     def _get_page_permissions_data(self, **kwargs):
         if 'id' in kwargs:

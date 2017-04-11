@@ -1227,6 +1227,14 @@ class PlaceholderAdminMixin(object):
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
         language = request.GET.get('language')
 
+        if placeholder.pk == request.toolbar.clipboard.pk:
+            # User is clearing the clipboard, no need for permission
+            # checks here as the clipboard is unique per user.
+            # There could be a case where a plugin has relationship to
+            # an object the user does not have permission to delete.
+            placeholder.clear(language)
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
+
         if not self.has_clear_placeholder_permission(request, placeholder, language):
             return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
 
@@ -1251,6 +1259,7 @@ class PlaceholderAdminMixin(object):
             )
 
             placeholder.clear(language)
+            placeholder.mark_as_dirty(language, clear_cache=True)
 
             self.log_deletion(request, placeholder, obj_display)
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {

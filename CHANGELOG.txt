@@ -11,6 +11,7 @@
 * Added Dropdown class to toolbar items
 * Replaced all custom markup on the ``admin/cms/page/includes/fieldset.html`` template
   with an ``{% include %}`` call to Django's builtin ``fieldset.html`` template.
+* Fixed a bug which prevented a page from being marked as dirty when a placeholder was cleared.
 
 
 === 3.4.2 (2017-01-23) ===
