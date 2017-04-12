@@ -12,6 +12,8 @@
 * Replaced all custom markup on the ``admin/cms/page/includes/fieldset.html`` template
   with an ``{% include %}`` call to Django's builtin ``fieldset.html`` template.
 * Fixed a bug which prevented a page from being marked as dirty when a placeholder was cleared.
+* Fixed an IntegrityError raised when publishing a page with no public version and whose publisher
+  state is pending.
 
 
 === 3.4.2 (2017-01-23) ===

@@ -709,10 +709,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.save()
 
         # be sure we have the newest data including tree information
-        p = Page.objects.get(pk=self.pk)
-        self.path = p.path
-        self.depth = p.depth
-        self.numchild = p.numchild
+        self.refresh_from_db()
+
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -886,14 +884,13 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         # List of published draft pages
         publish_set = list(
-            self.get_descendants()
+            self.get_children()
             .filter(
                 title_set__published=True,
-                parent__title_set__published=True,
                 title_set__language=language
             )
             .select_related('publisher_public', 'publisher_public__parent')
-            .order_by('depth', 'path')
+            .order_by('path')
         )
 
         # prefetch the titles
@@ -918,7 +915,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             if page.pk in titles_by_page_id:
                 page.title_cache = {language: titles_by_page_id[page.pk]}
 
-            if page.publisher_public_id:
+            if page.publisher_public:
                 # Page has a public version
                 publisher_public = page.publisher_public
 
@@ -935,20 +932,22 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 # Check if the parent of this page's
                 # public version is published.
                 if publisher_public.parent.is_published(language):
-                    public_title = titles_by_page_id.get(page.publisher_public_id)
-
-                    if public_title and not public_title.published:
-                        public_title._publisher_keep_state = True
-                        public_title.published = True
-                        public_title.publisher_state = PUBLISHER_STATE_DEFAULT
-                        public_title.save()
-
                     draft_title = titles_by_page_id[page.pk]
 
                     if draft_title.publisher_state == PUBLISHER_STATE_PENDING:
-                        draft_title.publisher_state = PUBLISHER_STATE_DEFAULT
-                        draft_title._publisher_keep_state = True
-                        draft_title.save()
+                        (page
+                         .title_set
+                         .filter(pk=draft_title.pk)
+                         .update(publisher_state=PUBLISHER_STATE_DEFAULT))
+
+                    public_title = titles_by_page_id.get(page.publisher_public_id)
+
+                    if public_title and not public_title.published:
+                        (publisher_public
+                         .title_set
+                         .filter(pk=public_title.pk)
+                         .update(published=True, publisher_state=PUBLISHER_STATE_DEFAULT))
+                    page.mark_descendants_as_published(language)
             elif page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                 page.publish(language)
 
