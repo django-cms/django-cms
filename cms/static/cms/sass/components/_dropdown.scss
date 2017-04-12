@@ -194,6 +194,7 @@
         width: 100%;
         > .cms-btn {
             display: table-cell;
+            text-align: left !important;
             &.cms-btn-action,
             &.cms-btn-caution {
                 color: white;
