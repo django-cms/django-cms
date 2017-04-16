@@ -2,6 +2,7 @@
 
 import time
 
+from cms.utils.compat import DJANGO_1_10
 from django.conf import settings
 from django.template import Context
 
@@ -351,7 +352,8 @@ class CacheTestCase(CMSTestCase):
             self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
             cache_control1 = response['Cache-Control']
             expires1 = response['Expires']
-            last_modified1 = response['Last-Modified']
+            # No longer set / needed by Django 1.11
+            last_modified1 = response.get('Last-Modified', None)
 
             time.sleep(1)  # This ensures that the cache has aged measurably
 
@@ -368,8 +370,10 @@ class CacheTestCase(CMSTestCase):
             self.assertNotEqual(response['Cache-Control'], cache_control1)
             # However, the Expires timestamp will be the same
             self.assertEqual(response['Expires'], expires1)
-            # As will the Last-Modified timestamp.
-            self.assertEqual(response['Last-Modified'], last_modified1)
+            # No longer set / needed by Django 1.11
+            if DJANGO_1_10:
+                # As will the Last-Modified timestamp.
+                self.assertEqual(response['Last-Modified'], last_modified1)
 
         plugin_pool.unregister_plugin(TTLCacheExpirationPlugin)
         plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)

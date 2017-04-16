@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import warnings
 
 from django import template
 
@@ -11,6 +12,7 @@ from cms.wizards.wizard_pool import wizard_pool
 register = template.Library()
 
 
+@register.tag(name='cms_wizard')
 class WizardProperty(AsTag):
     name = 'cms_wizard'
 
@@ -27,21 +29,12 @@ class WizardProperty(AsTag):
         identified by «wizard_id». If no «property», just return the entire
         wizard object.
         """
+        warnings.warn(
+            "Templatetag cms_wizard will be removed in django CMS 3.5",
+            PendingDeprecationWarning
+        )
         try:
             wizard = wizard_pool.get_entry(wizard_id)
+            return wizard.widget_attributes.get(property, wizard)
         except ValueError:
-            wizard = None
-
-        if wizard:
-            if property in ['description', 'title', 'weight']:
-                # getters
-                getter = getattr(wizard, "get_{0}".format(property), None)
-                return getter()
-            elif property in ['id', 'form', 'model', 'template_name']:
-                # properties
-                return getattr(wizard, property, None)
-            else:
-                return wizard
-        return None
-
-register.tag(WizardProperty)
+            return None

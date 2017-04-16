@@ -5,6 +5,7 @@ import hashlib
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 
 from django.utils.translation import (
     override as force_language,
@@ -138,3 +139,15 @@ class Wizard(WizardBase):
                 return model
         raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
                                    u"ModelForm subclass as a form")
+
+    @cached_property
+    def widget_attributes(self):
+        return {
+            'description': self.get_description(),
+            'title': self.get_title(),
+            'weight': self.get_weight(),
+            'id': self.id,
+            'form': self.form,
+            'model': self.model,
+            'template_name': self.template_name
+        }

@@ -237,7 +237,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     # This is really a 'fake' field which does not correspond to any Page attribute
     # But creates a stub field to be populate by js
     application_configs = forms.ChoiceField(label=_('Application configurations'),
-                                            choices=(), required=False,)
+                                            choices=(), required=False, widget=ApplicationConfigSelect)
     fieldsets = (
         (None, {
             'fields': ('overwrite_url', 'redirect'),
