@@ -14,6 +14,7 @@ from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset, use_draft
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
+from django.contrib.sites.models import Site
 
 
 def get_visible_page_objects(request, pages, site=None):
@@ -164,7 +165,7 @@ class CMSMenu(Menu):
 
     def get_nodes(self, request):
         page_queryset = get_page_queryset(request)
-        site = current_site(request)
+        site = Site.objects.get_current()
         lang = get_language_from_request(request)
 
         filters = {
