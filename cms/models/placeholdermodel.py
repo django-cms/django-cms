@@ -123,6 +123,24 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
+    def has_clear_permission(self, user, languages):
+        from cms.utils.permissions import has_plugin_permission
+
+        plugin_types = (
+            self
+            .cmsplugin_set
+            .filter(language__in=languages)
+            # exclude the clipboard plugin
+            .exclude(plugin_type='PlaceholderPlugin')
+            .values_list('plugin_type', flat=True)
+            .distinct()
+        )
+
+        for plugin_type in plugin_types.iterator():
+            if not has_plugin_permission(user, plugin_type, "delete"):
+                return False
+        return True
+
     def render(self, context, width, lang=None, editable=True, use_cache=True):
         '''
         Set editable = False to disable front-end rendering for this render.
@@ -140,18 +158,33 @@ class Placeholder(models.Model):
         """
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
         """
-        from cms.models import CMSPlugin
+        from cms.models import CMSPlugin, UserSettings
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
             for rel in self._meta.get_all_related_objects():
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
+
                 if DJANGO_1_7:
-                    parent = rel.model
+                    related_model = rel.model
                 else:
-                    parent = rel.related_model
-                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
+                    related_model = rel.related_model
+
+                try:
+                    admin_class = admin.site._registry[related_model]
+                except KeyError:
+                    admin_class = None
+
+                # UserSettings is a special case
+                # Attached objects are used to check permissions
+                # and we filter out any attached object that does not
+                # inherit from PlaceholderAdminMixin
+                # Because UserSettings does not (and shouldn't) inherit
+                # from PlaceholderAdminMixin, we add a manual exception.
+                is_user_settings = related_model == UserSettings
+
+                if is_user_settings or isinstance(admin_class, PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.count():

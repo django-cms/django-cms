@@ -15,6 +15,7 @@ from cms.utils.urlutils import admin_reverse
 
 
 class SettingsAdmin(ModelAdmin):
+
     def get_urls(self):
         def wrap(view):
             def wrapper(*args, **kwargs):

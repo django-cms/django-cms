@@ -34,7 +34,9 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
@@ -49,6 +51,11 @@ class AdminTestsBase(CMSTestCase):
         admiN_user = self.get_superuser()
         if admin_only:
             return admiN_user
+
+        staff_user = self._get_staff_user(use_global_permissions)
+        return admiN_user, staff_user
+
+    def _get_staff_user(self, use_global_permissions=True):
         USERNAME = 'test'
 
         if get_user_model().USERNAME_FIELD == 'email':
@@ -73,7 +80,7 @@ class AdminTestsBase(CMSTestCase):
                 can_move_page=True,
             )
             gpp.sites = Site.objects.all()
-        return admiN_user, normal_guy
+        return normal_guy
 
 
 class AdminTestCase(AdminTestsBase):
@@ -323,6 +330,73 @@ class AdminTestCase(AdminTestsBase):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
+    def test_delete_permissions(self):
+        admin_user, staff_user = self._get_guys()
+        create_page("home", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
+
+        # CMS_PERMISSION is set to True and staff user
+        # has global permissions set.
+        with self.settings(CMS_PERMISSION=True):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
+
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugins but the page
+        # has no plugins.
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
+
+        page = create_page("delete-page", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        add_plugin(body, 'TextPlugin', 'en', body='text')
+        page.publish('en')
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugin
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was unsuccessful
+                self.assertEqual(response.status_code, 403)
+                self.assertTrue(Page.objects.filter(pk=page.pk).exists())
+
+        # Give the staff user permission to delete text plugins
+        staff_user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        # CMS_PERMISSION is set to False and user has
+        # permission to delete text plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                data = {'post': 'yes'}
+                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(Page.objects.filter(pk=page.pk).exists())
+
     def test_delete_diff_language(self):
         admin_user = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
@@ -380,6 +454,78 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
+
+    def test_delete_translation_permissions(self):
+        admin_user, staff_user = self._get_guys()
+        page = create_page("delete-page-translation", "nav_playground.html", "en",
+                           created_by=admin_user, published=True)
+        body = page.placeholders.get(slot='body')
+        create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
+        create_title("fr", "delete-page-translation-fr", page.reload(), slug="delete-page-translation-fr")
+        add_plugin(body, 'TextPlugin', 'de', body='text')
+
+        # add a link plugin but never give the user permission to delete it
+        # all our tests target the german translation.
+        # this asserts that a plugin in another language does not interfere
+        # with deleting.
+        link = add_plugin(body, 'LinkPlugin', 'en', name='link-1')
+
+        # CMS_PERMISSION is set to True and staff user
+        # has global permissions set.
+        with self.settings(CMS_PERMISSION=True):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(page.title_set.filter(language='de').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+
+        # the API needs a fresh page object
+        page = page.reload()
+        create_title("de", "delete-page-translation-2", page.reload(), slug="delete-page-translation-2")
+        add_plugin(body, 'TextPlugin', 'de', body='text')
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete text plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+
+                # assert deleting page was successful
+                self.assertEqual(response.status_code, 403)
+                self.assertTrue(page.title_set.filter(language='de').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+
+        # CMS_PERMISSION is set to False and user does not
+        # have permission to delete any plugins but the translation
+        # does not contain plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'fr'})
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(page.title_set.filter(language='fr').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
+
+        # Give the staff user permission to delete text plugins
+        staff_user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        # CMS_PERMISSION is set to False and user has
+        # permission to delete text plugins
+        with self.settings(CMS_PERMISSION=False):
+            with self.login_user_context(staff_user):
+                response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+
+                # assert deleting page was successful
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertFalse(page.title_set.filter(language='de').exists())
+                # LinkPlugin should continue to be
+                self.assertTrue(body.cmsplugin_set.filter(pk=link.pk).exists())
 
     def test_change_dates(self):
         admin_user, staff = self._get_guys()
@@ -678,6 +824,121 @@ class AdminTestCase(AdminTestsBase):
         # After cleaning the de placeholder, en placeholder must still have all the plugins
         self.assertEqual(ph.get_plugins('en').count(), 2)
         self.assertEqual(ph.get_plugins('de').count(), 0)
+
+    def test_clear_placeholder_permissions_page(self):
+        """
+        Ensures a user without delete plugin permissions
+        cannot clear a page placeholder that contains said plugin.
+        """
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        # add text plugin
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # add a link plugin to make sure we test diversity
+        add_plugin(ph, "LinkPlugin", "en", name='link-1')
+        add_plugin(ph, "LinkPlugin", "en", name='link-2')
+
+        # Staff user has basic page permissions but no
+        # plugin permissions.
+        staff = self._get_staff_user()
+        endpoint = '%s?language=en' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete text plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete link plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_link'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ph.get_plugins('en').count(), 0)
+
+    def test_clear_placeholder_permissions_generic(self):
+        """
+        Ensures a user without delete plugin permissions
+        cannot clear a generic placeholder that contains said plugin.
+        """
+        ex1 = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
+
+        ph = ex1.placeholder
+
+        # add text plugin
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # add a link plugin to make sure we test diversity
+        add_plugin(ph, "LinkPlugin", "en", name='link-1')
+        add_plugin(ph, "LinkPlugin", "en", name='link-2')
+
+        # Staff user has basic page permissions but no
+        # plugin permissions.
+        staff = self._get_staff_user()
+        endpoint = '%s?language=en' % admin_reverse('placeholderapp_example1_clear_placeholder', args=[ph.pk])
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete the object the placeholder is attached to
+        # which is Example1 and the user also does not have permission
+        # to delete text and links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the user permission to delete Example1 objects
+        staff.user_permissions.add(Permission.objects.get(codename='delete_example1'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete text and links
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete text plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_text'))
+
+        # Operation results in 403 because staff user does not have
+        # permission to delete links
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(ph.get_plugins('en').count(), 4)
+
+        # Give the staff user permission to delete link plugins
+        staff.user_permissions.add(Permission.objects.get(codename='delete_link'))
+
+        with self.login_user_context(staff):
+            response = self.client.post(endpoint, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ph.get_plugins('en').count(), 0)
 
 
 class AdminTests(AdminTestsBase):
@@ -1225,60 +1486,213 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-    def test_plugins_copy_placeholder_ref(self):
-        """User copies a placeholder into a clipboard. A PlaceholderReferencePlugin is created. Afterwards he copies this
-         into a placeholder and the PlaceholderReferencePlugin unpacks its content. After that he clear the clipboard"""
-        self.assertEqual(Placeholder.objects.count(), 2)
-        self._create_plugin()
-        self._create_plugin()
-        admin_user = self.get_superuser()
-        clipboard = Placeholder()
-        clipboard.save()
-        self.assertEqual(CMSPlugin.objects.count(), 2)
-        settings = UserSettings(language="fr", clipboard=clipboard, user=admin_user)
-        settings.save()
-        self.assertEqual(Placeholder.objects.count(), 3)
+    def test_plugins_copy_placeholder_from_page(self):
+        """
+        Copies a placeholder into the clipboard from
+        a Page and pastes it into a placeholder from
+        a PlaceholderField in a generic object
+        """
+        ex1 = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
 
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
-        else:
-            self.client.login(username='admin', password='admin')
+        target_placeholder = ex1.placeholder
+        source_placeholder = self._placeholder
+
+        self._create_plugin()
+        self._create_plugin()
+
+        plugin_count = CMSPlugin.objects.count
+        initial_plugin_count = plugin_count()
+
+        admin_user = self._create_user(
+            'copy_plugins_user',
+            is_staff=True,
+            is_superuser=False,
+            add_default_permissions=True,
+        )
+
+        self._give_cms_permissions(admin_user)
+
+        clipboard = Placeholder.objects.create()
+        UserSettings.objects.create(
+            language="fr",
+            user=admin_user,
+            clipboard=clipboard,
+        )
 
         url = admin_reverse('cms_page_copy_plugins')
-        data = dict(source_plugin_id='',
-                    source_placeholder_id=self._placeholder.pk,
-                    source_language='en',
-                    target_language='en',
-                    target_placeholder_id=clipboard.pk,
+        data = dict(
+            source_plugin_id='',
+            source_placeholder_id=source_placeholder.pk,
+            source_language='en',
+            target_language='en',
+            target_placeholder_id=clipboard.pk,
         )
-        response = self.client.post(url, data)
+
+        with self.login_user_context(admin_user):
+            # Copy plugins into the clipboard
+            response = self.client.post(url, data)
+
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
         clipboard_plugins = clipboard.get_plugins()
-        self.assertEqual(CMSPlugin.objects.count(), 5)
-        self.assertEqual(clipboard_plugins.count(), 1)
-        self.assertEqual(clipboard_plugins[0].plugin_type, "PlaceholderPlugin")
-        placeholder_plugin, _ = clipboard_plugins[0].get_plugin_instance()
+
+        # assert three new plugins have been created
+        # One for the PlaceholderPlugin and the other two
+        # are the plugins being copied.
+        self.assertEqual(plugin_count(), initial_plugin_count + 3)
+
+        # assert the clipboard has a PlaceholderPlugin
+        self.assertTrue(clipboard_plugins.filter(plugin_type='PlaceholderPlugin').exists())
+
+        placeholder_plugin = clipboard_plugins[0].get_plugin_instance()[0]
         ref_placeholder = placeholder_plugin.placeholder_ref
         copied_plugins = ref_placeholder.get_plugins()
+
+        # assert there's only two plugins in the clipboard
         self.assertEqual(copied_plugins.count(), 2)
-        data = dict(source_plugin_id=placeholder_plugin.pk,
-                    source_placeholder_id=clipboard.pk,
-                    source_language='en',
-                    target_language='fr',
-                    target_placeholder_id=self._placeholder.pk,
+
+        # Paste plugins from clipboard into placeholder
+        # under the french language.
+        data = dict(
+            source_plugin_id=placeholder_plugin.pk,
+            source_placeholder_id=clipboard.pk,
+            source_language='en',
+            target_language='fr',
+            target_placeholder_id=target_placeholder.pk,
         )
-        response = self.client.post(url, data)
+
+        with self.login_user_context(admin_user):
+            response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        plugins = self._placeholder.get_plugins()
-        self.assertEqual(plugins.count(), 4)
-        self.assertEqual(CMSPlugin.objects.count(), 7)
-        self.assertEqual(Placeholder.objects.count(), 4)
+
+        self.assertEqual(target_placeholder.get_plugins().count(), 2)
+        self.assertEqual(plugin_count(), initial_plugin_count + 5)
+
+        # Clear the clipboard
         url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
-        with self.assertNumQueries(FuzzyInt(70, 80)):
-            response = self.client.post(url, {'test': 0})
+
+        with self.login_user_context(admin_user):
+            with self.assertNumQueries(FuzzyInt(70, 90)):
+                response = self.client.post(url, {'test': 0})
+
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(CMSPlugin.objects.count(), 4)
-        self.assertEqual(Placeholder.objects.count(), 3)
+
+        # assert plugin count has only increased by two.
+        # The two new plugins pasted in french.
+        self.assertEqual(plugin_count(), initial_plugin_count + 2)
+
+    def test_plugins_copy_placeholder_from_generic_object(self):
+        """
+        Copies a placeholder into a clipboard from an object
+        with PlaceholderField and pastes the object into
+        a placeholder inside a page.
+        """
+        ex1 = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
+
+        source_placeholder = ex1.placeholder
+        target_placeholder = self._placeholder
+
+        add_plugin(ex1.placeholder, 'TextPlugin', 'en')
+        add_plugin(ex1.placeholder, 'TextPlugin', 'en')
+
+        plugin_count = CMSPlugin.objects.count
+        initial_plugin_count = plugin_count()
+
+        admin_user = self._create_user(
+            'copy_plugins_user',
+            is_staff=True,
+            is_superuser=False,
+            add_default_permissions=True,
+            permissions=[
+                'add_example1',
+                # These are required to alter the clipboard
+                'add_usersettings',
+                'change_usersettings',
+            ],
+        )
+
+        self._give_cms_permissions(admin_user)
+
+        clipboard = Placeholder.objects.create()
+        UserSettings.objects.create(
+            language="fr",
+            user=admin_user,
+            clipboard=clipboard,
+        )
+
+        # It's important that the plugin copy url is the one from
+        # the generic object.
+        url = admin_reverse('placeholderapp_example1_copy_plugins')
+        data = dict(
+            source_plugin_id='',
+            source_placeholder_id=source_placeholder.pk,
+            source_language='en',
+            target_language='en',
+            target_placeholder_id=clipboard.pk,
+        )
+
+        with self.login_user_context(admin_user):
+            # Copy plugins into the clipboard
+            response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        clipboard_plugins = clipboard.get_plugins()
+
+        # assert the clipboard has a PlaceholderPlugin
+        self.assertTrue(clipboard_plugins.filter(plugin_type='PlaceholderPlugin').exists())
+
+        # assert three new plugins have been created
+        # One for the PlaceholderPlugin and the other two
+        # are the plugins being copied.
+        self.assertEqual(plugin_count(), initial_plugin_count + 3)
+
+        placeholder_plugin = clipboard_plugins[0].get_plugin_instance()[0]
+        ref_placeholder = placeholder_plugin.placeholder_ref
+        copied_plugins = ref_placeholder.get_plugins()
+
+        # assert there's only two plugins in the clipboard
+        self.assertEqual(copied_plugins.count(), 2)
+
+        # Paste plugins from clipboard into placeholder
+        # under the french language.
+        data = dict(
+            source_plugin_id=placeholder_plugin.pk,
+            source_placeholder_id=clipboard.pk,
+            source_language='en',
+            target_language='fr',
+            target_placeholder_id=target_placeholder.pk,
+        )
+
+        with self.login_user_context(admin_user):
+            response = self.client.post(url, data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertEqual(target_placeholder.get_plugins().count(), 2)
+        self.assertEqual(plugin_count(), initial_plugin_count + 5)
+
+        # Clear the clipboard
+        url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
+
+        with self.login_user_context(admin_user):
+            with self.assertNumQueries(FuzzyInt(70, 90)):
+                response = self.client.post(url, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+
+        # assert plugin count has only increased by two.
+        # The two new plugins pasted in french.
+        self.assertEqual(plugin_count(), initial_plugin_count + 2)
 
     def test_plugins_copy_language(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
