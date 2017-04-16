@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth import get_permission_codename, get_user_model
+from django.contrib.messages.storage.cookie import CookieStorage
 from django.forms.models import model_to_dict
 from django.test.utils import override_settings
 
 from cms.models.permissionmodels import PageUser
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat import DJANGO_1_10
 from cms.utils.urlutils import admin_reverse
 
 
@@ -371,6 +373,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         admin = self.get_superuser()
         staff_user = self.get_staff_page_user(created_by=admin)
         endpoint = self.get_admin_url(PageUser, 'change', staff_user.pk)
+        redirect_to = admin_reverse('index')
 
         data = model_to_dict(staff_user, exclude=['date_joined'])
         data['_continue'] = '1'
@@ -393,7 +396,13 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 404)
+            if DJANGO_1_10:
+                self.assertEqual(response.status_code, 404)
+            else:
+                self.assertRedirects(response, redirect_to)
+                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+                self.assertTrue(msgs[0], PageUser._meta.verbose_name)
+                self.assertTrue(msgs[0], 'ID "%s"' % staff_user.pk)
             self.assertFalse(self._user_exists(username))
 
     def test_user_cant_change_others(self):
@@ -405,6 +414,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         endpoint = self.get_admin_url(PageUser, 'change', staff_user_2.pk)
+        redirect_to = admin_reverse('index')
 
         data = model_to_dict(staff_user_2, exclude=['date_joined'])
         data['_continue'] = '1'
@@ -427,7 +437,13 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 404)
+            if DJANGO_1_10:
+                self.assertEqual(response.status_code, 404)
+            else:
+                self.assertRedirects(response, redirect_to)
+                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+                self.assertTrue(msgs[0], PageUser._meta.verbose_name)
+                self.assertTrue(msgs[0], 'ID "%s"' % staff_user_2.pk)
             self.assertFalse(self._user_exists(username))
 
     def test_user_can_delete_subordinate(self):
@@ -485,6 +501,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         admin = self.get_superuser()
         staff_user = self.get_staff_page_user(created_by=admin)
         endpoint = self.get_admin_url(PageUser, 'delete', staff_user.pk)
+        redirect_to = admin_reverse('index')
         data = {'post': 'yes'}
 
         self.add_permission(staff_user, self._get_delete_perm())
@@ -503,7 +520,14 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             # that the user has permissions for.
             # This queryset is used to fetch the object
             # from the request, resulting in a 404.
-            self.assertEqual(response.status_code, 404)
+            # Since Django 1.11 404 results in redirect to the admin home
+            if DJANGO_1_10:
+                self.assertEqual(response.status_code, 404)
+            else:
+                self.assertRedirects(response, redirect_to)
+                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+                self.assertTrue(msgs[0], PageUser._meta.verbose_name)
+                self.assertTrue(msgs[0], 'ID "%s"' % staff_user.pk)
             self.assertTrue(self._user_exists(username))
 
     def test_user_cant_delete_others(self):
@@ -515,6 +539,7 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         endpoint = self.get_admin_url(PageUser, 'delete', staff_user_2.pk)
+        redirect_to = admin_reverse('index')
 
         data = {'post': 'yes'}
 
@@ -534,5 +559,12 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
             # that the user has permissions for.
             # This queryset is used to fetch the object
             # from the request, resulting in a 404.
-            self.assertEqual(response.status_code, 404)
+            # Since Django 1.11 404 results in redirect to the admin home
+            if DJANGO_1_10:
+                self.assertEqual(response.status_code, 404)
+            else:
+                self.assertRedirects(response, redirect_to)
+                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+                self.assertTrue(msgs[0], PageUser._meta.verbose_name)
+                self.assertTrue(msgs[0], 'ID "%s"' % staff_user_2.pk)
             self.assertTrue(self._user_exists(username))

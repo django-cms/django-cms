@@ -1,0 +1,9 @@
+{% for group, entries, index in widget.optgroups %}
+    {% for entry in entries %}
+        <label tabindex="0" class="choice{% if forloop.first %} active{% endif %}">
+            <input type="radio" name="{{ entry.name }}" value="{{ entry.value }}"{% if forloop.first %} checked{% endif %}>
+            <strong>{{ entry.label }}</strong>
+            <span class="info">{{ entry.attrs.description }}</span>
+        </label>
+    {% endfor %}
+{% endfor %}

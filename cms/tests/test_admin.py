@@ -37,6 +37,7 @@ from cms.test_utils.testcases import (
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_10
 from cms.utils.urlutils import admin_reverse
 
 
@@ -385,7 +386,11 @@ class AdminTestCase(AdminTestsBase):
             self.client.login(username='admin', password='admin')
 
         response = self.client.get(URL_CMS_PAGE_CHANGE_LANGUAGE % (1, 'en'))
-        self.assertEqual(response.status_code, 404)
+        # Since Django 1.11 404 results in redirect to the admin home
+        if DJANGO_1_10:
+            self.assertEqual(response.status_code, 404)
+        else:
+            self.assertRedirects(response, reverse('admin:index'))
 
     def test_empty_placeholder_with_nested_plugins(self):
         # It's important that this test clears a placeholder
