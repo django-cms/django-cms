@@ -92,7 +92,8 @@ class PageSmartLinkField(forms.CharField):
         return attrs
 
     def clean(self, value):
-        parts = list(urlparse(value))
-        if parts[0].lower() not in ['', 'ftp', 'ftps', 'http', 'https']:
-            raise forms.ValidationError("Unsupported URI scheme")
+        if value is not None:
+            parts = list(urlparse(value))
+            if parts[0].lower() not in ['', 'ftp', 'ftps', 'http', 'https']:
+                raise forms.ValidationError("Unsupported URI scheme")
         return super(PageSmartLinkField, self).clean(value)
