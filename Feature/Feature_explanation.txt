@@ -1,0 +1,9 @@
+
+
+After installing and running a new project with the command
+
+python manage.py runserver
+
+Inside <myproject>/<mysite>/<templates>/feature.html should be as the feature.html in this folder.
+
+It should add 2 anchors that work as displayed on the images in the compressed folder.
