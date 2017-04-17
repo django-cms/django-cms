@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms.fields import EMPTY_VALUES
+from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.translation import ugettext_lazy as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
@@ -89,3 +90,9 @@ class PageSmartLinkField(forms.CharField):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)
         attrs.update({'placeholder_text': self.placeholder_text})
         return attrs
+
+    def clean(self, value):
+        parts = list(urlparse(value))
+        if parts[0].lower() not in ['', 'ftp', 'ftps', 'http', 'https']:
+            raise forms.ValidationError("Unsupported URI scheme")
+        return super(PageSmartLinkField, self).clean(value)
