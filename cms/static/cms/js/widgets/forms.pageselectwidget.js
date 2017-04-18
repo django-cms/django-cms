@@ -5,7 +5,7 @@
 // this essentially makes sure that dynamically required bundles are loaded
 // from the same place
 // eslint-disable-next-line
-__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.pageselectwidget.min.js');
+__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.pageselectwidget');
 
 // #############################################################################
 // PAGE SELECT WIDGET
