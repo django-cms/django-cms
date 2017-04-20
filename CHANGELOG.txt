@@ -1,4 +1,4 @@
-=== 3.4.3 (unreleased) ===
+=== 3.4.4 (unreleased) ===
 
 * Fixed a bug where canceling the publishing dialog wasn't respected.
 * Fixed a bug when after authentication us redirected on wrong url (site have only one language)
@@ -15,6 +15,11 @@
 * Fixed an IntegrityError raised when publishing a page with no public version and whose publisher
   state is pending.
 * Fixed an issue with JS not being able to determine correct path to async bundle
+
+
+=== 3.4.3 (unreleased) ===
+
+
 
 
 === 3.4.2 (2017-01-23) ===
