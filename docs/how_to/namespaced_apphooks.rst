@@ -67,7 +67,7 @@ but the simplified version is:
 Apphook configurations
 **********************
 
-Namespacing your apphooks also makes it possible to manage additional database-stored aphook configuration, on an
+Namespacing your apphooks also makes it possible to manage additional database-stored apphook configuration, on an
 instance-by-instance basis.
 
 
