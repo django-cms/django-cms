@@ -1108,3 +1108,13 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
+
+EMAIL_URL
+=========
+
+default
+    None
+   
+This string sets the SMTP email configuration for Django-CMS forms.
+It follows the form:
+ ``smtp://username:password@server:port[?ssl=True]``
