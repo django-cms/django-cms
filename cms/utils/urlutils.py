@@ -14,6 +14,14 @@ from cms.utils.conf import get_cms_setting
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
 
+# checks validity of relative url
+# matches the following:
+# /test
+# /test/
+# ./test/
+# ../test/
+relative_url_regex = re.compile('^[^/<>]+/[^/<>].*$|^/[^/<>].*$', re.IGNORECASE)
+
 
 def levelize_path(path):
     """Splits given path to list of paths removing latest level in each step.
