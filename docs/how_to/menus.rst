@@ -1,6 +1,6 @@
-############################
-Customising navigation menus
-############################
+#################################
+How to customise navigation menus
+#################################
 
 In this document we discuss three different way of customising the navigation
 menus of django CMS sites.

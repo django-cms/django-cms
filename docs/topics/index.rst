@@ -9,7 +9,7 @@ concerned with explaining *how to do things* than with helping you understand
 *how it works*.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     touch
     menu_system

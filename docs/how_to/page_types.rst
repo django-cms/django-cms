@@ -1,8 +1,8 @@
 .. versionadded:: 3.0
 
-##########
-Page Types
-##########
+########################
+How to manage Page Types
+########################
 
 **Page Types** make it easier for content editors to create pages from predefined **types**.
 

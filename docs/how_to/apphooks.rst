@@ -1,8 +1,8 @@
 .. _apphooks_how_to:
 
-########
-Apphooks
-########
+######################
+How to create apphooks
+######################
 
 An **apphook** allows you to attach a Django application to a page. For example,
 you might have a news application that you'd like integrated with django CMS. In
@@ -14,6 +14,7 @@ All URLs in that URL path will be passed to the attached application's URL confi
 
 The :ref:`Tutorials <tutorials>` section contains a basic guide to :ref:`getting started with apphooks
 <apphooks_introduction>`. This document assumes more familiarity with the CMS generally.
+
 
 ******************************
 The basics of apphook creation

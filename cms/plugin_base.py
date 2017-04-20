@@ -502,7 +502,7 @@ class PluginMenuItem(object):
         :param data: Data to be POSTed to the above URL
         :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
         :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
-        :param attributes: Dictionary whose content will be addes as data-attributes to the menu item
+        :param attributes: Dictionary whose content will be added as data-attributes to the menu item
         """
         if not attributes:
             attributes = {}

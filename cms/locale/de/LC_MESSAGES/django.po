@@ -1857,7 +1857,7 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr "\nJavascript scheint deaktiviert zu sein. Sie  können hier eine\n <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Seite manuell hinzufügen</a>."
+msgstr "\nJavaScript scheint deaktiviert zu sein. Sie  können hier eine\n <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Seite manuell hinzufügen</a>."
 
 #: templates/cms/welcome.html:56
 msgid "Installation Notes"

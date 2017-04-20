@@ -1,8 +1,8 @@
 .. _toolbar_how_to:
 
-#####################
-Extending the Toolbar
-#####################
+#########################
+How to extend the Toolbar
+#########################
 
 .. versionadded:: 3.0
 
