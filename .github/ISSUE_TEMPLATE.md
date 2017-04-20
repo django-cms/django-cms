@@ -12,6 +12,7 @@ For feature requests, please use our developers' email list: https://groups.goog
 
 ### Summary
 
+<!-- If this is a security issue stop right here and email security@django-cms.org instead -->
 
 
 ### Expected behaviour
