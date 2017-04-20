@@ -384,6 +384,17 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
+    def test_toolbar_login_redirect_validation(self):
+        user = self._create_user('toolbar', True, True)
+        username = getattr(user, user.USERNAME_FIELD)
+        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        endpoint = '{}?{}&cms-toolbar-login&next=https://notyourdomain.com'.format(
+            page.get_absolute_url(),
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        )
+        response = self.client.post(endpoint, {'username': username, 'password': username})
+        self.assertRedirects(response, page.get_absolute_url(), fetch_redirect_response=False)
+
     def test_show_toolbar_login_anonymous(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
