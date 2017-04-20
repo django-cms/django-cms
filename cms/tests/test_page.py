@@ -461,6 +461,44 @@ class PagesTestCase(CMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'changed title')
 
+    def test_page_redirect_field_validation(self):
+        superuser = self.get_superuser()
+        data = self.get_new_page_data()
+
+        with self.login_user_context(superuser):
+            self.client.post(URL_CMS_PAGE_ADD, data)
+
+        page = Page.objects.get(title_set__slug=data['slug'], publisher_is_draft=True)
+
+        endpoint = URL_CMS_PAGE_ADVANCED_CHANGE % page.pk
+        redirect_to = URL_CMS_PAGE
+
+        with self.login_user_context(superuser):
+            data['redirect'] = '/hello/'
+            # Absolute paths should continue to work
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+
+        with self.login_user_context(superuser):
+            data['redirect'] = '../hello/'
+            # Relative paths should continue to work
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+
+        with self.login_user_context(superuser):
+            data['redirect'] = 'javascript:alert(1)'
+            # Asserts users can't insert javascript call
+            response = self.client.post(endpoint, data)
+            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
+            self.assertContains(response, validation_error, html=True)
+
+        with self.login_user_context(superuser):
+            data['redirect'] = '<script>alert("test")</script>'
+            # Asserts users can't insert javascript call
+            response = self.client.post(endpoint, data)
+            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
+            self.assertContains(response, validation_error, html=True)
+
     def test_moderator_edit_page_redirect(self):
         """
         Test that a page can be edited multiple times with moderator
