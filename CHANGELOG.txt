@@ -21,6 +21,8 @@
 
 * Fixed a security vulnerability in the page redirect field which allowed users
   to insert javascript code.
+* Fixed a security vulnerability where the ``next`` parameter for the toolbar login
+  was not sanitized and could point to another domain.
 
 
 === 3.4.2 (2017-01-23) ===

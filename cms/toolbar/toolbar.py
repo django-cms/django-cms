@@ -18,6 +18,7 @@ from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.functional import cached_property
+from django.utils.http import is_safe_url
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -367,19 +368,25 @@ class CMSToolbar(ToolbarAPIMixin):
             logout(self.request)
             return HttpResponseRedirect(self.request.path_info)
 
+    def _get_login_redirect_to(self):
+        redirect_to = self.request.GET.get(REDIRECT_FIELD_NAME)
+
+        if is_safe_url(url=redirect_to, host=self.request.get_host()):
+            return redirect_to
+        return
+
     def _request_hook_post(self):
         # login hook
         if 'cms-toolbar-login' in self.request.GET:
+            redirect_to = self._get_login_redirect_to()
             self.login_form = CMSToolbarLoginForm(request=self.request, data=self.request.POST)
+
             if self.login_form.is_valid():
                 login(self.request, self.login_form.user_cache)
-                if REDIRECT_FIELD_NAME in self.request.GET:
-                    return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME])
-                else:
-                    return HttpResponseRedirect(self.request.path_info)
-            else:
-                if REDIRECT_FIELD_NAME in self.request.GET:
-                    return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME]+"?cms-toolbar-login-error=1")
+                redirect_to = redirect_to or self.request.path_info
+                return HttpResponseRedirect(redirect_to)
+            elif redirect_to:
+                return HttpResponseRedirect(redirect_to + "?cms-toolbar-login-error=1")
 
     def _call_toolbar(self, func_name):
         with force_language(self.toolbar_language):
