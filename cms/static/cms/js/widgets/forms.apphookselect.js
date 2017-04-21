@@ -15,12 +15,12 @@ require.ensure([], function (require) {
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        var appHooks = $('#application_urls');
+        var appHooks = $('#application_urls, #id_application_urls');
         var selected = appHooks.find('option:selected');
-        var appNsRow = $('.form-row.application_namespace');
-        var appNs = appNsRow.find('#id_application_namespace');
-        var appCfgsRow = $('.form-row.application_configs');
-        var appCfgs = appCfgsRow.find('#application_configs');
+        var appNsRow = $('.form-row.application_namespace, .form-row.field-application_namespace');
+        var appNs = appNsRow.find('#application_namespace, #id_application_namespace');
+        var appCfgsRow = $('.form-row.application_configs, .form-row.field-application_configs');
+        var appCfgs = appCfgsRow.find('#application_configs, #id_application_configs');
         var appCfgsAdd = appCfgsRow.find('#add_application_configs');
         var original_ns = appNs.val();
 

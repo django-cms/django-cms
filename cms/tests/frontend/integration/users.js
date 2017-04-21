@@ -36,7 +36,7 @@ casper.test.begin('Users Management', function (test) {
                 .waitForSelector('#changelist-form', function () {
                     test.assertExists('.column-first_name', 'Admin panel with the list of users opened in sideframe');
 
-                    this.click('.field-username a[href$="/user/1/"]');
+                    this.clickLabel('admin', 'a');
                 })
                 .waitForSelector('#user_form', function () {
                     test.assertExists('#user_form', 'The admin profile edit page has been opened');
