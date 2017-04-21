@@ -205,7 +205,6 @@ class MenuRenderer(object):
         if not site_id:
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(site_id)
-        nodes = copy.deepcopy(nodes)
         nodes = self.apply_modifiers(
             nodes=nodes,
             namespace=namespace,
