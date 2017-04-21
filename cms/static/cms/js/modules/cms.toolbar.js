@@ -74,7 +74,7 @@ var Toolbar = new Class({
         this.touchStart = 'touchstart.cms.toolbar';
         this.pointerUp = 'pointerup.cms.toolbar';
         this.pointerOverOut = 'pointerover.cms.toolbar pointerout.cms.toolbar';
-        this.pointerLeave = 'pointerleave.csm.toolbar';
+        this.pointerLeave = 'pointerleave.cms.toolbar';
         this.mouseEnter = 'mouseenter.cms.toolbar';
         this.mouseLeave = 'mouseleave.cms.toolbar';
         this.resize = 'resize.cms.toolbar';
@@ -592,6 +592,7 @@ var Toolbar = new Class({
      * @param {Object} opts
      * @param {String} opts.url url where the ajax points to
      * @param {String} [opts.post] post data to be passed (must be stringified JSON)
+     * @param {String} [opts.method='POST'] ajax method
      * @param {String} [opts.text] message to be displayed
      * @param {Function} [opts.callback] custom callback instead of reload
      * @param {String} [opts.onSuccess] reload and display custom message
@@ -604,6 +605,7 @@ var Toolbar = new Class({
         var post = opts.post || '{}';
         var text = opts.text || '';
         var callback = opts.callback;
+        var method = opts.method || 'POST';
         var onSuccess = opts.onSuccess;
         var question = text ? Helpers.secureConfirm(text) : true;
 
@@ -616,7 +618,7 @@ var Toolbar = new Class({
         this.showLoader();
 
         return $.ajax({
-            type: 'POST',
+            type: method,
             url: url,
             data: JSON.parse(post)
         }).done(function (response) {
@@ -705,6 +707,7 @@ var Toolbar = new Class({
                 this.openAjax({
                     url: el.attr('href'),
                     post: JSON.stringify(el.data('post')),
+                    method: el.data('method'),
                     text: el.data('text'),
                     onSuccess: el.data('on-success')
                 });

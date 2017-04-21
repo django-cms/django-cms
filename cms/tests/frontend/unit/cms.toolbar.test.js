@@ -1,10 +1,18 @@
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base');
 var Toolbar = require('../../../static/cms/js/modules/cms.toolbar');
+var Navigation = require('../../../static/cms/js/modules/cms.navigation');
+var Messages = require('../../../static/cms/js/modules/cms.messages');
+var Sideframe = require('../../../static/cms/js/modules/cms.sideframe');
+var Modal = require('../../../static/cms/js/modules/cms.modal');
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;
 CMS.Toolbar = Toolbar;
+CMS.Navigation = Navigation;
+CMS.Messages = Messages;
+CMS.Modal = Modal;
+CMS.Sideframe = Sideframe;
 
 
 describe('CMS.Toolbar', function () {
@@ -76,6 +84,7 @@ describe('CMS.Toolbar', function () {
         // this spec can be thoroughly expanded, but for the moment just checking for the
         // class and event is sufficient
         it('initializes the states', function (done) {
+            CMS.Toolbar.prototype._initialStates.calls.reset();
             CMS.Toolbar.prototype._initialStates.and.callThrough();
             CMS.settings = { sideframe: {}, version: 'fake' };
             CMS.config = { settings: { version: 'fake' }, auth: true };
@@ -994,6 +1003,7 @@ describe('CMS.Toolbar', function () {
                 url: 'href',
                 post: '{"test":"shmest"}',
                 text: 'text',
+                method: undefined,
                 onSuccess: 'REFRESH'
             });
         });
