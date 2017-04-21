@@ -1,5 +1,5 @@
 var getDistPath = function (scriptFileName) {
-    var fileNameReplaceRegExp = new RegExp(scriptFileName + '(\\?.*)?$', 'gi');
+    var fileNameReplaceRegExp = new RegExp(scriptFileName + '.*$', 'gi');
 
     if (document.currentScript) {
         return document.currentScript.src.replace(fileNameReplaceRegExp, '');
