@@ -21,6 +21,7 @@
   instead of the current request site.
 * Fixed a race condition bug where the cache keys on the database were deleted without syncing with the
   cache server and as a result old menu items would continue to be displayed.
+* Fixed a 404 raised when clicking the ``Delete`` button for a page or title extension on Django >= 1.9
 
 
 === 3.4.3 (2017-04-24) ===
