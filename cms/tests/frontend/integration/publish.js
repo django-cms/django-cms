@@ -189,19 +189,10 @@ casper.test.begin('Publishing dates', function (test) {
             this.click('.cms-btn-publish');
         })
         .waitForResource(/publish/)
+        .wait(3000)
         // logging out through toolbar
         .thenOpen(globals.editUrl)
-        .waitForSelector('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation li:first-child a');
-        })
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
-        })
-        .waitForResource(/admin/)
-        .wait(1000)
-        .waitForSelector('body', function () {
-            test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
-        })
+        .then(cms.logout())
         // going to the newly created page url and checking that it hasn't been published yet
         .thenOpen(pageUrl, function () {
             test.assertTitleMatch(/Page not found/, 'The page is not yet available');

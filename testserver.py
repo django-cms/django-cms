@@ -41,6 +41,7 @@ class DisableMigrations(object):
 
 
 HELPER_SETTINGS = dict(
+    ALLOWED_HOSTS=[u'0.0.0.0', u'localhost'],
     CMS_PERMISSION=permission,
     LANGUAGES=(
         ('en', u'English'),

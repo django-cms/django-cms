@@ -678,6 +678,7 @@ describe('CMS.Toolbar', function () {
                 url: 'href',
                 post: '{"test":"shmest"}',
                 text: 'text',
+                method: undefined,
                 onSuccess: 'REFRESH'
             });
         });
