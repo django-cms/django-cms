@@ -43,6 +43,12 @@ django CMS also has other requirements, which it lists as dependencies in its ``
 
 In an activated virtualenv, run::
 
+	pip install --upgrade pip
+
+to make sure ``pip`` is up-to-date, as earlier versions can be less reliable.
+
+Then::
+
     pip install django-cms
 
 to install the latest stable version of django CMS.
