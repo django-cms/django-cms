@@ -1,0 +1,23 @@
+.. _upgrade-to-3.4.3:
+
+###################
+3.4.3 release notes
+###################
+
+*******************
+What's new in 3.4.3
+*******************
+
+Security Fixes
+==============
+
+* Fixed a security vulnerability in the page redirect field which allowed users
+  to insert JavaScript code.
+* Fixed a security vulnerability where the ``next`` parameter for the toolbar login
+  was not sanitised and could point to another domain.
+
+
+Thanks
+======
+
+Thanks to Mark Walker and Anthony Steinhauser for reporting the security issues.
