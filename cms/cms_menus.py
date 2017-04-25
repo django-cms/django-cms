@@ -151,9 +151,9 @@ def page_to_node(renderer, page, home, language):
     # Now finally, build the NavigationNode object and return it.
     ret_node = CMSNavigationNode(
         translation.menu_title or translation.title,
-        '',
-        page.pk,
-        parent_id,
+        url='',
+        id=page.pk,
+        parent_id=parent_id,
         attr=attr,
         visible=page.in_navigation,
         path=translation.path or translation.slug

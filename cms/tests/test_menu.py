@@ -317,7 +317,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(6):
             """
             The queries should be:
                 get all public pages
@@ -325,9 +325,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
                 get all page permissions
                 get all titles
                 get the menu cache key
-                create a savepoint
                 set the menu cache key
-                release the savepoint
             """
             tpl = Template("{% load menu_tags %}{% show_menu %}")
             tpl.render(context)
@@ -393,18 +391,57 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
         self.assertEqual(len(node_ids), page_count, msg='Not all pages in the public menu are public')
 
-    def test_menu_keys_duplicate_truncates(self):
-        """
-        When two objects with the same characteristics are present in the
-        database, get_or_create truncates the database table to "invalidate"
-        the cache, before retrying. This can happen after migrations, and since
-        it's only cache, we don't want any propagation of errors.
-        """
-        CacheKey.objects.create(language="fr", site=1, key="a")
-        CacheKey.objects.create(language="fr", site=1, key="a")
-        CacheKey.objects.get_or_create(language="fr", site=1, key="a")
+    def test_menu_cache_respects_database_keys(self):
+        public_page = self.get_page(1)
 
+        # Prime the public menu cache
+        context = self.get_context(path=public_page.get_absolute_url(), page=public_page)
+        context['request'].session['cms_edit'] = False
+
+        # Prime the cache
+        with self.assertNumQueries(6):
+            # The queries should be:
+            #     get all public pages
+            #     get all draft pages from public pages
+            #     get all page permissions
+            #     get all titles
+            #     get the menu cache key
+            #     set the menu cache key
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        # One new CacheKey should have been created
         self.assertEqual(CacheKey.objects.count(), 1)
+
+        # Because its cached, only one query is made to the db
+        with self.assertNumQueries(1):
+            # The queries should be:
+            #     get the menu cache key
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+        # Delete the current cache key but don't touch the cache
+        CacheKey.objects.all().delete()
+
+        # The menu should be recalculated
+        with self.assertNumQueries(6):
+            # The queries should be:
+            #     get all public pages
+            #     get all draft pages from public pages
+            #     get all page permissions
+            #     get all titles
+            #     get the menu cache key
+            #     set the menu cache key
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+
+    def test_menu_keys_duplicate_clear(self):
+        """
+        Tests that the menu clears all keys, including duplicates.
+        """
+        CacheKey.objects.create(language="fr", site=1, key="a")
+        CacheKey.objects.create(language="fr", site=1, key="a")
+
+        self.assertEqual(CacheKey.objects.count(), 2)
+        menu_pool.clear(site_id=1, language='fr')
+        self.assertEqual(CacheKey.objects.count(), 0)
 
     def test_only_active_tree(self):
         context = self.get_context(page=self.get_page(1))
@@ -994,7 +1031,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         context = self.get_context(page.get_absolute_url(), page=page)
 
         # test standard show_menu
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(6):
             """
             The queries should be:
                 get all public pages
@@ -1002,9 +1039,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
                 get all page permissions
                 get all titles
                 get the menu cache key
-                create a savepoint
                 set the menu cache key
-                release the savepoint
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
@@ -1171,7 +1206,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(8):
+            with self.assertNumQueries(6):
                 """
                 The queries should be:
                     get all public pages
@@ -1179,9 +1214,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                     get all page permissions
                     get all titles
                     get the menu cache key
-                    create a savepoint
                     set the menu cache key
-                    release the savepoint
                 """
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")

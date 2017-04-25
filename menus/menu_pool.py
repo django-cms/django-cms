@@ -107,6 +107,38 @@ class MenuRenderer(object):
         self.site = Site.objects.get_current(request)
         self.draft_mode_active = use_draft(request)
 
+    def _get_cache_key(self, site_id):
+        # This internal will change to a cached property on 3.5
+
+        prefix = getattr(settings, 'CMS_CACHE_PREFIX', 'menu_cache_')
+
+        key = '%smenu_nodes_%s_%s' % (prefix, self.language, site_id)
+
+        if self.request.user.is_authenticated():
+            key += '_%s_user' % self.request.user.pk
+
+        if self.draft_mode_active:
+            key += ':draft'
+        else:
+            key += ':public'
+        return key
+
+    def _is_cached(self, site_id):
+        # This internal will change to a cached property on 3.5
+
+        _internal_cache = '_is_cached_{}'.format(site_id)
+
+        if not hasattr(self, _internal_cache):
+            cache_key = self._get_cache_key(site_id=site_id)
+            db_cache_key_lookup = CacheKey.objects.filter(
+                key=cache_key,
+                language=self.language,
+                site=site_id,
+            )
+            # Cache the lookup to avoid a query on every call to a menu tag
+            setattr(self, _internal_cache, db_cache_key_lookup.exists())
+        return getattr(self, _internal_cache)
+
     def _build_nodes(self, site_id):
         """
         This is slow. Caching must be used.
@@ -130,28 +162,17 @@ class MenuRenderer(object):
                 "It will be removed in django CMS 3.5",
                 PendingDeprecationWarning
             )
-
-        if not site_id:
-            # Backwards compatibility shim for < 3.5 projects
-            # On 3.5, this method will change to no longer receive
-            # a site id.
+        else:
             site_id = self.site.pk
 
-        prefix = getattr(settings, 'CMS_CACHE_PREFIX', 'menu_cache_')
-
-        key = '%smenu_nodes_%s_%s' % (prefix, self.language, site_id)
-
-        if self.request.user.is_authenticated():
-            key += '_%s_user' % self.request.user.pk
-
-        if self.draft_mode_active:
-            key += ':draft'
-        else:
-            key += ':public'
+        key = self._get_cache_key(site_id)
 
         cached_nodes = cache.get(key, None)
 
-        if cached_nodes:
+        if cached_nodes and self._is_cached(site_id):
+            # Only use the cache if the key is present in the database.
+            # This prevents a condition where keys which have been removed
+            # from the database due to a change in content, are still used.
             return cached_nodes
 
         final_nodes = []
@@ -177,12 +198,17 @@ class MenuRenderer(object):
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
-        # We need to have a list of the cache keys for languages and sites that
-        # span several processes - so we follow the Django way and share through
-        # the database. It's still cheaper than recomputing every time!
-        # This way we can selectively invalidate per-site and per-language,
-        # since the cache shared but the keys aren't
-        CacheKey.objects.get_or_create(key=key, language=self.language, site=site_id)
+
+        if not self._is_cached(site_id):
+            # No need to invalidate the internal lookup cache,
+            # just set the value directly.
+            setattr(self, '_is_cached_{}'.format(site_id), True)
+            # We need to have a list of the cache keys for languages and sites that
+            # span several processes - so we follow the Django way and share through
+            # the database. It's still cheaper than recomputing every time!
+            # This way we can selectively invalidate per-site and per-language,
+            # since the cache is shared but the keys aren't
+            CacheKey.objects.create(key=key, language=self.language, site=site_id)
         return final_nodes
 
     def _mark_selected(self, nodes):
@@ -243,7 +269,7 @@ class MenuPool(object):
     def discover_menus(self):
         if self.discovered:
             return
-        # FIXME: Remove in 3.4
+        # FIXME: Remove in 3.5
         load('menu')
         load('cms_menus')
         from menus.modifiers import register
@@ -321,7 +347,7 @@ class MenuPool(object):
 
         if menu_cls.__module__.split('.')[-1] == 'menu':
             warnings.warn('menu.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
+                          'and it will be removed in version 3.5; '
                           'please rename it to cms_menus.py', DeprecationWarning)
         from menus.base import Menu
         assert issubclass(menu_cls, Menu)
@@ -339,7 +365,7 @@ class MenuPool(object):
         source_file = os.path.basename(inspect.stack()[1][1])
         if source_file == 'menu.py':
             warnings.warn('menu.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
+                          'and it will be removed in version 3.5; '
                           'please rename it to cms_menus.py', DeprecationWarning)
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
@@ -368,7 +394,7 @@ class MenuPool(object):
     def apply_modifiers(self, nodes, request, namespace=None, root_id=None,
             post_cut=False, breadcrumb=False):
         warnings.warn('menu_pool.apply_modifiers is deprecated '
-                      'and it will be removed in version 3.4; '
+                      'and it will be removed in version 3.5; '
                       'please use the menu renderer instead.', DeprecationWarning)
         renderer = self.get_renderer(request)
         nodes = renderer.apply_modifiers(
@@ -383,7 +409,7 @@ class MenuPool(object):
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None,
                   breadcrumb=False):
         warnings.warn('menu_pool.get_nodes is deprecated '
-                      'and it will be removed in version 3.4; '
+                      'and it will be removed in version 3.5; '
                       'please use the menu renderer instead.', DeprecationWarning)
         renderer = self.get_renderer(request)
         nodes = renderer.get_nodes(

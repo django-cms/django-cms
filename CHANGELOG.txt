@@ -17,6 +17,10 @@
 * Fixed an issue with JS not being able to determine correct path to async bundle
 * Fixed a ``DoesNotExist`` db error raised when moving a page marked as published but whose public
   translation does not exist.
+* Fixed a bug where the menu would render nodes using the site session variable (set in the admin),
+  instead of the current request site.
+* Fixed a race condition bug where the cache keys on the database were deleted without syncing with the
+  cache server and as a result old menu items would continue to be displayed.
 
 
 === 3.4.3 (2017-04-24) ===
