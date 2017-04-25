@@ -6,11 +6,11 @@
     "patches": [
         {
             "version": "3.4.3",
-            "url": "http://docs.django-cms.org/en/release-3.4.x/upgrade/3.4.2.html"
+            "url": "http://docs.django-cms.org/en/release-3.4.x/upgrade/3.4.3.html"
         },
         {
             "version": "3.3.4",
-            "url": "http://docs.django-cms.org/en/release-3.3.x/upgrade/3.3.3.html"
+            "url": "http://docs.django-cms.org/en/release-3.3.x/upgrade/3.3.4.html"
         },
         {
             "version": "3.2.6",
