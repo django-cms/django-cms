@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
-
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
@@ -91,11 +89,6 @@ class Title(models.Model):
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
 
-        # Published pages should always have a publication date
-        # if the page is published we set the publish date if not set yet.
-        if self.page.publication_date is None and self.published:
-            self.page.publication_date = timezone.now() - timedelta(seconds=5)
-
         if self.publisher_is_draft and not keep_state and self.is_new_dirty():
             self.publisher_state = PUBLISHER_STATE_DIRTY
 
@@ -128,11 +121,8 @@ class Title(models.Model):
 
 
 class EmptyTitle(object):
-
-    def __init__(self, language):
-        self.language = language
-
-    """Empty title object, can be returned from Page.get_title_obj() if required
+    """
+    Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
     """
     title = ""
@@ -145,6 +135,17 @@ class EmptyTitle(object):
     menu_title = ""
     page_title = ""
     published = False
+
+    def __init__(self, language):
+        self.language = language
+
+    def __nonzero__(self):
+        # Python 2 compatibility
+        return False
+
+    def __bool__(self):
+        # Python 3 compatibility
+        return False
 
     @property
     def overwrite_url(self):
