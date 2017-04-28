@@ -38,12 +38,12 @@ class PageView(View):
     def dispatch(self, request, slug):
         self.request = request
         self.slug = slug
-        if self.use_cache():
+        if self.using_cache_is_fine():
             return self.page_from_cache()
         else:
             return self.page_from_database()
 
-    def use_cache(self):
+    def using_cache_is_fine(self):
         return get_cms_setting("PAGE_CACHE") and (
             not hasattr(self.request, 'toolbar') or (
                 not self.request.toolbar.edit_mode and
@@ -72,7 +72,7 @@ class PageView(View):
         self.page = get_page_from_request(self.request, use_path=self.slug)
         self.current_language = self.get_desired_language()
         try:
-            return self.report_page_does_not_exist()
+            return self.render_404()
         except NothingToDo:
             pass
         try:
@@ -95,9 +95,9 @@ class PageView(View):
             return self.redirect_to_login()
         except NothingToDo:
             pass
-        return self.ordinary_page()
+        return self.render_ordinary_page()
 
-    def report_page_does_not_exist(self):
+    def render_404(self):
         if not self.page:
             return _handle_no_page(self.request, self.slug)
         else:
@@ -142,7 +142,7 @@ class PageView(View):
         raise NothingToDo
 
     def follow_page_redirect(self):
-        own_urls = self.get_own_urls()
+        urls_matching_request = self.get_urls_matching_request()
         # Check if the page has a redirect url defined for this language.
         redirect_url = self.page.get_redirect(language=self.current_language)
         if redirect_url:
@@ -154,7 +154,7 @@ class PageView(View):
 
             if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
                 self.request.toolbar.redirect_url = redirect_url
-            elif redirect_url not in own_urls:
+            elif redirect_url not in urls_matching_request:
                 return HttpResponseRedirect(redirect_url)
         raise NothingToDo
 
@@ -165,7 +165,7 @@ class PageView(View):
         else:
             raise NothingToDo
 
-    def ordinary_page(self):
+    def render_ordinary_page(self):
         if hasattr(self.request, 'toolbar'):
             self.request.toolbar.set_object(self.page)
         response = render_page(self.request, self.page, current_language=self.current_language, slug=self.slug)
@@ -179,7 +179,7 @@ class PageView(View):
             language = get_language_code(get_language())
         return language
 
-    def get_own_urls(self):
+    def get_urls_matching_request(self):
         return [
             'http%s://%s%s' % ('s' if self.request.is_secure() else '', self.request.get_host(), self.request.path),
             '/%s' % self.request.path,
@@ -193,7 +193,7 @@ class PageView(View):
         return self.page.get_path(language=self.current_language) or self.page.get_slug(language=self.current_language)
 
     def ugly_language_redirect_code(self):
-        own_urls = self.get_own_urls()
+        urls_matching_request = self.get_urls_matching_request()
         # Check that the current page is available in the desired (current) language
         available_languages = []
         # this will return all languages in draft mode, and published only in live mode
@@ -221,7 +221,7 @@ class PageView(View):
                             pages_root = reverse('pages-root')
                             if (hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode):
                                 self.request.toolbar.redirect_url = pages_root
-                            elif pages_root not in own_urls:
+                            elif pages_root not in urls_matching_request:
                                 return HttpResponseRedirect(pages_root)
                 elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
                     _handle_no_page(self.request, self.slug)
@@ -242,7 +242,7 @@ class PageView(View):
                         if (hasattr(self.request, 'toolbar') and self.request.user.is_staff
                                 and self.request.toolbar.edit_mode):
                             self.request.toolbar.redirect_url = path
-                        elif path not in own_urls:
+                        elif path not in urls_matching_request:
                             return HttpResponseRedirect(path)
                     else:
                         found = True
