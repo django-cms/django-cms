@@ -35,6 +35,10 @@ class PageView(View):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
+    RESPONSE_ATTEMPTS = ['render_404', 'ugly_language_redirect_code',
+                         'redirect_to_correct_slug', 'follow_apphook',
+                         'follow_page_redirect', 'redirect_to_login']
+
     def dispatch(self, request, slug):
         self.request = request
         self.slug = slug
@@ -71,30 +75,12 @@ class PageView(View):
         # Get a Page model object from the self.request
         self.page = get_page_from_request(self.request, use_path=self.slug)
         self.current_language = self.get_desired_language()
-        try:
-            return self.render_404()
-        except NothingToDo:
-            pass
-        try:
-            return self.ugly_language_redirect_code()
-        except NothingToDo:
-            pass
-        try:
-            return self.redirect_to_correct_slug()
-        except NothingToDo:
-            pass
-        try:
-            return self.follow_apphook()
-        except NothingToDo:
-            pass
-        try:
-            return self.follow_page_redirect()
-        except NothingToDo:
-            pass
-        try:
-            return self.redirect_to_login()
-        except NothingToDo:
-            pass
+        for response_name in self.RESPONSE_ATTEMPTS:
+            try:
+                response = getattr(self, response_name)
+                return response()
+            except NothingToDo:
+                continue
         return self.render_ordinary_page()
 
     def render_404(self):
