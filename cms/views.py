@@ -128,7 +128,7 @@ class PageView(View):
                 # add language prefix to url
                 redirect_url = "/%s/%s" % (self.current_language, redirect_url.lstrip("/"))
             try:
-                return self.cms_redirection(redirect_url, check_for_circular_redirection=True)
+                return self.cms_redirection(redirect_url)
             except CircularRedirectionError:
                 pass
         raise NoHttpResponseReturned
@@ -146,12 +146,11 @@ class PageView(View):
         response = render_page(self.request, self.page, current_language=self.current_language, slug=self.slug)
         return response
 
-    def cms_redirection(self, url, check_for_circular_redirection=False):
-        skip_check = not check_for_circular_redirection
+    def cms_redirection(self, url):
         if self.redirects_should_wait():
             self.request.toolbar.redirect_url = url
             raise NoHttpResponseReturned
-        elif skip_check or not self.url_matches_request(url):
+        elif not self.url_matches_request(url):
             return HttpResponseRedirect(url)
         else:
             raise CircularRedirectionError
@@ -225,7 +224,7 @@ class PageView(View):
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
                             try:
-                                return self.cms_redirection(pages_root, check_for_circular_redirection=True)
+                                return self.cms_redirection(pages_root)
                             except CircularRedirectionError:
                                 pass
                 elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
@@ -245,7 +244,7 @@ class PageView(View):
                         # preferred language, *redirect* to the fallback page. This
                         # is a design decision (instead of rendering in place)).
                         try:
-                            return self.cms_redirection(path, check_for_circular_redirection=True)
+                            return self.cms_redirection(path)
                         except CircularRedirectionError:
                             pass
                     else:
