@@ -32,38 +32,51 @@ class PageView(View):
     page.
     """
     def dispatch(self, request, slug):
-        response_timestamp = now()
-        if get_cms_setting("PAGE_CACHE") and (
-            not hasattr(request, 'toolbar') or (
-                not request.toolbar.edit_mode and
-                not request.toolbar.show_toolbar and
-                not request.user.is_authenticated()
-            )
-        ):
-            cache_content = get_page_cache(request)
-            if cache_content is not None:
-                content, headers, expires_datetime = cache_content
-                response = HttpResponse(content)
-                response._headers = headers
-                # Recalculate the max-age header for this cached response
-                max_age = int(
-                    (expires_datetime - response_timestamp).total_seconds() + 0.5)
-                patch_cache_control(response, max_age=max_age)
-                return response
+        self.request = request
+        self.slug = slug
+        if self.use_cache():
+            return self.page_from_cache()
+        else:
+            return self.page_from_database()
 
-        # Get a Page model object from the request
-        page = get_page_from_request(request, use_path=slug)
+    def use_cache(self):
+        return get_cms_setting("PAGE_CACHE") and (
+            not hasattr(self.request, 'toolbar') or (
+                not self.request.toolbar.edit_mode and
+                not self.request.toolbar.show_toolbar and
+                not self.request.user.is_authenticated()
+            )
+        )
+
+    def page_from_cache(self):
+        cache_content = get_page_cache(self.request)
+        if cache_content is not None:
+            response_timestamp = now()
+            content, headers, expires_datetime = cache_content
+            response = HttpResponse(content)
+            response._headers = headers
+            # Recalculate the max-age header for this cached response
+            max_age = int(
+                (expires_datetime - response_timestamp).total_seconds() + 0.5)
+            patch_cache_control(response, max_age=max_age)
+            return response
+        else:
+            return self.page_from_database()
+
+    def page_from_database(self):
+        # Get a Page model object from the self.request
+        page = get_page_from_request(self.request, use_path=self.slug)
         if not page:
-            return _handle_no_page(request, slug)
-        current_language = request.GET.get('language', None)
+            return _handle_no_page(self.request, self.slug)
+        current_language = self.request.GET.get('language', None)
         if not current_language:
-            current_language = request.POST.get('language', None)
+            current_language = self.request.POST.get('language', None)
         if current_language:
             current_language = get_language_code(current_language)
             if current_language not in get_language_list(page.site_id):
                 current_language = None
         if current_language is None:
-            current_language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
+            current_language = get_language_code(getattr(self.request, 'LANGUAGE_CODE', None))
             if current_language:
                 current_language = get_language_code(current_language)
                 if current_language not in get_language_list(page.site_id):
@@ -74,7 +87,7 @@ class PageView(View):
         available_languages = []
         # this will return all languages in draft mode, and published only in live mode
         page_languages = list(page.get_published_languages())
-        if hasattr(request, 'user') and request.user.is_staff:
+        if hasattr(self.request, 'user') and self.request.user.is_staff:
             user_languages = get_language_list()
         else:
             user_languages = get_public_languages()
@@ -83,62 +96,62 @@ class PageView(View):
                 available_languages.append(frontend_lang)
         # Check that the language is in FRONTEND_LANGUAGES:
         own_urls = [
-            'http%s://%s%s' % ('s' if request.is_secure() else '', request.get_host(), request.path),
-            '/%s' % request.path,
-            request.path,
+            'http%s://%s%s' % ('s' if self.request.is_secure() else '', self.request.get_host(), self.request.path),
+            '/%s' % self.request.path,
+            self.request.path,
         ]
         if current_language not in user_languages:
             #are we on root?
-            if not slug:
+            if not self.slug:
                 #redirect to supported language
                 languages = []
                 for language in available_languages:
                     languages.append((language, language))
                 if languages:
                     # get supported language
-                    new_language = get_language_from_request(request)
+                    new_language = get_language_from_request(self.request)
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
-                            if (hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode):
-                                request.toolbar.redirect_url = pages_root
+                            if (hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode):
+                                self.request.toolbar.redirect_url = pages_root
                             elif pages_root not in own_urls:
                                 return HttpResponseRedirect(pages_root)
-                elif not hasattr(request, 'toolbar') or not request.toolbar.redirect_url:
-                    _handle_no_page(request, slug)
+                elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
+                    _handle_no_page(self.request, self.slug)
             else:
-                return _handle_no_page(request, slug)
+                return _handle_no_page(self.request, self.slug)
         if current_language not in available_languages:
             # If we didn't find the required page in the requested (current)
             # language, let's try to find a fallback
             found = False
             for alt_lang in get_fallback_languages(current_language):
                 if alt_lang in available_languages:
-                    if get_redirect_on_fallback(current_language) or slug == "":
+                    if get_redirect_on_fallback(current_language) or self.slug == "":
                         with force_language(alt_lang):
                             path = page.get_absolute_url(language=alt_lang, fallback=True)
                             # In the case where the page is not available in the
                         # preferred language, *redirect* to the fallback page. This
                         # is a design decision (instead of rendering in place)).
-                        if (hasattr(request, 'toolbar') and request.user.is_staff
-                                and request.toolbar.edit_mode):
-                            request.toolbar.redirect_url = path
+                        if (hasattr(self.request, 'toolbar') and self.request.user.is_staff
+                                and self.request.toolbar.edit_mode):
+                            self.request.toolbar.redirect_url = path
                         elif path not in own_urls:
                             return HttpResponseRedirect(path)
                     else:
                         found = True
-            if not found and (not hasattr(request, 'toolbar') or not request.toolbar.redirect_url):
+            if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
                 # There is a page object we can't find a proper language to render it
-                _handle_no_page(request, slug)
+                _handle_no_page(self.request, self.slug)
         else:
             page_path = page.get_absolute_url(language=current_language)
             page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
 
-            if slug and slug != page_slug and request.path[:len(page_path)] != page_path:
+            if self.slug and self.slug != page_slug and self.request.path[:len(page_path)] != page_path:
                 # The current language does not match it's slug.
                 #  Redirect to the current language.
-                if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
-                    request.toolbar.redirect_url = page_path
+                if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
+                    self.request.toolbar.redirect_url = page_path
                 else:
                     return HttpResponseRedirect(page_path)
 
@@ -151,8 +164,8 @@ class PageView(View):
             # Check for apphooks! This time for real!
             app_urls = page.get_application_urls(current_language, False)
             skip_app = False
-            if (not page.is_published(current_language) and hasattr(request, 'toolbar')
-                    and request.toolbar.edit_mode):
+            if (not page.is_published(current_language) and hasattr(self.request, 'toolbar')
+                    and self.request.toolbar.edit_mode):
                 skip_app = True
             if app_urls and not skip_app:
                 app = apphook_pool.get_apphook(app_urls)
@@ -162,7 +175,7 @@ class PageView(View):
                         pattern_list += urlpatterns
                     try:
                         view, args, kwargs = resolve('/', tuple(pattern_list))
-                        return view(request, *args, **kwargs)
+                        return view(self.request, *args, **kwargs)
                     except Resolver404:
                         pass
         # Check if the page has a redirect url defined for this language.
@@ -174,16 +187,16 @@ class PageView(View):
                 redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
                 # prevent redirect to self
 
-            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
-                request.toolbar.redirect_url = redirect_url
+            if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
+                self.request.toolbar.redirect_url = redirect_url
             elif redirect_url not in own_urls:
                 return HttpResponseRedirect(redirect_url)
 
         # permission checks
-        if page.login_required and not request.user.is_authenticated():
-            return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
-        if hasattr(request, 'toolbar'):
-            request.toolbar.set_object(page)
+        if page.login_required and not self.request.user.is_authenticated():
+            return redirect_to_login(urlquote(self.request.get_full_path()), settings.LOGIN_URL)
+        if hasattr(self.request, 'toolbar'):
+            self.request.toolbar.set_object(page)
 
-        response = render_page(request, page, current_language=current_language, slug=slug)
+        response = render_page(self.request, page, current_language=current_language, slug=self.slug)
         return response
