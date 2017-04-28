@@ -70,29 +70,20 @@ class PageView(View):
     def page_from_database(self):
         # Get a Page model object from the self.request
         page = get_page_from_request(self.request, use_path=self.slug)
-        if not page:
-            return _handle_no_page(self.request, self.slug)
         current_language = self.get_desired_language(page)
-        own_urls = [
-            'http%s://%s%s' % ('s' if self.request.is_secure() else '', self.request.get_host(), self.request.path),
-            '/%s' % self.request.path,
-            self.request.path,
-        ]
+        own_urls = self.get_own_urls()
+        try:
+            return self.report_page_does_not_exist(page)
+        except NothingToDo:
+            pass
         try:
             return self.ugly_language_redirect_code(page, current_language, own_urls)
         except NothingToDo:
             pass
-        page_path = page.get_absolute_url(language=current_language)
-        page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
-
-        if self.slug and self.slug != page_slug and self.request.path[:len(page_path)] != page_path:
-            # The current language does not match it's slug.
-            #  Redirect to the current language.
-            if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
-                self.request.toolbar.redirect_url = page_path
-            else:
-                return HttpResponseRedirect(page_path)
-
+        try:
+            return self.redirect_to_correct_slug(page, current_language)
+        except NothingToDo:
+            pass
         try:
             return self.follow_apphook(page, current_language)
         except NothingToDo:
@@ -105,11 +96,25 @@ class PageView(View):
             return self.redirect_to_login(page)
         except NothingToDo:
             pass
+        return self.ordinary_page(page, current_language)
 
-        if hasattr(self.request, 'toolbar'):
-            self.request.toolbar.set_object(page)
-        response = render_page(self.request, page, current_language=current_language, slug=self.slug)
-        return response
+    def report_page_does_not_exist(self, page):
+        if not page:
+            return _handle_no_page(self.request, self.slug)
+        else:
+            raise NothingToDo
+
+    def redirect_to_correct_slug(self, page, current_language):
+        page_path = self.get_page_path(page, current_language)
+        page_slug = self.get_page_slug(page, current_language)
+        if self.slug and self.slug != page_slug and self.request.path[:len(page_path)] != page_path:
+            # The current language does not match it's slug.
+            #  Redirect to the current language.
+            if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
+                self.request.toolbar.redirect_url = page_path
+            else:
+                return HttpResponseRedirect(page_path)
+        raise NothingToDo
 
     def follow_apphook(self, page, current_language):
         if apphook_pool.get_apphooks():
@@ -160,6 +165,12 @@ class PageView(View):
         else:
             raise NothingToDo
 
+    def ordinary_page(self, page, current_language):
+        if hasattr(self.request, 'toolbar'):
+            self.request.toolbar.set_object(page)
+        response = render_page(self.request, page, current_language=current_language, slug=self.slug)
+        return response
+
     def get_desired_language(self, page):
         language = get_desired_language(self.request, page)
         if not language:
@@ -167,6 +178,19 @@ class PageView(View):
             # This is not present in cms.utils.get_desired_language.
             language = get_language_code(get_language())
         return language
+
+    def get_own_urls(self):
+        return [
+            'http%s://%s%s' % ('s' if self.request.is_secure() else '', self.request.get_host(), self.request.path),
+            '/%s' % self.request.path,
+            self.request.path,
+        ]
+
+    def get_page_path(self, page, current_language):
+        return page.get_absolute_url(language=current_language)
+
+    def get_page_slug(self, page, current_language):
+        return page.get_path(language=current_language) or page.get_slug(language=current_language)
 
     def ugly_language_redirect_code(self, page, current_language, own_urls):
         # Check that the current page is available in the desired (current) language
