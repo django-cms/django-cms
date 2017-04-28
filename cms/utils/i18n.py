@@ -178,3 +178,19 @@ def is_language_prefix_patterns_used():
     """
     return any(isinstance(url_pattern, LocaleRegexURLResolver)
                for url_pattern in get_resolver(None).url_patterns)
+
+
+def complete_i18n_url(url, language_code):
+    """
+    Adds the language prefix if it is required and missing
+    :param url:
+    :param language_code:
+    :return: URL
+    """
+    if (
+        is_language_prefix_patterns_used()
+        and url[0] == "/"
+        and not url.startswith('/%s/' % language_code)
+    ):
+        url = "/%s/%s" % (language_code, url.lstrip("/"))
+    return url

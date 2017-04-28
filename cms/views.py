@@ -16,8 +16,8 @@ from cms.cache.page import get_page_cache
 from cms.page_rendering import _handle_no_page, render_page
 from cms.utils import get_language_from_request, get_cms_setting, get_desired_language
 from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
-                            get_redirect_on_fallback, get_language_list,
-                            is_language_prefix_patterns_used, get_language_code)
+                            get_redirect_on_fallback, get_language_list, complete_i18n_url,
+                            get_language_code)
 from cms.utils.page_resolver import get_page_from_request
 
 
@@ -123,10 +123,7 @@ class PageView(View):
         # Check if the page has a redirect url defined for this language.
         redirect_url = self.page.get_redirect(language=self.current_language)
         if redirect_url:
-            if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
-                    and not redirect_url.startswith('/%s/' % self.current_language)):
-                # add language prefix to url
-                redirect_url = "/%s/%s" % (self.current_language, redirect_url.lstrip("/"))
+            redirect_url = complete_i18n_url(redirect_url, self.current_language)
             try:
                 return self.cms_redirection(redirect_url)
             except CircularRedirectionError:
