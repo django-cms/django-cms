@@ -38,10 +38,7 @@ def get_template_from_request(request, obj=None, no_current_page=False):
     return get_cms_setting('TEMPLATES')[0][0]
 
 
-def get_language_from_request(request, current_page=None):
-    """
-    Return the most obvious language according the request
-    """
+def get_desired_language(request, current_page=None):
     language = None
     if hasattr(request, 'POST'):
         language = request.POST.get('language', None)
@@ -57,7 +54,15 @@ def get_language_from_request(request, current_page=None):
     if language:
         if not language in get_language_list(site_id):
             language = None
+    return language
 
+
+def get_language_from_request(request, current_page=None):
+    """
+    Return the most obvious language according the request
+    """
+    language = get_desired_language(request, current_page)
+    site_id = current_page.site_id if current_page else None
     if not language and current_page:
         # in last resort, get the first language available in the page
         languages = current_page.get_languages()

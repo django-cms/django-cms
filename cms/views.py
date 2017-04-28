@@ -5,19 +5,19 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.cache import patch_cache_control
+from django.utils.translation import get_language
 from django.utils.http import urlquote
 from django.utils.timezone import now
-from django.utils.translation import get_language
 from django.views.generic import View
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.cache.page import get_page_cache
 from cms.page_rendering import _handle_no_page, render_page
-from cms.utils import get_language_code, get_language_from_request, get_cms_setting
+from cms.utils import get_language_from_request, get_cms_setting, get_desired_language
 from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
-                            is_language_prefix_patterns_used)
+                            is_language_prefix_patterns_used, get_language_code)
 from cms.utils.page_resolver import get_page_from_request
 
 
@@ -72,7 +72,7 @@ class PageView(View):
         page = get_page_from_request(self.request, use_path=self.slug)
         if not page:
             return _handle_no_page(self.request, self.slug)
-        current_language = self.get_current_language(page)
+        current_language = self.get_desired_language(page)
         # Check that the current page is available in the desired (current) language
         available_languages = []
         # this will return all languages in draft mode, and published only in live mode
@@ -212,20 +212,10 @@ class PageView(View):
         else:
             raise NothingToDo
 
-    def get_current_language(self, page):
-        current_language = self.request.GET.get('language', None)
-        if not current_language:
-            current_language = self.request.POST.get('language', None)
-        if current_language:
-            current_language = get_language_code(current_language)
-            if current_language not in get_language_list(page.site_id):
-                current_language = None
-        if current_language is None:
-            current_language = get_language_code(getattr(self.request, 'LANGUAGE_CODE', None))
-            if current_language:
-                current_language = get_language_code(current_language)
-                if current_language not in get_language_list(page.site_id):
-                    current_language = None
-        if current_language is None:
-            current_language = get_language_code(get_language())
-        return current_language
+    def get_desired_language(self, page):
+        language = get_desired_language(self.request, page)
+        if not language:
+            # TODO: What is the use case for this?
+            # This is not present in cms.utils.get_desired_language.
+            language = get_language_code(get_language())
+        return language
