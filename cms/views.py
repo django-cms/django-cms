@@ -21,7 +21,7 @@ from cms.utils.i18n import (get_fallback_languages, force_language, get_public_l
 from cms.utils.page_resolver import get_page_from_request
 
 
-class NothingToDo(Exception):
+class NoHttpResponseReturned(Exception):
     pass
 
 
@@ -74,7 +74,7 @@ class PageView(View):
             try:
                 response = getattr(self, response_name)
                 return response()
-            except NothingToDo:
+            except NoHttpResponseReturned:
                 continue
         return self.render_ordinary_page()
 
@@ -82,7 +82,7 @@ class PageView(View):
         if not self.page:
             return _handle_no_page(self.request, self.slug)
         else:
-            raise NothingToDo
+            raise NoHttpResponseReturned
 
     def redirect_to_correct_slug(self):
         page_path = self.get_page_path()
@@ -91,7 +91,7 @@ class PageView(View):
             # The current language does not match it's slug.
             #  Redirect to the current language.
             return self.cms_redirection(page_path)
-        raise NothingToDo
+        raise NoHttpResponseReturned
 
     def follow_apphook(self):
         if apphook_pool.get_apphooks():
@@ -117,7 +117,7 @@ class PageView(View):
                         return view(self.request, *args, **kwargs)
                     except Resolver404:
                         pass
-        raise NothingToDo
+        raise NoHttpResponseReturned
 
     def follow_page_redirect(self):
         # Check if the page has a redirect url defined for this language.
@@ -131,14 +131,14 @@ class PageView(View):
                 return self.cms_redirection(redirect_url, check_for_circular_redirection=True)
             except CircularRedirectionError:
                 pass
-        raise NothingToDo
+        raise NoHttpResponseReturned
 
     def redirect_to_login(self):
         # permission checks
         if self.page.login_required and not self.request.user.is_authenticated():
             return redirect_to_login(urlquote(self.request.get_full_path()), settings.LOGIN_URL)
         else:
-            raise NothingToDo
+            raise NoHttpResponseReturned
 
     def render_ordinary_page(self):
         if hasattr(self.request, 'toolbar'):
@@ -150,7 +150,7 @@ class PageView(View):
         skip_check = not check_for_circular_redirection
         if self.redirects_should_wait():
             self.request.toolbar.redirect_url = url
-            raise NothingToDo
+            raise NoHttpResponseReturned
         elif skip_check or not self.url_matches_request(url):
             return HttpResponseRedirect(url)
         else:
@@ -253,4 +253,4 @@ class PageView(View):
             if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
                 # There is a page object we can't find a proper language to render it
                 _handle_no_page(self.request, self.slug)
-        raise NothingToDo
+        raise NoHttpResponseReturned
