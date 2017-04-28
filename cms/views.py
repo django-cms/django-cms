@@ -21,6 +21,10 @@ from cms.utils.i18n import (get_fallback_languages, force_language, get_public_l
 from cms.utils.page_resolver import get_page_from_request
 
 
+class NothingToDo(Exception):
+    pass
+
+
 def details(request, slug):
     view = PageView.as_view()
     return view(request, slug)
@@ -141,6 +145,25 @@ class PageView(View):
                 else:
                     return HttpResponseRedirect(page_path)
 
+        try:
+            return self.follow_apphook(page, current_language)
+        except NothingToDo:
+            pass
+        try:
+            return self.follow_page_redirect(page, current_language, own_urls)
+        except NothingToDo:
+            pass
+        try:
+            return self.redirect_to_login(page)
+        except NothingToDo:
+            pass
+
+        if hasattr(self.request, 'toolbar'):
+            self.request.toolbar.set_object(page)
+        response = render_page(self.request, page, current_language=current_language, slug=self.slug)
+        return response
+
+    def follow_apphook(self, page, current_language):
         if apphook_pool.get_apphooks():
             # There are apphooks in the pool. Let's see if there is one for the
             # current page
@@ -164,6 +187,9 @@ class PageView(View):
                         return view(self.request, *args, **kwargs)
                     except Resolver404:
                         pass
+        raise NothingToDo
+
+    def follow_page_redirect(self, page, current_language, own_urls):
         # Check if the page has a redirect url defined for this language.
         redirect_url = page.get_redirect(language=current_language)
         if redirect_url:
@@ -177,15 +203,14 @@ class PageView(View):
                 self.request.toolbar.redirect_url = redirect_url
             elif redirect_url not in own_urls:
                 return HttpResponseRedirect(redirect_url)
+        raise NothingToDo
 
+    def redirect_to_login(self, page):
         # permission checks
         if page.login_required and not self.request.user.is_authenticated():
             return redirect_to_login(urlquote(self.request.get_full_path()), settings.LOGIN_URL)
-        if hasattr(self.request, 'toolbar'):
-            self.request.toolbar.set_object(page)
-
-        response = render_page(self.request, page, current_language=current_language, slug=self.slug)
-        return response
+        else:
+            raise NothingToDo
 
     def get_current_language(self, page):
         current_language = self.request.GET.get('language', None)
