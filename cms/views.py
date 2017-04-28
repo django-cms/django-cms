@@ -68,21 +68,7 @@ class PageView(View):
         page = get_page_from_request(self.request, use_path=self.slug)
         if not page:
             return _handle_no_page(self.request, self.slug)
-        current_language = self.request.GET.get('language', None)
-        if not current_language:
-            current_language = self.request.POST.get('language', None)
-        if current_language:
-            current_language = get_language_code(current_language)
-            if current_language not in get_language_list(page.site_id):
-                current_language = None
-        if current_language is None:
-            current_language = get_language_code(getattr(self.request, 'LANGUAGE_CODE', None))
-            if current_language:
-                current_language = get_language_code(current_language)
-                if current_language not in get_language_list(page.site_id):
-                    current_language = None
-        if current_language is None:
-            current_language = get_language_code(get_language())
+        current_language = self.get_current_language(page)
         # Check that the current page is available in the desired (current) language
         available_languages = []
         # this will return all languages in draft mode, and published only in live mode
@@ -200,3 +186,21 @@ class PageView(View):
 
         response = render_page(self.request, page, current_language=current_language, slug=self.slug)
         return response
+
+    def get_current_language(self, page):
+        current_language = self.request.GET.get('language', None)
+        if not current_language:
+            current_language = self.request.POST.get('language', None)
+        if current_language:
+            current_language = get_language_code(current_language)
+            if current_language not in get_language_list(page.site_id):
+                current_language = None
+        if current_language is None:
+            current_language = get_language_code(getattr(self.request, 'LANGUAGE_CODE', None))
+            if current_language:
+                current_language = get_language_code(current_language)
+                if current_language not in get_language_list(page.site_id):
+                    current_language = None
+        if current_language is None:
+            current_language = get_language_code(get_language())
+        return current_language
