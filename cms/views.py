@@ -25,6 +25,10 @@ class NothingToDo(Exception):
     pass
 
 
+class CircularRedirectionError(Exception):
+    pass
+
+
 def details(request, slug):
     view = PageView.as_view()
     return view(request, slug)
@@ -46,15 +50,6 @@ class PageView(View):
             return self.page_from_cache()
         else:
             return self.page_from_database()
-
-    def using_cache_is_fine(self):
-        return get_cms_setting("PAGE_CACHE") and (
-            not hasattr(self.request, 'toolbar') or (
-                not self.request.toolbar.edit_mode and
-                not self.request.toolbar.show_toolbar and
-                not self.request.user.is_authenticated()
-            )
-        )
 
     def page_from_cache(self):
         cache_content = get_page_cache(self.request)
@@ -95,10 +90,7 @@ class PageView(View):
         if self.slug and self.slug != page_slug and self.request.path[:len(page_path)] != page_path:
             # The current language does not match it's slug.
             #  Redirect to the current language.
-            if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
-                self.request.toolbar.redirect_url = page_path
-            else:
-                return HttpResponseRedirect(page_path)
+            return self.cms_redirection(page_path)
         raise NothingToDo
 
     def follow_apphook(self):
@@ -128,7 +120,6 @@ class PageView(View):
         raise NothingToDo
 
     def follow_page_redirect(self):
-        urls_matching_request = self.get_urls_matching_request()
         # Check if the page has a redirect url defined for this language.
         redirect_url = self.page.get_redirect(language=self.current_language)
         if redirect_url:
@@ -136,12 +127,10 @@ class PageView(View):
                     and not redirect_url.startswith('/%s/' % self.current_language)):
                 # add language prefix to url
                 redirect_url = "/%s/%s" % (self.current_language, redirect_url.lstrip("/"))
-                # prevent redirect to self
-
-            if hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode:
-                self.request.toolbar.redirect_url = redirect_url
-            elif redirect_url not in urls_matching_request:
-                return HttpResponseRedirect(redirect_url)
+            try:
+                return self.cms_redirection(redirect_url, check_for_circular_redirection=True)
+            except CircularRedirectionError:
+                pass
         raise NothingToDo
 
     def redirect_to_login(self):
@@ -157,6 +146,44 @@ class PageView(View):
         response = render_page(self.request, self.page, current_language=self.current_language, slug=self.slug)
         return response
 
+    def cms_redirection(self, url, check_for_circular_redirection=False):
+        skip_check = not check_for_circular_redirection
+        if self.redirects_should_wait():
+            self.request.toolbar.redirect_url = url
+            raise NothingToDo
+        elif skip_check or not self.url_matches_request(url):
+            return HttpResponseRedirect(url)
+        else:
+            raise CircularRedirectionError
+
+    def using_cache_is_fine(self):
+        return get_cms_setting("PAGE_CACHE") and (
+            not hasattr(self.request, 'toolbar') or (
+                not self.request.toolbar.edit_mode and
+                not self.request.toolbar.show_toolbar and
+                not self.request.user.is_authenticated()
+            )
+        )
+
+    def redirects_should_wait(self):
+        """
+        Determine who should see a message about the redirect
+        instead of being redirected.
+        """
+        return (
+            hasattr(self.request, 'toolbar')
+            and self.request.user.is_staff
+            and self.request.toolbar.edit_mode
+        )
+
+    def url_matches_request(self, url):
+        url_variants = [
+            'http%s://%s%s' % ('s' if self.request.is_secure() else '', self.request.get_host(), self.request.path),
+            '/%s' % self.request.path,
+            self.request.path,
+        ]
+        return url in url_variants
+
     def get_desired_language(self):
         language = get_desired_language(self.request, self.page)
         if not language:
@@ -165,13 +192,6 @@ class PageView(View):
             language = get_language_code(get_language())
         return language
 
-    def get_urls_matching_request(self):
-        return [
-            'http%s://%s%s' % ('s' if self.request.is_secure() else '', self.request.get_host(), self.request.path),
-            '/%s' % self.request.path,
-            self.request.path,
-        ]
-
     def get_page_path(self):
         return self.page.get_absolute_url(language=self.current_language)
 
@@ -179,7 +199,6 @@ class PageView(View):
         return self.page.get_path(language=self.current_language) or self.page.get_slug(language=self.current_language)
 
     def ugly_language_redirect_code(self):
-        urls_matching_request = self.get_urls_matching_request()
         # Check that the current page is available in the desired (current) language
         available_languages = []
         # this will return all languages in draft mode, and published only in live mode
@@ -205,10 +224,10 @@ class PageView(View):
                     if new_language in get_public_languages():
                         with force_language(new_language):
                             pages_root = reverse('pages-root')
-                            if (hasattr(self.request, 'toolbar') and self.request.user.is_staff and self.request.toolbar.edit_mode):
-                                self.request.toolbar.redirect_url = pages_root
-                            elif pages_root not in urls_matching_request:
-                                return HttpResponseRedirect(pages_root)
+                            try:
+                                return self.cms_redirection(pages_root, check_for_circular_redirection=True)
+                            except CircularRedirectionError:
+                                pass
                 elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
                     _handle_no_page(self.request, self.slug)
             else:
@@ -225,11 +244,10 @@ class PageView(View):
                             # In the case where the page is not available in the
                         # preferred language, *redirect* to the fallback page. This
                         # is a design decision (instead of rendering in place)).
-                        if (hasattr(self.request, 'toolbar') and self.request.user.is_staff
-                                and self.request.toolbar.edit_mode):
-                            self.request.toolbar.redirect_url = path
-                        elif path not in urls_matching_request:
-                            return HttpResponseRedirect(path)
+                        try:
+                            return self.cms_redirection(path, check_for_circular_redirection=True)
+                        except CircularRedirectionError:
+                            pass
                     else:
                         found = True
             if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
