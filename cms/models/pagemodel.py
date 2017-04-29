@@ -1004,6 +1004,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             return self.__class__.get_tree(self).exclude(pk=self.pk).filter(site_id=self.site_id)
 
     def get_published_languages(self):
+        # TODO: this function name is misleading.
         if self.publisher_is_draft:
             return self.get_languages()
         return sorted([language for language in self.get_languages() if self.is_published(language)])

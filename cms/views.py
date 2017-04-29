@@ -37,7 +37,8 @@ class PageView(View):
     """
     RESPONSE_ATTEMPTS = [
         'render_404_if_appropriate',
-        'ugly_language_redirect_code',
+        'redirect_root_url_if_appropriate',
+        'redirect_to_fallback_language_if_appropriate',
         'redirect_to_correct_slug_if_appropriate',
         'follow_apphook_if_appropriate',
         'follow_page_redirect_if_appropriate',
@@ -81,6 +82,42 @@ class PageView(View):
     def render_404_if_appropriate(self):
         if not self.page:
             return _handle_no_page(self.request, self.slug)
+
+    def redirect_root_url_if_appropriate(self):
+        user_languages = get_visible_languages(self.request)
+        # Check that the language is in FRONTEND_LANGUAGES:
+        if self.current_language not in user_languages:
+            if self.root_url_is_requested():
+                #redirect to supported language
+                available_languages = self.get_available_languages()
+                languages = []
+                for language in available_languages:
+                    languages.append((language, language))
+                if languages:
+                    # get supported language
+                    new_language = get_language_from_request(self.request)
+                    if new_language in get_public_languages():
+                        return self.cms_language_redirection(new_language)
+                elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
+                    _handle_no_page(self.request, self.slug)
+            else:
+                return _handle_no_page(self.request, self.slug)
+
+    def redirect_to_fallback_language_if_appropriate(self):
+        available_languages = self.get_available_languages()
+        if self.current_language not in available_languages:
+            # If we didn't find the required page in the requested (current)
+            # language, let's try to find a fallback
+            found = False
+            for alt_lang in get_fallback_languages(self.current_language):
+                if alt_lang in available_languages:
+                    if get_redirect_on_fallback(self.current_language) or self.slug == "":
+                        return self.cms_language_redirection(alt_lang)
+                    else:
+                        found = True
+            if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
+                # There is a page object we can't find a proper language to render it
+                _handle_no_page(self.request, self.slug)
 
     def redirect_to_correct_slug_if_appropriate(self):
         page_path = self.get_page_path()
@@ -180,7 +217,7 @@ class PageView(View):
         ]
         return url in url_variants
 
-    def page_root_is_requested(self):
+    def root_url_is_requested(self):
         return not self.slug
 
     def get_desired_language(self):
@@ -191,47 +228,15 @@ class PageView(View):
             language = get_language_code(get_language())
         return language
 
+    def get_available_languages(self):
+        user_languages = get_visible_languages(self.request)
+        # this will return all languages in draft mode, and published only in live mode
+        page_languages = self.page.get_published_languages()
+        intersection = set(user_languages) & set(page_languages)
+        return intersection
+
     def get_page_path(self):
         return self.page.get_absolute_url(language=self.current_language)
 
     def get_page_slug(self):
         return self.page.get_path(language=self.current_language) or self.page.get_slug(language=self.current_language)
-
-    def ugly_language_redirect_code(self):
-        # Check that the current page is available in the desired (current) language
-        available_languages = []
-        # this will return all languages in draft mode, and published only in live mode
-        page_languages = list(self.page.get_published_languages())
-        user_languages = get_visible_languages(self.request)
-        for frontend_lang in user_languages:
-            if frontend_lang in page_languages:
-                available_languages.append(frontend_lang)
-        # Check that the language is in FRONTEND_LANGUAGES:
-        if self.current_language not in user_languages:
-            if self.page_root_is_requested():
-                #redirect to supported language
-                languages = []
-                for language in available_languages:
-                    languages.append((language, language))
-                if languages:
-                    # get supported language
-                    new_language = get_language_from_request(self.request)
-                    if new_language in get_public_languages():
-                        return self.cms_language_redirection(new_language)
-                elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
-                    _handle_no_page(self.request, self.slug)
-            else:
-                return _handle_no_page(self.request, self.slug)
-        if self.current_language not in available_languages:
-            # If we didn't find the required page in the requested (current)
-            # language, let's try to find a fallback
-            found = False
-            for alt_lang in get_fallback_languages(self.current_language):
-                if alt_lang in available_languages:
-                    if get_redirect_on_fallback(self.current_language) or self.slug == "":
-                        return self.cms_language_redirection(alt_lang)
-                    else:
-                        found = True
-            if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
-                # There is a page object we can't find a proper language to render it
-                _handle_no_page(self.request, self.slug)
