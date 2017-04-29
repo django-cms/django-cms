@@ -38,7 +38,7 @@ class PageView(View):
     RESPONSE_ATTEMPTS = [
         'render_404_if_appropriate',
         'redirect_root_url_if_appropriate',
-        'redirect_to_fallback_language_if_appropriate',
+        'deal_with_missing_language_if_appropriate',
         'redirect_to_correct_slug_if_appropriate',
         'follow_apphook_if_appropriate',
         'follow_page_redirect_if_appropriate',
@@ -103,20 +103,13 @@ class PageView(View):
             else:
                 return _handle_no_page(self.request, self.slug)
 
-    def redirect_to_fallback_language_if_appropriate(self):
+    def deal_with_missing_language_if_appropriate(self):
         available_languages = self.get_available_languages()
         if self.current_language not in available_languages:
-            # If we didn't find the required page in the requested (current)
-            # language, let's try to find a fallback
-            found = False
-            for alt_lang in get_fallback_languages(self.current_language):
-                if alt_lang in available_languages:
-                    if get_redirect_on_fallback(self.current_language) or self.slug == "":
-                        return self.cms_language_redirection(alt_lang)
-                    else:
-                        found = True
-            if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
-                # There is a page object we can't find a proper language to render it
+            fallback_language = self.get_fallback_language()
+            if fallback_language and self.redirect_to_fallback_language_is_fine():
+                return self.cms_language_redirection(fallback_language)
+            if not fallback_language and not self.toolbar_has_redirect():
                 _handle_no_page(self.request, self.slug)
 
     def redirect_to_correct_slug_if_appropriate(self):
@@ -203,6 +196,18 @@ class PageView(View):
             or not self.request.toolbar.edit_mode
         )
 
+    def redirect_to_fallback_language_is_fine(self):
+        return (
+            get_redirect_on_fallback(self.current_language)
+            or self.slug == ""
+        )
+
+    def toolbar_has_redirect(self):
+        return (
+            hasattr(self.request, 'toolbar')
+            and self.request.toolbar.redirect_url
+        )
+
     def redirect_to_login_is_necessary(self):
         return (
             self.page.login_required
@@ -234,6 +239,12 @@ class PageView(View):
         page_languages = self.page.get_published_languages()
         intersection = set(user_languages) & set(page_languages)
         return intersection
+
+    def get_fallback_language(self):
+        available_languages = self.get_available_languages()
+        for language in get_fallback_languages(self.current_language):
+            if language in available_languages:
+                return language
 
     def get_page_path(self):
         return self.page.get_absolute_url(language=self.current_language)
