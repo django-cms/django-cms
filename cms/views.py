@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import resolve, Resolver404, reverse
+from django.core.urlresolvers import Resolver404, reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.cache import patch_cache_control
 from django.utils.translation import get_language
@@ -11,7 +11,7 @@ from django.utils.timezone import now
 from django.views.generic import View
 
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import get_app_urls, get_app_response_for_page
+from cms.appresolver import get_app_response_for_page
 from cms.cache.page import get_page_cache
 from cms.page_rendering import _handle_no_page, render_page
 from cms.utils import get_language_from_request, get_cms_setting, get_desired_language
@@ -115,9 +115,10 @@ class PageView(View):
         raise NoHttpResponseReturned
 
     def redirect_to_login(self):
-        # permission checks
-        if self.page.login_required and not self.request.user.is_authenticated():
-            return redirect_to_login(urlquote(self.request.get_full_path()), settings.LOGIN_URL)
+        if self.redirect_to_login_is_necessary():
+            url = self.request.get_full_path()
+            quoted_url = urlquote(url)
+            return redirect_to_login(quoted_url, settings.LOGIN_URL)
         else:
             raise NoHttpResponseReturned
 
@@ -164,6 +165,12 @@ class PageView(View):
             self.page.is_published(self.current_language)
             or not hasattr(self.request, 'toolbar')
             or not self.request.toolbar.edit_mode
+        )
+
+    def redirect_to_login_is_necessary(self):
+        return (
+            self.page.login_required
+            and not self.request.user.is_authenticated()
         )
 
     def url_matches_request(self, url):
