@@ -182,6 +182,24 @@ def get_patterns_for_title(path, title):
     return url_patterns
 
 
+def get_app_response_for_page(page, language_code, request):
+    """
+    Get the view matching a page and language_code.
+    If no view matches, return nothing or raise Resolver404 (implicitly).
+    """
+    # TODO: I don't understand, why the logic her is so different from
+    # the logic in `get_patterns_for_title`, above.
+    app_urls = page.get_application_urls(language_code, False)
+    if app_urls:
+        app = apphook_pool.get_apphook(app_urls)
+        pattern_list = []
+        if app:
+            for urlpatterns in get_app_urls(app.get_urls(page, language_code)):
+                pattern_list += urlpatterns
+            view, args, kwargs = resolve('/', tuple(pattern_list))
+            return view(request, *args, **kwargs)
+
+
 def get_app_patterns():
     try:
         return _get_app_patterns()

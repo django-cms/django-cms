@@ -11,7 +11,7 @@ from django.utils.timezone import now
 from django.views.generic import View
 
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import get_app_urls
+from cms.appresolver import get_app_urls, get_app_response_for_page
 from cms.cache.page import get_page_cache
 from cms.page_rendering import _handle_no_page, render_page
 from cms.utils import get_language_from_request, get_cms_setting, get_desired_language
@@ -94,29 +94,13 @@ class PageView(View):
         raise NoHttpResponseReturned
 
     def follow_apphook(self):
-        if apphook_pool.get_apphooks():
-            # There are apphooks in the pool. Let's see if there is one for the
-            # current page
-            # since we always have a page at this point, applications_page_check is
-            # pointless
-            # page = applications_page_check(request, page, slug)
-            # Check for apphooks! This time for real!
-            app_urls = self.page.get_application_urls(self.current_language, False)
-            skip_app = False
-            if (not self.page.is_published(self.current_language) and hasattr(self.request, 'toolbar')
-                    and self.request.toolbar.edit_mode):
-                skip_app = True
-            if app_urls and not skip_app:
-                app = apphook_pool.get_apphook(app_urls)
-                pattern_list = []
-                if app:
-                    for urlpatterns in get_app_urls(app.get_urls(self.page, self.current_language)):
-                        pattern_list += urlpatterns
-                    try:
-                        view, args, kwargs = resolve('/', tuple(pattern_list))
-                        return view(self.request, *args, **kwargs)
-                    except Resolver404:
-                        pass
+        if apphook_pool.get_apphooks() and self.following_apphook_is_fine():
+            try:
+                response = get_app_response_for_page(self.page, self.current_language, self.request)
+            except Resolver404:
+                pass
+            if response:
+                return response
         raise NoHttpResponseReturned
 
     def follow_page_redirect(self):
@@ -170,6 +154,16 @@ class PageView(View):
             hasattr(self.request, 'toolbar')
             and self.request.user.is_staff
             and self.request.toolbar.edit_mode
+        )
+
+    def following_apphook_is_fine(self):
+        """
+        Determine when apphooks belonging to the page should be used.
+        """
+        return (
+            self.page.is_published(self.current_language)
+            or not hasattr(self.request, 'toolbar')
+            or not self.request.toolbar.edit_mode
         )
 
     def url_matches_request(self, url):
