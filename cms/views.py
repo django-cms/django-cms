@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import Resolver404, reverse
+from django.core.urlresolvers import Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.cache import patch_cache_control
 from django.utils.translation import get_language
@@ -15,7 +15,7 @@ from cms.appresolver import get_app_response_for_page
 from cms.cache.page import get_page_cache
 from cms.page_rendering import _handle_no_page, render_page
 from cms.utils import get_language_from_request, get_cms_setting, get_desired_language
-from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
+from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_redirect_on_fallback, get_language_list, complete_i18n_url,
                             get_language_code)
 from cms.utils.page_resolver import get_page_from_request
@@ -129,6 +129,13 @@ class PageView(View):
         else:
             raise CircularRedirectionError
 
+    def cms_language_redirection(self, language):
+        path = self.page.get_absolute_url(language=language, fallback=True)
+        try:
+            return self.cms_redirection(path)
+        except CircularRedirectionError:
+            return None
+
     def using_cache_is_fine(self):
         return get_cms_setting("PAGE_CACHE") and (
             not hasattr(self.request, 'toolbar') or (
@@ -211,12 +218,7 @@ class PageView(View):
                     # get supported language
                     new_language = get_language_from_request(self.request)
                     if new_language in get_public_languages():
-                        with force_language(new_language):
-                            pages_root = reverse('pages-root')
-                            try:
-                                return self.cms_redirection(pages_root)
-                            except CircularRedirectionError:
-                                pass
+                        return self.cms_language_redirection(new_language)
                 elif not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url:
                     _handle_no_page(self.request, self.slug)
             else:
@@ -228,15 +230,7 @@ class PageView(View):
             for alt_lang in get_fallback_languages(self.current_language):
                 if alt_lang in available_languages:
                     if get_redirect_on_fallback(self.current_language) or self.slug == "":
-                        with force_language(alt_lang):
-                            path = self.page.get_absolute_url(language=alt_lang, fallback=True)
-                            # In the case where the page is not available in the
-                        # preferred language, *redirect* to the fallback page. This
-                        # is a design decision (instead of rendering in place)).
-                        try:
-                            return self.cms_redirection(path)
-                        except CircularRedirectionError:
-                            pass
+                        return self.cms_language_redirection(alt_lang)
                     else:
                         found = True
             if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
