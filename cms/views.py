@@ -21,10 +21,6 @@ from cms.utils.i18n import (get_fallback_languages, force_language, get_public_l
 from cms.utils.page_resolver import get_page_from_request
 
 
-class NoHttpResponseReturned(Exception):
-    pass
-
-
 class CircularRedirectionError(Exception):
     pass
 
@@ -39,9 +35,15 @@ class PageView(View):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
-    RESPONSE_ATTEMPTS = ['render_404', 'ugly_language_redirect_code',
-                         'redirect_to_correct_slug', 'follow_apphook',
-                         'follow_page_redirect', 'redirect_to_login']
+    RESPONSE_ATTEMPTS = [
+        'render_404_if_appropriate',
+        'ugly_language_redirect_code',
+        'redirect_to_correct_slug_if_appropriate',
+        'follow_apphook_if_appropriate',
+        'follow_page_redirect_if_appropriate',
+        'redirect_to_login_if_appropriate',
+        'render_ordinary_page'
+    ]
 
     def dispatch(self, request, slug):
         self.request = request
@@ -71,39 +73,33 @@ class PageView(View):
         self.page = get_page_from_request(self.request, use_path=self.slug)
         self.current_language = self.get_desired_language()
         for response_name in self.RESPONSE_ATTEMPTS:
-            try:
-                response = getattr(self, response_name)
-                return response()
-            except NoHttpResponseReturned:
-                continue
-        return self.render_ordinary_page()
+            response_method = getattr(self, response_name)
+            response = response_method()
+            if response is not None:
+                return response
 
-    def render_404(self):
+    def render_404_if_appropriate(self):
         if not self.page:
             return _handle_no_page(self.request, self.slug)
-        else:
-            raise NoHttpResponseReturned
 
-    def redirect_to_correct_slug(self):
+    def redirect_to_correct_slug_if_appropriate(self):
         page_path = self.get_page_path()
         page_slug = self.get_page_slug()
         if self.slug and self.slug != page_slug and self.request.path[:len(page_path)] != page_path:
             # The current language does not match it's slug.
             #  Redirect to the current language.
             return self.cms_redirection(page_path)
-        raise NoHttpResponseReturned
 
-    def follow_apphook(self):
+    def follow_apphook_if_appropriate(self):
         if apphook_pool.get_apphooks() and self.following_apphook_is_fine():
             try:
                 response = get_app_response_for_page(self.page, self.current_language, self.request)
             except Resolver404:
                 pass
-            if response:
+            else:
                 return response
-        raise NoHttpResponseReturned
 
-    def follow_page_redirect(self):
+    def follow_page_redirect_if_appropriate(self):
         # Check if the page has a redirect url defined for this language.
         redirect_url = self.page.get_redirect(language=self.current_language)
         if redirect_url:
@@ -112,15 +108,12 @@ class PageView(View):
                 return self.cms_redirection(redirect_url)
             except CircularRedirectionError:
                 pass
-        raise NoHttpResponseReturned
 
-    def redirect_to_login(self):
+    def redirect_to_login_if_appropriate(self):
         if self.redirect_to_login_is_necessary():
             url = self.request.get_full_path()
             quoted_url = urlquote(url)
             return redirect_to_login(quoted_url, settings.LOGIN_URL)
-        else:
-            raise NoHttpResponseReturned
 
     def render_ordinary_page(self):
         if hasattr(self.request, 'toolbar'):
@@ -131,7 +124,6 @@ class PageView(View):
     def cms_redirection(self, url):
         if self.redirects_should_wait():
             self.request.toolbar.redirect_url = url
-            raise NoHttpResponseReturned
         elif not self.url_matches_request(url):
             return HttpResponseRedirect(url)
         else:
@@ -250,4 +242,3 @@ class PageView(View):
             if not found and (not hasattr(self.request, 'toolbar') or not self.request.toolbar.redirect_url):
                 # There is a page object we can't find a proper language to render it
                 _handle_no_page(self.request, self.slug)
-        raise NoHttpResponseReturned
