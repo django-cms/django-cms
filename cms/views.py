@@ -180,6 +180,9 @@ class PageView(View):
         ]
         return url in url_variants
 
+    def page_root_is_requested(self):
+        return not self.slug
+
     def get_desired_language(self):
         language = get_desired_language(self.request, self.page)
         if not language:
@@ -208,8 +211,7 @@ class PageView(View):
                 available_languages.append(frontend_lang)
         # Check that the language is in FRONTEND_LANGUAGES:
         if self.current_language not in user_languages:
-            #are we on root?
-            if not self.slug:
+            if self.page_root_is_requested():
                 #redirect to supported language
                 languages = []
                 for language in available_languages:
