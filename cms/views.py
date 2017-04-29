@@ -16,8 +16,8 @@ from cms.cache.page import get_page_cache
 from cms.page_rendering import _handle_no_page, render_page
 from cms.utils import get_language_from_request, get_cms_setting, get_desired_language
 from cms.utils.i18n import (get_fallback_languages, get_public_languages,
-                            get_redirect_on_fallback, get_language_list, complete_i18n_url,
-                            get_language_code)
+                            get_redirect_on_fallback, complete_i18n_url,
+                            get_language_code, get_visible_languages)
 from cms.utils.page_resolver import get_page_from_request
 
 
@@ -202,10 +202,7 @@ class PageView(View):
         available_languages = []
         # this will return all languages in draft mode, and published only in live mode
         page_languages = list(self.page.get_published_languages())
-        if hasattr(self.request, 'user') and self.request.user.is_staff:
-            user_languages = get_language_list()
-        else:
-            user_languages = get_public_languages()
+        user_languages = get_visible_languages(self.request)
         for frontend_lang in user_languages:
             if frontend_lang in page_languages:
                 available_languages.append(frontend_lang)

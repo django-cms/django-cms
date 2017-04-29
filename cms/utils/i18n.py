@@ -93,6 +93,15 @@ def get_public_languages(site_id=None):
     return [lang['code'] for lang in get_language_objects(site_id)
             if lang.get('public', True)]
 
+def get_visible_languages(request, site_id=None):
+    """
+    :return: list of iso2codes of languages visible for requset user
+    """
+    if hasattr(request, 'user') and request.user.is_staff:
+        return get_language_list()
+    else:
+        return get_public_languages()
+
 
 def get_language_object(language_code, site_id=None):
     """
