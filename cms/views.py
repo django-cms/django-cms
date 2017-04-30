@@ -210,11 +210,10 @@ class PageView(View):
             )
         )
 
-    def message_should_replace_redirect(self):
+    def redirect_to_fallback_language_is_allowed(self):
         return (
-            hasattr(self.request, 'toolbar')
-            and self.request.user.is_staff
-            and self.request.toolbar.edit_mode
+            get_redirect_on_fallback(self.current_language)
+            or self.slug == ""
         )
 
     def following_apphooks_is_allowed(self):
@@ -224,10 +223,11 @@ class PageView(View):
             or not self.request.toolbar.edit_mode
         )
 
-    def redirect_to_fallback_language_is_allowed(self):
+    def message_should_replace_redirect(self):
         return (
-            get_redirect_on_fallback(self.current_language)
-            or self.slug == ""
+            hasattr(self.request, 'toolbar')
+            and self.request.user.is_staff
+            and self.request.toolbar.edit_mode
         )
 
     def toolbar_has_redirect(self):
