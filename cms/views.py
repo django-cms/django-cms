@@ -116,12 +116,9 @@ class PageView(View):
                 _handle_no_page(self.request, self.slug)
 
     def redirect_to_correct_slug_if_appropriate(self):
-        page_path = self.get_page_path()
-        page_slug = self.get_page_slug()
-        if self.slug and self.slug != page_slug and self.request.path[:len(page_path)] != page_path:
-            # The current language does not match it's slug.
-            #  Redirect to the current language.
-            return self.cms_redirection(page_path)
+        if not self.slug_is_matching_language():
+            url = self.get_page_absolute_url()
+            return self.cms_redirection(url)
 
     def follow_apphook_if_appropriate(self):
         if apphook_pool.get_apphooks() and self.following_apphook_is_fine():
@@ -148,6 +145,8 @@ class PageView(View):
             quoted_url = urlquote(url)
             return redirect_to_login(quoted_url, settings.LOGIN_URL)
 
+    #
+
     def render_ordinary_page(self):
         if hasattr(self.request, 'toolbar'):
             self.request.toolbar.set_object(self.page)
@@ -168,6 +167,8 @@ class PageView(View):
             return self.cms_redirection(path)
         except CircularRedirectionError:
             return None
+
+    #
 
     def using_cache_is_fine(self):
         return get_cms_setting("PAGE_CACHE") and (
@@ -211,6 +212,17 @@ class PageView(View):
             and self.request.toolbar.redirect_url
         )
 
+    def slug_is_matching_language(self):
+        if not self.slug:
+            return True
+        else:
+            url = self.get_page_absolute_url()
+            page_slug = self.get_page_slug()
+            return (
+                self.slug == page_slug
+                or self.request.path[:len(url)] == url
+            )
+
     def redirect_to_login_is_necessary(self):
         return (
             self.page.login_required
@@ -228,11 +240,13 @@ class PageView(View):
     def root_url_is_requested(self):
         return not self.slug
 
+    #
+
     def get_desired_language(self):
         language = get_desired_language(self.request, self.page)
         if not language:
             # TODO: What is the use case for this?
-            # This is not present in cms.utils.get_desired_language.
+            # This is not present in cms.utils.get_desired_language:
             language = get_language_code(get_language())
         return language
 
@@ -249,8 +263,10 @@ class PageView(View):
             if language in available_languages:
                 return language
 
-    def get_page_path(self):
+    def get_page_absolute_url(self):
         return self.page.get_absolute_url(language=self.current_language)
 
     def get_page_slug(self):
-        return self.page.get_path(language=self.current_language) or self.page.get_slug(language=self.current_language)
+        path = self.page.get_path(language=self.current_language)
+        slug = self.page.get_slug(language=self.current_language)
+        return path or slug
