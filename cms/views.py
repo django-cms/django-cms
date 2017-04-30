@@ -273,7 +273,8 @@ class PageView(View):
         language = get_desired_language(self.request, self.page)
         if not language:
             # TODO: What is the use case for this?
-            # This is not present in cms.utils.get_desired_language:
+            # This is not present in cms.utils.get_desired_language
+            # If we omit this, all tests will still pass:
             language = get_language_code(get_language())
         return language
 
