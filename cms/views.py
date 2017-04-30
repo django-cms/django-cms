@@ -84,6 +84,9 @@ class PageView(View):
             return _handle_no_page(self.request, self.slug)
 
     def redirect_root_url_if_appropriate(self):
+        # TODO: If we don't call this method, all tests will still pass.
+        # The default django behaviour seems to do
+        # roughly what's done here.
         user_languages = get_visible_languages(self.request)
         # Check that the language is in FRONTEND_LANGUAGES:
         if self.current_language not in user_languages:
