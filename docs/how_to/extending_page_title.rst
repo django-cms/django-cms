@@ -308,13 +308,13 @@ Handling relations
 ==================
 
 If your ``PageExtension`` or ``TitleExtension`` includes a ForeignKey *from* another
-model or includes a ManyToMany field, you should also override the method
+model or includes a ManyToManyField, you should also override the method
 ``copy_relations(self, oldinstance, language)`` so that these fields are
 copied appropriately when the CMS makes a copy of your extension to support
 versioning, etc.
 
 
-Here's an example that uses a ``ManyToMany``` field::
+Here's an example that uses a ``ManyToManyField`` ::
 
     from django.db import models
     from cms.extensions import PageExtension
@@ -323,7 +323,7 @@ Here's an example that uses a ``ManyToMany``` field::
 
     class MyPageExtension(PageExtension):
 
-        page_categories = models.ManyToMany('categories.Category', blank=True, null=True)
+        page_categories = models.ManyToManyField(Category, blank=True)
 
         def copy_relations(self, oldinstance, language):
             for page_category in oldinstance.page_categories.all():
