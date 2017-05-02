@@ -2,7 +2,6 @@
 
 {% if request.toolbar.edit_mode or request.toolbar.build_mode %}
 {% with clipboard_plugins=local_toolbar.get_clipboard_plugins|slice:":1" %}
-{% if clipboard_plugins %}
 <div class="cms-clipboard" data-title="{% trans 'Clipboard' %}">
     {% for plugin in clipboard_plugins %}
     <div class="cms-plugins">
@@ -15,6 +14,5 @@
         {% endfor %}
     </div>
 </div>
-{% endif %}
 {% endwith %}
 {% endif %}

@@ -13,7 +13,6 @@ var fuzzyFilter = require('fuzzaldrin').filter;
 require('../polyfills/array.prototype.findindex');
 
 var doc;
-var clipboard;
 var clipboardDraggable;
 var path = window.location.pathname + window.location.search;
 
@@ -385,6 +384,7 @@ var Plugin = new Class({
         }
 
         pasteItem.find('a').removeAttr('tabindex');
+        pasteItem.removeClass('cms-submenu-item-disabled');
 
         return true;
     },
@@ -1363,6 +1363,8 @@ var Plugin = new Class({
      * @param {jQuery} nav trigger element
      */
     _showSettingsMenu: function (nav) {
+        this._checkIfPasteAllowed();
+
         var dropdown = this.ui.dropdown;
         var parents = nav.parentsUntil('.cms-dragarea').last();
         var MIN_SCREEN_MARGIN = 10;
@@ -1742,8 +1744,20 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     var clickCounter = 0;
 
     doc = $(document);
-    clipboard = $('.cms-clipboard');
-    clipboardDraggable = clipboard.find('.cms-draggable:first');
+    Plugin._updateClipboard();
+
+    // Structureboard initialized too late
+    setTimeout(function () {
+        var pluginData = {};
+        var html = '';
+
+        if (clipboardDraggable.length) {
+            pluginData = clipboardDraggable.data('cms');
+            html = clipboardDraggable.parent().html();
+
+        }
+        CMS.API.Clipboard.populate(html, pluginData);
+    }, 0);
 
     doc.on('pointerup.cms.plugin', function () {
         // call it as a static method, because otherwise we trigger it the
@@ -1936,6 +1950,10 @@ Plugin._initializeTree = function _initializeTree() {
     $.each(CMS._plugins, function (index, args) {
         new CMS.Plugin(args[0], args[1]);
     });
+};
+
+Plugin._updateClipboard = function _updateClipboard() {
+    clipboardDraggable = $('.cms-draggable-from-clipboard:first');
 };
 
 // shorthand for jQuery(document).ready();
