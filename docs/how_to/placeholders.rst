@@ -1,8 +1,8 @@
 .. _placeholders_outside_cms:
 
-############################
-Placeholders outside the CMS
-############################
+#######################################
+How to use placeholders outside the CMS
+#######################################
 
 Placeholders are special model fields that django CMS uses to render
 user-editable content (plugins) in templates. That is, it's the place where a

@@ -1,8 +1,8 @@
 .. _custom-plugins:
 
-##############
-Custom Plugins
-##############
+############################
+How to create custom Plugins
+############################
 
 CMS Plugins are reusable content publishers that can be inserted into django
 CMS pages (or indeed into any content that uses django CMS placeholders). They
@@ -17,7 +17,8 @@ It's like magic, but quicker.
 Unless you're lucky enough to discover that your needs can be met by the
 built-in plugins, or by the many available third-party plugins, you'll have to
 write your own custom CMS Plugin. Don't worry though - writing a CMS Plugin is
-rather simple.
+very straightforward.
+
 
 *************************************
 Why would you need to write a plugin?

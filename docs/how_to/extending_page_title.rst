@@ -1,5 +1,5 @@
 #################################
-Extending the Page & Title models
+How to extend Page & Title models
 #################################
 
 You can extend the :class:`cms.models.Page` and :class:`cms.models.Title` models with your own fields (e.g. adding an

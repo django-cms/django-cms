@@ -1,8 +1,8 @@
 ..  _contributing_patch:
 
-####################
-Contributing a patch
-####################
+#########################
+How to contribute a patch
+#########################
 
 .. note:: For more background on the material covered in this how-to section, see the
    :ref:`contributing-code` and :ref:`testing` sections of the documentation.

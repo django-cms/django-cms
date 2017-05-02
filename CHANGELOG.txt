@@ -154,7 +154,7 @@
 * Added a workaround for a bug when plugins couldn't be deleted in Firefox
   with 1Password extension installed
 * Changed CMS JavaScript bundling from simple concatenation to webpack-based.
-  Using CMS Javascript modules directly is no longer possible.
+  Using CMS JavaScript modules directly is no longer possible.
 * Fixed an issue where plugins that have no immediate DOM representation
   wouldn't be editable or movable.
 * Fixed a regression in which plugins that defined ``parent_classes``
@@ -344,7 +344,7 @@
 - Added tooltips for certain user interaction elements
 - Added full touch support and optimisations for mobile devices
 - Added gulp.js for linting, compressing and bundling
-- Added YuiDocs for Javascript documentation
+- Added YuiDocs for JavaScript documentation
 - Added ``CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE`` to switch back to the old board rendering,
   this will be deprecated in 3.3.0
 - Added ``request.toolbars.placeholder_list`` this will replace

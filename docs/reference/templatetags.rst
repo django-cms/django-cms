@@ -491,7 +491,7 @@ This will render to:
 
     By default this template tag escapes the content of the rendered
     model attribute. This helps prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
     To change this behavior, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
@@ -573,7 +573,7 @@ method is available; also template tags and filters are available in the block.
 
     By default this template tag escapes the content of the rendered
     model attribute. This helps prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
     To change this behavior, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
@@ -640,7 +640,7 @@ It will render to something like:
 
     By default this template tag escapes the content of the rendered
     model attribute. This helps prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
     To change this behavior, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
@@ -703,7 +703,7 @@ It will render to something like:
 
     By default this template tag escapes the content of the rendered
     model attribute. This helps prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
     To change this behavior, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
