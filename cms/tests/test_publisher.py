@@ -579,7 +579,7 @@ class PublishingTests(TestCase):
         page = self.create_page('test', published=True)
         sub_page = self.create_page('test2', published=True, parent=page)
         self.assertTrue(sub_page.publisher_public.is_published('en'))
-        page.title_set.all().delete()
+        page.reload().title_set.all().delete()
         self.assertFalse(sub_page.publisher_public.is_published('en', force_reload=True))
 
     def test_modify_child_while_pending(self):
@@ -686,9 +686,14 @@ class PublishingTests(TestCase):
         self.assertFalse(gc1.publisher_public_id)
         self.assertTrue(gc1.is_published('en'))
         self.assertTrue(gc2.is_published('en'))
+
+        home = self.reload(home)
         home.unpublish('en')
+
         unpub1 = self.reload(unpub1)
+        unpub2 = self.reload(unpub2)
         unpub2.unpublish('en')  # Just marks this as not published
+
         for page in (unpub1, unpub2):
             self.assertFalse(page.is_published('en'), page)
             self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
@@ -770,7 +775,7 @@ class PublishingTests(TestCase):
         self.assertTrue(child.publisher_public.is_published('en'))
         self.assertTrue(gchild.publisher_public.is_published('en'))
 
-        page.unpublish('en')
+        page.reload().unpublish('en')
         child = self.reload(child)
         gchild = self.reload(gchild)
         # Descendants become dirty after unpublish

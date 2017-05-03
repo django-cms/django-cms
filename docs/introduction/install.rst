@@ -30,6 +30,15 @@ Note that if you're using Windows, to activate the virtualenv you'll need::
 
     env\Scripts\activate
 
+
+Update pip
+==========
+
+``pip`` is the Python installer. Make sure yours is up-to-date, as earlier versions can be less reliable::
+
+	pip install --upgrade pip
+
+
 Use the django CMS installer
 ============================
 

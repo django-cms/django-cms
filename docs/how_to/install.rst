@@ -1,8 +1,8 @@
 .. _installation:
 
-#############################
-Installing django CMS by hand
-#############################
+#################################
+How to install django CMS by hand
+#################################
 
 The easiest way to install django CMS is by using the automated `django CMS installer
 <https://github.com/nephila/djangocms-installer>`_. This is the recommended way to start with new projects, and it's
@@ -42,6 +42,12 @@ django CMS also has other requirements, which it lists as dependencies in its ``
         source django-cms-site/bin/activate  # activate it
 
 In an activated virtualenv, run::
+
+	pip install --upgrade pip
+
+to make sure ``pip`` is up-to-date, as earlier versions can be less reliable.
+
+Then::
 
     pip install django-cms
 

@@ -67,7 +67,7 @@ What this all means
 * ``watch_models`` allows the frontend editor to redirect the user to the model instance
   ``get_absolute_url`` whenever an instance of this model is created or saved through the frontend editor
   (see :ref:`url_changes` for details).
-* The ``populate()`` method, which poulates the toolbar menu with nodes, will only be called if the current user is a
+* The ``populate()`` method, which populates the toolbar menu with nodes, will only be called if the current user is a
   staff user. In this case it:
 
   * checks whether we're in a page belonging to this application, using ``self.is_current_app``

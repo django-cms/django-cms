@@ -5,6 +5,7 @@ from django.forms.fields import EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
 
@@ -75,8 +76,10 @@ class PageSelectFormField(forms.MultiValueField):
     def _has_changed(self, initial, data):
         return self.has_changed(initial, data)
 
+
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget
+    default_validators = [validate_url]
 
     def __init__(self, max_length=None, min_length=None, placeholder_text=None,
                  ajax_view=None, *args, **kwargs):
@@ -89,3 +92,7 @@ class PageSmartLinkField(forms.CharField):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)
         attrs.update({'placeholder_text': self.placeholder_text})
         return attrs
+
+    def clean(self, value):
+        value = self.to_python(value).strip()
+        return super(PageSmartLinkField, self).clean(value)
