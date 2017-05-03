@@ -434,9 +434,11 @@ Example::
     )
 
 
-*************
-I18N and L10N
-*************
+.. _i18n_l10n_reference:
+
+*****************************************************
+Internationalisation and localisation (I18N and L10N) 
+*****************************************************
 
 CMS_LANGUAGES
 =============
@@ -570,7 +572,13 @@ default
 
 hide_untranslated
 -----------------
-Hide untranslated pages in menus
+
+Hides untranslated pages in menus. 
+
+When applied to the ``default`` directive, if ``False``, all pages in menus will be listed in all languages, including those
+that don't yet have content in a particular language. If ``True``, untranslated pages will be hidden.
+
+When applied to a particular language, hides that language's pages in menus until translations exist for them.
 
 type
     Boolean
@@ -601,10 +609,10 @@ default
 Unicode support for automated slugs
 ===================================
 
-django CMS supports automated slug generation from page titles that contain
-Unicode characters via the unihandecode.js project. To enable support for
-unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
-:setting:`CMS_UNIHANDECODE_VERSION` must be set.
+If your site has languages which use non-ASCII character sets, :setting:`CMS_UNIHANDECODE_HOST` and
+:setting:`CMS_UNIHANDECODE_VERSION` will allow it to automate slug generation for those languages too.
+
+Support for this is provided by the unihandecode.js project. 
 
 
 ..  setting:: CMS_UNIHANDECODE_HOST

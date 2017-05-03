@@ -109,7 +109,7 @@ with a plugin instance connected to the otherwise empty and meaningless
 ``CMSPlugin``.
 
 In some cases, "ghost plugins" would be created, if the process of creating the
-plugin instance failed or were interrupted, for example by the broswer window's
+plugin instance failed or were interrupted, for example by the browser window's
 being closed.
 
 This would leave orphaned ``CMSPlugin`` instances in the database without any
