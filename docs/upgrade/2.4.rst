@@ -139,7 +139,7 @@ For django 1.4 more information can be found here:
 If you are still running django 1.3 you are able to achieve the same functionality with django-i18nurl. It is a backport
 of the new functionality in django 1.4 and can be found here:
 
-    https://github.com/brocaar/django-i18nurls
+   https://github.com/brocaar/django-i18nurls
 
 
 What you need to do:
@@ -270,7 +270,7 @@ Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
 
 The column plugin can be found here:
 
-    https://github.com/divio/djangocms-column
+   https://github.com/divio/djangocms-column
 
 At the moment the limitation is that plugins in plugins is only editable in the frontend.
 

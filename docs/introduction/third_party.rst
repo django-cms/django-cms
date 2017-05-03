@@ -14,7 +14,7 @@ Basic installation
 ******************
 
 First, we need to install the app into our virtual environment from
-`PyPI <http://pypi.python.org>`_::
+`PyPI <https://pypi.python.org>`_::
 
     pip install aldryn-newsblog
 

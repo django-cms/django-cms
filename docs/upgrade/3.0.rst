@@ -140,7 +140,7 @@ We removed the file plugin (``cms.plugins.file``). Its new location is at:
 As an alternative, you could also use the following (yet you will not be able
 to keep your existing files from the old ``cms.plugins.file``!)
 
-* https://github.com/stefanfoulis/django-filer
+* https://github.com/divio/django-filer
 
 
 Flash Plugin

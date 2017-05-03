@@ -399,7 +399,7 @@ unusual to have a django CMS site that does *not* run Django Filer. The configur
 started, but you should refer to the `Django Filer documentation <https://django-filer.readthedocs.io>`_ for more
 comprehensive configuration information.
 
-.. _Django Filer: https://github.com/stefanfoulis/django-filer
+.. _Django Filer: https://github.com/divio/django-filer
 
 To install::
 
@@ -409,7 +409,7 @@ A number of applications will be installed as dependencies. `Easy Thumbnails
 <https://github.com/SmileyChris/easy-thumbnails>`_ is required to create new versions of images in different sizes;
 `Django MPTT <https://github.com/django-mptt/django-mptt/>`_ manages the tree structure of the folders in Django Filer.
 
-Pillow, the Python imaging library, will be installed. `Pillow <https://github.com/python-imaging/Pillow>`_ needs some
+Pillow, the Python imaging library, will be installed. `Pillow <https://github.com/python-pillow/Pillow>`_ needs some
 system-level libraries - the `Pillow documentation <https://pillow.readthedocs.io>`_ describes in detail what is
 required to get this running on various operating systems.
 

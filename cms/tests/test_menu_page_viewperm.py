@@ -539,7 +539,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
 )
 class ViewPermissionTreeBugTests(ViewPermissionTests):
     """Test issue 1113
-    https://github.com/divio/django-cms/issues/1113
+   https://github.com/divio/django-cms/issues/1113
     Wrong view permission calculation in PagePermission.objects.for_page
     grant_on=ACCESS_PAGE_AND_CHILDREN or ACCESS_PAGE_AND_DESCENDANTS to page 6
     Test if this affects the menu entries and page visibility

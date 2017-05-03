@@ -4,7 +4,7 @@
 Code and project management
 ###########################
 
-We use our `GitHub project <http://github.com/divio/django-cms>`_ for managing both django CMS code
+We use our `GitHub project <https://github.com/divio/django-cms>`_ for managing both django CMS code
 and development activity.
 
 This document describes how we manage tickets on GitHub. By "tickets", we mean GitHub issues and

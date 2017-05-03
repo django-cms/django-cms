@@ -96,14 +96,14 @@ out in its Code of Conduct.
 Current core developers
 =======================
 
-* Angelo Dini http://github.com/finalangel
-* Daniele Procida http://github.com/evildmp
-* Iacopo Spalletti http://github.com/yakky
-* Jonas Obrist http://github.com/ojii
-* Martin Koistinen http://github.com/mkoistinen
-* Patrick Lauber http://github.com/digi604
-* Paulo Alvarado http://github.com/czpython
-* Stefan Foulis http://github.com/stefanfoulis
+* Angelo Dini https://github.com/finalangel
+* Daniele Procida https://github.com/evildmp
+* Iacopo Spalletti https://github.com/yakky
+* Jonas Obrist https://github.com/ojii
+* Martin Koistinen https://github.com/mkoistinen
+* Patrick Lauber https://github.com/digi604
+* Paulo Alvarado https://github.com/czpython
+* Stefan Foulis https://github.com/stefanfoulis
 * Vadim Sikora https://github.com/vxsx
 
 
@@ -119,9 +119,9 @@ design:
 Retired core developers
 =======================
 
-* Chris Glass http://github.com/chrisglass
-* Øyvind Saltvik http://github.com/fivethreeo
-* Benjamin Wohlwend http://github.com/piquadrat
+* Chris Glass https://github.com/chrisglass
+* Øyvind Saltvik https://github.com/fivethreeo
+* Benjamin Wohlwend https://github.com/piquadrat
 
 Following a year or so of inactivity, a core developer will be moved to the
 "Retired" list, with the understanding that they can rejoin the project in the
@@ -203,6 +203,6 @@ The board will co-opt new members as appropriate.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _django-cms-developers: http://groups.google.com/group/django-cms-developers
+.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode: http://freenode.net/
 .. _@djangocms: https://twitter.com/djangocms
