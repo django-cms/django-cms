@@ -24,6 +24,7 @@
 * Fixed a 404 raised when clicking the ``Delete`` button for a page or title extension on Django >= 1.9
 * Added "How to serve multiple languages" section to documentation
 * Fixed a performance issue with nested pages when using the ``inherit`` flag on the ``{% placeholder %}`` tag.
+* Removed the internal ``reset_to_public`` page method in favour of the ``revert_to_live`` method.
 
 
 === 3.4.3 (2017-04-24) ===
