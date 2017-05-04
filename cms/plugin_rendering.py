@@ -265,6 +265,7 @@ class ContentRenderer(object):
             page=current_page,
             editable=True,
             nodelist=nodelist,
+            inherit=inherit
         )
 
         if content:
@@ -289,6 +290,7 @@ class ContentRenderer(object):
                 page=page,
                 nodelist=None,
                 editable=False,
+                inherit=inherit
             )
 
             if inherited_content:
@@ -482,7 +484,7 @@ class ContentRenderer(object):
             raise PlaceholderNotFound(message)
         return placeholder
 
-    def _render_page_placeholder(self, context, slot, page, editable=True, nodelist=None):
+    def _render_page_placeholder(self, context, slot, page, editable=True, nodelist=None, inherit=False):
         """
         Renders a placeholder attached to a page.
         """
@@ -493,6 +495,7 @@ class ContentRenderer(object):
                 return nodelist.render(context)
             return ''
 
+        placeholder.is_inherit = inherit
         content = self.render_placeholder(
             placeholder,
             context=context,
