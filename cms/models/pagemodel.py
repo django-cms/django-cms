@@ -682,6 +682,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # publish, but only if all parents are published!!
         published = None
 
+        # Publication can be successful but the page is not guaranteed
+        # to be in the published state.
+        # This happens if a parent of the page is not published,
+        # so the page is marked as pending.
+        marked_as_published = False
+
         if not self.pk:
             self.save()
 
@@ -689,6 +695,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.refresh_from_db()
 
         if self._publisher_can_publish():
+            published = True
+
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
                 public_page = Page.objects.get(pk=self.publisher_public_id)
@@ -710,14 +718,14 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             if not public_page.parent_id:
                 # If we're publishing a page with no parent
                 # automatically set it's status to published
-                published = True
+                marked_as_published = True
             else:
                 # The page has a parent so we fetch the published
                 # status of the parent page.
-                published = public_page.parent.is_published(language)
+                marked_as_published = public_page.parent.is_published(language)
 
             # The target page now has a pk, so can be used as a target
-            self._copy_titles(public_page, language, published)
+            self._copy_titles(public_page, language, marked_as_published)
             self._copy_contents(public_page, language)
 
             # trigger home update
@@ -725,7 +733,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             # invalidate the menu for this site
             menu_pool.clear(site_id=self.site_id)
             self.publisher_public = public_page
-            published = True
         else:
             # Nothing left to do
             pass
@@ -756,6 +763,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
+        if marked_as_published and get_cms_setting('PLACEHOLDER_CACHE'):
+            # Only clear the placeholder cache if the page
+            # was successfully published and is actually marked as published.
+            for placeholder in self.publisher_public.get_placeholders():
+                placeholder.clear_cache(language, site_id=self.site_id)
         return published
 
     def unpublish(self, language):
