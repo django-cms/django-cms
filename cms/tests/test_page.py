@@ -334,11 +334,11 @@ class PagesTestCase(CMSTestCase):
         page = page_a.publisher_public
         self.assertRaises(PublicIsUnmodifiable, page.copy_page, 3, 1)
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
-        self.assertRaises(PublicIsUnmodifiable, page.reset_to_public, 'en')
+        self.assertRaises(PublicIsUnmodifiable, page.revert_to_live, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
 
         self.assertTrue(page.get_draft_object().publisher_is_draft)
-        self.assertRaises(PublicVersionNeeded, page_b.reset_to_public, 'en')
+        self.assertRaises(PublicVersionNeeded, page_b.revert_to_live, 'en')
 
     def test_move_page_regression_left_to_right_5752(self):
         # ref: https://github.com/divio/django-cms/issues/5752

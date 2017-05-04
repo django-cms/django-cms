@@ -33,7 +33,7 @@ class ModeratorOnCommand(SubcommandsCommand):
             for language in page.get_languages():
                 if CMSPlugin.objects.filter(placeholder__page=page, language=language).exists():
                     log.debug('Reverting page pk=%d' % (page.pk,))
-                    page.publisher_draft.reset_to_public(language)
+                    page.publisher_draft.revert_to_live(language)
 
         log.info('Publishing all published drafts')
         for title in Title.objects.filter(publisher_is_draft=True, publisher_public_id__gt=0):

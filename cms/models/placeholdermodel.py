@@ -501,6 +501,9 @@ class Placeholder(models.Model):
 
         return min_ttl
 
+    def clear_cache(self, language):
+        clear_placeholder_cache(self, language, get_site_id(getattr(self.page, 'site_id', None)))
+
     def mark_as_dirty(self, language, clear_cache=True):
         """
         Utility method to mark the attached object of this placeholder
@@ -511,7 +514,7 @@ class Placeholder(models.Model):
         from cms.models import Page, StaticPlaceholder, Title
 
         if clear_cache:
-            clear_placeholder_cache(self, language, get_site_id(getattr(self.page, 'site_id', None)))
+            self.clear_cache(language)
 
         # Find the attached model for this placeholder
         # This can be a static placeholder, page or none.

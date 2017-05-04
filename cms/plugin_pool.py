@@ -12,7 +12,7 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
-from cms.models import CMSPlugin
+from cms.utils import get_cms_setting
 from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import is_installed
@@ -30,7 +30,10 @@ class PluginPool(object):
         if self.discovered:
             return
         from cms.cache import invalidate_cms_page_cache
-        invalidate_cms_page_cache()
+
+        if get_cms_setting("PAGE_CACHE"):
+            invalidate_cms_page_cache()
+
         load('cms_plugins')
         self.discovered = True
 
@@ -113,14 +116,10 @@ class PluginPool(object):
 
         plugin.value = plugin_name
         self.plugins[plugin_name] = plugin
-        from cms.signals import pre_save_plugins, post_delete_plugins, pre_delete_plugins
+        from cms.signals import pre_save_plugins
 
         signals.pre_save.connect(pre_save_plugins, sender=plugin.model,
                                  dispatch_uid='cms_pre_save_plugin_%s' % plugin_name)
-        signals.post_delete.connect(post_delete_plugins, sender=CMSPlugin,
-                                    dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
-        signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
-                                   dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
 
         if is_installed('reversion'):
             from cms.utils.reversion_hacks import RegistrationError

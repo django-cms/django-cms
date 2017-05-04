@@ -1259,6 +1259,7 @@ class AdminFormsTests(AdminTestsBase):
     def test_smart_link_published_pages(self):
         admin, staff_guy = self._get_guys()
         page_url = URL_CMS_PAGE_PUBLISHED  # Not sure how to achieve this with reverse...
+        create_page('home', 'col_two.html', 'en', published=True)
 
         with self.login_user_context(staff_guy):
             multi_title_page = create_page('main_title', 'col_two.html', 'en', published=True,
