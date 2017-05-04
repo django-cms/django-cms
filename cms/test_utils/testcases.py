@@ -471,6 +471,9 @@ class BaseCMSTestCase(object):
     def load_template_from_string(self, template):
         return engines['django'].from_string(template)
 
+    def get_template(self, template):
+        return engines['django'].get_template(template)
+
     def render_template_obj(self, template, context, request):
         template_obj = self.load_template_from_string(template)
         return template_obj.render(context, request)

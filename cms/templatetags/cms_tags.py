@@ -28,7 +28,7 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from classytags.utils import flatten_context
-from classytags.values import StringValue
+from classytags.values import ListValue, StringValue
 
 from cms import __version__
 from cms.cache.page import get_page_url_cache, set_page_url_cache
@@ -223,6 +223,17 @@ class Placeholder(Tag):
 
     def get_name(self):
         return self.kwargs['name'].var.value.strip('"').strip("'")
+
+    def get_inherit_status(self):
+        flags = self.kwargs['extra_bits']
+
+        if not isinstance(flags, ListValue):
+            return False
+
+        for extra in self.kwargs['extra_bits']:
+            if extra.var.value.strip() == 'inherit':
+                return True
+        return False
 
 
 register.tag('placeholder', Placeholder)
