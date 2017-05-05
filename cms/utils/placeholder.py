@@ -110,8 +110,9 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     # plugin.value points to the class name of the plugin
     # It's added on registration. TIL.
     for plugin in plugins:
-        if permissions.has_plugin_permission(permissions.get_current_user(), plugin.value , 'add'):
-            main_list.append({'value': plugin.value,
+        if hasattr(permissions.get_current_user(), 'has_perm'):
+            if permissions.has_plugin_permission(permissions.get_current_user(), plugin.value , 'add'):
+                main_list.append({'value': plugin.value,
                           'name': names.get(plugin.value, plugin.name),
                           'module': modules.get(plugin.value, plugin.module)})
     return sorted(main_list, key=operator.itemgetter("module"))
