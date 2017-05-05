@@ -109,4 +109,4 @@ The django-dbgettext support has been fully dropped in 2.2 in favour of the
 built-in multi-lingual support mechanisms.
 
 
-.. _django-staticfiles: http://pypi.python.org/pypi/django-staticfiles/
+.. _django-staticfiles: https://pypi.python.org/pypi/django-staticfiles/

@@ -14,12 +14,9 @@ In a nutshell
 
 Here's what the contribution process looks like in brief:
 
-#. django CMS is hosted on `GitHub`_, at https://github.com/divio/django-cms
-#. The best method to contribute back is to create an account there, then fork
-   the project. You can use this fork as if it was your own project, and should
-   push your changes to it.
-#. When you feel your code is good enough for inclusion, "send us a `pull
-   request`_", by using the nice GitHub web interface.
+#. Fork our `GitHub`_ repository, https://github.com/divio/django-cms
+#. Work locally and push your changes to your repository.
+#. When you feel your code is good enough for inclusion, send us a pull request.
 
 See the :ref:`contributing_patch` how-to document for a walk-through of this process.
 
@@ -134,7 +131,7 @@ django CMS you need to have the following dependencies installed:
     1. `Node <https://nodejs.org/>`_ version 0.12.7 (will install npm as well).
        We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
        the correct version of Node.
-    2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
+    2. `gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md>`_
     3. Local dependencies ``npm install``
 
 Styles
@@ -143,7 +140,7 @@ Styles
 We use `Sass <http://sass-lang.com/>`_ for our styles. The files
 are located within ``cms/static/cms/sass`` and can be compiled using the
 `libsass <http://libsass.org/>`_ implementation of Sass compiler through
-`Gulp <http://gulpjs.com/>`_.
+`gulp <http://gulpjs.com/>`_.
 
 In order to compile the stylesheets you need to run this command from the repo
 root::
@@ -188,8 +185,8 @@ JS Bundling
 
 JavaScript files are split up for easier development, but in the end they are
 bundled together and minified to decrease amount of requests made and improve
-performance. In order to do that we use ``gulp`` task runner, where ``bundle``
-command is available. We use `Webpack <https://github.com/webpack/webpack>_` for
+performance. In order to do that we use the ``gulp`` task runner, where ``bundle``
+command is available. We use `Webpack <https://github.com/webpack/webpack>`_ for
 bundling JavaScript files. Configuration for each bundle are stored inside the
 ``webpack.config.js`` and their respective entry points. CMS exposes only one
 global variable, named ``CMS``. If you want to use JavaScript code provided by
@@ -197,10 +194,10 @@ CMS in external applications, you can only use bundles distributed by CMS, not
 the source modules.
 
 
-.. _fork: http://github.com/divio/django-cms
+.. _fork: https://github.com/divio/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _Aldryn Boilerplate: https://aldryn-boilerplate-bootstrap3.readthedocs.io/en/latest/guidelines/index.html
-.. _django-cms-developers: http://groups.google.com/group/django-cms-developers
+.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _GitHub: http://www.github.com
 .. _GitHub help: http://help.github.com
 .. _freenode: http://freenode.net/

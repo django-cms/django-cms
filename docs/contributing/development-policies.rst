@@ -54,7 +54,7 @@ Proposal and discussion of significant changes
 **********************************************
 
 New features and backward-incompatible changes should be proposed using the `django CMS developers email list
-<http://groups.google.com/group/django-cms-developers>`_. Discussion should take place there before any pull requests
+<https://groups.google.com/group/django-cms-developers>`_. Discussion should take place there before any pull requests
 are made.
 
 This is in the interests of openness and transparency, and to give the community a chance to participate in and
@@ -70,7 +70,7 @@ The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our webs
 We are planning releases according to **key principles and aims**. Issues within milestones are
 therefore subject to change.
 
-The `django CMS developers email list <http://groups.google.com/group/django-cms-developers>`_ serves as gathering
+The `django CMS developers email list <https://groups.google.com/group/django-cms-developers>`_ serves as gathering
 point for developers. We submit ideas and proposals prior to the roadmap goals.
 
 django CMS 3.4 will be the first "LTS" ("Long-Term Support") release of the application. *Long-term support* means that
@@ -214,5 +214,5 @@ New lines should be added to the top of the list.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _django-cms-developers: http://groups.google.com/group/django-cms-developers
+.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode: http://freenode.net/

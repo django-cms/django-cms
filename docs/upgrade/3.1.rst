@@ -28,7 +28,7 @@ Since django CMS 2.0 we have relied on MPTT (Modified Pre-order Tree Traversal) 
 handling tree structures in the database.
 
 In 3.1, `Django MPTT <https://github.com/django-mptt/django-mptt>`_ has been replaced by
-`django-treebeard <https://github.com/tabo/django-treebeard>`_, to improve performance and
+`django-treebeard <https://github.com/django-treebeard/django-treebeard>`_, to improve performance and
 reliability.
 
 Over the years MPTT has proved not to be fast enough for big tree operations (>1000 pages); tree
@@ -49,7 +49,7 @@ Other than this, end users should not notice any changes.
     While most of the low-level interface is very similar between ``django-mptt`` and
     ``django-treebeard`` they are not exactly the same. If any custom code needs to make use of the
     low-level interfaces of the page or plugins tree, please see the `django-treebeard
-    documentation <https://tabo.pe/projects/django-treebeard/docs/2.0/>`_ for information
+    documentation <http://django-treebeard.readthedocs.io/en/latest/>`_ for information
     on how to use equivalent calls in ``django-treebeard``.
 
 .. note:: Handling plugin data migrations
@@ -232,8 +232,6 @@ Toolbar API extension
 The toolbar API has been extended to permit more powerful use of it in future development,
 including the use of "clipboard-like" items.
 
-For an example of how this can be used, see the new
-`Aldryn Blueprint <https://github.com/aldryn/aldryn-blueprint/>`_ application.
 
 Per-namespace apphook configuration
 ===================================
