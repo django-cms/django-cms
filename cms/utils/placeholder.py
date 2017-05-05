@@ -17,7 +17,7 @@ from sekizai.helpers import get_varname, is_variable_extend_node
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils import get_cms_setting
 
-from cms.utils import permissions
+from cms.utils.permissions import get_current_user , has_plugin_permission
 
 DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
 
@@ -110,8 +110,8 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     # plugin.value points to the class name of the plugin
     # It's added on registration. TIL.
     for plugin in plugins:
-        if hasattr(permissions.get_current_user(), 'has_perm'):
-            if permissions.has_plugin_permission(permissions.get_current_user(), plugin.value , 'add'):
+        if hasattr(get_current_user(), 'has_perm'):
+            if has_plugin_permission(get_current_user(), plugin.value , 'add'):
                 main_list.append({'value': plugin.value,
                           'name': names.get(plugin.value, plugin.name),
                           'module': modules.get(plugin.value, plugin.module)})
