@@ -131,7 +131,7 @@ django CMS you need to have the following dependencies installed:
     1. `Node <https://nodejs.org/>`_ version 0.12.7 (will install npm as well).
        We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
        the correct version of Node.
-    2. `gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md>`_
+    2. gulp - see `Gulp's Getting Started notes <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md>`_
     3. Local dependencies ``npm install``
 
 Styles
