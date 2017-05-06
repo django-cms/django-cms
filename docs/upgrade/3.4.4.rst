@@ -29,6 +29,15 @@ Deprecations
 Backward incompatible changes
 *****************************
 
+Page methods
+============
+
+The following methods have been removed from the ``Page`` model:
+
+* ``reset_to_live``
+  This internal method was removed and replaced with ``revert_to_live``.
+
+
 Placeholder utilities
 =====================
 
