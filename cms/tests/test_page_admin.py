@@ -76,7 +76,7 @@ class PageTestBase(CMSTestCase):
 
     def _add_plugin_to_page(self, page, plugin_type='LinkPlugin', language='en', publish=True):
         plugin_data = {
-            'TextPlugin': {'body': 'text'},
+            'TextPlugin': {'body': '<p>text</p>'},
             'LinkPlugin': {'name': 'A Link', 'url': 'https://www.django-cms.org'},
         }
         placeholder = page.placeholders.get(slot='body')
@@ -1215,6 +1215,45 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    @override_settings(CMS_PLACEHOLDER_CACHE=True)
+    def test_placeholder_cache_cleared_on_publish(self):
+        page = self.get_page()
+        staff_user = self.get_superuser()
+        plugins = [
+            self._add_plugin_to_page(page, 'TextPlugin', publish=False),
+            self._add_plugin_to_page(page, 'LinkPlugin', publish=False),
+        ]
+
+        with self.login_user_context(staff_user):
+            # Publish the page
+            publish_endpoint = self.get_admin_url(Page, 'publish_page', page.pk, 'en')
+            self.client.post(publish_endpoint)
+
+        response = self.client.get(page.get_absolute_url())
+        self.assertContains(response, '<p>text</p>', html=True)
+        self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+        placeholder = plugins[0].placeholder
+
+        with self.login_user_context(staff_user):
+            # Delete the plugins
+            data = {'post': True}
+
+            for plugin in plugins:
+                endpoint = self.get_delete_plugin_uri(plugin)
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 302)
+            self.assertEqual(placeholder.get_plugins('en').count(), 0)
+
+        with self.login_user_context(staff_user):
+            # Publish the page
+            publish_endpoint = self.get_admin_url(Page, 'publish_page', page.pk, 'en')
+            self.client.post(publish_endpoint)
+
+        response = self.client.get(page.get_absolute_url())
+        self.assertNotContains(response, '<p>text</p>', html=True)
+        self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
     def test_clear_placeholder_marks_page_as_dirty(self):
         page = self.get_page()
