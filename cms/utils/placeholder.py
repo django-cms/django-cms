@@ -17,6 +17,7 @@ from sekizai.helpers import get_varname, is_variable_extend_node
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils import get_cms_setting
 
+
 DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
 
 
@@ -107,7 +108,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
 
     # plugin.value points to the class name of the plugin
     # It's added on registration. TIL.
-    for plugin in plugins: 
+    for plugin in plugins:
         main_list.append({'value': plugin.value,
                           'name': names.get(plugin.value, plugin.name),
                           'module': modules.get(plugin.value, plugin.module)})
