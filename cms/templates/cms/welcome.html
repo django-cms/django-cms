@@ -63,11 +63,15 @@
                 <p class="cms-welcome-notes">If you don't see the django CMS logo at the top, make sure
                     you linked the <code>static/cms</code> folder to your
                     static files.</p>
-                <p class="cms-welcome-notes">You're seeing this message because you have
-                    <code>DEBUG = True</code> in your django settings file and
-                    haven't added any pages yet.
-                </p>
             {% endblocktrans %}
+            {% if django_debug %}
+                {% blocktrans %}
+                    <p class="cms-welcome-notes">You're seeing this message because you have
+                        <code>DEBUG = True</code> in your django settings file and
+                        haven't added any pages yet.
+                    </p>
+                {% endblocktrans %}
+            {% endif %}
         </footer>
     </div>
     {% render_block "js" %}

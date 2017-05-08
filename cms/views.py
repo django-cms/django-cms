@@ -12,11 +12,12 @@ from django.utils.translation import get_language
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.cache.page import get_page_cache
-from cms.page_rendering import _handle_no_page, render_page
+from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
 from cms.utils import get_language_code, get_language_from_request, get_cms_setting
 from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             is_language_prefix_patterns_used)
+from cms.utils.page import get_pages_queryset
 from cms.utils.page_resolver import get_page_from_request
 
 
@@ -46,11 +47,22 @@ def details(request, slug):
 
     # Get a Page model object from the request
     page = get_page_from_request(request, use_path=slug)
+    draft_pages =  get_pages_queryset(draft=True)
+
+    if not page and not slug and not draft_pages.exists():
+        # render the welcome page if the requested path is root "/"
+        # and there's no pages
+        return _render_welcome_page(request)
+
     if not page:
-        return _handle_no_page(request, slug)
+        # raise 404
+        _handle_no_page(request)
+
     current_language = request.GET.get('language', None)
+
     if not current_language:
         current_language = request.POST.get('language', None)
+
     if current_language:
         current_language = get_language_code(current_language)
         if current_language not in get_language_list(page.site_id):
@@ -98,9 +110,11 @@ def details(request, slug):
                         elif pages_root not in own_urls:
                             return HttpResponseRedirect(pages_root)
             elif not hasattr(request, 'toolbar') or not request.toolbar.redirect_url:
-                _handle_no_page(request, slug)
+                # raise 404
+                _handle_no_page(request)
         else:
-            return _handle_no_page(request, slug)
+            # raise 404
+            _handle_no_page(request)
     if current_language not in available_languages:
         # If we didn't find the required page in the requested (current)
         # language, let's try to find a fallback
@@ -122,7 +136,7 @@ def details(request, slug):
                     found = True
         if not found and (not hasattr(request, 'toolbar') or not request.toolbar.redirect_url):
             # There is a page object we can't find a proper language to render it
-            _handle_no_page(request, slug)
+            _handle_no_page(request)
     else:
         page_path = page.get_absolute_url(language=current_language)
         page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)

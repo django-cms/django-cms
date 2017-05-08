@@ -411,7 +411,9 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
     casper
         .start()
         .then(cms.addPage({ title: 'Homepage' }))
-        .thenOpen(globals.baseUrl)
+        // this should be baseUrl, but if you never accessed /?edit the CMS doesn't know
+        // that you ever been in edit mode and will redirect you to a 404 once you unpublish home page
+        .thenOpen(globals.editUrl)
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
