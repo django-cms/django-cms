@@ -2,6 +2,7 @@
 """
 Edit Toolbar middleware
 """
+from classytags.utils import flatten_context
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
@@ -20,21 +21,18 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
 
     instance.placeholder = placeholder
 
-    with force_language(toolbar.toolbar_language):
-        data = {
-            'instance': instance,
-            'rendered_content': rendered_content,
-        }
-        # TODO: Remove js_compat once get_action_urls is refactored.
-        data.update(instance.get_action_urls(js_compat=False))
+    context = flatten_context(original_context)
 
-    original_context.update(data)
+    with force_language(toolbar.toolbar_language):
+        context['instance'] = instance
+        context['rendered_content'] = rendered_content
+        # TODO: Remove js_compat once get_action_urls is refactored.
+        context.update(instance.get_action_urls(js_compat=False))
+
     template = toolbar.get_cached_template(
         template=instance.get_plugin_class().frontend_edit_template
     )
-    output = template.render(original_context).strip()
-    original_context.pop()
-    return output
+    return template.render(context).strip()
 
 
 class ToolbarMiddleware(object):
