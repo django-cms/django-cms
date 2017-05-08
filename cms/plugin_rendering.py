@@ -18,6 +18,8 @@ from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
 
+from cms.utils.permissions import has_plugin_permission
+from functools import partial
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
@@ -439,10 +441,12 @@ class ContentRenderer(object):
         return content
 
     def render_editable_placeholder(self, placeholder, context, language):
+        can_add_plugin = partial(has_plugin_permission, user=self.request.user, permission_type='add')
+        plugins = [plugin for plugin in self.registered_plugins if can_add_plugin(plugin_type=plugin.value)]
         plugin_menu = get_toolbar_plugin_struct(
-            plugins=self.registered_plugins,
-            slot=placeholder.slot,
-            page=placeholder.page,
+        plugins=plugins,
+        slot=placeholder.slot,
+        page=placeholder.page,
         )
         new_context = {
             'plugin_menu': plugin_menu,
