@@ -17,8 +17,6 @@ from sekizai.helpers import get_varname, is_variable_extend_node
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils import get_cms_setting
 
-from cms.utils.permissions import get_current_user , has_plugin_permission
-
 DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
 
 
