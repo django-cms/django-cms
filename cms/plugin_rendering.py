@@ -3,7 +3,6 @@ import warnings
 
 from collections import deque
 
-from cms.utils.permissions import has_plugin_permission
 from functools import partial
 
 from classytags.utils import flatten_context
