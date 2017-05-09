@@ -24,6 +24,8 @@ from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_text
 
+from functools import partial
+
 from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
@@ -50,6 +52,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import force_language
+from cms.utils.permissions import has_plugin_permission
 from cms.utils.plugins import get_plugins_for_page, get_plugins
 from django.contrib.auth.models import Permission
 from django.utils.http import urlencode
@@ -1236,8 +1239,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
 
-        from cms.utils.permissions import has_plugin_permission
-        from functools import partial
         from cms.utils.placeholder import get_toolbar_plugin_struct
 
         expected_struct_en = {
