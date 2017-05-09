@@ -1,0 +1,11 @@
+django-mptt
+django-sekizai
+django-classy-tags
+html5lib
+django-reversion
+django
+south
+pillow
+sphinx
+jinja2
+pygments
