@@ -3,9 +3,7 @@ from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.constants import PUBLISHER_STATE_PENDING
-from cms.toolbar.utils import get_plugin_toolbar_js
 from cms.utils.admin import render_admin_rows
-from sekizai.helpers import get_varname
 
 from django import template
 from django.conf import settings
@@ -225,38 +223,6 @@ class CMSAdminIconBase(Tag):
 
 
 register.tag(CMSAdminIconBase)
-
-
-@register.simple_tag(takes_context=True)
-def render_plugin_toolbar_config(context, plugin):
-    content_renderer = context['cms_content_renderer']
-
-    instance, plugin_class = plugin.get_plugin_instance()
-
-    if not instance:
-        return ''
-
-    with context.push():
-        content = content_renderer.render_editable_plugin(
-            instance,
-            context,
-            plugin_class,
-        )
-        # render_editable_plugin will populate the plugin
-        # parents and children cache.
-        placeholder_cache = content_renderer.get_rendered_plugins_cache(instance.placeholder)
-        toolbar_js = get_plugin_toolbar_js(
-            instance,
-            request_language=content_renderer.request_language,
-            children=placeholder_cache['plugin_children'][instance.plugin_type],
-            parents=placeholder_cache['plugin_parents'][instance.plugin_type],
-        )
-        varname = get_varname()
-        toolbar_js = '<script>{}</script>'.format(toolbar_js)
-        # Add the toolbar javascript for this plugin to the
-        # sekizai "js" namespace.
-        context[varname]['js'].append(toolbar_js)
-    return mark_safe(content)
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)

@@ -7,17 +7,22 @@ from django.shortcuts import render_to_response
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.template.defaultfilters import force_escape
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    ObjectDoesNotExist,
+    ValidationError,
+)
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
+from django.utils.html import escapejs
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms import operations
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
+from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
 from cms.utils import get_cms_setting
+from cms.utils import get_language_from_request
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
@@ -85,6 +90,15 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         # Set default name
         if not new_plugin.name:
             new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
+
+        # By flagging the plugin class, we avoid having to call these class
+        # methods for every plugin all the time.
+        # Instead, we only call them if they are actually overridden.
+        if 'get_extra_placeholder_menu_items' in attrs:
+            new_plugin._has_extra_placeholder_menu_items = True
+
+        if 'get_extra_plugin_menu_items' in attrs:
+            new_plugin._has_extra_plugin_menu_items = True
         return new_plugin
 
 
@@ -122,19 +136,13 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     cache_child_classes = True
     cache_parent_classes = True
 
+    _has_extra_placeholder_menu_items = False
+    _has_extra_plugin_menu_items = False
+
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
 
     opts = {}
-
-    action_options = {
-        PLUGIN_MOVE_ACTION: {
-            'requires_reload': False
-        },
-        PLUGIN_COPY_ACTION: {
-            'requires_reload': True
-        },
-    }
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
@@ -254,15 +262,44 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def render_close_frame(self, obj, extra_context=None):
+    def render_close_frame(self, request, obj, extra_context=None):
+        try:
+            root = obj.parent.get_bound_plugin() if obj.parent else obj
+        except ObjectDoesNotExist:
+            # This is a nasty edge-case.
+            # If the parent plugin is a ghost plugin, fetching the plugin tree
+            # will fail because the downcasting function filters out all ghost plugins.
+            # Currently this case is only present in the djangocms-text-ckeditor app
+            # which uses ghost plugins to create inline plugins on the text.
+            root = obj
+
+        plugins = [root] + list(root.get_descendants().order_by('path'))
+
+        child_classes = self.get_child_classes(
+            slot=obj.placeholder.slot,
+            page=obj.page,
+            instance=obj,
+        )
+
+        parent_classes = self.get_parent_classes(
+            slot=obj.placeholder.slot,
+            page=obj.page,
+            instance=obj,
+        )
+
+        data = get_plugin_toolbar_info(
+            obj,
+            request_language=get_language_from_request(request),
+            children=child_classes,
+            parents=parent_classes,
+        )
+        data['plugin_desc'] = escapejs(force_text(obj.get_short_description()))
+
         context = {
             'plugin': obj,
             'is_popup': True,
-            'name': force_text(obj),
-            "type": obj.get_plugin_name(),
-            'plugin_id': obj.pk,
-            'icon': force_escape(obj.get_instance_icon_src()),
-            'alt': force_escape(obj.get_instance_icon_alt()),
+            'plugin_data': json.dumps(data),
+            'plugin_structure': get_plugin_tree_as_json(request, plugins),
         }
 
         if extra_context:
@@ -316,7 +353,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # was added successfully but looks like the CMS has not
         # supported this and can lead to issues with plugins
         # like ckeditor.
-        return self.render_close_frame(obj)
+        return self.render_close_frame(request, obj)
 
     def response_change(self, request, obj):
         self.object_successfully_changed = True
@@ -324,7 +361,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
-        return self.render_close_frame(obj)
+        return self.render_close_frame(request, obj)
 
     def log_addition(self, request, obj, bypass=None):
         pass
@@ -454,17 +491,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         parent_classes = ph_conf.get(cls.__name__, cls.parent_classes)
         return parent_classes
 
-    def get_action_options(self):
-        return self.action_options
-
-    def requires_reload(self, action):
-        actions = self.get_action_options()
-        reload_required = False
-        if action in actions:
-            options = actions[action]
-            reload_required = options.get('requires_reload', False)
-        return reload_required
-
     def get_plugin_urls(self):
         """
         Return URL patterns for which the plugin wants to register
@@ -476,13 +502,12 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return self.get_plugin_urls()
     plugin_urls = property(plugin_urls)
 
+    @classmethod
     def get_extra_placeholder_menu_items(self, request, placeholder):
         pass
 
-    def get_extra_global_plugin_menu_items(self, request, plugin):
-        pass
-
-    def get_extra_local_plugin_menu_items(self, request, plugin):
+    @classmethod
+    def get_extra_plugin_menu_items(cls, request, plugin):
         pass
 
     def __repr__(self):
@@ -493,7 +518,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
 
 class PluginMenuItem(object):
-    def __init__(self, name, url, data, question=None, action='ajax', attributes=None):
+
+    def __init__(self, name, url, data=None, question=None, action='ajax', attributes=None):
         """
         Creates an item in the plugin / placeholder menu
 
@@ -506,9 +532,13 @@ class PluginMenuItem(object):
         """
         if not attributes:
             attributes = {}
+
+        if data:
+            data = json.dumps(data)
+
         self.name = name
         self.url = url
-        self.data = json.dumps(data)
+        self.data = data
         self.question = question
         self.action = action
         self.attributes = attributes

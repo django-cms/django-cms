@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden,
+from django.http import (Http404, HttpResponseBadRequest,
                          QueryDict, HttpResponseNotFound)
 from django.utils.encoding import force_text, smart_str
 from django.utils import timezone
@@ -22,7 +22,7 @@ from cms.api import create_page, create_title, add_plugin, publish_page
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
-from cms.constants import PLUGIN_MOVE_ACTION, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -37,7 +37,6 @@ from cms.test_utils.testcases import (
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
-from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 
 
@@ -571,86 +570,6 @@ class AdminTests(AdminTestsBase):
             endpoint = self.get_delete_plugin_uri(plugin)
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
-
-    def test_move_plugin(self):
-        ph = Placeholder.objects.create(slot='test')
-        plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
-        page = self.get_page()
-        source, target = list(page.placeholders.all())[:2]
-        pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
-        plugin_class = pageplugin.get_plugin_class_instance()
-
-        with force_language('en'):
-            action_urls = pageplugin.get_action_urls()
-
-        expected = {
-            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
-            'urls': action_urls,
-        }
-        placeholder = Placeholder.objects.all()[0]
-        permless = self.get_permless()
-        admin_user = self.get_admin()
-
-        move_plugin_endpoint = self.get_move_plugin_uri(plugin)
-        move_page_plugin_endpoint = self.get_move_plugin_uri(pageplugin)
-
-        with self.login_user_context(permless):
-            response = self.client.get(move_plugin_endpoint)
-            self.assertEqual(response.status_code, 405)
-            self.assertRaises(RuntimeError, self.client.post, move_plugin_endpoint, {'not_usable': '1'})
-
-        with self.login_user_context(admin_user):
-            self.assertRaises(RuntimeError, self.client.post, move_plugin_endpoint, {'ids': plugin.pk})
-
-        with self.login_user_context(admin_user):
-            data = {
-                'plugin_id': pageplugin.pk,
-                'placeholder_id': 'invalid-placeholder',
-                'plugin_language': 'en',
-            }
-            self.assertRaises(RuntimeError, self.client.post, move_page_plugin_endpoint, data)
-
-        with self.login_user_context(permless):
-            data = {
-                'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk,
-                'plugin_parent': '',
-                'plugin_language': 'en',
-            }
-            response = self.client.post(move_page_plugin_endpoint, data)
-            self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-        with self.login_user_context(admin_user):
-            data = {
-                'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.pk,
-                'plugin_parent': '',
-                'plugin_language': 'en',
-            }
-            response = self.client.post(move_page_plugin_endpoint, data)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
-
-        with self.login_user_context(permless):
-            data = {
-                'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id,
-                'plugin_parent': '',
-                'plugin_language': 'en',
-            }
-            response = self.client.post(move_page_plugin_endpoint, data)
-            self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-        with self.login_user_context(admin_user):
-            data = {
-                'plugin_id': pageplugin.pk,
-                'placeholder_id': placeholder.id,
-                'plugin_parent': '',
-                'plugin_language': 'en',
-            }
-            response = self.client.post(move_page_plugin_endpoint, data)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
     def test_move_language(self):
         page = self.get_page()

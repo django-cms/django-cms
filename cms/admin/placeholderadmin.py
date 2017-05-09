@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 import uuid
 import warnings
 
@@ -29,24 +28,17 @@ from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.admin.forms import PluginAddValidationForm
-from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION, SLUG_REGEXP
+from cms.constants import SLUG_REGEXP
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.signals import pre_placeholder_operation, post_placeholder_operation
-from cms.utils import (
-    copy_plugins,
-    get_cms_setting,
-    get_language_from_request,
-)
-from cms.utils.i18n import get_language_list, get_language_code, force_language
-from cms.utils.plugins import (
-    requires_reload,
-    has_reached_plugin_limit,
-    reorder_plugins
-)
+from cms.toolbar.utils import get_plugin_tree_as_json
+from cms.utils import copy_plugins, get_cms_setting
+from cms.utils.i18n import get_language_list, get_language_code
+from cms.utils.plugins import has_reached_plugin_limit, reorder_plugins
 from cms.utils.urlutils import admin_reverse
 
 _no_default = object()
@@ -286,24 +278,6 @@ class PlaceholderAdminMixin(object):
             )
         return placeholder.has_clear_permission(request.user, languages)
 
-    def post_add_plugin(self, request, plugin):
-        pass
-
-    def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
-        pass
-
-    def post_edit_plugin(self, request, plugin):
-        pass
-
-    def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
-        pass
-
-    def post_delete_plugin(self, request, plugin):
-        pass
-
-    def post_clear_placeholder(self, request, placeholder):
-        pass
-
     def get_placeholder_template(self, request, placeholder):
         pass
 
@@ -368,14 +342,6 @@ class PlaceholderAdminMixin(object):
 
         plugin = getattr(plugin_instance, 'saved_object', None)
 
-        uses_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_add_plugin')
-
-        if plugin_instance.object_successfully_changed and uses_hook:
-            warnings.warn('The post_add_plugin hook has been deprecated. '
-                          'Please use placeholder operation signals instead.',
-                          DeprecationWarning)
-            self.post_add_plugin(request, plugin)
-
         if plugin_instance._operation_token:
             tree_order = placeholder.get_plugin_tree_order(plugin.parent_id)
             self._send_post_placeholder_operation(
@@ -416,72 +382,27 @@ class PlaceholderAdminMixin(object):
         source_plugin_id = request.POST.get('source_plugin_id', None)
 
         if copy_to_clipboard and source_plugin_id:
-            old_plugins = self._copy_plugin_to_clipboard(
+            new_plugin = self._copy_plugin_to_clipboard(
                 request,
                 source_placeholder,
                 target_placeholder,
             )
+            new_plugins = [new_plugin]
         elif copy_to_clipboard:
-            old_plugins = self._copy_placeholder_to_clipboard(
+            new_plugin = self._copy_placeholder_to_clipboard(
                 request,
                 source_placeholder,
                 target_placeholder,
             )
+            new_plugins = [new_plugin]
         else:
-            old_plugins = self._add_plugins_from_placeholder(
+            new_plugins = self._add_plugins_from_placeholder(
                 request,
                 source_placeholder,
                 target_placeholder,
             )
-
-        plugin_list = target_placeholder.get_plugins_list(target_language)
-        reload_required = requires_reload(PLUGIN_COPY_ACTION, old_plugins)
-
-        reduced_list = []
-
-        for plugin in plugin_list:
-            reduced_list.append(
-                {
-                    'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
-                    'position': plugin.position, 'desc': force_text(plugin.get_short_description()),
-                    'language': plugin.language, 'placeholder_id': plugin.placeholder_id
-                }
-            )
-
-        # When this is executed we are in the admin class of the source placeholder
-        # It can be a page or a model with a placeholder field.
-        # Because of this we need to get the admin class instance of the
-        # target placeholder and call post_copy_plugins() on it.
-        # By doing this we make sure that both the source and target are
-        # informed of the operation.
-        target_placeholder_admin = self._get_attached_admin(target_placeholder)
-
-        uses_copy_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_copy_plugins')
-
-        if target_placeholder_admin and not uses_copy_hook:
-            uses_copy_hook = _instance_overrides_method(
-                PlaceholderAdminMixin,
-                target_placeholder_admin,
-                'post_copy_plugins',
-            )
-
-        if uses_copy_hook:
-            warnings.warn('The post_copy_plugins hook has been deprecated. '
-                          'Please use placeholder operation signals instead.',
-                          DeprecationWarning)
-            self.post_copy_plugins(request, source_placeholder, target_placeholder, old_plugins)
-
-            if (target_placeholder_admin and
-                        target_placeholder_admin.model != self.model):
-                target_placeholder_admin.post_copy_plugins(
-                    request,
-                    source_placeholder=source_placeholder,
-                    target_placeholder=target_placeholder,
-                    plugins=old_plugins,
-                )
-
-        json_response = {'plugin_list': reduced_list, 'reload': reload_required}
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+        data = get_plugin_tree_as_json(request, new_plugins)
+        return HttpResponse(data, content_type='application/json')
 
     def _copy_plugin_to_clipboard(self, request, source_placeholder, target_placeholder):
         source_language = request.POST['source_language']
@@ -508,12 +429,12 @@ class PlaceholderAdminMixin(object):
         # Empty the clipboard
         target_placeholder.clear()
 
-        copy_plugins.copy_plugins_to(
+        plugin_pairs = copy_plugins.copy_plugins_to(
             old_plugins,
             to_placeholder=target_placeholder,
             to_language=target_language,
         )
-        return old_plugins
+        return plugin_pairs[0][0]
 
     def _copy_placeholder_to_clipboard(self, request, source_placeholder, target_placeholder):
         source_language = request.POST['source_language']
@@ -546,7 +467,7 @@ class PlaceholderAdminMixin(object):
             to_placeholder=reference.placeholder_ref,
             to_language=target_language,
         )
-        return old_plugins
+        return reference
 
     def _add_plugins_from_placeholder(self, request, source_placeholder, target_placeholder):
         # Plugins are being copied from a placeholder in another language
@@ -609,19 +530,20 @@ class PlaceholderAdminMixin(object):
         )
 
         new_plugins = CMSPlugin.objects.filter(pk__in=new_plugin_ids).order_by('path')
+        new_plugins = list(new_plugins)
 
         self._send_post_placeholder_operation(
             request,
             operation=operations.ADD_PLUGINS_FROM_PLACEHOLDER,
             token=operation_token,
-            plugins=list(new_plugins),
+            plugins=new_plugins,
             source_language=source_language,
             source_placeholder=source_placeholder,
             target_language=target_language,
             target_placeholder=target_placeholder,
             target_order=target_tree_order,
         )
-        return old_plugins
+        return new_plugins
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
@@ -641,14 +563,6 @@ class PlaceholderAdminMixin(object):
         response = plugin_instance.change_view(request, str(plugin_id))
 
         plugin = getattr(plugin_instance, 'saved_object', None)
-
-        uses_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_edit_plugin')
-
-        if plugin_instance.object_successfully_changed and uses_hook:
-            warnings.warn('The post_edit_plugin hook has been deprecated. '
-                          'Please use placeholder operation signals instead.',
-                          DeprecationWarning)
-            self.post_edit_plugin(request, plugin)
 
         if plugin_instance._operation_token:
             self._send_post_placeholder_operation(
@@ -755,8 +669,11 @@ class PlaceholderAdminMixin(object):
         else:
             target_parent = None
 
+        new_plugin = None
+        fetch_tree = False
+
         if move_a_copy and plugin.plugin_type == "PlaceholderPlugin":
-            new_plugin = self._paste_placeholder(
+            new_plugins = self._paste_placeholder(
                 request,
                 plugin=plugin,
                 target_language=language,
@@ -764,6 +681,7 @@ class PlaceholderAdminMixin(object):
                 tree_order=order,
             )
         elif move_a_copy:
+            fetch_tree = True
             new_plugin = self._paste_plugin(
                 request,
                 plugin=plugin,
@@ -779,7 +697,9 @@ class PlaceholderAdminMixin(object):
                 target_language=language,
                 target_placeholder=placeholder,
             )
+            new_plugins = [new_plugin]
         else:
+            fetch_tree = True
             new_plugin = self._move_plugin(
                 request,
                 plugin=plugin,
@@ -789,6 +709,10 @@ class PlaceholderAdminMixin(object):
                 tree_order=order,
             )
 
+        if new_plugin and fetch_tree:
+            root = (new_plugin.parent or new_plugin)
+            new_plugins = [root] + list(root.get_descendants().order_by('path'))
+
         # Mark the target placeholder as dirty
         placeholder.mark_as_dirty(language)
 
@@ -796,83 +720,18 @@ class PlaceholderAdminMixin(object):
             # Plugin is being moved or copied into a separate placeholder
             # Mark source placeholder as dirty
             source_placeholder.mark_as_dirty(source_language)
-
-        # When this is executed we are in the admin class of the source placeholder
-        # It can be a page or a model with a placeholder field.
-        # Because of this we need to get the admin class instance of the
-        # target placeholder and call post_move_plugin() on it.
-        # By doing this we make sure that both the source and target are
-        # informed of the operation.
-        target_placeholder_admin = self._get_attached_admin(placeholder)
-
-        uses_copy_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_copy_plugins')
-
-        if target_placeholder_admin and not uses_copy_hook:
-            uses_copy_hook = _instance_overrides_method(
-                PlaceholderAdminMixin,
-                target_placeholder_admin,
-                'post_copy_plugins',
-            )
-
-        uses_move_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_move_plugin')
-
-        if target_placeholder_admin and not uses_move_hook:
-            uses_move_hook = _instance_overrides_method(
-                PlaceholderAdminMixin,
-                target_placeholder_admin,
-                'post_move_plugin',
-            )
-
-        if move_a_copy and uses_copy_hook:
-            warnings.warn('The post_copy_plugins hook has been deprecated. '
-                          'Please use placeholder operation signals instead.',
-                          DeprecationWarning)
-            plugins = list(new_plugin.get_tree())
-
-            self.post_copy_plugins(request, source_placeholder, placeholder, plugins)
-
-            if (target_placeholder_admin and
-                    target_placeholder_admin.model != self.model):
-                target_placeholder_admin.post_copy_plugins(
-                    request,
-                    source_placeholder=source_placeholder,
-                    target_placeholder=placeholder,
-                    plugins=plugins,
-                )
-        elif uses_move_hook:
-            warnings.warn('The post_move_plugin hook has been deprecated. '
-                          'Please use placeholder operation signals instead.',
-                          DeprecationWarning)
-            self.post_move_plugin(request, source_placeholder, placeholder, new_plugin)
-
-            if (target_placeholder_admin and
-                    target_placeholder_admin.model != self.model):
-                target_placeholder_admin.post_move_plugin(
-                    request,
-                    source_placeholder=source_placeholder,
-                    target_placeholder=placeholder,
-                    plugin=new_plugin,
-                )
-
-        try:
-            language = request.toolbar.toolbar_language
-        except AttributeError:
-            language = get_language_from_request(request)
-
-        with force_language(language):
-            plugin_urls = new_plugin.get_action_urls()
-
-        json_response = {
-            'urls': plugin_urls,
-            'reload': move_a_copy or requires_reload(
-                PLUGIN_MOVE_ACTION, [new_plugin])
-        }
-        return HttpResponse(
-            json.dumps(json_response), content_type='application/json')
+        data = get_plugin_tree_as_json(request, new_plugins)
+        return HttpResponse(data, content_type='application/json')
 
     def _paste_plugin(self, request, plugin, target_language,
                       target_placeholder, tree_order, target_parent=None):
-        plugins = [plugin] + list(plugin.get_descendants())
+        plugins = (
+            CMSPlugin
+            .get_tree(parent=plugin)
+            .filter(placeholder=plugin.placeholder_id)
+            .order_by('path')
+        )
+        plugins = list(plugins)
 
         if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
             message = force_text(_("You have no permission to paste this plugin"))
@@ -895,14 +754,13 @@ class PlaceholderAdminMixin(object):
             target_order=target_tree_order,
         )
 
-        new_plugins = copy_plugins.copy_plugins_to(
+        plugin_pairs = copy_plugins.copy_plugins_to(
             plugins,
             to_placeholder=target_placeholder,
             to_language=target_language,
             parent_plugin_id=target_parent_id,
         )
-
-        root_plugin = new_plugins[0][0]
+        root_plugin = plugin_pairs[0][0]
 
         # If an ordering was supplied, replace the item that has
         # been copied with the new copy
@@ -973,7 +831,14 @@ class PlaceholderAdminMixin(object):
             order=target_tree_order,
         )
 
-        new_plugins = list(CMSPlugin.objects.filter(pk__in=new_plugin_ids).order_by('path'))
+        new_plugins = (
+            CMSPlugin
+            .objects
+            .filter(pk__in=new_plugin_ids)
+            .order_by('path')
+            .select_related('placeholder')
+        )
+        new_plugins = list(new_plugins)
 
         self._send_post_placeholder_operation(
             request,
@@ -984,7 +849,7 @@ class PlaceholderAdminMixin(object):
             target_placeholder=target_placeholder,
             target_order=target_tree_order,
         )
-        return new_plugins[0]
+        return new_plugins
 
     def _move_plugin(self, request, plugin, target_language,
                      target_placeholder, tree_order, target_parent=None):
@@ -1191,14 +1056,6 @@ class PlaceholderAdminMixin(object):
                 placeholder=placeholder,
                 tree_order=new_plugin_tree_order,
             )
-
-            uses_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_delete_plugin')
-
-            if uses_hook:
-                warnings.warn('The post_delete_plugin hook has been deprecated. '
-                              'Please use placeholder operation signals instead.',
-                              DeprecationWarning)
-                self.post_delete_plugin(request, plugin)
             return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
 
         plugin_name = force_text(plugin.get_plugin_class().name)
@@ -1272,14 +1129,6 @@ class PlaceholderAdminMixin(object):
                 plugins=plugins,
                 placeholder=placeholder,
             )
-
-            uses_hook = _instance_overrides_method(PlaceholderAdminMixin, self, 'post_clear_placeholder')
-
-            if uses_hook:
-                warnings.warn('The post_clear_placeholder hook has been deprecated. '
-                              'Please use placeholder operation signals instead.',
-                              DeprecationWarning)
-                self.post_clear_placeholder(request, placeholder)
             return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
 
         if perms_needed or protected:

@@ -17,6 +17,7 @@ from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
+from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Title, Page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
@@ -316,6 +317,10 @@ class ApphooksTestCase(CMSTestCase):
         page.publish('en')
         page.publish('de')
         page.save()
+
+        # Needed because publish button only shows if the page is dirty
+        page.set_publisher_state('en', state=PUBLISHER_STATE_DIRTY)
+
         public_page = page.get_public_object()
 
         with self.login_user_context(superuser):

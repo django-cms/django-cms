@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
-import json
 import pickle
 
 from cms.api import create_page
@@ -14,15 +13,13 @@ from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWid
 from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
-from sekizai.context import SekizaiContext
 from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_text
 
 from cms import api
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
-from cms.models import Page, Placeholder, UserSettings
+from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -42,6 +39,7 @@ from cms.test_utils.testcases import (
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import force_language
@@ -61,6 +59,13 @@ def register_plugins(*plugins):
     finally:
         for plugin in plugins:
             plugin_pool.unregister_plugin(plugin)
+
+
+def _render_placeholder(placeholder, context, **kwargs):
+    request = context['request']
+    toolbar = get_toolbar_from_request(request)
+    content_renderer = toolbar.content_renderer
+    return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -287,7 +292,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(text_plugin_2.position, 1)
             self.assertEqual(db_plugin_2.position, 1)
             ## Finally we render the placeholder to test the actual content
-            rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url(), page=page_en), None)
+            context = self.get_context(page_en.get_absolute_url(), page=page_en)
+            rendered_placeholder = _render_placeholder(ph_en, context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the second")
 
     def test_plugin_order_alt(self):
@@ -334,9 +340,11 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_3.pk).position, 2)
 
             ## Finally we render the placeholder to test the actual content
-            rendered_placeholder = placeholder.render(self.get_context(draft_page.get_absolute_url(), page=draft_page), None)
+            draft_page_context = self.get_context(draft_page.get_absolute_url(), page=draft_page)
+            rendered_placeholder = _render_placeholder(placeholder, draft_page_context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the secondI'm the third")
-            rendered_live_placeholder = live_placeholder.render(self.get_context(live_page.get_absolute_url(), page=live_page), None)
+            live_page_context = self.get_context(live_page.get_absolute_url(), page=live_page)
+            rendered_live_placeholder = _render_placeholder(live_placeholder, live_page_context)
             self.assertEqual(rendered_live_placeholder, "I'm the firstI'm the secondI'm the third")
 
         columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
@@ -806,7 +814,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin.add_root(instance=plugin)
 
         # this should not raise any errors, but just ignore the empty plugin
-        out = placeholder.render(self.get_context(), width=300)
+        out = _render_placeholder(placeholder, self.get_context(), width=300)
         self.assertFalse(len(out))
         self.assertFalse(len(placeholder._plugins_cache))
 
@@ -947,133 +955,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
         self.assertEqual(db_text_plugin_1.pk, text_plugin_1.pk)
 
-    def test_plugin_move_with_reload(self):
-        action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': True
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': True
-            },
-        }
-        non_reload_action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': False
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': False
-            },
-        }
-        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options, render_plugin=False))
-        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
-
-        with register_plugins(ReloadDrivenPlugin, NonReloadDrivenPlugin):
-            page = api.create_page("page", "nav_playground.html", "en", published=True)
-            source_placeholder = page.placeholders.get(slot='body')
-            target_placeholder = page.placeholders.get(slot='right-column')
-            plugin_1 = api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
-            plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
-
-            with force_language('en'):
-                plugin_1_action_urls = plugin_1.get_action_urls()
-
-            reload_expected = {
-                'reload': True,
-                'urls': plugin_1_action_urls,
-            }
-
-            # Test Plugin reload == True on Move
-            post = {
-                'plugin_id': plugin_1.pk,
-                'placeholder_id': target_placeholder.pk,
-                'plugin_parent': '',
-            }
-
-            endpoint = self.get_move_plugin_uri(plugin_1)
-
-            response = self.client.post(endpoint, post)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), reload_expected)
-
-            with force_language('en'):
-                plugin_2_action_urls = plugin_2.get_action_urls()
-
-            no_reload_expected = {
-                'reload': False,
-                'urls': plugin_2_action_urls,
-            }
-
-            # Test Plugin reload == False on Move
-            post = {
-                'plugin_id': plugin_2.pk,
-                'placeholder_id': target_placeholder.pk,
-                'plugin_parent': '',
-            }
-
-            response = self.client.post(endpoint, post)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), no_reload_expected)
-
-    def test_plugin_copy_with_reload(self):
-        action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': True
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': True
-            },
-        }
-        non_reload_action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': False
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': False
-            },
-        }
-        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options, render_plugin=False))
-        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
-
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
-
-        user_settings = UserSettings.objects.create(
-            language="en",
-            user=self.super_user,
-            clipboard=Placeholder.objects.create(slot='clipboard'),
-        )
-
-        with register_plugins(ReloadDrivenPlugin, NonReloadDrivenPlugin):
-            page = api.create_page("page", "nav_playground.html", "en", published=True)
-            source_placeholder = page.placeholders.get(slot='body')
-            target_placeholder = user_settings.clipboard
-            api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
-            plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
-
-            # Test Plugin reload == True on Copy
-            copy_data = {
-                'source_placeholder_id': source_placeholder.pk,
-                'target_placeholder_id': target_placeholder.pk,
-                'target_language': settings.LANGUAGES[0][0],
-                'source_language': settings.LANGUAGES[0][0],
-            }
-            response = self.client.post(endpoint, copy_data)
-            self.assertEqual(response.status_code, 200)
-            json_response = json.loads(response.content.decode('utf8'))
-            self.assertEqual(json_response['reload'], True)
-
-            # Test Plugin reload == False on Copy
-            copy_data = {
-                'source_placeholder_id': source_placeholder.pk,
-                'source_plugin_id': plugin_2.pk,
-                'target_placeholder_id': target_placeholder.pk,
-                'target_language': settings.LANGUAGES[0][0],
-                'source_language': settings.LANGUAGES[0][0],
-            }
-            response = self.client.post(endpoint, copy_data)
-            self.assertEqual(response.status_code, 200)
-            json_response = json.loads(response.content.decode('utf8'))
-            self.assertEqual(json_response['reload'], False)
-
     def test_custom_plugin_urls(self):
         plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')
 
@@ -1146,17 +1027,9 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         with self.login_user_context(staff_user):
             request = self.get_request(page_url, page=page)
-            request.session['cms_edit'] = True
             request.toolbar = CMSToolbar(request)
-            content_renderer = self.get_content_renderer(request=request)
-            context = {'request': request, 'cms_content_renderer': content_renderer}
-            output = content_renderer.render_placeholder(
-                placeholder,
-                context=SekizaiContext(context),
-                language='en',
-                page=page,
-                editable=True,
-            )
+            renderer = self.get_structure_renderer(request=request)
+            output = renderer.render_placeholder(placeholder, language='en', page=page)
             self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
             self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
 
@@ -1307,13 +1180,17 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         context = self.get_context(path=page_en.get_absolute_url())
         request = context['request']
         plugins = get_plugins(request, ph_en, page_en.template)
+        content_renderer = self.get_content_renderer()
+
         for plugin in plugins:
             if plugin.title == 'custom template':
+                content = content_renderer.render_plugin(plugin, context, ph_en)
                 self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html')
-                self.assertTrue('Articles Custom template' in plugin.render_plugin(context, ph_en))
+                self.assertTrue('Articles Custom template' in content)
             else:
+                content = content_renderer.render_plugin(plugin, context, ph_en)
                 self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html')
-                self.assertFalse('Articles Custom template' in plugin.render_plugin(context, ph_en))
+                self.assertFalse('Articles Custom template' in content)
 
     def test_add_plugin_with_m2m(self):
         # add a new text plugin
@@ -1436,7 +1313,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
         response = self.client.post(endpoint, copy_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode('utf8').count('"position":'), 1)
+        self.assertEqual(response.content.decode('utf8').count('"plugin_type": "ArticlePlugin"'), 1)
         # assert copy success
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+from django.contrib.sites.models import Site
+from django.forms import MediaDefiningClass
+from django.utils import six
+
 from cms.exceptions import LanguageError
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_language_object
-from django.contrib.sites.models import Site
 
 
-class CMSToolbar(object):
+class CMSToolbar(six.with_metaclass(MediaDefiningClass)):
     supported_apps = None
 
     def __init__(self, request, toolbar, is_current_app, app_path):
@@ -25,9 +28,6 @@ class CMSToolbar(object):
     def post_template_populate(self):
         pass
 
-    def request_hook(self):
-        pass
-
     @classmethod
     def check_current_app(cls, key, app_name):
         if cls.supported_apps is None:
@@ -38,9 +38,3 @@ class CMSToolbar(object):
             if app_name and local_app and app_name.startswith(local_app):
                 return True
         return False
-
-    def render_addons(self, context):
-        return []
-
-    def post_template_render_addons(self, context):
-        return []

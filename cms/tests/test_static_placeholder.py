@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 
 from django.contrib.admin.sites import site
 from django.template import Context
@@ -7,10 +6,8 @@ from django.template.base import Template
 from django.utils import six
 
 from cms.api import add_plugin
-from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import StaticPlaceholder, Placeholder, UserSettings
 from cms.tests.test_plugins import PluginsTestBaseCase
-from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 
 
@@ -122,15 +119,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar', site_id=1)
         static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
         sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test')
-        plugin_class = sourceplugin.get_plugin_class_instance()
 
-        with force_language('en'):
-            action_urls = sourceplugin.get_action_urls()
-
-        expected = {
-            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
-            'urls': action_urls,
-        }
         admin = self.get_admin()
 
         with self.login_user_context(admin):
@@ -143,7 +132,6 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             }
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), expected)
             source = StaticPlaceholder.objects.get(pk=static_placeholder_source.pk)
             target = StaticPlaceholder.objects.get(pk=static_placeholder_target.pk)
             self.assertTrue(source.dirty)

@@ -2,15 +2,16 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
+import Modal from './cms.modal';
+import StructureBoard from './cms.structureboard';
+import $ from 'jquery';
+import '../polyfills/array.prototype.findindex';
+
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
-var KEYS = require('./cms.base').KEYS;
-var Modal = require('./cms.modal');
+var Helpers = require('./cms.base').default.API.Helpers;
+var KEYS = require('./cms.base').default.KEYS;
 var nextUntil = require('./nextuntil');
 var fuzzyFilter = require('fuzzaldrin').filter;
-
-require('../polyfills/array.prototype.findindex');
 
 var doc;
 var clipboardDraggable;
@@ -66,18 +67,13 @@ var Plugin = new Class({
         this.touchStart = 'touchstart.cms.plugin';
         this.touchEnd = 'touchend.cms.plugin';
 
-        // bind data element to the container (mutating!)
-        if (!this.ui.container.data('cms')) {
-            this.ui.container.data('cms', []);
-        }
+        this._ensureData();
         if (Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
             return;
         }
-        if (Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id]) {
+        if (this.options.type === 'placeholder' && Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id]) {
             return;
         }
-
-        Plugin._initializeDragItemsStates();
 
         // determine type of plugin
         switch (this.options.type) {
@@ -96,6 +92,13 @@ var Plugin = new Class({
             default: // handler for static content
                 this.ui.container.data('cms').push(this.options);
                 this._setGeneric();
+        }
+    },
+
+    _ensureData: function _ensureData() {
+        // bind data element to the container (mutating!)
+        if (!this.ui.container.data('cms')) {
+            this.ui.container.data('cms', []);
         }
     },
 
@@ -146,16 +149,10 @@ var Plugin = new Class({
             contents = $('<div></div>');
         }
 
-        this.ui = {
-            container: contents,
-            save: $('.cms-toolbar-item-switch-save-edit'),
-            window: $(window),
-            dragbar: null,
-            draggable: null,
-            draggables: null,
-            submenu: null,
-            dropdown: null
-        };
+        this.ui = this.ui || {};
+        this.ui.container = contents;
+        this.ui.save = $('.cms-toolbar-item-switch-save-edit');
+        this.ui.window = $(window);
     },
 
     /**
@@ -207,6 +204,13 @@ var Plugin = new Class({
     _setPlugin: function () {
         var that = this;
 
+        that._setPluginStructureEvents();
+        that._setPluginContentEvents();
+    },
+
+    _setPluginStructureEvents: function _setPluginStructureEvents() {
+        var that = this;
+
         // filling up ui object
         this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
         this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
@@ -215,49 +219,7 @@ var Plugin = new Class({
 
         this.ui.draggable.data('cms', this.options);
 
-        // adds double click to edit
-        var dblClickHandler = function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            that.editPlugin(
-                Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
-                that.options.plugin_name,
-                that._getPluginBreadcrumbs()
-            );
-        };
-
-        this.ui.dragitem.on(this.doubleClick, dblClickHandler);
-
-        if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
-            // have to delegate here because there might be plugins that
-            // have their content replaced by something dynamic. in case that tool
-            // copies the classes - double click to edit would still work
-            doc.on(this.doubleClick, '.cms-plugin-' + this.options.plugin_id, dblClickHandler);
-            doc.on(
-                this.pointerOverAndOut + ' ' + this.touchStart,
-                '.cms-plugin-' + this.options.plugin_id,
-                function (e) {
-                    // required for both, click and touch
-                    // otherwise propagation won't work to the nested plugin
-                    e.stopPropagation();
-                    if (e.type === 'touchstart') {
-                        CMS.API.Tooltip._forceTouchOnce();
-                    }
-                    var name = that.options.plugin_name;
-                    var id = that.options.plugin_id;
-
-                    var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
-                    var placeholder = $('.cms-placeholder-' + placeholderId);
-
-                    if (placeholder.length && placeholder.data('cms')) {
-                        name = placeholder.data('cms').name + ': ' + name;
-                    }
-
-                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
-                }
-            );
-        }
+        this.ui.dragitem.on(this.doubleClick, this._dblClickToEditHandler.bind(this));
 
         // adds listener for all plugin updates
         this.ui.draggable.on('cms-plugins-update', function (e, eventData) {
@@ -297,6 +259,53 @@ var Plugin = new Class({
 
         // clickability of "Paste" menu item
         this._checkIfPasteAllowed();
+    },
+
+    _dblClickToEditHandler: function _dblClickToEditHandler(e) {
+        var that = this;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        that.editPlugin(
+            Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
+            that.options.plugin_name,
+            that._getPluginBreadcrumbs()
+        );
+    },
+
+    _setPluginContentEvents: function _setPluginContentEvents() {
+        var that = this;
+
+        if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
+            // have to delegate here because there might be plugins that
+            // have their content replaced by something dynamic. in case that tool
+            // copies the classes - double click to edit would still work
+            doc.on(this.doubleClick, '.cms-plugin-' + this.options.plugin_id, this._dblClickToEditHandler.bind(this));
+            doc.on(
+                this.pointerOverAndOut + ' ' + this.touchStart,
+                '.cms-plugin-' + this.options.plugin_id,
+                function (e) {
+                    // required for both, click and touch
+                    // otherwise propagation won't work to the nested plugin
+                    e.stopPropagation();
+                    if (e.type === 'touchstart') {
+                        CMS.API.Tooltip._forceTouchOnce();
+                    }
+                    var name = that.options.plugin_name;
+                    var id = that.options.plugin_id;
+
+                    var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+                    var placeholder = $('.cms-placeholder-' + placeholderId);
+
+                    if (placeholder.length && placeholder.data('cms')) {
+                        name = placeholder.data('cms').name + ': ' + name;
+                    }
+
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+                }
+            );
+        }
     },
 
     /**
@@ -582,6 +591,9 @@ var Plugin = new Class({
         };
 
         clipboardDraggable.appendTo(this.ui.draggables);
+        if (this.options.plugin_id) {
+            StructureBoard.actualizePluginCollapseStatus(this.options.plugin_id);
+        }
         this.ui.draggables.trigger('cms-structure-update', [eventData]);
         clipboardDraggable.trigger('cms-paste-plugin-update', [eventData]);
     },
@@ -667,8 +679,9 @@ var Plugin = new Class({
             data: data,
             success: function (response) {
                 // if response is reload
-                if (response.reload || requiresReload) {
-                    Helpers.reloadBrowser();
+                if (response.reload || requiresReload) { // FIXME should get rid of those
+                    // Helpers.reloadBrowser();
+                    CMS.API.StructureBoard.invalidateState();
                 }
 
                 // set new url settings when moving #4803
@@ -683,7 +696,7 @@ var Plugin = new Class({
                 CMS.API.Toolbar.hideLoader();
 
                 // TODO: show only if (response.status)
-                Plugin._highlightPluginStructure(dragitem);
+                // Plugin._highlightPluginStructure(dragitem);
                 Plugin._updateRegistry({
                     pluginId: options.plugin_id,
                     update: {
@@ -708,8 +721,6 @@ var Plugin = new Class({
                 CMS.API.Toolbar.hideLoader();
             }
         });
-
-        CMS.API.Toolbar.onPublishAvailable();
     },
 
     /**
@@ -1695,6 +1706,10 @@ Plugin._updateRegistry = function _updateRegistry(opts) {
     }
 
     $.extend(true, CMS._plugins[pluginEntryIndex][1], opts.update);
+
+    // FIXME update instance and data('cms') here!
+    // var instanceIndex = (CMS._plugins || []).findIndex(function (instance) {
+    // });
 };
 
 /**
@@ -1796,38 +1811,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         }
     });
 };
-
-/**
- * Initializes the collapsed/expanded states of dragitems in structureboard.
- *
- * @method _initializeDragItemsStates
- * @static
- * @private
- */
-Plugin._initializeDragItemsStates = Helpers.once(function _initializeDragItemsStates() {
-    // removing duplicate entries
-    var states = CMS.settings.states || [];
-    var sortedArr = states.sort();
-    var filteredArray = [];
-
-    for (var i = 0; i < sortedArr.length; i++) {
-        if (sortedArr[i] !== sortedArr[i + 1]) {
-            filteredArray.push(sortedArr[i]);
-        }
-    }
-    CMS.settings.states = filteredArray;
-
-    // loop through the items
-    $.each(CMS.settings.states, function (index, id) {
-        var el = $('.cms-draggable-' + id);
-
-        // only add this class to elements which have a draggable area
-        if (el.find('.cms-draggables').length) {
-            el.find('> .cms-collapsable-container').removeClass('cms-hidden');
-            el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
-        }
-    });
-});
 
 /**
  * @method _isContainingMultiplePlugins
@@ -1959,4 +1942,4 @@ Plugin._updateClipboard = function _updateClipboard() {
 // shorthand for jQuery(document).ready();
 $(Plugin._initializeGlobalHandlers);
 
-module.exports = Plugin;
+export default Plugin;

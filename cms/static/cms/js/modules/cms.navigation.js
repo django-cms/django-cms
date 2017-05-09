@@ -4,7 +4,7 @@
 
 var $ = require('jquery');
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
+var Helpers = require('./cms.base').default.API.Helpers;
 
 /**
  * Responsible for creating usable navigation for narrow screens.
@@ -70,12 +70,16 @@ var Navigation = new Class({
     _events: function _events() {
         var THROTTLE_TIMEOUT = 50;
 
-        this.ui.window.on(
-            [this.resize, this.load, this.orientationChange].join(' '),
-            Helpers.throttle(
-                this._handleResize.bind(this), THROTTLE_TIMEOUT
+        this.ui.window
+            .off(
+                [this.resize, this.load, this.orientationChange].join(' '),
             )
-        );
+            .on(
+                [this.resize, this.load, this.orientationChange].join(' '),
+                Helpers.throttle(
+                    this._handleResize.bind(this), THROTTLE_TIMEOUT
+                )
+            );
     },
 
     /**
@@ -352,4 +356,4 @@ var Navigation = new Class({
 
 });
 
-module.exports = Navigation;
+export default Navigation;

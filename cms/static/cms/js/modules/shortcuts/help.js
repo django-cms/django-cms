@@ -1,6 +1,7 @@
-var keyboard = require('../keyboard');
+import Modal from '../cms.modal';
+
+import keyboard from '../keyboard';
 var tmpl = require('../tmpl');
-var Modal = require('../cms.modal');
 var template = require('./help.html');
 
 /**
@@ -9,7 +10,7 @@ var template = require('./help.html');
  * @function initHelpShortcut
  * @public
  */
-module.exports = function initHelpShortcut() {
+export default function initHelpShortcut() {
     var shortcutAreas = CMS.config.lang.shortcutAreas;
     var modal = new Modal({
         width: 600,
@@ -28,4 +29,4 @@ module.exports = function initHelpShortcut() {
             html: tmpl(template, { shortcutAreas: shortcutAreas })
         });
     });
-};
+}

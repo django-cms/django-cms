@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import forms
+from django.apps import apps
 from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -14,6 +15,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import PluginLimitReached
 from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
+from cms.forms.validators import validate_relative_url
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
 from cms.models import (CMSPlugin, Page, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, EmptyTitle, GlobalPagePermission)
@@ -824,3 +826,47 @@ class PluginAddValidationForm(forms.Form):
         except PluginLimitReached as error:
             self.add_error(None, force_text(error))
         return self.cleaned_data
+
+
+class RequestToolbarForm(forms.Form):
+
+    obj_id = forms.CharField(required=False)
+    obj_type = forms.CharField(required=False)
+    cms_path = forms.CharField(required=False)
+
+    def clean(self):
+        data = self.cleaned_data
+
+        obj_id = data.get('obj_id')
+        obj_type = data.get('obj_type')
+
+        if not bool(obj_id or obj_type):
+            return data
+
+        if (obj_id and not obj_type) or (obj_type and not obj_id):
+            message = 'Invalid object lookup. Both obj_id and obj_type are required'
+            raise forms.ValidationError(message)
+
+        app, sep, model = obj_type.rpartition('.')
+
+        try:
+            model_class = apps.get_model(app_label=app, model_name=model)
+        except LookupError:
+            message = 'Invalid object lookup. Both obj_id and obj_type are required'
+            raise forms.ValidationError(message)
+
+        try:
+            generic_obj = model_class.objects.get(pk=obj_id)
+        except model_class.DoesNotExist:
+            message = 'Invalid object lookup. Both obj_id and obj_type are required'
+            raise forms.ValidationError(message)
+        else:
+            data['attached_obj'] = generic_obj
+        return data
+
+    def clean_cms_path(self):
+        path = self.cleaned_data.get('cms_path')
+
+        if path:
+            validate_relative_url(path)
+        return path

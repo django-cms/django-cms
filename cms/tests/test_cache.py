@@ -52,28 +52,30 @@ class CacheTestCase(CMSTestCase):
     def test_cache_placeholder(self):
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
         page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+        page1_url = page1.get_absolute_url()
 
         placeholder = page1.placeholders.filter(slot="body")[0]
         add_plugin(placeholder, "TextPlugin", 'en', body="English")
         add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
-        request = self.get_request('/en/')
+        request = self.get_request(page1_url)
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
         with self.assertNumQueries(FuzzyInt(5, 9)):
             self.render_template_obj(template, {}, request)
-        request = self.get_request('/en/')
+        request = self.get_request(page1_url)
+        request.session['cms_edit'] = True
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = False
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
         with self.assertNumQueries(1):
             self.render_template_obj(template, {}, request)
         # toolbar
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
-        request.toolbar.show_toolbar = True
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request(page1_url)
+            request.session['cms_edit'] = True
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            request.toolbar.show_toolbar = True
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
         with self.assertNumQueries(3):
             self.render_template_obj(template, {}, request)
@@ -91,14 +93,14 @@ class CacheTestCase(CMSTestCase):
             overrides['MIDDLEWARE_CLASSES'] = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
-                self.client.get('/en/')
+                self.client.get(page1_url)
             with self.assertNumQueries(FuzzyInt(5, 11)):
-                self.client.get('/en/')
+                self.client.get(page1_url)
 
         overrides['CMS_PLACEHOLDER_CACHE'] = False
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(7, 15)):
-                self.client.get('/en/')
+                self.client.get(page1_url)
 
     def test_no_cache_plugin(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
@@ -663,7 +665,6 @@ class CacheTestCase(CMSTestCase):
         content_renderer = self.get_content_renderer(request)
         # asserting initial text
         context = SekizaiContext()
-        context['cms_content_renderer'] = content_renderer
         context['request'] = self.get_request()
         text = content_renderer.render_placeholder(ph1, context)
         self.assertEqual(text, "Some text")
@@ -768,30 +769,30 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def test_set_get_placeholder_cache(self):
         # Test with a super-long prefix
+        en_renderer = self.get_content_renderer(self.en_request)
         en_context = Context({
             'request': self.en_request,
-            'cms_content_renderer': self.get_content_renderer(self.en_request)
         })
+        en_us_renderer = self.get_content_renderer(self.en_us_request)
         en_us_context = Context({
             'request': self.en_us_request,
-            'cms_content_renderer': self.get_content_renderer(self.en_us_request)
         })
+        en_uk_renderer = self.get_content_renderer(self.en_uk_request)
         en_uk_context = Context({
             'request': self.en_uk_request,
-            'cms_content_renderer': self.get_content_renderer(self.en_uk_request)
         })
 
-        en_content = self.placeholder.render(en_context, 350, lang='en')
-        en_us_content = self.placeholder.render(en_us_context, 350, lang='en')
-        en_uk_content = self.placeholder.render(en_uk_context, 350, lang='en')
+        en_content = en_renderer.render_placeholder(self.placeholder, en_context, 'en', width=350)
+        en_us_content = en_us_renderer.render_placeholder(self.placeholder, en_us_context, 'en', width=350)
+        en_uk_content = en_uk_renderer.render_placeholder(self.placeholder, en_uk_context, 'en', width=350)
 
         del self.placeholder._plugins_cache
 
+        de_renderer = self.get_content_renderer(self.de_request)
         de_context = Context({
             'request': self.de_request,
-            'cms_content_renderer': self.get_content_renderer(self.de_request)
         })
-        de_content = self.placeholder.render(de_context, 350, lang='de')
+        de_content = de_renderer.render_placeholder(self.placeholder, de_context, 'de', width=350)
 
         self.assertNotEqual(en_content, de_content)
 
@@ -819,10 +820,16 @@ class PlaceholderCacheTestCase(CMSTestCase):
         # Use an absurdly long cache prefix to get us in the right neighborhood...
         with self.settings(CMS_CACHE_PREFIX="super_lengthy_prefix" * 9):  # 180 chars
             en_crazy_request = self.get_request('/en/')
+            en_crazy_renderer = self.get_content_renderer(self.de_request)
             # Use a ridiculously long "country code" (80 chars), already we're at 260 chars.
             en_crazy_request.META['HTTP_COUNTRY_CODE'] = 'US' * 40  # 80 chars
             en_crazy_context = Context({'request': en_crazy_request})
-            en_crazy_content = self.placeholder.render(en_crazy_context, 350, lang='en')
+            en_crazy_content = en_crazy_renderer.render_placeholder(
+                self.placeholder,
+                en_crazy_context,
+                language='en',
+                width=350,
+            )
             set_placeholder_cache(self.placeholder, 'en', 1, en_crazy_content, en_crazy_request)
 
             # Prove that it is hashed...

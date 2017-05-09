@@ -1390,7 +1390,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                     except:
                         obj = None
         if obj:
-            if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode', False):
+            if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
                 if isinstance(obj, Page):
                     if obj.get_public_object():
                         url = obj.get_public_object().get_absolute_url()

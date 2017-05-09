@@ -1,6 +1,6 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var Messages = require('../../../static/cms/js/modules/cms.messages');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var Messages = require('../../../static/cms/js/modules/cms.messages').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;

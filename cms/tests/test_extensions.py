@@ -480,7 +480,7 @@ class ExtensionAdminTestCase(AdminTestsBase):
                     page_extension, url = self.get_page_extension_admin()
                     if url:
                         current_page_menu.add_modal_item('TestItem', url=url,
-                                                         disabled=not self.toolbar.edit_mode,
+                                                         disabled=not self.toolbar.edit_mode_active,
                                                          position=position)
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
@@ -501,7 +501,7 @@ class ExtensionAdminTestCase(AdminTestsBase):
                     urls = self.get_title_extension_admin()
                     for title_extension, url in urls:
                         current_page_menu.add_modal_item('TestItem', url=url,
-                                                         disabled=not self.toolbar.edit_mode,
+                                                         disabled=not self.toolbar.edit_mode_active,
                                                          position=position)
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):

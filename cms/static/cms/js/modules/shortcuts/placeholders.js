@@ -1,7 +1,7 @@
-var keyboard = require('../keyboard');
-var $ = require('jquery');
+import keyboard from '../keyboard';
+import $ from 'jquery';
 
-require('../jquery.trap');
+import '../jquery.trap';
 
 /**
  * Binds shortcuts:
@@ -156,7 +156,7 @@ var bindPluginActionKeys = function () {
  * @function initPlaceholders
  * @public
  */
-module.exports = function initPlaceholders() {
+export default function initPlaceholders() {
     var data = CMS.config.lang.shortcutAreas[1].shortcuts.placeholders;
 
     bindPlaceholderKeys();
@@ -176,4 +176,4 @@ module.exports = function initPlaceholders() {
         $('.cms-structure-content').trap();
         keyboard.setContext('placeholders');
     });
-};
+}

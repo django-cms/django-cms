@@ -174,6 +174,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
 
 
 class BaseItem(six.with_metaclass(ABCMeta)):
+    toolbar = None
     template = None
 
     def __init__(self, side=LEFT):
@@ -184,6 +185,10 @@ class BaseItem(six.with_metaclass(ABCMeta)):
         return self.side is RIGHT
 
     def render(self):
+        if self.toolbar:
+            template = self.toolbar.templates.get_cached_template(self.template)
+            return template.render(self.get_context())
+        # Backwards compatibility
         return render_to_string(self.template, self.get_context())
 
     def get_context(self):
@@ -191,6 +196,7 @@ class BaseItem(six.with_metaclass(ABCMeta)):
 
 
 class TemplateItem(BaseItem):
+
     def __init__(self, template, extra_context=None, side=LEFT):
         super(TemplateItem, self).__init__(side)
         self.template = template
@@ -225,6 +231,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
     def get_items(self):
         items = self.items
         for item in items:
+            item.toolbar = self.toolbar
             if hasattr(item, 'disabled'):
                 item.disabled = self.disabled or item.disabled
         return items
@@ -362,9 +369,14 @@ class Break(BaseItem):
 
 
 class BaseButton(six.with_metaclass(ABCMeta)):
+    toolbar = None
     template = None
 
     def render(self):
+        if self.toolbar:
+            template = self.toolbar.templates.get_cached_template(self.template)
+            return template.render(self.get_context())
+        # Backwards compatibility
         return render_to_string(self.template, self.get_context())
 
     def get_context(self):
@@ -474,11 +486,20 @@ class ButtonList(BaseItem):
         self.buttons.append(item)
         return item
 
+    def get_buttons(self):
+        for button in self.buttons:
+            button.toolbar = self.toolbar
+            yield button
+
     def get_context(self):
-        return {
-            'buttons': self.buttons,
+        context = {
+            'buttons': list(self.get_buttons()),
             'extra_classes': self.extra_classes
         }
+
+        if self.toolbar:
+            context['cms_structure_on'] = self.toolbar.structure_mode_url_on
+        return context
 
 
 class Dropdown(ButtonList):
@@ -497,6 +518,7 @@ class Dropdown(ButtonList):
 
     def get_buttons(self):
         for button in self.buttons:
+            button.toolbar = self.toolbar
             button.is_in_dropdown = True
             yield button
 

@@ -18,15 +18,16 @@ var webpackConfig = require('../../../webpack.config.js')({
     debug: true
 });
 
-webpackConfig.module.preLoaders = [
-    {
-        test: /cms\/js\/modules\/(?!jquery).*.js$/,
-        loader: 'istanbul-instrumenter',
+webpackConfig.module.rules.splice(1, 0, {
+    test: /cms\/js\/modules\/(?!jquery).*.js$/,
+    use: [{
+        loader: 'istanbul-instrumenter-loader',
         query: {
+            esModules: true,
             noCompact: true
         }
-    }
-];
+    }]
+});
 
 var files = ['*'];
 if (argv && argv.tests) {
@@ -85,6 +86,7 @@ module.exports = function (config) {
         exclude: [
             'cms/static/cms/js/dist/*.js',
             'cms/static/cms/js/*.js',
+            'cms/static/cms/js/modules/*.js',
             'cms/static/cms/js/modules/jquery.*.js'
         ],
 
@@ -121,7 +123,6 @@ module.exports = function (config) {
         webpack: {
             cache: true,
             devtool: 'inline-source-map',
-            debug: true,
             resolve: webpackConfig.resolve,
             plugins: webpackConfig.plugins,
             module: webpackConfig.module

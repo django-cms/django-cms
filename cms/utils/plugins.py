@@ -5,9 +5,8 @@ from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
 
 from django.utils.encoding import force_text
-from django.utils.lru_cache import lru_cache
-from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
+from django.utils.lru_cache import lru_cache
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
@@ -19,7 +18,7 @@ from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (get_placeholder_conf, get_placeholders)
 
 
-@lru_cache()
+@lru_cache(maxsize=None)
 def get_plugin_class(plugin_type):
     return plugin_pool.get_plugin(plugin_type)
 
@@ -37,15 +36,7 @@ def get_plugins(request, placeholder, template, lang=None):
     return getattr(placeholder, '_plugins_cache')
 
 
-def requires_reload(action, plugins):
-    """
-    Returns True if ANY of the plugins require a page reload when action is taking place.
-    """
-    return any(p.get_plugin_class_instance().requires_reload(action)
-               for p in plugins)
-
-
-def assign_plugins(request, placeholders, template, lang=None, is_fallback=False):
+def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=False):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -62,7 +53,7 @@ def assign_plugins(request, placeholders, template, lang=None, is_fallback=False
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
     if (not is_fallback and
-        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode)):
+        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)):
         disjoint_placeholders = (ph for ph in placeholders
                                  if all(ph.pk != p.placeholder_id for p in plugins))
         for placeholder in disjoint_placeholders:
@@ -141,17 +132,55 @@ def build_plugin_tree(plugins):
     children plugins to their respective parents.
     Returns a sorted list of root plugins.
     """
-    cache = dict((p.pk, p) for p in plugins)
-    by_parent_id = attrgetter('parent_id')
-    nonroots = sorted(filter(by_parent_id, cache.values()),
-                      key=attrgetter('parent_id', 'position'))
-    families = ((cache[parent_id], tuple(children))
-                for parent_id, children
-                in groupby(nonroots, by_parent_id))
-    for parent, children in families:
-        parent.child_plugin_instances = children
-    return sorted(filterfalse(by_parent_id, cache.values()),
-                  key=attrgetter('position'))
+    tree = defaultdict(list)
+    # Backwards compatibility in case a generator was passed
+    plugins = list(plugins)
+    root_depth = min(plugin.depth for plugin in plugins)
+    root_plugins = (plugin for plugin in plugins if plugin.depth == root_depth)
+
+    for plugin in plugins:
+        if plugin.parent_id:
+            tree[plugin.parent_id].append(plugin)
+
+    for plugin in plugins:
+        children = sorted(tree[plugin.pk], key=attrgetter('position'))
+        plugin.child_plugin_instances = children
+    return sorted(root_plugins, key=attrgetter('position'))
+
+
+def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
+    if restrictions_cache is None:
+        restrictions_cache = {}
+
+    plugin_type = plugin.plugin_type
+    plugin_class = get_plugin_class(plugin.plugin_type)
+    parents_cache = restrictions_cache.setdefault('plugin_parents', {})
+    children_cache = restrictions_cache.setdefault('plugin_children', {})
+
+    try:
+        parent_classes = parents_cache[plugin_type]
+    except KeyError:
+        parent_classes = plugin_class.get_parent_classes(
+            slot=plugin.placeholder.slot,
+            page=page,
+            instance=plugin,
+        )
+
+    if plugin_class.cache_parent_classes:
+        parents_cache[plugin_type] = parent_classes or []
+
+    try:
+        child_classes = children_cache[plugin_type]
+    except KeyError:
+        child_classes = plugin_class.get_child_classes(
+            slot=plugin.placeholder.slot,
+            page=page,
+            instance=plugin,
+        )
+
+    if plugin_class.cache_child_classes:
+        children_cache[plugin_type] = child_classes or []
+    return (child_classes, parent_classes)
 
 
 def copy_plugins_to_placeholder(plugins, placeholder, language, root_plugin=None):
@@ -201,10 +230,12 @@ def copy_plugins_to_placeholder(plugins, placeholder, language, root_plugin=None
 def get_bound_plugins(plugins):
     get_plugin = plugin_pool.get_plugin
     plugin_types_map = defaultdict(list)
+    plugin_ids = []
     plugin_lookup = {}
 
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
+        plugin_ids.append(plugin.pk)
         plugin_types_map[plugin.plugin_type].append(plugin.pk)
 
     for plugin_type, pks in plugin_types_map.items():
@@ -217,7 +248,12 @@ def get_bound_plugins(plugins):
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
-        yield plugin_lookup.get(plugin.pk, plugin)
+        parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)
+        # The plugin either has no parent or needs to have a non-ghost parent
+        valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
+
+        if valid_parent and plugin.pk in plugin_lookup:
+            yield plugin_lookup[plugin.pk]
 
 
 def downcast_plugins(plugins,

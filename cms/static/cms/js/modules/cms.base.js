@@ -2,12 +2,8 @@
  * CMS.API.Helpers
  * Multiple helpers used across all CMS features
  */
-/* eslint-disable indent */
-// will be removed for 3.4
-if (typeof require === 'function') {
-
-var $ = require('jquery');
-var Class = require('classjs');
+import $ from 'jquery';
+import Class from 'classjs';
 
 /**
  * @module CMS
@@ -154,7 +150,17 @@ CMS.API.Helpers = {
      * @public
      */
     onPluginSave: function () {
-        // istanbul ignore else
+        var data = this.dataBridge;
+        var editedPlugin = data && data.plugin_id && window.CMS._instances.some(function (plugin) {
+            return Number(plugin.options.plugin_id) === Number(data.plugin_id);
+        });
+        var addedPlugin = !editedPlugin && data && data.plugin_id;
+
+        if (editedPlugin || addedPlugin) {
+            CMS.API.StructureBoard.invalidateState(data);
+            return;
+        }
+
         if (!this._isReloading) {
             this.reloadBrowser(null, 300); // eslint-disable-line
         }
@@ -634,7 +640,4 @@ $(function () {
     CMS.API.Helpers.preventSubmit();
 });
 
-module.exports = CMS;
-
-}
-/* eslint-enable-indent */
+export default CMS;

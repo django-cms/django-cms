@@ -20,6 +20,7 @@ except ImportError:
     # Django >= 1.9
     from django.db.models.fields.related import ForwardManyToOneDescriptor
 from django.utils import six, timezone
+from django.utils.six import text_type
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import filter
@@ -269,26 +270,21 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             self._inst = self
         return self._inst
 
-    def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
-        warnings.warn(
-            "Method `render_plugin` will be removed in django CMS 3.5",
-            PendingDeprecationWarning
-        )
-
-        if not context or not 'cms_content_renderer' in context:
-            return ''
-
-        if not isinstance(placeholder, Placeholder):
-            # Sadly this method blindly accepted a placeholder slot.
-            placeholder = self.placeholder
-
-        content_renderer = context['cms_content_renderer']
-        content = content_renderer.render_plugin(
-            instance=self,
-            context=context,
-            placeholder=placeholder,
-        )
-        return content
+    def get_plugin_info(self, children=None, parents=None):
+        plugin_name = self.get_plugin_name()
+        data = {
+            'type': 'plugin',
+            'placeholder_id': text_type(self.placeholder_id),
+            'plugin_name': force_text(plugin_name) or '',
+            'plugin_type': self.plugin_type,
+            'plugin_id': text_type(self.pk),
+            'plugin_language': self.language or '',
+            'plugin_parent': text_type(self.parent_id or ''),
+            'plugin_restriction': children or [],
+            'plugin_parent_restriction': parents or [],
+            'urls': self.get_action_urls(),
+        }
+        return data
 
     def refresh_from_db(self, *args, **kwargs):
         super(CMSPlugin, self).refresh_from_db(*args, **kwargs)

@@ -1,7 +1,7 @@
 /* global document */
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;

@@ -32,18 +32,6 @@ def get_page_queryset(request=None):
 def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
     """ Returns a queryset of pages corresponding to the path given
     """
-    if is_installed('django.contrib.admin'):
-        admin_base = admin_reverse('index')
-
-        # Check if this is called from an admin request
-        if path.startswith(admin_base):
-            # if so, get the page ID to request it directly
-            match = ADMIN_PAGE_RE.search(path)
-            if match:
-                return Page.objects.filter(pk=match.group(1))
-            else:
-                return Page.objects.none()
-
     if not site:
         site = Site.objects.get_current()
 
@@ -78,7 +66,7 @@ def get_page_from_path(path, preview=False, draft=False):
         return None
 
 
-def get_page_from_request(request, use_path=None):
+def get_page_from_request(request, use_path=None, clean_path=None):
     """
     Gets the current page from a request object.
 
@@ -98,13 +86,14 @@ def get_page_from_request(request, use_path=None):
     if hasattr(request, '_current_page_cache'):
         return request._current_page_cache
 
+    if clean_path is None:
+        clean_path = not bool(use_path)
+
     draft = use_draft(request)
     preview = 'preview' in request.GET
-    # If use_path is given, someone already did the path cleaning
-    if use_path is not None:
-        path = use_path
-    else:
-        path = request.path_info
+    path = request.path_info if use_path is None else use_path
+
+    if clean_path:
         pages_root = unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
         if is_installed('django.contrib.admin'):
@@ -130,8 +119,6 @@ def get_page_from_request(request, use_path=None):
         )
         if ancestors.exists():
             page = None
-
-    request._current_page_cache = page
     return page
 
 

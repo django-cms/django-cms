@@ -1,8 +1,5 @@
 from copy import deepcopy
 import os
-from collections import defaultdict
-
-from classytags.tests import DummyParser, DummyTokens
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -14,9 +11,6 @@ from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from sekizai.data import UniqueSequence
-from sekizai.helpers import get_varname
-
 import cms
 from cms.api import create_page, create_title, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
@@ -24,9 +18,9 @@ from cms.models import Page, Placeholder
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
     _show_placeholder_by_id,
-    RenderPlugin,
+    render_plugin,
 )
-from cms.templatetags.cms_js_tags import json_filter, render_placeholder_toolbar_js
+from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -249,106 +243,13 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         # I need to make it seem like the user added another placeholder to the SAME template.
         page._template_cache = 'col_three.html'
 
-        class FakeRequest(object):
-            current_page = page
-            GET = {'language': 'en'}
-
-        context = self.get_context(page=page)
-        content_renderer = context['cms_content_renderer']
-        placeholder = content_renderer._get_page_placeholder(context, page, 'col_right')
-        page.placeholders.get(slot='col_right')
-        self.assertEqual(placeholder.slot, 'col_right')
-
-    def test_render_plugin_toolbar_config(self):
-        """
-        Ensures that the render_plugin_toolbar_config tag
-        sets the correct values in the sekizai context.
-        """
-        page = self._getfirst()
-        placeholder = page.placeholders.get(slot='body')
-        parent_plugin = add_plugin(placeholder, 'SolarSystemPlugin', 'en')
-        child_plugin_1 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
-        child_plugin_2 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
-
-        parent_plugin.child_plugin_instances = [
-            child_plugin_1,
-            child_plugin_2,
-        ]
-
-        plugins = [
-            parent_plugin,
-            child_plugin_1,
-            child_plugin_2,
-        ]
-
-        with self.login_user_context(self.get_superuser()):
-            context = self.get_context(path=page.get_absolute_url(), page=page)
-            context['request'].toolbar = CMSToolbar(context['request'])
-            context['request'].toolbar.edit_mode = True
-            context[get_varname()] = defaultdict(UniqueSequence)
-
-            content_renderer = context['cms_content_renderer']
-
-            output = content_renderer.render_plugin(
-                instance=parent_plugin,
-                context=context,
-                placeholder=placeholder,
-                editable=True
-            )
-
-            tag_format = '<template class="cms-plugin cms-plugin-start cms-plugin-{}">'
-
-            for plugin in plugins:
-                start_tag = tag_format.format(plugin.pk)
-                self.assertIn(start_tag, output)
-
-    def test_render_placeholder_toolbar_js_escaping(self):
-        page = self._getfirst()
-        request = self.get_request(language='en', page=page)
+        request = self.get_request(page=page)
+        context = SekizaiContext()
+        context['request'] = request
         renderer = self.get_content_renderer(request)
-        placeholder = page.placeholders.get(slot='body')
-
-        conf = {placeholder.slot: {'name': 'Content-with-dash'}}
-
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            content = render_placeholder_toolbar_js(
-                placeholder,
-                render_language='en',
-                content_renderer=renderer,
-            )
-
-        expected_bits = [
-            '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
-            '"name": "Content-with-dash"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
-            '"plugin_language": "en"',
-            '"page_language": "en"',
-        ]
-
-        for bit in expected_bits:
-            self.assertIn(bit, content)
-
-    def test_render_placeholder_toolbar_js_with_no_plugins(self):
-        page = self._getfirst()
-        request = self.get_request(language='en', page=page)
-        renderer = self.get_content_renderer(request)
-        placeholder = page.placeholders.get(slot='body')
-        content = render_placeholder_toolbar_js(
-            placeholder,
-            render_language='en',
-            content_renderer=renderer,
-        )
-
-        expected_bits = [
-            '"addPluginHelpTitle": "Add plugin to placeholder \\"Body\\""',
-            '"name": "Body"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
-            '"plugin_language": "en"',
-            '"page_language": "en"',
-        ]
-
-        for bit in expected_bits:
-            self.assertIn(bit, content)
+        self.assertFalse(page.placeholders.filter(slot='col_right').exists())
+        renderer._render_page_placeholder(context, 'col_right', page)
+        self.assertTrue(page.placeholders.filter(slot='col_right').exists())
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
@@ -476,9 +377,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {'plugin': plugin}, request)
         expected = (
@@ -499,9 +399,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': False}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = False
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {'plugin': plugin}, request)
         self.assertEqual('<b>Test</b>', output)
@@ -509,21 +408,16 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
     def test_render_plugin_no_context(self):
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')
-        parser = DummyParser()
-        tokens = DummyTokens(plugin)
-        tag = RenderPlugin(parser, tokens)
         superuser = self.get_superuser()
         request = RequestFactory().get('/')
         request.current_page = None
         request.user = superuser
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         context = SekizaiContext({
             'request': request,
-            'cms_content_renderer': request.toolbar.content_renderer,
         })
-        output = tag.render(context)
+        output = render_plugin(context, plugin)
         self.assertEqual(
             output,
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>Test<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'.format(
@@ -538,9 +432,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self.get_superuser()
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         with self.assertNumQueries(2):
             output = self.render_template_obj(template, {}, request)
@@ -553,9 +446,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self.get_superuser()
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         with self.assertNumQueries(2):
             output = self.render_template_obj(template, {}, request)
@@ -573,9 +465,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get('/')
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         category = Category.objects.only('name').get()
         output = self.render_template_obj(template, {'category': category}, request)
@@ -604,9 +495,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)
@@ -637,9 +527,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)

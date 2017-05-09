@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
-import functools
 
 from classytags.core import Tag, Options
-from cms.toolbar.utils import get_placeholder_toolbar_js, get_plugin_toolbar_js
 from cms.utils.encoder import SafeJSONEncoder
 from django import template
 from django.utils.safestring import mark_safe
+
+from sekizai.helpers import get_varname
+
+from cms.models import StaticPlaceholder
+
 
 register = template.Library()
 
@@ -27,51 +32,47 @@ def bool(value):
         return 'false'
 
 
-@register.simple_tag(takes_context=False)
-def render_placeholder_toolbar_js(placeholder, render_language, content_renderer):
-    page = placeholder.page
-    slot = placeholder.slot
-    placeholder_cache = content_renderer.get_rendered_plugins_cache(placeholder)
-    rendered_plugins = placeholder_cache['plugins']
-    plugin_parents = placeholder_cache['plugin_parents']
-    plugin_children = placeholder_cache['plugin_children']
-    plugin_pool = content_renderer.plugin_pool
-    plugin_types = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
-    allowed_plugins = plugin_types + plugin_pool.get_system_plugins()
+@register.simple_tag(takes_context=True)
+def render_cms_structure_js(context, renderer, obj):
+    markup_bits = []
+    static_placeholders = []
+    page_placeholders_by_slot = obj.rescan_placeholders()
+    declared_static_placeholders = obj.get_declared_static_placeholders(context)
 
-    get_toolbar_js = functools.partial(
-        get_plugin_toolbar_js,
-        request_language=content_renderer.request_language,
-    )
+    for static_placeholder in declared_static_placeholders:
+        kwargs = {
+            'code': static_placeholder.slot,
+            'defaults': {'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE}
+        }
 
-    def _render_plugin_js(plugin):
-        try:
-            child_classes = plugin_children[plugin.plugin_type]
-        except KeyError:
-            plugin_class = plugin_pool.plugins[plugin.plugin_type]
-            child_classes = plugin_class.get_child_classes(slot=slot, page=page, instance=plugin)
+        if static_placeholder.site_bound:
+            kwargs['site'] = renderer.site_id
+        else:
+            kwargs['site_id__isnull'] = True
 
-        try:
-            parent_classes = plugin_parents[plugin.plugin_type]
-        except KeyError:
-            plugin_class = plugin_pool.plugins[plugin.plugin_type]
-            parent_classes = plugin_class.get_parent_classes(slot=slot, page=page, instance=plugin)
+        static_placeholder = StaticPlaceholder.objects.get_or_create(**kwargs)[0]
+        static_placeholders.append(static_placeholder)
 
-        content = get_toolbar_js(
-            plugin,
-            children=child_classes,
-            parents=parent_classes,
-        )
-        return content
+    for placeholder_node in obj.get_declared_placeholders():
+        page_placeholder = page_placeholders_by_slot.get(placeholder_node.slot)
 
-    plugin_js_output = ''.join(_render_plugin_js(plugin) for plugin in rendered_plugins)
-    placeholder_js_output = get_placeholder_toolbar_js(
-        placeholder=placeholder,
-        request_language=content_renderer.request_language,
-        render_language=render_language,
-        allowed_plugins=allowed_plugins,
-    )
-    return mark_safe(plugin_js_output + '\n' + placeholder_js_output)
+        if page_placeholder:
+            placeholder_js = renderer.render_page_placeholder(obj, page_placeholder)
+            markup_bits.append(placeholder_js)
+
+    for placeholder in static_placeholders:
+        placeholder_js = renderer.render_static_placeholder(placeholder)
+        markup_bits.append(placeholder_js)
+    return mark_safe('\n'.join(markup_bits))
+
+
+@register.simple_tag(takes_context=True)
+def render_plugin_init_js(context, plugin):
+    renderer = context['cms_renderer']
+    plugin_js = renderer.get_plugin_toolbar_js(plugin)
+    # Add the toolbar javascript for this plugin to the
+    # sekizai "js" namespace.
+    context[get_varname()]['js'].append('<script>{}</script>'.format(plugin_js))
 
 
 class JavascriptString(Tag):
@@ -88,5 +89,5 @@ class JavascriptString(Tag):
         except ImportError:
             from django.utils.text import javascript_quote as escapejs
         rendered = self.nodelist.render(context)
-        return u"'%s'" % escapejs(rendered.strip())
+        return "'%s'" % escapejs(rendered.strip())
 register.tag(JavascriptString)

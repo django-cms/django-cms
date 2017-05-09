@@ -895,10 +895,11 @@ class PagesTestCase(CMSTestCase):
             context = self.get_context(page=page)
             context['request'].current_page.get_languages()
 
-            content_renderer = context['cms_content_renderer']
+            renderer = self.get_content_renderer(context['request'])
+
             with self.assertNumQueries(4):
                 for i, placeholder in enumerate(placeholders):
-                    content = content_renderer.render_page_placeholder(
+                    content = renderer.render_page_placeholder(
                         placeholder.slot,
                         context,
                         inherit=False,

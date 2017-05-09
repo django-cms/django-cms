@@ -2,7 +2,7 @@
 require('./polyfills/function.prototype.bind.js');
 require('./libs/pep');
 
-var CMS = require('./modules/cms.base');
+var CMS = require('./modules/cms.base').default;
 
 window.CMS = CMS;
 

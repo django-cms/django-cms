@@ -17,6 +17,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.test_utils.util.context_managers import signal_tester
 
+#TODO: DO this for app placeholders
 
 class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
 

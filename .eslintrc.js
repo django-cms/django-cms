@@ -3,7 +3,8 @@ module.exports = {
         "browser": true,
         "node": true,
         "jquery": true,
-        "jasmine": true
+        "jasmine": true,
+        "es6": true
     },
     "globals": {
         "CMS": true
@@ -11,6 +12,16 @@ module.exports = {
     "root": true,
     "ecmaFeatures": {
         "modules": true
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "plugins": ["compat"],
+    "settings": {
+        "polyfills": [
+            "document-currentscript"
+        ]
     },
     "rules": {
         // Possible Errors
@@ -199,6 +210,8 @@ module.exports = {
         "max-params": [2, 3],
         "max-statements": 0,
         "no-bitwise": 2,
-        "no-plusplus": 0
+        "no-plusplus": 0,
+
+        "compat/compat": 2
     }
 }

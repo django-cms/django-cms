@@ -926,29 +926,6 @@ class PageTest(PageTestBase):
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
 
-    def test_get_page_from_request_on_non_cms_admin(self):
-        request = self.get_request(
-            admin_reverse('sampleapp_category_change', args=(1,))
-        )
-        page = get_page_from_request(request)
-        self.assertEqual(page, None)
-
-    def test_get_page_from_request_on_cms_admin(self):
-        page = create_page("page", "nav_playground.html", "en")
-        request = self.get_request(
-            admin_reverse('cms_page_change', args=(page.pk,))
-        )
-        found_page = get_page_from_request(request)
-        self.assertTrue(found_page)
-        self.assertEqual(found_page.pk, page.pk)
-
-    def test_get_page_from_request_on_cms_admin_nopage(self):
-        request = self.get_request(
-            admin_reverse('cms_page_change', args=(1,))
-        )
-        page = get_page_from_request(request)
-        self.assertEqual(page, None)
-
     def test_get_page_from_request_cached(self):
         mock_page = 'hello world'
         request = self.get_request(
@@ -957,22 +934,6 @@ class PageTest(PageTestBase):
         request._current_page_cache = mock_page
         page = get_page_from_request(request)
         self.assertEqual(page, mock_page)
-
-    def test_get_page_from_request_on_cms_admin_with_editplugin(self):
-        page = create_page("page", "nav_playground.html", "en")
-        request = self.get_request(
-            admin_reverse('cms_page_change', args=(page.pk,)) + 'edit-plugin/42/'
-        )
-        found_page = get_page_from_request(request)
-        self.assertTrue(found_page)
-        self.assertEqual(found_page.pk, page.pk)
-
-    def test_get_page_from_request_on_cms_admin_with_editplugin_nopage(self):
-        request = self.get_request(
-            admin_reverse('cms_page_change', args=(1,)) + 'edit-plugin/42/'
-        )
-        page = get_page_from_request(request)
-        self.assertEqual(page, None)
 
     def test_existing_overwrite_url(self):
         with self.settings(CMS_PERMISSION=False):

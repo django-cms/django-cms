@@ -1,7 +1,7 @@
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var Tooltip = require('../../../static/cms/js/modules/cms.tooltip');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var Tooltip = require('../../../static/cms/js/modules/cms.tooltip').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;

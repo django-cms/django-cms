@@ -1,9 +1,9 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var StructureBoard = require('../../../static/cms/js/modules/cms.structureboard');
-var Plugin = require('../../../static/cms/js/modules/cms.plugins');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var StructureBoard = require('../../../static/cms/js/modules/cms.structureboard').default;
+var Plugin = require('../../../static/cms/js/modules/cms.plugins').default;
 var $ = require('jquery');
-var keyboard = require('../../../static/cms/js/modules/keyboard');
+var keyboard = require('../../../static/cms/js/modules/keyboard').default;
 
 window.CMS = window.CMS || CMS;
 CMS.StructureBoard = StructureBoard;
@@ -31,6 +31,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -158,6 +161,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -259,6 +265,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -380,6 +389,9 @@ describe('CMS.StructureBoard', function () {
                     mode: 'edit'
                 };
                 CMS.config = {
+                    settings: {
+                        mode: 'edit'
+                    },
                     mode: 'edit'
                 };
                 spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
@@ -475,6 +487,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -571,6 +586,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -622,6 +640,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -765,6 +786,9 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'edit'
             };
             $(function () {
@@ -819,11 +843,15 @@ describe('CMS.StructureBoard', function () {
                 mode: 'structure'
             };
             CMS.config = {
+                settings: {
+                    mode: 'edit'
+                },
                 mode: 'structure'
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
+                board._drag();
                 options = board.ui.sortables.nestedSortable('option');
                 done();
             });

@@ -1,10 +1,10 @@
 'use strict';
-var initShortcuts = require('../../../static/cms/js/modules/shortcuts');
-var initHelpModal = require('../../../static/cms/js/modules/shortcuts/help');
-var initCreateModal = require('../../../static/cms/js/modules/shortcuts/create-modal');
+var initShortcuts = require('../../../static/cms/js/modules/shortcuts').default;
+var initHelpModal = require('../../../static/cms/js/modules/shortcuts/help').default;
+var initCreateModal = require('../../../static/cms/js/modules/shortcuts/create-modal').default;
 var $ = require('jquery');
-var keyboard = require('../../../static/cms/js/modules/keyboard');
-var Modal = require('../../../static/cms/js/modules/cms.modal');
+var keyboard = require('../../../static/cms/js/modules/keyboard').default;
+var Modal = require('../../../static/cms/js/modules/cms.modal').default;
 
 var CMS = window.CMS || {};
 

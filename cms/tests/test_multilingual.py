@@ -248,6 +248,8 @@ class MultilingualTestCase(CMSTestCase):
             def get_host():
                 return 'testserver'
 
+            self.get_request()
+
             request = AttributeObject(
                 GET=QueryDict('language=x-elvish'),
                 POST=QueryDict(''),

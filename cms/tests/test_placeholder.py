@@ -48,7 +48,6 @@ def _render_placeholder(placeholder, context, **kwargs):
     request = context['request']
     toolbar = get_toolbar_from_request(request)
     content_renderer = toolbar.content_renderer
-    context['cms_content_renderer'] = content_renderer
     return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
@@ -118,11 +117,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_scanning_var(self):
         t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
-        phs = sorted(node.get_name() for node in _scan_placeholders(t.nodelist))
+        phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
         self.assertListEqual(phs, sorted([u'a_placeholder']))
 
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
-        phs = sorted(node.get_name() for node in _scan_placeholders(t.nodelist))
+        phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
         self.assertListEqual(phs, sorted([u'two', u'new_one', u'base_outside']))
 
     def test_fieldsets_requests(self):
@@ -403,20 +402,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
             self.assertEqual(force_text(placeholder_3.get_label()), 'No_Name')
 
-    def test_placeholder_context_leaking(self):
-        TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
-        ph = Placeholder.objects.create(slot='test')
-
-        content_renderer = self.get_content_renderer()
-        context = SekizaiContext()
-        context['request'] = content_renderer.request
-
-        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            _render_placeholder(ph, context)
-            self.assertFalse('extra_width' in context)
-            ph.render(context, None)
-            self.assertFalse('extra_width' in context)
-
     def test_placeholder_scanning_nested_super(self):
         placeholders = _get_placeholder_slots('placeholder_tests/nested_super_level1.html')
         self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
@@ -511,9 +496,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertNotRegex(content_de, "^en body$")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
+            request.session['cms_edit'] = True
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
-            request.toolbar.edit_mode = True
             context_de2['request'] = request
             del(placeholder_de._plugins_cache)
             cache.clear()
@@ -552,9 +537,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertRegexpMatches(content_de, "en body")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
+            request.session['cms_edit'] = True
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
-            request.toolbar.edit_mode = True
             context_de2['request'] = request
             del(placeholder_de._plugins_cache)
             cache.clear()

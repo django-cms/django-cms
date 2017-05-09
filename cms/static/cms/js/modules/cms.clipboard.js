@@ -2,12 +2,12 @@
  * Copyright https://github.com/divio/django-cms
  */
 
+import Modal from './cms.modal';
 var $ = require('jquery');
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
-var Modal = require('./cms.modal');
 var storageKey = 'cms.clipboard';
-var Plugin = require('./cms.plugins');
+var Plugin = require('./cms.plugins').default;
+var Helpers = require('./cms.base').default.API.Helpers;
 
 /**
  * Handles copy & paste in the structureboard.
@@ -243,5 +243,4 @@ var Clipboard = new Class({
     }
 });
 
-
-module.exports = Clipboard;
+export default Clipboard;

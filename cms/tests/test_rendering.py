@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
 from django.test.utils import override_settings
+
 from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
@@ -13,6 +14,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.views import details
+
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 INHERIT_TEMPLATE_NAME = 'tests/rendering/inherit.html'
@@ -176,6 +178,7 @@ class RenderingTestCase(CMSTestCase):
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, page, template=None, context_vars=None):
         request = self.get_request(page=page)
+        request.toolbar = CMSToolbar(request)
 
         if context_vars is None:
             context_vars = {}
@@ -204,8 +207,9 @@ class RenderingTestCase(CMSTestCase):
     )
     def test_processors(self):
         """
-        Tests that default plugin context processors are working, that plugin processors and plugin context processors
-        can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
+        Tests that plugin processors and plugin context processors can be defined
+        in settings and are working and that extra plugin context processors can be
+        passed to PluginContext.
         """
         from djangocms_text_ckeditor.cms_plugins import TextPlugin
         from cms.plugin_pool import plugin_pool
@@ -220,7 +224,7 @@ class RenderingTestCase(CMSTestCase):
 
             def get_render_template(self, context, instance, placeholder):
                 t = u'{% load cms_tags %}' + \
-                    u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|' \
+                    u'{{ body }}|test_passed_plugin_context_processor_ok|' \
                     u'{{ test_plugin_context_processor }}'
                 return load_from_string(t)
 
@@ -235,14 +239,12 @@ class RenderingTestCase(CMSTestCase):
         plugin_rendering._standard_processors = {}
 
         content_renderer = self.get_content_renderer()
-        c = content_renderer.render_plugins([instance], context, self.test_placeholders['main'])
-        r = "".join(c)
+        r = content_renderer.render_plugin(instance, context, self.test_placeholders['main'])
         expected = (
             self.test_data['text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
             self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' +
             self.test_data['text_main'] + '|main|original_context_var_ok'
         )
-        expected = u'1|' + expected
         self.assertEqual(r, expected)
         plugin_rendering._standard_processors = {}
 
@@ -575,20 +577,106 @@ class RenderingTestCase(CMSTestCase):
         placeholder = Placeholder()
         placeholder.slot = 'test'
         placeholder.pk = placeholder.id = 99
-        request = self.get_request(page=None)
-        request.toolbar = CMSToolbar(request)
 
-        content_renderer = self.get_content_renderer(request)
-
-        context = SekizaiContext()
-        context['request'] = request
-        context['cms_content_renderer'] = content_renderer
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request(page=None)
+            request.session = {'cms_edit': True}
+            request.toolbar = CMSToolbar(request)
+            renderer = self.get_content_renderer(request)
+            context = SekizaiContext()
+            context['request'] = request
 
         classes = [
             "cms-placeholder-%s" % placeholder.pk,
             'cms-placeholder',
         ]
+        output = renderer.render_placeholder(placeholder, context, 'en', editable=True)
 
-        output = content_renderer.render_editable_placeholder(placeholder, context, 'en')
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
+
+    def test_render_placeholder_toolbar_js_escaping(self):
+        page = self.test_page.publisher_public
+        request = self.get_request(language='en', page=page)
+        renderer = self.get_content_renderer(request)
+        placeholder = page.placeholders.get(slot='main')
+
+        conf = {placeholder.slot: {'name': 'Content-with-dash'}}
+
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            content = renderer.get_placeholder_toolbar_js(
+                placeholder,
+                language='en',
+                page=page,
+            )
+
+        expected_bits = [
+            '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
+            '"name": "Content-with-dash"',
+            '"placeholder_id": "{}"'.format(placeholder.pk),
+            '"plugin_language": "en"',
+            '"page_language": "en"',
+        ]
+
+        for bit in expected_bits:
+            self.assertIn(bit, content)
+
+    def test_render_placeholder_toolbar_js_with_no_plugins(self):
+        page = self.test_page.publisher_public
+        request = self.get_request(language='en', page=page)
+        renderer = self.get_content_renderer(request)
+        placeholder = page.placeholders.get(slot='empty')
+        content = renderer.get_placeholder_toolbar_js(
+            placeholder,
+            language='en',
+            page=page,
+        )
+
+        expected_bits = [
+            '"addPluginHelpTitle": "Add plugin to placeholder \\"Empty\\""',
+            '"name": "Empty"',
+            '"placeholder_id": "{}"'.format(placeholder.pk),
+            '"plugin_language": "en"',
+            '"page_language": "en"',
+        ]
+
+        for bit in expected_bits:
+            self.assertIn(bit, content)
+
+    def test_render_plugin_toolbar_markup(self):
+        """
+        Ensures that the edit-mode markup is correct
+        """
+        page = self.test_page.publisher_public
+        placeholder = page.placeholders.get(slot='main')
+        parent_plugin = add_plugin(placeholder, 'SolarSystemPlugin', 'en')
+        child_plugin_1 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
+        child_plugin_2 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
+        parent_plugin.child_plugin_instances = [
+            child_plugin_1,
+            child_plugin_2,
+        ]
+        plugins = [
+            parent_plugin,
+            child_plugin_1,
+            child_plugin_2,
+        ]
+
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request(page.get_absolute_url(), page=page)
+            request.session = {'cms_edit': True}
+            request.toolbar = CMSToolbar(request)
+            context = SekizaiContext()
+            context['request'] = request
+            content_renderer = request.toolbar.get_content_renderer()
+            output = content_renderer.render_plugin(
+                instance=parent_plugin,
+                context=context,
+                placeholder=placeholder,
+                editable=True,
+            )
+            tag_format = '<template class="cms-plugin cms-plugin-start cms-plugin-{}">'
+
+        for plugin in plugins:
+            start_tag = tag_format.format(plugin.pk)
+            self.assertIn(start_tag, output)
