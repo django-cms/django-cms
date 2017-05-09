@@ -4,7 +4,6 @@ import json
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page, add_plugin
-from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -942,7 +941,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 }
                 plugin_class = text_plugin_two.get_plugin_class_instance()
                 expected = {
-                    'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
                     'urls': action_urls,
                 }
                 edit_url = self.get_move_plugin_uri(text_plugin_two)

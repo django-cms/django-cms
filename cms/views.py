@@ -1,23 +1,28 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import resolve_url
 from django.utils.cache import patch_cache_control
-from django.utils.http import urlquote
+from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
 from django.utils.translation import get_language
+from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.cache.page import get_page_cache
-from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
+from cms.forms.login import CMSToolbarLoginForm
+from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
 from cms.utils import get_language_code, get_language_from_request, get_cms_setting
 from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             is_language_prefix_patterns_used)
 from cms.utils.page import get_pages_queryset
+from cms.utils.page_permissions import user_can_change_page
 from cms.utils.page_resolver import get_page_from_request
 
 
@@ -57,6 +62,8 @@ def details(request, slug):
     if not page:
         # raise 404
         _handle_no_page(request)
+
+    request.current_page = page
 
     current_language = request.GET.get('language', None)
 
@@ -189,8 +196,31 @@ def details(request, slug):
     # permission checks
     if page.login_required and not request.user.is_authenticated():
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(page)
 
+    if user_can_change_page(request.user, page) and 'structure' in request.GET:
+        return render_object_structure(request, page)
+
     response = render_page(request, page, current_language=current_language, slug=slug)
     return response
+
+
+@require_POST
+def login(request):
+    redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
+
+    if not is_safe_url(url=redirect_to, host=request.get_host()):
+        redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(redirect_to)
+
+    form = CMSToolbarLoginForm(request=request, data=request.POST)
+
+    if form.is_valid():
+        auth_login(request, form.user_cache)
+    else:
+        redirect_to += u'?cms_toolbar_login_error=1'
+    return HttpResponseRedirect(redirect_to)

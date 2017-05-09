@@ -4,8 +4,8 @@
 
 var $ = require('jquery');
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
-var KEYS = require('./cms.base').KEYS;
+var Helpers = require('./cms.base').default.API.Helpers;
+var KEYS = require('./cms.base').default.KEYS;
 
 /**
  * The sideframe is triggered via API calls from the backend either
@@ -452,4 +452,4 @@ var Sideframe = new Class({
     }
 });
 
-module.exports = Sideframe;
+export default Sideframe;

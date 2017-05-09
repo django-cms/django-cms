@@ -1,7 +1,8 @@
-var keyboard = require('../keyboard');
-var $ = require('jquery');
+import keyboard from '../keyboard';
+import $ from 'jquery';
 
-module.exports = function () {
+// eslint-disable-next-line require-jsdoc
+export default function () {
     var data = CMS.config.lang.shortcutAreas[0].shortcuts.toolbar;
 
     keyboard.setContext('cms');
@@ -12,4 +13,4 @@ module.exports = function () {
             $('.cms-toolbar-trigger a').focus();
         }
     });
-};
+}

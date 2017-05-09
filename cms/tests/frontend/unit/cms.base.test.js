@@ -1,6 +1,6 @@
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var jQuery = require('jquery');
 var $ = jQuery;
 var Class = require('classjs');

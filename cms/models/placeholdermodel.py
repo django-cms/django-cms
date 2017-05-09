@@ -225,29 +225,6 @@ class Placeholder(models.Model):
                 return False
         return True
 
-    def render(self, context, width, lang=None, editable=True, use_cache=True):
-        '''
-        Set editable = False to disable front-end rendering for this render.
-        '''
-        content_renderer = context.get('cms_content_renderer')
-
-        if not content_renderer:
-            return '<!-- missing cms_content_renderer -->'
-
-        width = width or self.default_width
-
-        if width:
-            context['width'] = width
-
-        content = content_renderer.render_placeholder(
-            self,
-            context,
-            language=lang,
-            editable=editable,
-            use_cache=use_cache,
-        )
-        return content
-
     def _get_related_objects(self):
         fields = self._meta._get_fields(
             forward=False, reverse=True,

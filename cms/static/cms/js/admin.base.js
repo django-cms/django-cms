@@ -1,7 +1,7 @@
 // polyfills
 require('./polyfills/function.prototype.bind.js');
 require('./libs/pep');
-var CMS = require('./modules/cms.base');
+var CMS = require('./modules/cms.base').default;
 
 // in case some data is already attached to the CMS global
 // we shoud not override it

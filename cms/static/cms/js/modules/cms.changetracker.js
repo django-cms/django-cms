@@ -36,10 +36,14 @@ var ChangeTracker = new Class({
     },
 
     _setupEvents: function _setupEvents() {
-        this.ui.iframe.contents()
-            .find('.change-form form')
-            .find('input, textarea, select')
-            .on('change.cms.tracker keydown.cms.tracker', this._trackChange.bind(this));
+        try {
+            this.ui.iframe.contents()
+                .find('.change-form form')
+                .find('input, textarea, select')
+                .on('change.cms.tracker keydown.cms.tracker', this._trackChange.bind(this));
+        } catch (e) {
+            // there can be cases when the iframe contents don't exist
+        }
     },
 
     /**
@@ -165,4 +169,4 @@ var ChangeTracker = new Class({
     }
 });
 
-module.exports = ChangeTracker;
+export default ChangeTracker;

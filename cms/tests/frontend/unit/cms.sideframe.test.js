@@ -1,8 +1,8 @@
 /* global window, document */
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var Sideframe = require('../../../static/cms/js/modules/cms.sideframe');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;

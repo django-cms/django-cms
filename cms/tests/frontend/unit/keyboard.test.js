@@ -1,5 +1,5 @@
 'use strict';
-var keyboard = require('../../../static/cms/js/modules/keyboard');
+var keyboard = require('../../../static/cms/js/modules/keyboard').default;
 var $ = require('jquery');
 
 describe('keyboard', function () {

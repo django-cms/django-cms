@@ -7,7 +7,6 @@ from django.template.base import Template
 from django.utils import six
 
 from cms.api import add_plugin
-from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import StaticPlaceholder, Placeholder, UserSettings
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.i18n import force_language
@@ -128,7 +127,6 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             action_urls = sourceplugin.get_action_urls()
 
         expected = {
-            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
             'urls': action_urls,
         }
         admin = self.get_admin()

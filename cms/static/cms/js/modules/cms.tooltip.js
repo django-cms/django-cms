@@ -6,7 +6,7 @@
 
 var $ = require('jquery');
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
+var Helpers = require('./cms.base').default.API.Helpers;
 
 /**
  * The tooltip is the element which shows over plugins
@@ -172,4 +172,4 @@ var Tooltip = new Class({
     }
 });
 
-module.exports = Tooltip;
+export default Tooltip;

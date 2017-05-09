@@ -25,9 +25,8 @@ from django.utils import timezone
 from django.utils.encoding import force_text
 
 from cms import api
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
-from cms.models import Page, Placeholder, UserSettings
+from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -1050,133 +1049,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
         self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
         self.assertEqual(db_text_plugin_1.pk, text_plugin_1.pk)
-
-    def test_plugin_move_with_reload(self):
-        action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': True
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': True
-            },
-        }
-        non_reload_action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': False
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': False
-            },
-        }
-        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options, render_plugin=False))
-        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
-
-        with register_plugins(ReloadDrivenPlugin, NonReloadDrivenPlugin):
-            page = api.create_page("page", "nav_playground.html", "en", published=True)
-            source_placeholder = page.placeholders.get(slot='body')
-            target_placeholder = page.placeholders.get(slot='right-column')
-            plugin_1 = api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
-            plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
-
-            with force_language('en'):
-                plugin_1_action_urls = plugin_1.get_action_urls()
-
-            reload_expected = {
-                'reload': True,
-                'urls': plugin_1_action_urls,
-            }
-
-            # Test Plugin reload == True on Move
-            post = {
-                'plugin_id': plugin_1.pk,
-                'placeholder_id': target_placeholder.pk,
-                'plugin_parent': '',
-            }
-
-            endpoint = self.get_move_plugin_uri(plugin_1)
-
-            response = self.client.post(endpoint, post)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), reload_expected)
-
-            with force_language('en'):
-                plugin_2_action_urls = plugin_2.get_action_urls()
-
-            no_reload_expected = {
-                'reload': False,
-                'urls': plugin_2_action_urls,
-            }
-
-            # Test Plugin reload == False on Move
-            post = {
-                'plugin_id': plugin_2.pk,
-                'placeholder_id': target_placeholder.pk,
-                'plugin_parent': '',
-            }
-
-            response = self.client.post(endpoint, post)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(json.loads(response.content.decode('utf8')), no_reload_expected)
-
-    def test_plugin_copy_with_reload(self):
-        action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': True
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': True
-            },
-        }
-        non_reload_action_options = {
-            PLUGIN_MOVE_ACTION: {
-                'requires_reload': False
-            },
-            PLUGIN_COPY_ACTION: {
-                'requires_reload': False
-            },
-        }
-        ReloadDrivenPlugin = type('ReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=action_options, render_plugin=False))
-        NonReloadDrivenPlugin = type('NonReloadDrivenPlugin', (CMSPluginBase,), dict(action_options=non_reload_action_options, render_plugin=False))
-
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
-
-        user_settings = UserSettings.objects.create(
-            language="en",
-            user=self.super_user,
-            clipboard=Placeholder.objects.create(slot='clipboard'),
-        )
-
-        with register_plugins(ReloadDrivenPlugin, NonReloadDrivenPlugin):
-            page = api.create_page("page", "nav_playground.html", "en", published=True)
-            source_placeholder = page.placeholders.get(slot='body')
-            target_placeholder = user_settings.clipboard
-            api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
-            plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
-
-            # Test Plugin reload == True on Copy
-            copy_data = {
-                'source_placeholder_id': source_placeholder.pk,
-                'target_placeholder_id': target_placeholder.pk,
-                'target_language': settings.LANGUAGES[0][0],
-                'source_language': settings.LANGUAGES[0][0],
-            }
-            response = self.client.post(endpoint, copy_data)
-            self.assertEqual(response.status_code, 200)
-            json_response = json.loads(response.content.decode('utf8'))
-            self.assertEqual(json_response['reload'], True)
-
-            # Test Plugin reload == False on Copy
-            copy_data = {
-                'source_placeholder_id': source_placeholder.pk,
-                'source_plugin_id': plugin_2.pk,
-                'target_placeholder_id': target_placeholder.pk,
-                'target_language': settings.LANGUAGES[0][0],
-                'source_language': settings.LANGUAGES[0][0],
-            }
-            response = self.client.post(endpoint, copy_data)
-            self.assertEqual(response.status_code, 200)
-            json_response = json.loads(response.content.decode('utf8'))
-            self.assertEqual(json_response['reload'], False)
 
     def test_custom_plugin_urls(self):
         plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')

@@ -1,7 +1,7 @@
 'use strict';
 
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var ChangeTracker = require('../../../static/cms/js/modules/cms.changetracker');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var ChangeTracker = require('../../../static/cms/js/modules/cms.changetracker').default;
 var jQuery = require('jquery');
 var $ = jQuery;
 

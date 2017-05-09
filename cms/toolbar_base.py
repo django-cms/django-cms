@@ -25,9 +25,6 @@ class CMSToolbar(object):
     def post_template_populate(self):
         pass
 
-    def request_hook(self):
-        pass
-
     @classmethod
     def check_current_app(cls, key, app_name):
         if cls.supported_apps is None:
@@ -38,9 +35,3 @@ class CMSToolbar(object):
             if app_name and local_app and app_name.startswith(local_app):
                 return True
         return False
-
-    def render_addons(self, context):
-        return []
-
-    def post_template_render_addons(self, context):
-        return []

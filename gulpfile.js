@@ -1,6 +1,3 @@
-/* eslint strict: [2, "global"] */
-'use strict';
-
 // #####################################################################################################################
 // #IMPORTS#
 var gulp = require('gulp');
@@ -104,8 +101,8 @@ var INTEGRATION_TESTS = [
         'disableToolbar',
         'dragndrop',
         'copy-apphook-page',
-        //'history',
-        //'revertLive',
+        // 'history',
+        // 'revertLive',
         'narrowScreen'
     ]
 ];
@@ -207,7 +204,7 @@ var webpackBundle = function (opts) {
             if (err) {
                 throw new gutil.PluginError('webpack', err);
             }
-            gutil.log('[webpack]', stats.toString({ colors: true }));
+            gutil.log('[webpack]', stats.toString({ maxModules: Infinity, colors: true }));
             if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
                 done();
             }

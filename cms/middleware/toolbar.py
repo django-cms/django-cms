@@ -88,14 +88,6 @@ class ToolbarMiddleware(MiddlewareMixin):
                 request.cms_latest_entry = -1
         request.toolbar = CMSToolbar(request)
 
-    def process_view(self, request, view_func, view_args, view_kwarg):
-        if not self.is_cms_request(request):
-            return
-
-        response = request.toolbar.request_hook()
-        if isinstance(response, HttpResponse):
-            return response
-
     def process_response(self, request, response):
         if not self.is_cms_request(request):
             return response

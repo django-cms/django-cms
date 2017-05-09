@@ -4,7 +4,7 @@
 
 var $ = require('jquery');
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
+var Helpers = require('./cms.base').default.API.Helpers;
 
 /**
  * Sticky language headers in pagetree
@@ -206,4 +206,4 @@ var PageTreeStickyHeader = new Class({
 
 });
 
-module.exports = PageTreeStickyHeader;
+export default PageTreeStickyHeader;

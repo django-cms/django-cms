@@ -259,49 +259,6 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         page.placeholders.get(slot='col_right')
         self.assertEqual(placeholder.slot, 'col_right')
 
-    def test_render_plugin_toolbar_config(self):
-        """
-        Ensures that the render_plugin_toolbar_config tag
-        sets the correct values in the sekizai context.
-        """
-        page = self._getfirst()
-        placeholder = page.placeholders.get(slot='body')
-        parent_plugin = add_plugin(placeholder, 'SolarSystemPlugin', 'en')
-        child_plugin_1 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
-        child_plugin_2 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
-
-        parent_plugin.child_plugin_instances = [
-            child_plugin_1,
-            child_plugin_2,
-        ]
-
-        plugins = [
-            parent_plugin,
-            child_plugin_1,
-            child_plugin_2,
-        ]
-
-        with self.login_user_context(self.get_superuser()):
-            context = self.get_context(path=page.get_absolute_url(), page=page)
-            context['request'].toolbar = CMSToolbar(context['request'])
-            context['request'].toolbar.edit_mode = True
-            context[get_varname()] = defaultdict(UniqueSequence)
-
-            content_renderer = context['cms_content_renderer']
-
-            output = content_renderer.render_plugin(
-                instance=parent_plugin,
-                context=context,
-                placeholder=placeholder,
-                editable=True
-            )
-
-            tag_format = '<template class="cms-plugin cms-plugin-start cms-plugin-{}">'
-
-            for plugin in plugins:
-                start_tag = tag_format.format(plugin.pk)
-                self.assertIn(start_tag, output)
-
     def test_render_placeholder_toolbar_js_escaping(self):
         page = self._getfirst()
         request = self.get_request(language='en', page=page)
@@ -314,7 +271,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             content = render_placeholder_toolbar_js(
                 placeholder,
                 render_language='en',
-                content_renderer=renderer,
+                renderer=renderer,
             )
 
         expected_bits = [
@@ -336,7 +293,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         content = render_placeholder_toolbar_js(
             placeholder,
             render_language='en',
-            content_renderer=renderer,
+            renderer=renderer,
         )
 
         expected_bits = [

@@ -19,13 +19,11 @@ window.CMS || window.parent.CMS || document.write(
     (function(Window) {
         // the dataBridge is used to access plugin information from different resources
         // Do NOT move this!!!
-        Window.CMS.API.Helpers.dataBridge = {
-            'plugin_id': '{{ plugin_id|unlocalize }}',
-            'plugin_type': '{% filter escapejs %}{{ type }}{% endfilter %}',
-            'plugin_name': '{% filter escapejs %}{{ name }}{% endfilter %}',
-            'plugin_icon': '{% filter escapejs %}{{ icon }}{% endfilter %}',
-            'plugin_desc': '{% filter escapejs %}{{ alt }}{% endfilter %}'
-        };
+        Window.CMS.API.Helpers.dataBridge = {{ plugin_data|safe }};
+
+        {% if plugin_structure %}
+            Window.CMS.API.Helpers.dataBridge.structure = {{ plugin_structure|safe }};
+        {% endif %}
 
         Window.CMS.$(document).ready(function () {
             // make sure we're doing after the "modal" mechanism kicked in

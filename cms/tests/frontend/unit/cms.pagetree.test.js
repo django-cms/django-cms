@@ -1,6 +1,6 @@
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var PageTree = require('../../../static/cms/js/modules/cms.pagetree');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var PageTree = require('../../../static/cms/js/modules/cms.pagetree').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;

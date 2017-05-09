@@ -43,6 +43,7 @@ def copy_plugins_to(old_plugins, to_placeholder,
     # nested plugins and need to update their content based on the new plugins.
     for new_plugin, old_plugin in plugins_ziplist:
         new_instance = new_plugin.get_plugin_instance()[0]
+
         if new_instance:
             new_instance._no_reorder = True
             new_instance.post_copy(old_plugin, plugins_ziplist)

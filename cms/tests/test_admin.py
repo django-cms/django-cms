@@ -22,7 +22,7 @@ from cms.api import create_page, create_title, add_plugin, publish_page
 from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
-from cms.constants import PLUGIN_MOVE_ACTION, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -584,7 +584,6 @@ class AdminTests(AdminTestsBase):
             action_urls = pageplugin.get_action_urls()
 
         expected = {
-            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
             'urls': action_urls,
         }
         placeholder = Placeholder.objects.all()[0]

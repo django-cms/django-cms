@@ -6,10 +6,6 @@ URL_CHANGE = 'URL_CHANGE'
 RIGHT = object() # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
 LEFT = object()
 
-# Plugin actions
-PLUGIN_MOVE_ACTION = 'move'
-PLUGIN_COPY_ACTION = 'copy'
-
 PUBLISHER_STATE_DEFAULT = 0
 PUBLISHER_STATE_DIRTY = 1
 # Page was marked published, but some of page parents are not.
@@ -35,9 +31,9 @@ EXPIRE_NOW = 0
 # HTTP Specification says max caching should only be up to one year.
 MAX_EXPIRATION_TTL = 365 * 24 * 3600
 
-PLUGIN_TOOLBAR_JS = "CMS._plugins.push(['cms-plugin-%(pk)s', %(config)s]);"
+PLUGIN_TOOLBAR_JS = "CMS._plugins.push([\"cms-plugin-%(pk)s\", %(config)s]);\n"
 
-PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push(['cms-placeholder-%(pk)s', %(config)s]);"
+PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push([\"cms-placeholder-%(pk)s\", %(config)s]);"
 
 # In the permissions system we use user levels to determine
 # the depth in which the user has permissions.

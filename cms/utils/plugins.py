@@ -6,7 +6,7 @@ from operator import attrgetter, itemgetter
 from django.utils.encoding import force_text
 from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
-
+from django.utils.lru_cache import lru_cache
 
 from cms.exceptions import PluginLimitReached
 from cms.models import CMSPlugin
@@ -26,15 +26,7 @@ def get_plugins(request, placeholder, template, lang=None):
     return getattr(placeholder, '_plugins_cache')
 
 
-def requires_reload(action, plugins):
-    """
-    Returns True if ANY of the plugins require a page reload when action is taking place.
-    """
-    return any(p.get_plugin_class_instance().requires_reload(action)
-               for p in plugins)
-
-
-def assign_plugins(request, placeholders, template, lang=None, is_fallback=False):
+def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=False):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -130,17 +122,60 @@ def build_plugin_tree(plugins):
     children plugins to their respective parents.
     Returns a sorted list of root plugins.
     """
-    cache = dict((p.pk, p) for p in plugins)
-    by_parent_id = attrgetter('parent_id')
-    nonroots = sorted(filter(by_parent_id, cache.values()),
-                      key=attrgetter('parent_id', 'position'))
-    families = ((cache[parent_id], tuple(children))
-                for parent_id, children
-                in groupby(nonroots, by_parent_id))
-    for parent, children in families:
-        parent.child_plugin_instances = children
-    return sorted(filterfalse(by_parent_id, cache.values()),
-                  key=attrgetter('position'))
+    tree = defaultdict(list)
+    # Backwards compatibility in case a generator was passed
+    plugins = list(plugins)
+    root_depth = min(plugin.depth for plugin in plugins)
+    root_plugins = (plugin for plugin in plugins if plugin.depth == root_depth)
+
+    for plugin in plugins:
+        if plugin.parent_id:
+            tree[plugin.parent_id].append(plugin)
+
+    for plugin in plugins:
+        children = sorted(tree[plugin.pk], key=attrgetter('position'))
+        plugin.child_plugin_instances = children
+    return sorted(root_plugins, key=attrgetter('position'))
+
+
+@lru_cache(maxsize=None)
+def get_plugin_class(plugin_type):
+    return plugin_pool.get_plugin(plugin_type)
+
+
+def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
+    if restrictions_cache is None:
+        restrictions_cache = {}
+
+    plugin_type = plugin.plugin_type
+    plugin_class = get_plugin_class(plugin.plugin_type)
+    parents_cache = restrictions_cache.setdefault('plugin_parents', {})
+    children_cache = restrictions_cache.setdefault('plugin_children', {})
+
+    try:
+        parent_classes = parents_cache[plugin_type]
+    except KeyError:
+        parent_classes = plugin_class.get_parent_classes(
+            slot=plugin.placeholder.slot,
+            page=page,
+            instance=plugin,
+        )
+
+    if plugin_class.cache_parent_classes:
+        parents_cache[plugin_type] = parent_classes or []
+
+    try:
+        child_classes = children_cache[plugin_type]
+    except KeyError:
+        child_classes = plugin_class.get_child_classes(
+            slot=plugin.placeholder.slot,
+            page=page,
+            instance=plugin,
+        )
+
+    if plugin_class.cache_child_classes:
+        children_cache[plugin_type] = child_classes or []
+    return (child_classes, parent_classes)
 
 
 def downcast_plugins(plugins,

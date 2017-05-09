@@ -1,10 +1,10 @@
 /* globals window, document */
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var Plugin = require('../../../static/cms/js/modules/cms.plugins');
-var Modal = require('../../../static/cms/js/modules/cms.modal');
-var Messages = require('../../../static/cms/js/modules/cms.messages');
-var Clipboard = require('../../../static/cms/js/modules/cms.clipboard');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var Plugin = require('../../../static/cms/js/modules/cms.plugins').default;
+var Modal = require('../../../static/cms/js/modules/cms.modal').default;
+var Messages = require('../../../static/cms/js/modules/cms.messages').default;
+var Clipboard = require('../../../static/cms/js/modules/cms.clipboard').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;
@@ -465,7 +465,7 @@ describe('CMS.Plugin', function () {
                     on: jasmine.createSpy(),
                     open: jasmine.createSpy()
                 };
-                spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+                spyOn(CMS.Modal.prototype, 'constructor').and.callFake(function () {
                     return fakeModal;
                 });
                 done();
@@ -480,7 +480,7 @@ describe('CMS.Plugin', function () {
         it('opens the modal with correct url', function () {
             plugin.addPlugin('TextPlugin', 'Text plugin', 12);
 
-            expect(CMS.Modal.prototype.initialize).toHaveBeenCalledWith({
+            expect(CMS.Modal.prototype.constructor).toHaveBeenCalledWith({
                 onClose: false,
                 redirectOnClose: false
             });
@@ -504,7 +504,7 @@ describe('CMS.Plugin', function () {
 
             plugin.addPlugin('TextPlugin', 'Text plugin');
 
-            expect(CMS.Modal.prototype.initialize).toHaveBeenCalledWith({
+            expect(CMS.Modal.prototype.constructor).toHaveBeenCalledWith({
                 onClose: 'mock',
                 redirectOnClose: 'another mock'
             });
@@ -535,7 +535,7 @@ describe('CMS.Plugin', function () {
                 on: jasmine.createSpy(),
                 open: jasmine.createSpy()
             };
-            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+            spyOn(CMS.Modal.prototype, 'constructor').and.callFake(function () {
                 return fakeModal;
             });
             fixture.load('plugins.html');
@@ -1355,11 +1355,6 @@ describe('CMS.Plugin', function () {
             plugin.movePlugin();
         });
 
-        it('triggers onPublishAvailable', function () {
-            plugin.movePlugin();
-            expect(CMS.API.Toolbar.onPublishAvailable).toHaveBeenCalled();
-        });
-
         // this essentially tests CMS.Toolbar#onPublishAvaiable
         it('shows publish page button optimistically', function () {
             CMS.API.locked = false;
@@ -1431,7 +1426,7 @@ describe('CMS.Plugin', function () {
                 on: jasmine.createSpy(),
                 open: jasmine.createSpy()
             };
-            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function (params) {
+            spyOn(CMS.Modal.prototype, 'constructor').and.callFake(function (params) {
                 expect(params).toEqual({
                     onClose: false,
                     redirectOnClose: false

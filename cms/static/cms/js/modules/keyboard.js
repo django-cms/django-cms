@@ -1,5 +1,5 @@
-var keyboard = require('keyboardjs');
-var $ = require('jquery');
+import keyboard from 'keyboardjs';
+import $ from 'jquery';
 
 /**
  * @function override
@@ -29,4 +29,4 @@ keyboard._applyBindings = override(keyboard._applyBindings, function (originalBi
     };
 });
 
-module.exports = keyboard;
+export default keyboard;

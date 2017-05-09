@@ -1,7 +1,7 @@
 /* global document */
 'use strict';
-var CMS = require('../../../static/cms/js/modules/cms.base');
-var Clipboard = require('../../../static/cms/js/modules/cms.clipboard');
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var Clipboard = require('../../../static/cms/js/modules/cms.clipboard').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;

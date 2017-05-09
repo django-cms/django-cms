@@ -1,7 +1,6 @@
 {% load i18n l10n cms_tags %}
 
 <div class="cms-dragbar cms-dragbar-{{ placeholder.pk|unlocalize }}">
-    {% language request.toolbar.toolbar_language %}
     <div class="cms-submenu-btn cms-submenu-add cms-btn">
         <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
     </div>
@@ -21,7 +20,6 @@
         <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
         {# plugin child classes here #}
     </div>
-    {% endlanguage %}
 
     <div class="cms-dragbar-title">
         {{ placeholder.get_label }}
