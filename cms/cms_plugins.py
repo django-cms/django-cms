@@ -4,6 +4,7 @@ from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.urlutils import admin_reverse
 from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
@@ -33,25 +34,33 @@ class AliasPlugin(CMSPluginBase):
     render_template = "cms/plugins/alias.html"
     system = True
 
+    @classmethod
+    def get_render_queryset(cls):
+        queryset = super(AliasPlugin, cls).get_render_queryset()
+        return queryset.select_related('plugin', 'alias_placeholder')
+
     def render(self, context, instance, placeholder):
         from cms.utils.plugins import downcast_plugins, build_plugin_tree
 
         context = super(AliasPlugin, self).render(context, instance, placeholder)
-        cms_content_renderer = context.get('cms_content_renderer')
+        request = context.get('request')
 
-        if not cms_content_renderer or instance.is_recursive():
+        if not request or instance.is_recursive():
             return context
 
         if instance.plugin_id:
             plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
             plugins = [instance.plugin] + list(plugins)
-            plugins = downcast_plugins(plugins, request=cms_content_renderer.request)
+            plugins = downcast_plugins(plugins, request=request)
             plugins = list(plugins)
             plugins[0].parent_id = None
             plugins = build_plugin_tree(plugins)
             context['plugins'] = plugins
+
         if instance.alias_placeholder_id:
-            content = cms_content_renderer.render_placeholder(
+            toolbar = get_toolbar_from_request(request)
+            renderer = toolbar.content_renderer
+            content = renderer.render_placeholder(
                 placeholder=instance.alias_placeholder,
                 context=context,
                 editable=False,
@@ -59,7 +68,8 @@ class AliasPlugin(CMSPluginBase):
             context['content'] = mark_safe(content)
         return context
 
-    def get_extra_global_plugin_menu_items(self, request, plugin):
+    @classmethod
+    def get_extra_plugin_menu_items(cls, request, plugin):
         return [
             PluginMenuItem(
                 _("Create Alias"),
@@ -68,7 +78,8 @@ class AliasPlugin(CMSPluginBase):
             )
         ]
 
-    def get_extra_placeholder_menu_items(self, request, placeholder):
+    @classmethod
+    def get_extra_placeholder_menu_items(cls, request, placeholder):
         return [
             PluginMenuItem(
                 _("Create Alias"),

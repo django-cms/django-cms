@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
+
 from cms import constants
 from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_site_id  # nopyflakes

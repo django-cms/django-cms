@@ -1,23 +1,27 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.cache import patch_cache_control
-from django.utils.http import urlquote
+from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
 from django.utils.translation import get_language
+from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.cache.page import get_page_cache
-from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
+from cms.forms.login import CMSToolbarLoginForm
+from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
 from cms.utils import get_language_code, get_language_from_request, get_cms_setting
 from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             is_language_prefix_patterns_used)
 from cms.utils.page import get_pages_queryset
+from cms.utils.page_permissions import user_can_change_page
 from cms.utils.page_resolver import get_page_from_request
 
 
@@ -29,7 +33,7 @@ def details(request, slug):
     response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
-            not request.toolbar.edit_mode and
+            not request.toolbar.edit_mode_active and
             not request.toolbar.show_toolbar and
             not request.user.is_authenticated()
         )
@@ -57,6 +61,8 @@ def details(request, slug):
     if not page:
         # raise 404
         _handle_no_page(request)
+
+    request.current_page = page
 
     current_language = request.GET.get('language', None)
 
@@ -105,7 +111,7 @@ def details(request, slug):
                 if new_language in get_public_languages():
                     with force_language(new_language):
                         pages_root = reverse('pages-root')
-                        if (hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode):
+                        if (hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode_active):
                             request.toolbar.redirect_url = pages_root
                         elif pages_root not in own_urls:
                             return HttpResponseRedirect(pages_root)
@@ -128,7 +134,7 @@ def details(request, slug):
                     # preferred language, *redirect* to the fallback page. This
                     # is a design decision (instead of rendering in place)).
                     if (hasattr(request, 'toolbar') and request.user.is_staff
-                            and request.toolbar.edit_mode):
+                            and request.toolbar.edit_mode_active):
                         request.toolbar.redirect_url = path
                     elif path not in own_urls:
                         return HttpResponseRedirect(path)
@@ -144,7 +150,7 @@ def details(request, slug):
         if slug and slug != page_slug and request.path[:len(page_path)] != page_path:
             # The current language does not match it's slug.
             #  Redirect to the current language.
-            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
+            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode_active:
                 request.toolbar.redirect_url = page_path
             else:
                 return HttpResponseRedirect(page_path)
@@ -159,7 +165,7 @@ def details(request, slug):
         app_urls = page.get_application_urls(current_language, False)
         skip_app = False
         if (not page.is_published(current_language) and hasattr(request, 'toolbar')
-                and request.toolbar.edit_mode):
+                and request.toolbar.edit_mode_active):
             skip_app = True
         if app_urls and not skip_app:
             app = apphook_pool.get_apphook(app_urls)
@@ -181,7 +187,7 @@ def details(request, slug):
             redirect_url = "/%s/%s" % (current_language, redirect_url.lstrip("/"))
             # prevent redirect to self
 
-        if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
+        if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode_active:
             request.toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
             return HttpResponseRedirect(redirect_url)
@@ -189,8 +195,33 @@ def details(request, slug):
     # permission checks
     if page.login_required and not request.user.is_authenticated():
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(page)
 
+    structure_requested = get_cms_setting('CMS_TOOLBAR_URL__BUILD') in request.GET
+
+    if user_can_change_page(request.user, page) and structure_requested:
+        return render_object_structure(request, page)
+
     response = render_page(request, page, current_language=current_language, slug=slug)
     return response
+
+
+@require_POST
+def login(request):
+    redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
+
+    if not is_safe_url(url=redirect_to, host=request.get_host()):
+        redirect_to = reverse("pages-root")
+
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(redirect_to)
+
+    form = CMSToolbarLoginForm(request=request, data=request.POST)
+
+    if form.is_valid():
+        auth_login(request, form.user_cache)
+    else:
+        redirect_to += u'?cms_toolbar_login_error=1'
+    return HttpResponseRedirect(redirect_to)

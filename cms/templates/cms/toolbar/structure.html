@@ -1,0 +1,16 @@
+{% load cms_tags cms_js_tags i18n sekizai_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ object.get_page_title }}</title>
+    {% render_block "css" %}
+</head>
+<body>
+    {% cms_toolbar %}
+    {% render_block "js" %}{# backwards incompatible but better cms_js %}
+    {% language request.toolbar.toolbar_language %}
+        {% render_cms_structure_js request.toolbar.structure_renderer object %}
+    {% endlanguage %}
+</body>
+</html>

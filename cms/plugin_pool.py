@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.template.defaultfilters import slugify
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.functional import cached_property
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
@@ -233,6 +234,22 @@ class PluginPool(object):
         self.discover_plugins()
         self.set_plugin_meta()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
+
+    @cached_property
+    def registered_plugins(self):
+        return self.get_all_plugins()
+
+    @cached_property
+    def plugins_with_extra_menu(self):
+        plugin_classes = [cls for cls in self.registered_plugins
+                          if cls._has_extra_plugin_menu_items]
+        return plugin_classes
+
+    @cached_property
+    def plugins_with_extra_placeholder_menu(self):
+        plugin_classes = [cls for cls in self.registered_plugins
+                          if cls._has_extra_placeholder_menu_items]
+        return plugin_classes
 
 
 plugin_pool = PluginPool()

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import operator
 import warnings
-from collections import namedtuple
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -16,9 +15,6 @@ from sekizai.helpers import get_varname, is_variable_extend_node
 
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils import get_cms_setting
-
-
-DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
 
 
 def _get_nodelist(tpl):
@@ -171,10 +167,13 @@ def restore_sekizai_context(context, changes):
             sekizai_namespace.append(value)
 
 
-def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
+def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blocks=None):
     from cms.templatetags.cms_tags import Placeholder
 
-    placeholders = []
+    if not node_class:
+        node_class = Placeholder
+
+    nodes = []
 
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
@@ -183,8 +182,8 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
 
     for node in nodelist:
         # check if this is a placeholder first
-        if isinstance(node, Placeholder):
-            placeholders.append(node)
+        if isinstance(node, node_class):
+            nodes.append(node)
         elif isinstance(node, IncludeNode):
             # if there's an error in the to-be-included template, node.template becomes None
             if node.template:
@@ -199,16 +198,16 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                         template = get_template(node.template.var)
                 else:
                     template = node.template
-                placeholders += _scan_placeholders(_get_nodelist(template), current_block)
+                nodes += _scan_placeholders(_get_nodelist(template), node_class, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
-            placeholders += _extend_nodelist(node)
+            nodes += _extend_nodelist(node, node_class)
         # in block nodes we have to scan for super blocks
         elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == 'block.super':
                 if not hasattr(current_block.super, 'nodelist'):
                     raise TemplateSyntaxError("Cannot render block.super for blocks without a parent.")
-                placeholders += _scan_placeholders(_get_nodelist(current_block.super), current_block.super)
+                nodes += _scan_placeholders(_get_nodelist(current_block.super), node_class, current_block.super)
         # ignore nested blocks which are already handled
         elif isinstance(node, BlockNode) and node.name in ignore_blocks:
             continue
@@ -221,7 +220,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                     if isinstance(subnodelist, NodeList):
                         if isinstance(node, BlockNode):
                             current_block = node
-                        placeholders += _scan_placeholders(subnodelist, current_block, ignore_blocks)
+                        nodes += _scan_placeholders(subnodelist, node_class, current_block, ignore_blocks)
         # else just scan the node for nodelist instance attributes
         else:
             for attr in dir(node):
@@ -229,20 +228,26 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                 if isinstance(obj, NodeList):
                     if isinstance(node, BlockNode):
                         current_block = node
-                    placeholders += _scan_placeholders(obj, current_block, ignore_blocks)
-    return placeholders
+                    nodes += _scan_placeholders(obj, node_class, current_block, ignore_blocks)
+    return nodes
+
+
+def _scan_static_placeholders(nodelist):
+    from cms.templatetags.cms_tags import StaticPlaceholderNode
+
+    return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
 
 
 def get_placeholders(template):
     compiled_template = get_template(template)
 
     placeholders = []
-    placeholder_nodes = _scan_placeholders(_get_nodelist(compiled_template))
+    nodes = _scan_placeholders(_get_nodelist(compiled_template))
     clean_placeholders = []
 
-    for node in placeholder_nodes:
-        slot = node.get_name()
-        inherit = node.get_inherit_status()
+    for node in nodes:
+        placeholder = node.get_declaration()
+        slot = placeholder.slot
 
         if slot in clean_placeholders:
             warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
@@ -251,12 +256,28 @@ def get_placeholders(template):
                           DuplicatePlaceholderWarning)
         else:
             validate_placeholder_name(slot)
-            placeholders.append(DeclaredPlaceholder(slot=slot, inherit=inherit))
+            placeholders.append(placeholder)
             clean_placeholders.append(slot)
     return placeholders
 
 
-def _extend_nodelist(extend_node):
+def get_static_placeholders(template, context):
+    compiled_template = get_template(template)
+    nodes = _scan_static_placeholders(_get_nodelist(compiled_template))
+    placeholders = [node.get_declaration(context) for node in nodes]
+    placeholders_with_code = []
+
+    for placeholder in placeholders:
+        if placeholder.slot:
+            placeholders_with_code.append(placeholder)
+        else:
+            warnings.warn('Unable to resolve static placeholder '
+                          'name in template "{}"'.format(template),
+                          Warning)
+    return placeholders_with_code
+
+
+def _extend_nodelist(extend_node, node_class):
     """
     Returns a list of placeholders found in the parent template(s) of this
     ExtendsNode
@@ -270,11 +291,11 @@ def _extend_nodelist(extend_node):
     placeholders = []
 
     for block in blocks.values():
-        placeholders += _scan_placeholders(_get_nodelist(block), block, blocks.keys())
+        placeholders += _scan_placeholders(_get_nodelist(block), node_class, block, blocks.keys())
 
     # Scan topmost template for placeholder outside of blocks
     parent_template = _find_topmost_template(extend_node)
-    placeholders += _scan_placeholders(_get_nodelist(parent_template), None, blocks.keys())
+    placeholders += _scan_placeholders(_get_nodelist(parent_template), node_class, None, blocks.keys())
     return placeholders
 
 

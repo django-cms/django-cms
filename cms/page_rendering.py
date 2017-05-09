@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import Http404
+from django.shortcuts import render
 from django.template.response import TemplateResponse
 
 from cms import __version__
@@ -49,6 +50,14 @@ def render_page(request, page, current_language, slug):
     elif xframe_options == Page.X_FRAME_OPTIONS_DENY:
         response['X-Frame-Options'] = 'DENY'
     return response
+
+
+def render_object_structure(request, obj):
+    context = {
+        'object': obj,
+        'cms_toolbar': request.toolbar,
+    }
+    return render(request, 'cms/toolbar/structure.html', context)
 
 
 def _handle_no_page(request):

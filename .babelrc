@@ -1,0 +1,15 @@
+{
+    "presets": [
+        ["env", {
+            "modules": false
+        }]
+    ],
+    "plugins": ["transform-runtime"],
+    "env": {
+        "production": {
+            "plugins": [
+                "lodash"
+            ]
+        }
+    }
+}

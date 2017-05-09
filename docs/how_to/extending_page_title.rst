@@ -139,7 +139,7 @@ selected, it will open a modal dialog in which the *Page icon* field can be edit
                 if url:
                     # adds a toolbar item in position 0 (at the top of the menu)
                     current_page_menu.add_modal_item(_('Page Icon'), url=url,
-                        disabled=not self.toolbar.edit_mode, position=0)
+                        disabled=not self.toolbar.edit_mode_active, position=0)
 
 
 Title model extension example
@@ -210,7 +210,7 @@ In this example, we need to loop over the titles for the page, and populate the 
             current_page_menu = self._setup_extension_toolbar()
 
             # if it's all ok
-            if current_page_menu and self.toolbar.edit_mode:
+            if current_page_menu and self.toolbar.edit_mode_active:
                 # create a sub menu labelled "Ratings" at position 1 in the menu
                 sub_menu = self._get_sub_menu(
                     current_page_menu, 'submenu_label', 'Ratings', position=1
@@ -235,7 +235,7 @@ In this example, we need to loop over the titles for the page, and populate the 
 
                     # adds toolbar items
                     sub_menu.add_modal_item(
-                        'Rate %s' % title, url=url, disabled=not self.toolbar.edit_mode
+                        'Rate %s' % title, url=url, disabled=not self.toolbar.edit_mode_active
                         )
 
 
@@ -380,7 +380,7 @@ low-level API to edit the toolbar according to your needs::
                     # not in urls
                     pass
                 else:
-                    not_edit_mode = not self.toolbar.edit_mode
+                    not_edit_mode = not self.toolbar.edit_mode_active
                     current_page_menu = self.toolbar.get_or_create_menu('page')
                     current_page_menu.add_modal_item(_('Page Icon'), url=url, disabled=not_edit_mode)
 

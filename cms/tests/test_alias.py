@@ -110,15 +110,12 @@ class AliasTestCase(CMSTestCase):
 
         with self.login_user_context(self.get_superuser()):
             context = self.get_context(path=target_page.get_absolute_url(), page=target_page)
-            context['request'].toolbar = CMSToolbar(context['request'])
-            context['request'].toolbar.edit_mode = True
-            # This flag is evaluated on init
-            context['cms_content_renderer']._placeholders_are_editable = True
+            request = context['request']
+            request.session['cms_edit'] = True
+            request.toolbar = CMSToolbar(request)
+            renderer = request.toolbar.get_content_renderer()
             context[get_varname()] = defaultdict(UniqueSequence)
-
-            content_renderer = context['cms_content_renderer']
-
-            output = content_renderer.render_placeholder(
+            output = renderer.render_placeholder(
                 target_placeholder,
                 context=context,
                 language='en',
@@ -139,7 +136,7 @@ class AliasTestCase(CMSTestCase):
                 start_tag = tag_format.format(plugin.pk)
                 self.assertNotIn(start_tag, output)
 
-            editable_placeholders = content_renderer.get_rendered_editable_placeholders()
+            editable_placeholders = renderer.get_rendered_editable_placeholders()
             self.assertNotIn(source_placeholder,editable_placeholders)
 
     def test_alias_from_page_change_form_text(self):

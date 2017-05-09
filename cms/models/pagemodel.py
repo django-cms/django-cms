@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from logging import getLogger
 from os.path import join
 
@@ -1565,7 +1566,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Rescan and if necessary create placeholders in the current template.
         """
-        existing = {}
+        existing = OrderedDict()
         placeholders = [pl.slot for pl in self.get_declared_placeholders()]
 
         for placeholder in self.placeholders.all():
@@ -1582,6 +1583,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         from cms.utils.placeholder import get_placeholders
 
         return get_placeholders(self.get_template())
+
+    def get_declared_static_placeholders(self, context):
+        # inline import to prevent circular imports
+        from cms.utils.placeholder import get_static_placeholders
+
+        return get_static_placeholders(self.get_template(), context)
 
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """

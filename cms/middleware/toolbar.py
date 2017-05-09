@@ -4,7 +4,6 @@ Edit Toolbar middleware
 """
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
-from django.http import HttpResponse
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
@@ -51,33 +50,33 @@ class ToolbarMiddleware(MiddlewareMixin):
 
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        build = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         disable = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
         anonymous_on = get_cms_setting('TOOLBAR_ANONYMOUS_ON')
+        edit_enabled = edit_on in request.GET
+        edit_disabled = edit_off in request.GET
 
         if disable in request.GET:
             request.session['cms_toolbar_disabled'] = True
-        if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
+
+        if edit_enabled:
+            # If we actively enter edit mode, we should show the toolbar in any case
             request.session['cms_toolbar_disabled'] = False
 
-        if not request.session.get('cms_toolbar_disabled', False) and (
-                request.user.is_staff or (anonymous_on and request.user.is_anonymous())
-        ):
-            if edit_on in request.GET and not request.session.get('cms_edit', False):
-                request.session['cms_edit'] = True
-                if request.session.get('cms_build', False):
-                    request.session['cms_build'] = False
-            if edit_off in request.GET and request.session.get('cms_edit', True):
-                request.session['cms_edit'] = False
-                if request.session.get('cms_build', False):
-                    request.session['cms_build'] = False
-            if build in request.GET and not request.session.get('cms_build', False):
-                request.session['cms_build'] = True
-        else:
-            if request.session.get('cms_build'):
-                request.session['cms_build'] = False
-            if request.session.get('cms_edit'):
-                request.session['cms_edit'] = False
+        toolbar_enabled = not request.session.get('cms_toolbar_disabled', False)
+        can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous())
+        show_toolbar = (toolbar_enabled and can_see_toolbar)
+
+        if edit_enabled and show_toolbar and not request.session.get('cms_edit'):
+            # User has explicitly enabled mode
+            # AND can see the toolbar
+            request.session['cms_edit'] = True
+
+        if edit_disabled or not show_toolbar and request.session.get('cms_edit'):
+            # User has explicitly disabled the toolbar
+            # OR user has explicitly turned off edit mode
+            # OR user can't see toolbar
+            request.session['cms_edit'] = False
+
         if request.user.is_staff:
             try:
                 request.cms_latest_entry = LogEntry.objects.filter(
@@ -87,14 +86,6 @@ class ToolbarMiddleware(MiddlewareMixin):
             except IndexError:
                 request.cms_latest_entry = -1
         request.toolbar = CMSToolbar(request)
-
-    def process_view(self, request, view_func, view_args, view_kwarg):
-        if not self.is_cms_request(request):
-            return
-
-        response = request.toolbar.request_hook()
-        if isinstance(response, HttpResponse):
-            return response
 
     def process_response(self, request, response):
         if not self.is_cms_request(request):

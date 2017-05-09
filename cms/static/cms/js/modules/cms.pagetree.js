@@ -8,10 +8,10 @@ require('jstree');
 require('../libs/jstree/jstree.grid.min');
 
 var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
-var KEYS = require('./cms.base').KEYS;
-var PageTreeDropdowns = require('./cms.pagetree.dropdown');
-var PageTreeStickyHeader = require('./cms.pagetree.stickyheader');
+var Helpers = require('./cms.base').default.API.Helpers;
+var KEYS = require('./cms.base').default.KEYS;
+var PageTreeDropdowns = require('./cms.pagetree.dropdown').default;
+var PageTreeStickyHeader = require('./cms.pagetree.stickyheader').default;
 
 /**
  * The pagetree is loaded via `/admin/cms/page` and has a custom admin
@@ -1027,4 +1027,4 @@ $(function () {
     new PageTree();
 });
 
-module.exports = PageTree;
+export default PageTree;

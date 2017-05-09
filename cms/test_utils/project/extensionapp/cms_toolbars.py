@@ -34,7 +34,7 @@ class MyTitleExtensionToolbar(CMSToolbar):
                 # not in urls
                 pass
             else:
-                not_edit_mode = not self.toolbar.edit_mode
+                not_edit_mode = not self.toolbar.edit_mode_active
                 current_page_menu = self.toolbar.get_or_create_menu('page')
                 current_page_menu.add_modal_item(_('Title Extension'), url=url, disabled=not_edit_mode)
 
@@ -65,6 +65,6 @@ class MyPageExtensionToolbar(CMSToolbar):
                 # not in urls
                 pass
             else:
-                not_edit_mode = not self.toolbar.edit_mode
+                not_edit_mode = not self.toolbar.edit_mode_active
                 current_page_menu = self.toolbar.get_or_create_menu('page')
                 current_page_menu.add_modal_item(_('Page Extension'), url=url, disabled=not_edit_mode)

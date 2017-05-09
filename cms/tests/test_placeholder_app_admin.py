@@ -4,8 +4,7 @@ from django.test.utils import override_settings
 
 from cms.api import add_plugin
 from cms.models import CMSPlugin, Placeholder, UserSettings
-from cms.test_utils.project.placeholderapp.exceptions import PlaceholderHookException
-from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 
 
@@ -231,77 +230,6 @@ class AppAdminTest(AppAdminTestCase):
                 endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
-
-    def test_placeholder_post_move_hook_resolve(self):
-        """
-        Ensure moving a plugin from placeholder A
-        registered with admin A calls the move plugin hooks
-        on the target placeholder's registered admin.
-        """
-        superuser = self.get_superuser()
-        exception = PlaceholderHookException
-        message = 'move plugin hook has been called.'
-
-        example_1 = self._obj
-        source_placeholder = example_1.placeholder
-        plugin = self._add_plugin_to_placeholder(source_placeholder)
-
-        example_2 = CharPksExample.objects.create(
-            char_1='one',
-            slug='two',
-        )
-        target_placeholder = example_2.placeholder_1
-
-        with self.login_user_context(superuser):
-            with self.assertRaisesMessage(exception, message):
-                # move plugin to placeholder_2
-                # this will cause the Example1 admin
-                # to resolve the attached model/admin of the target placeholder
-                # and call it's hook.
-                data = {
-                    'plugin_id': plugin.pk,
-                    'placeholder_id': target_placeholder.pk,
-                    'plugin_parent': '',
-                }
-                endpoint = self.get_move_plugin_uri(plugin, container=Example1)
-                self.client.post(endpoint, data)
-
-    def test_placeholder_post_copy_hook_resolve(self):
-        """
-        Ensure copying a plugin from placeholder A
-        registered with admin A calls the copy plugin hooks
-        on the target placeholder's registered admin.
-        """
-        superuser = self.get_superuser()
-        exception = PlaceholderHookException
-        message = 'copy plugin hook has been called.'
-
-        example_1 = self._obj
-        source_placeholder = example_1.placeholder
-        plugin = self._add_plugin_to_placeholder(source_placeholder)
-
-        endpoint = self.get_copy_plugin_uri(plugin, container=Example1)
-
-        example_2 = CharPksExample.objects.create(
-            char_1='one',
-            slug='two',
-        )
-        target_placeholder = example_2.placeholder_1
-
-        with self.login_user_context(superuser):
-            with self.assertRaisesMessage(exception, message):
-                # move plugin to placeholder_2
-                # this will cause the Example1 admin
-                # to resolve the attached model/admin of the target placeholder
-                # and call it's hook.
-                data = {
-                    'source_language': plugin.language,
-                    'source_placeholder_id': source_placeholder.pk,
-                    'source_plugin_id': plugin.pk,
-                    'target_language': plugin.language,
-                    'target_placeholder_id': target_placeholder.pk,
-                }
-                self.client.post(endpoint, data)
 
 
 class AppAdminPermissionsTest(AppAdminTestCase):

@@ -1,6 +1,5 @@
-{% load i18n l10n cms_tags %}
+{% load i18n l10n cms_tags cms_js_tags %}
 
-{% language request.toolbar.toolbar_language %}
 <div id="cms-top"
      class="cms cms-reset
      {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
@@ -65,9 +64,9 @@
         {% endspaceless %}
     </div>
 
-    {# start: addons #}
-    {{ addons }}
-    {# end: addons #}
+    {% if request.toolbar.edit_mode or request.toolbar.build_mode and request.toolbar.clipboard_plugin %}
+        {% include 'cms/toolbar/clipboard.html' with clipboard_plugin=request.toolbar.clipboard_plugin %}
+    {% endif %}
 
     <div class="cms-modal" tabindex="-1" data-touch-action="none">
         <div class="cms-modal-head" data-touch-action="none">
@@ -93,18 +92,20 @@
     {# start: structure #}
     <div class="cms-structure">
         <div class="cms-structure-content" data-touch-action="pan-y">
-            {% for placeholder in cms_content_renderer.get_rendered_editable_placeholders %}
+        {% if request.toolbar.structure_mode_active or request.toolbar.uses_legacy_structure_mode %}
+            {% for placeholder in cms_renderer.get_rendered_editable_placeholders %}
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
-                {% include cms_content_renderer.dragbar_template with placeholder=placeholder language=language %}
+                {% include cms_renderer.dragbar_template with placeholder=placeholder %}
 
                 <div class="cms-draggables cms-draggables-root">
                     <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
                     {% for plugin in placeholder.get_cached_plugins %}
-                        {% include cms_content_renderer.drag_item_template with plugin=plugin slot=slot %}
+                        {% include cms_renderer.drag_item_template with plugin=plugin %}
                     {% endfor %}
                 </div>
             </div>
             {% endfor %}
+        {% endif %}
         </div>
     </div>
     {# end: structure #}
@@ -117,5 +118,8 @@
             </div>
         </div>
     {% endif %}
+    <script type="text/javascript" data-cms>
+        var CMS = CMS || {};
+        CMS._plugins = [];
+    </script>
 </div>
-{% endlanguage %}

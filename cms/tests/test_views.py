@@ -204,11 +204,50 @@ class ViewTests(CMSTestCase):
 
         Page.set_homepage(page)
 
+        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        structure_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+
         with self.login_user_context(user):
-            response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            self.assertContains(response, "/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'), 1, 200)
-            response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
-            self.assertContains(response, "/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'), 1, 200)
+            response = self.client.get("/fr/?{}".format(edit_on))
+            self.assertContains(
+                response,
+                '<a href="/fr/?{}" class="cms-btn">Structure</a>'.format(structure_on),
+                count=1,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '<a href="/fr/?{}" class="cms-btn cms-btn-active">Content</a>'.format(edit_on),
+                count=1,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '<a class="cms-btn cms-btn-switch-save" href="/fr/?{}">'
+                '<span>View published page</span></a>'.format(edit_off),
+                count=1,
+                html=True,
+            )
+            response = self.client.get("/fr/?{}".format(edit_off))
+            self.assertContains(
+                response,
+                '<a href="/fr/?{}" class="cms-btn">Structure</a>'.format(structure_on),
+                count=1,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '<a href="/fr/?{}" class="cms-btn">Content</a>'.format(edit_on),
+                count=1,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{}">Edit page</a>'.format(edit_on),
+                count=1,
+                html=True,
+            )
 
     def test_incorrect_slug_for_language(self):
         """

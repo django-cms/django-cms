@@ -148,4 +148,4 @@ var Messages = new Class({
 
 });
 
-module.exports = Messages;
+export default Messages;

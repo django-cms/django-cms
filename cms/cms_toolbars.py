@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
-from classytags.utils import flatten_context
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
-from cms.models import CMSPlugin, Title, Page
+from cms.models import Placeholder, Title, Page, StaticPlaceholder
 from cms.toolbar.items import ButtonList, TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -25,6 +23,7 @@ from cms.utils.page_permissions import (
     user_can_publish_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
+
 from menus.utils import DefaultLanguageChanger
 
 
@@ -51,19 +50,37 @@ COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 
 
-@toolbar_pool.register
-class PlaceholderToolbar(CMSToolbar):
-    """
-    Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
-    """
+class ToolbarBase(CMSToolbar):
 
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
 
     def init_placeholders(self):
-        content_renderer = self.toolbar.content_renderer
-        self.placeholders = content_renderer.get_rendered_editable_placeholders()
-        self.statics = content_renderer.get_rendered_static_placeholders()
+        request = self.request
+        toolbar = self.toolbar
+
+        if request.method == 'GET':
+            is_api_call = 'placeholders[]' in request.GET and request.is_ajax()
+        else:
+            is_api_call = False
+
+        if is_api_call:
+            # AJAX request to reload page structure
+            placeholder_ids = request.GET.getlist("placeholders[]")
+            self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)
+            self.statics = StaticPlaceholder.objects.filter(
+                Q(draft__in=placeholder_ids)|Q(public__in=placeholder_ids)
+            )
+            return
+
+        if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
+            # User has explicitly requested structure mode
+            # and the object (page, blog, etc..) allows for the non-legacy structure mode
+            renderer = toolbar.structure_renderer
+        else:
+            renderer = toolbar.get_content_renderer()
+        self.placeholders = renderer.get_rendered_editable_placeholders()
+        self.statics = renderer.get_rendered_static_placeholders()
 
     def populate(self):
         self.init_from_request()
@@ -71,6 +88,15 @@ class PlaceholderToolbar(CMSToolbar):
     def post_template_populate(self):
         self.init_placeholders()
 
+
+@toolbar_pool.register
+class PlaceholderToolbar(ToolbarBase):
+    """
+    Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
+    """
+
+    def post_template_populate(self):
+        super(PlaceholderToolbar, self).post_template_populate()
         self.add_wizard_button()
         self.add_structure_mode()
 
@@ -87,15 +113,16 @@ class PlaceholderToolbar(CMSToolbar):
                 return self.add_structure_mode_item()
 
     def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
-        build_mode = self.toolbar.build_mode
-        build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
-        edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        structure_active = self.toolbar.structure_mode_active
+        edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
+        build_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        edit_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
 
         if self.request.user.has_perm("cms.use_structure"):
             switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                     extra_classes=extra_classes)
-            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=False)
-            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
+            switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False)
+            switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False)
 
     def add_wizard_button(self):
         from cms.wizards.wizard_pool import entry_choices
@@ -120,6 +147,7 @@ class PlaceholderToolbar(CMSToolbar):
                                       side=self.toolbar.RIGHT,
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
+
 
 @toolbar_pool.register
 class BasicToolbar(CMSToolbar):
@@ -166,9 +194,9 @@ class BasicToolbar(CMSToolbar):
             self._admin_menu.add_break(USER_SETTINGS_BREAK)
 
             # clipboard
-            if self.toolbar.edit_mode or self.toolbar.build_mode:
+            if self.toolbar.edit_mode_active:
                 # True if the clipboard exists and there's plugins in it.
-                clipboard_is_bound = self.get_clipboard_plugins().exists()
+                clipboard_is_bound = self.toolbar.clipboard_plugin
 
                 self._admin_menu.add_link_item(_('Clipboard...'), url='#',
                         extra_classes=['cms-clipboard-trigger'],
@@ -238,37 +266,21 @@ class BasicToolbar(CMSToolbar):
         except (AttributeError, NotImplementedError):
             return default
 
-    def get_clipboard_plugins(self):
-        self.populate()
-
-        if not hasattr(self, "clipboard"):
-            return CMSPlugin.objects.none()
-        return self.clipboard.get_plugins().select_related('placeholder')
-
-    def render_addons(self, context):
-        context.push()
-        context['local_toolbar'] = self
-        clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', flatten_context(context)))
-        context.pop()
-        return [clipboard]
-
 
 @toolbar_pool.register
-class PageToolbar(CMSToolbar):
+class PageToolbar(ToolbarBase):
     _changed_admin_menu = None
     watch_models = [Page]
 
     # Helpers
 
     def init_from_request(self):
-        self.page = get_page_draft(self.request.current_page)
+        super(PageToolbar, self).init_from_request()
         self.title = self.get_title()
         self.permissions_activated = get_cms_setting('PERMISSION')
 
     def init_placeholders(self):
-        content_renderer = self.toolbar.content_renderer
-        self.placeholders = content_renderer.get_rendered_editable_placeholders()
-        self.statics = content_renderer.get_rendered_static_placeholders()
+        super(PageToolbar, self).init_placeholders()
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 
     def get_title(self):
@@ -303,7 +315,7 @@ class PageToolbar(CMSToolbar):
     def in_apphook(self):
         with force_language(self.toolbar.language):
             try:
-                resolver = resolve(self.request.path_info)
+                resolver = resolve(self.toolbar.request_path)
             except Resolver404:
                 return False
             else:
@@ -319,7 +331,7 @@ class PageToolbar(CMSToolbar):
         page = getattr(self.request, 'current_page', False)
         if page:
             language = get_language_from_request(self.request)
-            return self.request.path == page.get_absolute_url(language=language)
+            return self.toolbar.request_path == page.get_absolute_url(language=language)
         return False
 
     def get_on_delete_redirect_url(self):
@@ -337,35 +349,42 @@ class PageToolbar(CMSToolbar):
     # Populate
 
     def populate(self):
-        self.init_from_request()
-
+        super(PageToolbar, self).populate()
         self.change_admin_menu()
         self.add_page_menu()
         self.change_language_menu()
 
     def post_template_populate(self):
-        self.init_placeholders()
+        super(PageToolbar, self).post_template_populate()
         self.add_draft_live()
         self.add_publish_button()
 
     def has_dirty_objects(self):
-        if self.dirty_statics:
-            return True
+        language = self.current_lang
 
-        if not self.page:
-            return False
-
-        if self.page.is_dirty(self.current_lang):
-            return True
-        return self.page_is_pending(self.page, self.current_lang)
+        if self.page:
+            if self.dirty_statics:
+                # There's dirty static placeholders on this page.
+                # Only show the page as dirty (publish button) if the page
+                # translation has been configured.
+                dirty = self.page.title_set.filter(language=language).exists()
+            else:
+                dirty = (self.page.is_dirty(language) or self.page_is_pending(self.page, language))
+        else:
+            dirty = bool(self.dirty_statics)
+        return dirty
 
     # Buttons
 
     def add_publish_button(self, classes=('cms-btn-action', 'cms-btn-publish',)):
-        # only do dirty lookups if publish permission is granted else button isn't added anyway
-        if self.toolbar.edit_mode and self.has_publish_permission():
+        if self.user_can_publish():
             button = self.get_publish_button(classes=classes)
             self.toolbar.add_item(button)
+
+    def user_can_publish(self):
+        if not self.toolbar.edit_mode_active:
+            return False
+        return self.has_publish_permission() and self.has_dirty_objects()
 
     def get_publish_button(self, classes=None):
         dirty = self.has_dirty_objects()
@@ -397,7 +416,7 @@ class PageToolbar(CMSToolbar):
             params['statics'] = ','.join(str(sp.pk) for sp in self.dirty_statics)
 
         if self.in_apphook():
-            params['redirect'] = self.request.path_info
+            params['redirect'] = self.toolbar.request_path
 
         with force_language(self.current_lang):
             url = admin_reverse('cms_page_publish_page', args=(pk, self.current_lang))
@@ -405,7 +424,7 @@ class PageToolbar(CMSToolbar):
 
     def add_draft_live(self):
         if self.page:
-            if self.toolbar.edit_mode and not self.title:
+            if self.toolbar.edit_mode_active and not self.title:
                 self.add_page_settings_button()
 
             if user_can_change_page(self.request.user, page=self.page) and self.page.is_published(self.current_lang):
@@ -419,7 +438,7 @@ class PageToolbar(CMSToolbar):
                 return self.add_draft_live_item()
 
     def add_draft_live_item(self, template='cms/toolbar/items/live_draft.html', extra_context=None):
-        context = {'request': self.request}
+        context = {'cms_toolbar': self.toolbar}
         context.update(extra_context or {})
         pos = len(self.toolbar.right_items)
         self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
@@ -430,7 +449,7 @@ class PageToolbar(CMSToolbar):
 
     # Menus
     def change_language_menu(self):
-        if self.toolbar.edit_mode and self.page:
+        if self.toolbar.edit_mode_active and self.page:
             language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
             if not language_menu:
                 return None
@@ -494,7 +513,7 @@ class PageToolbar(CMSToolbar):
 
     def add_page_menu(self):
         if self.page and self.has_page_change_permission():
-            edit_mode = self.toolbar.edit_mode
+            edit_mode = self.toolbar.edit_mode_active
             refresh = self.toolbar.REFRESH_PAGE
 
             # menu for current page
@@ -566,7 +585,7 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
 
             # templates menu
-            if self.toolbar.build_mode or edit_mode:
+            if edit_mode:
                 templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
                 action = admin_reverse('cms_page_change_template', args=(self.page.pk,))
                 for path, name in get_cms_setting('TEMPLATES'):

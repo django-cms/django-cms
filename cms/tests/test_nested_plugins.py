@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-import json
-
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page, add_plugin
-from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.i18n import force_language
 from cms.utils.plugins import reorder_plugins
 
 
@@ -928,9 +924,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertEqual(pre_copy_placeholder_count, 6)
             superuser = self.get_superuser()
 
-            with force_language('en'):
-                action_urls = text_plugin_two.get_action_urls()
-
             with self.login_user_context(superuser):
                 # now move the parent text plugin to another placeholder
                 post_data = {
@@ -940,15 +933,9 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     'plugin_parent': '',
 
                 }
-                plugin_class = text_plugin_two.get_plugin_class_instance()
-                expected = {
-                    'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
-                    'urls': action_urls,
-                }
                 edit_url = self.get_move_plugin_uri(text_plugin_two)
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(json.loads(response.content.decode('utf8')), expected)
                 # check if the plugin got moved
                 page_one = self.reload(page_one)
                 self.reload(text_plugin_two)

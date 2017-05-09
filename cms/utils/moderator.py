@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from cms.utils.conf import get_cms_setting
+
+
 def use_draft(request):
     if request:
+        structure = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         is_staff = request.user.is_authenticated() and request.user.is_staff
-        edit_mode = is_staff and request.session.get('cms_edit', False)
-        build_mode = is_staff and request.session.get('cms_build', False)
-        return edit_mode or build_mode
+        edit_mode_active = is_staff and request.session.get('cms_edit', False)
+        structure_mode_active = is_staff and structure in request.GET
+        return bool(edit_mode_active or structure_mode_active)
     return False
 
 

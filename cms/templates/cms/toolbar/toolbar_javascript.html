@@ -1,12 +1,11 @@
-{% load i18n l10n sekizai_tags admin_static cms_tags cms_static %}
+{% load i18n l10n sekizai_tags admin_static cms_tags cms_js_tags cms_static %}
 
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static_with_version "cms/css/cms.base.css" %}" />{% endaddtoblock %}
 
 {% addtoblock "js" %}
-<script src="{% static_with_version "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript"></script>
-{% language request.toolbar.toolbar_language %}
-<script>
-CMS._plugins = [];
+<script data-cms src="{% static_with_version "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript"></script>
+<script data-cms>
+CMS._plugins = CMS._plugins || [];
 // this is a global shared configuration
 CMS.config = {
     'mode': {% if request.toolbar.edit_mode %}'draft'{% else %}'live'{% endif %},
@@ -30,6 +29,7 @@ CMS.config = {
         'publish': '{% filter escapejs %}{% trans "Are you sure you want to publish this page?" %}{% endfilter %}',
         'addPluginPlaceholder': '{% filter escapejs %}{% trans "Plugin will be added here" %}{% endfilter %}',
         'confirmDirty': '{% filter escapejs %}{% trans "You have unsaved changes." %}{% endfilter %}',
+        'loading': '{% filter escapejs %}{% trans "Loading" %}{% endfilter %}',
         'confirmDirtyESC': '{% filter escapejs %}{% trans "Are you sure you want to abandon these changes?" %}{% endfilter %}',
         'errorLoadingEditForm': '{% filter escapejs %}{% trans "The form could not be loaded. Please check that the server is running correctly." %}{% endfilter %}',
         'shortcuts': '{% filter escapejs %}{% trans "Shortcuts" %}{% endfilter %}',
@@ -119,23 +119,18 @@ CMS.config = {
     'error': '{% filter escapejs %}{% if request.toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}{% endfilter %}',
     'publisher': '{% filter escapejs %}{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}{% endfilter %}'
 };
-(function($) {
-// CMS.$ will be passed for $
-$(document).ready(function () {
+CMS.$(function () {
     CMS.settings = CMS.API.Helpers.getSettings();
 
     // extends API
-    $.extend(CMS.API, {
-        'Toolbar': new CMS.Toolbar(),
-        'Clipboard': new CMS.Clipboard(),
-        'StructureBoard': new CMS.StructureBoard(),
-        'Messages': new CMS.Messages(),
-        'Tooltip': new CMS.Tooltip()
-    });
+    CMS.API.Toolbar = new CMS.Toolbar();
+    CMS.API.Clipboard = new CMS.Clipboard();
+    CMS.API.StructureBoard = new CMS.StructureBoard();
+    CMS.API.Messages = new CMS.Messages();
+    CMS.API.Tooltip = new CMS.Tooltip();
 
     CMS.Plugin._initializeTree();
 });
-})(CMS.$);
 </script>
-{% endlanguage %}
 {% endaddtoblock %}
+{% if request.toolbar.clipboard_plugin %}{% render_plugin_init_js request.toolbar.clipboard_plugin %}{% endif %}

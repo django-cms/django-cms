@@ -2,17 +2,40 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
-var Class = require('classjs');
-var Helpers = require('./cms.base').API.Helpers;
-var KEYS = require('./cms.base').KEYS;
-var Navigation = require('./cms.navigation');
-var Sideframe = require('./cms.sideframe');
-var Modal = require('./cms.modal');
+import $ from 'jquery';
+import Class from 'classjs';
+import Navigation from './cms.navigation';
+import Sideframe from './cms.sideframe';
+import Modal from './cms.modal';
+import DiffDOM from 'diff-dom';
+
+var Helpers = require('./cms.base').default.API.Helpers;
+var KEYS = require('./cms.base').default.KEYS;
 
 var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
 var DEBUG_BAR_HEIGHT = 5; // TODO has to be fixed
+var dd = new DiffDOM({
+    preDiffApply(info) {
+        if ($('.cms-toolbar-item-cms-mode-switcher').is(info.node)) {
+            return true;
+        }
+        if ($('.cms-toolbar-item-cms-mode-switcher a').is(info.node)) {
+            return true;
+        }
+
+        if (
+            (
+                info.diff.action === 'removeAttribute' ||
+                info.diff.action === 'modifyAttribute'
+            ) &&
+            info.diff.name === 'style' &&
+            $('.cms-toolbar').is(info.node)
+        ) {
+            return true;
+        }
+    }
+});
 
 /**
  * @function hideDropdownIfRequired
@@ -140,16 +163,18 @@ var Toolbar = new Class({
         var LONG_MENUS_THROTTLE = 10;
 
         // attach event to the trigger handler
-        this.ui.toolbarTrigger.on(this.pointerUp + ' keyup.cms.toolbar', function (e) {
-            if (e.type === 'keyup' && e.keyCode !== CMS.KEYS.ENTER) {
-                return;
-            }
-            e.preventDefault();
-            that.toggle();
-            that.ui.document.trigger(that.click);
-        }).on(this.click, function (e) {
-            e.preventDefault();
-        });
+        this.ui.toolbarTrigger
+            .off(this.pointerUp + ' keyup.cms.toolbar')
+            .on(this.pointerUp + ' keyup.cms.toolbar', function (e) {
+                if (e.type === 'keyup' && e.keyCode !== CMS.KEYS.ENTER) {
+                    return;
+                }
+                e.preventDefault();
+                that.toggle();
+                that.ui.document.trigger(that.click);
+            }).off(this.click).on(this.click, function (e) {
+                e.preventDefault();
+            });
 
         // attach event to the navigation elements
         this.ui.navigations.each(function () {
@@ -180,7 +205,7 @@ var Toolbar = new Class({
                 that._handleLongMenus();
             }
 
-            $(window).on('keyup.cms.toolbar', function (e) {
+            that.ui.window.on('keyup.cms.toolbar', function (e) {
                 if (e.keyCode === CMS.KEYS.ESC) {
                     reset();
                 }
@@ -347,26 +372,26 @@ var Toolbar = new Class({
 
                 // in case the button has a data-rel attribute
                 if (link.attr('data-rel')) {
-                    link.on(that.click, function (e) {
+                    link.off(that.click).on(that.click, function (e) {
                         e.preventDefault();
                         that._delegate($(this));
                     });
                 } else {
-                    link.on(that.click, function (e) {
+                    link.off(that.click).on(that.click, function (e) {
                         e.stopPropagation();
                     });
                 }
             });
 
             // in case of the publish button
-            btn.find('.cms-publish-page').on(that.click, function (e) {
+            btn.find('.cms-publish-page').off(that.click).on(that.click, function (e) {
                 if (!Helpers.secureConfirm(CMS.config.lang.publish)) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                 }
             });
 
-            btn.find('.cms-btn-publish').on(that.click, function (e) {
+            btn.find('.cms-btn-publish').off(that.click).on(that.click, function (e) {
                 e.preventDefault();
                 that.showLoader();
                 // send post request to prevent xss attacks
@@ -396,10 +421,15 @@ var Toolbar = new Class({
             });
 
         });
-        this.ui.window.on(
-            [this.resize, this.scroll].join(' '),
-            Helpers.throttle($.proxy(this._handleLongMenus, this), LONG_MENUS_THROTTLE)
-        );
+
+        this.ui.window
+            .off(
+                [this.resize, this.scroll].join(' '),
+            )
+            .on(
+                [this.resize, this.scroll].join(' '),
+                Helpers.throttle($.proxy(this._handleLongMenus, this), LONG_MENUS_THROTTLE)
+            );
     },
 
     /**
@@ -837,27 +867,32 @@ var Toolbar = new Class({
      *
      * @method onPublishAvailable
      * @public
+     * @deprecated since 3.5 due to us reloading the toolbar instead
      */
     onPublishAvailable: function showPublishButton() {
         // show publish / save buttons
-        var publishBtn = $('.cms-btn-publish');
+        // eslint-disable-next-line no-console
+        console.warn('This method is deprecated and will be removed in future versions');
+    },
 
-        publishBtn
-            .addClass('cms-btn-publish-active')
-            .removeClass('cms-btn-disabled')
-            .parent().show().removeAttr('data-cms-hidden');
+    _refreshMarkup: function (newToolbar) {
+        const diff = dd.diff(this.ui.toolbar[0], newToolbar[0]);
 
-        var dropdown = publishBtn.closest('.cms-dropdown[data-cms-hidden]');
+        dd.apply(this.ui.toolbar[0], diff);
 
-        if (dropdown.length) {
-            dropdown.show().removeAttr('data-cms-hidden');
-        }
+        this._setupUI();
 
-        this.ui.window.trigger('resize');
+        // have to clone the nav to eliminate double events
+        // there must be a better way to do this
+        var clone = this.ui.navigations.clone();
 
-        // enable revert to live
-        this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');
+        this.ui.navigations.replaceWith(clone);
+        this.ui.navigations = clone;
+
+        this._events();
+        this.navigation = new Navigation();
+        this.navigation.ui.window.trigger('resize');
     }
 });
 
-module.exports = Toolbar;
+export default Toolbar;

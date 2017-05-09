@@ -2,10 +2,10 @@
 from django.conf import settings
 from django.conf.urls import include, url
 
+from cms import views
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_patterns
 from cms.constants import SLUG_REGEXP
-from cms.views import details
 
 
 if settings.APPEND_SLASH:
@@ -22,7 +22,8 @@ else:
 
 
 urlpatterns.extend([
+    url(r'^cms_login/$', views.login, name='cms_login'),
     url(r'^cms_wizard/', include('cms.wizards.urls')),
-    url(regexp, details, name='pages-details-by-slug'),
-    url(r'^$', details, {'slug': ''}, name='pages-root'),
+    url(regexp, views.details, name='pages-details-by-slug'),
+    url(r'^$', views.details, {'slug': ''}, name='pages-root'),
 ])

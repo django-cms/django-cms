@@ -127,4 +127,4 @@ var PageTreeDropdowns = new Class({
     }
 });
 
-module.exports = PageTreeDropdowns;
+export default PageTreeDropdowns;

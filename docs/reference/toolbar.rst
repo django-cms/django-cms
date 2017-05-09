@@ -37,7 +37,7 @@ cms.toolbar.toolbar
 
         Whether the current user is a staff user or not.
 
-    .. attribute:: edit_mode
+    .. attribute:: edit_mode_active
 
         Whether the toolbar is in edit mode.
 

@@ -1,10 +1,11 @@
-var $ = require('jquery');
-var initHelpModal = require('./help');
-var initFocusPlaceholders = require('./placeholders');
-var initCreateModal = require('./create-modal');
-var initFocusToolbar = require('./toolbar');
+import initHelpModal from './help';
+import $ from 'jquery';
+import initFocusPlaceholders from './placeholders';
+import initCreateModal from './create-modal';
+import initFocusToolbar from './toolbar';
 
-module.exports = function () {
+// eslint-disable-next-line require-jsdoc
+export default function () {
     // istanbul ignore next
     $(function () {
         initHelpModal();
@@ -12,4 +13,4 @@ module.exports = function () {
         initCreateModal();
         initFocusToolbar();
     });
-};
+}

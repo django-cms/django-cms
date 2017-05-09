@@ -1,35 +1,29 @@
 # -*- coding: utf-8 -*-
-import warnings
-
+from __future__ import unicode_literals
 from collections import deque
 
 from functools import partial
 
 from classytags.utils import flatten_context
+
+from django.contrib.sites.models import Site
 from django.template import Context
-from django.template.loader import get_template
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
-from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
-from cms.toolbar.utils import get_toolbar_from_request
+from cms.toolbar.utils import (
+    get_placeholder_toolbar_js,
+    get_plugin_toolbar_js,
+    get_toolbar_from_request,
+)
 from cms.utils import get_language_from_request
-from cms.utils.conf import get_cms_setting, get_site_id
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
- 
-
-DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
-    plugin_meta_context_processor,
-)
-
-# these are always called after all other plugin processors
-DEFAULT_PLUGIN_PROCESSORS = (
-    mark_safe_plugin_processor,
-)
+from cms.utils.plugins import get_plugin_restrictions
 
 
 def _get_page_ancestors(page):
@@ -46,6 +40,17 @@ def _get_page_ancestors(page):
 
     for ancestor in _get_page_ancestors(page.parent):
         yield ancestor
+
+
+def _unpack_plugins(parent_plugin):
+    found_plugins = []
+
+    for plugin in parent_plugin.child_plugin_instances or []:
+        found_plugins.append(plugin)
+
+        if plugin.child_plugin_instances:
+            found_plugins.extend(_unpack_plugins(plugin))
+    return found_plugins
 
 
 class RenderedPlaceholder(object):
@@ -71,18 +76,20 @@ class RenderedPlaceholder(object):
         return hash(self.placeholder)
 
 
-class ContentRenderer(object):
+class BaseRenderer(object):
+
+    placeholder_edit_template = ''
 
     def __init__(self, request):
         self.request = request
         self.request_language = get_language_from_request(self.request)
         self._cached_templates = {}
+        self._cached_plugin_classes = {}
         self._placeholders_content_cache = {}
         self._placeholders_by_page_cache = {}
         self._rendered_placeholders = deque()
         self._rendered_static_placeholders = deque()
         self._rendered_plugins_by_placeholder = {}
-        self._placeholders_are_editable = self.user_is_on_edit_mode()
 
     @cached_property
     def current_page(self):
@@ -93,50 +100,76 @@ class ContentRenderer(object):
         return get_toolbar_from_request(self.request)
 
     @cached_property
+    def templates(self):
+        return self.toolbar.templates
+
+    @cached_property
     def plugin_pool(self):
         import cms.plugin_pool
         return cms.plugin_pool.plugin_pool
 
     @cached_property
-    def registered_plugins(self):
-        return self.plugin_pool.get_all_plugins()
+    def site_id(self):
+        site = Site.objects.get_current(self.request)
+        return site.pk
 
-    @cached_property
-    def placeholder_toolbar_template(self):
-        return self.get_cached_template('cms/toolbar/placeholder.html')
+    def get_placeholder_plugin_menu(self, placeholder, page=None):
+        registered_plugins = self.plugin_pool.registered_plugins
+        can_add_plugin = partial(has_plugin_permission, user=self.request.user, permission_type='add')
+        plugins = [plugin for plugin in registered_plugins if can_add_plugin(plugin_type=plugin.value)]
+        plugin_menu = get_toolbar_plugin_struct(
+            plugins=plugins,
+            slot=placeholder.slot,
+            page=page,
+        )
+        plugin_menu_template = self.templates.placeholder_plugin_menu_template
+        return plugin_menu_template.render({'plugin_menu': plugin_menu})
 
-    @cached_property
-    def drag_item_template(self):
-        return self.get_cached_template('cms/toolbar/dragitem.html')
+    def get_placeholder_toolbar_js(self, placeholder, language, page=None):
+        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page) # original
 
-    @cached_property
-    def drag_item_menu_template(self):
-        return self.get_cached_template('cms/toolbar/dragitem_menu.html')
+        plugin_types = [cls.__name__ for cls in plugins]
+        allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
+        placeholder_toolbar_js = get_placeholder_toolbar_js(
+            placeholder=placeholder,
+            request_language=self.request_language,
+            render_language=language,
+            allowed_plugins=allowed_plugins,
+        )
+        return placeholder_toolbar_js
 
-    @cached_property
-    def dragbar_template(self):
-        return self.get_cached_template('cms/toolbar/dragbar.html')
+    def get_plugin_toolbar_js(self, plugin, page=None):
+        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
+        child_classes, parent_classes = get_plugin_restrictions(
+            plugin=plugin,
+            page=page,
+            restrictions_cache=placeholder_cache,
+        )
+        content = get_plugin_toolbar_js(
+            plugin,
+            children=child_classes,
+            parents=parent_classes,
+            request_language=self.request_language,
+        )
+        return content
 
-    def user_is_on_edit_mode(self):
-        return self.toolbar.edit_mode and self.toolbar.show_toolbar
+    def get_plugin_class(self, plugin):
+        plugin_type = plugin.plugin_type
 
-    def placeholder_cache_is_enabled(self):
-        if not get_cms_setting('PLACEHOLDER_CACHE'):
-            return False
-        if self.request.user.is_staff:
-            return False
-        return not self._placeholders_are_editable
+        if not plugin_type in self._cached_plugin_classes:
+            self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
+        return self._cached_plugin_classes[plugin_type]
 
-    def get_cached_template(self, template):
-        # we check if template quacks like a Template, as generic Template and engine-specific Template
-        # does not share a common ancestor
-        if hasattr(template, 'render'):
-            return template
+    def get_plugins_to_render(self, placeholder, language, template):
+        from cms.utils.plugins import get_plugins
 
-        if not template in self._cached_templates:
-            # this always return a enging-specific template object
-            self._cached_templates[template] = get_template(template)
-        return self._cached_templates[template]
+        plugins = get_plugins(
+            request=self.request,
+            placeholder=placeholder,
+            template=template,
+            lang=language,
+        )
+        return plugins
 
     def get_rendered_plugins_cache(self, placeholder):
         blank = {
@@ -155,10 +188,34 @@ class ContentRenderer(object):
     def get_rendered_static_placeholders(self):
         return self._rendered_static_placeholders
 
+
+class ContentRenderer(BaseRenderer):
+
+    plugin_edit_template = (
+        '<template class="cms-plugin '
+        'cms-plugin-start cms-plugin-{pk}"></template>{content}'
+        '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
+    )
+    placeholder_edit_template = (
+        '{content} '
+        '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div> '
+        '<script data-cms>{plugin_js}\n{placeholder_js}</script>'
+    )
+
+    def __init__(self, request):
+        super(ContentRenderer, self).__init__(request)
+        self._placeholders_are_editable = bool(self.toolbar.edit_mode_active)
+
+    def placeholder_cache_is_enabled(self):
+        if not get_cms_setting('PLACEHOLDER_CACHE'):
+            return False
+        if self.request.user.is_staff:
+            return False
+        return not self._placeholders_are_editable
+
     def render_placeholder(self, placeholder, context, language=None, page=None,
                            editable=False, use_cache=False, nodelist=None, width=None):
         from sekizai.helpers import Watcher
-        from cms.utils.plugins import get_plugins
 
         language = language or self.request_language
         editable = editable and self._placeholders_are_editable
@@ -168,17 +225,9 @@ class ContentRenderer(object):
         else:
             use_cache = False
 
-        if page:
-            site_id = page.site_id
-            template = page.get_template()
-        else:
-            site_id = get_site_id(None)
-            template = None
-
         if use_cache:
             cached_value = self._get_cached_placeholder_content(
                 placeholder=placeholder,
-                site_id=site_id,
                 language=language,
             )
         else:
@@ -193,6 +242,7 @@ class ContentRenderer(object):
         context.push()
 
         width = width or placeholder.default_width
+        template = page.get_template() if page else None
 
         if width:
             context['width'] = width
@@ -208,26 +258,18 @@ class ContentRenderer(object):
         if use_cache:
             watcher = Watcher(context)
 
-        plugins = get_plugins(
-            request=self.request,
-            placeholder=placeholder,
+        plugin_content = self.render_plugins(
+            placeholder,
+            language=language,
+            context=context,
+            editable=editable,
             template=template,
-            lang=language,
         )
+        placeholder_content = ''.join(plugin_content)
 
-        if plugins:
-            plugin_content = self.render_plugins(
-                plugins=plugins,
-                context=context,
-                placeholder=placeholder,
-                editable=editable,
-            )
-            placeholder_content = ''.join(plugin_content)
-        elif nodelist:
+        if not placeholder_content and nodelist:
             # should be nodelist from a template
             placeholder_content = nodelist.render(context)
-        else:
-            placeholder_content = ''
 
         if use_cache:
             content = {
@@ -237,24 +279,15 @@ class ContentRenderer(object):
             set_placeholder_cache(
                 placeholder,
                 lang=language,
-                site_id=site_id,
+                site_id=self.site_id,
                 content=content,
                 request=self.request,
             )
 
-        if editable:
-            toolbar_content = self.render_editable_placeholder(
-                placeholder=placeholder,
-                context=context,
-                language=language,
-            )
-        else:
-            toolbar_content = ''
-
         rendered_placeholder = RenderedPlaceholder(
             placeholder=placeholder,
             language=language,
-            site_id=site_id,
+            site_id=self.site_id,
             cached=use_cache,
             editable=editable,
         )
@@ -269,11 +302,32 @@ class ContentRenderer(object):
                 self.toolbar._cache_disabled = not use_cache
             self._rendered_placeholders.append(rendered_placeholder)
 
-        context.pop()
-        return mark_safe(toolbar_content + placeholder_content)
+        if editable:
+            data = self.get_editable_placeholder_context(placeholder, language, page=page)
+            data['content'] = placeholder_content
+            placeholder_content = self.placeholder_edit_template.format(**data)
 
-    def render_page_placeholder(self, slot, context, inherit, nodelist=None):
-        current_page = self.current_page
+        context.pop()
+        return mark_safe(placeholder_content)
+
+    def get_editable_placeholder_context(self, placeholder, language, page=None):
+        placeholder_cache = self.get_rendered_plugins_cache(placeholder)
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(
+            placeholder,
+            language=language,
+            page=page,
+        )
+        plugin_toolbar_js_bits = (self.get_plugin_toolbar_js(plugin, page=page)
+                                  for plugin in placeholder_cache['plugins'])
+        context = {
+            'plugin_js': ''.join(plugin_toolbar_js_bits),
+            'placeholder_js': placeholder_toolbar_js,
+            'placeholder_id': placeholder.pk,
+        }
+        return context
+
+    def render_page_placeholder(self, slot, context, inherit=False, nodelist=None):
+        current_page = self.request.current_page
 
         if not current_page:
             return ''
@@ -292,7 +346,7 @@ class ContentRenderer(object):
         # don't display inherited plugins in edit mode, so that the user doesn't
         # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
         # there for possible enhancements
-        if not inherit or self.toolbar.edit_mode:
+        if not inherit or self.toolbar.edit_mode_active:
             return content
 
         if current_page.parent_id not in self._placeholders_by_page_cache:
@@ -328,7 +382,7 @@ class ContentRenderer(object):
     def render_static_placeholder(self, static_placeholder, context, nodelist=None):
         user = self.request.user
 
-        if self.toolbar.edit_mode and user.has_perm('cms.edit_static_placeholder'):
+        if self.toolbar.edit_mode_active and user.has_perm('cms.edit_static_placeholder'):
             placeholder = static_placeholder.draft
             editable = True
             use_cache = False
@@ -373,7 +427,7 @@ class ContentRenderer(object):
         context = flatten_context(context)
 
         template = plugin._get_render_template(context, instance, placeholder)
-        template = self.get_cached_template(template)
+        template = self.templates.get_cached_template(template)
 
         content = template.render(context)
 
@@ -381,99 +435,30 @@ class ContentRenderer(object):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            content = self.render_editable_plugin(
-                instance,
-                context=context,
-                plugin_class=plugin,
-                placeholder=placeholder,
-                content=content,
-            )
-            placeholder_cache = self._rendered_plugins_by_placeholder[placeholder.pk]
+            content = self.plugin_edit_template.format(pk=instance.pk, content=content)
+            placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
+            placeholder_cache.setdefault('plugins', []).append(instance)
+        return mark_safe(content)
 
-            plugins_cache = placeholder_cache.setdefault('plugins', [])
-            plugins_cache.append(instance)
-
-        for processor in DEFAULT_PLUGIN_PROCESSORS:
-            content = processor(instance, placeholder, content, context)
-        return content
-
-    def render_editable_plugin(self, instance, context, plugin_class,
-                               placeholder=None, content=''):
-        if not placeholder:
-            placeholder = instance.placeholder
-
-        # this is fine. I'm fine.
-        output = ('<template class="cms-plugin '
-                  'cms-plugin-start cms-plugin-%(pk)s"></template>%(content)s'
-                  '<template class="cms-plugin cms-plugin-end cms-plugin-%(pk)s"></template>')
-        try:
-            # Compatibility with CMS < 3.4
-            template = self.get_cached_template(plugin_class.frontend_edit_template)
-        except AttributeError:
-            content = output % {'pk': instance.pk, 'content': content}
-        else:
-            warnings.warn(
-                "Attribute `frontend_edit_template` will be removed in django CMS 3.5",
-                PendingDeprecationWarning
-            )
-            content = template.render(context)
-
-        plugin_type = instance.plugin_type
-        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
-
-        parents_cache = placeholder_cache.setdefault('plugin_parents', {})
-        children_cache = placeholder_cache.setdefault('plugin_children', {})
-
-        if plugin_class.cache_parent_classes and plugin_type not in parents_cache:
-            parent_classes = plugin_class.get_parent_classes(
-                slot=placeholder.slot,
-                page=self.current_page,
-                instance=instance,
-            )
-            parents_cache[plugin_type] = parent_classes or []
-
-        if plugin_class.cache_child_classes and plugin_type not in children_cache:
-            child_classes = plugin_class.get_child_classes(
-                slot=placeholder.slot,
-                page=self.current_page,
-                instance=instance,
-            )
-            children_cache[plugin_type] = child_classes or []
-        return content
-
-    def render_editable_placeholder(self, placeholder, context, language):
-        can_add_plugin = partial(has_plugin_permission, user=self.request.user, permission_type='add')
-        plugins = [plugin for plugin in self.registered_plugins if can_add_plugin(plugin_type=plugin.value)]
-        plugin_menu = get_toolbar_plugin_struct(
-            plugins=plugins,
-            slot=placeholder.slot,
-            page=placeholder.page,
+    def render_plugins(self, placeholder, language, context, editable=False, template=None):
+        plugins = self.get_plugins_to_render(
+            placeholder=placeholder,
+            template=template,
+            language=language,
         )
-        new_context = {
-            'plugin_menu': plugin_menu,
-            'placeholder': placeholder,
-            'language': language,
-        }
 
-        with context.push(new_context):
-            return self.placeholder_toolbar_template.render(context.flatten())
-
-    def render_plugins(self, plugins, context, placeholder=None, editable=False):
-        total = len(plugins)
-
-        for index, plugin in enumerate(plugins):
-            plugin._render_meta.total = total
-            plugin._render_meta.index = index
+        for plugin in plugins:
+            plugin._placeholder_cache = placeholder
             yield self.render_plugin(plugin, context, placeholder, editable)
 
-    def _get_cached_placeholder_content(self, placeholder, site_id, language):
+    def _get_cached_placeholder_content(self, placeholder, language):
         """
         Returns a dictionary mapping placeholder content and sekizai data.
         Returns None if no cache is present.
         """
         # Placeholders can be rendered multiple times under different sites
         # it's important to have a per-site "cache".
-        site_cache = self._placeholders_content_cache.setdefault(site_id, {})
+        site_cache = self._placeholders_content_cache.setdefault(self.site_id, {})
         # Placeholders can be rendered multiple times under different languages
         # it's important to have a per-language "cache".
         language_cache = site_cache.setdefault(language, {})
@@ -482,7 +467,7 @@ class ContentRenderer(object):
             cached_value = get_placeholder_cache(
                 placeholder,
                 lang=language,
-                site_id=site_id,
+                site_id=self.site_id,
                 request=self.request,
             )
 
@@ -518,12 +503,7 @@ class ContentRenderer(object):
         """
         Renders a placeholder attached to a page.
         """
-        try:
-            placeholder = self._get_page_placeholder(context, page, slot)
-        except PlaceholderNotFound:
-            if nodelist:
-                return nodelist.render(context)
-            return ''
+        placeholder = self._get_page_placeholder(context, page, slot)
 
         content = self.render_placeholder(
             placeholder,
@@ -543,8 +523,6 @@ class ContentRenderer(object):
         """
         from cms.utils.plugins import assign_plugins
 
-        site_id = page.site_id
-
         if slots:
             placeholders = page.get_placeholders().filter(slot__in=slots)
         else:
@@ -555,7 +533,7 @@ class ContentRenderer(object):
             # When the inherit flag is True,
             # assume all placeholders found are inherited and thus prefetch them.
             slots_w_inheritance = [pl.slot for pl in placeholders]
-        elif not self.toolbar.edit_mode:
+        elif not self.toolbar.edit_mode_active:
             # Scan through the page template to find all placeholders
             # that have inheritance turned on.
             slots_w_inheritance = [pl.slot for pl in page.get_declared_placeholders() if pl.inherit]
@@ -569,7 +547,7 @@ class ContentRenderer(object):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, site_id, self.request_language) == None]
+                if _cached_content(placeholder, self.request_language) == None]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.
@@ -610,6 +588,117 @@ class ContentRenderer(object):
         self._placeholders_by_page_cache[page.pk] = page_placeholder_cache
 
 
+class StructureRenderer(BaseRenderer):
+
+    placeholder_edit_template = (
+        """
+        <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
+            {plugin_menu_js}
+        </script>
+        <script data-cms>{plugin_js}\n{placeholder_js}</script>
+        """
+    )
+
+    def get_plugins_to_render(self, *args, **kwargs):
+        plugins = super(StructureRenderer, self).get_plugins_to_render(*args, **kwargs)
+
+        for plugin in plugins:
+            yield plugin
+
+            if not plugin.child_plugin_instances:
+                continue
+
+            for plugin in _unpack_plugins(plugin):
+                yield plugin
+
+    def render_placeholder(self, placeholder, language, page=None):
+        rendered_plugins = self.render_plugins(placeholder, language=language, page=page)
+        plugin_js_output = ''.join(rendered_plugins)
+
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(
+            placeholder,
+            language=language,
+            page=page,
+        )
+
+        rendered_placeholder = RenderedPlaceholder(
+            placeholder=placeholder,
+            language=language,
+            site_id=self.site_id,
+            cached=False,
+            editable=True,
+        )
+
+        if rendered_placeholder not in self._rendered_placeholders:
+            self._rendered_placeholders.append(rendered_placeholder)
+
+        placeholder_structure_is = self.placeholder_edit_template.format(
+            placeholder_id=placeholder.pk,
+            plugin_js=plugin_js_output,
+            plugin_menu_js=self.get_placeholder_plugin_menu(placeholder, page=page),
+            placeholder_js=placeholder_toolbar_js,
+        )
+        return mark_safe(placeholder_structure_is)
+
+    def render_page_placeholder(self, page, placeholder, language=None):
+        return self.render_placeholder(placeholder, language=language, page=page)
+
+    def render_static_placeholder(self, static_placeholder, language=None):
+        user = self.request.user
+
+        if not user.has_perm('cms.edit_static_placeholder'):
+            return ''
+
+        language = language or self.request_language
+
+        placeholder = static_placeholder.draft
+        # I really don't like these impromptu flags...
+        placeholder.is_static = True
+
+        content = self.render_placeholder(placeholder, language=language)
+
+        if static_placeholder not in self._rendered_static_placeholders:
+            # First time this static placeholder is rendered
+            self._rendered_static_placeholders.append(static_placeholder)
+        return content
+
+    def render_plugin(self, instance, page=None):
+        placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(instance.placeholder_id, {})
+        placeholder_cache.setdefault('plugins', []).append(instance)
+        return self.get_plugin_toolbar_js(instance, page=page)
+
+    def render_plugins(self, placeholder, language, page=None):
+        template = page.get_template() if page else None
+        plugins = self.get_plugins_to_render(placeholder, language, template)
+
+        for plugin in plugins:
+            plugin._placeholder_cache = placeholder
+            yield self.render_plugin(plugin, page=page)
+
+
+class LegacyRenderer(ContentRenderer):
+
+    placeholder_edit_template = (
+        """
+        {content}
+        <div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>
+        <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
+            {plugin_menu_js}
+        </script>
+        <script data-cms>{plugin_js}\n{placeholder_js}</script>
+        """
+    )
+
+    def get_editable_placeholder_context(self, placeholder, language, page=None):
+        context = super(LegacyRenderer, self).get_editable_placeholder_context(
+            placeholder=placeholder,
+            language=language,
+            page=page,
+        )
+        context['plugin_menu_js'] = self.get_placeholder_plugin_menu(placeholder, page=page)
+        return context
+
+
 class PluginContext(Context):
     """
     This subclass of template.Context automatically populates itself using
@@ -621,10 +710,10 @@ class PluginContext(Context):
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
         dict_ = flatten_context(dict_)
         super(PluginContext, self).__init__(dict_)
+
         if not processors:
             processors = []
-        for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
-            self.update(processor(instance, placeholder, self))
+
         for processor in iterload_objects(get_cms_setting('PLUGIN_CONTEXT_PROCESSORS')):
             self.update(processor(instance, placeholder, self))
         for processor in processors:
