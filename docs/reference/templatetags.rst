@@ -840,7 +840,7 @@ Toolbar template tags
 
 The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the
 required CSS and javascript to the sekizai blocks in the base template. The template tag
-has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences
+has to be placed after the ``<body>`` tag and before any ``{% placeholder %}`` occurrences
 within your HTML.
 
 Example::
