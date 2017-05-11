@@ -20,11 +20,10 @@ from django.core.exceptions import (
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
+from sekizai.context import SekizaiContext
 from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_text
-
-from functools import partial
 
 from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
@@ -52,9 +51,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import force_language
-from cms.utils.permissions import has_plugin_permission
 from cms.utils.plugins import get_plugins_for_page, get_plugins
-from django.contrib.auth.models import Permission
 from django.utils.http import urlencode
 
 from djangocms_googlemap.models import GoogleMap
@@ -108,8 +105,6 @@ class PluginsTestBaseCase(CMSTestCase):
     def setUp(self):
         self.super_user = self._create_user("test", True, True)
         self.slave = self._create_user("slave", True)
-        self.user_test = self._create_user("randomuser", is_staff=True)
-        self.user_test.user_permissions.add(Permission.objects.get(codename='add_style'))
 
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
@@ -1235,49 +1230,29 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(force_text(style_config['name']), expected_struct_de['name'])
 
     def test_plugin_toolbar_struct_permissions(self):
-        # Tests that the output of the plugin toolbar structure.
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.placeholders.get(slot='body')
+        page_url = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
 
-        from cms.utils.placeholder import get_toolbar_plugin_struct
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
 
-        expected_struct_en = {
-            'module': u'Generic',
-            'name': u'Style',
-            'value': 'StylePlugin',
-        }
-
-        expected_struct_de = {
-            'module': u'Generisch',
-            'name': u'Stil',
-            'value': 'StylePlugin',
-        }
-
-        randomuser=self.user_test
-
-        can_add_plugin = partial(has_plugin_permission, user=randomuser, permission_type='add')
-        plugins = [plugin for plugin in plugin_pool.get_all_plugins() if can_add_plugin(plugin_type=plugin.value)]  
-        toolbar_struct = get_toolbar_plugin_struct(
-            plugins=plugins,
-            slot=placeholder.slot,
-            page=page,
-        )
-
-        self.assertEqual(len(plugins), 1)
-
-        style_config = [config for config in toolbar_struct if config['value'] == 'StylePlugin']
-
-        self.assertEqual(len(style_config), 1)
-
-        style_config = style_config[0]
-
-        with force_language('en'):
-            self.assertEqual(force_text(style_config['module']), expected_struct_en['module'])
-            self.assertEqual(force_text(style_config['name']), expected_struct_en['name'])
-
-        with force_language('de'):
-            self.assertEqual(force_text(style_config['module']), expected_struct_de['module'])
-            self.assertEqual(force_text(style_config['name']), expected_struct_de['name'])
+        with self.login_user_context(staff_user):
+            request = self.get_request(page_url, page=page)
+            request.session['cms_edit'] = True
+            request.toolbar = CMSToolbar(request)
+            content_renderer = self.get_content_renderer(request=request)
+            context = {'request': request, 'cms_content_renderer': content_renderer}
+            output = content_renderer.render_placeholder(
+                placeholder,
+                context=SekizaiContext(context),
+                language='en',
+                page=page,
+                editable=True,
+            )
+            self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
+            self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
