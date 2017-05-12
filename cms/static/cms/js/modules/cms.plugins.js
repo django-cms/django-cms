@@ -6,16 +6,20 @@ import Modal from './cms.modal';
 import StructureBoard from './cms.structureboard';
 import $ from 'jquery';
 import '../polyfills/array.prototype.findindex';
+import nextUntil from './nextuntil';
+
+import { toPairs, findIndex, uniqWith, isEqual } from 'lodash';
 
 var Class = require('classjs');
 var Helpers = require('./cms.base').default.API.Helpers;
 var KEYS = require('./cms.base').default.KEYS;
-var nextUntil = require('./nextuntil');
 var fuzzyFilter = require('fuzzaldrin').filter;
 
 var doc;
 var clipboardDraggable;
 var path = window.location.pathname + window.location.search;
+
+var pluginUsageMap = Helpers._isStorageSupported ? JSON.parse(localStorage.getItem('cms-plugin-usage')) || {} : {};
 
 /**
  * Class for handling Plugins / Placeholders or Generics.
@@ -68,7 +72,7 @@ var Plugin = new Class({
         this.touchEnd = 'touchend.cms.plugin';
 
         this._ensureData();
-        if (Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
+        if (this.options.type === 'plugin' && Plugin.aliasPluginDuplicatesMap[this.options.plugin_id]) {
             return;
         }
         if (this.options.type === 'placeholder' && Plugin.staticPlaceholderDuplicatesMap[this.options.placeholder_id]) {
@@ -111,7 +115,7 @@ var Plugin = new Class({
      * @param {String} container `cms-plugin-${id}`
      */
     _setupUI: function setupUI(container) {
-        var wrapper = $('.' + container);
+        var wrapper = $(`template.${container}`);
         var contents;
 
         // have to check for cms-plugin, there can be a case when there are multiple
@@ -140,12 +144,12 @@ var Plugin = new Class({
 
             // addClass iterates
             contents.addClass('cms-plugin ' + className);
-        } else {
-            contents = wrapper;
+        } else if (this.options.type !== 'plugin') {
+            contents = $(`.${container}`);
         }
 
         // in clipboard can be non-existent
-        if (!contents.length) {
+        if (!contents || !contents.length) {
             contents = $('<div></div>');
         }
 
@@ -231,8 +235,7 @@ var Plugin = new Class({
         this.ui.draggable.on('cms-paste-plugin-update', function (e, eventData) {
             e.stopPropagation();
 
-            var el = $(e.delegateTarget);
-            var dragitem = $('.cms-draggable-' + eventData.id);
+            var dragitem = $(`.cms-draggable-${eventData.id}:last`);
 
             // find out new placeholder id
             var placeholder_id = that._getId(dragitem.closest('.cms-dragarea'));
@@ -242,7 +245,7 @@ var Plugin = new Class({
                 return false;
             }
 
-            var data = el.data('cms');
+            var data = dragitem.data('cms');
 
             data.target = placeholder_id;
             data.parent = that._getId(dragitem.parent().closest('.cms-draggable'));
@@ -319,7 +322,7 @@ var Plugin = new Class({
         var that = this;
 
         // adds double click to edit
-        this.ui.container.on(this.doubleClick, function (e) {
+        this.ui.container.off(this.doubleClick).on(this.doubleClick, function (e) {
             e.preventDefault();
             e.stopPropagation();
             that.editPlugin(
@@ -330,15 +333,16 @@ var Plugin = new Class({
         });
 
         // adds edit tooltip
-        this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
-            if (e.type !== 'touchstart') {
-                e.stopPropagation();
-            }
-            var name = that.options.plugin_name;
-            var id = that.options.plugin_id;
+        this.ui.container.off(this.pointerOverAndOut + ' ' + this.touchStart)
+            .on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
+                if (e.type !== 'touchstart') {
+                    e.stopPropagation();
+                }
+                var name = that.options.plugin_name;
+                var id = that.options.plugin_id;
 
-            CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
-        });
+                CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+            });
     },
 
     /**
@@ -482,11 +486,13 @@ var Plugin = new Class({
         }
         CMS.API.locked = true;
 
-        // set correct options
-        var options = opts || this.options;
+        // set correct options (don't mutate them)
+        var options = $.extend({}, opts || this.options);
         var sourceLanguage = source_language;
+        let copyingFromLanguage = false;
 
         if (sourceLanguage) {
+            copyingFromLanguage = true;
             options.target = options.placeholder_id;
             options.plugin_id = '';
             options.parent = '';
@@ -507,12 +513,17 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(options.urls.copy_plugin),
             data: data,
-            success: function () {
+            success: function (response) {
                 CMS.API.Messages.open({
                     message: CMS.config.lang.success
                 });
-                // reload
-                Helpers.reloadBrowser();
+                if (copyingFromLanguage) {
+                    CMS.API.StructureBoard.invalidateState('PASTE', $.extend({}, data, response));
+                } else {
+                    CMS.API.StructureBoard.invalidateState('COPY', response);
+                }
+                CMS.API.locked = false;
+                CMS.API.Toolbar.hideLoader();
             },
             error: function (jqXHR) {
                 CMS.API.locked = false;
@@ -558,12 +569,13 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(that.options.urls.move_plugin),
             data: data,
-            success: function () {
+            success: function (response) {
+                CMS.API.locked = false;
                 CMS.API.Messages.open({
                     message: CMS.config.lang.success
                 });
-                // if response is reload
-                CMS.API.Helpers.reloadBrowser();
+                CMS.API.StructureBoard.invalidateState('CUT', $.extend({}, data, response));
+                CMS.API.Toolbar.hideLoader();
             },
             error: function (jqXHR) {
                 CMS.API.locked = false;
@@ -574,6 +586,7 @@ var Plugin = new Class({
                     message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                     error: true
                 });
+                CMS.API.Toolbar.hideLoader();
             }
         });
     },
@@ -590,12 +603,14 @@ var Plugin = new Class({
             id: id
         };
 
-        clipboardDraggable.appendTo(this.ui.draggables);
+        const clipboardDraggableClone = clipboardDraggable.clone(true, true);
+
+        clipboardDraggableClone.appendTo(this.ui.draggables);
         if (this.options.plugin_id) {
             StructureBoard.actualizePluginCollapseStatus(this.options.plugin_id);
         }
         this.ui.draggables.trigger('cms-structure-update', [eventData]);
-        clipboardDraggable.trigger('cms-paste-plugin-update', [eventData]);
+        clipboardDraggableClone.trigger('cms-paste-plugin-update', [eventData]);
     },
 
     /**
@@ -609,32 +624,25 @@ var Plugin = new Class({
      * @param {String} [opts.plugin_parent]
      * @param {String} [opts.plugin_language]
      * @param {Boolean} [opts.move_a_copy]
-     * @param {Object} [eventData={}] optional eventData
      * @returns {Boolean|void}
      */
-    movePlugin: function (opts, eventData) {
+    movePlugin: function (opts) {
         // cancel request if already in progress
         if (CMS.API.locked) {
             return false;
         }
         CMS.API.locked = true;
 
-        var that = this;
         // set correct options
         var options = opts || this.options;
 
-        var plugin = $('.cms-plugin-' + options.plugin_id);
-        var dragitem = $('.cms-draggable-' + options.plugin_id);
-
-        var previousParentPluginId = typeof eventData === 'undefined' ? undefined : eventData.previousParentPluginId;
-
-        // SETTING POSITION
-        var requiresReload = this._setPosition(options.plugin_id, plugin, dragitem, previousParentPluginId);
+        var dragitem = $(`.cms-draggable-${options.plugin_id}:last`);
 
         // SAVING POSITION
         var placeholder_id = this._getId(
             dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first()
         );
+
         var plugin_parent = this._getId(dragitem.parent().closest('.cms-draggable'));
         var plugin_order = this._getIds(dragitem.siblings('.cms-draggable').andSelf());
 
@@ -678,18 +686,10 @@ var Plugin = new Class({
             url: Helpers.updateUrlWithPath(options.urls.move_plugin),
             data: data,
             success: function (response) {
-                // if response is reload
-                if (response.reload || requiresReload) { // FIXME should get rid of those
-                    // Helpers.reloadBrowser();
-                    CMS.API.StructureBoard.invalidateState();
-                }
-
-                // set new url settings when moving #4803
-                if (response.urls) {
-                    that._setSettings(options, {
-                        urls: response.urls
-                    });
-                }
+                CMS.API.StructureBoard.invalidateState(
+                    data.move_a_copy ? 'PASTE' : 'MOVE',
+                    $.extend({}, data, response)
+                );
 
                 // enable actions again
                 CMS.API.locked = false;
@@ -697,17 +697,6 @@ var Plugin = new Class({
 
                 // TODO: show only if (response.status)
                 // Plugin._highlightPluginStructure(dragitem);
-                Plugin._updateRegistry({
-                    pluginId: options.plugin_id,
-                    update: {
-                        plugin_parent: plugin_parent || '',
-                        placeholder_id: placeholder_id
-                    }
-                });
-                that._setSettings(that.options, {
-                    plugin_parent: plugin_parent || '',
-                    placeholder_id: placeholder_id
-                });
             },
             error: function (jqXHR) {
                 CMS.API.locked = false;
@@ -789,75 +778,75 @@ var Plugin = new Class({
      * @returns {Boolean} requires reload?
      */
     // eslint-disable-next-line max-params
-    _setPosition: function (id, plugin, dragitem, previousParentPluginId) {
-        // after we insert the plugin onto its new place, we need to figure out where to position it
-        var prevItem = dragitem.prev('.cms-draggable');
-        var nextItem = dragitem.next('.cms-draggable');
-        var parent = dragitem.parent().closest('.cms-draggable');
-        var child = $('.cms-plugin-' + this._getId(parent));
-        var placeholder = dragitem.closest('.cms-dragarea');
-        var pluginId = this._getId(dragitem);
-
-        // determine if there are other plugins within the same level, this makes the move easier
-        // in case "editMode" plugin DOM exists, proceed
-        if (plugin.length) {
-            this._removeOldParentsData({
-                plugin: plugin,
-                pluginId: pluginId,
-                previousParentPluginId: previousParentPluginId
-            });
-
-            // there is a dragitem in a tree right before the new place
-            if (prevItem.length) {
-                var previousItemId = this._getId(prevItem);
-                var previousPlugin = $('.cms-plugin-' + previousItemId + ':last');
-
-                if (previousPlugin.length) {
-                    plugin.insertAfter(previousPlugin);
-                    // meaning there are parent plugins with no DOM
-                    this._addNewParentsData({
-                        sibling: previousPlugin,
-                        siblingId: previousItemId,
-                        plugin: plugin
-                    });
-                    return false;
-                }
-            } else if (nextItem.length) {
-                var nextItemId = this._getId(nextItem);
-                var nextPlugin = $('.cms-plugin-' + nextItemId + ':first');
-
-                if (nextPlugin.length) {
-                    plugin.insertBefore(nextPlugin);
-                    // meaning there are parent plugins with no DOM
-                    this._addNewParentsData({
-                        sibling: nextPlugin,
-                        siblingId: nextItemId,
-                        plugin: plugin
-                    });
-                    return false;
-                }
-            } else if (parent.length && child.length) {
-                // if we can't find a plugin on the same level, we need to travel higher
-                // for this we need to find the deepest child
-
-                // TODO this is _just_ an assumtion because in reality we do not know where
-                // the children would be positioned in case the plugin contains multiple divs
-                // so instead of putting them into one of the tree paths we should just reload
-                while (child.children().length) {
-                    child = child.children();
-                }
-                child.append(plugin);
-                return false;
-            } else if (!parent.length && placeholder.length) {
-                // we also need to cover the case if we move the plugin to an empty placeholder
-                plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
-                return false;
-            }
-        }
-
-        // if we did not found any match, require reload
-        return true;
-    },
+    // _setPosition: function (id, plugin, dragitem, previousParentPluginId) {
+    //     // after we insert the plugin onto its new place, we need to figure out where to position it
+    //     var prevItem = dragitem.prev('.cms-draggable');
+    //     var nextItem = dragitem.next('.cms-draggable');
+    //     var parent = dragitem.parent().closest('.cms-draggable');
+    //     var child = $('.cms-plugin-' + this._getId(parent));
+    //     var placeholder = dragitem.closest('.cms-dragarea');
+    //     var pluginId = this._getId(dragitem);
+    //
+    //     // determine if there are other plugins within the same level, this makes the move easier
+    //     // in case "editMode" plugin DOM exists, proceed
+    //     if (plugin.length) {
+    //         this._removeOldParentsData({
+    //             plugin: plugin,
+    //             pluginId: pluginId,
+    //             previousParentPluginId: previousParentPluginId
+    //         });
+    //
+    //         // there is a dragitem in a tree right before the new place
+    //         if (prevItem.length) {
+    //             var previousItemId = this._getId(prevItem);
+    //             var previousPlugin = $('.cms-plugin-' + previousItemId + ':last');
+    //
+    //             if (previousPlugin.length) {
+    //                 plugin.insertAfter(previousPlugin);
+    //                 // meaning there are parent plugins with no DOM
+    //                 this._addNewParentsData({
+    //                     sibling: previousPlugin,
+    //                     siblingId: previousItemId,
+    //                     plugin: plugin
+    //                 });
+    //                 return false;
+    //             }
+    //         } else if (nextItem.length) {
+    //             var nextItemId = this._getId(nextItem);
+    //             var nextPlugin = $('.cms-plugin-' + nextItemId + ':first');
+    //
+    //             if (nextPlugin.length) {
+    //                 plugin.insertBefore(nextPlugin);
+    //                 // meaning there are parent plugins with no DOM
+    //                 this._addNewParentsData({
+    //                     sibling: nextPlugin,
+    //                     siblingId: nextItemId,
+    //                     plugin: plugin
+    //                 });
+    //                 return false;
+    //             }
+    //         } else if (parent.length && child.length) {
+    //             // if we can't find a plugin on the same level, we need to travel higher
+    //             // for this we need to find the deepest child
+    //
+    //             // TODO this is _just_ an assumtion because in reality we do not know where
+    //             // the children would be positioned in case the plugin contains multiple divs
+    //             // so instead of putting them into one of the tree paths we should just reload
+    //             while (child.children().length) {
+    //                 child = child.children();
+    //             }
+    //             child.append(plugin);
+    //             return false;
+    //         } else if (!parent.length && placeholder.length) {
+    //             // we also need to cover the case if we move the plugin to an empty placeholder
+    //             plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
+    //             return false;
+    //         }
+    //     }
+    //
+    //     // if we did not found any match, require reload
+    //     return true;
+    // },
 
     /**
      * If a plugin is moved to the the plugin that has no DOM representation
@@ -872,26 +861,26 @@ var Plugin = new Class({
      * @param {String|Number} options.siblingId
      * @param {jQuery} options.plugin the plugin that has been just moved
      */
-    _addNewParentsData: function _addNewParentsData(options) {
-        if (Plugin._isContainingMultiplePlugins(options.sibling)) {
-            // add more data to it and classes
-            // there could be one or more parents
-            var plugin = options.plugin;
-            var siblingPluginData = options.sibling.data('cms').slice(0); // clones so we don't mutate data
-            var ownIndex = siblingPluginData.findIndex(function (pluginData) {
-                return pluginData.plugin_id === options.siblingId;
-            });
-            var siblingPluginParentsData = siblingPluginData.slice(ownIndex + 1);
-
-            siblingPluginParentsData.forEach(function (pluginData) {
-                plugin.each(function () {
-                    $(this)
-                        .addClass('cms-plugin-' + pluginData.plugin_id)
-                        .data('cms').push(pluginData);
-                });
-            });
-        }
-    },
+    // _addNewParentsData: function _addNewParentsData(options) {
+    //     if (Plugin._isContainingMultiplePlugins(options.sibling)) {
+    //         // add more data to it and classes
+    //         // there could be one or more parents
+    //         var plugin = options.plugin;
+    //         var siblingPluginData = options.sibling.data('cms').slice(0); // clones so we don't mutate data
+    //         var ownIndex = siblingPluginData.findIndex(function (pluginData) {
+    //             return pluginData.plugin_id === options.siblingId;
+    //         });
+    //         var siblingPluginParentsData = siblingPluginData.slice(ownIndex + 1);
+    //
+    //         siblingPluginParentsData.forEach(function (pluginData) {
+    //             plugin.each(function () {
+    //                 $(this)
+    //                     .addClass('cms-plugin-' + pluginData.plugin_id)
+    //                     .data('cms').push(pluginData);
+    //             });
+    //         });
+    //     }
+    // },
 
     /**
      * If we move a plugin out of a plugin that had a parent with no own DOM
@@ -905,39 +894,39 @@ var Plugin = new Class({
      * @param {String|Number} options.pluginId
      * @param {String|Number} options.previousParentPluginId
      */
-    _removeOldParentsData: function _removeOldParentsData(options) {
-        var plugin = options.plugin;
-        var pluginId = options.pluginId;
-        var previousParentPluginId = options.previousParentPluginId;
-
-        if (Plugin._isContainingMultiplePlugins(plugin)) {
-            var currentPluginData = plugin.data('cms').slice(0); // clone array
-            // if plugin contains multiple parents then it _has to_ have a previous parent
-            var parentIndex = currentPluginData.findIndex(function (pluginData) {
-                return pluginData.plugin_id === previousParentPluginId;
-            });
-            var ownIndex = currentPluginData.findIndex(function (pluginData) {
-                return pluginData.plugin_id === pluginId;
-            });
-
-            var newPluginData = currentPluginData.slice(pluginId, parentIndex + 1);
-            var parentPluginData = currentPluginData.slice(0, ownIndex)
-                .concat(currentPluginData.slice(parentIndex));
-
-            plugin.each(function () {
-                $(this).data('cms', newPluginData);
-            });
-
-            parentPluginData.forEach(function (pluginData) {
-                plugin.removeClass('cms-plugin-' + pluginData.plugin_id);
-            });
-
-            // if it was a last plugin in the parent we could create a dummy in place
-            // so things can still be moved to it
-            // however, if we don't do anything, next plugin moving into it will just
-            // trigger a reload, so "not now"
-        }
-    },
+    // _removeOldParentsData: function _removeOldParentsData(options) {
+    //     var plugin = options.plugin;
+    //     var pluginId = options.pluginId;
+    //     var previousParentPluginId = options.previousParentPluginId;
+    //
+    //     if (Plugin._isContainingMultiplePlugins(plugin)) {
+    //         var currentPluginData = plugin.data('cms').slice(0); // clone array
+    //         // if plugin contains multiple parents then it _has to_ have a previous parent
+    //         var parentIndex = currentPluginData.findIndex(function (pluginData) {
+    //             return pluginData.plugin_id === previousParentPluginId;
+    //         });
+    //         var ownIndex = currentPluginData.findIndex(function (pluginData) {
+    //             return pluginData.plugin_id === pluginId;
+    //         });
+    //
+    //         var newPluginData = currentPluginData.slice(pluginId, parentIndex + 1);
+    //         var parentPluginData = currentPluginData.slice(0, ownIndex)
+    //             .concat(currentPluginData.slice(parentIndex));
+    //
+    //         plugin.each(function () {
+    //             $(this).data('cms', newPluginData);
+    //         });
+    //
+    //         parentPluginData.forEach(function (pluginData) {
+    //             plugin.removeClass('cms-plugin-' + pluginData.plugin_id);
+    //         });
+    //
+    //         // if it was a last plugin in the parent we could create a dummy in place
+    //         // so things can still be moved to it
+    //         // however, if we don't do anything, next plugin moving into it will just
+    //         // trigger a reload, so "not now"
+    //     }
+    // },
 
     /**
      * Called after plugin is added through ajax.
@@ -967,7 +956,7 @@ var Plugin = new Class({
         this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
         var dropdown = this.ui.dropdown;
 
-        nav.on(this.pointerUp, function (e) {
+        nav.off(this.pointerUp).on(this.pointerUp, function (e) {
             e.preventDefault();
             e.stopPropagation();
             var trigger = $(this);
@@ -978,27 +967,30 @@ var Plugin = new Class({
                 Plugin._hideSettingsMenu();
                 that._showSettingsMenu(trigger);
             }
-        }).on(this.touchStart, function (e) {
+        }).off(this.touchStart).on(this.touchStart, function (e) {
             // required on some touch devices so
             // ui touch punch is not triggering mousemove
             // which in turn results in pep triggering pointercancel
             e.stopPropagation();
         });
 
-        dropdown.on(this.mouseEvents, function (e) {
+        dropdown.off(this.mouseEvents).on(this.mouseEvents, function (e) {
             e.stopPropagation();
-        }).on(this.touchStart, function (e) {
+        }).off(this.touchStart).on(this.touchStart, function (e) {
             // required for scrolling on mobile
             e.stopPropagation();
         });
 
         that._setupActions(nav);
         // prevent propagation
-        nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
-            e.stopPropagation();
-        });
+        nav
+            .on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '))
+            .on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
+                e.stopPropagation();
+            });
 
         nav.siblings('.cms-quicksearch, .cms-submenu-dropdown-settings')
+            .off([this.pointerUp, this.click, this.doubleClick].join(' '))
             .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                 e.stopPropagation();
             });
@@ -1118,10 +1110,11 @@ var Plugin = new Class({
 
             // since we don't know exact plugin parent (because dragndrop)
             // we need to know the parent id by the time we open "add plugin" dialog
-            var pluginsCopy = plugins.clone(true, true).data(
-                'parentId', that._getId(nav.closest('.cms-draggable'))
-            ).append(that._getPossibleChildClasses());
-
+            var pluginsCopy = that._updateWithMostUsedPlugins(
+                plugins.clone(true, true).data(
+                    'parentId', that._getId(nav.closest('.cms-draggable'))
+                ).append(that._getPossibleChildClasses())
+            );
 
             modal.open({
                 title: that.options.addPluginHelpTitle,
@@ -1140,6 +1133,45 @@ var Plugin = new Class({
             .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                 e.stopPropagation();
             });
+    },
+
+    _updateWithMostUsedPlugins: function _updateWithMostUsedPlugins(plugins) {
+        const items = plugins.find('.cms-submenu-item');
+        // eslint-disable-next-line no-unused-vars
+        const mostUsedPlugins = toPairs(pluginUsageMap).sort(([x, a], [y, b]) => a - b).reverse();
+        const MAX_MOST_USED_PLUGINS = 5;
+        let count = 0;
+
+        if (items.filter(':not(.cms-submenu-item-title)').length <= MAX_MOST_USED_PLUGINS) {
+            return plugins;
+        }
+
+        let ref = plugins.find('.cms-quicksearch');
+
+        mostUsedPlugins.forEach(([name]) => {
+            if (count === MAX_MOST_USED_PLUGINS) {
+                return;
+            }
+            const item = items.find(`[href=${name}]`);
+
+            if (item.length) {
+                const clone = item.closest('.cms-submenu-item').clone(true, true);
+
+                ref.after(clone);
+                ref = clone;
+                count += 1;
+            }
+        });
+
+        if (count) {
+            plugins.find('.cms-quicksearch').after(
+                $(`<div class="cms-submenu-item cms-submenu-item-title" data-cms-most-used>
+                    <span>${CMS.config.lang.mostUsed}</span>
+                </div>`)
+            );
+        }
+
+        return plugins;
     },
 
     /**
@@ -1267,11 +1299,16 @@ var Plugin = new Class({
 
         Plugin._hideSettingsMenu(nav);
 
+
         // set switch for subnav entries
         switch (el.attr('data-rel')) {
+            // eslint-disable-next-line no-case-declarations
             case 'add':
+                const pluginType = el.attr('href').replace('#', '');
+
+                Plugin._updateUsageCount(pluginType);
                 that.addPlugin(
-                    el.attr('href').replace('#', ''),
+                    pluginType,
                     el.text(),
                     el.closest('.cms-plugin-picker').data('parentId')
                 );
@@ -1306,9 +1343,8 @@ var Plugin = new Class({
                 that.cutPlugin();
                 break;
             case 'paste':
-                if (el.parent().hasClass('cms-submenu-item-disabled')) {
-                    CMS.API.Toolbar.hideLoader();
-                } else {
+                CMS.API.Toolbar.hideLoader();
+                if (!el.parent().hasClass('cms-submenu-item-disabled')) {
                     that.pastePlugin();
                 }
                 break;
@@ -1416,6 +1452,10 @@ var Plugin = new Class({
             return false;
         }
 
+        var mostRecentItems = list.find('.cms-submenu-item[data-cms-most-used]');
+
+        mostRecentItems = mostRecentItems.add(mostRecentItems.nextUntil('.cms-submenu-item-title'));
+
         var itemsToFilter = items.toArray().map(function (el) {
             var element = $(el);
 
@@ -1448,6 +1488,8 @@ var Plugin = new Class({
                 item.prevUntil('.cms-submenu-item-title').last().prev().show();
             }
         });
+
+        mostRecentItems.hide();
     },
 
     /**
@@ -1685,31 +1727,32 @@ var Plugin = new Class({
 
 
 /**
- * Updates plugin data in CMS._plugins.
- * Keep in mind that it doesn't update children plugins, and you
- * probably want that.
+ * Updates plugin data in CMS._plugins / CMS._instances or creates new
+ * plugin instances if they didn't exist
  *
  * @method _updateRegistry
  * @private
  * @static
- * @param {Object} opts options
- * @param {String|Number} opts.pluginId id
- * @param {Object} opts.update object with data to update
+ * @param {Object[]} plugins plugins data
  */
-Plugin._updateRegistry = function _updateRegistry(opts) {
-    var pluginEntryIndex = (CMS._plugins || []).findIndex(function (pluginOptions) {
-        return pluginOptions[0] === 'cms-plugin-' + opts.pluginId;
+Plugin._updateRegistry = function _updateRegistry(plugins) {
+    plugins.forEach((pluginData) => {
+        const pluginContainer = `cms-plugin-${pluginData.plugin_id}`;
+        const pluginIndex = findIndex(
+            CMS._plugins,
+            ([pluginStr]) => pluginStr === pluginContainer
+        );
+
+        if (pluginIndex === -1) {
+            CMS._plugins.push([pluginContainer, pluginData]);
+            CMS._instances.push(new Plugin(pluginContainer, pluginData));
+        } else {
+            Plugin.aliasPluginDuplicatesMap[pluginData.plugin_id] = false;
+            CMS._plugins[pluginIndex] = [pluginContainer, pluginData];
+            // TODO make sure that instances doesn't have generics
+            CMS._instances[pluginIndex] = new Plugin(pluginContainer, pluginData);
+        }
     });
-
-    if (pluginEntryIndex === -1) {
-        return;
-    }
-
-    $.extend(true, CMS._plugins[pluginEntryIndex][1], opts.update);
-
-    // FIXME update instance and data('cms') here!
-    // var instanceIndex = (CMS._plugins || []).findIndex(function (instance) {
-    // });
 };
 
 /**
@@ -1771,7 +1814,9 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
             html = clipboardDraggable.parent().html();
 
         }
-        CMS.API.Clipboard.populate(html, pluginData);
+        if (CMS.API && CMS.API.Clipboard) {
+            CMS.API.Clipboard.populate(html, pluginData);
+        }
     }, 0);
 
     doc.on('pointerup.cms.plugin', function () {
@@ -1799,10 +1844,10 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         e.preventDefault();
         if (++clickCounter === 1) {
             timer = setTimeout(function () {
+                // FIXME this shouldn't happen if the default was prevented already
                 var anchor = $(e.target).closest('a');
 
                 clickCounter = 0;
-                // make sure that the target attribute is honoured on links
                 window.open(anchor.attr('href'), anchor.attr('target') || '_self');
             }, DOUBLECLICK_DELAY);
         } else {
@@ -1930,13 +1975,24 @@ Plugin.staticPlaceholderDuplicatesMap = {};
 
 // istanbul ignore next
 Plugin._initializeTree = function _initializeTree() {
-    $.each(CMS._plugins, function (index, args) {
-        new CMS.Plugin(args[0], args[1]);
+    CMS._plugins = uniqWith(CMS._plugins, isEqual);
+    CMS._instances = CMS._plugins.map(function (args) {
+        return new CMS.Plugin(args[0], args[1]);
     });
 };
 
 Plugin._updateClipboard = function _updateClipboard() {
     clipboardDraggable = $('.cms-draggable-from-clipboard:first');
+};
+
+Plugin._updateUsageCount = function _updateUsageCount(pluginType) {
+    var currentValue = pluginUsageMap[pluginType] || 0;
+
+    pluginUsageMap[pluginType] = currentValue + 1;
+
+    if (Helpers._isStorageSupported) {
+        localStorage.setItem('cms-plugin-usage', JSON.stringify(pluginUsageMap));
+    }
 };
 
 // shorthand for jQuery(document).ready();

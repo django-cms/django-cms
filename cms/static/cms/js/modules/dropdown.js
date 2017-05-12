@@ -157,7 +157,3 @@ $(function () {
         .on('keydown.cms.dropdown.data-api', toggle, Dropdown.prototype.keydown)
         .on('keydown.cms.dropdown.data-api', '.cms-dropdown-menu', Dropdown.prototype.keydown)
 })
-
-// $(function () {
-//     $('.cms-dropdown-toggle').dropdown();
-// });

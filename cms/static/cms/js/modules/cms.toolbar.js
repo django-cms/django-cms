@@ -8,6 +8,7 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import DiffDOM from 'diff-dom';
+import { filter, uniq } from 'lodash';
 
 var Helpers = require('./cms.base').default.API.Helpers;
 var KEYS = require('./cms.base').default.KEYS;
@@ -15,27 +16,11 @@ var KEYS = require('./cms.base').default.KEYS;
 var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
 var DEBUG_BAR_HEIGHT = 5; // TODO has to be fixed
-var dd = new DiffDOM({
-    preDiffApply(info) {
-        if ($('.cms-toolbar-item-cms-mode-switcher').is(info.node)) {
-            return true;
-        }
-        if ($('.cms-toolbar-item-cms-mode-switcher a').is(info.node)) {
-            return true;
-        }
-
-        if (
-            (
-                info.diff.action === 'removeAttribute' ||
-                info.diff.action === 'modifyAttribute'
-            ) &&
-            info.diff.name === 'style' &&
-            $('.cms-toolbar').is(info.node)
-        ) {
-            return true;
-        }
-    }
-});
+var dd;
+const getPlaceholderIds = (pluginRegistry) => uniq(
+    filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder')
+        .map(([, opts]) => opts.placeholder_id)
+);
 
 /**
  * @function hideDropdownIfRequired
@@ -118,14 +103,32 @@ var Toolbar = new Class({
         // are loaded after the toolbar so it can create a clash where
         // CMS.API is not ready. This is a workaround until a proper fix
         // will be released in 3.x
-        var that = this;
-
-        setTimeout(function () {
-            that._initialStates();
-        }, 0);
+        setTimeout(() => this._initialStates(), 0);
 
         // set a state to determine if we need to reinitialize this._events();
         this.ui.toolbar.data('ready', true);
+
+        dd = new DiffDOM({
+            preDiffApply(info) {
+                if ($('.cms-toolbar-item-cms-mode-switcher').is(info.node)) {
+                    return true;
+                }
+                if ($('.cms-toolbar-item-cms-mode-switcher a').is(info.node)) {
+                    return true;
+                }
+
+                if (
+                    (
+                        info.diff.action === 'removeAttribute' ||
+                        info.diff.action === 'modifyAttribute'
+                    ) &&
+                    info.diff.name === 'style' &&
+                    $('.cms-toolbar').is(info.node)
+                ) {
+                    return true;
+                }
+            }
+        });
     },
 
     /**
@@ -315,7 +318,6 @@ var Toolbar = new Class({
 
             // attach hover
             lists.on(that.pointerOverOut + ' keyup.cms.toolbar', 'li', function (e) {
-                // debugger
                 var el = $(this);
                 var parent = el.closest('.cms-toolbar-item-navigation-children')
                     .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -384,14 +386,16 @@ var Toolbar = new Class({
             });
 
             // in case of the publish button
-            btn.find('.cms-publish-page').off(that.click).on(that.click, function (e) {
-                if (!Helpers.secureConfirm(CMS.config.lang.publish)) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                }
-            });
+            btn.find('.cms-publish-page')
+                .off(`${that.click}.publishpage`)
+                .on(`${that.click}.publishpage`, function (e) {
+                    if (!Helpers.secureConfirm(CMS.config.lang.publish)) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                    }
+                });
 
-            btn.find('.cms-btn-publish').off(that.click).on(that.click, function (e) {
+            btn.find('.cms-btn-publish').off(`${that.click}.publish`).on(`${that.click}.publish`, function (e) {
                 e.preventDefault();
                 that.showLoader();
                 // send post request to prevent xss attacks
@@ -399,6 +403,7 @@ var Toolbar = new Class({
                     type: 'post',
                     url: $(this).prop('href'),
                     data: {
+                        placeholders: getPlaceholderIds(CMS._plugins),
                         csrfmiddlewaretoken: CMS.config.csrf
                     },
                     success: function () {
@@ -871,6 +876,7 @@ var Toolbar = new Class({
      */
     onPublishAvailable: function showPublishButton() {
         // show publish / save buttons
+        // istanbul ignore next
         // eslint-disable-next-line no-console
         console.warn('This method is deprecated and will be removed in future versions');
     },
@@ -892,6 +898,10 @@ var Toolbar = new Class({
         this._events();
         this.navigation = new Navigation();
         this.navigation.ui.window.trigger('resize');
+
+        CMS.API.Clipboard.ui.triggers = $('.cms-clipboard-trigger a');
+        CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
+        CMS.API.Clipboard._toolbarEvents();
     }
 });
 

@@ -323,6 +323,31 @@ describe('cms.base.js', function () {
         });
 
         describe('onPluginSave()', function () {
+            beforeEach(() => {
+                CMS.API.StructureBoard = {
+                    invalidateState: jasmine.createSpy()
+                };
+            });
+            afterEach(() => {
+                CMS.API.Helpers.dataBridge = null;
+            });
+
+            it('invalidates state if the plugin was edited', () => {
+                CMS._instances = [{ options: { plugin_id: 1 } }];
+
+                CMS.API.Helpers.dataBridge = { plugin_id: '1' };
+                CMS.API.Helpers.onPluginSave();
+                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('EDIT', { plugin_id: '1' });
+            });
+
+            it('invalidates state if the plugin was added', () => {
+                CMS._instances = [];
+
+                CMS.API.Helpers.dataBridge = { plugin_id: '1' };
+                CMS.API.Helpers.onPluginSave();
+                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('ADD', { plugin_id: '1' });
+            });
+
             it('proxies to reloadBrowser', function () {
                 spyOn(CMS.API.Helpers, 'reloadBrowser');
 

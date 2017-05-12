@@ -1,10 +1,12 @@
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var PageTree = require('../../../static/cms/js/modules/cms.pagetree').default;
+var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
 var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;
 CMS.PageTree = PageTree;
+CMS.PageTreeDropdowns = PageTreeDropdowns;
 
 
 describe('CMS.PageTree', function () {

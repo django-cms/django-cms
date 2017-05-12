@@ -1038,11 +1038,14 @@ class Modal {
                 } else {
                     setTimeout(function () {
                         if (that.justDeleted && (that.justDeletedPlugin || that.justDeletedPlaceholder)) {
-                            CMS.API.StructureBoard.invalidateState({
-                                plugin_id: that.justDeletedPlugin,
-                                placeholder_id: that.justDeletedPlaceholder,
-                                deleted: true
-                            });
+                            CMS.API.StructureBoard.invalidateState(
+                                that.justDeletedPlaceholder ? 'CLEAR_PLACEHOLDER' : 'DELETE',
+                                {
+                                    plugin_id: that.justDeletedPlugin,
+                                    placeholder_id: that.justDeletedPlaceholder,
+                                    deleted: true
+                                }
+                            );
                         }
                         // hello ckeditor
                         CMS.API.Helpers.removeEventListener(

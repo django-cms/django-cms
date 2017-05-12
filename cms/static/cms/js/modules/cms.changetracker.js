@@ -2,9 +2,9 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
-var Class = require('classjs');
-var SimpleMap = require('./simplemap');
+import $ from 'jquery';
+import Class from 'classjs';
+import SimpleMap from './simplemap';
 
 /**
  * Tracks the changes done inside the modal form.

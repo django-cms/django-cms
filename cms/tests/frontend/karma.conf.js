@@ -6,6 +6,8 @@
 
 'use strict';
 
+process.env.NODE_ENV = 'test';
+
 var baseConf = require('./base.conf');
 var path = require('path');
 var fs = require('fs');

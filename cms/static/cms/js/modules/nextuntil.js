@@ -27,4 +27,4 @@ var nextUntil = function nextUntil(element, until) {
     return next;
 };
 
-module.exports = nextUntil;
+export default nextUntil;

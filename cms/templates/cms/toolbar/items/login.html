@@ -1,16 +1,16 @@
 {% load i18n sekizai_tags cms_tags %}
 
 {% url 'logout' as logout_url %}
-<form action="{% url 'pages-root' %}{% if request.path != logout_url %}?next={{ request.path }}&amp;{{ cms_edit_on }}&amp;cms-toolbar-login=1{% endif %}"
+<form action="{% url 'cms_login' %}?next={{ request.path }}&amp;{{ cms_edit_on }}"
     class="cms-toolbar-item cms-form-login" method="post">
     {% csrf_token %}
-    <label{% if request.toolbar.login_form.username.errors or request.toolbar.login_form.non_field_errors or cms_toolbar_login_error %} class="cms-error"{% endif %}>
-        <span>{% trans request.toolbar.login_form.username.label %}</span>
-        {{ request.toolbar.login_form.username }}
+    <label{% if request.GET.cms_toolbar_login_error %} class="cms-error"{% endif %}>
+        <span>{% trans login_form.username.label %}</span>
+        {{ login_form.username }}
     </label>
-    <label{% if request.toolbar.login_form.password.errors or request.toolbar.login_form.non_field_errors or cms_toolbar_login_error %} class="cms-error"{% endif %}>
-        <span>{% trans request.toolbar.login_form.password.label %}</span>
-        {{ request.toolbar.login_form.password }}
+    <label{% if request.GET.cms_toolbar_login_error %} class="cms-error"{% endif %}>
+        <span>{% trans login_form.password.label %}</span>
+        {{ login_form.password }}
     </label>
     <label>
         <input class="cms-btn cms-btn-action" type="submit" value="{% trans 'Login' %}">

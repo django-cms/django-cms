@@ -7,7 +7,8 @@ module.exports = {
         "es6": true
     },
     "globals": {
-        "CMS": true
+        "CMS": true,
+        "Promise": true
     },
     "root": true,
     "ecmaFeatures": {

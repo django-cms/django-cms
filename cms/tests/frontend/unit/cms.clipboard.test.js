@@ -1,9 +1,7 @@
 /* global document */
-'use strict';
+import Clipboard from '../../../static/cms/js/modules/cms.clipboard';
+import $ from 'jquery';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Clipboard = require('../../../static/cms/js/modules/cms.clipboard').default;
-var Plugin = require('../../../static/cms/js/modules/cms.plugins').default;
-var $ = require('jquery');
 
 window.CMS = window.CMS || CMS;
 CMS.Clipboard = Clipboard;
@@ -187,6 +185,35 @@ describe('CMS.Clipboard', function () {
             // manually cleaning up, otherwise PhantomJS fails
             $('.cms-modal').remove();
         });
+
+        it('sets up event to handle external updates', () => {
+            Clipboard.__Rewire__('Helpers', { _getWindow() {
+                return {
+                    addEventListener(name, fn) {
+                        expect(name).toEqual('storage');
+                        fn({});
+                    }
+                };
+            } });
+            spyOn(CMS.Clipboard.prototype, '_handleExternalUpdate');
+
+            clipboard = new CMS.Clipboard();
+            expect(CMS.Clipboard.prototype._handleExternalUpdate).not.toHaveBeenCalled();
+
+            Clipboard.__Rewire__('Helpers', { _getWindow() {
+                return {
+                    addEventListener(name, fn) {
+                        expect(name).toEqual('storage');
+                        fn({ key: 'cms.clipboard', x: 1 });
+                    }
+                };
+            } });
+            clipboard = new CMS.Clipboard();
+            expect(CMS.Clipboard.prototype._handleExternalUpdate).toHaveBeenCalledWith({
+                key: 'cms.clipboard', x: 1
+            });
+            Clipboard.__ResetDependency__('Helpers');
+        });
     });
 
     describe('.clear()', function () {
@@ -326,6 +353,13 @@ describe('CMS.Clipboard', function () {
 
     describe('_handleExternalUpdate()', function () {
         var clipboard;
+        const pluginConstructor = jasmine.createSpy();
+        class FakePlugin {
+            constructor(...args) {
+                pluginConstructor(...args);
+            }
+        }
+        FakePlugin._updateClipboard = jasmine.createSpy();
         beforeEach(function (done) {
             fixture.load('clipboard.html');
             $(function () {
@@ -333,13 +367,15 @@ describe('CMS.Clipboard', function () {
                 spyOn(clipboard, 'populate');
                 spyOn(clipboard, '_cleanupDOM');
                 spyOn(clipboard, '_enableTriggers');
-                spyOn(Plugin.prototype, 'initialize');
-                spyOn(Plugin, '_updateClipboard');
+                Clipboard.__Rewire__('Plugin', FakePlugin);
                 done();
             });
         });
 
         afterEach(function () {
+            pluginConstructor.calls.reset();
+            FakePlugin._updateClipboard.calls.reset();
+            Clipboard.__ResetDependency__('Plugin');
             fixture.cleanup();
         });
 
@@ -356,8 +392,8 @@ describe('CMS.Clipboard', function () {
                 })
             })).not.toBeDefined();
 
-            expect(Plugin.prototype.initialize).not.toHaveBeenCalled();
-            expect(Plugin._updateClipboard).not.toHaveBeenCalled();
+            expect(pluginConstructor).not.toHaveBeenCalled();
+            expect(FakePlugin._updateClipboard).not.toHaveBeenCalled();
             expect(clipboard._cleanupDOM).not.toHaveBeenCalled();
             expect(clipboard._enableTriggers).not.toHaveBeenCalled();
             expect(clipboard.currentClipboardData).toEqual({
@@ -381,8 +417,8 @@ describe('CMS.Clipboard', function () {
                 })
             })).not.toBeDefined();
 
-            expect(Plugin.prototype.initialize).not.toHaveBeenCalled();
-            expect(Plugin._updateClipboard).not.toHaveBeenCalled();
+            expect(pluginConstructor).not.toHaveBeenCalled();
+            expect(FakePlugin._updateClipboard).not.toHaveBeenCalled();
             expect(clipboard._cleanupDOM).not.toHaveBeenCalled();
             expect(clipboard._enableTriggers).not.toHaveBeenCalled();
             expect(clipboard.currentClipboardData).toEqual({
@@ -408,8 +444,8 @@ describe('CMS.Clipboard', function () {
                 })
             })).not.toBeDefined();
 
-            expect(Plugin.prototype.initialize).not.toHaveBeenCalled();
-            expect(Plugin._updateClipboard).not.toHaveBeenCalled();
+            expect(pluginConstructor).not.toHaveBeenCalled();
+            expect(FakePlugin._updateClipboard).not.toHaveBeenCalled();
             expect(clipboard._cleanupDOM).toHaveBeenCalledTimes(1);
             expect(clipboard._enableTriggers).not.toHaveBeenCalled();
             expect(clipboard.currentClipboardData).toEqual({
@@ -434,8 +470,9 @@ describe('CMS.Clipboard', function () {
                 })
             })).not.toBeDefined();
 
-            expect(Plugin.prototype.initialize).toHaveBeenCalled();
-            expect(Plugin._updateClipboard).toHaveBeenCalled();
+
+            expect(pluginConstructor).toHaveBeenCalled();
+            expect(FakePlugin._updateClipboard).toHaveBeenCalled();
             expect(clipboard._cleanupDOM).not.toHaveBeenCalled();
             expect(clipboard._enableTriggers).toHaveBeenCalled();
             expect(clipboard.currentClipboardData).toEqual({
@@ -460,8 +497,8 @@ describe('CMS.Clipboard', function () {
                 })
             })).not.toBeDefined();
 
-            expect(Plugin.prototype.initialize).toHaveBeenCalled();
-            expect(Plugin._updateClipboard).toHaveBeenCalled();
+            expect(pluginConstructor).toHaveBeenCalled();
+            expect(FakePlugin._updateClipboard).toHaveBeenCalled();
             expect(clipboard._cleanupDOM).not.toHaveBeenCalled();
             expect(clipboard._enableTriggers).not.toHaveBeenCalled();
             expect(clipboard.currentClipboardData).toEqual({

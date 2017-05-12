@@ -1,7 +1,7 @@
 import Modal from '../cms.modal';
 
 import keyboard from '../keyboard';
-var tmpl = require('../tmpl');
+import tmpl from '../tmpl';
 var template = require('./help.html');
 
 /**

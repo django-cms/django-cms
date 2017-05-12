@@ -5,9 +5,14 @@
 import Modal from './cms.modal';
 var $ = require('jquery');
 var Class = require('classjs');
+var Helpers = require('./cms.base').default.API.Helpers;
 var storageKey = 'cms.clipboard';
 var Plugin = require('./cms.plugins').default;
-var Helpers = require('./cms.base').default.API.Helpers;
+
+var MIN_WIDTH = 400;
+// FIXME kind of a magic number for 1 item in clipboard
+var MIN_HEIGHT = 117;
+
 
 /**
  * Handles copy & paste in the structureboard.
@@ -57,10 +62,6 @@ var Clipboard = new Class({
     _events: function () {
         var that = this;
 
-        var MIN_WIDTH = 400;
-        // FIXME kind of a magic number for 1 item in clipboard
-        var MIN_HEIGHT = 117;
-
         that.modal = new Modal({
             minWidth: MIN_WIDTH,
             minHeight: MIN_HEIGHT,
@@ -79,7 +80,19 @@ var Clipboard = new Class({
             that.ui.pluginsList.prependTo(that.ui.clipboard);
         });
 
-        that.ui.triggers.on(that.click, function (e) {
+        Helpers._getWindow().addEventListener('storage', function (e) {
+            if (e.key === storageKey) {
+                that._handleExternalUpdate(e);
+            }
+        });
+
+        this._toolbarEvents();
+    },
+
+    _toolbarEvents() {
+        var that = this;
+
+        that.ui.triggers.off(that.click).on(that.click, function (e) {
             e.preventDefault();
             e.stopPropagation();
             if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -96,7 +109,7 @@ var Clipboard = new Class({
         });
 
         // add remove event
-        that.ui.triggerRemove.on(that.click, function (e) {
+        that.ui.triggerRemove.off(that.click).on(that.click, function (e) {
             e.preventDefault();
             e.stopPropagation();
             if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -105,11 +118,6 @@ var Clipboard = new Class({
             that.clear();
         });
 
-        Helpers._getWindow().addEventListener('storage', function (e) {
-            if (e.key === storageKey) {
-                that._handleExternalUpdate(e);
-            }
-        });
     },
 
     /**
@@ -239,7 +247,9 @@ var Clipboard = new Class({
             html: html
         };
 
-        localStorage.setItem(storageKey, JSON.stringify(this.currentClipboardData));
+        if (Helpers._isStorageSupported) {
+            localStorage.setItem(storageKey, JSON.stringify(this.currentClipboardData));
+        }
     }
 });
 
