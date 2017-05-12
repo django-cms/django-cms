@@ -42,4 +42,4 @@ SimpleMap.prototype.has = function has(key) {
     return index > -1;
 };
 
-module.exports = SimpleMap;
+export default SimpleMap;

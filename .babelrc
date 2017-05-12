@@ -10,6 +10,11 @@
             "plugins": [
                 "lodash"
             ]
+        },
+        "test": {
+            "plugins": [
+                "rewire"
+            ]
         }
     }
 }

@@ -157,10 +157,11 @@ CMS.API.Helpers = {
         var addedPlugin = !editedPlugin && data && data.plugin_id;
 
         if (editedPlugin || addedPlugin) {
-            CMS.API.StructureBoard.invalidateState(data);
+            CMS.API.StructureBoard.invalidateState(addedPlugin ? 'ADD' : 'EDIT', data);
             return;
         }
 
+        // istanbul ignore else
         if (!this._isReloading) {
             this.reloadBrowser(null, 300); // eslint-disable-line
         }
@@ -214,7 +215,7 @@ CMS.API.Helpers = {
         // merge settings
         var settings = JSON.stringify($.extend({}, window.CMS.config.settings, newSettings));
 
-        // set loader
+        // istanbul ignore else
         if (CMS.API.Toolbar) {
             CMS.API.Toolbar.showLoader();
         }
@@ -223,6 +224,7 @@ CMS.API.Helpers = {
         if (this._isStorageSupported) {
             // save within local storage
             localStorage.setItem('cms_cookie', settings);
+            // istanbul ignore else
             if (CMS.API.Toolbar) {
                 CMS.API.Toolbar.hideLoader();
             }
@@ -273,7 +275,7 @@ CMS.API.Helpers = {
     getSettings: function () {
         var settings;
 
-        // set loader
+        // istanbul ignore else
         if (CMS.API.Toolbar) {
             CMS.API.Toolbar.showLoader();
         }
@@ -282,6 +284,7 @@ CMS.API.Helpers = {
         if (this._isStorageSupported) {
             // get from local storage
             settings = JSON.parse(localStorage.getItem('cms_cookie'));
+            // istanbul ignore else
             if (CMS.API.Toolbar) {
                 CMS.API.Toolbar.hideLoader();
             }
@@ -330,6 +333,7 @@ CMS.API.Helpers = {
      * @param {String[]} [params] array of `param=value` strings to update the url
      * @returns {String}
      */
+    // TODO get rid of this
     makeURL: function makeURL(url, params) {
         var arr = [];
         var keys = [];

@@ -1,10 +1,18 @@
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Toolbar = require('../../../static/cms/js/modules/cms.toolbar').default;
+var Navigation = require('../../../static/cms/js/modules/cms.navigation').default;
+var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
+var Messages = require('../../../static/cms/js/modules/cms.messages').default;
 var $ = require('jquery');
+import Toolbar, { __RewireAPI__ as ToolbarRewireAPI } from '../../../static/cms/js/modules/cms.toolbar';
+import Modal from '../../../static/cms/js/modules/cms.modal';
 
 window.CMS = window.CMS || CMS;
 CMS.Toolbar = Toolbar;
+CMS.Navigation = Navigation;
+CMS.Modal = Modal;
+CMS.Sideframe = Sideframe;
+CMS.Messages = Messages;
 
 
 describe('CMS.Toolbar', function () {
@@ -857,8 +865,6 @@ describe('CMS.Toolbar', function () {
             expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(2);
             expect($.Event.prototype.stopImmediatePropagation).toHaveBeenCalledTimes(1);
         });
-
-        it('attaches a handler to publish button');
     });
 
     describe('._screenBlock()', function () {
@@ -899,6 +905,9 @@ describe('CMS.Toolbar', function () {
     describe('._delegate()', function () {
         var toolbar;
         var fakeWindow;
+        class FakeModal {
+            constructor() {}
+        }
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             CMS.config = {};
@@ -918,7 +927,7 @@ describe('CMS.Toolbar', function () {
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
-                spyOn(CMS.Modal.prototype, 'constructor');
+                ToolbarRewireAPI.__Rewire__('Modal', FakeModal);
                 spyOn(CMS.Sideframe.prototype, 'initialize');
                 spyOn(toolbar, 'openAjax');
                 spyOn(CMS.API.Helpers, '_getWindow').and.returnValue(fakeWindow);
@@ -931,6 +940,7 @@ describe('CMS.Toolbar', function () {
         });
 
         afterEach(function (done) {
+            ToolbarRewireAPI.__ResetDependency__('Modal');
             fixture.cleanup();
             setTimeout(function () {
                 done();
@@ -942,12 +952,8 @@ describe('CMS.Toolbar', function () {
         });
         it('opens modal if item is "modal"', function () {
             var modalOpen = jasmine.createSpy();
-            CMS.Modal.prototype.constructor.and.callFake(function (opts) {
-                expect(opts.onClose).toEqual('test');
-                return {
-                    open: modalOpen
-                };
-            });
+
+            FakeModal.prototype.open = modalOpen;
 
             toolbar._delegate($('<div href="href" data-name="modal" data-rel="modal" data-on-close="test"></div>'));
 
@@ -1064,6 +1070,86 @@ describe('CMS.Toolbar', function () {
             jasmine.clock().tick(10000);
 
             expect(CMS.API.Messages.open).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('_refreshMarkup', () => {
+        const diffDOMConstructor = jasmine.createSpy();
+        const newToolbar = $('<div></div>');
+        let toolbar;
+
+        class DiffDOM {
+            constructor() {
+                diffDOMConstructor();
+            }
+        }
+        DiffDOM.prototype.diff = jasmine.createSpy();
+        DiffDOM.prototype.apply = jasmine.createSpy();
+
+        const trigger = jasmine.createSpy();
+        class FakeNavigation {
+            constructor() {
+                this.ui = {
+                    window: {
+                        trigger
+                    }
+                };
+            }
+        }
+
+        beforeEach(function (done) {
+            fixture.load('toolbar.html');
+            CMS.config = {
+                lang: {
+                    debug: 'DEBUG!'
+                }
+            };
+            CMS.settings = $.extend(CMS.settings, {
+                toolbar: 'expanded'
+            });
+            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
+                return {};
+            });
+            $(function () {
+                Toolbar.__Rewire__('Navigation', FakeNavigation);
+                Toolbar.__Rewire__('DiffDOM', DiffDOM);
+                spyOn(CMS.Toolbar.prototype, '_initialStates');
+                toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
+                    return $.extend(true, CMS.settings, input);
+                });
+                spyOn(toolbar, '_setupUI');
+                spyOn(toolbar, '_events');
+                CMS.API.Clipboard = {
+                    ui: {},
+                    _toolbarEvents: jasmine.createSpy()
+                };
+
+                jasmine.clock().install();
+                done();
+            });
+        });
+
+        afterEach(function (done) {
+            jasmine.clock().uninstall();
+            Toolbar.__ResetDependency__('Navigation');
+            Toolbar.__ResetDependency__('DiffDOM');
+            fixture.cleanup();
+            setTimeout(function () {
+                done();
+            }, 200);
+        });
+
+        it('refreshes markup', () => {
+            toolbar.navigation = null;
+            toolbar._refreshMarkup(newToolbar);
+            expect(toolbar._setupUI).toHaveBeenCalledTimes(1);
+            expect(toolbar._events).toHaveBeenCalledTimes(1);
+            expect(toolbar.navigation instanceof FakeNavigation).toEqual(true);
+            expect(DiffDOM.prototype.diff).toHaveBeenCalledTimes(1);
+            expect(DiffDOM.prototype.apply).toHaveBeenCalledTimes(1);
+            expect(trigger).toHaveBeenCalledWith('resize');
+            expect(CMS.API.Clipboard._toolbarEvents).toHaveBeenCalledTimes(1);
         });
     });
 });

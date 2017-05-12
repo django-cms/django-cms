@@ -1,6 +1,6 @@
 var cache = {};
 
-module.exports = function tmpl(str, data) {
+export default function tmpl(str, data) {
     // Figure out if we're getting a template, or if we need to
     // load the template - and be sure to cache the result.
     // eslint-disable-next-line no-negated-condition

@@ -9,21 +9,22 @@ require('./helpers/jasmine-jquery');
 
 if (files[0] === '*') {
     require('./cms.base.test');
+    require('./cms.toolbar.test'); // missing some tests
+    require('./cms.plugins.test'); // missing some tests
     require('./cms.messages.test');
     require('./cms.changetracker.test');
-    require('./cms.modal.test');
     require('./cms.sideframe.test');
-    require('./cms.clipboard.test');
-    require('./cms.plugins.test');
-    require('./cms.structureboard.test');
     require('./cms.navigation.test');
-    require('./cms.toolbar.test');
     require('./cms.tooltip.test');
     require('./cms.pagetree.dropdown.test');
     require('./cms.pagetree.stickyheader.test');
     require('./cms.pagetree.test');
+    require('./cms.clipboard.test');
+    require('./cms.modal.test');
     require('./shortcuts.test');
     require('./keyboard.test');
+    // FIXME this has to be last because it messes with the url
+    require('./cms.structureboard.test'); // missing some tests
 } else {
     files.forEach(function (file) {
         require('./' + file + '.test');

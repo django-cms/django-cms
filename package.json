@@ -7,6 +7,7 @@
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
     "babel-plugin-lodash": "^3.2.11",
+    "babel-plugin-rewire": "^1.1.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.4.0",
     "babel-runtime": "^6.23.0",
@@ -48,6 +49,7 @@
     "diff-dom": "^2.1.0",
     "fuzzaldrin": "^2.1.0",
     "keyboardjs": "^2.3.1",
+    "lodash": "^4.17.4",
     "urijs": "^1.18.10"
   }
 }
