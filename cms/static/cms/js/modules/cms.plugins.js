@@ -1784,7 +1784,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         e.preventDefault();
         if (++clickCounter === 1) {
             timer = setTimeout(function () {
-                var anchor = $(e.currentTarget);
+                var anchor = $(e.target).closest('a');
 
                 clickCounter = 0;
                 // make sure that the target attribute is honoured on links
