@@ -8,6 +8,7 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import DiffDOM from 'diff-dom';
+import { filter, uniq } from 'lodash';
 
 var Helpers = require('./cms.base').default.API.Helpers;
 var KEYS = require('./cms.base').default.KEYS;
@@ -36,6 +37,11 @@ var dd = new DiffDOM({
         }
     }
 });
+
+const getPlaceholderIds = (pluginRegistry) => uniq(
+    filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder')
+        .map(([, opts]) => opts.placeholder_id)
+);
 
 /**
  * @function hideDropdownIfRequired
@@ -315,7 +321,6 @@ var Toolbar = new Class({
 
             // attach hover
             lists.on(that.pointerOverOut + ' keyup.cms.toolbar', 'li', function (e) {
-                // debugger
                 var el = $(this);
                 var parent = el.closest('.cms-toolbar-item-navigation-children')
                     .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -399,6 +404,7 @@ var Toolbar = new Class({
                     type: 'post',
                     url: $(this).prop('href'),
                     data: {
+                        placeholders: getPlaceholderIds(CMS._plugins),
                         csrfmiddlewaretoken: CMS.config.csrf
                     },
                     success: function () {
@@ -892,6 +898,10 @@ var Toolbar = new Class({
         this._events();
         this.navigation = new Navigation();
         this.navigation.ui.window.trigger('resize');
+
+        CMS.API.Clipboard.ui.triggers = $('.cms-clipboard-trigger a');
+        CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
+        CMS.API.Clipboard._toolbarEvents();
     }
 });
 

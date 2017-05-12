@@ -1017,7 +1017,15 @@
       "version": "0.2.5",
       "from": "browserslist-saucelabs@>=0.2.3 <0.3.0",
       "resolved": "https://registry.npmjs.org/browserslist-saucelabs/-/browserslist-saucelabs-0.2.5.tgz",
-      "dev": true
+      "dev": true,
+      "dependencies": {
+        "lodash": {
+          "version": "3.10.1",
+          "from": "lodash@>=3.10.1 <4.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "dev": true
+        }
+      }
     },
     "buffer": {
       "version": "4.9.1",
@@ -4863,6 +4871,12 @@
           "resolved": "https://registry.npmjs.org/glob/-/glob-7.1.1.tgz",
           "dev": true
         },
+        "lodash": {
+          "version": "3.10.1",
+          "from": "lodash@>=3.8.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "dev": true
+        },
         "minimatch": {
           "version": "3.0.4",
           "from": "minimatch@>=3.0.0 <4.0.0",
@@ -4963,6 +4977,11 @@
           "version": "0.2.17",
           "from": "loader-utils@>=0.2.5 <0.3.0",
           "resolved": "https://registry.npmjs.org/loader-utils/-/loader-utils-0.2.17.tgz"
+        },
+        "lodash": {
+          "version": "3.10.1",
+          "from": "lodash@>=3.8.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
         },
         "object-assign": {
           "version": "4.1.1",
@@ -5074,9 +5093,9 @@
       "dev": true
     },
     "lodash": {
-      "version": "3.10.1",
-      "from": "lodash@>=3.10.1 <4.0.0",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
+      "version": "4.17.4",
+      "from": "lodash@>=4.0.0 <5.0.0",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.4.tgz"
     },
     "lodash._basecopy": {
       "version": "3.0.1",
@@ -6512,6 +6531,12 @@
           "resolved": "https://registry.npmjs.org/glob/-/glob-5.0.15.tgz",
           "dev": true
         },
+        "lodash": {
+          "version": "3.10.1",
+          "from": "lodash@3.10.1",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "dev": true
+        },
         "rimraf": {
           "version": "2.4.3",
           "from": "rimraf@2.4.3",
@@ -6941,7 +6966,15 @@
       "version": "2.0.2",
       "from": "svg2ttf@>=2.0.0 <2.1.0",
       "resolved": "https://registry.npmjs.org/svg2ttf/-/svg2ttf-2.0.2.tgz",
-      "dev": true
+      "dev": true,
+      "dependencies": {
+        "lodash": {
+          "version": "3.10.1",
+          "from": "lodash@>=3.6.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
+          "dev": true
+        }
+      }
     },
     "svgicons2svgfont": {
       "version": "3.0.2",

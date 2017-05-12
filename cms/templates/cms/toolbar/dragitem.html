@@ -55,7 +55,7 @@
         {% if allow_children %} cms-draggables{% endif %}">
         {% if plugin.child_plugin_instances %}
             {% for child in plugin.child_plugin_instances %}
-                {% include cms_renderer.drag_item_template with plugin=child disabled_child=disable_child_plugins %}
+                {% include cms_toolbar.templates.drag_item_template with plugin=child disabled_child=disable_child_plugins %}
             {% endfor %}
         {% endif %}
     </div>

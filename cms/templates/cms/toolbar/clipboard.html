@@ -1,10 +1,10 @@
 {% load i18n cms_admin %}
 
-{% if clipboard_plugin %}
 <div class="cms-clipboard" data-title="{% trans 'Clipboard' %}">
     <div class="cms-plugins"></div>
     <div class="cms-clipboard-containers cms-dragarea cms-draggables">
-        {% include cms_renderer.drag_item_template with clipboard="true" plugin=clipboard_plugin %}
+        {% if clipboard_plugin %}
+            {% include cms_toolbar.templates.drag_item_template with clipboard="true" plugin=clipboard_plugin %}
+        {% endif %}
     </div>
 </div>
-{% endif %}

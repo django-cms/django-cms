@@ -5,13 +5,16 @@
 import $ from 'jquery';
 import keyboard from './keyboard';
 import Plugin from './cms.plugins';
+import Clipboard from './cms.clipboard';
 import URI from 'urijs';
 import DiffDOM from 'diff-dom';
-import { once, find, remove, compact } from 'lodash';
+import { once, remove, compact, findIndex, uniqWith, isEqual } from 'lodash';
+
 import './jquery.ui.custom';
 import './jquery.ui.touchpunch';
 import './jquery.ui.nestedsortable';
 
+import preloadImagesFromMarkup from './preload-images';
 
 const Helpers = require('./cms.base').default.API.Helpers;
 var KEYS = require('./cms.base').default.KEYS;
@@ -41,7 +44,7 @@ class StructureBoard {
         // setup initial stuff
         const setup = this._setup();
 
-        if (typeof setup === 'undefined' && CMS.config.splitmode) {
+        if (typeof setup === 'undefined' && CMS.config.splitmode && CMS.config.mode === 'draft') {
             this._preloadOppositeMode();
         }
         this._setupModeSwitcher();
@@ -94,7 +97,7 @@ class StructureBoard {
         }
 
         // setup toolbar mode
-        if (CMS.settings.mode === 'structure') {
+        if (CMS.config.settings.mode === 'structure') {
             that.show(true);
             that._loadedStructure = true;
             StructureBoard._initializeDragItemsStates();
@@ -152,6 +155,7 @@ class StructureBoard {
             // otherwise hide
             that.hide();
         });
+
         // show structure mode
         modes.eq(0).on(that.click + ' ' + that.pointerUp, function (e) {
             e.preventDefault();
@@ -332,8 +336,9 @@ class StructureBoard {
         // apply new settings
         CMS.settings.mode = 'structure';
         if (!init) {
-            CMS.settings = Helpers.setSettings(CMS.settings);
+            this._saveStateInURL();
         }
+
 
         // ensure all elements are visible
         this.ui.dragareas.show();
@@ -390,7 +395,6 @@ class StructureBoard {
                 if (instance.options.type === 'plugin') {
                     instance._setPluginStructureEvents();
                     instance._collapsables();
-                    // TODO generics
                 }
             });
 
@@ -420,6 +424,10 @@ class StructureBoard {
             this[`_request${mode}`] = $.ajax({
                 url: url.toString(),
                 method: 'GET'
+            }).then((markup) => {
+                preloadImagesFromMarkup(markup);
+
+                return markup;
             });
         }
 
@@ -466,9 +474,9 @@ class StructureBoard {
                 var elem = $(this);
 
                 return !elem.is('.cms#cms-top') && // toolbar
-                    !elem.is('[data-cms]'); // cms scripts
+                    !elem.is('[data-cms]:not([data-cms-generic])'); // cms scripts
             });
-            body.find('[data-cms]').remove(); // cms scripts
+            body.find('[data-cms]:not([data-cms-generic])').remove(); // cms scripts
 
             // TODO
             // handle scripts - first run cms stuff, then run the scripts that were injected in the
@@ -481,15 +489,18 @@ class StructureBoard {
                 $('html').attr(attr.name, attr.value);
             });
 
-            $('body').html(body);
+            $('body').append(body);
             $('head').append(head);
             $('body').prepend(toolbar);
+
             CMS.API.Toolbar._refreshMarkup(newToolbar);
             $(window).trigger('resize');
 
             // TODO find better way to reset
             Plugin.aliasPluginDuplicatesMap = {};
             Plugin.staticPlaceholderDuplicatesMap = {};
+            CMS._plugins = uniqWith(CMS._plugins, isEqual);
+
             CMS._instances.forEach(function (instance, index) {
                 if (instance.options.type === 'placeholder') {
                     instance._setupUI(CMS._plugins[index][0]);
@@ -503,7 +514,26 @@ class StructureBoard {
                     instance._ensureData();
                     instance.ui.container.data('cms').push(instance.options);
                     instance._setPluginContentEvents();
-                    // TODO generics
+                }
+            });
+
+            CMS._plugins.forEach(([type, opts]) => {
+                if (opts.type !== 'placeholder' && opts.type !== 'plugin') {
+                    const instance = find(
+                        CMS._instances,
+                        (i) => i.options.type === opts.type && i.options.plugin_id === opts.plugin_id
+                    );
+
+                    if (instance) {
+                        // update
+                        instance._setupUI(type);
+                        instance._ensureData();
+                        instance.ui.container.data('cms').push(instance.options);
+                        instance._setGeneric();
+                    } else {
+                        // create
+                        CMS._instances.push(new Plugin(type, opts));
+                    }
                 }
             });
 
@@ -515,6 +545,15 @@ class StructureBoard {
                 window.dispatchEvent(new Event('load'));
                 window.dispatchEvent(new Event('DOMContentLoaded'));
             });
+
+            const unhandledPlugins = $('body').find('template.cms-plugin');
+
+            if (unhandledPlugins.length) {
+                CMS.API.Messages.open({
+                    message: 'The page was changed in the meantime, reloading...'
+                });
+                Helpers.reloadBrowser();
+            }
 
             // TODO handle the case when there is a mismatch in number of plugins/placeholders
             // TODO might be edge cases when page doesn't exist anymore (moved/removed) by another user
@@ -558,7 +597,7 @@ class StructureBoard {
 
         CMS.settings.mode = 'edit';
         if (!init) {
-            CMS.settings = Helpers.setSettings(CMS.settings);
+            this._saveStateInURL();
         }
 
         // hide canvas
@@ -676,6 +715,11 @@ class StructureBoard {
         var that = this;
         var originalPluginContainer;
 
+        try {
+            this.ui.sortables.nestedSortable('destroy');
+        } catch (e) {
+
+        }
         this.ui.sortables.nestedSortable({
             items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
             placeholder: 'cms-droppable',
@@ -769,7 +813,7 @@ class StructureBoard {
 
                 // we pass the id to the updater which checks within the backend the correct place
                 var id = that.getId(ui.item);
-                var plugin = $('.cms-draggable-' + id);
+                var plugin = $(`.cms-draggable-${id}`);
                 var eventData = {
                     id: id
                 };
@@ -783,6 +827,7 @@ class StructureBoard {
 
                 // check if we copy/paste a plugin or not
                 if (originalPluginContainer.hasClass('cms-clipboard-containers')) {
+                    originalPluginContainer.html(plugin.eq(0).clone(true, true));
                     plugin.trigger('cms-paste-plugin-update', [eventData]);
                 } else {
                     plugin.trigger('cms-plugins-update', [eventData]);
@@ -872,56 +917,77 @@ class StructureBoard {
     //
     //
     // Currently is only called when something changed on the page, but shouldn't make that assumption
-    invalidateState(data) {
-        var currentMode = CMS.settings.mode;
+    // eslint-disable-next-line complexity
+    invalidateState(action, data) {
+        // eslint-disable-next-line default-case
+        switch (action) {
+            case 'COPY': {
+                this.handleCopyPlugin(data);
+                break;
+            }
 
-        if (data) {
-            if (data.deleted) {
-                if (data.plugin_id) {
-                    this.handleDeletePlugin(data);
-                }
-                if (data.placeholder_id) {
-                    this.handleClearPlaceholder(data);
-                }
-            } else {
-                var plugin = find(CMS._instances, (instance) => instance.options.plugin_id === data.plugin_id);
+            case 'ADD': {
+                this.handleAddPlugin(data);
+                break;
+            }
 
-                if (plugin) {
-                    this.handleEditPlugin(data);
-                } else {
-                    this.handleAddPlugin(data);
-                }
+            case 'EDIT': {
+                this.handleEditPlugin(data);
+                break;
+            }
+
+            case 'DELETE': {
+                this.handleDeletePlugin(data);
+                break;
+            }
+
+            case 'CLEAR_PLACEHOLDER': {
+                this.handleClearPlaceholder(data);
+                break;
+            }
+
+            case 'PASTE':
+            case 'MOVE': {
+                this.handleMovePlugin(data);
+                break;
+            }
+
+            case 'CUT': {
+                this.handleCutPlugin(data);
+                break;
             }
         }
 
-        // if none of the above - assume something moved
+        if (!action) {
+            CMS.API.Helpers.reloadBrowser();
+            return;
+        }
+
+        // refresh content mode if needed
+        // refresh toolbar
+        var currentMode = CMS.settings.mode;
+
         if (currentMode === 'structure' && !this._loadedContent) {
             this._requestcontent = null;
-            this._requestMode('content') // TODO do on idle
-                .done((contentMarkup) => {
-                    const fixedContentMarkup = contentMarkup; // .replace(/<noscript[\s\S]*?<\/noscript>/, '');
-                    const newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
-                    const newToolbar = $(newDoc).find('.cms-toolbar').clone();
-
-                    CMS.API.Toolbar._refreshMarkup(newToolbar);
+            this._loadToolbar()
+                .done((newToolbar) => {
+                    CMS.API.Toolbar._refreshMarkup($(newToolbar).find('.cms-toolbar'));
                 });
             return;
         }
 
         if (currentMode === 'structure' && this._loadedContent) {
-            this._requestcontent = null;
             if (this._loadedContent) {
+                this._requestcontent = null;
                 this._requestMode('content')
-                    .done(this.refreshContent.bind(this));
+                    .done(this.refreshContent.bind(this))
+                    .fail(() => Helpers.reloadBrowser());
             } else {
-                this._requestMode('content')
-                    .done((contentMarkup) => {
-                        const fixedContentMarkup = contentMarkup; // .replace(/<noscript[\s\S]*?<\/noscript>/, '');
-                        const newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
-                        const newToolbar = $(newDoc).find('.cms-toolbar').clone();
-
-                        CMS.API.Toolbar._refreshMarkup(newToolbar);
-                    });
+                this._loadToolbar()
+                    .done((newToolbar) => {
+                        CMS.API.Toolbar._refreshMarkup($(newToolbar).find('.cms-toolbar'));
+                    })
+                    .fail(() => Helpers.reloadBrowser());
             }
             return;
         }
@@ -929,11 +995,123 @@ class StructureBoard {
         if (currentMode !== 'structure') {
             this._requestContent = null;
             // TODO don't do extra req for structure
-            this._requestMode('content').done(this.refreshContent.bind(this));
+            this._requestMode('content')
+                .done(this.refreshContent.bind(this))
+                .fail(() => Helpers.reloadBrowser());
             return;
         }
+    }
 
-        CMS.API.Helpers.reloadBrowser();
+    _loadToolbar() {
+        return $.ajax({
+            url: Helpers.updateUrlWithPath(
+                `${CMS.config.request.toolbar}` +
+                `?obj_id=${CMS.config.request.pk}&` +
+                `obj_type=${encodeURIComponent(CMS.config.request.model)}`
+            )
+        });
+    }
+
+    handleMovePlugin(data) {
+        if (data.plugin_parent) {
+            $(`.cms-draggable-${data.plugin_parent}`).replaceWith(data.html);
+        } else {
+            // the one in the clipboard is first, so we need to take the second one,
+            // that is already visually moved into correct place
+            const draggable = $(`.cms-draggable-${data.plugin_id}:last`);
+
+            if (draggable.length) {
+                draggable.replaceWith(data.html);
+            } else if (data.target_placeholder_id) {
+                // copy from language
+                $(`.cms-dragarea-${data.target_placeholder_id} > .cms-draggables`).append(data.html);
+            }
+        }
+
+        StructureBoard.actualizeEmptyPlaceholders();
+        Plugin._updateRegistry(data.plugins);
+        data.plugins.forEach((pluginData) => {
+            StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
+        });
+
+        // TODO do this on markup level
+        const topLevel = $(`.cms-draggable-${data.plugins[0].plugin_id} > .cms-dragitem`);
+
+        if (!topLevel.hasClass('cms-dragitem-expanded')) {
+            topLevel.find('> .cms-dragitem-text').trigger('click');
+        }
+
+        this.ui.sortables = $('.cms-draggables');
+        this._drag();
+    }
+
+    handleCopyPlugin(data) {
+        if (CMS.API.Clipboard._isClipboardModalOpen()) {
+            CMS.API.Clipboard.modal.close();
+        }
+
+        $('.cms-clipboard-containers').html(data.html);
+        const cloneClipboard = $('.cms-clipboard').clone();
+
+        $('.cms-clipboard').replaceWith(cloneClipboard);
+
+        const pluginData = [`cms-plugin-${data.plugins[0].plugin_id}`, data.plugins[0]];
+
+        Plugin.aliasPluginDuplicatesMap[pluginData[1].plugin_id] = false;
+        CMS._plugins.push(pluginData);
+        CMS._instances.push(new Plugin(pluginData[0], pluginData[1]));
+
+        CMS.API.Clipboard = new Clipboard();
+
+        Plugin._updateClipboard();
+
+        let html = '';
+
+        const clipboardDraggable = $('.cms-clipboard .cms-draggable:first');
+
+        html = clipboardDraggable.parent().html();
+
+        CMS.API.Clipboard.populate(html, pluginData[1]);
+        CMS.API.Clipboard._enableTriggers();
+
+        this.ui.sortables = $('.cms-draggables');
+        this._drag();
+    }
+
+    handleCutPlugin(data) {
+        this.handleDeletePlugin(data);
+        this.handleCopyPlugin(data);
+    }
+
+    handlePastePlugin(data) {
+        if (data.plugin_parent) {
+            $(`.cms-draggable-${data.plugin_parent}`).replaceWith(data.html);
+        } else {
+            // the one in the clipboard is first
+            $(`.cms-draggable-${data.plugin_id}:last`).replaceWith(data.html);
+        }
+
+        StructureBoard.actualizeEmptyPlaceholders();
+
+        data.plugins.forEach((pluginData) => {
+            const pluginContainer = `cms-plugin-${pluginData.plugin_id}`;
+            const pluginIndex = findIndex(
+                CMS._plugins,
+                ([pluginStr]) => pluginStr === pluginContainer
+            );
+
+            if (pluginIndex === -1) {
+                CMS._plugins.push([pluginContainer, pluginData]);
+                CMS._instances.push(new Plugin(pluginContainer, pluginData));
+            } else {
+                Plugin.aliasPluginDuplicatesMap[pluginData.plugin_id] = false;
+                CMS._plugins[pluginIndex] = [pluginContainer, pluginData];
+                // TODO make sure that instances doesn't have generics
+                CMS._instances[pluginIndex] = new Plugin(pluginContainer, pluginData);
+            }
+
+            StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
+        });
     }
 
     _extractMessages(doc) {
@@ -958,7 +1136,6 @@ class StructureBoard {
     }
 
     refreshContent(contentMarkup) {
-        // debugger
         this._requestcontent = null;
         var fixedContentMarkup = contentMarkup; // .replace(/<noscript[\s\S]*?<\/noscript>/, '');
         var newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
@@ -1020,111 +1197,58 @@ class StructureBoard {
     }
 
     handleAddPlugin(data) {
-        // new plugin
-        var positionForNewPlugin = $('.cms-add-plugin-placeholder').closest('.cms-draggables');
-        const temporaryItem = $(`
-            <div class="cms-draggable">
-                <div class="cms-dragitem">
-                    <div class="cms-submenu-btn cms-btn-disabled cms-submenu-edit cms-btn"></div>
-                    <div class="cms-submenu-btn cms-submenu-add cms-btn cms-btn-disabled"></div>
-                    <div class="cms-submenu cms-btn-disabled cms-submenu-settings cms-submenu-btn cms-btn"></div>
-                    <span class="cms-dragitem-text">
-                        <strong style="opacity: 0.5;">${CMS.config.lang.loading}...</strong>
-                    </span>
-                </div>
-            </div>
-        `);
+        if (data.plugin_parent) {
+            $(`.cms-draggable-${data.plugin_parent}`).replaceWith(data.structure.html);
+        } else {
+            // the one in the clipboard is first
+            $(`.cms-dragarea-${data.placeholder_id} > .cms-draggables`).append(data.structure.html);
+        }
 
-        $('.cms-add-plugin-placeholder').remove();
-        positionForNewPlugin.append(temporaryItem);
         StructureBoard.actualizeEmptyPlaceholders();
-
-        CMS.API.Toolbar.showLoader();
-        this._requeststructure = null;
-        return this._requestMode('structure').done((response) => {
-            CMS.API.Toolbar.hideLoader();
-            const newPluginStructure = $(response).find(`.cms-draggable-${data.plugin_id}`);
-
-            temporaryItem.replaceWith(newPluginStructure);
-            const pluginIdsToAdd = this._getPluginIdsFromMarkup(newPluginStructure);
-            const pluginDataToAdd = this._getPluginDataFromText(
-                $(new DOMParser().parseFromString(response, 'text/html').documentElement)
-                    .find('script[data-cms]')
-                    .filter((i, el) => $(el).text().match(new RegExp(`cms-plugin-${data.plugin_id}`)))
-                    .text(),
-                pluginIdsToAdd
-            );
-
-            pluginDataToAdd.forEach((pluginData) => {
-                CMS._plugins.push(pluginData);
-                CMS._instances.push(new Plugin(pluginData[0], pluginData[1]));
-            });
-
-            StructureBoard.actualizeEmptyPlaceholders();
-            StructureBoard.actualizePluginsCollapsibleStatus(newPluginStructure.find('> .cms-draggables'));
-
-            this.ui.sortables = $('.cms-draggables');
-            this._drag();
+        Plugin._updateRegistry(data.structure.plugins);
+        data.structure.plugins.forEach((pluginData) => {
+            StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
         });
+
+        this.ui.sortables = $('.cms-draggables');
+        this._drag();
     }
 
     handleEditPlugin(data) {
-        // quick and dirty update
-        $('.cms-draggable-' + data.plugin_id + ' > .cms-dragitem > .cms-dragitem-text').html(
-            '<strong>' + data.plugin_name + '</strong> ' + data.plugin_desc
-        );
+        if (data.plugin_parent) {
+            $(`.cms-draggable-${data.plugin_parent}`).replaceWith(data.structure.html);
+        } else {
+            $(`.cms-draggable-${data.plugin_id}`).replaceWith(data.structure.html);
+        }
 
-        CMS.API.Toolbar.showLoader();
-        this._requeststructure = null;
-        return this._requestMode('structure').done((response) => {
-            // real update!
-            CMS.API.Toolbar.hideLoader();
-            var newPluginStructure = $(response).find(`.cms-draggable-${data.plugin_id}`);
+        Plugin._updateRegistry(data.structure.plugins);
 
-            $(`.cms-draggable-${data.plugin_id}`).replaceWith(newPluginStructure);
-
-            const pluginIdsToUpdate = this._getPluginIdsFromMarkup(newPluginStructure);
-
-            pluginIdsToUpdate.forEach((pluginId) => {
-                const plugin = find(CMS._instances, (instance) =>
-                    instance.options &&
-                    instance.options.type === 'plugin' &&
-                    instance.options.plugin_id === pluginId
-                );
-
-                if (!plugin) {
-                    return;
-                }
-
-                plugin._setPluginStructureEvents();
-                plugin._collapsables();
-                StructureBoard.actualizePluginCollapseStatus(plugin.options.plugin_id);
-                this.ui.sortables = $('.cms-draggables');
-                this._drag();
-            });
-
-            StructureBoard.actualizeEmptyPlaceholders();
-            StructureBoard.actualizePluginsCollapsibleStatus(newPluginStructure.find('> .cms-draggables'));
+        data.structure.plugins.forEach((pluginData) => {
+            StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
         });
+
+        this.ui.sortables = $('.cms-draggables');
+        this._drag();
     }
 
     handleDeletePlugin(data) {
         var deletedPluginIds = [data.plugin_id];
         var draggable = $('.cms-draggable-' + data.plugin_id);
         var children = draggable.find('.cms-draggable');
-        let parent = draggable.closest('.cms-draggable');
+        let parent = draggable.parent().closest('.cms-draggable');
 
         if (!parent.length) {
             parent = draggable.closest('.cms-dragarea');
         }
-
-        StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
 
         if (children.length) {
             deletedPluginIds = deletedPluginIds.concat(this.getIds(children));
         }
 
         draggable.remove();
+
+        StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
+        StructureBoard.actualizeEmptyPlaceholders();
         deletedPluginIds.forEach(function (pluginId) {
             remove(CMS._plugins, (settings) => settings[0] === `cms-plugin-${pluginId}`);
             remove(CMS._instances, (instance) =>
@@ -1240,7 +1364,7 @@ class StructureBoard {
         const open = CMS.settings.states.find((openPluginId) => openPluginId.trim() === pluginId);
 
         // only add this class to elements which have a draggable area
-        if (open && el.find('.cms-draggables').length) {
+        if (open && el.find('> .cms-draggables').length) {
             el.find('> .cms-collapsable-container').removeClass('cms-hidden');
             el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
         }

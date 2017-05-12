@@ -157,7 +157,7 @@ CMS.API.Helpers = {
         var addedPlugin = !editedPlugin && data && data.plugin_id;
 
         if (editedPlugin || addedPlugin) {
-            CMS.API.StructureBoard.invalidateState(data);
+            CMS.API.StructureBoard.invalidateState(addedPlugin ? 'ADD' : 'EDIT', data);
             return;
         }
 
@@ -330,6 +330,7 @@ CMS.API.Helpers = {
      * @param {String[]} [params] array of `param=value` strings to update the url
      * @returns {String}
      */
+    // TODO get rid of this
     makeURL: function makeURL(url, params) {
         var arr = [];
         var keys = [];
