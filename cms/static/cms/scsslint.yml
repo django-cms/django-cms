@@ -1,0 +1,166 @@
+linters:
+  HexLength:
+    enabled: true
+    style: 'short'
+
+  Indentation:
+    enabled: true
+    width: 4
+
+  ImportPath:
+    enabled: true
+
+  NameFormat:
+    enabled: true
+
+  NestingDepth:
+    enabled: true
+    max_depth: 5
+
+  QualifyingElement:
+    enabled: true
+
+  # Need to talk about that (cms_*)
+  SelectorFormat:
+    enabled: false
+
+  Shorthand:
+    enabled: true
+
+  SingleLinePerProperty:
+    enabled: true
+    allow_single_line_rule_sets: true
+
+  SingleLinePerSelector:
+    enabled: true
+
+  SpaceAfterPropertyColon:
+    enabled: true
+    style: one_space
+
+  StringQuotes:
+    enabled: true
+    style: double_quotes
+
+# TODISCUSS
+# default "sane" values that should be discussed by core team
+
+  BangFormat:
+    enabled: true
+
+  BorderZero:
+    enabled: false
+
+  CapitalizationInSelector:
+    enabled: false
+
+  ColorKeyword:
+    enabled: false
+
+  ColorVariable:
+    enabled: false
+
+  Comment:
+    enabled: false
+
+  DebugStatement:
+    enabled: true
+
+  DeclarationOrder:
+    enabled: true
+
+  DuplicateProperty:
+    enabled: true
+
+  ElsePlacement:
+    enabled: true
+
+  EmptyLineBetweenBlocks:
+    enabled: true
+
+  EmptyRule:
+    enabled: true
+
+  FinalNewline:
+    enabled: true
+
+  HexNotation:
+    enabled: false
+
+  HexValidation:
+    enabled: true
+
+  IdSelector:
+    enabled: false
+
+  ImportantRule:
+    enabled: false
+
+  LeadingZero:
+    enabled: false
+
+  MergeableSelector:
+    enabled: false
+
+  PlaceholderInExtend:
+    enabled: true
+
+  PropertyCount:
+    enabled: false
+
+  PropertySortOrder:
+    enabled: false
+
+  PropertySpelling:
+    enabled: true
+
+  SelectorDepth:
+    enabled: true
+    max_depth: 5
+
+  SelectorFormat:
+    enabled: false
+
+  SpaceAfterComma:
+    enabled: true
+
+  SpaceAfterPropertyName:
+    enabled: true
+
+  SpaceBeforeBrace:
+    enabled: true
+    allow_single_line_padding: false
+
+  SpaceBetweenParens:
+    enabled: true
+
+  TrailingSemicolon:
+    enabled: true
+
+  TrailingZero:
+    enabled: false
+
+  UnnecessaryMantissa:
+    enabled: false
+
+  UnnecessaryParentReference:
+    enabled: true
+
+  UrlFormat:
+    enabled: false
+
+  UrlQuotes:
+    enabled: false
+
+  VariableForProperty:
+    enabled: false
+
+  VendorPrefixes:
+    enabled: false
+
+  ZeroUnit:
+    enabled: false
+
+  Compass::*:
+    enabled: false
+
