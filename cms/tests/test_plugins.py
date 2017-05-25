@@ -914,6 +914,17 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertFalse(len(out))
         self.assertFalse(len(placeholder._plugins_cache))
 
+    def test_repr(self):
+        non_saved_plugin = CMSPlugin()
+        self.assertIsNone(non_saved_plugin.pk)
+        self.assertIn('id=None', repr(non_saved_plugin))
+        self.assertIn("plugin_type=''", repr(non_saved_plugin))
+
+        saved_plugin = CMSPlugin.objects.create(plugin_type='TextPlugin')
+        self.assertIn('id={}'.format(saved_plugin.pk), repr(saved_plugin))
+        self.assertIn("plugin_type='{}'".format(saved_plugin.plugin_type), repr(saved_plugin))
+
+
     def test_pickle(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.placeholders.get(slot='body')

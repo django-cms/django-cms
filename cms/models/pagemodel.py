@@ -138,9 +138,14 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return force_text(title)
 
     def __repr__(self):
-        # This is needed to solve the infinite recursion when
-        # adding new pages.
-        return object.__repr__(self)
+        display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.pk,
+            is_draft=self.publisher_is_draft,
+            location=hex(id(self)),
+        )
+        return display
 
     @classmethod
     def get_draft_root_node(cls, position=None, site=None):

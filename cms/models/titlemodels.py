@@ -55,6 +55,16 @@ class Title(models.Model):
     def __str__(self):
         return u"%s (%s, %s)" % (self.title, self.slug, self.language)
 
+    def __repr__(self):
+        display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.pk,
+            is_draft=self.publisher_is_draft,
+            location=hex(id(self)),
+        )
+        return display
+
     def update_path(self):
         # Build path from parent page's path and slug
         slug = u'%s' % self.slug

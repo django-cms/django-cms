@@ -50,6 +50,16 @@ class Placeholder(models.Model):
     def __str__(self):
         return self.slot
 
+    def __repr__(self):
+        display = "<{module}.{class_name} id={id} slot='{slot}' object at {location}>".format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.pk,
+            slot=self.slot,
+            location=hex(id(self)),
+        )
+        return display
+
     def clear(self, language=None):
         if language:
             qs = self.cmsplugin_set.filter(language=language)
