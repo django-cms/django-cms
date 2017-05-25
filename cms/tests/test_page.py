@@ -773,6 +773,25 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
 
+    def test_page_and_title_repr(self):
+        non_saved_page = Page()
+        self.assertIsNone(non_saved_page.pk)
+        self.assertIn('id=None', repr(non_saved_page))
+
+        saved_page = create_page('test saved page', 'nav_playground.html', 'en')
+        self.assertIsNotNone(saved_page.pk)
+        self.assertIn('id={}'.format(saved_page.pk), repr(saved_page))
+        self.assertIn('is_draft={}'.format(saved_page.publisher_is_draft), repr(saved_page))
+
+        non_saved_title = Title()
+        self.assertIsNone(non_saved_title.pk)
+        self.assertIn('id=None', repr(non_saved_title))
+
+        saved_title = saved_page.get_title_obj()
+        self.assertIsNotNone(saved_title.pk)
+        self.assertIn('id={}'.format(saved_title.pk), repr(saved_title))
+        self.assertIn('is_draft={}'.format(saved_title.publisher_is_draft), repr(saved_title))
+
     def test_page_overwrite_urls(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)

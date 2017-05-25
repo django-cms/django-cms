@@ -2,6 +2,7 @@
 
 * Fixed a bug which prevented users from seeing the welcome screen when debug is
   turned off.
+* Introduced improved repr for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models.
 
 
 === 3.4.4 (unreleased) ===

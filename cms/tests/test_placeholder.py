@@ -999,6 +999,15 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
 
+    def test_repr(self):
+        unsaved_ph = Placeholder()
+        self.assertIn('id=None', repr(unsaved_ph))
+        self.assertIn("slot=''", repr(unsaved_ph))
+
+        saved_ph = Placeholder.objects.create(slot='test')
+        self.assertIn('id={}'.format(saved_ph.pk), repr(saved_ph))
+        self.assertIn("slot='{}'".format(saved_ph.slot), repr(saved_ph))
+
 
 class PlaceholderConfTests(TestCase):
     def test_get_all_plugins_single_page(self):

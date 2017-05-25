@@ -202,6 +202,16 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     def __str__(self):
         return force_text(self.pk)
 
+    def __repr__(self):
+        display = "<{module}.{class_name} id={id} plugin_type='{plugin_type}' object at {location}>".format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.pk,
+            plugin_type=(self.plugin_type),
+            location=hex(id(self)),
+        )
+        return display
+
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
 
