@@ -536,6 +536,22 @@ class ApphooksTestCase(CMSTestCase):
         self.assertTemplateUsed(response, 'sampleapp/home.html')
         self.assertContains(response, 'my_params: is-my-param-really-in-the-context-QUESTIONMARK')
 
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
+    def test_apphooks_return_urls_directly(self):
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = create_page("apphooked-page", "nav_playground.html", "en",
+                           created_by=superuser, published=True, apphook="SampleApp3")
+        create_title("de", "aphooked-page-direct-url", page)
+        self.assertTrue(page.publish('en'))
+        self.reload_urls()
+
+        path = reverse('sample-app-3')
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Sample App 3 Response')
+        self.apphook_clear()
+
     @override_settings(ROOT_URLCONF='cms.test_utils.project.third_urls_for_apphook_tests')
     def test_multiple_apphooks(self):
         # test for #1538
