@@ -43,7 +43,7 @@ class SampleApp3(CMSApp):
             return HttpResponse("Sample App 3 Response")
 
         return [
-            url(r'^$', my_view, name='sample-app-3'),
+            url(r'^$', my_view, name='sample3-root'),
         ]
 
 apphook_pool.register(SampleApp3)
