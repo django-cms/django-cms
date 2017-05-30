@@ -148,6 +148,8 @@ def page_to_node(renderer, page, home, language):
     # Do we have a redirectURL?
     attr['redirect_url'] = translation.redirect  # save redirect URL if any
 
+    attr['slug'] = page.get_slug() #save page slug
+
     # Now finally, build the NavigationNode object and return it.
     ret_node = CMSNavigationNode(
         translation.menu_title or translation.title,
