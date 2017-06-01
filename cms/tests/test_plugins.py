@@ -20,6 +20,7 @@ from django.core.exceptions import (
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
+from sekizai.context import SekizaiContext
 from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_text
@@ -1238,6 +1239,31 @@ class PluginsTestCase(PluginsTestBaseCase):
         with force_language('de'):
             self.assertEqual(force_text(style_config['module']), expected_struct_de['module'])
             self.assertEqual(force_text(style_config['name']), expected_struct_de['name'])
+
+    def test_plugin_toolbar_struct_permissions(self):
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        placeholder = page.placeholders.get(slot='body')
+        page_url = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_permission(staff_user, 'add_text')
+
+        with self.login_user_context(staff_user):
+            request = self.get_request(page_url, page=page)
+            request.session['cms_edit'] = True
+            request.toolbar = CMSToolbar(request)
+            content_renderer = self.get_content_renderer(request=request)
+            context = {'request': request, 'cms_content_renderer': content_renderer}
+            output = content_renderer.render_placeholder(
+                placeholder,
+                context=SekizaiContext(context),
+                language='en',
+                page=page,
+                editable=True,
+            )
+            self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
+            self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
