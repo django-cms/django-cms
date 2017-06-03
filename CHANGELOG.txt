@@ -33,6 +33,7 @@
 * Fixed a performance issue with nested pages when using the ``inherit`` flag on the ``{% placeholder %}`` tag.
 * Removed the internal ``reset_to_public`` page method in favour of the ``revert_to_live`` method.
 * Fixed a bug where the placeholder cache was not consistently cleared when a page was published.
+* Enhanced the plugin menu to not show plugins the user does not have permission to add.
 
 
 === 3.4.3 (2017-04-24) ===
