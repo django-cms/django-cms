@@ -361,14 +361,27 @@ class PageTest(PageTestBase):
         redirect_to = URL_CMS_PAGE
 
         with self.login_user_context(superuser):
+            data['redirect'] = '/'
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+
+        with self.login_user_context(superuser):
+            data['redirect'] = '/hello'
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+
+        with self.login_user_context(superuser):
             data['redirect'] = '/hello/'
-            # Absolute paths should continue to work
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, redirect_to)
+
+        with self.login_user_context(superuser):
+            data['redirect'] = '../hello'
             response = self.client.post(endpoint, data)
             self.assertRedirects(response, redirect_to)
 
         with self.login_user_context(superuser):
             data['redirect'] = '../hello/'
-            # Relative paths should continue to work
             response = self.client.post(endpoint, data)
             self.assertRedirects(response, redirect_to)
 
