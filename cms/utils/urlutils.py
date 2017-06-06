@@ -20,7 +20,7 @@ any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
 # /test/
 # ./test/
 # ../test/
-relative_url_regex = re.compile('^[^/<>]+/[^/<>].*$|^/[^/<>].*$', re.IGNORECASE)
+relative_url_regex = re.compile(r'^[^/<>]+/[^/<>].*$|^/[^/<>]*.*$', re.IGNORECASE)
 
 
 def levelize_path(path):
