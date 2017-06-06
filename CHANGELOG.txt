@@ -3,6 +3,7 @@
 * Fixed a bug which prevented users from seeing the welcome screen when debug is
   turned off.
 * Introduced improved repr for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models.
+* Fixed a regression which prevented users from setting a redirect to the homepage.
 
 
 === 3.4.4 (unreleased) ===
