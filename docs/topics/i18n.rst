@@ -1,5 +1,5 @@
 ####################
-Internationalisation
+internationalization
 ####################
 
 django CMS excels in its multilingual support, and can be configured to handle a vast range of different requirements. Its
