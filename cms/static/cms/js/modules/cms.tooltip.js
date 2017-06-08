@@ -4,8 +4,9 @@
 
 /* eslint-disable max-params */
 
-var $ = require('jquery');
-var Class = require('classjs');
+import $ from 'jquery';
+import Class from 'classjs';
+import { once } from 'lodash';
 var Helpers = require('./cms.base').default.API.Helpers;
 
 /**
@@ -32,7 +33,7 @@ var Tooltip = new Class({
          */
         this.domElem = this._pick();
 
-        this._forceTouchOnce = Helpers.once(this._forceTouch);
+        this._forceTouchOnce = once(this._forceTouch);
         this._checkTouch();
     },
 

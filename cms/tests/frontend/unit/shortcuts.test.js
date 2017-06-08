@@ -109,7 +109,7 @@ describe('shortcuts', function () {
         it('shortcut opens modal', function () {
             spyOn(Modal.prototype, 'open');
             initHelpModal();
-            keyboard.bind.calls.mostRecent().args[1]();
+            keyboard.bind.calls.mostRecent().args[1]({ preventDefault() {} });
             expect(Modal.prototype.open).toHaveBeenCalledTimes(1);
             expect(Modal.prototype.open).toHaveBeenCalledWith({
                 width: jasmine.any(Number),

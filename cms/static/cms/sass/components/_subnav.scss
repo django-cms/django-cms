@@ -134,6 +134,9 @@
             &[href*=alias_plugin] {
                 @include icon(alias);
             }
+            &[data-cms-icon=highlight] {
+                @include icon(highlight);
+            }
         }
         &:first-child a:hover,
         &:first-child a:focus {

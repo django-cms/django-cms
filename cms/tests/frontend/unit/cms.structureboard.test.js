@@ -36,7 +36,7 @@ FakePlugin.prototype._collapsables = jasmine.createSpy();
 FakePlugin.prototype._setPluginContentEvents = jasmine.createSpy();
 FakePlugin.prototype._setPluginStructureEvents = jasmine.createSpy();
 
-describe('CMS.StructureBoard', function () {
+describe('CMS.StructureBoard', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
     beforeEach(() => {
@@ -56,32 +56,32 @@ describe('CMS.StructureBoard', function () {
         FakePlugin.prototype._setPluginStructureEvents.calls.reset();
     });
 
-    it('creates a StructureBoard class', function () {
+    it('creates a StructureBoard class', function() {
         expect(CMS.StructureBoard).toBeDefined();
     });
 
-    it('has public API', function () {
+    it('has public API', function() {
         expect(CMS.StructureBoard.prototype.show).toEqual(jasmine.any(Function));
         expect(CMS.StructureBoard.prototype.hide).toEqual(jasmine.any(Function));
         expect(CMS.StructureBoard.prototype.getId).toEqual(jasmine.any(Function));
         expect(CMS.StructureBoard.prototype.getIds).toEqual(jasmine.any(Function));
     });
 
-    describe('instance', function () {
+    describe('instance', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
+            $(function() {
                 CMS.StructureBoard._initializeGlobalHandlers();
                 jasmine.clock().install();
                 board = new CMS.StructureBoard();
@@ -89,12 +89,12 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             jasmine.clock().uninstall();
             fixture.cleanup();
         });
 
-        it('has ui', function () {
+        it('has ui', function() {
             expect(board.ui).toEqual(jasmine.any(Object));
             expect(Object.keys(board.ui)).toContain('container');
             expect(Object.keys(board.ui)).toContain('content');
@@ -110,15 +110,14 @@ describe('CMS.StructureBoard', function () {
             expect(Object.keys(board.ui)).toContain('dragareas');
             expect(Object.keys(board.ui)).toContain('toolbarModeSwitcher');
             expect(Object.keys(board.ui)).toContain('toolbarModeLinks');
-            expect(Object.keys(board.ui)).toContain('toolbarTrigger');
-            expect(Object.keys(board.ui).length).toEqual(15);
+            expect(Object.keys(board.ui).length).toEqual(14);
         });
 
-        it('has no options', function () {
+        it('has no options', function() {
             expect(board.options).not.toBeDefined();
         });
 
-        it('applies correct classes to empty placeholder dragareas', function () {
+        it('applies correct classes to empty placeholder dragareas', function() {
             $('.cms-dragarea').removeClass('cms-dragarea-empty');
             board = new CMS.StructureBoard();
             expect('.cms-dragarea-1').not.toHaveClass('cms-dragarea-empty');
@@ -126,7 +125,7 @@ describe('CMS.StructureBoard', function () {
             expect('.cms-dragarea-10').toHaveClass('cms-dragarea-empty');
         });
 
-        it('initially shows or hides board based on settings', function () {
+        it('initially shows or hides board based on settings', function() {
             spyOn(CMS.StructureBoard.prototype, 'show');
             spyOn(CMS.StructureBoard.prototype, 'hide');
 
@@ -136,7 +135,7 @@ describe('CMS.StructureBoard', function () {
             expect(board.hide).toHaveBeenCalled();
         });
 
-        it('initially shows or hides board based on settings 2', function () {
+        it('initially shows or hides board based on settings 2', function() {
             spyOn(CMS.StructureBoard.prototype, 'show');
             spyOn(CMS.StructureBoard.prototype, 'hide');
 
@@ -146,7 +145,7 @@ describe('CMS.StructureBoard', function () {
             expect(board.hide).not.toHaveBeenCalled();
         });
 
-        it('does not show or hide structureboard if there are no dragareas', function () {
+        it('does not show or hide structureboard if there are no dragareas', function() {
             board.ui.dragareas.remove();
             board = new CMS.StructureBoard();
 
@@ -160,7 +159,7 @@ describe('CMS.StructureBoard', function () {
             expect(board.hide).not.toHaveBeenCalled();
         });
 
-        it('does not show or hide structureboard if there is no board mode switcher', function () {
+        it('does not show or hide structureboard if there is no board mode switcher', function() {
             board.ui.toolbarModeSwitcher.remove();
             board = new CMS.StructureBoard();
 
@@ -174,45 +173,40 @@ describe('CMS.StructureBoard', function () {
             expect(board.hide).not.toHaveBeenCalled();
         });
 
-        it('shows board mode switcher if there are placeholders', function () {
+        it('enables board mode switcher if there are placeholders', function() {
             expect(board.ui.placeholders.length > 0).toEqual(true);
-            board.ui.toolbarModeSwitcher.hide();
-            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
+            board.ui.toolbarModeSwitcher.find('.cms-btn').addClass('cms-btn-disabled');
 
             new CMS.StructureBoard();
 
-            expect(board.ui.toolbarModeSwitcher).toBeVisible();
+            jasmine.clock().tick(100);
+
+            expect(board.ui.toolbarModeSwitcher.find('.cms-btn')).not.toHaveClass('cms-btn-disabled');
         });
 
-        it('does not show board mode switcher if there are no placeholders', function () {
+        it('does not enable board mode switcher if there are no placeholders', function() {
             expect(board.ui.placeholders.length > 0).toEqual(true);
             expect(board.ui.dragareas.length > 0).toEqual(true);
+
             board.ui.placeholders.remove();
-
-            board.ui.toolbarModeSwitcher.hide();
-            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
-
-            board = new CMS.StructureBoard();
-            expect(board.ui.placeholders.length).toEqual(0);
-
-            expect(board.ui.toolbarModeSwitcher).toBeVisible();
-
             board.ui.dragareas.remove();
-            board.ui.toolbarModeSwitcher.hide();
+            board.ui.toolbarModeSwitcher.find('.cms-btn').addClass('cms-btn-disabled');
+
             board = new CMS.StructureBoard();
             expect(board.ui.placeholders.length).toEqual(0);
             expect(board.ui.dragareas.length).toEqual(0);
 
-            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
+            jasmine.clock().tick(100);
+
+            expect(board.ui.toolbarModeSwitcher.find('.cms-btn')).toHaveClass('cms-btn-disabled');
         });
     });
 
-    describe('.show()', function () {
+    describe('.show()', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.API.Toolbar = {
@@ -222,12 +216,13 @@ describe('CMS.StructureBoard', function () {
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
-                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
+            $(function() {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function(input) {
                     return input;
                 });
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -237,65 +232,51 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('shows the board', function (done) {
+        it('shows the board', function(done) {
             spyOn(board, '_showBoard').and.callThrough();
             expect(board.ui.container).not.toBeVisible();
-            board.show().then(function () {
+            board.show().then(function() {
                 expect(board.ui.container).toBeVisible();
                 expect(board._showBoard).toHaveBeenCalled();
                 done();
             });
         });
 
-        it('does not show the board if we are viewing published page', function () {
+        it('does not show the board if we are viewing published page', function(done) {
             CMS.config.mode = 'live';
             spyOn(board, '_showBoard').and.callThrough();
             expect(board.ui.container).not.toBeVisible();
-            expect(board.show()).toEqual(false);
-            expect(board.ui.container).not.toBeVisible();
-            expect(board._showBoard).not.toHaveBeenCalled();
+            board.show().then(r => {
+                expect(r).toEqual(false);
+                expect(board.ui.container).not.toBeVisible();
+                expect(board._showBoard).not.toHaveBeenCalled();
+                done();
+            });
         });
 
-        it('resizes toolbar correctly if there is no scrollbar', function () {
-            board.show();
-            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
-            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
+        it('highlights correct trigger', function(done) {
+            expect(board.ui.toolbarModeLinks).not.toHaveClass('cms-btn-active');
+            board.show().then(() => {
+                expect(board.ui.toolbarModeLinks).toHaveClass('cms-btn-active');
+                done();
+            });
         });
 
-        it('resizes toolbar correctly based if there is a scrollbar', function () {
-            // fake window that has a scrollbar of 20px
-            board.ui.window = {
-                0: {
-                    innerWidth: board.ui.toolbar.width() + 20
-                },
-                off: $.noop,
-                trigger: $.noop
-            };
-            board.show();
-            expect(board.ui.toolbar).toHaveCss({ right: '20px' });
-            expect(board.ui.toolbarTrigger).toHaveCss({ right: '20px' });
-        });
-
-        it('highlights correct trigger', function () {
-            expect(board.ui.toolbarModeLinks.eq(0)).not.toHaveClass('cms-btn-active');
-            board.show();
-            expect(board.ui.toolbarModeLinks.eq(0)).toHaveClass('cms-btn-active');
-            expect(board.ui.toolbarModeLinks.eq(1)).not.toHaveClass('cms-btn-active');
-        });
-
-        it('adds correct classes to the root of the document', function () {
+        it('adds correct classes to the root of the document', function(done) {
             board.ui.html.removeClass('cms-structure-mode-structure');
             expect(board.ui.html).not.toHaveClass('cms-structure-mode-structure');
-            board.show();
-            expect(board.ui.html).toHaveClass('cms-structure-mode-structure');
+            board.show().then(() => {
+                expect(board.ui.html).toHaveClass('cms-structure-mode-structure');
+                done();
+            });
         });
 
-        it('does not set state through settings', function (done) {
-            CMS.API.Helpers.setSettings.and.callFake(function (input) {
+        it('does not set state through settings', function(done) {
+            CMS.API.Helpers.setSettings.and.callFake(function(input) {
                 return input;
             });
             expect(CMS.settings.mode).toEqual('edit');
@@ -307,51 +288,32 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('saves the state in the url');
-
-        it('shows all placeholders', function (done) {
-            expect(board.ui.dragareas).not.toBeVisible();
-            expect(board.ui.dragareas).not.toHaveAttr('style');
-            board.show(true).then(() => {
-                expect(board.ui.dragareas).toBeVisible();
-                // browsers report different strings
-                expect(board.ui.dragareas.attr('style')).toMatch(/opacity: 1/);
-                done();
-            });
-        });
-
-        it('reorders static placeholders to be last', function (done) {
-            expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:first'));
-            board.show().then(() => {
-                expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:last'));
-                done();
-            });
-        });
     });
 
-    describe('highlights', function () {
+    describe('highlights', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html', 'clipboard.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
-                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
+            $(function() {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function(input) {
                     return input;
                 });
                 CMS.API.Tooltip = {
                     domElem: {
-                        is: function () {
+                        is: function() {
                             return true;
                         },
-                        data: function () {
+                        data: function() {
                             return 1;
                         }
                     }
@@ -366,42 +328,42 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        describe('._showAndHighlightPlugin()', function () {
-            it('returns false if tooltip does not exist', function (done) {
+        describe('._showAndHighlightPlugin()', function() {
+            it('returns false if tooltip does not exist', function(done) {
                 CMS.API.Tooltip = false;
-                board._showAndHighlightPlugin().catch((r) => {
+                board._showAndHighlightPlugin().then(r => {
                     expect(r).toEqual(false);
                     expect(board.show).not.toHaveBeenCalled();
                     done();
                 });
             });
 
-            it('returns false if in live mode', function (done) {
+            it('returns false if in live mode', function(done) {
                 CMS.config.mode = 'live';
-                board._showAndHighlightPlugin().catch((r) => {
+                board._showAndHighlightPlugin().then(r => {
                     expect(r).toEqual(false);
                     expect(board.show).not.toHaveBeenCalled();
                     done();
                 });
             });
 
-            it('returns false if no plugin is hovered', function (done) {
-                CMS.API.Tooltip.domElem.is = function () {
+            it('returns false if no plugin is hovered', function(done) {
+                CMS.API.Tooltip.domElem.is = function() {
                     return false;
                 };
 
-                board._showAndHighlightPlugin().catch((r) => {
+                board._showAndHighlightPlugin().then(r => {
                     expect(r).toEqual(false);
                     expect(board.show).not.toHaveBeenCalled();
                     done();
                 });
             });
 
-            it('shows board if plugin is hovered', function (done) {
+            it('shows board if plugin is hovered', function(done) {
                 jasmine.clock().install();
                 board._showAndHighlightPlugin().then(() => {
                     expect(board.show).toHaveBeenCalledTimes(1);
@@ -413,83 +375,24 @@ describe('CMS.StructureBoard', function () {
                 });
             });
         });
-
-        describe('._hideAndHighlightPlugin()', function () {
-            beforeEach(function (done) {
-                $(function () {
-                    CMS.settings.mode = 'structure';
-                    done();
-                });
-            });
-
-            it('returns false if no plugin is hovered', function (done) {
-                board._hideAndHighlightPlugin().catch((r) => {
-                    expect(r).toEqual(false);
-                    expect(board.hide).not.toHaveBeenCalled();
-                    done();
-                });
-            });
-
-            it('returns false if in live mode', function (done) {
-                CMS.config.mode = 'live';
-                board._hideAndHighlightPlugin().catch((r) => {
-                    expect(r).toEqual(false);
-                    expect(board.hide).not.toHaveBeenCalled();
-                    done();
-                });
-            });
-
-            it('returns false if hovered plugin is inside clipboard', function (done) {
-                var clipboardDraggable = $('.cms-draggable-from-clipboard');
-
-                spyOn($.fn, 'init').and.returnValue(clipboardDraggable);
-
-                board._hideAndHighlightPlugin().catch((r) => {
-                    expect(r).toEqual(false);
-                    expect(board.hide).not.toHaveBeenCalled();
-                    done();
-                });
-            });
-
-            it('hides board if plugin is hovered', function (done) {
-                jasmine.clock().install();
-                var draggable = $('.cms-draggable-1');
-
-                spyOn($.fn, 'init').and.returnValue(draggable);
-                spyOn($.fn, 'closest').and.returnValue([]);
-                spyOn(board, 'getId').and.returnValue(999);
-
-                board._hideAndHighlightPlugin().then(() => {
-                    expect(board.hide).toHaveBeenCalledTimes(1);
-                    expect(Plugin._highlightPluginContent).not.toHaveBeenCalled();
-
-                    jasmine.clock().tick(201);
-
-                    expect(Plugin._highlightPluginContent).toHaveBeenCalledTimes(1);
-                    expect(Plugin._highlightPluginContent).toHaveBeenCalledWith(999);
-                    jasmine.clock().uninstall();
-                    done();
-                });
-            });
-        });
     });
 
-    describe('.hide()', function () {
+    describe('.hide()', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
-            $(function () {
+            $(function() {
                 CMS.settings = {
-                    structure: 'structure',
                     mode: 'edit'
                 };
                 CMS.config = {
                     settings: {
-                        mode: 'edit'
+                        mode: 'edit',
+                        structure: 'structure'
                     },
                     mode: 'edit'
                 };
-                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function (input) {
+                spyOn(CMS.API.Helpers, 'setSettings').and.callFake(function(input) {
                     return input;
                 });
                 CMS.StructureBoard._initializeGlobalHandlers();
@@ -500,24 +403,27 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('hides the board', function (done) {
+        it('hides the board', function(done) {
             spyOn(board, '_hideBoard').and.callThrough();
-            board.show().then(() => {
-                expect(board.ui.container).toBeVisible();
+            board
+                .show()
+                .then(() => {
+                    expect(board.ui.container).toBeVisible();
 
-                return board.hide();
-            }).then(() => {
-                expect(board.ui.container).not.toBeVisible();
-                expect(board._hideBoard).toHaveBeenCalled();
-                done();
-            });
+                    return board.hide();
+                })
+                .then(() => {
+                    expect(board.ui.container).not.toBeVisible();
+                    expect(board._hideBoard).toHaveBeenCalled();
+                    done();
+                });
         });
 
-        it('does not hide the board if we are viewing published page', function () {
+        it('does not hide the board if we are viewing published page', function() {
             CMS.config.mode = 'live';
             spyOn(board, '_hideBoard');
             expect(board.ui.container).not.toBeVisible();
@@ -526,42 +432,17 @@ describe('CMS.StructureBoard', function () {
             expect(board._hideBoard).not.toHaveBeenCalled();
         });
 
-        it('resets size of the toolbar if there was no scrollbar', function () {
-            board.show();
-            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
-            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
-            board.hide();
-            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
-            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
+        it('deactivates the button', function(done) {
+            board.hide().then(() => {
+                expect(board.ui.toolbarModeLinks).not.toHaveClass('cms-btn-active');
+                done();
+            });
         });
 
-        it('resets size of the toolbar if there was a scrollbar', function () {
-            // fake window that has a scrollbar of 100px
-            board.ui.window = {
-                0: {
-                    innerWidth: board.ui.toolbar.width() + 100
-                },
-                off: $.noop,
-                trigger: $.noop
-            };
-            board.show();
-            board.hide();
-            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
-            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
-        });
-
-
-        it('highlights correct trigger', function () {
-            board.show();
-            board.hide();
-            expect(board.ui.toolbarModeLinks.eq(0)).not.toHaveClass('cms-btn-active');
-            expect(board.ui.toolbarModeLinks.eq(1)).toHaveClass('cms-btn-active');
-        });
-
-        it('does not remember the state in localstorage', function () {
+        it('does not remember the state in localstorage', function() {
             board.show();
             expect(CMS.settings.mode).toEqual('structure');
-            CMS.API.Helpers.setSettings.and.callFake(function (input) {
+            CMS.API.Helpers.setSettings.and.callFake(function(input) {
                 return input;
             });
             board.hide();
@@ -571,46 +452,49 @@ describe('CMS.StructureBoard', function () {
 
         it('remembers the state in the url');
 
-        it('triggers `resize` event on the window', function (done) {
+        it('triggers `resize` event on the window', function(done) {
             var spy = jasmine.createSpy();
 
-            board.show().then(() => {
-                $(window).on('resize', spy);
-                return board.hide();
-            }).then(() => {
-                expect(spy).toHaveBeenCalledTimes(1);
-                $(window).off('resize', spy);
-                done();
-            });
+            board
+                .show()
+                .then(() => {
+                    $(window).on('resize', spy);
+                    return board.hide();
+                })
+                .then(() => {
+                    expect(spy).toHaveBeenCalledTimes(1);
+                    $(window).off('resize', spy);
+                    done();
+                });
         });
     });
 
-    describe('.getId()', function () {
+    describe('.getId()', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
+            $(function() {
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('returns the id of passed element', function () {
+        it('returns the id of passed element', function() {
             [
                 {
                     from: 'cms-plugin cms-plugin-1',
@@ -652,12 +536,12 @@ describe('CMS.StructureBoard', function () {
                     from: 'cms-dragarea cms-dragarea-125',
                     result: '125'
                 }
-            ].forEach(function (obj) {
+            ].forEach(function(obj) {
                 expect(board.getId($('<div class="' + obj.from + '"></div>'))).toEqual(obj.result);
             });
         });
 
-        it('returns null if element is of non supported "type"', function () {
+        it('returns null if element is of non supported "type"', function() {
             [
                 {
                     from: 'cannot determine',
@@ -667,50 +551,50 @@ describe('CMS.StructureBoard', function () {
                     from: 'cms-not-supported cms-not-supported-1',
                     result: null
                 }
-            ].forEach(function (obj) {
+            ].forEach(function(obj) {
                 expect(board.getId($('<div class="' + obj.from + '"></div>'))).toEqual(obj.result);
             });
         });
 
-        it('returns false if element does not exist', function () {
+        it('returns false if element does not exist', function() {
             expect(board.getId()).toEqual(false);
             expect(board.getId(null)).toEqual(false);
             expect(board.getId($('.non-existent'))).toEqual(false);
             expect(board.getId([])).toEqual(false);
         });
 
-        it('fails if classname string is incorrect', function () {
+        it('fails if classname string is incorrect', function() {
             expect(board.getId.bind(board, $('<div class="cms-plugin"></div>'))).toThrow();
             expect(board.getId($('<div class="cms-plugin fail cms-plugin-10"></div>'))).toEqual('fail');
         });
     });
 
-    describe('.getIds()', function () {
+    describe('.getIds()', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
+            $(function() {
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('returns the array of ids of passed collection', function () {
+        it('returns the array of ids of passed collection', function() {
             spyOn(board, 'getId').and.callThrough();
             [
                 {
@@ -729,9 +613,9 @@ describe('CMS.StructureBoard', function () {
                     from: ['non-existent', 'cms-plugin cms-plugin-1'],
                     result: [null, '1']
                 }
-            ].forEach(function (obj) {
+            ].forEach(function(obj) {
                 var collection = $();
-                obj.from.forEach(function (className) {
+                obj.from.forEach(function(className) {
                     collection = collection.add($('<div class="' + className + '"></div>'));
                 });
                 expect(board.getIds(collection)).toEqual(obj.result);
@@ -740,48 +624,46 @@ describe('CMS.StructureBoard', function () {
         });
     });
 
-    describe('._setupModeSwitcher()', function () {
+    describe('._setupModeSwitcher()', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
+            $(function() {
                 spyOn(keyboard, 'bind');
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
-                spyOn(board, 'show').and.callFake(function () {
+                spyOn(board, 'show').and.callFake(function() {
                     CMS.settings.mode = 'structure';
                 });
-                spyOn(board, 'hide').and.callFake(function () {
+                spyOn(board, 'hide').and.callFake(function() {
                     CMS.settings.mode = 'edit';
                 });
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             board.ui.doc.off('keydown.cms.structureboard.switcher');
             fixture.cleanup();
         });
 
-        it('sets up click handler to show board', function () {
-            var showTrigger = board.ui.toolbarModeLinks.eq(0);
+        it('sets up click handler to show board', function() {
+            var showTrigger = board.ui.toolbarModeLinks;
             expect(showTrigger).toHandle(board.click);
-            expect(showTrigger).toHandle(board.pointerUp);
 
             CMS.settings.mode = 'structure';
 
             showTrigger.trigger(board.click);
-            showTrigger.trigger(board.pointerUp);
 
             expect(board.show).not.toHaveBeenCalled();
 
@@ -789,25 +671,15 @@ describe('CMS.StructureBoard', function () {
 
             showTrigger.trigger(board.click);
             expect(board.show).toHaveBeenCalledTimes(1);
-            showTrigger.trigger(board.pointerUp);
-            expect(board.show).toHaveBeenCalledTimes(1);
-
-            CMS.settings.mode = 'edit';
-            showTrigger.trigger(board.pointerUp);
-            expect(board.show).toHaveBeenCalledTimes(2);
-            showTrigger.trigger(board.click);
-            expect(board.show).toHaveBeenCalledTimes(2);
         });
 
-        it('sets up click handler to hide board', function () {
-            var hideTrigger = board.ui.toolbarModeLinks.eq(1);
+        it('sets up click handler to hide board', function() {
+            var hideTrigger = board.ui.toolbarModeLinks;
             expect(hideTrigger).toHandle(board.click);
-            expect(hideTrigger).toHandle(board.pointerUp);
 
             CMS.settings.mode = 'edit';
 
             hideTrigger.trigger(board.click);
-            hideTrigger.trigger(board.pointerUp);
 
             expect(board.hide).not.toHaveBeenCalled();
 
@@ -815,17 +687,9 @@ describe('CMS.StructureBoard', function () {
 
             hideTrigger.trigger(board.click);
             expect(board.hide).toHaveBeenCalledTimes(1);
-            hideTrigger.trigger(board.pointerUp);
-            expect(board.hide).toHaveBeenCalledTimes(1);
-
-            CMS.settings.mode = 'structure';
-            hideTrigger.trigger(board.pointerUp);
-            expect(board.hide).toHaveBeenCalledTimes(2);
-            hideTrigger.trigger(board.click);
-            expect(board.hide).toHaveBeenCalledTimes(2);
         });
 
-        it('sets up shortcuts to toggle board', function () {
+        it('sets up shortcuts to toggle board', function() {
             spyOn(board, '_toggleStructureBoard');
             var preventDefaultSpySpace = jasmine.createSpy();
             var preventDefaultSpyShiftSpace = jasmine.createSpy();
@@ -851,23 +715,23 @@ describe('CMS.StructureBoard', function () {
             expect(preventDefaultSpyShiftSpace).toHaveBeenCalledTimes(1);
         });
 
-        it('does not setup key binds if toggler is not availabe', function () {
+        it('does not setup key binds if toggler is not availabe', function() {
             keyboard.bind.calls.reset();
             board.ui.toolbarModeSwitcher.remove();
 
             CMS.StructureBoard._initializeGlobalHandlers();
             board = new CMS.StructureBoard();
-            spyOn(board, 'show').and.callFake(function () {
+            spyOn(board, 'show').and.callFake(function() {
                 CMS.settings.mode = 'structure';
             });
-            spyOn(board, 'hide').and.callFake(function () {
+            spyOn(board, 'hide').and.callFake(function() {
                 CMS.settings.mode = 'edit';
             });
 
             expect(keyboard.bind).not.toHaveBeenCalled();
         });
 
-        it('does not setup key binds if toggler is not visible (there are no placeholders)', function () {
+        it('does not setup key binds if toggler is not visible (there are no placeholders)', function() {
             keyboard.bind.calls.reset();
 
             board.ui.placeholders.remove();
@@ -876,10 +740,10 @@ describe('CMS.StructureBoard', function () {
             CMS.StructureBoard._initializeGlobalHandlers();
             board = new CMS.StructureBoard();
 
-            spyOn(board, 'show').and.callFake(function () {
+            spyOn(board, 'show').and.callFake(function() {
                 CMS.settings.mode = 'structure';
             });
-            spyOn(board, 'hide').and.callFake(function () {
+            spyOn(board, 'hide').and.callFake(function() {
                 CMS.settings.mode = 'edit';
             });
 
@@ -888,79 +752,79 @@ describe('CMS.StructureBoard', function () {
         });
     });
 
-    describe('._toggleStructureBoard()', function () {
+    describe('._toggleStructureBoard()', function() {
         var board;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'edit'
             };
             CMS.config = {
                 settings: {
-                    mode: 'edit'
+                    mode: 'edit',
+                    structure: 'structure'
                 },
                 mode: 'edit'
             };
-            $(function () {
+            $(function() {
                 spyOn(keyboard, 'bind');
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
-                spyOn(board, 'show').and.callFake(function () {
+                spyOn(board, 'show').and.callFake(function() {
                     CMS.settings.mode = 'structure';
                 });
-                spyOn(board, 'hide').and.callFake(function () {
+                spyOn(board, 'hide').and.callFake(function() {
                     CMS.settings.mode = 'edit';
                 });
-                spyOn(board, '_showAndHighlightPlugin');
-                spyOn(board, '_hideAndHighlightPlugin');
+                spyOn(board, '_showAndHighlightPlugin').and.returnValue({
+                    then() {}
+                });
                 done();
             });
         });
 
-        it('shows structureboard', function () {
+        it('shows structureboard', function() {
             board._toggleStructureBoard();
             expect(board.show).toHaveBeenCalledTimes(1);
             expect(board.hide).not.toHaveBeenCalled();
         });
 
-        it('hides strucrueboard', function () {
+        it('hides strucrueboard', function() {
             CMS.settings.mode = 'structure';
             board._toggleStructureBoard();
             expect(board.show).not.toHaveBeenCalled();
             expect(board.hide).toHaveBeenCalledTimes(1);
         });
 
-        it('shows structureboard and highlights plugin', function () {
+        it('shows structureboard and highlights plugin', function() {
+            CMS.settings.mode = 'edit';
             board._toggleStructureBoard({ useHoveredPlugin: true });
             expect(board._showAndHighlightPlugin).toHaveBeenCalledTimes(1);
-            expect(board._hideAndHighlightPlugin).not.toHaveBeenCalled();
         });
 
-        it('hides structureboard and highlights plugin', function () {
+        it('does not show structureboard and highlights plugin if it is open already', function() {
             CMS.settings.mode = 'structure';
             board._toggleStructureBoard({ useHoveredPlugin: true });
             expect(board._showAndHighlightPlugin).not.toHaveBeenCalled();
-            expect(board._hideAndHighlightPlugin).toHaveBeenCalledTimes(1);
         });
     });
 
-    describe('._drag()', function () {
+    describe('._drag()', function() {
         var board;
         var options;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('plugins.html');
             CMS.settings = {
-                structure: 'structure',
                 mode: 'structure'
             };
             CMS.config = {
                 settings: {
-                    mode: 'structure'
+                    mode: 'structure',
+                    structure: 'structure'
                 },
                 mode: 'structure'
             };
-            $(function () {
+            $(function() {
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 board._drag();
@@ -971,42 +835,45 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             board.ui.doc.off('keyup.cms.interrupt');
             fixture.cleanup();
         });
 
-        it('initializes nested sortable', function () {
+        it('initializes nested sortable', function() {
             options = board.ui.sortables.nestedSortable('option');
-            expect(options).toEqual(jasmine.objectContaining({
-                items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
-                placeholder: 'cms-droppable',
-                connectWith: '.cms-draggables:not(.cms-hidden)',
-                appendTo: '.cms-structure-content',
-                listType: 'div.cms-draggables',
-                doNotClear: true,
-                toleranceElement: '> div',
-                disableNestingClass: 'cms-draggable-disabled',
-                errorClass: 'cms-draggable-disallowed',
-                start: jasmine.any(Function),
-                helper: jasmine.any(Function),
-                beforeStop: jasmine.any(Function),
-                update: jasmine.any(Function),
-                isAllowed: jasmine.any(Function)
-            }));
+            expect(options).toEqual(
+                jasmine.objectContaining({
+                    items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
+                    placeholder: 'cms-droppable',
+                    connectWith: '.cms-draggables:not(.cms-hidden)',
+                    appendTo: '.cms-structure-content',
+                    listType: 'div.cms-draggables',
+                    doNotClear: true,
+                    toleranceElement: '> div',
+                    disableNestingClass: 'cms-draggable-disabled',
+                    errorClass: 'cms-draggable-disallowed',
+                    start: jasmine.any(Function),
+                    helper: jasmine.any(Function),
+                    beforeStop: jasmine.any(Function),
+                    update: jasmine.any(Function),
+                    isAllowed: jasmine.any(Function)
+                })
+            );
         });
 
-        it('adds event handler for cms-structure-update to actualize empty placeholders', function () {
+        it('adds event handler for cms-structure-update to actualize empty placeholders', function() {
             if (!CMS.$._data(board.ui.sortables[0]).events['cms-structure-update'][0].handler.name) {
                 pending();
             }
             expect(board.ui.sortables).toHandle('cms-structure-update');
             // cheating here a bit
-            expect(CMS.$._data(board.ui.sortables[0]).events['cms-structure-update'][0].handler.name)
-                .toEqual('actualizeEmptyPlaceholders');
+            expect(CMS.$._data(board.ui.sortables[0]).events['cms-structure-update'][0].handler.name).toEqual(
+                'actualizeEmptyPlaceholders'
+            );
         });
 
-        it('defines how draggable helper is created', function () {
+        it('defines how draggable helper is created', function() {
             options = board.ui.sortables.nestedSortable('option');
             var helper = options.helper;
 
@@ -1014,9 +881,9 @@ describe('CMS.StructureBoard', function () {
                 '<div class="some class string">' +
                     '<div class="cms-dragitem">Only this will be cloned</div>' +
                     '<div class="cms-draggables">' +
-                        '<div class="cms-dragitem">This will not</div>' +
+                    '<div class="cms-dragitem">This will not</div>' +
                     '</div>' +
-                '</div>'
+                    '</div>'
             );
 
             var result = helper(null, item);
@@ -1029,33 +896,37 @@ describe('CMS.StructureBoard', function () {
             expect(result).not.toHaveText('This will not');
         });
 
-        describe('start', function () {
-            it('sets data-touch-action attribute', function () {
+        describe('start', function() {
+            it('sets data-touch-action attribute', function() {
                 expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
                 expect(board.ui.content).toHaveAttr('data-touch-action', 'none');
             });
 
-            it('sets dragging state', function () {
+            it('sets dragging state', function() {
                 expect(board.dragging).toEqual(false);
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
                 expect(board.dragging).toEqual(true);
             });
 
-            it('actualizes empty placeholders', function () {
+            it('actualizes empty placeholders', function() {
                 var firstPlaceholder = board.ui.dragareas.eq(0);
-                var firstPlaceholderCopyAll = firstPlaceholder
-                    .find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+                var firstPlaceholderCopyAll = firstPlaceholder.find(
+                    '.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first'
+                );
                 var secondPlaceholder = board.ui.dragareas.eq(1);
-                var secondPlaceholderCopyAll = secondPlaceholder
-                    .find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+                var secondPlaceholderCopyAll = secondPlaceholder.find(
+                    '.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first'
+                );
 
                 expect(firstPlaceholder).toHaveClass('cms-dragarea-empty');
                 expect(firstPlaceholderCopyAll).toHaveClass('cms-submenu-item-disabled');
                 expect(secondPlaceholder).not.toHaveClass('cms-dragarea-empty');
                 expect(secondPlaceholderCopyAll).not.toHaveClass('cms-submenu-item-disabled');
 
-                secondPlaceholder.find('> .cms-draggables').contents()
+                secondPlaceholder
+                    .find('> .cms-draggables')
+                    .contents()
                     .appendTo(firstPlaceholder.find('> .cms-draggables'));
 
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
@@ -1067,11 +938,13 @@ describe('CMS.StructureBoard', function () {
 
                 // now check that the plugin currently being dragged does not count
                 // towards "plugins count"
-                firstPlaceholder.find('> .cms-draggables').contents()
+                firstPlaceholder
+                    .find('> .cms-draggables')
+                    .contents()
                     .appendTo(secondPlaceholder.find('> .cms-draggables'));
-                firstPlaceholder.find('> .cms-draggables').append(
-                    $('<div class="cms-draggable cms-draggable-is-dragging"></div>')
-                );
+                firstPlaceholder
+                    .find('> .cms-draggables')
+                    .append($('<div class="cms-draggable cms-draggable-is-dragging"></div>'));
 
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
 
@@ -1081,51 +954,57 @@ describe('CMS.StructureBoard', function () {
                 expect(secondPlaceholderCopyAll).not.toHaveClass('cms-submenu-item-disabled');
             });
 
-            it('hides settings menu', function () {
+            it('hides settings menu', function() {
                 spyOn(CMS.Plugin, '_hideSettingsMenu');
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
                 expect(CMS.Plugin._hideSettingsMenu).toHaveBeenCalledTimes(1);
             });
 
-            it('shows all the empty sortables', function () {
+            it('shows all the empty sortables', function() {
                 expect($('.cms-draggables.cms-hidden').length).toEqual(1);
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
                 expect($('.cms-draggables.cms-hidden').length).toEqual(0);
             });
 
-            it('adds appropriate classes on item without children and helper', function () {
+            it('adds appropriate classes on item without children and helper', function() {
                 var item = $('<div class="cms-draggable"><div class="cms-dragitem">Some plugin</div></div>');
                 var helper = options.helper(null, item);
 
-                options.start({}, {
-                    item: item,
-                    helper: helper
-                });
+                options.start(
+                    {},
+                    {
+                        item: item,
+                        helper: helper
+                    }
+                );
 
                 expect(item).toHaveClass('cms-is-dragging');
                 expect(helper).toHaveClass('cms-draggable-is-dragging');
             });
 
-            it('adds appropriate classes on item with children', function () {
+            it('adds appropriate classes on item with children', function() {
                 var item = $(
                     '<div class="cms-draggable">' +
                         '<div class="cms-dragitem">Some plugin</div>' +
                         '<div class="cms-draggables">' +
-                            '<div></div>' +
+                        '<div></div>' +
                         '</div>' +
-                    '</div>'
+                        '</div>'
                 );
                 var helper = options.helper(null, item);
 
-                options.start({}, {
-                    item: item,
-                    helper: helper
-                });
+                options.start(
+                    {},
+                    {
+                        item: item,
+                        helper: helper
+                    }
+                );
 
                 expect(helper).toHaveClass('cms-draggable-stack');
             });
 
-            it('sets up a handler for interrupting dragging with keyboard', function () {
+            it('sets up a handler for interrupting dragging with keyboard', function() {
                 expect(board.ui.doc).not.toHandle('keyup.cms.interrupt');
 
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
@@ -1164,21 +1043,21 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        describe('beforeStop', function () {
-            it('sets dragging state to false', function () {
+        describe('beforeStop', function() {
+            it('sets dragging state to false', function() {
                 board.dragging = true;
                 options.beforeStop(null, { item: $('<div></div>') });
                 expect(board.dragging).toEqual(false);
             });
 
-            it('removes classes', function () {
+            it('removes classes', function() {
                 var item = $('<div class="cms-is-dragging cms-draggable-stack"></div>');
                 options.beforeStop(null, { item: item });
                 expect(item).not.toHaveClass('cms-is-dragging');
                 expect(item).not.toHaveClass('cms-draggable-stack');
             });
 
-            it('unbinds interrupt event', function () {
+            it('unbinds interrupt event', function() {
                 var spy = jasmine.createSpy();
                 board.ui.doc.on('keyup.cms.interrupt', spy);
                 options.beforeStop(null, { item: $('<div></div>') });
@@ -1187,20 +1066,20 @@ describe('CMS.StructureBoard', function () {
                 expect(board.ui.doc).not.toHandle('keyup.cms.interrupt');
             });
 
-            it('resets data-touch-action attribute', function () {
+            it('resets data-touch-action attribute', function() {
                 board.ui.content.removeAttr('data-touch-action');
                 options.beforeStop(null, { item: $('<div></div>') });
                 expect(board.ui.content).toHaveAttr('data-touch-action', 'pan-y');
             });
         });
 
-        describe('update', function () {
-            it('returns false if it is not possible to update', function () {
+        describe('update', function() {
+            it('returns false if it is not possible to update', function() {
                 board.state = false;
                 expect(options.update()).toEqual(false);
             });
 
-            it('actualizes collapsible status', function () {
+            it('actualizes collapsible status', function() {
                 var textPlugin = $('.cms-draggable-1');
                 var randomPlugin = $('.cms-draggable-2');
                 var helper = options.helper(null, textPlugin);
@@ -1230,23 +1109,23 @@ describe('CMS.StructureBoard', function () {
                 expect(randomPlugin.find('> .cms-dragitem')).toHaveClass('cms-dragitem-expanded');
             });
 
-            it('returns false if we moved plugin inside same container ' +
-               'and the event is fired on the container', function () {
-                var textPlugin = $('.cms-draggable-1');
-                var helper = options.helper(null, textPlugin);
-                var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
+            it(
+                'returns false if we moved plugin inside same container and the event is fired on the container',
+                function() {
+                    var textPlugin = $('.cms-draggable-1');
+                    var helper = options.helper(null, textPlugin);
+                    var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
 
-                // and one more time
-                options.start(null, { item: textPlugin, helper: helper });
-                board.state = true;
+                    // and one more time
+                    options.start(null, { item: textPlugin, helper: helper });
+                    board.state = true;
 
-                textPlugin.prependTo(placeholderDraggables);
-                expect(
-                    options.update.bind(textPlugin)(null, { item: textPlugin, helper: helper })
-                ).toEqual(false);
-            });
+                    textPlugin.prependTo(placeholderDraggables);
+                    expect(options.update.bind(textPlugin)(null, { item: textPlugin, helper: helper })).toEqual(false);
+                }
+            );
 
-            it('triggers event on the plugin when necessary', function () {
+            it('triggers event on the plugin when necessary', function() {
                 var textPlugin = $('.cms-draggable-1');
                 var randomPlugin = $('.cms-draggable-2');
                 var helper = options.helper(null, textPlugin);
@@ -1264,7 +1143,6 @@ describe('CMS.StructureBoard', function () {
 
                 expect(spy).toHaveBeenCalledTimes(1);
 
-
                 // and back
                 options.start(null, { item: textPlugin, helper: helper });
                 board.state = true;
@@ -1273,7 +1151,6 @@ describe('CMS.StructureBoard', function () {
                 options.update(null, { item: textPlugin, helper: helper });
 
                 expect(spy).toHaveBeenCalledTimes(2);
-
 
                 // and one more time
                 options.start(null, { item: textPlugin, helper: helper });
@@ -1285,11 +1162,11 @@ describe('CMS.StructureBoard', function () {
                 expect(spy).toHaveBeenCalledTimes(3);
             });
 
-            it('triggers event on the plugin in clipboard', function () {
+            it('triggers event on the plugin in clipboard', function() {
                 $(fixture.el).prepend(
                     '<div class="cms-clipboard">' +
-                    '<div class="cms-clipboard-containers cms-draggables"></div>' +
-                    '</div>'
+                        '<div class="cms-clipboard-containers cms-draggables"></div>' +
+                        '</div>'
                 );
 
                 var textPlugin = $('.cms-draggable-1');
@@ -1315,13 +1192,15 @@ describe('CMS.StructureBoard', function () {
                 expect(clipboardSpy).toHaveBeenCalledTimes(1);
             });
 
-            it('actualizes empty placeholders', function () {
+            it('actualizes empty placeholders', function() {
                 var firstPlaceholder = board.ui.dragareas.eq(0);
-                var firstPlaceholderCopyAll = firstPlaceholder
-                    .find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+                var firstPlaceholderCopyAll = firstPlaceholder.find(
+                    '.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first'
+                );
                 var secondPlaceholder = board.ui.dragareas.eq(1);
-                var secondPlaceholderCopyAll = secondPlaceholder
-                    .find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+                var secondPlaceholderCopyAll = secondPlaceholder.find(
+                    '.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first'
+                );
 
                 expect(firstPlaceholder).toHaveClass('cms-dragarea-empty');
                 expect(firstPlaceholderCopyAll).toHaveClass('cms-submenu-item-disabled');
@@ -1330,7 +1209,9 @@ describe('CMS.StructureBoard', function () {
 
                 options.start({}, { item: $('<div></div>'), helper: $('<div></div>') });
 
-                secondPlaceholder.find('> .cms-draggables').contents()
+                secondPlaceholder
+                    .find('> .cms-draggables')
+                    .contents()
                     .appendTo(firstPlaceholder.find('> .cms-draggables'));
 
                 board.state = true;
@@ -1343,11 +1224,13 @@ describe('CMS.StructureBoard', function () {
 
                 // now check that the plugin currently being dragged does not count
                 // towards "plugins count"
-                firstPlaceholder.find('> .cms-draggables').contents()
+                firstPlaceholder
+                    .find('> .cms-draggables')
+                    .contents()
                     .appendTo(secondPlaceholder.find('> .cms-draggables'));
-                firstPlaceholder.find('> .cms-draggables').append(
-                    $('<div class="cms-draggable cms-draggable-is-dragging"></div>')
-                );
+                firstPlaceholder
+                    .find('> .cms-draggables')
+                    .append($('<div class="cms-draggable cms-draggable-is-dragging"></div>'));
 
                 options.update({}, { item: $('<div class="cms-plugin-1"></div>'), helper: $('<div></div>') });
 
@@ -1357,7 +1240,7 @@ describe('CMS.StructureBoard', function () {
                 expect(secondPlaceholderCopyAll).not.toHaveClass('cms-submenu-item-disabled');
             });
 
-            it('hides empty sortables', function () {
+            it('hides empty sortables', function() {
                 var textPlugin = $('.cms-draggable-1');
                 var randomPlugin = $('.cms-draggable-2');
                 var helper = options.helper(null, textPlugin);
@@ -1384,28 +1267,28 @@ describe('CMS.StructureBoard', function () {
             });
         });
 
-        describe('isAllowed', function () {
-            it('returns false if CMS.API is locked', function () {
+        describe('isAllowed', function() {
+            it('returns false if CMS.API is locked', function() {
                 CMS.API.locked = true;
                 board.state = 'mock';
                 expect(options.isAllowed()).toEqual(false);
                 expect(board.state).toEqual('mock');
             });
 
-            it('returns false if there is no item', function () {
+            it('returns false if there is no item', function() {
                 CMS.API.locked = false;
                 board.state = 'mock';
                 expect(options.isAllowed()).toEqual(false);
                 expect(board.state).toEqual('mock');
             });
 
-            it('returns false if item has no settings', function () {
+            it('returns false if item has no settings', function() {
                 board.state = 'mock';
                 expect(options.isAllowed(null, null, $('.cms-draggable-1'))).toEqual(false);
                 expect(board.state).toEqual('mock');
             });
 
-            it('returns false if parent cannot have children', function () {
+            it('returns false if parent cannot have children', function() {
                 board.state = 'mock';
                 var pluginStructure = $('.cms-draggable-1');
                 var pluginEdit = $('.cms-plugin-1');
@@ -1418,7 +1301,7 @@ describe('CMS.StructureBoard', function () {
                 expect(board.state).toEqual('mock');
             });
 
-            it('returns false if parent is a clipboard', function () {
+            it('returns false if parent is a clipboard', function() {
                 board.state = 'mock';
                 var pluginStructure = $('.cms-draggable-1');
                 var pluginEdit = $('.cms-plugin-1');
@@ -1431,8 +1314,8 @@ describe('CMS.StructureBoard', function () {
                 expect(board.state).toEqual('mock');
             });
 
-            describe('bounds of a place we put current plugin in', function () {
-                it('uses placeholder bounds', function () {
+            describe('bounds of a place we put current plugin in', function() {
+                it('uses placeholder bounds', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var placeholder = $('.cms-dragarea-1 > .cms-draggables');
@@ -1444,7 +1327,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(false);
                 });
 
-                it('uses placeholder bounds', function () {
+                it('uses placeholder bounds', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var placeholder = $('.cms-dragarea-1 > .cms-draggables');
@@ -1456,7 +1339,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(true);
                 });
 
-                it('uses plugin bounds if pasted into the plugin', function () {
+                it('uses plugin bounds if pasted into the plugin', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1473,7 +1356,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(false);
                 });
 
-                it('uses plugin bounds if pasted into the plugin', function () {
+                it('uses plugin bounds if pasted into the plugin', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1490,7 +1373,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(false);
                 });
 
-                it('uses plugin bounds if pasted into the plugin', function () {
+                it('uses plugin bounds if pasted into the plugin', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1507,7 +1390,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(true);
                 });
 
-                it('uses placeholderParent bounds', function () {
+                it('uses placeholderParent bounds', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1526,8 +1409,8 @@ describe('CMS.StructureBoard', function () {
                 });
             });
 
-            describe('parent bonds of the plugin', function () {
-                it('respects parent bounds of the plugin', function () {
+            describe('parent bonds of the plugin', function() {
+                it('respects parent bounds of the plugin', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1547,7 +1430,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(true);
                 });
 
-                it('respects parent bounds of the plugin', function () {
+                it('respects parent bounds of the plugin', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1567,7 +1450,7 @@ describe('CMS.StructureBoard', function () {
                     expect(board.state).toEqual(false);
                 });
 
-                it('works around "0" parent restriction for PlaceholderPlugin', function () {
+                it('works around "0" parent restriction for PlaceholderPlugin', function() {
                     board.state = 'mock';
                     var pluginStructure = $('.cms-draggable-1');
                     var parentPluginStructure = $('.cms-draggable-2');
@@ -1590,8 +1473,12 @@ describe('CMS.StructureBoard', function () {
     describe('invalidateState', () => {
         let board;
 
-        beforeEach(() => {
+        beforeEach(done => {
             fixture.load('plugins.html');
+            CMS.API.Toolbar = {
+                hideLoader: jasmine.createSpy(),
+                showLoader: jasmine.createSpy()
+            };
             board = new CMS.StructureBoard();
             StructureBoard.__Rewire__('Plugin', FakePlugin);
             spyOn(StructureBoard, 'actualizePluginCollapseStatus');
@@ -1599,6 +1486,9 @@ describe('CMS.StructureBoard', function () {
             spyOn(StructureBoard, 'actualizePluginsCollapsibleStatus');
             spyOn(Plugin, '_updateClipboard');
             spyOn(board, '_drag');
+            setTimeout(() => {
+                done();
+            }, 20);
         });
 
         afterEach(() => {
@@ -1725,7 +1615,7 @@ describe('CMS.StructureBoard', function () {
                 const args = ['random', 'stuff'];
                 expect(CMS.settings.mode).toEqual('structure');
                 board._loadedContent = false;
-                board._requestMode.and.callFake((mode) => {
+                board._requestMode.and.callFake(mode => {
                     expect(mode).toEqual('content');
                     return {
                         done(fn) {
@@ -1745,7 +1635,7 @@ describe('CMS.StructureBoard', function () {
                 const args = ['random', 'stuff'];
                 expect(CMS.settings.mode).toEqual('structure');
                 board._loadedContent = true;
-                board._requestMode.and.callFake((mode) => {
+                board._requestMode.and.callFake(mode => {
                     expect(mode).toEqual('content');
                     return {
                         done(fn) {
@@ -1756,14 +1646,14 @@ describe('CMS.StructureBoard', function () {
                 });
 
                 board.invalidateState('x');
-                expect(board.refreshContent).toHaveBeenCalledWith(...args);
+                expect(board.refreshContent).toHaveBeenCalledWith('random');
             });
 
             it('reloads if it cannot refresh content', () => {
                 const args = ['random', 'stuff'];
                 expect(CMS.settings.mode).toEqual('structure');
                 board._loadedContent = true;
-                board._requestMode.and.callFake((mode) => {
+                board._requestMode.and.callFake(mode => {
                     expect(mode).toEqual('content');
                     return {
                         done() {
@@ -1784,15 +1674,14 @@ describe('CMS.StructureBoard', function () {
                 const args = ['random', 'stuff'];
                 CMS.settings.mode = 'edit';
                 board._loadedContent = true;
-                board._requestMode.and.callFake((mode) => {
+                board._requestMode.and.callFake(mode => {
                     expect(mode).toEqual('content');
                     expect(board._requestcontent).toEqual(null);
                     return {
                         done(fn) {
                             fn(...args);
                             return {
-                                fail() {
-                                }
+                                fail() {}
                             };
                         }
                     };
@@ -1800,14 +1689,14 @@ describe('CMS.StructureBoard', function () {
 
                 board.invalidateState('x');
                 expect(board._requestMode).toHaveBeenCalledWith('content');
-                expect(board.refreshContent).toHaveBeenCalledWith(...args);
+                expect(board.refreshContent).toHaveBeenCalledWith('random');
             });
 
             it('reloads if cant refresh content when in content mode', () => {
                 const args = ['random', 'stuff'];
                 CMS.settings.mode = 'edit';
                 board._loadedContent = false;
-                board._requestMode.and.callFake((mode) => {
+                board._requestMode.and.callFake(mode => {
                     expect(mode).toEqual('content');
                     expect(board._requestcontent).toEqual(null);
                     return {
@@ -1851,7 +1740,11 @@ describe('CMS.StructureBoard', function () {
                 const data = {
                     plugin_parent: 2,
                     plugin_id: 1,
-                    html: '<div class="new-draggable"><div class="cms-draggables"></div></div>',
+                    html: `
+                        <div class="new-draggable ">
+                            <div class="cms-draggables"><div class="cms-draggable-1"></div></div>
+                        </div>
+                    `,
                     plugins: [{ plugin_id: 1, otherStuff: true }]
                 };
                 board.handleMovePlugin(data);
@@ -2003,8 +1896,9 @@ describe('CMS.StructureBoard', function () {
                 CMS._instances = [{ options: { plugin_id: 1 } }, { options: { plugin_id: 2 } }];
                 board.handleDeletePlugin({ plugin_id: 1 });
                 expect($('.cms-draggable-1')).not.toBeInDOM();
-                expect(StructureBoard.actualizePluginsCollapsibleStatus)
-                    .toHaveBeenCalledWith($('.cms-dragarea-1 > .cms-draggables'));
+                expect(StructureBoard.actualizePluginsCollapsibleStatus).toHaveBeenCalledWith(
+                    $('.cms-dragarea-1 > .cms-draggables')
+                );
                 expect(CMS._plugins).toEqual([['cms-plugin-2']]);
                 expect(CMS._instances).toEqual([{ options: { plugin_id: 2 } }]);
             });
@@ -2025,8 +1919,9 @@ describe('CMS.StructureBoard', function () {
                 board.handleDeletePlugin({ plugin_id: 3 });
                 expect($('.cms-draggable-3')).not.toBeInDOM();
                 expect($('.cms-draggable-4')).not.toBeInDOM();
-                expect(StructureBoard.actualizePluginsCollapsibleStatus)
-                    .toHaveBeenCalledWith($('.cms-draggable-2 > .cms-draggables'));
+                expect(StructureBoard.actualizePluginsCollapsibleStatus).toHaveBeenCalledWith(
+                    $('.cms-draggable-2 > .cms-draggables')
+                );
                 expect(CMS._plugins).toEqual([]);
                 expect(CMS._instances).toEqual([]);
             });
@@ -2051,8 +1946,7 @@ describe('CMS.StructureBoard', function () {
 
                 expect($('.cms-draggable-1')).not.toBeInDOM();
                 expect($('.cms-draggable-2')).not.toBeInDOM();
-                expect(StructureBoard.actualizePluginsCollapsibleStatus)
-                    .not.toHaveBeenCalled();
+                expect(StructureBoard.actualizePluginsCollapsibleStatus).not.toHaveBeenCalled();
                 expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
                 expect(CMS._plugins).toEqual([['cms-plugin-3']]);
                 expect(CMS._instances).toEqual([{ options: { plugin_id: 3 } }]);
@@ -2184,7 +2078,7 @@ describe('CMS.StructureBoard', function () {
                     return request;
                 }
             };
-            spyOn($, 'ajax').and.callFake((req) => {
+            spyOn($, 'ajax').and.callFake(req => {
                 expect(req.method).toEqual('GET');
                 expect(req.url).toMatch(/\?edit/);
                 return request;
@@ -2204,7 +2098,7 @@ describe('CMS.StructureBoard', function () {
                     return request;
                 }
             };
-            spyOn($, 'ajax').and.callFake((req) => {
+            spyOn($, 'ajax').and.callFake(req => {
                 expect(req.method).toEqual('GET');
                 expect(req.url).toMatch(/\?structure/);
                 return request;
@@ -2224,7 +2118,7 @@ describe('CMS.StructureBoard', function () {
                     return request;
                 }
             };
-            spyOn($, 'ajax').and.callFake((req) => {
+            spyOn($, 'ajax').and.callFake(req => {
                 expect(req.method).toEqual('GET');
                 expect(req.url).toMatch(/\?edit/);
                 return request;
@@ -2281,7 +2175,7 @@ describe('CMS.StructureBoard', function () {
             StructureBoard.__ResetDependency__('Plugin');
         });
 
-        it('resolves immediately when content mode is already loaded', (done) => {
+        it('resolves immediately when content mode is already loaded', done => {
             CMS.config.settings.mode = 'edit';
             board._loadContent().then(() => {
                 expect(requestSucceeded).not.toHaveBeenCalled();
@@ -2290,7 +2184,7 @@ describe('CMS.StructureBoard', function () {
 
             CMS.config.settings.mode = 'structure';
         });
-        it('resolves immediately when content mode is already loaded', (done) => {
+        it('resolves immediately when content mode is already loaded', done => {
             board._loadedContent = true;
             board._loadContent().then(() => {
                 expect(requestSucceeded).not.toHaveBeenCalled();
@@ -2300,7 +2194,7 @@ describe('CMS.StructureBoard', function () {
             CMS.config.settings.mode = 'structure';
         });
 
-        it('requests content', (done) => {
+        it('requests content', done => {
             response = `
                 <html attr0="a" attr1="b">
                     <head>
@@ -2335,7 +2229,6 @@ describe('CMS.StructureBoard', function () {
                 expect($('body').attr('attr2')).toEqual('x');
                 expect($('body').attr('attr3')).toEqual('y');
                 expect($('.new-content')).toBeInDOM();
-
 
                 expect(FakePlugin.prototype._ensureData).toHaveBeenCalledTimes(3);
                 expect(FakePlugin.prototype._setGeneric).toHaveBeenCalledTimes(1);
@@ -2393,7 +2286,7 @@ describe('CMS.StructureBoard', function () {
             StructureBoard.__ResetDependency__('Plugin');
         });
 
-        it('resolves immediately when structure mode is already loaded', (done) => {
+        it('resolves immediately when structure mode is already loaded', done => {
             CMS.config.settings.mode = 'structure';
             board._loadStructure().then(() => {
                 expect(requestSucceeded).not.toHaveBeenCalled();
@@ -2403,7 +2296,7 @@ describe('CMS.StructureBoard', function () {
             CMS.config.settings.mode = 'edit';
         });
 
-        it('resolves immediately when structure mode is already loaded', (done) => {
+        it('resolves immediately when structure mode is already loaded', done => {
             board._loadedStructure = true;
             board._loadStructure().then(() => {
                 expect(requestSucceeded).not.toHaveBeenCalled();
@@ -2413,7 +2306,7 @@ describe('CMS.StructureBoard', function () {
             CMS.config.settings.mode = 'edit';
         });
 
-        it('requests structure', (done) => {
+        it('requests structure', done => {
             response = `
                 <html attr0="a" attr1="b">
                     <head>
@@ -2460,7 +2353,9 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('extracts messages', () => {
-            expect(board._extractMessages($(`
+            expect(
+                board._extractMessages(
+                    $(`
                 <div>
                     <div data-cms-messages-container>
                         <div data-cms-message data-cms-message-tags="error">
@@ -2474,12 +2369,13 @@ describe('CMS.StructureBoard', function () {
                         </div>
                     </div>
                 </div>
-            `))).toEqual([
-                { message: 'Error', error: true },
-                { message: 'Normal', error: false }
-            ]);
+            `)
+                )
+            ).toEqual([{ message: 'Error', error: true }, { message: 'Normal', error: false }]);
 
-            expect(board._extractMessages($(`
+            expect(
+                board._extractMessages(
+                    $(`
                 <div>
                     <ul class="messagelist"></ul>
                     <div data-cms-messages-container>
@@ -2491,27 +2387,31 @@ describe('CMS.StructureBoard', function () {
                         </div>
                     </div>
                 </div>
-            `))).toEqual([
-                { message: 'Error1', error: true },
-                { message: 'Normal1', error: false }
-            ]);
+            `)
+                )
+            ).toEqual([{ message: 'Error1', error: true }, { message: 'Normal1', error: false }]);
 
-            expect(board._extractMessages($(`
+            expect(
+                board._extractMessages(
+                    $(`
                 <div>
                     <ul class="messagelist">
                         <li class="whatever">normal message</li>
                         <li class="error">error message</li>
                     </ul>
                 </div>
-            `))).toEqual([
-                { message: 'normal message', error: false },
-                { message: 'error message', error: true }
-            ]);
+            `)
+                )
+            ).toEqual([{ message: 'normal message', error: false }, { message: 'error message', error: true }]);
 
-            expect(board._extractMessages($(`
+            expect(
+                board._extractMessages(
+                    $(`
                 <div>
                 </div>
-            `))).toEqual([]);
+            `)
+                )
+            ).toEqual([]);
         });
     });
 
@@ -2553,6 +2453,8 @@ describe('CMS.StructureBoard', function () {
                 open: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy(),
                 _refreshMarkup: jasmine.createSpy()
             };
         });
@@ -2571,11 +2473,9 @@ describe('CMS.StructureBoard', function () {
             expect(board._loadedContent).toBe(true);
         });
 
-        it('shows messages', (done) => {
+        it('shows messages', done => {
             CMS._instances = [];
-            spyOn(board, '_extractMessages').and.returnValue([
-                { message: 'hello' }
-            ]);
+            spyOn(board, '_extractMessages').and.returnValue([{ message: 'hello' }]);
             board.refreshContent(newDoc);
             setTimeout(() => {
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({ message: 'hello' });
@@ -2600,7 +2500,7 @@ describe('CMS.StructureBoard', function () {
     });
 
     describe('_preloadOppositeMode', () => {
-        ['content', 'structure'].forEach((mode) => {
+        ['content', 'structure'].forEach(mode => {
             it(`preloads the opposite mode (${mode})`, () => {
                 const div = document.createElement('div');
                 const _getWindow = jasmine.createSpy().and.returnValue(div);
@@ -2615,7 +2515,6 @@ describe('CMS.StructureBoard', function () {
 
                 jasmine.clock().install();
 
-
                 if (mode === 'content') {
                     board._loadedStructure = false;
                 } else {
@@ -2628,9 +2527,7 @@ describe('CMS.StructureBoard', function () {
                 expect(board._requestMode).not.toHaveBeenCalled();
                 jasmine.clock().tick(2001);
                 expect(board._requestMode).toHaveBeenCalledTimes(1);
-                expect(board._requestMode).toHaveBeenCalledWith(
-                    mode === 'content' ? 'structure' : 'content'
-                );
+                expect(board._requestMode).toHaveBeenCalledWith(mode === 'content' ? 'structure' : 'content');
 
                 jasmine.clock().uninstall();
 

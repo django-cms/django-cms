@@ -94,7 +94,12 @@ module.exports = {
         "no-labels": 2,
         "no-lone-blocks": 2,
         "no-loop-func": 2,
-        "no-magic-numbers": ["error", { "ignore": [0, -1, 1, 2], "ignoreArrayIndexes": true }],
+        "no-magic-numbers": [
+            "error", {
+                "ignore": [0, -1, 1, 2],
+                "ignoreArrayIndexes": true
+            }
+        ],
         "no-multi-spaces": 2,
         "no-multi-str": 0,
         "no-native-reassign": 2,
@@ -195,7 +200,8 @@ module.exports = {
         "sort-vars": 0,
         "keyword-spacing": 2,
         "space-before-blocks": 2,
-        "space-before-function-paren": ["error", { "anonymous": "always", "named": "never" }],
+        // FIXME reenable after running prettier on full codebase
+        "space-before-function-paren": [0, { "anonymous": "never", "named": "never" }],
         "space-in-parens": [2, "never"],
         "space-infix-ops": 2,
         "space-unary-ops": 2,
@@ -203,7 +209,7 @@ module.exports = {
         "wrap-regex": 2,
 
         // ES6
-        "arrow-parens": [2, "always"],
+        "arrow-parens": [2, "as-needed"],
 
         // Legacy
         "max-depth": [2, 4],

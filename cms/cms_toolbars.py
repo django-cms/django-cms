@@ -48,81 +48,21 @@ ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
-
-
-class ToolbarBase(CMSToolbar):
-
-    def init_from_request(self):
-        self.page = get_page_draft(self.request.current_page)
-
-    def init_placeholders(self):
-        request = self.request
-        toolbar = self.toolbar
-
-        if request.method == 'GET':
-            is_api_call = 'placeholders[]' in request.GET and request.is_ajax()
-        else:
-            is_api_call = False
-
-        if is_api_call:
-            # AJAX request to reload page structure
-            placeholder_ids = request.GET.getlist("placeholders[]")
-            self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)
-            self.statics = StaticPlaceholder.objects.filter(
-                Q(draft__in=placeholder_ids)|Q(public__in=placeholder_ids)
-            )
-            return
-
-        if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
-            # User has explicitly requested structure mode
-            # and the object (page, blog, etc..) allows for the non-legacy structure mode
-            renderer = toolbar.structure_renderer
-        else:
-            renderer = toolbar.get_content_renderer()
-        self.editable_placeholders = renderer.get_rendered_editable_placeholders()
-        self.statics = renderer.get_rendered_static_placeholders()
-
-    def populate(self):
-        self.init_from_request()
-
-    def post_template_populate(self):
-        self.init_placeholders()
+SHORTCUTS_BREAK = 'Shortcuts Break'
 
 
 @toolbar_pool.register
-class PlaceholderToolbar(ToolbarBase):
+class PlaceholderToolbar(CMSToolbar):
     """
     Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
     """
 
+    def populate(self):
+        self.page = get_page_draft(self.request.current_page)
+
     def post_template_populate(self):
         super(PlaceholderToolbar, self).post_template_populate()
         self.add_wizard_button()
-        self.add_structure_mode()
-
-    def add_structure_mode(self):
-        if self.page and not self.page.application_urls:
-            if page_permissions.user_can_change_page(self.request.user, page=self.page):
-                return self.add_structure_mode_item()
-
-        elif any(ph for ph in self.editable_placeholders if ph.has_change_permission(self.request.user)):
-            return self.add_structure_mode_item()
-
-        for sp in self.statics:
-            if sp.has_change_permission(self.request):
-                return self.add_structure_mode_item()
-
-    def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
-        structure_active = self.toolbar.structure_mode_active
-        edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
-        build_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        edit_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-
-        if self.request.user.has_perm("cms.use_structure"):
-            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
-                                                    extra_classes=extra_classes)
-            switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False)
-            switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False)
 
     def add_wizard_button(self):
         from cms.wizards.wizard_pool import entry_choices
@@ -209,6 +149,9 @@ class BasicToolbar(CMSToolbar):
             # Disable toolbar
             self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
             self._admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
+            self._admin_menu.add_link_item(_('Shortcuts...'), url='#',
+                    extra_classes=('cms-show-shortcuts',))
+            self._admin_menu.add_break(SHORTCUTS_BREAK)
 
             # logout
             self.add_logout_button(self._admin_menu)
@@ -268,16 +211,9 @@ class BasicToolbar(CMSToolbar):
 
 
 @toolbar_pool.register
-class PageToolbar(ToolbarBase):
+class PageToolbar(CMSToolbar):
     _changed_admin_menu = None
     watch_models = [Page]
-
-    # Helpers
-
-    def init_from_request(self):
-        super(PageToolbar, self).init_from_request()
-        self.title = self.get_title()
-        self.permissions_activated = get_cms_setting('PERMISSION')
 
     def init_placeholders(self):
         request = self.request
@@ -303,9 +239,36 @@ class PageToolbar(ToolbarBase):
             renderer = toolbar.structure_renderer
         else:
             renderer = toolbar.get_content_renderer()
+
         self.placeholders = renderer.get_rendered_placeholders()
         self.statics = renderer.get_rendered_static_placeholders()
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
+
+    def add_structure_mode(self):
+        if self.page and not self.page.application_urls:
+            if page_permissions.user_can_change_page(self.request.user, page=self.page):
+                return self.add_structure_mode_item()
+
+        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
+            return self.add_structure_mode_item()
+
+        for sp in self.statics:
+            if sp.has_change_permission(self.request):
+                return self.add_structure_mode_item()
+
+    def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
+        structure_active = self.toolbar.structure_mode_active
+        edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
+        build_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        edit_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+
+        if self.request.user.has_perm("cms.use_structure"):
+            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                    extra_classes=extra_classes)
+            switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
+                    extra_classes='cms-structure-btn')
+            switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
+                    extra_classes='cms-content-btn')
 
     def get_title(self):
         try:
@@ -373,15 +336,18 @@ class PageToolbar(ToolbarBase):
     # Populate
 
     def populate(self):
-        super(PageToolbar, self).populate()
+        self.page = get_page_draft(self.request.current_page)
+        self.title = self.get_title()
+        self.permissions_activated = get_cms_setting('PERMISSION')
         self.change_admin_menu()
         self.add_page_menu()
         self.change_language_menu()
 
     def post_template_populate(self):
-        super(PageToolbar, self).post_template_populate()
+        self.init_placeholders()
         self.add_draft_live()
         self.add_publish_button()
+        self.add_structure_mode()
 
     def has_dirty_objects(self):
         language = self.current_lang

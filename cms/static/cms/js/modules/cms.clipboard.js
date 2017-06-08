@@ -173,6 +173,7 @@ var Clipboard = new Class({
         var pasteItems = $('.cms-submenu-item [data-rel=paste]').attr('tabindex', '-1').parent()
             .addClass('cms-submenu-item-disabled');
 
+        pasteItems.find('> a').attr('aria-disabled', 'true');
         pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');
         pasteItems.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
 

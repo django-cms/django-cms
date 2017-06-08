@@ -11,6 +11,7 @@
 
     {# start: toolbar #}
     <div class="cms-toolbar">
+        <div class="cms-debug-bar"></div>
         <div class="cms-toolbar-left">
             {% include "cms/toolbar/items/logo.html" %}
             {% if not user.is_authenticated %}
@@ -36,7 +37,6 @@
             {% endfor %}
         </div>
     </div>
-    <div class="cms-toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
     {# end: toolbar #}
 
     {% block toolbar_bottom %}

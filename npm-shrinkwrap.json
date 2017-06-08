@@ -5534,6 +5534,11 @@
       "resolved": "https://registry.npmjs.org/npmlog/-/npmlog-1.2.1.tgz",
       "dev": true
     },
+    "nprogress": {
+      "version": "0.2.0",
+      "from": "nprogress@>=0.2.0 <0.3.0",
+      "resolved": "https://registry.npmjs.org/nprogress/-/nprogress-0.2.0.tgz"
+    },
     "num2fraction": {
       "version": "1.2.2",
       "from": "num2fraction@>=1.2.2 <2.0.0",

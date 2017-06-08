@@ -1,14 +1,13 @@
 /*
  * Copyright https://github.com/divio/django-cms
  */
-
 import Modal from './cms.modal';
 import StructureBoard from './cms.structureboard';
 import $ from 'jquery';
 import '../polyfills/array.prototype.findindex';
 import nextUntil from './nextuntil';
 
-import { toPairs, findIndex, uniqWith, isEqual } from 'lodash';
+import { toPairs, isNaN, debounce, findIndex, uniqWith, isEqual, once } from 'lodash';
 
 var Class = require('classjs');
 var Helpers = require('./cms.base').default.API.Helpers;
@@ -19,7 +18,7 @@ var doc;
 var clipboardDraggable;
 var path = window.location.pathname + window.location.search;
 
-var pluginUsageMap = Helpers._isStorageSupported ? JSON.parse(localStorage.getItem('cms-plugin-usage')) || {} : {};
+var pluginUsageMap = Helpers._isStorageSupported ? JSON.parse(localStorage.getItem('cms-plugin-usage') || '{}') : {};
 
 /**
  * Class for handling Plugins / Placeholders or Generics.
@@ -31,7 +30,6 @@ var pluginUsageMap = Helpers._isStorageSupported ? JSON.parse(localStorage.getIt
  * @uses CMS.API.Helpers
  */
 var Plugin = new Class({
-
     implement: [Helpers],
 
     options: {
@@ -93,7 +91,8 @@ var Plugin = new Class({
                 this._setPlugin();
                 this._collapsables();
                 break;
-            default: // handler for static content
+            default:
+                // handler for static content
                 this.ui.container.data('cms').push(this.options);
                 this._setGeneric();
         }
@@ -128,7 +127,7 @@ var Plugin = new Class({
 
             wrapper.filter('template').remove();
 
-            contents.each(function (index, el) {
+            contents.each(function(index, el) {
                 if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
                     var element = $(el);
 
@@ -138,7 +137,7 @@ var Plugin = new Class({
             });
 
             // otherwise we don't really need text nodes or comment nodes
-            contents = contents.filter(function () {
+            contents = contents.filter(function() {
                 return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
             });
 
@@ -165,7 +164,7 @@ var Plugin = new Class({
      * @method _setPlaceholder
      * @private
      */
-    _setPlaceholder: function () {
+    _setPlaceholder: function() {
         var that = this;
 
         this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
@@ -183,7 +182,7 @@ var Plugin = new Class({
         CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
         // enable expanding/collapsing globally within the placeholder
-        togglerLinks.off(this.click).on(this.click, function (e) {
+        togglerLinks.off(this.click).on(this.click, function(e) {
             e.preventDefault();
             if (title.hasClass(expanded)) {
                 that._collapseAll(title);
@@ -196,6 +195,14 @@ var Plugin = new Class({
             title.addClass(expanded);
         }
 
+        const dragarea = this.ui.dragbar.closest('.cms-dragarea');
+
+        if (this.ui.dragbar.closest('.cms-dragarea').hasClass('cms-dragarea-static')) {
+            this.ui.dragbar.on('click', () => {
+                dragarea.toggleClass('cms-dragarea-static-expanded');
+            });
+        }
+
         this._checkIfPasteAllowed();
     },
 
@@ -205,7 +212,7 @@ var Plugin = new Class({
      * @method _setPlugin
      * @private
      */
-    _setPlugin: function () {
+    _setPlugin: function() {
         var that = this;
 
         that._setPluginStructureEvents();
@@ -226,13 +233,13 @@ var Plugin = new Class({
         this.ui.dragitem.on(this.doubleClick, this._dblClickToEditHandler.bind(this));
 
         // adds listener for all plugin updates
-        this.ui.draggable.on('cms-plugins-update', function (e, eventData) {
+        this.ui.draggable.on('cms-plugins-update', function(e, eventData) {
             e.stopPropagation();
             that.movePlugin(null, eventData);
         });
 
         // adds listener for copy/paste updates
-        this.ui.draggable.on('cms-paste-plugin-update', function (e, eventData) {
+        this.ui.draggable.on('cms-paste-plugin-update', function(e, eventData) {
             e.stopPropagation();
 
             var dragitem = $(`.cms-draggable-${eventData.id}:last`);
@@ -253,6 +260,33 @@ var Plugin = new Class({
 
             that.movePlugin(data);
         });
+
+        this.ui.dragitem
+            .on('mouseenter', e => {
+                e.stopPropagation();
+                if (!doc.data('expandmode')) {
+                    return;
+                }
+                if (this.ui.draggable.find('> .cms-dragitem > .cms-plugin-disabled').length) {
+                    return;
+                }
+                if (!CMS.API.StructureBoard.ui.container.hasClass('cms-structure-condensed')) {
+                    return;
+                }
+                if (CMS.API.StructureBoard.dragging) {
+                    return;
+                }
+                // eslint-disable-next-line no-magic-numbers
+                Plugin._highlightPluginContent(this.options.plugin_id, { successTimeout: 0, seeThrough: true });
+            })
+            .on('mouseleave', e => {
+                if (!CMS.API.StructureBoard.ui.container.hasClass('cms-structure-condensed')) {
+                    return;
+                }
+                e.stopPropagation();
+                // eslint-disable-next-line no-magic-numbers
+                Plugin._removeHighlightPluginContent(this.options.plugin_id);
+            });
 
         // attach event to the plugin menu
         this._setSettingsMenu(this.ui.submenu);
@@ -277,37 +311,76 @@ var Plugin = new Class({
         );
     },
 
+    _clickToHighlightHandler: function _clickToHighlightHandler(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (CMS.settings.mode !== 'structure') {
+            return;
+        }
+        // FIXME refactor into an object
+        CMS.API.StructureBoard._showAndHighlightPlugin(200, true); // eslint-disable-line no-magic-numbers
+    },
+
     _setPluginContentEvents: function _setPluginContentEvents() {
         var that = this;
+
+        this.ui.container
+            .off('mouseover.cms.plugins')
+            .on(
+                'mouseover.cms.plugins',
+                debounce(e => {
+                    e.stopPropagation();
+                    if (!doc.data('expandmode')) {
+                        return;
+                    }
+                    if (CMS.settings.mode !== 'structure') {
+                        return;
+                    }
+                    // FIXME wrap in a method
+                    CMS.API.StructureBoard._showAndHighlightPlugin(0, true); // eslint-disable-line no-magic-numbers
+                }, 0)
+            )
+            .off('mouseout.cms.plugins')
+            .on(
+                'mouseout.cms.plugins',
+                debounce(e => {
+                    e.stopPropagation();
+                    if (CMS.settings.mode !== 'structure') {
+                        return;
+                    }
+                    this.ui.draggable.find('.cms-dragitem-success').remove();
+                    this.ui.draggable.removeClass('cms-draggable-success');
+                    // Plugin._removeHighlightPluginContent(this.options.plugin_id);
+                }, 0)
+            );
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
             // have to delegate here because there might be plugins that
             // have their content replaced by something dynamic. in case that tool
             // copies the classes - double click to edit would still work
             doc.on(this.doubleClick, '.cms-plugin-' + this.options.plugin_id, this._dblClickToEditHandler.bind(this));
-            doc.on(
-                this.pointerOverAndOut + ' ' + this.touchStart,
-                '.cms-plugin-' + this.options.plugin_id,
-                function (e) {
-                    // required for both, click and touch
-                    // otherwise propagation won't work to the nested plugin
-                    e.stopPropagation();
-                    if (e.type === 'touchstart') {
-                        CMS.API.Tooltip._forceTouchOnce();
-                    }
-                    var name = that.options.plugin_name;
-                    var id = that.options.plugin_id;
-
-                    var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
-                    var placeholder = $('.cms-placeholder-' + placeholderId);
-
-                    if (placeholder.length && placeholder.data('cms')) {
-                        name = placeholder.data('cms').name + ': ' + name;
-                    }
-
-                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+            doc.on(this.click, '.cms-plugin-' + this.options.plugin_id, this._clickToHighlightHandler.bind(this));
+            doc.on(this.pointerOverAndOut + ' ' + this.touchStart, '.cms-plugin-' + this.options.plugin_id, function(
+                e
+            ) {
+                // required for both, click and touch
+                // otherwise propagation won't work to the nested plugin
+                e.stopPropagation();
+                if (e.type === 'touchstart') {
+                    CMS.API.Tooltip._forceTouchOnce();
                 }
-            );
+                var name = that.options.plugin_name;
+                var id = that.options.plugin_id;
+
+                var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+                var placeholder = $('.cms-placeholder-' + placeholderId);
+
+                if (placeholder.length && placeholder.data('cms')) {
+                    name = placeholder.data('cms').name + ': ' + name;
+                }
+
+                CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+            });
         }
     },
 
@@ -318,23 +391,20 @@ var Plugin = new Class({
      * @method _setGeneric
      * @private
      */
-    _setGeneric: function () {
+    _setGeneric: function() {
         var that = this;
 
         // adds double click to edit
-        this.ui.container.off(this.doubleClick).on(this.doubleClick, function (e) {
+        this.ui.container.off(this.doubleClick).on(this.doubleClick, function(e) {
             e.preventDefault();
             e.stopPropagation();
-            that.editPlugin(
-                Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
-                that.options.plugin_name,
-                []
-            );
+            that.editPlugin(Helpers.updateUrlWithPath(that.options.urls.edit_plugin), that.options.plugin_name, []);
         });
 
         // adds edit tooltip
-        this.ui.container.off(this.pointerOverAndOut + ' ' + this.touchStart)
-            .on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
+        this.ui.container
+            .off(this.pointerOverAndOut + ' ' + this.touchStart)
+            .on(this.pointerOverAndOut + ' ' + this.touchStart, function(e) {
                 if (e.type !== 'touchstart') {
                     e.stopPropagation();
                 }
@@ -362,14 +432,14 @@ var Plugin = new Class({
 
         if (!clipboardDraggable.length) {
             pasteItem.addClass('cms-submenu-item-disabled');
-            pasteItem.find('a').attr('tabindex', '-1');
+            pasteItem.find('a').attr('tabindex', '-1').attr('aria-disabled', 'true');
             pasteItem.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
             return false;
         }
 
         if (this.ui.draggable && this.ui.draggable.hasClass('cms-draggable-disabled')) {
             pasteItem.addClass('cms-submenu-item-disabled');
-            pasteItem.find('a').attr('tabindex', '-1');
+            pasteItem.find('a').attr('tabindex', '-1').attr('aria-disabled', 'true');
             pasteItem.find('.cms-submenu-item-paste-tooltip-disabled').css('display', 'block');
             return false;
         }
@@ -379,16 +449,18 @@ var Plugin = new Class({
         if (clipboardDraggable.data('cms')) {
             var clipboardPluginData = clipboardDraggable.data('cms');
             var type = clipboardPluginData.plugin_type;
-            var parent_bounds = $.grep(clipboardPluginData.plugin_parent_restriction, function (restriction) {
+            var parent_bounds = $.grep(clipboardPluginData.plugin_parent_restriction, function(restriction) {
                 // special case when PlaceholderPlugin has a parent restriction named "0"
                 return restriction !== '0';
             });
             var currentPluginType = this.options.plugin_type;
 
-            if ((bounds.length && $.inArray(type, bounds) === -1) ||
-                (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
+            if (
+                (bounds.length && $.inArray(type, bounds) === -1) ||
+                (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)
+            ) {
                 pasteItem.addClass('cms-submenu-item-disabled');
-                pasteItem.find('a').attr('tabindex', '-1');
+                pasteItem.find('a').attr('tabindex', '-1').attr('aria-disabled', 'true');
                 pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
                 return false;
             }
@@ -396,7 +468,7 @@ var Plugin = new Class({
             return false;
         }
 
-        pasteItem.find('a').removeAttr('tabindex');
+        pasteItem.find('a').removeAttr('tabindex').removeAttr('aria-disabled');
         pasteItem.removeClass('cms-submenu-item-disabled');
 
         return true;
@@ -410,7 +482,7 @@ var Plugin = new Class({
      * @param {String} name name of the plugin, e.g. "Column"
      * @param {String} parent id of a parent plugin
      */
-    addPlugin: function (type, name, parent) {
+    addPlugin: function(type, name, parent) {
         var params = {
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
@@ -445,7 +517,7 @@ var Plugin = new Class({
      * @param {Object[]} breadcrumb array of objects representing a breadcrumb,
      *     each item is `{ title: 'string': url: 'string' }`
      */
-    editPlugin: function (url, name, breadcrumb) {
+    editPlugin: function(url, name, breadcrumb) {
         // trigger modal window
         var modal = new Modal({
             onClose: this.options.onClose || false,
@@ -479,7 +551,7 @@ var Plugin = new Class({
      * @returns {Boolean|void}
      */
     // eslint-disable-next-line complexity
-    copyPlugin: function (opts, source_language) {
+    copyPlugin: function(opts, source_language) {
         // cancel request if already in progress
         if (CMS.API.locked) {
             return false;
@@ -513,7 +585,7 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(options.urls.copy_plugin),
             data: data,
-            success: function (response) {
+            success: function(response) {
                 CMS.API.Messages.open({
                     message: CMS.config.lang.success
                 });
@@ -525,7 +597,7 @@ var Plugin = new Class({
                 CMS.API.locked = false;
                 CMS.API.Toolbar.hideLoader();
             },
-            error: function (jqXHR) {
+            error: function(jqXHR) {
                 CMS.API.locked = false;
                 var msg = CMS.config.lang.error;
 
@@ -547,7 +619,7 @@ var Plugin = new Class({
      * @method cutPlugin
      * @returns {Boolean|void}
      */
-    cutPlugin: function () {
+    cutPlugin: function() {
         // if cut is once triggered, prevent additional actions
         if (CMS.API.locked) {
             return false;
@@ -569,7 +641,7 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(that.options.urls.move_plugin),
             data: data,
-            success: function (response) {
+            success: function(response) {
                 CMS.API.locked = false;
                 CMS.API.Messages.open({
                     message: CMS.config.lang.success
@@ -577,7 +649,7 @@ var Plugin = new Class({
                 CMS.API.StructureBoard.invalidateState('CUT', $.extend({}, data, response));
                 CMS.API.Toolbar.hideLoader();
             },
-            error: function (jqXHR) {
+            error: function(jqXHR) {
                 CMS.API.locked = false;
                 var msg = CMS.config.lang.error;
 
@@ -597,7 +669,7 @@ var Plugin = new Class({
      *
      * @method pastePlugin
      */
-    pastePlugin: function () {
+    pastePlugin: function() {
         var id = this._getId(clipboardDraggable);
         var eventData = {
             id: id
@@ -626,7 +698,7 @@ var Plugin = new Class({
      * @param {Boolean} [opts.move_a_copy]
      * @returns {Boolean|void}
      */
-    movePlugin: function (opts) {
+    movePlugin: function(opts) {
         // cancel request if already in progress
         if (CMS.API.locked) {
             return false;
@@ -639,15 +711,13 @@ var Plugin = new Class({
         var dragitem = $(`.cms-draggable-${options.plugin_id}:last`);
 
         // SAVING POSITION
-        var placeholder_id = this._getId(
-            dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first()
-        );
+        var placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
 
         var plugin_parent = this._getId(dragitem.parent().closest('.cms-draggable'));
         var plugin_order = this._getIds(dragitem.siblings('.cms-draggable').andSelf());
 
         if (options.move_a_copy) {
-            plugin_order = plugin_order.map(function (pluginId) {
+            plugin_order = plugin_order.map(function(pluginId) {
                 var id = pluginId;
 
                 // TODO correct way would be to check if it's actually a
@@ -685,7 +755,7 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(options.urls.move_plugin),
             data: data,
-            success: function (response) {
+            success: function(response) {
                 CMS.API.StructureBoard.invalidateState(
                     data.move_a_copy ? 'PASTE' : 'MOVE',
                     $.extend({}, data, response)
@@ -694,11 +764,8 @@ var Plugin = new Class({
                 // enable actions again
                 CMS.API.locked = false;
                 CMS.API.Toolbar.hideLoader();
-
-                // TODO: show only if (response.status)
-                // Plugin._highlightPluginStructure(dragitem);
             },
-            error: function (jqXHR) {
+            error: function(jqXHR) {
                 CMS.API.locked = false;
                 var msg = CMS.config.lang.error;
 
@@ -728,11 +795,11 @@ var Plugin = new Class({
         // set new setting on instance and plugin data
         this.options = settings;
         if (plugin.length) {
-            var index = plugin.data('cms').findIndex(function (pluginData) {
+            var index = plugin.data('cms').findIndex(function(pluginData) {
                 return pluginData.plugin_id === settings.plugin_id;
             });
 
-            plugin.each(function () {
+            plugin.each(function() {
                 $(this).data('cms')[index] = settings;
             });
         }
@@ -750,7 +817,7 @@ var Plugin = new Class({
      * @param {Object[]} breadcrumb array of objects representing a breadcrumb,
      *     each item is `{ title: 'string': url: 'string' }`
      */
-    deletePlugin: function (url, name, breadcrumb) {
+    deletePlugin: function(url, name, breadcrumb) {
         // trigger modal window
         var modal = new Modal({
             onClose: this.options.onClose || false,
@@ -935,12 +1002,8 @@ var Plugin = new Class({
      * @param {Object} toolbar CMS.API.Toolbar instance (not used)
      * @param {Object} response response from server
      */
-    editPluginPostAjax: function (toolbar, response) {
-        this.editPlugin(
-            Helpers.updateUrlWithPath(response.url),
-            this.options.plugin_name,
-            response.breadcrumb
-        );
+    editPluginPostAjax: function(toolbar, response) {
+        this.editPlugin(Helpers.updateUrlWithPath(response.url), this.options.plugin_name, response.breadcrumb);
     },
 
     /**
@@ -956,42 +1019,51 @@ var Plugin = new Class({
         this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
         var dropdown = this.ui.dropdown;
 
-        nav.off(this.pointerUp).on(this.pointerUp, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var trigger = $(this);
+        nav
+            .off(this.pointerUp)
+            .on(this.pointerUp, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var trigger = $(this);
 
-            if (trigger.hasClass('cms-btn-active')) {
-                Plugin._hideSettingsMenu(trigger);
-            } else {
-                Plugin._hideSettingsMenu();
-                that._showSettingsMenu(trigger);
-            }
-        }).off(this.touchStart).on(this.touchStart, function (e) {
-            // required on some touch devices so
-            // ui touch punch is not triggering mousemove
-            // which in turn results in pep triggering pointercancel
-            e.stopPropagation();
-        });
+                if (trigger.hasClass('cms-btn-active')) {
+                    Plugin._hideSettingsMenu(trigger);
+                } else {
+                    Plugin._hideSettingsMenu();
+                    that._showSettingsMenu(trigger);
+                }
+            })
+            .off(this.touchStart)
+            .on(this.touchStart, function(e) {
+                // required on some touch devices so
+                // ui touch punch is not triggering mousemove
+                // which in turn results in pep triggering pointercancel
+                e.stopPropagation();
+            });
 
-        dropdown.off(this.mouseEvents).on(this.mouseEvents, function (e) {
-            e.stopPropagation();
-        }).off(this.touchStart).on(this.touchStart, function (e) {
-            // required for scrolling on mobile
-            e.stopPropagation();
-        });
+        dropdown
+            .off(this.mouseEvents)
+            .on(this.mouseEvents, function(e) {
+                e.stopPropagation();
+            })
+            .off(this.touchStart)
+            .on(this.touchStart, function(e) {
+                // required for scrolling on mobile
+                e.stopPropagation();
+            });
 
         that._setupActions(nav);
         // prevent propagation
         nav
             .on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '))
-            .on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
+            .on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function(e) {
                 e.stopPropagation();
             });
 
-        nav.siblings('.cms-quicksearch, .cms-submenu-dropdown-settings')
+        nav
+            .siblings('.cms-quicksearch, .cms-submenu-dropdown-settings')
             .off([this.pointerUp, this.click, this.doubleClick].join(' '))
-            .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
+            .on([this.pointerUp, this.click, this.doubleClick].join(' '), function(e) {
                 e.stopPropagation();
             });
     },
@@ -1021,9 +1093,12 @@ var Plugin = new Class({
         var isInViewport = elPosition + elHeight + offset <= scrollHeight;
 
         if (!isInViewport) {
-            scrollable.animate({
-                scrollTop: elPosition + offset + elHeight + scrollTop - scrollHeight
-            }, duration);
+            scrollable.animate(
+                {
+                    scrollTop: elPosition + offset + elHeight + scrollTop - scrollHeight
+                },
+                duration
+            );
         }
     },
 
@@ -1045,11 +1120,9 @@ var Plugin = new Class({
         var isTouching;
         var plugins;
 
-        var initModal = Helpers.once(function initModal() {
+        var initModal = once(function initModal() {
             var placeholder = $(
-                '<div class="cms-add-plugin-placeholder">' +
-                    CMS.config.lang.addPluginPlaceholder +
-                '</div>'
+                '<div class="cms-add-plugin-placeholder">' + CMS.config.lang.addPluginPlaceholder + '</div>'
             );
             var dragItem = nav.closest('.cms-dragitem');
             var isPlaceholder = !dragItem.length;
@@ -1078,7 +1151,7 @@ var Plugin = new Class({
             modal.on('cms.modal.closed', function removePlaceholder() {
                 $('.cms-add-plugin-placeholder').remove();
             });
-            modal.on('cms.modal.shown', function () {
+            modal.on('cms.modal.shown', function() {
                 var dropdown = $('.cms-modal-markup .cms-plugin-picker');
 
                 if (!isTouching) {
@@ -1094,43 +1167,47 @@ var Plugin = new Class({
             that._setupQuickSearch(plugins);
         });
 
-        nav.on(this.touchStart, function (e) {
-            isTouching = true;
-            // required on some touch devices so
-            // ui touch punch is not triggering mousemove
-            // which in turn results in pep triggering pointercancel
-            e.stopPropagation();
-        }).on(this.pointerUp, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+        nav
+            .on(this.touchStart, function(e) {
+                isTouching = true;
+                // required on some touch devices so
+                // ui touch punch is not triggering mousemove
+                // which in turn results in pep triggering pointercancel
+                e.stopPropagation();
+            })
+            .on(this.pointerUp, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            Plugin._hideSettingsMenu();
+                Plugin._hideSettingsMenu();
 
-            initModal();
+                initModal();
 
-            // since we don't know exact plugin parent (because dragndrop)
-            // we need to know the parent id by the time we open "add plugin" dialog
-            var pluginsCopy = that._updateWithMostUsedPlugins(
-                plugins.clone(true, true).data(
-                    'parentId', that._getId(nav.closest('.cms-draggable'))
-                ).append(that._getPossibleChildClasses())
-            );
+                // since we don't know exact plugin parent (because dragndrop)
+                // we need to know the parent id by the time we open "add plugin" dialog
+                var pluginsCopy = that._updateWithMostUsedPlugins(
+                    plugins
+                        .clone(true, true)
+                        .data('parentId', that._getId(nav.closest('.cms-draggable')))
+                        .append(that._getPossibleChildClasses())
+                );
 
-            modal.open({
-                title: that.options.addPluginHelpTitle,
-                html: pluginsCopy,
-                width: 530,
-                height: 400
+                modal.open({
+                    title: that.options.addPluginHelpTitle,
+                    html: pluginsCopy,
+                    width: 530,
+                    height: 400
+                });
             });
-        });
 
         // prevent propagation
-        nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
+        nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function(e) {
             e.stopPropagation();
         });
 
-        nav.siblings('.cms-quicksearch, .cms-submenu-dropdown')
-            .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
+        nav
+            .siblings('.cms-quicksearch, .cms-submenu-dropdown')
+            .on([this.pointerUp, this.click, this.doubleClick].join(' '), function(e) {
                 e.stopPropagation();
             });
     },
@@ -1191,21 +1268,24 @@ var Plugin = new Class({
         var resultElements = $($('#cms-plugin-child-classes-' + placeholderId).html());
 
         if (childRestrictions && childRestrictions.length) {
-            resultElements = resultElements.filter(function () {
+            resultElements = resultElements.filter(function() {
                 var item = $(this);
 
-                return item.hasClass('cms-submenu-item-title') ||
-                    childRestrictions.indexOf(item.find('a').attr('href')) !== -1;
+                return (
+                    item.hasClass('cms-submenu-item-title') ||
+                    childRestrictions.indexOf(item.find('a').attr('href')) !== -1
+                );
             });
 
-            resultElements = resultElements.filter(function (index) {
+            resultElements = resultElements.filter(function(index) {
                 var item = $(this);
 
-                return !item.hasClass('cms-submenu-item-title') ||
-                    item.hasClass('cms-submenu-item-title') && (
-                        !resultElements.eq(index + 1).hasClass('cms-submenu-item-title') &&
-                        resultElements.eq(index + 1).length
-                    );
+                return (
+                    !item.hasClass('cms-submenu-item-title') ||
+                    (item.hasClass('cms-submenu-item-title') &&
+                        (!resultElements.eq(index + 1).hasClass('cms-submenu-item-title') &&
+                            resultElements.eq(index + 1).length))
+                );
             });
         }
 
@@ -1226,7 +1306,7 @@ var Plugin = new Class({
         var FILTER_DEBOUNCE_TIMER = 100;
         var FILTER_PICK_DEBOUNCE_TIMER = 110;
 
-        var handler = Helpers.debounce(function () {
+        var handler = debounce(function() {
             var input = $(this);
             // have to always find the pluginsPicker in the handler
             // because of how we move things into/out of the modal
@@ -1235,20 +1315,26 @@ var Plugin = new Class({
             that._filterPluginsList(pluginsPicker, input);
         }, FILTER_DEBOUNCE_TIMER);
 
-        plugins.find('> .cms-quicksearch').find('input')
-            .on(this.keyUp, handler)
-            .on(this.keyUp, Helpers.debounce(function (e) {
+        plugins.find('> .cms-quicksearch').find('input').on(this.keyUp, handler).on(
+            this.keyUp,
+            debounce(function(e) {
                 var input;
                 var pluginsPicker;
 
                 if (e.keyCode === KEYS.ENTER) {
                     input = $(this);
                     pluginsPicker = input.closest('.cms-plugin-picker');
-                    pluginsPicker.find('.cms-submenu-item')
-                        .not('.cms-submenu-item-title').filter(':visible').first().find('> a').focus()
+                    pluginsPicker
+                        .find('.cms-submenu-item')
+                        .not('.cms-submenu-item-title')
+                        .filter(':visible')
+                        .first()
+                        .find('> a')
+                        .focus()
                         .trigger('click');
                 }
-            }, FILTER_PICK_DEBOUNCE_TIMER));
+            }, FILTER_PICK_DEBOUNCE_TIMER)
+        );
     },
 
     /**
@@ -1263,7 +1349,7 @@ var Plugin = new Class({
         var items = '.cms-submenu-edit, .cms-submenu-item a';
         var parent = nav.parent();
 
-        parent.find('.cms-submenu-edit').on(this.touchStart, function (e) {
+        parent.find('.cms-submenu-edit').on(this.touchStart, function(e) {
             // required on some touch devices so
             // ui touch punch is not triggering mousemove
             // which in turn results in pep triggering pointercancel
@@ -1299,7 +1385,6 @@ var Plugin = new Class({
 
         Plugin._hideSettingsMenu(nav);
 
-
         // set switch for subnav entries
         switch (el.attr('data-rel')) {
             // eslint-disable-next-line no-case-declarations
@@ -1307,11 +1392,7 @@ var Plugin = new Class({
                 const pluginType = el.attr('href').replace('#', '');
 
                 Plugin._updateUsageCount(pluginType);
-                that.addPlugin(
-                    pluginType,
-                    el.text(),
-                    el.closest('.cms-plugin-picker').data('parentId')
-                );
+                that.addPlugin(pluginType, el.text(), el.closest('.cms-plugin-picker').data('parentId'));
                 break;
             case 'ajax_add':
                 CMS.API.Toolbar.openAjax({
@@ -1355,6 +1436,12 @@ var Plugin = new Class({
                     that._getPluginBreadcrumbs()
                 );
                 break;
+            case 'highlight':
+                CMS.API.Toolbar.hideLoader();
+                // eslint-disable-next-line no-magic-numbers
+                Plugin._highlightPluginContent(this.options.plugin_id, { seeThrough: true });
+                e.stopImmediatePropagation();
+                break;
             default:
                 CMS.API.Toolbar.hideLoader();
                 CMS.API.Toolbar._delegate(el);
@@ -1376,7 +1463,7 @@ var Plugin = new Class({
         // add key events
         doc.off(this.keyDown + '.traverse');
         // istanbul ignore next: not really possible to reproduce focus state in unit tests
-        doc.on(this.keyDown + '.traverse', function (e) {
+        doc.on(this.keyDown + '.traverse', function(e) {
             var anchors = dropdown.find('.cms-submenu-item:visible a');
             var index = anchors.index(anchors.filter(':focus'));
 
@@ -1409,7 +1496,7 @@ var Plugin = new Class({
      * @private
      * @param {jQuery} nav trigger element
      */
-    _showSettingsMenu: function (nav) {
+    _showSettingsMenu: function(nav) {
         this._checkIfPasteAllowed();
 
         var dropdown = this.ui.dropdown;
@@ -1423,9 +1510,11 @@ var Plugin = new Class({
         dropdown.show();
 
         // calculate dropdown positioning
-        if (this.ui.window.height() + this.ui.window.scrollTop() -
-            nav.offset().top - dropdown.height() <= MIN_SCREEN_MARGIN &&
-            nav.offset().top - dropdown.height() >= 0) {
+        if (
+            this.ui.window.height() + this.ui.window.scrollTop() - nav.offset().top - dropdown.height() <=
+                MIN_SCREEN_MARGIN &&
+            nav.offset().top - dropdown.height() >= 0
+        ) {
             dropdown.removeClass('cms-submenu-dropdown-top').addClass('cms-submenu-dropdown-bottom');
         } else {
             dropdown.removeClass('cms-submenu-dropdown-bottom').addClass('cms-submenu-dropdown-top');
@@ -1456,7 +1545,7 @@ var Plugin = new Class({
 
         mostRecentItems = mostRecentItems.add(mostRecentItems.nextUntil('.cms-submenu-item-title'));
 
-        var itemsToFilter = items.toArray().map(function (el) {
+        var itemsToFilter = items.toArray().map(function(el) {
             var element = $(el);
 
             return {
@@ -1468,18 +1557,18 @@ var Plugin = new Class({
         var filteredItems = fuzzyFilter(itemsToFilter, query, { key: 'value' });
 
         items.hide();
-        filteredItems.forEach(function (item) {
+        filteredItems.forEach(function(item) {
             item.element.show();
         });
 
         // check if a title is matching
-        titles.filter(':visible').each(function (index, item) {
+        titles.filter(':visible').each(function(index, item) {
             titles.hide();
             $(item).nextUntil('.cms-submenu-item-title').show();
         });
 
         // always display title of a category
-        items.filter(':visible').each(function (index, titleItem) {
+        items.filter(':visible').each(function(index, titleItem) {
             var item = $(titleItem);
 
             if (item.prev().hasClass('cms-submenu-item-title')) {
@@ -1513,15 +1602,18 @@ var Plugin = new Class({
         // collapsable function and save states
         if (el.hasClass('cms-dragitem-expanded')) {
             settings.states.splice($.inArray(id, settings.states), 1);
-            el.removeClass('cms-dragitem-expanded').parent()
-                .find('> .cms-collapsable-container').addClass('cms-hidden');
+            el
+                .removeClass('cms-dragitem-expanded')
+                .parent()
+                .find('> .cms-collapsable-container')
+                .addClass('cms-hidden');
 
             if (doc.data('expandmode')) {
                 items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                 if (!items.length) {
                     return false;
                 }
-                items.each(function () {
+                items.each(function() {
                     var item = $(this);
 
                     if (item.hasClass('cms-dragitem-expanded')) {
@@ -1529,18 +1621,20 @@ var Plugin = new Class({
                     }
                 });
             }
-
         } else {
             settings.states.push(id);
-            el.addClass('cms-dragitem-expanded').parent()
-                .find('> .cms-collapsable-container').removeClass('cms-hidden');
+            el
+                .addClass('cms-dragitem-expanded')
+                .parent()
+                .find('> .cms-collapsable-container')
+                .removeClass('cms-hidden');
 
             if (doc.data('expandmode')) {
                 items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                 if (!items.length) {
                     return false;
                 }
-                items.each(function () {
+                items.each(function() {
                     var item = $(this);
 
                     if (!item.hasClass('cms-dragitem-expanded')) {
@@ -1554,7 +1648,7 @@ var Plugin = new Class({
         this.ui.window.trigger('resize.sideframe');
 
         // save settings
-        CMS.API.Toolbar.setSettings(settings);
+        Helpers.setSettings(settings);
     },
 
     /**
@@ -1564,7 +1658,7 @@ var Plugin = new Class({
      * @private
      * @returns {Boolean|void}
      */
-    _collapsables: function () {
+    _collapsables: function() {
         // one time setup
         var that = this;
 
@@ -1580,7 +1674,7 @@ var Plugin = new Class({
         var els = this.ui.draggable.find('.cms-dragitem-collapsable');
         var open = els.filter('.cms-dragitem-expanded');
 
-        if (els.length === open.length && (els.length + open.length !== 0)) {
+        if (els.length === open.length && els.length + open.length !== 0) {
             this.ui.draggable.find('.cms-dragbar-title').addClass('cms-dragbar-title-expanded');
         }
 
@@ -1589,7 +1683,7 @@ var Plugin = new Class({
         // so we consolidate latest click and touch event to run the collapse only once
         dragitem.find('> .cms-dragitem-text').on(
             this.touchEnd + ' ' + this.click,
-            Helpers.debounce(function () {
+            debounce(function() {
                 if (!dragitem.hasClass('cms-dragitem-collapsable')) {
                     return;
                 }
@@ -1606,7 +1700,7 @@ var Plugin = new Class({
      * @param {jQuery} el trigger element that is a child of a placeholder
      * @returns {Boolean|void}
      */
-    _expandAll: function (el) {
+    _expandAll: function(el) {
         var that = this;
         var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
 
@@ -1614,7 +1708,7 @@ var Plugin = new Class({
         if (!items.length) {
             return false;
         }
-        items.each(function () {
+        items.each(function() {
             var item = $(this);
 
             if (!item.hasClass('cms-dragitem-expanded')) {
@@ -1628,7 +1722,7 @@ var Plugin = new Class({
 
         settings.dragbars = settings.dragbars || [];
         settings.dragbars.push(this.options.placeholder_id);
-        CMS.API.Toolbar.setSettings(settings);
+        Helpers.setSettings(settings);
     },
 
     /**
@@ -1638,11 +1732,11 @@ var Plugin = new Class({
      * @private
      * @param {jQuery} el trigger element that is a child of a placeholder
      */
-    _collapseAll: function (el) {
+    _collapseAll: function(el) {
         var that = this;
         var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
 
-        items.each(function () {
+        items.each(function() {
             var item = $(this);
 
             if (item.hasClass('cms-dragitem-expanded')) {
@@ -1656,7 +1750,7 @@ var Plugin = new Class({
 
         settings.dragbars = settings.dragbars || [];
         settings.dragbars.splice($.inArray(this.options.placeholder_id, settings.states), 1);
-        CMS.API.Toolbar.setSettings(settings);
+        Helpers.setSettings(settings);
     },
 
     /**
@@ -1667,7 +1761,7 @@ var Plugin = new Class({
      * @param {jQuery} el element to get id from
      * @returns {String}
      */
-    _getId: function (el) {
+    _getId: function(el) {
         return CMS.API.StructureBoard.getId(el);
     },
 
@@ -1679,7 +1773,7 @@ var Plugin = new Class({
      * @param {jQuery} els elements to get id from
      * @returns {String[]}
      */
-    _getIds: function (els) {
+    _getIds: function(els) {
         return CMS.API.StructureBoard.getIds(els);
     },
 
@@ -1698,8 +1792,8 @@ var Plugin = new Class({
             url: this.options.urls.edit_plugin
         });
 
-        var findParentPlugin = function (id) {
-            return $.grep(CMS._plugins || [], function (pluginOptions) {
+        var findParentPlugin = function(id) {
+            return $.grep(CMS._plugins || [], function(pluginOptions) {
                 return pluginOptions[0] === 'cms-plugin-' + id;
             })[0];
         };
@@ -1725,7 +1819,6 @@ var Plugin = new Class({
     }
 });
 
-
 /**
  * Updates plugin data in CMS._plugins / CMS._instances or creates new
  * plugin instances if they didn't exist
@@ -1736,12 +1829,9 @@ var Plugin = new Class({
  * @param {Object[]} plugins plugins data
  */
 Plugin._updateRegistry = function _updateRegistry(plugins) {
-    plugins.forEach((pluginData) => {
+    plugins.forEach(pluginData => {
         const pluginContainer = `cms-plugin-${pluginData.plugin_id}`;
-        const pluginIndex = findIndex(
-            CMS._plugins,
-            ([pluginStr]) => pluginStr === pluginContainer
-        );
+        const pluginIndex = findIndex(CMS._plugins, ([pluginStr]) => pluginStr === pluginContainer);
 
         if (pluginIndex === -1) {
             CMS._plugins.push([pluginContainer, pluginData]);
@@ -1763,7 +1853,7 @@ Plugin._updateRegistry = function _updateRegistry(plugins) {
  * @private
  * @param {jQuery} [navEl] element representing the subnav trigger
  */
-Plugin._hideSettingsMenu = function (navEl) {
+Plugin._hideSettingsMenu = function(navEl) {
     var nav = navEl || $('.cms-submenu-btn.cms-btn-active');
 
     if (!nav.length) {
@@ -1778,10 +1868,7 @@ Plugin._hideSettingsMenu = function (navEl) {
     nav.siblings('.cms-submenu-dropdown').hide();
     nav.siblings('.cms-quicksearch').hide();
     // reset search
-    nav.siblings('.cms-quicksearch')
-        .find('input')
-        .val('')
-        .trigger(this.keyUp).blur();
+    nav.siblings('.cms-quicksearch').find('input').val('').trigger(this.keyUp).blur();
 
     // reset relativity
     $('.cms-dragbar').css('position', '');
@@ -1805,55 +1892,69 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     Plugin._updateClipboard();
 
     // Structureboard initialized too late
-    setTimeout(function () {
+    setTimeout(function() {
         var pluginData = {};
         var html = '';
 
         if (clipboardDraggable.length) {
             pluginData = clipboardDraggable.data('cms');
             html = clipboardDraggable.parent().html();
-
         }
         if (CMS.API && CMS.API.Clipboard) {
             CMS.API.Clipboard.populate(html, pluginData);
         }
     }, 0);
 
-    doc.on('pointerup.cms.plugin', function () {
-        // call it as a static method, because otherwise we trigger it the
-        // amount of times CMS.Plugin is instantiated,
-        // which does not make much sense.
-        Plugin._hideSettingsMenu();
-    }).on('keydown.cms.plugin', function (e) {
-        if (e.keyCode === KEYS.SHIFT) {
-            doc.data('expandmode', true);
-        }
-    }).on('keyup.cms.plugin', function (e) {
-        if (e.keyCode === KEYS.SHIFT) {
-            doc.data('expandmode', false);
-        }
-    }).on('click.cms.plugin', '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin', function (e) {
-        var DOUBLECLICK_DELAY = 300;
+    doc
+        .on('pointerup.cms.plugin', function() {
+            // call it as a static method, because otherwise we trigger it the
+            // amount of times CMS.Plugin is instantiated,
+            // which does not make much sense.
+            Plugin._hideSettingsMenu();
+        })
+        .on('keydown.cms.plugin', function(e) {
+            if (e.keyCode === KEYS.SHIFT) {
+                doc.data('expandmode', true);
+                try {
+                    $(':hover').trigger('mouseenter');
+                } catch (err) {}
+            }
+        })
+        .on('keyup.cms.plugin', function(e) {
+            if (e.keyCode === KEYS.SHIFT) {
+                doc.data('expandmode', false);
+                try {
+                    $(':hover').trigger('mouseleave');
+                } catch (err) {}
+            }
+        })
+        .on('click.cms.plugin', '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin', function(e) {
+            var DOUBLECLICK_DELAY = 300;
 
-        // prevents single click from messing up the edit call
-        // don't go to the link if there is custom js attached to it
-        // or if it's clicked along with shift, ctrl, cmd
-        if (e.shiftKey || e.ctrlKey || e.metaKey || e.isDefaultPrevented()) {
-            return;
-        }
-        e.preventDefault();
-        if (++clickCounter === 1) {
-            timer = setTimeout(function () {
-                // FIXME this shouldn't happen if the default was prevented already
-                var anchor = $(e.target).closest('a');
+            // prevents single click from messing up the edit call
+            // don't go to the link if there is custom js attached to it
+            // or if it's clicked along with shift, ctrl, cmd
+            if (e.shiftKey || e.ctrlKey || e.metaKey || e.isDefaultPrevented()) {
+                return;
+            }
+            e.preventDefault();
+            if (++clickCounter === 1) {
+                timer = setTimeout(function() {
+                    // FIXME this shouldn't happen if the default was prevented already
+                    var anchor = $(e.target).closest('a');
 
+                    clickCounter = 0;
+                    window.open(anchor.attr('href'), anchor.attr('target') || '_self');
+                }, DOUBLECLICK_DELAY);
+            } else {
+                clearTimeout(timer);
                 clickCounter = 0;
-                window.open(anchor.attr('href'), anchor.attr('target') || '_self');
-            }, DOUBLECLICK_DELAY);
-        } else {
-            clearTimeout(timer);
-            clickCounter = 0;
-        }
+            }
+        });
+
+    $(window).on('blur.cms', (e) => {
+        // TODO should be called differently tbh
+        doc.data('expandmode', false);
     });
 };
 
@@ -1872,7 +1973,7 @@ Plugin._isContainingMultiplePlugins = function _isContainingMultiplePlugins(node
         throw new Error('Provided node is not a cms plugin.');
     }
 
-    var pluginIds = currentData.map(function (pluginData) {
+    var pluginIds = currentData.map(function(pluginData) {
         return pluginData.plugin_id;
     });
 
@@ -1896,16 +1997,27 @@ Plugin._isContainingMultiplePlugins = function _isContainingMultiplePlugins(node
  * @static
  * @param {jQuery} el draggable element
  */
-Plugin._highlightPluginStructure = function _highlightPluginStructure(el) {
-    var tpl = $('<div class="cms-dragitem-success"></div>');
-    var SUCCESS_TIMEOUT = 2000;
+// eslint-disable-next-line no-magic-numbers
+Plugin._highlightPluginStructure = function _highlightPluginStructure(
+    el,
+    // eslint-disable-next-line no-magic-numbers
+    { successTimeout = 200, delay = 1500, seeThrough = false }
+) {
+    const tpl = $(`
+        <div class="cms-dragitem-success ${seeThrough ? 'cms-plugin-overlay-see-through' : ''}">
+        </div>
+    `);
 
     el.addClass('cms-draggable-success').append(tpl);
     // start animation
-    tpl.fadeOut(SUCCESS_TIMEOUT, function () {
-        $(this).remove();
-        el.removeClass('cms-draggable-success');
-    });
+    if (successTimeout) {
+        setTimeout(() => {
+            tpl.fadeOut(successTimeout, function() {
+                $(this).remove();
+                el.removeClass('cms-draggable-success');
+            });
+        }, delay);
+    }
     // make sure structurboard gets updated after success
     $(Helpers._getWindow()).trigger('resize.sideframe');
 };
@@ -1918,25 +2030,43 @@ Plugin._highlightPluginStructure = function _highlightPluginStructure(el) {
  * @static
  * @param {String|Number} pluginId
  */
-Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
+Plugin._highlightPluginContent = function _highlightPluginContent(
+    pluginId,
+    // eslint-disable-next-line no-magic-numbers
+    { successTimeout = 200, seeThrough = false, delay = 1500, prominent = false } = {}
+) {
     var coordinates = {};
     var positions = [];
     var win = $(Helpers._getWindow());
-    var SUCCESS_TIMEOUT = 2000;
-    var OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO = 0.20;
+    var OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO = 0.2;
 
-    $('.cms-plugin-' + pluginId).each(function () {
+    $('.cms-plugin-' + pluginId).each(function() {
         var el = $(this);
         var offset = el.offset();
+        var ml = parseInt(el.css('margin-left'), 10);
+        var mr = parseInt(el.css('margin-right'), 10);
+        var mt = parseInt(el.css('margin-top'), 10);
+        var mb = parseInt(el.css('margin-bottom'), 10);
 
-        positions.push(
-            {
-                x1: offset.left,
-                x2: offset.left + el.outerWidth(),
-                y1: offset.top,
-                y2: offset.top + el.outerHeight()
-            }
-        );
+        if (isNaN(ml)) {
+            ml = 0;
+        }
+        if (isNaN(mr)) {
+            mr = 0;
+        }
+        if (isNaN(mt)) {
+            mt = 0;
+        }
+        if (isNaN(mb)) {
+            mb = 0;
+        }
+
+        positions.push({
+            x1: offset.left - ml,
+            x2: offset.left + el.outerWidth() + mr,
+            y1: offset.top - mt,
+            y2: offset.top + el.outerHeight() + mb
+        });
     });
 
     // turns out that offset calculation will be off by toolbar height if
@@ -1944,39 +2074,53 @@ Plugin._highlightPluginContent = function _highlightPluginContent(pluginId) {
     var html = $('html');
     var htmlMargin = html.css('position') === 'relative' ? parseInt($('html').css('margin-top'), 10) : 0;
 
-    coordinates.left = Math.min.apply(null, positions.map(function (pos) {
-        return pos.x1;
-    }));
-    coordinates.top = Math.min.apply(null, positions.map(function (pos) {
-        return pos.y1;
-    })) - htmlMargin;
-    coordinates.width = Math.max.apply(null, positions.map(function (pos) {
-        return pos.x2;
-    })) - coordinates.left;
-    coordinates.height = Math.max.apply(null, positions.map(function (pos) {
-        return pos.y2;
-    })) - coordinates.top - htmlMargin;
+    coordinates.left = Math.min(...positions.map(pos => pos.x1));
+    coordinates.top = Math.min(...positions.map(pos => pos.y1)) - htmlMargin;
+    coordinates.width = Math.max(...positions.map(pos => pos.x2)) - coordinates.left;
+    coordinates.height = Math.max(...positions.map(pos => pos.y2)) - coordinates.top - htmlMargin;
 
     win.scrollTop(coordinates.top - win.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
 
-    $('<div class="cms-plugin-overlay cms-dragitem-success"></div>').css(coordinates).css({
-        zIndex: 9999
-    }).appendTo($('body'));
+    $(
+        `
+        <div class="
+            cms-plugin-overlay
+            cms-dragitem-success
+            cms-plugin-overlay-${pluginId}
+            ${seeThrough ? 'cms-plugin-overlay-see-through' : ''}
+            ${prominent ? 'cms-plugin-overlay-prominent' : ''}
+        "
+            data-success-timeout="${successTimeout}"
+        >
+        </div>
+    `
+    )
+        .css(coordinates)
+        .css({
+            zIndex: 9999
+        })
+        .appendTo($('body'));
 
-    $('.cms-plugin-overlay').fadeOut(SUCCESS_TIMEOUT, function () {
-        $(this).remove();
-    });
+    if (successTimeout) {
+        setTimeout(() => {
+            $(`.cms-plugin-overlay-${pluginId}`).fadeOut(successTimeout, function() {
+                $(this).remove();
+            });
+        }, delay);
+    }
 };
 
+Plugin._removeHighlightPluginContent = function(pluginId) {
+    $(`.cms-plugin-overlay-${pluginId}[data-success-timeout=0]`).remove();
+};
 
 Plugin.aliasPluginDuplicatesMap = {};
 Plugin.staticPlaceholderDuplicatesMap = {};
 
-
 // istanbul ignore next
 Plugin._initializeTree = function _initializeTree() {
     CMS._plugins = uniqWith(CMS._plugins, isEqual);
-    CMS._instances = CMS._plugins.map(function (args) {
+    CMS._instances = CMS._plugins.map(function(args) {
         return new CMS.Plugin(args[0], args[1]);
     });
 };

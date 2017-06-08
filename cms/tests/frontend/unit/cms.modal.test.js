@@ -275,14 +275,6 @@ describe('CMS.Modal', function () {
             modal.minimize(); // restore
         });
 
-        it('opens the toolbar', function () {
-            modal.open({ html: '<div></div>' });
-            modal.minimize();
-
-            expect(CMS.API.Toolbar.open).toHaveBeenCalled();
-            modal.minimize(); // restore
-        });
-
         it('stores the css data to be able to restore a modal', function () {
             modal.open({ html: '<div></div>' });
             modal.minimize();

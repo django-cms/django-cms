@@ -10,7 +10,6 @@
     "babel-plugin-rewire": "^1.1.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.4.0",
-    "babel-runtime": "^6.23.0",
     "browserslist-saucelabs": "^0.2.3",
     "djangocms-casper-helpers": "^1.4.0",
     "eslint-plugin-compat": "^1.0.2",
@@ -46,10 +45,12 @@
     "webpack": "^2.5.1"
   },
   "dependencies": {
+    "babel-runtime": "^6.23.0",
     "diff-dom": "^2.1.0",
     "fuzzaldrin": "^2.1.0",
     "keyboardjs": "^2.3.1",
     "lodash": "^4.17.4",
+    "nprogress": "^0.2.0",
     "urijs": "^1.18.10"
   }
 }

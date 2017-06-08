@@ -8,14 +8,24 @@
     right: 0;
     z-index: z(toolbar, base);
     min-height: $toolbar-height;
-    margin-top: -$toolbar-height - 10px;
-    border-bottom: 1px solid $toolbar-border !important;
+    margin-top: 0;
     background-color: $white;
-    box-shadow: $toolbar-shadow;
     backface-visibility: hidden;
-
-    .cms-toolbar-expanded & {
-        margin-top: 0;
+    &:after {
+        position: absolute;
+        content: '';
+        box-shadow: $toolbar-shadow;
+        top: 100%;
+        left: 0;
+        right: $toolbar-height - 1px;
+        height: 1px;
+        margin-top: -1px;
+        z-index: z(debug);
+        clip: rect(0, auto, 10px, 0);
+        background: $toolbar-border !important;
+        @at-root .cms-structure-mode-content & {
+            right: 0;
+        }
     }
 
     .cms-toolbar-left {
@@ -29,7 +39,7 @@
         right: 0;
         top: 0;
         z-index: z(toolbar, right);
-        padding-right: $toolbar-trigger-width + 2px;
+        padding-right: $toolbar-height;
     }
 
     .cms-toolbar-left .cms-toolbar-item {
@@ -53,37 +63,31 @@
     .cms .cms-toolbar {
         position: absolute;
     }
-    .cms.cms-toolbar-debug .cms-toolbar {
-        margin-top: -$toolbar-debug-height !important;
-    }
 }
 
 
 //###########################################################
 // #TOOLBAR/debug#
 &.cms-toolbar-debug {
-    .cms-toolbar {
-        top: $toolbar-debug-height !important;
-    }
-    .cms-toolbar-trigger {
-        top: $toolbar-debug-height !important;
-    }
-
     .cms-debug-bar {
-        position: fixed;
-        top: 0;
+        position: absolute;
         left: 0;
+        right: 0;
+        top: 0;
         z-index: z(debug);
-        width: 100%;
         height: $toolbar-debug-height;
-        border-bottom: 1px solid $gray-lighter;
         background-color: $toolbar-debug-bgcolor;
-        background-image: linear-gradient($gradient-striped-dark);
-        background-size: $toolbar-debug-bgsize;
+        z-index: 30;
+
+        @at-root .cms-structure-mode-structure & {
+            right: $toolbar-height;
+        }
     }
-}
-&.cms-toolbar-debug #container {
-    padding-top: $toolbar-height + $toolbar-debug-height !important;
+    .cms-toolbar .cms-btn-action {
+        background-color: $toolbar-debug-bgcolor;
+        border-color: $toolbar-debug-bgcolor;
+        color: $black;
+    }
 }
 
 //###########################################################
@@ -247,8 +251,6 @@
     width: 100%;
     // 100vw is better because if the user's content exceeds the viewport width
     // the dropdown will also go out of the screen, which is not ideal, esp. on mobile
-    // technically we should also adapt toolbar trigger, but it would involve calc
-    // which is not very performant.
     width: 100vw;
     top: $toolbar-height;
     bottom: 0;
@@ -289,11 +291,47 @@
         margin-left: 20px;
     }
 }
-&.cms-toolbar-debug .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
-    top: $toolbar-height + $toolbar-debug-height;
-}
 .cms-toolbar-item-cms-mode-switcher {
-    display: none;
+    // display: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: $toolbar-height;
+    height: $toolbar-height;
+    margin-right: 0 !important;
+
+    .cms-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        border-top: 0 !important;
+        border-right: 0 !important;
+        width: $toolbar-height;
+        height: $toolbar-height + 20px;
+        display: block;
+        border-radius: 0;
+        border-bottom: 0;
+        clip: rect(0, $toolbar-height, $toolbar-height, 0px);
+        .cms-icon {
+            position: absolute;
+            left: $toolbar-height / 2;
+            top: $toolbar-height / 2;
+            margin-left: -10px;
+            margin-top: -9px;
+            font-size: 20px !important;
+        }
+        &.cms-btn-active {
+            &,
+            &:active,
+            &:focus {
+                border-color: $toolbar-border !important;
+                background-color: $structure-bgcolor !important;
+            }
+        }
+    }
 }
 
 //###########################################################
@@ -359,9 +397,6 @@
 }
 .cms-messages-error strong {
     color: $color-danger;
-}
-&.cms-toolbar-debug .cms-messages {
-    margin-top: $toolbar-debug-height;
 }
 
 //###########################################################
@@ -515,72 +550,6 @@
     }
 }
 
-// #TOOLBAR/elements/toggler#
-.cms-toolbar-trigger {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: z(toolbar-trigger);
-    border-bottom: 1px solid $toolbar-border;
-    border-left: 1px solid $toolbar-border;
-    background: $white;
-
-    a {
-        display: block;
-        width: $toolbar-trigger-width;
-        height: $toolbar-trigger-height - 1px;
-        text-align: center;
-        border-top: 1px solid $white;
-        border-left: 1px solid $white;
-        background: $white;
-        &:hover {
-            background: $white;
-        }
-        &:hover span,
-        &:active span,
-        &:focus span {
-            color: $gray-darkest;
-        }
-        span {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-left: -($toolbar-trigger-icon-size / 2);
-            margin-top: -($toolbar-trigger-icon-size / 2 + 1px);
-            font-size: $toolbar-trigger-icon-size;
-            color: $gray-darker;
-            transition: transform $speed-base;
-            transform: rotate(270deg);
-            background: none;
-        }
-    }
-}
-// #TOOLBAR/elements/loader#
-.cms-toolbar-trigger-expanded a span {
-    transform: rotate(90deg);
-}
-.cms-toolbar-loader {
-    a {
-        span {
-            @extend .cms-icon-loader;
-            position: absolute;
-            margin-top: -($toolbar-trigger-loader-size / 2);
-            margin-left: -($toolbar-trigger-loader-size / 2);
-            font-size: $toolbar-trigger-loader-size;
-            line-height: $toolbar-trigger-loader-size;
-            background: transparent;
-            animation: cms-spin 2s infinite linear;
-        }
-        &,
-        &:hover,
-        &:focus {
-            span {
-                color: $color-primary;
-            }
-        }
-    }
-}
-
 // TODO Reimplement blinking if unpublished content is present
 //###########################################################
 // #TOOLBAR/blocker#
@@ -614,4 +583,31 @@
     a:hover {
         text-decoration: underline;
     }
+}
+
+@at-root .cms-scrollbar-measure {
+    overflow-y: scroll;
+}
+
+.cms-loading-bar {
+    background: $color-primary;
+
+    position: fixed;
+    z-index: 99999999;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 2px;
+}
+
+.cms-loading-peg {
+    display: block;
+    position: absolute;
+    right: 0px;
+    width: 100px;
+    height: 100%;
+    box-shadow: 0 0 10px #29d, 0 0 5px $color-primary;
+    opacity: 1.0;
+    transform: rotate(3deg) translate(0px, -4px);
 }

@@ -14,12 +14,9 @@ describe('CMS.Navigation', function () {
     });
 
     it('has no public API', function () {
-        var allowedKeys = Object.keys(CMS.API.Helpers).concat(['initialize']);
-
+        // eslint-disable-next-line
         for (var key in CMS.Navigation.prototype) {
-            if (allowedKeys.indexOf(key) === '-1') {
-                expect(key[0]).not.toEqual('_');
-            }
+            expect(key[0]).not.toEqual('_');
         }
     });
 
@@ -81,7 +78,6 @@ describe('CMS.Navigation', function () {
                 leftTotalWidth: jasmine.any(Number),
                 right: [
                     // cannot check for actual widths since they vary browser to browser
-                    { element: jasmine.any(Object), width: jasmine.any(Number) },
                     { element: jasmine.any(Object), width: jasmine.any(Number) },
                     { element: jasmine.any(Object), width: jasmine.any(Number) },
                     { element: jasmine.any(Object), width: jasmine.any(Number) }
@@ -173,8 +169,7 @@ describe('CMS.Navigation', function () {
                     right: [
                         { element: nav.items.right[0].element, width: 100 },
                         { element: nav.items.right[1].element, width: 100 },
-                        { element: nav.items.right[2].element, width: 100 },
-                        { element: nav.items.right[3].element, width: 100 }
+                        { element: nav.items.right[2].element, width: 100 }
                     ],
                     rightTotalWidth: 400,
                     moreButtonWidth: 50
@@ -209,7 +204,7 @@ describe('CMS.Navigation', function () {
             expect(nav._showDropdown).toHaveBeenCalled();
             expect(nav._showAllRight).not.toHaveBeenCalled();
             expect(nav.rightMostItemIndex).toEqual(-1);
-            expect(nav.leftMostItemIndex).toEqual(4);
+            expect(nav.leftMostItemIndex).toEqual(3);
 
             nav._handleResize();
 
@@ -217,7 +212,7 @@ describe('CMS.Navigation', function () {
             expect(nav._showDropdown).toHaveBeenCalledTimes(2);
             expect(nav._showAllRight).not.toHaveBeenCalled();
             expect(nav.rightMostItemIndex).toEqual(-1);
-            expect(nav.leftMostItemIndex).toEqual(4);
+            expect(nav.leftMostItemIndex).toEqual(3);
         });
 
         it('shows "more" dropdown if there is not enough space in the toolbar', function () {
@@ -256,7 +251,7 @@ describe('CMS.Navigation', function () {
             nav._handleResize();
             expect(nav.ui.dropdown.find('.cms-more-buttons').length).toEqual(0);
             nav._handleResize();
-            expect(nav.ui.dropdown.find('.cms-more-buttons').length).toEqual(4);
+            expect(nav.ui.dropdown.find('.cms-more-buttons').length).toEqual(3);
         });
 
         it('adds cms-toolbar-item-navigation-children class if moved item has menu', function () {

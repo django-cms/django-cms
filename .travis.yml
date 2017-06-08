@@ -65,11 +65,10 @@ before_install:
 
 install:
   - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; pip freeze; fi
-  - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+  - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then nvm install 6 && nvm use 6; fi
   # Disable the spinner, it looks bad on Travis
   - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then npm config set spin false; fi
-  - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then npm install -g npm@2; fi
-  - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then npm install -g gulp@3.9.0; fi
+  - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then npm install -g gulp@3.9.1; fi
   - if [ "$FRONTEND" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then scripts/install-npm-dependencies.sh; fi
   - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ] && [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
   - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ] && [ "$DATABASE_URL" == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi

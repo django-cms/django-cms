@@ -94,8 +94,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
-                _lock: jasmine.createSpy()
+                hideLoader: jasmine.createSpy()
             };
             $(function () {
                 sideframe = new CMS.Sideframe();
@@ -175,18 +174,18 @@ describe('CMS.Sideframe', function () {
 
             CMS.config.request.language = 'ru';
             sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, ['language=ru']]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, [['language', 'ru']]]);
 
             CMS.config.request.language = false;
             CMS.config.request.page_id = 'page_id';
             sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, ['page_id=page_id']]);
+            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, [['page_id', 'page_id']]]);
 
             CMS.config.request.language = 'de';
             CMS.config.request.page_id = 'page_id_another';
             sideframe.open({ url: url });
             expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual(
-                [url, ['language=de', 'page_id=page_id_another']]
+                [url, [['language', 'de'], ['page_id', 'page_id_another']]]
             );
         });
 
@@ -201,16 +200,6 @@ describe('CMS.Sideframe', function () {
                 width: '95%',
                 overflow: 'visible'
             }, 300);
-        });
-
-        it('opens the toolbar', function () {
-            sideframe.open({ url: url });
-            expect(CMS.API.Toolbar.open).toHaveBeenCalled();
-        });
-
-        it('locks the toolbar', function () {
-            sideframe.open({ url: url });
-            expect(CMS.API.Toolbar._lock).toHaveBeenCalledWith(true);
         });
 
         it('hides the toolbar loader', function () {
@@ -287,7 +276,7 @@ describe('CMS.Sideframe', function () {
             CMS.config.debug = true;
             sideframe.open({ url: url });
 
-            expect(CMS.settings.sideframe).toEqual({ hidden: false });
+            expect(CMS.settings.sideframe).toEqual(jasmine.objectContaining({ hidden: false }));
             sideframe.ui.frame.find('iframe').on('load', function () {
                 expect($(this.contentDocument.body)).toHaveClass('cms-debug');
                 done();
@@ -297,7 +286,7 @@ describe('CMS.Sideframe', function () {
         it('saves the url in settings', function (done) {
             sideframe.open({ url: url });
 
-            expect(CMS.settings.sideframe).toEqual({ hidden: false });
+            expect(CMS.settings.sideframe).toEqual(jasmine.objectContaining({ hidden: false }));
             sideframe.ui.frame.find('iframe').on('load', function () {
                 expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
                 // actual url would be http://localhost:port/${url}
@@ -348,8 +337,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
-                _lock: jasmine.createSpy()
+                hideLoader: jasmine.createSpy()
             };
             $(function () {
                 sideframe = new CMS.Sideframe();
@@ -394,12 +382,6 @@ describe('CMS.Sideframe', function () {
             sideframe.open({ url: url });
             sideframe.close();
             expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE', false, true);
-        });
-
-        it('unlocks the toolbar', function () {
-            sideframe.open({ url: url });
-            sideframe.close();
-            expect(CMS.API.Toolbar._lock).toHaveBeenCalledWith(false);
         });
 
         it('removes the loader from sideframe', function () {
@@ -462,8 +444,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
-                _lock: jasmine.createSpy()
+                hideLoader: jasmine.createSpy()
             };
             $(function () {
                 sideframe = new CMS.Sideframe();
@@ -565,8 +546,7 @@ describe('CMS.Sideframe', function () {
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
-                _lock: jasmine.createSpy()
+                hideLoader: jasmine.createSpy()
             };
             $(function () {
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';

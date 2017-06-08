@@ -121,8 +121,8 @@ var Sideframe = new Class({
         var animate = opts.animate;
 
         // setup internals
-        var language = 'language=' + CMS.config.request.language;
-        var page_id = 'page_id=' + CMS.config.request.page_id;
+        var language = ['language', CMS.config.request.language];
+        var page_id = ['page_id', CMS.config.request.page_id];
         var params = [];
 
         // We have to rebind events every time we open a sideframe
@@ -250,10 +250,6 @@ var Sideframe = new Class({
                 body.addClass('cms-debug');
             }
 
-            // save url in settings
-            CMS.settings.sideframe.url = iframe[0].contentWindow.location.href;
-            CMS.settings = Helpers.setSettings(CMS.settings);
-
             // This essentially hides the toolbar dropdown when
             // click happens inside of a sideframe iframe
             contents.on(that.click, function () {
@@ -275,6 +271,24 @@ var Sideframe = new Class({
             // update history
             that._addToHistory(this.contentWindow.location.href);
         });
+
+        let iframeUrl = url;
+
+        CMS.settings.sideframe.url = iframeUrl;
+        CMS.settings = Helpers.setSettings(CMS.settings);
+
+        this.pageLoadInterval = setInterval(() => {
+            try {
+                const currentUrl = iframe[0].contentWindow.location.href;
+
+                if (currentUrl !== iframeUrl) {
+                    // save url in settings
+                    CMS.settings.sideframe.url = currentUrl;
+                    CMS.settings = Helpers.setSettings(CMS.settings);
+                    iframeUrl = currentUrl;
+                }
+            } catch (e) {}
+        }, 100); // eslint-disable-line
 
         // clear the frame (removes all the handlers)
         holder.empty();
@@ -308,9 +322,7 @@ var Sideframe = new Class({
         // istanbul ignore else: always trigger API handlers
         if (CMS.API && CMS.API.Toolbar) {
             // FIXME: initialization needs to be done after our libs are loaded
-            CMS.API.Toolbar.open();
             CMS.API.Toolbar.hideLoader();
-            CMS.API.Toolbar._lock(true);
         }
 
         // add esc close event
@@ -349,6 +361,8 @@ var Sideframe = new Class({
         this._hide({
             duration: this.options.sideframeDuration / 2
         });
+
+        clearInterval(this.pageLoadInterval);
     },
 
     /**
@@ -370,11 +384,6 @@ var Sideframe = new Class({
             $(this).hide();
         });
         this.ui.frame.removeClass('cms-loader');
-
-        // istanbul ignore else
-        if (CMS.API && CMS.API.Toolbar) {
-            CMS.API.Toolbar._lock(false);
-        }
 
         this.ui.body.off('keydown.cms.close');
 

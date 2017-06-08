@@ -1,4 +1,16 @@
 /**
+ * preload
+ *
+ * @public
+ * @param {String} image path
+ */
+function preload(image) {
+    try {
+        new Image().src = image;
+    } catch (e) {}
+}
+
+/**
  * preloadImagesFromMarkup
  * In this case we don't care much if it succeeds or not, we just try our best
  *
@@ -19,17 +31,5 @@ export default function preloadImagesFromMarkup(html) {
         }
     } while (match);
 
-    images.forEach((image) => preload(image));
-}
-
-/**
- * preload
- *
- * @public
- * @param {String} image path
- */
-function preload(image) {
-    try {
-        (new Image()).src = image;
-    } catch (e) {}
+    images.forEach(image => preload(image));
 }
