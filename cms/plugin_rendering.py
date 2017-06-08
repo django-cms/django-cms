@@ -388,10 +388,6 @@ class ContentRenderer(object):
                 placeholder=placeholder,
                 content=content,
             )
-            placeholder_cache = self._rendered_plugins_by_placeholder[placeholder.pk]
-
-            plugins_cache = placeholder_cache.setdefault('plugins', [])
-            plugins_cache.append(instance)
 
         for processor in DEFAULT_PLUGIN_PROCESSORS:
             content = processor(instance, placeholder, content, context)
@@ -406,18 +402,7 @@ class ContentRenderer(object):
         output = ('<template class="cms-plugin '
                   'cms-plugin-start cms-plugin-%(pk)s"></template>%(content)s'
                   '<template class="cms-plugin cms-plugin-end cms-plugin-%(pk)s"></template>')
-        try:
-            # Compatibility with CMS < 3.4
-            template = self.get_cached_template(plugin_class.frontend_edit_template)
-        except AttributeError:
-            content = output % {'pk': instance.pk, 'content': content}
-        else:
-            warnings.warn(
-                "Attribute `frontend_edit_template` will be removed in django CMS 3.5",
-                PendingDeprecationWarning
-            )
-            content = template.render(context)
-
+        content = output % {'pk': instance.pk, 'content': content}
         plugin_type = instance.plugin_type
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
 
@@ -439,6 +424,9 @@ class ContentRenderer(object):
                 instance=instance,
             )
             children_cache[plugin_type] = child_classes or []
+
+        placeholder_cache = self._rendered_plugins_by_placeholder[placeholder.pk]
+        placeholder_cache.setdefault('plugins', []).append(instance)
         return content
 
     def render_editable_placeholder(self, placeholder, context, language):

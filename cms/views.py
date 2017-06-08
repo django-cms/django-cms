@@ -21,6 +21,24 @@ from cms.utils.page import get_pages_queryset
 from cms.utils.page_resolver import get_page_from_request
 
 
+def cms_editable(func):
+    def view(request, *args, **kwargs):
+        if request.GET.get('structure'):
+            return ''
+        return func(request, *args, **kwargs)
+    return view
+
+
+def serve_homepage(request):
+    # Get a Page model object from the request
+    page = get_page_from_request(request, use_path='')
+    draft_pages = get_pages_queryset(draft=True)
+
+    if not page and not draft_pages.exists():
+        # render the welcome page if there's no pages
+        return _render_welcome_page(request)
+
+
 def details(request, slug):
     """
     The main view of the Django-CMS! Takes a request and a slug, renders the
@@ -47,12 +65,6 @@ def details(request, slug):
 
     # Get a Page model object from the request
     page = get_page_from_request(request, use_path=slug)
-    draft_pages =  get_pages_queryset(draft=True)
-
-    if not page and not slug and not draft_pages.exists():
-        # render the welcome page if the requested path is root "/"
-        # and there's no pages
-        return _render_welcome_page(request)
 
     if not page:
         # raise 404
@@ -142,12 +154,7 @@ def details(request, slug):
         page_slug = page.get_path(language=current_language) or page.get_slug(language=current_language)
 
         if slug and slug != page_slug and request.path[:len(page_path)] != page_path:
-            # The current language does not match it's slug.
-            #  Redirect to the current language.
-            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
-                request.toolbar.redirect_url = page_path
-            else:
-                return HttpResponseRedirect(page_path)
+            return HttpResponseRedirect(page_path)
 
     if apphook_pool.get_apphooks():
         # There are apphooks in the pool. Let's see if there is one for the
@@ -172,8 +179,10 @@ def details(request, slug):
                     return view(request, *args, **kwargs)
                 except Resolver404:
                     pass
+
     # Check if the page has a redirect url defined for this language.
     redirect_url = page.get_redirect(language=current_language)
+
     if redirect_url:
         if (is_language_prefix_patterns_used() and redirect_url[0] == "/"
                 and not redirect_url.startswith('/%s/' % current_language)):
