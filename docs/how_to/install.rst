@@ -240,7 +240,24 @@ You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not ab
 Context processors
 ==================
 
-Add ``'cms.context_processors.cms_settings'`` to ``TEMPLATES['OPTIONS']['context_processors']``.
+Add ``'cms.context_processors.cms_settings'`` and ``'django.template.context_processors.i18n'`` to
+``TEMPLATES['OPTIONS']['context_processors']``:
+
+..  code-block:: python
+    :emphasize-lines: 7,8
+
+    TEMPLATES = [
+        {
+            ...
+            'OPTIONS': {
+                'context_processors': [
+                    ...
+                    'cms.context_processors.cms_settings',
+                    'django.template.context_processors.i18n',
+                ],
+            },
+        },
+    ]
 
 ``cms check`` should now be unable to identify any further issues with your project. Some additional configuration is
 required however.

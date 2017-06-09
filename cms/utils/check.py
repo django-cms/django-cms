@@ -251,6 +251,7 @@ def check_context_processors(output):
             chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         required_processors = (
             'cms.context_processors.cms_settings',
+            'django.template.context_processors.i18n',
         )
         for processor in required_processors:
             if processor not in processors:
