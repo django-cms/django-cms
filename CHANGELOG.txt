@@ -4,6 +4,7 @@
   turned off.
 * Introduced improved repr for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models.
 * Fixed a regression which prevented users from setting a redirect to the homepage.
+* Fixed a bug where the add page endpoint rendered ``Change page`` as the html title.
 
 
 === 3.4.4 (unreleased) ===

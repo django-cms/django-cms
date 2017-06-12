@@ -1,7 +1,7 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls admin_static admin_modify cms_admin cms_static %}
 
-{% block title %}{% trans "Change a page" %}{% endblock %}
+{% block title %}{% if add %}{% trans 'Add a page' %}{% else %}{% trans "Change a page" %}{% endif %}{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">

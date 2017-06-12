@@ -146,9 +146,11 @@ class PageTest(PageTestBase):
         Test that the add admin page could be displayed via the admin
         """
         superuser = self.get_superuser()
+
         with self.login_user_context(superuser):
             response = self.client.get(URL_CMS_PAGE_ADD)
             self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<title>Add a page</title>', html=True)
 
     def test_create_page_admin(self):
         """
@@ -282,6 +284,7 @@ class PageTest(PageTestBase):
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
             self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<title>Change a page</title>', html=True)
             page_data['title'] = 'changed title'
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
