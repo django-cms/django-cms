@@ -20,6 +20,7 @@ module.exports = function (opts) {
             // CMS widgets
             // they will load the on-demand bundle called admin.widget
             'forms.pageselectwidget': PROJECT_PATH.js + '/widgets/forms.pageselectwidget.js',
+            'forms.slugwidget': PROJECT_PATH.js + '/widgets/forms.slugwidget.js',
             'forms.pagesmartlinkwidget': PROJECT_PATH.js + '/widgets/forms.pagesmartlinkwidget.js',
             'forms.apphookselect': PROJECT_PATH.js + '/widgets/forms.apphookselect.js'
         },
