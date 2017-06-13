@@ -1,57 +1,23 @@
-/* global CMS, URLify, gettext */
+/* global CMS, gettext */
 var $ = require('jquery');
+var addSlugHandlers = require('./slug');
 
 $(function () {
 
     // set local variables
     var title = $('#id_title');
     var slug = $('#id_slug');
-    var changed = false;
-    var prefill = false;
 
-    // hide rows when hidden input fields are added
-    $('input[type="hidden"]').each(function () {
-        $(this).parent('.form-row').hide();
-    });
-
-    // determine if slug is empty
-    if (slug.val() === '') {
-        prefill = true;
-    }
-
-    // always bind the title > slug generation and do the validation inside for better ux
-    title.bind('keyup', function () {
-        var value = title.val();
-
-        // international language handling
-        if (window.UNIHANDECODER) {
-            value = window.UNIHANDECODER.decode(value);
-        }
-        // if slug is empty, prefill again
-        if (prefill === false && slug.val() === '') {
-            prefill = true;
-        }
-        // urlify
-        // eslint-disable-next-line
-        var urlified = URLify(value, 64);
-        if (prefill) {
-            slug.val(urlified);
-        }
-    });
-    // autocall
-    title.trigger('keyup');
-
-    // set focus to title
-    title.focus();
+    addSlugHandlers(title, slug);
 
     // all permissions and page states loader
     $('div.loading').each(function () {
         $(this).load($(this).attr('rel'));
     });
 
-    // add changed data bindings to elements
-    slug.add(title).bind('change', function () {
-        $(this).data('changed', true);
+    // hide rows when hidden input fields are added
+    $('input[type="hidden"]').each(function () {
+        $(this).parent('.form-row').hide();
     });
 
     // public api for changing the language tabs
@@ -60,6 +26,7 @@ $(function () {
         // also make sure that we will display the confirm dialog
         // in case users switch tabs while editing plugins
         var answer = true;
+        var changed = false;
 
         if (slug.length) {
             // check if the slug has the changed attribute

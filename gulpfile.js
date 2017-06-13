@@ -104,8 +104,8 @@ var INTEGRATION_TESTS = [
         'disableToolbar',
         'dragndrop',
         'copy-apphook-page',
-        //'history',
-        //'revertLive',
+        // 'history',
+        // 'revertLive',
         'narrowScreen'
     ]
 ];
@@ -190,7 +190,8 @@ gulp.task('tests:integration', integrationTests({
     argv: argv,
     dbPath: 'testdb.sqlite',
     serverCommand: 'testserver.py',
-    logger: gutil.log.bind(gutil)
+    logger: gutil.log.bind(gutil),
+    waitForMigrations: 150 // 2.5 min
 }));
 
 var webpackBundle = function (opts) {
