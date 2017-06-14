@@ -136,7 +136,7 @@ class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, "LinkPlugin", "en",
-                   name="A Link", url="https://www.django-cms.org")
+                   name="A Link", external_link="https://www.django-cms.org")
 
         # create a CMSPlugin with an unsaved instance
         instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")

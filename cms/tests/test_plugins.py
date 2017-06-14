@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
-import base64
 import datetime
 import json
 import pickle
-import os
 
 from cms.api import create_page
 
@@ -14,11 +12,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core import urlresolvers
-from django.core.cache import cache
-from django.core.exceptions import (
-    ValidationError, ImproperlyConfigured, ObjectDoesNotExist)
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command
+from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from sekizai.context import SekizaiContext
 from django.test.testcases import TestCase
@@ -54,13 +48,6 @@ from cms.utils.i18n import force_language
 from cms.utils.plugins import get_plugins_for_page, get_plugins
 from django.utils.http import urlencode
 
-from djangocms_googlemap.models import GoogleMap
-from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
-from djangocms_file.models import File
-from djangocms_inherit.models import InheritPagePlaceholder
-from djangocms_link.forms import LinkForm
-from djangocms_link.models import Link
-from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_to_tag
 
@@ -358,7 +345,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             "ColumnPlugin",
             "en",
             target=columns,
-            width='10%',
         )
 
         data = {
@@ -391,7 +377,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = draft_page.placeholders.get(slot="col_left")
 
         columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
-        column = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')
+        column = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns)
         text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column, body="I'm the second")
         text_breadcrumbs = text_plugin.get_breadcrumb()
         self.assertEqual(len(columns.get_breadcrumb()), 1)
@@ -403,26 +389,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertTrue('/edit-plugin/%s/'% columns.pk in text_breadcrumbs[0]['url'])
         self.assertTrue('/edit-plugin/%s/'% column.pk, text_breadcrumbs[1]['url'])
         self.assertTrue('/edit-plugin/%s/'% text_plugin.pk, text_breadcrumbs[2]['url'])
-
-    def test_extract_images_from_text(self):
-        img_path = os.path.join(os.path.dirname(__file__), 'data', 'image.jpg')
-        with open(img_path, 'rb') as fobj:
-            img_data = base64.b64encode(fobj.read()).decode('utf-8')
-        body = """<p>
-            <img alt='' src='data:image/jpeg;base64,{data}' />
-        </p>""".format(data=img_data)
-        page = api.create_page(
-            title='test page',
-            template='nav_playground.html',
-            language=settings.LANGUAGES[0][0],
-        )
-        plugin = api.add_plugin(
-            page.placeholders.get(slot="body"),
-            plugin_type='TextPlugin',
-            language=settings.LANGUAGES[0][0],
-            body=body,
-        )
-        self.assertEqual(plugin.get_children().count(), 1)
 
     def test_add_text_plugin_empty_tag(self):
         """
@@ -479,7 +445,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # add a *nested* link plugin
         link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
-                                        name="A Link", url="https://www.django-cms.org")
+                                        name="A Link", external_link="https://www.django-cms.org")
         #
         text_plugin_en.body += plugin_to_tag(link_plugin_en)
         text_plugin_en.save()
@@ -525,8 +491,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page_en.placeholders.get(slot="body")  # ID 2
         placeholder_right = page_en.placeholders.get(slot="right-column")
         columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")  # ID 1
-        column_1 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')  # ID 2
-        column_2 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='30%')  # ID 3
+        column_1 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns)  # ID 2
+        column_2 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns)  # ID 3
         first_text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the first")  # ID 4
         text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the second")  # ID 5
 
@@ -573,7 +539,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # add a *nested* link plugin
         link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
-                                        name="A Link", url="https://www.django-cms.org")
+                                        name="A Link", external_link="https://www.django-cms.org")
 
         # the call above to add a child makes a plugin reload required here.
         text_plugin_en = self.reload(text_plugin_en)
@@ -608,7 +574,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(link_plugin_en.parent.pk, text_plugin_en.pk)
 
         self.assertEqual(link_plugin_de.name, link_plugin_en.name)
-        self.assertEqual(link_plugin_de.url, link_plugin_en.url)
+        self.assertEqual(link_plugin_de.external_link, link_plugin_en.external_link)
 
         self.assertEqual(text_plugin_de.body, text_plugin_en.body)
 
@@ -635,7 +601,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             "en",
             target=col2_en,
             name="A Link",
-            url="https://www.django-cms.org"
+            external_link="https://www.django-cms.org"
         )
 
         old_plugins = [mcol1_en, col1_en, col2_en, link_plugin_en]
@@ -805,77 +771,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         number_of_plugins_after = len(plugin_pool.get_all_plugins())
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
-    def test_inheritplugin_media(self):
-        """
-        Test case for InheritPagePlaceholder
-        """
-
-        inheritfrompage = api.create_page('page to inherit from',
-                                          'nav_playground.html',
-                                          'en')
-
-        body = inheritfrompage.placeholders.get(slot="body")
-
-        plugin = GoogleMap(
-            plugin_type='GoogleMapPlugin',
-            placeholder=body,
-            position=1,
-            language=settings.LANGUAGE_CODE,
-            address="Riedtlistrasse 16",
-            zipcode="8006",
-            city="Zurich",
-        )
-        plugin.add_root(instance=plugin)
-        inheritfrompage.publish('en')
-
-        page = api.create_page('inherit from page',
-                               'nav_playground.html',
-                               'en',
-                               published=True)
-
-        inherited_body = page.placeholders.get(slot="body")
-
-        inherit_plugin = InheritPagePlaceholder(
-            plugin_type='InheritPagePlaceholderPlugin',
-            placeholder=inherited_body,
-            position=1,
-            language=settings.LANGUAGE_CODE,
-            from_page=inheritfrompage,
-            from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.add_root(instance=inherit_plugin)
-        page.publish('en')
-
-        self.client.logout()
-        cache.clear()
-        # TODO: Replace this test using a Test Plugin, not an externally managed one.
-        # response = self.client.get(page.get_absolute_url())
-        # self.assertTrue(
-        #     'https://maps-api-ssl.google.com/maps/api/js' in response.content.decode('utf8').replace("&amp;", "&"))
-
-    def test_inherit_plugin_with_empty_plugin(self):
-        inheritfrompage = api.create_page('page to inherit from',
-                                          'nav_playground.html',
-                                          'en', published=True)
-
-        body = inheritfrompage.placeholders.get(slot="body")
-        empty_plugin = CMSPlugin(
-            plugin_type='TextPlugin', # create an empty plugin
-            placeholder=body,
-            position=1,
-            language='en',
-        )
-        empty_plugin.add_root(instance=empty_plugin)
-        other_page = api.create_page('other page', 'nav_playground.html', 'en', published=True)
-        inherited_body = other_page.placeholders.get(slot="body")
-
-        api.add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
-                       from_page=inheritfrompage, from_language='en')
-
-        api.add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
-        # this should not fail, even if there in an empty plugin
-        rendered = inherited_body.render(context=self.get_context(other_page.get_absolute_url(), page=other_page), width=200)
-        self.assertIn("foobar", rendered)
-
     def test_search_pages(self):
         """
         Test search for pages
@@ -988,9 +883,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
 
     def test_set_translatable_content(self):
-        a = Text(body="hello")
+        a = self.get_plugin_model('TextPlugin')(body="hello")
         self.assertTrue(a.set_translatable_content({'body': 'world'}))
-        b = Link(name="hello")
+        b = self.get_plugin_model('LinkPlugin')(name="hello")
         self.assertTrue(b.set_translatable_content({'name': 'world'}))
 
 
@@ -1216,7 +1111,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         expected_struct_de = {
             'module': u'Generisch',
-            'name': u'Stil',
+            'name': u'Style',
             'value': 'StylePlugin',
         }
 
@@ -1376,45 +1271,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             render_plugin = False
             name = "Test Plugin"
         self.assertIsNotNone(DecoratorTestPlugin)
-
-
-class FileSystemPluginTests(PluginsTestBaseCase):
-    def setUp(self):
-        super(FileSystemPluginTests, self).setUp()
-        call_command('collectstatic', interactive=False, verbosity=0, link=True)
-
-    def tearDown(self):
-        for directory in [settings.STATIC_ROOT, settings.MEDIA_ROOT]:
-            for root, dirs, files in os.walk(directory, topdown=False):
-                # We need to walk() the directory tree since rmdir() does not allow
-                # to remove non-empty directories...
-                for name in files:
-                    # Start by killing all files we walked
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    # Now all directories we walked...
-                    os.rmdir(os.path.join(root, name))
-        super(FileSystemPluginTests, self).tearDown()
-
-    def test_fileplugin_icon_uppercase(self):
-        page = api.create_page('testpage', 'nav_playground.html', 'en')
-        body = page.placeholders.get(slot="body")
-        plugin = File(
-            plugin_type='FilePlugin',
-            placeholder=body,
-            position=1,
-            language=settings.LANGUAGE_CODE,
-        )
-        # This try/except block allows older and newer versions of the
-        # djangocms-file plugin to work here.
-        try:
-            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile(
-                "UPPERCASE.jpg", b"content"), False)
-        except ObjectDoesNotExist:  # catches 'RelatedObjectDoesNotExist'
-            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile(
-                "UPPERCASE.jpg", b"content"), False)
-        plugin.add_root(instance=plugin)
-        self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
@@ -1704,54 +1560,19 @@ class PluginsMetaOptionsTests(TestCase):
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
 
-class LinkPluginTestCase(PluginsTestBaseCase):
-    def test_does_not_verify_existance_of_url(self):
-        form = LinkForm(
-            {'name': 'Linkname', 'url': 'http://www.nonexistant.test'})
-        self.assertTrue(form.is_valid())
-
-    def test_opens_in_same_window_by_default(self):
-        """Could not figure out how to render this plugin
-
-        Checking only for the values in the model"""
-        form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test'})
-        link = form.save()
-        self.assertEqual(link.target, '')
-
-    def test_open_in_blank_window(self):
-        form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': '_blank'})
-        link = form.save()
-        self.assertEqual(link.target, '_blank')
-
-    def test_open_in_parent_window(self):
-        form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': '_parent'})
-        link = form.save()
-        self.assertEqual(link.target, '_parent')
-
-    def test_open_in_top_window(self):
-        form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': '_top'})
-        link = form.save()
-        self.assertEqual(link.target, '_top')
-
-    def test_open_in_nothing_else(self):
-        form = LinkForm({'name': 'Linkname',
-            'url': 'http://www.nonexistant.test', 'target': 'artificial'})
-        self.assertFalse(form.is_valid())
-
-
 class NoDatabasePluginTests(TestCase):
+
+    def get_plugin_model(self, plugin_type):
+        return plugin_pool.get_plugin(plugin_type).model
+
     def test_render_meta_is_unique(self):
-        text = Text()
-        link = Link()
+        text = self.get_plugin_model('TextPlugin')
+        link = self.get_plugin_model('LinkPlugin')
         self.assertNotEqual(id(text._render_meta), id(link._render_meta))
 
     def test_render_meta_does_not_leak(self):
-        text = Text()
-        link = Link()
+        text = self.get_plugin_model('TextPlugin')
+        link = self.get_plugin_model('LinkPlugin')
 
         text._render_meta.text_enabled = False
         link._render_meta.text_enabled = False
@@ -1775,29 +1596,8 @@ class NoDatabasePluginTests(TestCase):
         self.assertEqual(TestPlugin2._meta.db_table, 'bunch_of_plugins_testplugin2')
 
 
-class PicturePluginTests(PluginsTestBaseCase):
-    def test_link_or_page(self):
-        """Test a validator: you can enter a url or a page_link, but not both."""
-
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
-
-        picture = Picture(url="test")
-        # Note: don't call full_clean as it will check ALL fields - including
-        # the image, which we haven't defined. Call clean() instead which
-        # just validates the url and page_link fields.
-        picture.clean()
-
-        picture.page_link = page
-        picture.url = None
-        picture.clean()
-
-        picture.url = "test"
-        self.assertRaises(ValidationError, picture.clean)
-
-
 class SimplePluginTests(TestCase):
+
     def test_simple_naming(self):
         class MyPlugin(CMSPluginBase):
             render_template = 'base.html'

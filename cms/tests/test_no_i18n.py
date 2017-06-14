@@ -6,8 +6,6 @@ from django.template import Template
 from django.test import RequestFactory
 from django.test.utils import override_settings
 
-from djangocms_link.models import Link
-
 from cms.api import create_page
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, CMSPlugin
@@ -155,7 +153,7 @@ class TestNoI18N(CMSTestCase):
         page = Page.objects.all()[0]
 
         placeholder = page.placeholders.get(slot="body")
-        data = {'name': 'Hello', 'url': 'http://www.example.org/'}
+        data = {'name': 'Hello', 'external_link': 'http://www.example.org/'}
         add_url = self.get_add_plugin_uri(placeholder, 'LinkPlugin', 'en-us')
 
         response = self.client.post(add_url, data)
@@ -168,6 +166,7 @@ class TestNoI18N(CMSTestCase):
         data['name'] = 'Hello World'
         response = self.client.post(edit_url, data)
         self.assertEqual(response.status_code, 200)
+        Link = self.get_plugin_model('LinkPlugin')
         link = Link.objects.get(pk=created_plugin.pk)
         self.assertEqual("Hello World", link.name)
 

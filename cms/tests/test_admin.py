@@ -398,8 +398,8 @@ class AdminTestCase(AdminTestsBase):
 
         column_wrapper = add_plugin(ph, "MultiColumnPlugin", "en")
 
-        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper, width='50%')
-        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper, width='50%')
+        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper)
+        add_plugin(ph, "ColumnPlugin", "en", parent=column_wrapper)
 
         # before cleaning the de placeholder
         self.assertEqual(ph.get_plugins('en').count(), 3)

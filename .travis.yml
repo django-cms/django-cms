@@ -32,22 +32,22 @@ env:
   matrix:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
-    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
-    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
-    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
-    - TEST_DOCS=1 DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - TEST_DOCS=1 DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
@@ -78,7 +78,7 @@ script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then gulp lint; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ] && [ "$ONLY_DOCS" != 0 ]; then pip install -e .; pip freeze; gulp tests:integration; fi;
-  - if [ "$FRONTEND" != 1 ] && ([ "$TEST_DOCS" == 1 ] && [ "$ONLY_DOCS" == 0 ] || [ "$ONLY_DOCS" != 0 ]); then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
+  - if [ "$FRONTEND" != 1 ] && ([ "$TEST_DOCS" == 1 ] && [ "$ONLY_DOCS" == 0 ] || [ "$ONLY_DOCS" != 0 ]); then coverage run --parallel-mode manage.py test; fi;
   - if [ "$FRONTEND" != 1 ] && ([ "$TEST_DOCS" == 1 ] && [ "$ONLY_DOCS" == 0 ] || [ "$ONLY_DOCS" != 0 ]); then coverage combine; fi;
 
 after_success: coveralls
@@ -94,33 +94,33 @@ matrix:
   exclude:
 
     - python: 3.3
-      env: TEST_DOCS=1 DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+      env: TEST_DOCS=1 DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.3
       env: DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.3
-      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - python: 3.3
       env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.3
       env: DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.9 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.3
       env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.3
-      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - python: 3.3
       env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.3
       env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
     - python: 3.3
-      env: DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.3
       env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.3
-      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' MIGRATE_OPTION='--migrate'
+      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - python: 3.3
       env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
@@ -138,25 +138,25 @@ matrix:
       env: FRONTEND=1 LINT=1
 
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.5
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.5
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.5
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
   allow_failures:
 

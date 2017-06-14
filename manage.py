@@ -21,17 +21,13 @@ def install_auth_user_model(settings, value):
     settings['AUTH_USER_MODEL'] = value
 
 
-def _get_migration_modules(apps):
-    modules = {}
-    for module in apps:
-        module_name = '%s.migrations_django' % module
-        try:
-            __import__(module_name)
-        except ImportError:
-            pass
-        else:
-            modules[module] = module_name
-    return modules
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return 'notmigrations'
 
 
 if __name__ == '__main__':
@@ -45,17 +41,11 @@ if __name__ == '__main__':
 
     PLUGIN_APPS = [
         'djangocms_text_ckeditor',
-        'djangocms_column',
-        'djangocms_picture',
-        'djangocms_file',
-        'djangocms_googlemap',
-        'djangocms_inherit',
-        'djangocms_teaser',
-        'djangocms_video',
-        'djangocms_style',
-        'djangocms_link',
         'cms.test_utils.project.sampleapp',
         'cms.test_utils.project.placeholderapp',
+        'cms.test_utils.project.pluginapp.plugins.link',
+        'cms.test_utils.project.pluginapp.plugins.multicolumn',
+        'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
         'cms.test_utils.project.pluginapp.plugins.extra_context',
         'cms.test_utils.project.pluginapp.plugins.meta',
@@ -86,6 +76,19 @@ if __name__ == '__main__':
         'hvad',
     ] + PLUGIN_APPS
 
+    if DJANGO_1_9:
+        MIGRATION_MODULES = DisableMigrations()
+    else:
+        MIGRATION_MODULES = {
+            'auth': None,
+            'contenttypes': None,
+            'sessions': None,
+            'sites': None,
+            'cms': None,
+            'menus': None,
+            'djangocms_text_ckeditor': None,
+        }
+
     dynamic_configs = {
         'TEMPLATES': [{
             'NAME': 'django',
@@ -114,28 +117,6 @@ if __name__ == '__main__':
         }
     ]}
 
-    plugins = ('djangocms_column', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
-               'djangocms_teaser', 'djangocms_video')
-
-    migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
-    if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
-        print('Both --migrate and --no-migrations have been provided. --no-migrations is in effect.')
-    if '--migrate' in sys.argv:
-        sys.argv.remove('--migrate')
-
-    dynamic_configs['MIGRATION_MODULES'] = _get_migration_modules(plugins)
-    if not dynamic_configs.get('TESTS_MIGRATE', migrate):
-        # Disable migrations
-        class DisableMigrations(object):
-
-            def __contains__(self, item):
-                return True
-
-            def __getitem__(self, item):
-                return 'notmigrations'
-
-        dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
     if 'test' in sys.argv:
         SESSION_ENGINE = "django.contrib.sessions.backends.cache"
     else:
@@ -337,5 +318,6 @@ if __name__ == '__main__':
         ),
         ALLOWED_HOSTS=['localhost'],
         TEST_RUNNER='django.test.runner.DiscoverRunner',
+        MIGRATION_MODULES=MIGRATION_MODULES,
         **dynamic_configs
     )

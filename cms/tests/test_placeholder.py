@@ -9,8 +9,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils.numberformat import format
-from djangocms_link.cms_plugins import LinkPlugin
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
 
 from cms import constants
@@ -155,12 +153,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ex.save()
         ph1 = ex.placeholder_1
         ph2 = ex.placeholder_2
-        ph1_pl1 = add_plugin(ph1, TextPlugin, 'en', body='ph1 plugin1').cmsplugin_ptr
-        ph1_pl2 = add_plugin(ph1, TextPlugin, 'en', body='ph1 plugin2').cmsplugin_ptr
-        ph1_pl3 = add_plugin(ph1, TextPlugin, 'en', body='ph1 plugin3').cmsplugin_ptr
-        ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
-        ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
-        ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
+        ph1_pl1 = add_plugin(ph1, 'TextPlugin', 'en', body='ph1 plugin1').cmsplugin_ptr
+        ph1_pl2 = add_plugin(ph1, 'TextPlugin', 'en', body='ph1 plugin2').cmsplugin_ptr
+        ph1_pl3 = add_plugin(ph1, 'TextPlugin', 'en', body='ph1 plugin3').cmsplugin_ptr
+        ph2_pl1 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin1').cmsplugin_ptr
+        ph2_pl2 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin2').cmsplugin_ptr
+        ph2_pl3 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin3').cmsplugin_ptr
 
         data = {
             'placeholder_id': str(ph2.pk),
@@ -194,7 +192,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             "LinkPlugin",
             "en",
             name='name',
-            url='http://example.com/',
+            external_link='http://example.com/',
         )
 
         context_en = SekizaiContext()
@@ -202,7 +200,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
         content_en = _render_placeholder(placeholder_en, context_en)
 
-        self.assertEqual(content_en.strip(), '<a href="http://example.com/" >name</a>')
+        self.assertEqual(content_en.strip(), '<a href="http://example.com/">name</a>')
 
     def test_placeholder_render_ghost_plugin_with_child(self):
         """
@@ -225,7 +223,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             "en",
             target=plugin,
             name='invalid',
-            url='http://example.com/',
+            external_link='http://example.com/',
         )
 
         add_plugin(
@@ -233,7 +231,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             "LinkPlugin",
             "en",
             name='valid',
-            url='http://example.com/',
+            external_link='http://example.com/',
         )
 
         context_en = SekizaiContext()
@@ -241,7 +239,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
         content_en = _render_placeholder(placeholder_en, context_en)
 
-        self.assertEqual(content_en.strip(), '<a href="http://example.com/" >valid</a>')
+        self.assertEqual(content_en.strip(), '<a href="http://example.com/">valid</a>')
 
     @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs(self):
@@ -481,7 +479,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         title_de = create_title("de", "page_de", page_en)
         placeholder_en = page_en.placeholders.get(slot='col_left')
         placeholder_de = title_de.page.placeholders.get(slot='col_left')
-        add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
+        add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
 
         context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
@@ -525,7 +523,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             del(placeholder_de._plugins_cache)
             cache.clear()
             # Then we add a plugin to check for proper rendering
-            add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
+            add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
             content_de = _render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^de body$")
 
@@ -535,8 +533,8 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         title_de = create_title("de", "page_de", page_en)
         placeholder_en = page_en.placeholders.get(slot='col_left')
         placeholder_de = title_de.page.placeholders.get(slot='col_left')
-        link_en = add_plugin(placeholder_en, LinkPlugin, 'en', name='en name', url='http://example.com/en')
-        add_plugin(placeholder_en, TextPlugin, 'en',  target=link_en, body='en body')
+        link_en = add_plugin(placeholder_en, 'LinkPlugin', 'en', name='en name', external_link='http://example.com/en')
+        add_plugin(placeholder_en, 'TextPlugin', 'en',  target=link_en, body='en body')
 
         context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
@@ -566,8 +564,14 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             del(placeholder_de._plugins_cache)
             cache.clear()
             # Then we add a plugin to check for proper rendering
-            link_de = add_plugin(placeholder_en, LinkPlugin, 'de', name='de name', url='http://example.com/de')
-            add_plugin(placeholder_en, TextPlugin, 'de',  target=link_de, body='de body')
+            link_de = add_plugin(
+                placeholder_en,
+                'LinkPlugin',
+                language='de',
+                name='de name',
+                external_link='http://example.com/de',
+            )
+            add_plugin(placeholder_en, 'TextPlugin', 'de',  target=link_de, body='de body')
             content_de = _render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\"")
             self.assertRegexpMatches(content_de, "de body")
@@ -578,7 +582,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         create_title("de", "page_de", page_en)
         placeholder_en = page_en.placeholders.get(slot='col_left')
         placeholder_de = page_en.placeholders.get(slot='col_left')
-        add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
+        add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
 
         context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
@@ -612,7 +616,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             del(placeholder_en._plugins_cache)
             cache.clear()
             # Then we add a plugin to check for proper rendering
-            add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
+            add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
             content_en = _render_placeholder(placeholder_en, context_en)
             self.assertRegexpMatches(content_en, "^en body$")
 
@@ -625,7 +629,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         create_title("de", "page_de", page_en)
         placeholder_sidebar_en = page_en.placeholders.get(slot='col_sidebar')
         placeholder_en = page_en.placeholders.get(slot='col_left')
-        add_plugin(placeholder_sidebar_en, TextPlugin, 'en', body='en body')
+        add_plugin(placeholder_sidebar_en, 'TextPlugin', 'en', body='en body')
 
         context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
@@ -692,14 +696,14 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                                 'plugin_type': 'LinkPlugin',
                                 'values': {
                                     'name': 'django',
-                                    'url': 'https://www.djangoproject.com/'
+                                    'external_link': 'https://www.djangoproject.com/'
                                 },
                             },
                             {
                                 'plugin_type': 'LinkPlugin',
                                 'values': {
                                     'name': 'django-cms',
-                                    'url': 'https://www.django-cms.org'
+                                    'external_link': 'https://www.django-cms.org'
                                 },
                             },
                         ]
@@ -980,7 +984,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         ph = ex.placeholder
         result = list(ph._get_attached_models())
         self.assertEqual(result, [Example1]) # Simple PH - Example1 model
-        add_plugin(ph, TextPlugin, 'en', body='en body')
+        add_plugin(ph, 'TextPlugin', 'en', body='en body')
         result = list(ph._get_attached_models())
         self.assertEqual(result, [Example1]) # Simple PH still one Example1 model
 
@@ -995,7 +999,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         ph = ex.placeholder
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - placeholder field name
-        add_plugin(ph, TextPlugin, 'en', body='en body')
+        add_plugin(ph, 'TextPlugin', 'en', body='en body')
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
 
@@ -1021,6 +1025,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
+        LinkPlugin = plugin_pool.get_plugin('LinkPlugin')
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
@@ -1038,6 +1043,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
+        LinkPlugin = plugin_pool.get_plugin('LinkPlugin')
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
