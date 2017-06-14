@@ -509,6 +509,11 @@ class BaseCMSTestCase(object):
         )
         return page
 
+    def get_plugin_model(self, plugin_type):
+        from cms.plugin_pool import plugin_pool
+
+        return plugin_pool.get_plugin(plugin_type).model
+
     def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)

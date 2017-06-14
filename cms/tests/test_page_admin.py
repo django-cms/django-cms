@@ -77,7 +77,7 @@ class PageTestBase(CMSTestCase):
     def _add_plugin_to_page(self, page, plugin_type='LinkPlugin', language='en', publish=True):
         plugin_data = {
             'TextPlugin': {'body': '<p>text</p>'},
-            'LinkPlugin': {'name': 'A Link', 'url': 'https://www.django-cms.org'},
+            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
         }
         placeholder = page.placeholders.get(slot='body')
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
@@ -2392,7 +2392,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_global_permission(staff_user, can_change=True)
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(plugins.count(), 1)
@@ -2415,7 +2415,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_global_permission(staff_user, can_change=False)
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(plugins.count(), 0)
@@ -2436,7 +2436,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_global_permission(staff_user, can_change=True)
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)
@@ -2461,7 +2461,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_global_permission(staff_user, can_change=False)
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)
@@ -3875,7 +3875,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         )
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(plugins.count(), 1)
@@ -3902,7 +3902,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         )
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(plugins.count(), 0)
@@ -3927,7 +3927,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         )
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)
@@ -3956,7 +3956,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         )
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)

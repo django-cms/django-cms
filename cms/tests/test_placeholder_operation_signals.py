@@ -23,7 +23,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
     def _add_plugin(self, placeholder=None, plugin_type='LinkPlugin', language='en'):
         placeholder = placeholder or self._cms_placeholder
         plugin_data = {
-            'LinkPlugin': {'name': 'A Link', 'url': 'https://www.django-cms.org'},
+            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
             'PlaceholderPlugin': {},
         }
         plugin = add_plugin(
@@ -56,7 +56,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
     def test_pre_add_plugin(self):
         with signal_tester(pre_placeholder_operation) as env:
             endpoint = self._get_add_plugin_uri()
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
 
             with self.login_user_context(self._admin_user):
                 response = self.client.post(endpoint, data)
@@ -72,12 +72,12 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(call_kwargs['placeholder'], self._cms_placeholder)
             self.assertEqual(call_kwargs['plugin'].name, data['name'])
-            self.assertEqual(call_kwargs['plugin'].url, data['url'])
+            self.assertEqual(call_kwargs['plugin'].external_link, data['external_link'])
 
     def test_post_add_plugin(self):
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
             endpoint = self._get_add_plugin_uri()
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
 
             with self.login_user_context(self._admin_user):
                 response = self.client.post(endpoint, data)
@@ -97,7 +97,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['placeholder'], self._cms_placeholder)
             self.assertTrue(post_call_kwargs['plugin'].pk)
             self.assertEqual(post_call_kwargs['plugin'].name, data['name'])
-            self.assertEqual(post_call_kwargs['plugin'].url, data['url'])
+            self.assertEqual(post_call_kwargs['plugin'].external_link, data['external_link'])
 
     def test_pre_edit_plugin(self):
         plugin = self._add_plugin()
@@ -105,7 +105,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
         endpoint += '?cms_path=/en/'
 
         with signal_tester(pre_placeholder_operation) as env:
-            data = {'name': 'A Link 2', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link 2', 'external_link': 'https://www.django-cms.org'}
 
             with self.login_user_context(self._admin_user):
                 response = self.client.post(endpoint, data)
@@ -121,9 +121,9 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(call_kwargs['placeholder'], self._cms_placeholder)
             self.assertEqual(call_kwargs['old_plugin'].name, 'A Link')
-            self.assertEqual(call_kwargs['old_plugin'].url, data['url'])
+            self.assertEqual(call_kwargs['old_plugin'].external_link, data['external_link'])
             self.assertEqual(call_kwargs['new_plugin'].name, data['name'])
-            self.assertEqual(call_kwargs['new_plugin'].url, data['url'])
+            self.assertEqual(call_kwargs['new_plugin'].external_link, data['external_link'])
 
     def test_post_edit_plugin(self):
         plugin = self._add_plugin()
@@ -131,7 +131,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
         endpoint += '?cms_path=/en/'
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
-            data = {'name': 'A Link 2', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link 2', 'external_link': 'https://www.django-cms.org'}
 
             with self.login_user_context(self._admin_user):
                 response = self.client.post(endpoint, data)
@@ -150,9 +150,9 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['origin'], '/en/')
             self.assertEqual(post_call_kwargs['placeholder'], self._cms_placeholder)
             self.assertEqual(post_call_kwargs['old_plugin'].name, 'A Link')
-            self.assertEqual(post_call_kwargs['old_plugin'].url, data['url'])
+            self.assertEqual(post_call_kwargs['old_plugin'].external_link, data['external_link'])
             self.assertEqual(post_call_kwargs['new_plugin'].name, data['name'])
-            self.assertEqual(post_call_kwargs['new_plugin'].url, data['url'])
+            self.assertEqual(post_call_kwargs['new_plugin'].external_link, data['external_link'])
 
     def test_pre_delete_plugin(self):
         plugin = self._add_plugin()
@@ -176,7 +176,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(call_kwargs['placeholder'], self._cms_placeholder)
             self.assertEqual(call_kwargs['plugin'].name, 'A Link')
-            self.assertEqual(call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
 
     def test_post_delete_plugin(self):
         plugin = self._add_plugin()
@@ -203,7 +203,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['origin'], '/en/')
             self.assertEqual(post_call_kwargs['placeholder'], self._cms_placeholder)
             self.assertEqual(post_call_kwargs['plugin'].name, 'A Link')
-            self.assertEqual(post_call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(post_call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
 
     def test_pre_move_plugin(self):
         plugin = self._add_plugin()
@@ -232,7 +232,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(call_kwargs['plugin'].placeholder, source_placeholder)
-            self.assertEqual(call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(call_kwargs['source_language'], 'en')
             self.assertEqual(call_kwargs['source_placeholder'], source_placeholder)
             self.assertEqual(call_kwargs['source_parent_id'], plugin.parent_id)
@@ -270,7 +270,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['origin'], '/en/')
             self.assertEqual(post_call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(post_call_kwargs['plugin'].placeholder, target_placeholder)
-            self.assertEqual(post_call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(post_call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(post_call_kwargs['source_language'], 'en')
             self.assertEqual(post_call_kwargs['source_placeholder'], source_placeholder)
             self.assertEqual(post_call_kwargs['source_parent_id'], plugin.parent_id)
@@ -307,7 +307,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(call_kwargs['plugin'].placeholder, self._cms_placeholder)
-            self.assertEqual(call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(call_kwargs['clipboard'], user_settings.clipboard)
             self.assertEqual(call_kwargs['clipboard_language'], 'en')
             self.assertEqual(call_kwargs['source_language'], 'en')
@@ -346,7 +346,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['origin'], '/en/')
             self.assertEqual(post_call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(post_call_kwargs['plugin'].placeholder, user_settings.clipboard)
-            self.assertEqual(post_call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(post_call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(post_call_kwargs['clipboard'], user_settings.clipboard)
             self.assertEqual(post_call_kwargs['clipboard_language'], 'en')
             self.assertEqual(post_call_kwargs['source_language'], 'en')
@@ -384,7 +384,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(call_kwargs['plugin'].placeholder, user_settings.clipboard)
-            self.assertEqual(call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(call_kwargs['target_language'], 'en')
             self.assertEqual(call_kwargs['target_placeholder'], self._cms_placeholder)
             self.assertEqual(call_kwargs['target_parent_id'], None)
@@ -423,7 +423,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['origin'], '/en/')
             self.assertEqual(post_call_kwargs['plugin'].name, 'A Link')
             self.assertEqual(post_call_kwargs['plugin'].placeholder, self._cms_placeholder)
-            self.assertEqual(post_call_kwargs['plugin'].url, 'https://www.django-cms.org')
+            self.assertEqual(post_call_kwargs['plugin'].external_link, 'https://www.django-cms.org')
             self.assertEqual(post_call_kwargs['target_language'], 'en')
             self.assertEqual(post_call_kwargs['target_placeholder'], self._cms_placeholder)
             self.assertEqual(post_call_kwargs['target_parent_id'], None)
@@ -468,7 +468,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(call_kwargs['origin'], '/en/')
             self.assertEqual(plugin.name, 'A Link')
             self.assertEqual(plugin.placeholder, ref_placeholder)
-            self.assertEqual(plugin.url, 'https://www.django-cms.org')
+            self.assertEqual(plugin.external_link, 'https://www.django-cms.org')
             self.assertEqual(call_kwargs['target_language'], 'en')
             self.assertEqual(call_kwargs['target_placeholder'], self._cms_placeholder)
 
@@ -515,7 +515,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(post_call_kwargs['origin'], '/en/')
             self.assertEqual(plugin.name, 'A Link')
             self.assertEqual(plugin.placeholder, self._cms_placeholder)
-            self.assertEqual(plugin.url, 'https://www.django-cms.org')
+            self.assertEqual(plugin.external_link, 'https://www.django-cms.org')
             self.assertEqual(post_call_kwargs['target_language'], 'en')
             self.assertEqual(post_call_kwargs['target_placeholder'], self._cms_placeholder)
 
@@ -589,7 +589,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertNotEqual(plugin, new_plugin)
             self.assertEqual(new_plugin.name, 'A Link')
             self.assertEqual(new_plugin.placeholder, target_placeholder)
-            self.assertEqual(new_plugin.url, 'https://www.django-cms.org')
+            self.assertEqual(new_plugin.external_link, 'https://www.django-cms.org')
             self.assertEqual(post_call_kwargs['source_language'], 'en')
             self.assertEqual(post_call_kwargs['source_placeholder'], source_placeholder)
             self.assertEqual(post_call_kwargs['target_language'], 'de')

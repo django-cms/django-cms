@@ -212,7 +212,7 @@ class ManagementTestCase(CMSTestCase):
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                                 name="A Link", url="https://www.django-cms.org")
+                                 name="A Link", external_link="https://www.django-cms.org")
         self.assertEqual(
             CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
             2)
@@ -293,7 +293,7 @@ class ManagementTestCase(CMSTestCase):
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, "LinkPlugin", "en",
-                   name="A Link", url="https://www.django-cms.org")
+                   name="A Link", external_link="https://www.django-cms.org")
 
         instanceless_plugin = CMSPlugin(
             language="en", plugin_type="TextPlugin")
@@ -424,7 +424,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         # add a *nested* link plugin
         add_plugin(ph_en, "LinkPlugin", lang, target=col4,
-                                    name="A Link", url="https://www.django-cms.org")
+                                    name="A Link", external_link="https://www.django-cms.org")
         static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()), site_id=1)
         static_placeholder.save()
         add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
@@ -468,7 +468,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         link_en, _ = root_plugins.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
         link_de, _ = root_plugins.get(language='de', plugin_type='LinkPlugin').get_plugin_instance()
 
-        self.assertEqual(link_en.url, link_de.url)
+        self.assertEqual(link_en.external_link, link_de.external_link)
         self.assertEqual(link_en.get_position_in_placeholder(), link_de.get_position_in_placeholder())
 
         stack_plugins = CMSPlugin.objects.filter(placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
@@ -577,7 +577,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         link_1, _ = root_plugins_1.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
         link_2, _ = root_plugins_2.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
 
-        self.assertEqual(link_1.url, link_2.url)
+        self.assertEqual(link_1.external_link, link_2.external_link)
         self.assertEqual(link_1.get_position_in_placeholder(), link_2.get_position_in_placeholder())
 
     def test_copy_existing_title(self):

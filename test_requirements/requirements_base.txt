@@ -9,15 +9,6 @@ djangocms-admin-style>=1.0
 django-sekizai>=0.9
 django-classy-tags>=0.7.2
 https://github.com/divio/djangocms-text-ckeditor/archive/master.zip
-djangocms-column==1.6.0
-djangocms-style==1.7.0
-djangocms-file==0.2.1
-djangocms-googlemap==0.5.1
-djangocms-inherit==0.2.1
-djangocms-picture==0.2.0
-djangocms-teaser==0.2.0
-djangocms-video==1.1.0
-djangocms-link==1.8.2
 https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
 https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
 iptools
@@ -27,5 +18,3 @@ pyflakes==1.1.0
 pyenchant
 # required to run the server for integration tests
 djangocms-helper
-djangocms-grid
-aldryn-bootstrap3
