@@ -610,7 +610,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin = self.reload(text_plugin)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin)
             link_plugin.name = u"django-cms Link"
-            link_plugin.url = u"https://www.django-cms.org"
+            link_plugin.external_link = u"https://www.django-cms.org"
 
             # as for some reason mptt does not
             # update the parent child relationship
@@ -679,7 +679,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin_two = self.reload(text_plugin_two)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
             link_plugin.name = u"django-cms Link"
-            link_plugin.url = u"https://www.django-cms.org"
+            link_plugin.external_link = u"https://www.django-cms.org"
             link_plugin.parent = text_plugin_two
             link_plugin.save()
 
@@ -886,7 +886,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin_two = self.reload(text_plugin_two)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
             link_plugin.name = u"django-cms Link"
-            link_plugin.url = u"https://www.django-cms.org"
+            link_plugin.external_link = u"https://www.django-cms.org"
             link_plugin.parent = text_plugin_two
             link_plugin.save()
             # reload after every save
@@ -1096,7 +1096,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         with self.login_user_context(superuser):
             post_data = {
                 'name': 'test',
-                'url': 'http://www.example.org/'
+                'external_link': 'http://www.example.org/'
             }
             add_url = self.get_add_plugin_uri(page_one_ph_one, 'LinkPlugin', parent=text_plugin_en)
             response = self.client.post(add_url, post_data)

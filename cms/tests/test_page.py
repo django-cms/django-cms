@@ -29,10 +29,6 @@ from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
 
-from djangocms_link.cms_plugins import LinkPlugin
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
-
 
 class PageMigrationTestCase(CMSTestCase):
 
@@ -636,6 +632,7 @@ class PagesTestCase(CMSTestCase):
         Check that plugins and placeholders get correctly deleted when we delete
         a page!
         """
+        Text = self.get_plugin_model('TextPlugin')
         home = create_page("home", "nav_playground.html", "en")
         page = create_page("page", "nav_playground.html", "en")
         page.rescan_placeholders() # create placeholders
@@ -898,8 +895,8 @@ class PagesTestCase(CMSTestCase):
             placeholders = list(page.placeholders.all())
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):
-                    add_plugin(placeholder, TextPlugin, 'en', body='text-%d-%d' % (i, j))
-                    add_plugin(placeholder, LinkPlugin, 'en', name='link-%d-%d' % (i, j))
+                    add_plugin(placeholder, 'TextPlugin', 'en', body='text-%d-%d' % (i, j))
+                    add_plugin(placeholder, 'LinkPlugin', 'en', name='link-%d-%d' % (i, j))
 
             # trigger the apphook query so that it doesn't get in our way
             reverse('pages-root')

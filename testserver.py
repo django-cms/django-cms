@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 import os
 import sys
 
+from cms.utils.compat import DJANGO_1_9
+
+
 def noop_gettext(s):
     return s
 
@@ -23,6 +26,16 @@ for arg in sys.argv:
         port = arg.split('=')[1]
 
 gettext = noop_gettext
+
+
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return 'notmigrations'
+
 
 HELPER_SETTINGS = dict(
     CMS_PERMISSION=permission,
@@ -96,10 +109,11 @@ HELPER_SETTINGS = dict(
         }
     },
     INSTALLED_APPS=[
-        'djangocms_text_ckeditor',
-        'djangocms_grid',
         'filer',
-        'aldryn_bootstrap3',
+        'djangocms_text_ckeditor',
+        'cms.test_utils.project.pluginapp.plugins.link',
+        'cms.test_utils.project.pluginapp.plugins.multicolumn',
+        'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.placeholderapp',
     ],
     MIDDLEWARE_CLASSES=[
@@ -116,6 +130,19 @@ HELPER_SETTINGS = dict(
         ('simple.html', 'Simple page'),
     ),
 )
+
+if DJANGO_1_9:
+    HELPER_SETTINGS['MIGRATION_MODULES'] = DisableMigrations()
+else:
+    HELPER_SETTINGS['MIGRATION_MODULES'] = {
+        'auth': None,
+        'contenttypes': None,
+        'sessions': None,
+        'sites': None,
+        'cms': None,
+        'menus': None,
+        'djangocms_text_ckeditor': None,
+    }
 
 
 def run():

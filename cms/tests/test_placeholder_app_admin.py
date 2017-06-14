@@ -18,7 +18,7 @@ class AppAdminTestCase(CMSTestCase):
                                    plugin_type='LinkPlugin', language='en'):
         plugin_data = {
             'StylePlugin': {'tag_type': 'div'},
-            'LinkPlugin': {'name': 'A Link', 'url': 'https://www.django-cms.org'},
+            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
             'PlaceholderPlugin': {'name': 'Content'},
         }
         plugin = add_plugin(
@@ -66,7 +66,7 @@ class AppAdminTest(AppAdminTestCase):
 
         with self.login_user_context(superuser):
             with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+                data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 response = self.client.post(endpoint, data)  # second
@@ -325,7 +325,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'add_link')
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(plugins.count(), 1)
@@ -346,7 +346,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'add_link')
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(plugins.count(), 0)
@@ -355,7 +355,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.remove_permission(staff_user, 'add_link')
 
         with self.login_user_context(staff_user):
-            data = {'name': 'A Link', 'url': 'https://www.django-cms.org'}
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(plugins.count(), 0)
@@ -375,7 +375,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'change_link')
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)
@@ -399,7 +399,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'change_link')
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)
@@ -411,7 +411,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.remove_permission(staff_user, 'change_link')
 
         with self.login_user_context(staff_user):
-            data = model_to_dict(plugin, fields=['name', 'url'])
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'A link 2'
 
             response = self.client.post(endpoint, data)

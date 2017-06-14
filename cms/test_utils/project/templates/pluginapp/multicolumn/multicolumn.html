@@ -1,0 +1,6 @@
+{% load cms_tags %}
+<div class="multicolumn{{ instance.num_children }} clearfix">
+{% for plugin in instance.child_plugin_instances %}
+  	{% render_plugin plugin %}
+{% endfor %}
+</div>
