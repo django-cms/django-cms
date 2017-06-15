@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
@@ -29,14 +29,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-12 17:14+0000\n"
+"POT-Creation-Date: 2017-06-15 15:26+0000\n"
 "PO-Revision-Date: 2017-06-12 17:18+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
-"Language-Team: Swedish (http://www.transifex.com/divio/django-cms/language/sv/)\n"
+"Language-Team: Swedish (http://www.transifex.com/divio/django-cms/language/"
+"sv/)\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/forms.py:79
@@ -85,8 +86,7 @@ msgid "Page Title"
 msgstr "Sidrubrik"
 
 #: admin/forms.py:96
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Anger vad som visas i webbläsarens topp eller i bokmärken"
 
 #: admin/forms.py:98
@@ -154,12 +154,16 @@ msgstr "Språkoberoende alternativ"
 msgid ""
 "Please create the %(language)s page translation before editing its advanced "
 "settings."
-msgstr "Översättning för sidan måste finnas på %(language)s innan de avancerade inställnignarna kan ändras."
+msgstr ""
+"Översättning för sidan måste finnas på %(language)s innan de avancerade "
+"inställnignarna kan ändras."
 
 #: admin/forms.py:349
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr "URL-rubrik för %(language)s måste sättas innan de avancerade inställningarna kan ändras."
+msgstr ""
+"URL-rubrik för %(language)s måste sättas innan de avancerade inställningarna "
+"kan ändras."
 
 #: admin/forms.py:360
 msgid "A page with this reverse URL id exists already."
@@ -167,7 +171,8 @@ msgstr "En sida med detta URL-id finns redan."
 
 #: admin/forms.py:377
 msgid "An application instance using this configuration already exists."
-msgstr "En instans av applikationen som använder denna konfiguration finns redan."
+msgstr ""
+"En instans av applikationen som använder denna konfiguration finns redan."
 
 #: admin/forms.py:385 admin/forms.py:396
 msgid "An application instance with this name already exists."
@@ -210,37 +215,49 @@ msgstr "Radera"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr "Anvädnare kan inte skapa en sida utan rättigheter att redigera sidan. Redigeringsrättighet behövs."
+msgstr ""
+"Anvädnare kan inte skapa en sida utan rättigheter att redigera sidan. "
+"Redigeringsrättighet behövs."
 
 #: admin/forms.py:620 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr "Användare kan inte ta bort en sida utan att ha rättighet att redigera sidan. Redigeringsrättighet behövs."
+msgstr ""
+"Användare kan inte ta bort en sida utan att ha rättighet att redigera sidan. "
+"Redigeringsrättighet behövs."
 
 #: admin/forms.py:625
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr "Användare kan inte ändra rättigheter på sidor utan att ha rättighet att ändra rättigheter på sidan. Möjlighet att ändra rättigheter behövs."
+msgstr ""
+"Användare kan inte ändra rättigheter på sidor utan att ha rättighet att "
+"ändra rättigheter på sidan. Möjlighet att ändra rättigheter behövs."
 
 #: admin/forms.py:630
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr "Användare kan inte ta bort rättigheter för en sida utan att ha rättighet att ändra sidor. Redigeringsrättighet behövs."
+msgstr ""
+"Användare kan inte ta bort rättigheter för en sida utan att ha rättighet att "
+"ändra sidor. Redigeringsrättighet behövs."
 
 #: admin/forms.py:637
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr "Användare kan inte lägga till rättigheter på sidor utan att ha rättighet att ändra rättigheter på sidan. Möjlighet att ändra rättigheter behövs."
+msgstr ""
+"Användare kan inte lägga till rättigheter på sidor utan att ha rättighet att "
+"ändra rättigheter på sidan. Möjlighet att ändra rättigheter behövs."
 
 #: admin/forms.py:642
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr "Användare kan inte ta bort rättigheter för en sida utan att ha rättighet att ändra sidor. Möjlighet att ändra rättigheter behövs."
+msgstr ""
+"Användare kan inte ta bort rättigheter för en sida utan att ha rättighet att "
+"ändra sidor. Möjlighet att ändra rättigheter behövs."
 
 #: admin/forms.py:761
 #, python-format
@@ -256,15 +273,14 @@ msgid "Parent plugin language must be same as language!"
 msgstr ""
 
 #: admin/forms.py:789
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #: admin/pageadmin.py:292
 #, python-format
 msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+"Please create the %(language)s page translation before editing it's advanced "
+"settings."
 msgstr ""
 
 #: admin/pageadmin.py:301 templates/admin/cms/page/submit_row.html:10
@@ -312,7 +328,8 @@ msgstr "Mall ändrad"
 #: admin/pageadmin.py:748
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Fel: Du har inte rättighet att flytta denna sida. Var god ladda om sidan"
+msgstr ""
+"Fel: Du har inte rättighet att flytta denna sida. Var god ladda om sidan"
 
 #: admin/pageadmin.py:832 admin/placeholderadmin.py:505
 #: admin/placeholderadmin.py:569
@@ -320,7 +337,6 @@ msgid "You do not have permission to copy these plugins."
 msgstr "Du har inte tillåtelse att kopiera dessa plugins"
 
 #: admin/pageadmin.py:924
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "Du har inte rättighet att återställa denna sida"
 
@@ -335,7 +351,8 @@ msgstr "Du har inte tillåtelse att publicera denna sida"
 
 #: admin/pageadmin.py:1023 admin/pageadmin.py:1035
 msgid "Page not published! A parent page is not published yet."
-msgstr "Sidan är inte publicerad! En överliggande sida är inte publicerad ännu."
+msgstr ""
+"Sidan är inte publicerad! En överliggande sida är inte publicerad ännu."
 
 #: admin/pageadmin.py:1025
 msgid "The content was successfully published."
@@ -383,7 +400,6 @@ msgstr "Är du säker?"
 
 #: admin/pageadmin.py:1228
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "Du har inte rättighet att se sidan \"%(title)s\""
 
@@ -421,7 +437,6 @@ msgid "You do not have permission to add a plugin"
 msgstr "Du har inte rättighet att lägga till denna plugin"
 
 #: admin/placeholderadmin.py:526
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "Du har inte rättighet att kopiera denna placeholder"
 
@@ -446,12 +461,10 @@ msgid "parent must be in the same language as plugin_language"
 msgstr ""
 
 #: admin/placeholderadmin.py:878
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "Du har inte behörighet att kopiera in detta plugin-objekt. "
 
 #: admin/placeholderadmin.py:938
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "Du har inte rättighet att kopiera in denna placeholder"
 
@@ -460,7 +473,6 @@ msgid "You have no permission to move this plugin"
 msgstr "Du har inte behörighet att flytta detta plugin-objekt. "
 
 #: admin/placeholderadmin.py:1087
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "Du har inte behörighet att klippa ut detta plugin-objekt. "
 
@@ -529,8 +541,8 @@ msgstr "Skapa alias"
 #: cms_plugins.py:117
 #, python-format
 msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+"This is an alias reference, you can edit the content only on the <a href="
+"\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
 #: cms_toolbars.py:97
@@ -589,7 +601,6 @@ msgid "Logout"
 msgstr "Logga ut"
 
 #: cms_toolbars.py:378
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "Publicera ändringar på sida"
 
@@ -602,17 +613,14 @@ msgid "Page settings"
 msgstr "Sidinställningar"
 
 #: cms_toolbars.py:448
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "Lägg till översättning"
 
 #: cms_toolbars.py:455
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "Radera översättning"
 
 #: cms_toolbars.py:463
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "Kopiera alla plugins"
 
@@ -623,7 +631,6 @@ msgstr "från %s"
 
 #: cms_toolbars.py:465
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Är du säker på att du vill kopiera alla plugin från %s?"
 
@@ -637,7 +644,6 @@ msgid "Page"
 msgstr "Sida"
 
 #: cms_toolbars.py:531
-#| msgid "Create"
 msgid "Create Page"
 msgstr "Skapa Sida"
 
@@ -918,7 +924,9 @@ msgstr "Tillåt"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå live."
+msgstr ""
+"När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå "
+"live."
 
 #: models/pagemodel.py:68
 msgid "When to expire the page. Leave empty to never expire."
@@ -932,7 +940,9 @@ msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "Ett unikt id som används med mallkommandot page_url för att länka till denna sida"
+msgstr ""
+"Ett unikt id som används med mallkommandot page_url för att länka till denna "
+"sida"
 
 #: models/pagemodel.py:81
 msgid "The template used to render the content."
@@ -987,7 +997,6 @@ msgid "frontend view restriction"
 msgstr "frontend-vy begränsning"
 
 #: models/permissionmodels.py:79
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "Ange användare eller grupp."
 
@@ -995,25 +1004,33 @@ msgstr "Ange användare eller grupp."
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr "Användare kan inte publicera en sida utan att ha rättighet att redigera sidan. Redigeringsrättighet behövs."
+msgstr ""
+"Användare kan inte publicera en sida utan att ha rättighet att redigera "
+"sidan. Redigeringsrättighet behövs."
 
 #: models/permissionmodels.py:100
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr "Användare kan inte ändra avancerade inställnignar på sidor utan att ha rättighet att ändra sidan. Redigeringsrättigheter behövs."
+msgstr ""
+"Användare kan inte ändra avancerade inställnignar på sidor utan att ha "
+"rättighet att ändra sidan. Redigeringsrättigheter behövs."
 
 #: models/permissionmodels.py:105
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr "Användare kan inte ändra rättigheter på sidor utan att ha rättighet att redigera sidan. Redigeringsrättigheter behövs."
+msgstr ""
+"Användare kan inte ändra rättigheter på sidor utan att ha rättighet att "
+"redigera sidan. Redigeringsrättigheter behövs."
 
 #: models/permissionmodels.py:110
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr "Användare kan inte flytta en sida utan att ha rättighet att redigera sidan. Redigeringsrättighet behövs."
+msgstr ""
+"Användare kan inte flytta en sida utan att ha rättighet att redigera sidan. "
+"Redigeringsrättighet behövs."
 
 #: models/permissionmodels.py:175
 msgid "can recover any deleted page"
@@ -1039,7 +1056,9 @@ msgstr "Sidrättighet"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "Tillåtelse att lägga till sida kräver också tillgång till barn eller efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
+msgstr ""
+"Tillåtelse att lägga till sida kräver också tillgång till barn eller "
+"efterkommande annars kan inte tillagd sida redigeras av den som skapat den."
 
 #: models/permissionmodels.py:256
 msgid "User (page)"
@@ -1095,9 +1114,10 @@ msgstr "statiskt placeholder-namn"
 
 #: models/static_placeholder.py:33
 msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
-msgstr "Beskrivande namn för att identifiera denna statiska placeholder. Visas inte för besökare."
+"Descriptive name to identify this static placeholder. Not displayed to users."
+msgstr ""
+"Beskrivande namn för att identifiera denna statiska placeholder. Visas inte "
+"för besökare."
 
 #: models/static_placeholder.py:35
 msgid "placeholder code"
@@ -1177,13 +1197,14 @@ msgstr "Generisk"
 
 #: plugin_base.py:325
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
 #: plugin_base.py:380
 msgid "There are no further settings for this plugin. Please press save."
-msgstr "Det finns inga ytterligare inställningar för detta plugin. Klicka OK för att spara."
+msgstr ""
+"Det finns inga ytterligare inställningar för detta plugin. Klicka OK för att "
+"spara."
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:98
@@ -1384,7 +1405,6 @@ msgid "Search"
 msgstr "Sök"
 
 #: templates/admin/cms/page/tree/base.html:46
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr ""
 
@@ -1398,7 +1418,11 @@ msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr "\n                                                Återställ borttagen %(name)s\n                                            "
+msgstr ""
+"\n"
+"                                                Återställ borttagen "
+"%(name)s\n"
+"                                            "
 
 #: templates/admin/cms/page/tree/base.html:131
 #, python-format
@@ -1406,16 +1430,17 @@ msgid ""
 "\n"
 "                                New %(name)s\n"
 "                            "
-msgstr "\n                                Ny %(name)s\n                            "
+msgstr ""
+"\n"
+"                                Ny %(name)s\n"
+"                            "
 
 #: templates/admin/cms/page/tree/base.html:143
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr "Huvudnavigation"
 
 #: templates/admin/cms/page/tree/base.html:148
 #: templates/admin/cms/page/tree/menu.html:198
-#| msgid "Actions"
 msgid "Options"
 msgstr "Alternativ"
 
@@ -1433,8 +1458,8 @@ msgstr "Fel:"
 
 #: templates/admin/cms/page/tree/base.html:189
 msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the "
+"Page's Advanced settings to manage apphooks."
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:190
@@ -1446,7 +1471,6 @@ msgid "Reload"
 msgstr "Ladda om"
 
 #: templates/admin/cms/page/tree/base.html:193
-#| msgid "New Page"
 msgid "New node"
 msgstr "Ny nod"
 
@@ -1464,17 +1488,20 @@ msgstr "Meny"
 
 #: templates/admin/cms/page/tree/base.html:231
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no page around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
+"page</a> now.\n"
 "                        "
-msgstr "\n                            <em>Det finns inga sida ännu.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Skapa sida</a> nu.\n                        "
+msgstr ""
+"\n"
+"                            <em>Det finns inga sida ännu.</em>\n"
+"                            <br>\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Skapa "
+"sida</a> nu.\n"
+"                        "
 
 #: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
@@ -1494,38 +1521,31 @@ msgid "Legend"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:15
-#| msgid "published"
 msgid "Published"
 msgstr "Publicerad"
 
 #: templates/admin/cms/page/tree/legend.html:21
-#| msgid "Change"
 msgid "Changed"
 msgstr "Ändrad"
 
 #: templates/admin/cms/page/tree/legend.html:27
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Opublicerad"
 
 #: templates/admin/cms/page/tree/legend.html:39
-#| msgid "in menu"
 msgid "In menu"
 msgstr "I menyn"
 
 #: templates/admin/cms/page/tree/legend.html:45
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "Ej i menyn"
 
 #: templates/admin/cms/page/tree/legend.html:51
-#| msgid "New page"
 msgid "View page"
 msgstr "Visa sidan"
 
 #: templates/admin/cms/page/tree/legend.html:63
 #: templates/admin/cms/page/tree/menu.html:34
-#| msgid "softroot"
 msgid "Softroot"
 msgstr ""
 
@@ -1540,7 +1560,6 @@ msgstr "Applikation: %(apphook)s"
 
 #: templates/admin/cms/page/tree/menu.html:88
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr ""
 
@@ -1570,7 +1589,6 @@ msgstr "ej i menyn"
 
 #: templates/admin/cms/page/tree/menu.html:162
 #: templates/admin/cms/page/tree/menu.html:173
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Inställningar för sida (SHIFT-klicka för avancerade inställningar)"
 
@@ -1623,7 +1641,8 @@ msgstr "Du kan inte lägga till plugins i detta plugin"
 
 #: templates/cms/toolbar/dragitem.html:26
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr "Detta plugn kan inte flyttas eller redigeras utanför sitt förälder-plugin"
+msgstr ""
+"Detta plugn kan inte flyttas eller redigeras utanför sitt förälder-plugin"
 
 #: templates/cms/toolbar/dragitem.html:36
 msgid "Clipboard is empty."
@@ -1642,12 +1661,10 @@ msgid "Available plugins"
 msgstr "Tillgängliga plugins"
 
 #: templates/cms/toolbar/items/live_draft.html:6
-#| msgid "View published"
 msgid "View published page"
 msgstr "Visa pulicerad sida"
 
 #: templates/cms/toolbar/items/live_draft.html:11
-#| msgid "Edit this Page"
 msgid "Edit page"
 msgstr "Redigera sida"
 
@@ -1705,7 +1722,6 @@ msgstr "Denna vidarebefodras till:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
@@ -1720,7 +1736,6 @@ msgid "The following error occured:"
 msgstr "Följande fel inträffade:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:28
-#| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
 msgstr "Åtgärd utförd... laddar om."
 
@@ -1737,12 +1752,10 @@ msgid "Plugin will be added here"
 msgstr "Plugins kommer att läggas till här"
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "Du har icke sparade ändringar"
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Är du säker på att du vill överge dessa ändringar?"
 
@@ -1761,7 +1774,6 @@ msgid "Bring up this help dialog"
 msgstr "Visa denna hjälp-dialog"
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Stäng/avbryt"
 
@@ -1782,7 +1794,6 @@ msgid "Focus on Toolbar"
 msgstr "Fokusera på Verktygsfält"
 
 #: templates/cms/toolbar/toolbar_javascript.html:71
-#| msgid "static placeholders"
 msgid "Focus on placeholders"
 msgstr "Fokusera på placeholders"
 
@@ -1791,29 +1802,27 @@ msgid "Move to next/previous element"
 msgstr "Flytta till nästa/föregående element"
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr "Fokusera på plugins i placeholder"
 
 #: templates/cms/toolbar/toolbar_javascript.html:83
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "Redigera plugin"
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:95
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "Expandera/kollapsa"
 
 #: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr "<strong>Inloggning misslyckades.</strong> Var vänlig kontrollera uppgifterna och försök igen."
+msgstr ""
+"<strong>Inloggning misslyckades.</strong> Var vänlig kontrollera uppgifterna "
+"och försök igen."
 
 #: templates/cms/toolbar/toolbar_javascript.html:120
 msgid "This page has unpublished changes."
@@ -1835,26 +1844,43 @@ msgstr "Logga in"
 #, python-format
 msgid ""
 "\n"
-"                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
+"                    Welcome to django CMS version <strong>%(cms_version)s</"
+"strong>.\n"
 "                "
-msgstr "\n                    Välkommen till django CMS version <strong>%(cms_version)s</strong>.\n                "
+msgstr ""
+"\n"
+"                    Välkommen till django CMS version <strong>"
+"%(cms_version)s</strong>.\n"
+"                "
 
 #: templates/cms/welcome.html:43
 #, python-format
 msgid ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr "\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Skapa en sida</a> i systemet för att fortsätta.\n                    "
+msgstr ""
+"\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">Skapa en sida</a> i systemet för att fortsätta.\n"
+"                    "
 
 #: templates/cms/welcome.html:47
 #, python-format
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">add a page</a> manually.\n"
 "                    "
-msgstr "\n                        JavaScript verkar vara avstängt, för att fortsätta måste du \n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">skapa en sida</a> manuellt\n                    "
+msgstr ""
+"\n"
+"                        JavaScript verkar vara avstängt, för att fortsätta "
+"måste du \n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">skapa en sida</a> manuellt\n"
+"                    "
 
 #: templates/cms/welcome.html:56
 msgid "Installation Notes"
@@ -1871,15 +1897,29 @@ msgstr "Dokumentation"
 #: templates/cms/welcome.html:62
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django "
+"CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
-"                <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
-"                    <code>DEBUG = True</code> in your django settings file and\n"
+"                <p class=\"cms-welcome-notes\">You're seeing this message "
+"because you have\n"
+"                    <code>DEBUG = True</code> in your django settings file "
+"and\n"
 "                    haven't added any pages yet.\n"
 "                </p>\n"
 "            "
-msgstr "\n                <p class=\"cms-welcome-notes\">Om du inte ser logotypen för django CMS överst på sidan,\nse till att du har länkat <code>static/cms</code> mapen till dina\n                    statiska filer.</p>\n                <p class=\"cms-welcome-notes\">Du ser detta meddelande för att du har\n                    <code>DEBUG = True</code> i django settings-filen\noch att du inte har några sidor ännu\n                </p>\n            "
+msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">Om du inte ser logotypen för "
+"django CMS överst på sidan,\n"
+"se till att du har länkat <code>static/cms</code> mapen till dina\n"
+"                    statiska filer.</p>\n"
+"                <p class=\"cms-welcome-notes\">Du ser detta meddelande för "
+"att du har\n"
+"                    <code>DEBUG = True</code> i django settings-filen\n"
+"och att du inte har några sidor ännu\n"
+"                </p>\n"
+"            "
 
 #: templates/cms/welcome.html:84
 msgid "Welcome to django CMS"
@@ -1925,9 +1965,13 @@ msgstr "Sidan hittades inte på %(domain)s "
 #: templatetags/cms_tags.py:93
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "En mall-tagg kunde inte hitta sidan med uppslags-argumenten `%(page_lookup)s\n`. Webbadressen för begäran var: http://%(host)s%(path)s"
+msgstr ""
+"En mall-tagg kunde inte hitta sidan med uppslags-argumenten `"
+"%(page_lookup)s\n"
+"`. Webbadressen för begäran var: http://%(host)s%(path)s"
 
 #: test_utils/project/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
@@ -1974,7 +2018,9 @@ msgstr "aktiv"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "Anger om en användare är aktiv. Avaktivera detta i ställer för att ta bort konton."
+msgstr ""
+"Anger om en användare är aktiv. Avaktivera detta i ställer för att ta bort "
+"konton."
 
 #: test_utils/project/customuserapp/models.py:61
 msgid "users"
@@ -2030,7 +2076,6 @@ msgid "Sample App 2"
 msgstr "Exempel App 2"
 
 #: test_utils/project/sampleapp/cms_apps.py:39
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr ""
 
@@ -2079,7 +2124,6 @@ msgid "Static Menu3"
 msgstr ""
 
 #: test_utils/project/sampleapp/cms_menus.py:61
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr ""
 
@@ -2118,13 +2162,11 @@ msgstr "Användarinställningar"
 
 #: toolbar/utils.py:14
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Lägg till plugins till placeholder \"%(placeholder_label)s\""
 
 #: toolbar/utils.py:36
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Lägg till plugins till %(plugin_name)s"
 
@@ -2145,10 +2187,11 @@ msgstr "Felaktig URL, använd följande format: /min/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
-msgstr[0] "Sidan %(pages)s har samma url '%(url)s' som denna sida \"%(instance)s\""
-msgstr[1] "Sidorna %(pages)s har samma url '%(url)s' som denna sida \"%(instance)s\""
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+msgstr[0] ""
+"Sidan %(pages)s har samma url '%(url)s' som denna sida \"%(instance)s\""
+msgstr[1] ""
+"Sidorna %(pages)s har samma url '%(url)s' som denna sida \"%(instance)s\""
 
 #: utils/plugins.py:245
 #, python-format
@@ -2160,7 +2203,9 @@ msgstr "Denna platshållare har redan det maximala antalet plugins (%s)."
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr "Denna placeholder har redan det maximalt tillåtna antalet (%(limit)s) %(plugin_name)s plugin-objekt."
+msgstr ""
+"Denna placeholder har redan det maximalt tillåtna antalet (%(limit)s) "
+"%(plugin_name)s plugin-objekt."
 
 #: utils/request_ip_resolvers.py:24
 #, python-brace-format
@@ -2194,11 +2239,11 @@ msgstr ""
 #~ msgstr "Notify user"
 
 #~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 #~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -2289,7 +2334,8 @@ msgstr ""
 #~ msgstr "Revert %(verbose_name)s"
 
 #~ msgid "Press the save button below to revert to this version of the object."
-#~ msgstr "Press the save button below to revert to this version of the object."
+#~ msgstr ""
+#~ "Press the save button below to revert to this version of the object."
 
 #~ msgid "home"
 #~ msgstr "home"
@@ -2358,11 +2404,11 @@ msgstr ""
 #~ msgstr "Info"
 
 #~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 #~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"

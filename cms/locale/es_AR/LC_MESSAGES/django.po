@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # 2lopez <roberto.lopez.lopez@gmail.com>, 2013
@@ -24,14 +24,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-12 17:14+0000\n"
+"POT-Creation-Date: 2017-06-15 15:26+0000\n"
 "PO-Revision-Date: 2017-06-12 17:18+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/divio/django-cms/language/es_AR/)\n"
+"Language-Team: Spanish (Argentina) (http://www.transifex.com/divio/django-"
+"cms/language/es_AR/)\n"
+"Language: es_AR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es_AR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin/forms.py:79
@@ -80,9 +81,10 @@ msgid "Page Title"
 msgstr "Título de la Página"
 
 #: admin/forms.py:96
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "Sobreescribe lo que es mostrado en lo alto de su navegador o en sus marcadores"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr ""
+"Sobreescribe lo que es mostrado en lo alto de su navegador o en sus "
+"marcadores"
 
 #: admin/forms.py:98
 msgid "Description meta tag"
@@ -90,7 +92,8 @@ msgstr "Descripción del meta tag"
 
 #: admin/forms.py:100
 msgid "A description of the page used by search engines."
-msgstr "Lista de palabras clave que a veces será usada por los motores de búsqueda."
+msgstr ""
+"Lista de palabras clave que a veces será usada por los motores de búsqueda."
 
 #: admin/forms.py:153
 msgid "Another page with this slug already exists"
@@ -251,15 +254,14 @@ msgid "Parent plugin language must be same as language!"
 msgstr "El idioma del plugin padre debe ser el mismo que lenguaje."
 
 #: admin/forms.py:789
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #: admin/pageadmin.py:292
 #, python-format
 msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+"Please create the %(language)s page translation before editing it's advanced "
+"settings."
 msgstr ""
 
 #: admin/pageadmin.py:301 templates/admin/cms/page/submit_row.html:10
@@ -307,7 +309,9 @@ msgstr "La plantilla fue cambiada exitosamente"
 #: admin/pageadmin.py:748
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Error! Usted no tiene permisos para cambiar esta página. Por favor, refrescar la página."
+msgstr ""
+"Error! Usted no tiene permisos para cambiar esta página. Por favor, "
+"refrescar la página."
 
 #: admin/pageadmin.py:832 admin/placeholderadmin.py:505
 #: admin/placeholderadmin.py:569
@@ -315,7 +319,6 @@ msgid "You do not have permission to copy these plugins."
 msgstr "No tiene permisos para copiar estas extensiones"
 
 #: admin/pageadmin.py:924
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr ""
 
@@ -351,7 +354,9 @@ msgstr "La página nunca fue publicada"
 #: admin/pageadmin.py:1083
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "El %(language)s de la página \"%(page)s\" fue retirada del público exitosamente"
+msgstr ""
+"El %(language)s de la página \"%(page)s\" fue retirada del público "
+"exitosamente"
 
 #: admin/pageadmin.py:1125
 msgid "You do not have permission to change this page"
@@ -369,7 +374,8 @@ msgstr "Sólo existe una traducción para esta página."
 #: admin/pageadmin.py:1172
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr "El título y los plugins con el lenguaje %(language)s fueron eliminados."
+msgstr ""
+"El título y los plugins con el lenguaje %(language)s fueron eliminados."
 
 #: admin/pageadmin.py:1200 admin/placeholderadmin.py:1209
 #: admin/placeholderadmin.py:1288
@@ -378,13 +384,13 @@ msgstr "¿Está seguro?"
 
 #: admin/pageadmin.py:1228
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr ""
 
 #: admin/pageadmin.py:1254
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr "No tiene permisos para cambiar esta página en el estado 'in_navigation'"
+msgstr ""
+"No tiene permisos para cambiar esta página en el estado 'in_navigation'"
 
 #: admin/pageadmin.py:1298
 msgid "Page Types"
@@ -416,7 +422,6 @@ msgid "You do not have permission to add a plugin"
 msgstr "No tiene permisos para agregar conectores o plugins"
 
 #: admin/placeholderadmin.py:526
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr ""
 
@@ -441,12 +446,10 @@ msgid "parent must be in the same language as plugin_language"
 msgstr ""
 
 #: admin/placeholderadmin.py:878
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr ""
 
 #: admin/placeholderadmin.py:938
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr ""
 
@@ -455,7 +458,6 @@ msgid "You have no permission to move this plugin"
 msgstr "No tienes permiso para mover esta extensión"
 
 #: admin/placeholderadmin.py:1087
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr ""
 
@@ -524,8 +526,8 @@ msgstr "Crear Alias"
 #: cms_plugins.py:117
 #, python-format
 msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+"This is an alias reference, you can edit the content only on the <a href="
+"\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
 #: cms_toolbars.py:97
@@ -584,7 +586,6 @@ msgid "Logout"
 msgstr "Salir"
 
 #: cms_toolbars.py:378
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr ""
 
@@ -597,17 +598,14 @@ msgid "Page settings"
 msgstr "Configuración de la página"
 
 #: cms_toolbars.py:448
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr ""
 
 #: cms_toolbars.py:455
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr ""
 
 #: cms_toolbars.py:463
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr ""
 
@@ -618,7 +616,6 @@ msgstr ""
 
 #: cms_toolbars.py:465
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr ""
 
@@ -632,7 +629,6 @@ msgid "Page"
 msgstr "Página"
 
 #: cms_toolbars.py:531
-#| msgid "Create"
 msgid "Create Page"
 msgstr ""
 
@@ -913,7 +909,9 @@ msgstr "Permitir"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr "Cuando una página debería estar en línea. El estado debe estar en \"Publicado\" para que la página vaya a estar en línea."
+msgstr ""
+"Cuando una página debería estar en línea. El estado debe estar en \"Publicado"
+"\" para que la página vaya a estar en línea."
 
 #: models/pagemodel.py:68
 msgid "When to expire the page. Leave empty to never expire."
@@ -927,7 +925,9 @@ msgstr "Todos los ancestros no serán mostrados en la navegación"
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "Un identificador único que es usado con el 'templatetag' 'page_url' para enlazar a esta página"
+msgstr ""
+"Un identificador único que es usado con el 'templatetag' 'page_url' para "
+"enlazar a esta página"
 
 #: models/pagemodel.py:81
 msgid "The template used to render the content."
@@ -982,7 +982,6 @@ msgid "frontend view restriction"
 msgstr "restricción para el usuario final"
 
 #: models/permissionmodels.py:79
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr ""
 
@@ -1016,7 +1015,9 @@ msgstr "puede recuperar cualquier página eliminada"
 
 #: models/permissionmodels.py:180
 msgid "If none selected, user haves granted permissions to all sites."
-msgstr "Si no selecciona nada, el usuario tiene garantizado el permiso a todos los sitios."
+msgstr ""
+"Si no selecciona nada, el usuario tiene garantizado el permiso a todos los "
+"sitios."
 
 #: models/permissionmodels.py:187
 msgid "Page global permission"
@@ -1034,7 +1035,10 @@ msgstr "Permiso de la página"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "Añadir permisos a la página requiere también acceder a sus hijos o descendientes, de otra forma la página añadida no puede ser modificada por su creador."
+msgstr ""
+"Añadir permisos a la página requiere también acceder a sus hijos o "
+"descendientes, de otra forma la página añadida no puede ser modificada por "
+"su creador."
 
 #: models/permissionmodels.py:256
 msgid "User (page)"
@@ -1090,9 +1094,10 @@ msgstr "nombre del marcador de posición estático"
 
 #: models/static_placeholder.py:33
 msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
-msgstr "Nombre descriptivo para identificar este marcador de posición estático. No se muestra a los usuarios."
+"Descriptive name to identify this static placeholder. Not displayed to users."
+msgstr ""
+"Nombre descriptivo para identificar este marcador de posición estático. No "
+"se muestra a los usuarios."
 
 #: models/static_placeholder.py:35
 msgid "placeholder code"
@@ -1172,13 +1177,13 @@ msgstr "Generico"
 
 #: plugin_base.py:325
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
 #: plugin_base.py:380
 msgid "There are no further settings for this plugin. Please press save."
-msgstr "No hay mas configuraciones para este plugin. Por favor, presiona guardar."
+msgstr ""
+"No hay mas configuraciones para este plugin. Por favor, presiona guardar."
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:98
@@ -1192,7 +1197,8 @@ msgstr "Guardar"
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr "Entrar por <a href=\"%(login_url)s\">aquí</a>a la parte de administración."
+msgstr ""
+"Entrar por <a href=\"%(login_url)s\">aquí</a>a la parte de administración."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1379,7 +1385,6 @@ msgid "Search"
 msgstr "Buscar"
 
 #: templates/admin/cms/page/tree/base.html:46
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr ""
 
@@ -1404,13 +1409,11 @@ msgid ""
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:143
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:148
 #: templates/admin/cms/page/tree/menu.html:198
-#| msgid "Actions"
 msgid "Options"
 msgstr ""
 
@@ -1428,8 +1431,8 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:189
 msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the "
+"Page's Advanced settings to manage apphooks."
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:190
@@ -1441,7 +1444,6 @@ msgid "Reload"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:193
-#| msgid "New Page"
 msgid "New node"
 msgstr ""
 
@@ -1459,15 +1461,12 @@ msgstr "Menu"
 
 #: templates/admin/cms/page/tree/base.html:231
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no page around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
+"page</a> now.\n"
 "                        "
 msgstr ""
 
@@ -1489,38 +1488,31 @@ msgid "Legend"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:15
-#| msgid "published"
 msgid "Published"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:21
-#| msgid "Change"
 msgid "Changed"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:27
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:39
-#| msgid "in menu"
 msgid "In menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:45
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:51
-#| msgid "New page"
 msgid "View page"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:63
 #: templates/admin/cms/page/tree/menu.html:34
-#| msgid "softroot"
 msgid "Softroot"
 msgstr ""
 
@@ -1535,7 +1527,6 @@ msgstr "Aplicación: %(apphook)s"
 
 #: templates/admin/cms/page/tree/menu.html:88
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr ""
 
@@ -1565,7 +1556,6 @@ msgstr "no en el menú"
 
 #: templates/admin/cms/page/tree/menu.html:162
 #: templates/admin/cms/page/tree/menu.html:173
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
@@ -1637,12 +1627,10 @@ msgid "Available plugins"
 msgstr "Plugins disponibles"
 
 #: templates/cms/toolbar/items/live_draft.html:6
-#| msgid "View published"
 msgid "View published page"
 msgstr ""
 
 #: templates/cms/toolbar/items/live_draft.html:11
-#| msgid "Edit this Page"
 msgid "Edit page"
 msgstr ""
 
@@ -1700,7 +1688,6 @@ msgstr "Está siendo redirecionado a:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
@@ -1715,7 +1702,6 @@ msgid "The following error occured:"
 msgstr "Ha ocurrido del siguiente error:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:28
-#| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
 msgstr ""
 
@@ -1732,12 +1718,10 @@ msgid "Plugin will be added here"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr ""
 
@@ -1756,7 +1740,6 @@ msgid "Bring up this help dialog"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr ""
 
@@ -1777,7 +1760,6 @@ msgid "Focus on Toolbar"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:71
-#| msgid "static placeholders"
 msgid "Focus on placeholders"
 msgstr ""
 
@@ -1786,29 +1768,27 @@ msgid "Move to next/previous element"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:83
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:95
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr "<strong>Fallo al iniciar sesión.</strong> Por favor, compruebe sus datos e intente otra vez."
+msgstr ""
+"<strong>Fallo al iniciar sesión.</strong> Por favor, compruebe sus datos e "
+"intente otra vez."
 
 #: templates/cms/toolbar/toolbar_javascript.html:120
 msgid "This page has unpublished changes."
@@ -1830,7 +1810,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
+"                    Welcome to django CMS version <strong>%(cms_version)s</"
+"strong>.\n"
 "                "
 msgstr ""
 
@@ -1838,7 +1819,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">Add the first page</a> to the system to continue.\n"
 "                    "
 msgstr ""
 
@@ -1847,7 +1829,8 @@ msgstr ""
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">add a page</a> manually.\n"
 "                    "
 msgstr ""
 
@@ -1866,11 +1849,14 @@ msgstr ""
 #: templates/cms/welcome.html:62
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django "
+"CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
-"                <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
-"                    <code>DEBUG = True</code> in your django settings file and\n"
+"                <p class=\"cms-welcome-notes\">You're seeing this message "
+"because you have\n"
+"                    <code>DEBUG = True</code> in your django settings file "
+"and\n"
 "                    haven't added any pages yet.\n"
 "                </p>\n"
 "            "
@@ -1920,9 +1906,13 @@ msgstr "Página no encontrada en %(domain)s"
 #: templatetags/cms_tags.py:93
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "Una etiqueta en la plantilla no puedo encontrar la página con estos argumentos de lookup `%(page_lookup)s\n`. La URL de la petición era: http://%(host)s%(path)s"
+msgstr ""
+"Una etiqueta en la plantilla no puedo encontrar la página con estos "
+"argumentos de lookup `%(page_lookup)s\n"
+"`. La URL de la petición era: http://%(host)s%(path)s"
 
 #: test_utils/project/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
@@ -1969,7 +1959,9 @@ msgstr "activo"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "Determina si el usuario debe ser considerado como activo. Deseleccione esta opción en lugar de eliminar cuentas. "
+msgstr ""
+"Determina si el usuario debe ser considerado como activo. Deseleccione esta "
+"opción en lugar de eliminar cuentas. "
 
 #: test_utils/project/customuserapp/models.py:61
 msgid "users"
@@ -2025,7 +2017,6 @@ msgid "Sample App 2"
 msgstr "Aplicación de Ejemplo 2"
 
 #: test_utils/project/sampleapp/cms_apps.py:39
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr ""
 
@@ -2074,7 +2065,6 @@ msgid "Static Menu3"
 msgstr ""
 
 #: test_utils/project/sampleapp/cms_menus.py:61
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr ""
 
@@ -2113,13 +2103,11 @@ msgstr ""
 
 #: toolbar/utils.py:14
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr ""
 
 #: toolbar/utils.py:36
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
@@ -2140,10 +2128,13 @@ msgstr "URL inválida, use el formato /mi/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+msgstr[0] ""
+"La página %(pages)s tiene la misma url '%(url)s' que la página actual "
 "\"%(instance)s\"."
-msgstr[0] "La página %(pages)s tiene la misma url '%(url)s' que la página actual \"%(instance)s\"."
-msgstr[1] "Las páginas %(pages)s tienen la misma url '%(url)s' que la página actual \"%(instance)s\"."
+msgstr[1] ""
+"Las páginas %(pages)s tienen la misma url '%(url)s' que la página actual "
+"\"%(instance)s\"."
 
 #: utils/plugins.py:245
 #, python-format
@@ -2155,7 +2146,9 @@ msgstr "Este placeholder tiene ya el máximo número de plugins (%s)."
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr "Este placeholder tiene ya el máximo número (%(limit)s) de plugins %(plugin_name)s permitido."
+msgstr ""
+"Este placeholder tiene ya el máximo número (%(limit)s) de plugins "
+"%(plugin_name)s permitido."
 
 #: utils/request_ip_resolvers.py:24
 #, python-brace-format
@@ -2189,11 +2182,11 @@ msgstr ""
 #~ msgstr "Notify user"
 
 #~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 #~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -2284,7 +2277,8 @@ msgstr ""
 #~ msgstr "Revert %(verbose_name)s"
 
 #~ msgid "Press the save button below to revert to this version of the object."
-#~ msgstr "Press the save button below to revert to this version of the object."
+#~ msgstr ""
+#~ "Press the save button below to revert to this version of the object."
 
 #~ msgid "home"
 #~ msgstr "home"
@@ -2353,11 +2347,11 @@ msgstr ""
 #~ msgstr "Info"
 
 #~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 #~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"
