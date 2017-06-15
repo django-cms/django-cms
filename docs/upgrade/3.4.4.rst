@@ -13,24 +13,52 @@ What's new in 3.4.4
 Bug Fixes
 =========
 
+* Fixed a bug in which cancelling the publishing dialog wasn't respected.
+* Fixed a bug causing post-login redirection to an incorrect URL on single-language sites.
+* Fixed an error when retrieving placeholder label from configuration.
+* Fixed a bug which caused certain translations to display double-escaped text in the page
+  list admin view.
+* Adjusted the toolbar JavaScript template to escape values coming from the request.
+* Replaced all custom markup on the ``admin/cms/page/includes/fieldset.html`` template
+  with an ``{% include %}`` call to Django's built-in ``fieldset.html`` template.
+* Fixed a bug which prevented a page from being marked as dirty when a placeholder was cleared.
+* Fixed an IntegrityError raised when publishing a page with no public version and whose publisher
+  state was pending.
+* Fixed an issue with JavaScript not being able to determine correct path to the async bundle
+* Fixed a ``DoesNotExist`` database error raised when moving a page marked as published, but whose public
+  translation did not exist.
+* Fixed a bug in which the menu rendered nodes using the site session variable (set in the admin),
+  instead of the current request site.
+* Fixed a race condition bug in which the database cache keys were deleted without syncing with the
+  cache server, and as a result old menu items would continue to be displayed.
+* Fixed a 404 raised when using the ``Delete`` button for a Page or Title extension on Django >= 1.9
+* Fixed a performance issue with nested pages when using the ``inherit`` flag on the ``{% placeholder %}`` tag.
+* Fixed a bug in which the placeholder cache was not consistently cleared when a page was published.
+* Fixed a regression which prevented users from setting a redirect to the homepage.
 
 
 Improvements and new features
 =============================
 
+* Enhanced the plugin menu to not show plugins the user does not have permission to add.
+* Added Dropdown class to toolbar items.
+* Added "How to serve multiple languages" section to documentation.
 
 
-Deprecations
-============
+******************************
+Backwards incompatible changes
+******************************
 
 
+CMSPluginBase class
+===================
 
-*****************************
-Backward incompatible changes
-*****************************
+* Changed the signature for internal ``cms.plugin_base.CMSPluginBase`` methods ``get_child_classes``
+  and ``get_parent_classes`` to take an optional ``instance`` parameter.
 
-Page methods
-============
+
+Page model
+==========
 
 The following methods have been removed from the ``Page`` model:
 

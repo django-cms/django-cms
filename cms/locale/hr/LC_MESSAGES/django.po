@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Damir <damir.arbula@gmail.com>, 2013-2015
@@ -11,15 +11,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-12 17:14+0000\n"
+"POT-Creation-Date: 2017-06-15 15:26+0000\n"
 "PO-Revision-Date: 2017-06-12 17:18+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
-"Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
+"Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/"
+"hr/)\n"
+"Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #: admin/forms.py:79
 msgid "Copy permissions"
@@ -67,8 +69,7 @@ msgid "Page Title"
 msgstr "Naslov stranice"
 
 #: admin/forms.py:96
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Prepisati će ono što je prikazano u vrhu preglednika i u oznakama."
 
 #: admin/forms.py:98
@@ -77,7 +78,9 @@ msgstr "Opis meta tag"
 
 #: admin/forms.py:100
 msgid "A description of the page used by search engines."
-msgstr "Popis ključnih riječi, razadvojenih zarezima, koje koriste pojedine tražilice."
+msgstr ""
+"Popis ključnih riječi, razadvojenih zarezima, koje koriste pojedine "
+"tražilice."
 
 #: admin/forms.py:153
 msgid "Another page with this slug already exists"
@@ -238,15 +241,14 @@ msgid "Parent plugin language must be same as language!"
 msgstr "Jezik nadređenog plugina mora biti isti."
 
 #: admin/forms.py:789
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #: admin/pageadmin.py:292
 #, python-format
 msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+"Please create the %(language)s page translation before editing it's advanced "
+"settings."
 msgstr ""
 
 #: admin/pageadmin.py:301 templates/admin/cms/page/submit_row.html:10
@@ -294,7 +296,9 @@ msgstr "Predložak je uspješno promijenjen"
 #: admin/pageadmin.py:748
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Pogreška! Nemate ovlasti premjestiti ovu stranicu. Molim, ponovno učitajte stranicu."
+msgstr ""
+"Pogreška! Nemate ovlasti premjestiti ovu stranicu. Molim, ponovno učitajte "
+"stranicu."
 
 #: admin/pageadmin.py:832 admin/placeholderadmin.py:505
 #: admin/placeholderadmin.py:569
@@ -302,7 +306,6 @@ msgid "You do not have permission to copy these plugins."
 msgstr "Nemate ovlasti za kopiranje ovih pluginova."
 
 #: admin/pageadmin.py:924
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr ""
 
@@ -365,7 +368,6 @@ msgstr "Da li ste sigurni?"
 
 #: admin/pageadmin.py:1228
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr ""
 
@@ -403,7 +405,6 @@ msgid "You do not have permission to add a plugin"
 msgstr "Nemate ovlasti dodati plugin"
 
 #: admin/placeholderadmin.py:526
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr ""
 
@@ -428,12 +429,10 @@ msgid "parent must be in the same language as plugin_language"
 msgstr ""
 
 #: admin/placeholderadmin.py:878
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr ""
 
 #: admin/placeholderadmin.py:938
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr ""
 
@@ -442,7 +441,6 @@ msgid "You have no permission to move this plugin"
 msgstr "Nemate ovlasti za premještanje ovog plugina"
 
 #: admin/placeholderadmin.py:1087
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr ""
 
@@ -511,8 +509,8 @@ msgstr "Izradi Alias"
 #: cms_plugins.py:117
 #, python-format
 msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+"This is an alias reference, you can edit the content only on the <a href="
+"\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
 #: cms_toolbars.py:97
@@ -571,7 +569,6 @@ msgid "Logout"
 msgstr "Odjavi se"
 
 #: cms_toolbars.py:378
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr ""
 
@@ -584,17 +581,14 @@ msgid "Page settings"
 msgstr "Postavke za stranicu"
 
 #: cms_toolbars.py:448
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr ""
 
 #: cms_toolbars.py:455
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr ""
 
 #: cms_toolbars.py:463
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr ""
 
@@ -605,7 +599,6 @@ msgstr ""
 
 #: cms_toolbars.py:465
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr ""
 
@@ -619,7 +612,6 @@ msgid "Page"
 msgstr "Stranica"
 
 #: cms_toolbars.py:531
-#| msgid "Create"
 msgid "Create Page"
 msgstr ""
 
@@ -914,7 +906,9 @@ msgstr "svi preci  neće biti prikazani u navigaciji"
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr "Jedinstveni identifikator korišten sa page_url templatetag-om za povezivanje s ovom stranicom"
+msgstr ""
+"Jedinstveni identifikator korišten sa page_url templatetag-om za povezivanje "
+"s ovom stranicom"
 
 #: models/pagemodel.py:81
 msgid "The template used to render the content."
@@ -969,7 +963,6 @@ msgid "frontend view restriction"
 msgstr "zabrana prikaza na frontendu"
 
 #: models/permissionmodels.py:79
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr ""
 
@@ -1021,7 +1014,10 @@ msgstr "Ovlasti stranice"
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
-msgstr "Privilegije za dodavanje stranice također zahtjeva pravo pristupa djeci ili potomcima. U suprotnom, stranica se neće moći mijenjati od strane njenog tvorca."
+msgstr ""
+"Privilegije za dodavanje stranice također zahtjeva pravo pristupa djeci ili "
+"potomcima. U suprotnom, stranica se neće moći mijenjati od strane njenog "
+"tvorca."
 
 #: models/permissionmodels.py:256
 msgid "User (page)"
@@ -1077,9 +1073,10 @@ msgstr "ime statičkog placeholdera"
 
 #: models/static_placeholder.py:33
 msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
-msgstr "Opisno ime za identifikaciju ovog statičkog placeholdera. Ne prikazuje se korisnicima."
+"Descriptive name to identify this static placeholder. Not displayed to users."
+msgstr ""
+"Opisno ime za identifikaciju ovog statičkog placeholdera. Ne prikazuje se "
+"korisnicima."
 
 #: models/static_placeholder.py:35
 msgid "placeholder code"
@@ -1159,7 +1156,6 @@ msgstr "Generičko"
 
 #: plugin_base.py:325
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
@@ -1367,7 +1363,6 @@ msgid "Search"
 msgstr "Pretraživanje"
 
 #: templates/admin/cms/page/tree/base.html:46
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr ""
 
@@ -1392,13 +1387,11 @@ msgid ""
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:143
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:148
 #: templates/admin/cms/page/tree/menu.html:198
-#| msgid "Actions"
 msgid "Options"
 msgstr ""
 
@@ -1416,8 +1409,8 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:189
 msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the "
+"Page's Advanced settings to manage apphooks."
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:190
@@ -1429,7 +1422,6 @@ msgid "Reload"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:193
-#| msgid "New Page"
 msgid "New node"
 msgstr ""
 
@@ -1447,15 +1439,12 @@ msgstr "Izborni"
 
 #: templates/admin/cms/page/tree/base.html:231
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no page around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
+"page</a> now.\n"
 "                        "
 msgstr ""
 
@@ -1477,38 +1466,31 @@ msgid "Legend"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:15
-#| msgid "published"
 msgid "Published"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:21
-#| msgid "Change"
 msgid "Changed"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:27
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:39
-#| msgid "in menu"
 msgid "In menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:45
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:51
-#| msgid "New page"
 msgid "View page"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:63
 #: templates/admin/cms/page/tree/menu.html:34
-#| msgid "softroot"
 msgid "Softroot"
 msgstr ""
 
@@ -1523,7 +1505,6 @@ msgstr "Aplikacija: %(apphook)s"
 
 #: templates/admin/cms/page/tree/menu.html:88
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr ""
 
@@ -1553,7 +1534,6 @@ msgstr "nije u izborniku"
 
 #: templates/admin/cms/page/tree/menu.html:162
 #: templates/admin/cms/page/tree/menu.html:173
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
@@ -1625,12 +1605,10 @@ msgid "Available plugins"
 msgstr "Dostupni pluginovi"
 
 #: templates/cms/toolbar/items/live_draft.html:6
-#| msgid "View published"
 msgid "View published page"
 msgstr ""
 
 #: templates/cms/toolbar/items/live_draft.html:11
-#| msgid "Edit this Page"
 msgid "Edit page"
 msgstr ""
 
@@ -1688,7 +1666,6 @@ msgstr "Preusmjerena je na:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
@@ -1703,7 +1680,6 @@ msgid "The following error occured:"
 msgstr "Došlo je do sljedeće pogreške:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:28
-#| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
 msgstr ""
 
@@ -1720,12 +1696,10 @@ msgid "Plugin will be added here"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr ""
 
@@ -1744,7 +1718,6 @@ msgid "Bring up this help dialog"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr ""
 
@@ -1765,7 +1738,6 @@ msgid "Focus on Toolbar"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:71
-#| msgid "static placeholders"
 msgid "Focus on placeholders"
 msgstr ""
 
@@ -1774,29 +1746,27 @@ msgid "Move to next/previous element"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:83
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:95
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr "<strong>Prijava neuspješna.</strong> Molim provjerite pristupne podatke i pokušajte ponovno."
+msgstr ""
+"<strong>Prijava neuspješna.</strong> Molim provjerite pristupne podatke i "
+"pokušajte ponovno."
 
 #: templates/cms/toolbar/toolbar_javascript.html:120
 msgid "This page has unpublished changes."
@@ -1818,7 +1788,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
+"                    Welcome to django CMS version <strong>%(cms_version)s</"
+"strong>.\n"
 "                "
 msgstr ""
 
@@ -1826,7 +1797,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">Add the first page</a> to the system to continue.\n"
 "                    "
 msgstr ""
 
@@ -1835,7 +1807,8 @@ msgstr ""
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">add a page</a> manually.\n"
 "                    "
 msgstr ""
 
@@ -1854,11 +1827,14 @@ msgstr ""
 #: templates/cms/welcome.html:62
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django "
+"CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
-"                <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
-"                    <code>DEBUG = True</code> in your django settings file and\n"
+"                <p class=\"cms-welcome-notes\">You're seeing this message "
+"because you have\n"
+"                    <code>DEBUG = True</code> in your django settings file "
+"and\n"
 "                    haven't added any pages yet.\n"
 "                </p>\n"
 "            "
@@ -1908,9 +1884,12 @@ msgstr "Stranica nije pronađena na %(domain)s"
 #: templatetags/cms_tags.py:93
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "Template tag ne može pronaći stranicu sa parametrima `%(page_lookup)s `. URL je bio: http://%(host)s%(path)s"
+msgstr ""
+"Template tag ne može pronaći stranicu sa parametrima `%(page_lookup)s `. URL "
+"je bio: http://%(host)s%(path)s"
 
 #: test_utils/project/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
@@ -1947,7 +1926,8 @@ msgstr "status osoblja"
 
 #: test_utils/project/customuserapp/models.py:47
 msgid "Designates whether the user can log into this admin site."
-msgstr "Označava da li se korisnik može prijaviti na ovu administracijsku stranicu."
+msgstr ""
+"Označava da li se korisnik može prijaviti na ovu administracijsku stranicu."
 
 #: test_utils/project/customuserapp/models.py:49
 msgid "active"
@@ -1957,7 +1937,9 @@ msgstr "aktivan"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "Označava da li je ovaj korisnik aktivan. Odznačite ovo polje umjesto brisanja korisničkog računa."
+msgstr ""
+"Označava da li je ovaj korisnik aktivan. Odznačite ovo polje umjesto "
+"brisanja korisničkog računa."
 
 #: test_utils/project/customuserapp/models.py:61
 msgid "users"
@@ -2013,7 +1995,6 @@ msgid "Sample App 2"
 msgstr "Ogledna Aplikacija 2"
 
 #: test_utils/project/sampleapp/cms_apps.py:39
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr ""
 
@@ -2062,7 +2043,6 @@ msgid "Static Menu3"
 msgstr ""
 
 #: test_utils/project/sampleapp/cms_menus.py:61
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr ""
 
@@ -2101,13 +2081,11 @@ msgstr ""
 
 #: toolbar/utils.py:14
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr ""
 
 #: toolbar/utils.py:36
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
@@ -2128,11 +2106,16 @@ msgstr "Nepravilan URL, koristite format: /my/url."
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
+msgstr[0] ""
+"Stranica %(pages)s imaju isti url '%(url)s' kao trenutna stranica "
 "\"%(instance)s\"."
-msgstr[0] "Stranica %(pages)s imaju isti url '%(url)s' kao trenutna stranica \"%(instance)s\"."
-msgstr[1] "Stranice %(pages)s imaju isti url '%(url)s' kao trenutna stranica \"%(instance)s\"."
-msgstr[2] "Stranice %(pages)s imaju isti url '%(url)s' kao trenutna stranica \"%(instance)s\"."
+msgstr[1] ""
+"Stranice %(pages)s imaju isti url '%(url)s' kao trenutna stranica "
+"\"%(instance)s\"."
+msgstr[2] ""
+"Stranice %(pages)s imaju isti url '%(url)s' kao trenutna stranica "
+"\"%(instance)s\"."
 
 #: utils/plugins.py:245
 #, python-format
@@ -2144,7 +2127,9 @@ msgstr "Ovaj placeholder već ima najveći mogući broj pluginova (%s)."
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr "Ovaj placeholder veći ima najveći dozvoljeni broj (%(limit)s) pluginova %(plugin_name)s."
+msgstr ""
+"Ovaj placeholder veći ima najveći dozvoljeni broj (%(limit)s) pluginova "
+"%(plugin_name)s."
 
 #: utils/request_ip_resolvers.py:24
 #, python-brace-format
@@ -2178,11 +2163,11 @@ msgstr ""
 #~ msgstr "Notify user"
 
 #~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 #~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -2273,7 +2258,8 @@ msgstr ""
 #~ msgstr "Revert %(verbose_name)s"
 
 #~ msgid "Press the save button below to revert to this version of the object."
-#~ msgstr "Press the save button below to revert to this version of the object."
+#~ msgstr ""
+#~ "Press the save button below to revert to this version of the object."
 
 #~ msgid "home"
 #~ msgstr "home"
@@ -2343,11 +2329,11 @@ msgstr ""
 #~ msgstr "Info"
 
 #~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 #~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"

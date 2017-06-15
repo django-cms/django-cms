@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # 1bi9 <1bi9@sina.cn>, 2014
@@ -29,14 +29,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-12 17:14+0000\n"
+"POT-Creation-Date: 2017-06-15 15:26+0000\n"
 "PO-Revision-Date: 2017-06-12 17:18+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/language/zh_CN/)\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/"
+"language/zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: admin/forms.py:79
@@ -85,8 +86,7 @@ msgid "Page Title"
 msgstr "页面标题"
 
 #: admin/forms.py:96
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "覆盖显示在浏览器顶部标题栏或书签中的信息"
 
 #: admin/forms.py:98
@@ -256,15 +256,14 @@ msgid "Parent plugin language must be same as language!"
 msgstr "父层插件语言必须与当前语言一致！"
 
 #: admin/forms.py:789
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "父层插件占位符必须与当前占位符一致！"
 
 #: admin/pageadmin.py:292
 #, python-format
 msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+"Please create the %(language)s page translation before editing it's advanced "
+"settings."
 msgstr "编辑高级设置之前请先创建 %(language)s 的语言页面。"
 
 #: admin/pageadmin.py:301 templates/admin/cms/page/submit_row.html:10
@@ -320,7 +319,6 @@ msgid "You do not have permission to copy these plugins."
 msgstr "您没有复制插件的权限"
 
 #: admin/pageadmin.py:924
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "你没有权限回退本页面。"
 
@@ -383,7 +381,6 @@ msgstr "您确认码？"
 
 #: admin/pageadmin.py:1228
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "你没有查看  %(title)s 页面的权限"
 
@@ -421,7 +418,6 @@ msgid "You do not have permission to add a plugin"
 msgstr "您没有添加插件的权限"
 
 #: admin/placeholderadmin.py:526
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "没有权限复制该占位符"
 
@@ -446,12 +442,10 @@ msgid "parent must be in the same language as plugin_language"
 msgstr "父插件语言必须是同插件语言相同"
 
 #: admin/placeholderadmin.py:878
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "你没有权限粘贴这个插件"
 
 #: admin/placeholderadmin.py:938
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "你没有权限粘贴这个占位符"
 
@@ -460,7 +454,6 @@ msgid "You have no permission to move this plugin"
 msgstr "没有移动插件权限"
 
 #: admin/placeholderadmin.py:1087
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "你没有权限剪切这个插件"
 
@@ -529,8 +522,8 @@ msgstr "创建别名"
 #: cms_plugins.py:117
 #, python-format
 msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+"This is an alias reference, you can edit the content only on the <a href="
+"\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
 #: cms_toolbars.py:97
@@ -589,7 +582,6 @@ msgid "Logout"
 msgstr "注销"
 
 #: cms_toolbars.py:378
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr ""
 
@@ -602,17 +594,14 @@ msgid "Page settings"
 msgstr "页面设置"
 
 #: cms_toolbars.py:448
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr ""
 
 #: cms_toolbars.py:455
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr ""
 
 #: cms_toolbars.py:463
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr ""
 
@@ -623,7 +612,6 @@ msgstr ""
 
 #: cms_toolbars.py:465
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr ""
 
@@ -637,7 +625,6 @@ msgid "Page"
 msgstr "页"
 
 #: cms_toolbars.py:531
-#| msgid "Create"
 msgid "Create Page"
 msgstr ""
 
@@ -987,7 +974,6 @@ msgid "frontend view restriction"
 msgstr "前端视图限制"
 
 #: models/permissionmodels.py:79
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr ""
 
@@ -1095,8 +1081,7 @@ msgstr "静态占位符名称"
 
 #: models/static_placeholder.py:33
 msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
+"Descriptive name to identify this static placeholder. Not displayed to users."
 msgstr "表明这个静态占位符的描述性名称。不会呈现给用户。"
 
 #: models/static_placeholder.py:35
@@ -1177,7 +1162,6 @@ msgstr "普通的"
 
 #: plugin_base.py:325
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
@@ -1383,7 +1367,6 @@ msgid "Search"
 msgstr "搜索"
 
 #: templates/admin/cms/page/tree/base.html:46
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr ""
 
@@ -1408,13 +1391,11 @@ msgid ""
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:143
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:148
 #: templates/admin/cms/page/tree/menu.html:198
-#| msgid "Actions"
 msgid "Options"
 msgstr ""
 
@@ -1432,8 +1413,8 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:189
 msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+"This page cannot be copied because an application is attached to it. See the "
+"Page's Advanced settings to manage apphooks."
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:190
@@ -1445,7 +1426,6 @@ msgid "Reload"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:193
-#| msgid "New Page"
 msgid "New node"
 msgstr ""
 
@@ -1463,15 +1443,12 @@ msgstr "目录"
 
 #: templates/admin/cms/page/tree/base.html:231
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no page around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add "
+"page</a> now.\n"
 "                        "
 msgstr ""
 
@@ -1493,38 +1470,31 @@ msgid "Legend"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:15
-#| msgid "published"
 msgid "Published"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:21
-#| msgid "Change"
 msgid "Changed"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:27
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:39
-#| msgid "in menu"
 msgid "In menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:45
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:51
-#| msgid "New page"
 msgid "View page"
 msgstr ""
 
 #: templates/admin/cms/page/tree/legend.html:63
 #: templates/admin/cms/page/tree/menu.html:34
-#| msgid "softroot"
 msgid "Softroot"
 msgstr ""
 
@@ -1539,7 +1509,6 @@ msgstr "应用：%(apphook)s"
 
 #: templates/admin/cms/page/tree/menu.html:88
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr ""
 
@@ -1569,7 +1538,6 @@ msgstr "不在目录中"
 
 #: templates/admin/cms/page/tree/menu.html:162
 #: templates/admin/cms/page/tree/menu.html:173
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
@@ -1641,12 +1609,10 @@ msgid "Available plugins"
 msgstr "可用的插件"
 
 #: templates/cms/toolbar/items/live_draft.html:6
-#| msgid "View published"
 msgid "View published page"
 msgstr ""
 
 #: templates/cms/toolbar/items/live_draft.html:11
-#| msgid "Edit this Page"
 msgid "Edit page"
 msgstr ""
 
@@ -1704,7 +1670,6 @@ msgstr "它被重定向到："
 
 #: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
@@ -1719,7 +1684,6 @@ msgid "The following error occured:"
 msgstr "发生了下述错误："
 
 #: templates/cms/toolbar/toolbar_javascript.html:28
-#| msgid "Action successfull... reloading."
 msgid "Action successful... reloading."
 msgstr ""
 
@@ -1736,12 +1700,10 @@ msgid "Plugin will be added here"
 msgstr "插件将被添加到这里"
 
 #: templates/cms/toolbar/toolbar_javascript.html:32
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:33
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr ""
 
@@ -1760,7 +1722,6 @@ msgid "Bring up this help dialog"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr ""
 
@@ -1781,7 +1742,6 @@ msgid "Focus on Toolbar"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:71
-#| msgid "static placeholders"
 msgid "Focus on placeholders"
 msgstr ""
 
@@ -1790,22 +1750,18 @@ msgid "Move to next/previous element"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:79
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:83
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:91
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:95
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr ""
 
@@ -1834,26 +1790,37 @@ msgstr "请登录"
 #, python-format
 msgid ""
 "\n"
-"                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
+"                    Welcome to django CMS version <strong>%(cms_version)s</"
+"strong>.\n"
 "                "
-msgstr "\n欢迎来到django CMS版本 <strong>%(cms_version)s</strong>."
+msgstr ""
+"\n"
+"欢迎来到django CMS版本 <strong>%(cms_version)s</strong>."
 
 #: templates/cms/welcome.html:43
 #, python-format
 msgid ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr "\n<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">添加第一页</a> 到系统中以继续。"
+msgstr ""
+"\n"
+"<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">添加第一页</a> 到系统"
+"中以继续。"
 
 #: templates/cms/welcome.html:47
 #, python-format
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
+"\">add a page</a> manually.\n"
 "                    "
-msgstr "\nJavaScript好像被禁用所以请手动\n<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">添加页面</a> ."
+msgstr ""
+"\n"
+"JavaScript好像被禁用所以请手动\n"
+"<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">添加页面</a> ."
 
 #: templates/cms/welcome.html:56
 msgid "Installation Notes"
@@ -1870,15 +1837,26 @@ msgstr "文档"
 #: templates/cms/welcome.html:62
 msgid ""
 "\n"
-"                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
+"                <p class=\"cms-welcome-notes\">If you don't see the django "
+"CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
-"                <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
-"                    <code>DEBUG = True</code> in your django settings file and\n"
+"                <p class=\"cms-welcome-notes\">You're seeing this message "
+"because you have\n"
+"                    <code>DEBUG = True</code> in your django settings file "
+"and\n"
 "                    haven't added any pages yet.\n"
 "                </p>\n"
 "            "
-msgstr "\n<p class=\"cms-welcome-notes\">如果您没有在顶部看到django CMS的标识，请确保\n您将 <code>static/cms</code> 文件夹链接到您的\n静态文件</p>\n<p class=\"cms-welcome-notes\">您看到该信息是因为您在django设定文件中有\n<code>DEBUG = True</code> 并且\n您没有添加任何页面\n</p>"
+msgstr ""
+"\n"
+"<p class=\"cms-welcome-notes\">如果您没有在顶部看到django CMS的标识，请确保\n"
+"您将 <code>static/cms</code> 文件夹链接到您的\n"
+"静态文件</p>\n"
+"<p class=\"cms-welcome-notes\">您看到该信息是因为您在django设定文件中有\n"
+"<code>DEBUG = True</code> 并且\n"
+"您没有添加任何页面\n"
+"</p>"
 
 #: templates/cms/welcome.html:84
 msgid "Welcome to django CMS"
@@ -1924,9 +1902,12 @@ msgstr "该页面在 %(domain)s 中未找到"
 #: templatetags/cms_tags.py:93
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments `"
+"%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s%(path)s"
+msgstr ""
+"模板标签无法找到`%(page_lookup)s `所对应的页面。源请求页面为http://%(host)s"
+"%(path)s"
 
 #: test_utils/project/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
@@ -2029,7 +2010,6 @@ msgid "Sample App 2"
 msgstr "样板程序2"
 
 #: test_utils/project/sampleapp/cms_apps.py:39
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr ""
 
@@ -2078,7 +2058,6 @@ msgid "Static Menu3"
 msgstr "静态菜单3"
 
 #: test_utils/project/sampleapp/cms_menus.py:61
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr ""
 
@@ -2117,13 +2096,11 @@ msgstr "用户设置"
 
 #: toolbar/utils.py:14
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr ""
 
 #: toolbar/utils.py:36
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
@@ -2144,8 +2121,7 @@ msgstr "无效的URL, 正确格式：/my/url"
 msgid ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+"Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr[0] "页%(pages)s与当前页\"%(instance)s\"具有相同的URL地址'%(url)s'."
 
 #: utils/plugins.py:245
@@ -2192,11 +2168,11 @@ msgstr "一向导程序已经注册在模型%s"
 #~ msgstr "Notify user"
 
 #~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 #~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ "Send email notification to user about username or password change. "
+#~ "Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -2287,7 +2263,8 @@ msgstr "一向导程序已经注册在模型%s"
 #~ msgstr "Revert %(verbose_name)s"
 
 #~ msgid "Press the save button below to revert to this version of the object."
-#~ msgstr "Press the save button below to revert to this version of the object."
+#~ msgstr ""
+#~ "Press the save button below to revert to this version of the object."
 
 #~ msgid "home"
 #~ msgstr "home"
@@ -2355,11 +2332,11 @@ msgstr "一向导程序已经注册在模型%s"
 #~ msgstr "Info"
 
 #~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 #~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
+#~ "\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"
