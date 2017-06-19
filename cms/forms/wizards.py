@@ -22,6 +22,7 @@ from cms.utils.page_permissions import (
     user_can_add_subpage,
 )
 from cms.utils.conf import get_cms_setting
+from cms.utils.urlutils import static_with_version
 
 try:
     # djangocms_text_ckeditor is not guaranteed to be available
@@ -41,6 +42,16 @@ class PageTypeSelect(forms.widgets.Select):
             'cms/js/widgets/wizard.pagetypeselect.js',
         )
 
+class SlugWidget(forms.widgets.TextInput):
+    """
+    Special widget for the slug field that requires Title field to be there.
+    Adds the js for the slugifying.
+    """
+    class Media:
+        js = (
+            'admin/js/urlify.js',
+            static_with_version('cms/js/dist/bundle.forms.slugwidget.min.js'),
+        )
 
 class BaseCMSPageForm(forms.Form):
     page = None
@@ -50,7 +61,8 @@ class BaseCMSPageForm(forms.Form):
         help_text=_(u"Provide a title for the new page."))
     slug = forms.SlugField(
         label=_(u'Slug'), max_length=255, required=False,
-        help_text=_(u"Leave empty for automatic slug, or override as required.")
+        help_text=_(u"Leave empty for automatic slug, or override as required."),
+        widget=SlugWidget()
     )
     page_type = forms.ChoiceField(
         label=_(u'Page type'), required=False, widget=PageTypeSelect())
