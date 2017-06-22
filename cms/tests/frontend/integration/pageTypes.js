@@ -77,10 +77,9 @@ casper.test.begin('PageType can be created and used', function (test) {
     casper.start()
         // actually creates 3 plugins - row > col + col
         .then(cms.addPlugin({
-            type: 'GridPlugin',
+            type: 'MultiColumnPlugin',
             content: {
-                id_create: 2,
-                id_create_size: 12
+                id_create: 2
             }
         }))
         .then(cms.addPlugin({
@@ -188,8 +187,10 @@ casper.test.begin('PageType can be created and used', function (test) {
         .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             test.assertUrlMatch(/new-shiny-page/, 'Page was created');
-            test.assertSelectorHasText('.grid-12.alpha', 'Left column', 'Correct page type was used');
-            test.assertSelectorHasText('.grid-12.omega', 'Right column', 'Correct page type was used');
+            test.assertSelectorHasText(
+                '.multicolumn2 .column:first-child', 'Left column', 'Correct page type was used');
+            test.assertSelectorHasText(
+                '.multicolumn2 .column:last-child', 'Right column', 'Correct page type was used');
         })
         // cleanup before teardown
         .then(cms.removePage({ title: 'Page Types' }))

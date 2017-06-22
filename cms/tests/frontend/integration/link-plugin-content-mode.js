@@ -13,10 +13,10 @@ casper.test.setUp(function (done) {
         .then(cms.login())
         .then(cms.addPage({ title: 'First page' }))
         .then(cms.addPlugin({
-            type: 'Bootstrap3ButtonCMSPlugin',
+            type: 'LinkPlugin',
             content: {
-                id_label: 'Link Plugin',
-                id_link_url: 'http://google.com'
+                id_name: 'Link Plugin',
+                id_external_link: 'http://google.com'
             }
         }))
         .run(done);

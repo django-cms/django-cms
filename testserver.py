@@ -36,6 +36,9 @@ class DisableMigrations(object):
     def __getitem__(self, item):
         return 'notmigrations'
 
+    def update(self, whatever):
+        return True
+
 
 HELPER_SETTINGS = dict(
     CMS_PERMISSION=permission,
@@ -109,7 +112,6 @@ HELPER_SETTINGS = dict(
         }
     },
     INSTALLED_APPS=[
-        'filer',
         'djangocms_text_ckeditor',
         'cms.test_utils.project.pluginapp.plugins.link',
         'cms.test_utils.project.pluginapp.plugins.multicolumn',

@@ -154,7 +154,7 @@ casper.test.begin('Copy/paste plugin from the structure board with paste button 
     casper
         .start()
         .then(cms.addPlugin({
-            type: 'Bootstrap3BlockquoteCMSPlugin'
+            type: 'StylePlugin'
         }))
         .thenOpen(globals.editUrl)
         // go to the Structure mode
@@ -311,10 +311,9 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
         .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
-            type: 'Bootstrap3RowCMSPlugin',
+            type: 'MultiColumnPlugin',
             content: {
-                id_create: 2,
-                id_create_xs_col: 12
+                id_create: 2
             }
         }))
         .thenOpen(globals.editUrl)
@@ -346,7 +345,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
 
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExists(
-                '.cms-clipboard-containers [title*="Bootstrap3ColumnCMSPlugin"]',
+                '.cms-clipboard-containers [title*="ColumnPlugin"]',
                 'Correct plugin was copied'
             );
 
@@ -367,7 +366,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
                 return CMS.$('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(0).text();
-            }, 'Row', '1 item that does allow pasting is indeed a Row plugin');
+            }, 'Multi Columns', '1 item that does allow pasting is indeed a Row plugin');
         })
 
         // try to paste column in a column
@@ -433,10 +432,9 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
         .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
-            type: 'Bootstrap3RowCMSPlugin',
+            type: 'MultiColumnPlugin',
             content: {
-                id_create: 2,
-                id_create_xs_col: 12
+                id_create: 2
             }
         }))
         .thenOpen(globals.editUrl)
@@ -468,7 +466,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
 
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExists(
-                '.cms-clipboard-containers [title*="Bootstrap3ColumnCMSPlugin"]',
+                '.cms-clipboard-containers [title*="ColumnPlugin"]',
                 'Correct plugin was copied'
             );
 
@@ -489,7 +487,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
                 return CMS.$('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
                          ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
                         .find('.cms-dragitem-text strong').eq(0).text();
-            }, 'Row', '1 item that does allow pasting is indeed a Row plugin');
+            }, 'Multi Columns', '1 item that does allow pasting is indeed a Row plugin');
         })
 
         // try to paste column into column
@@ -572,10 +570,9 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
         .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
-            type: 'Bootstrap3RowCMSPlugin',
+            type: 'MultiColumnPlugin',
             content: {
-                id_create: 2,
-                id_create_xs_col: 12
+                id_create: 2
             }
         }))
         .thenOpen(globals.editUrl)
@@ -699,10 +696,9 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
         .waitForSelector('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
         .then(cms.addPlugin({
-            type: 'Bootstrap3RowCMSPlugin',
+            type: 'MultiColumnPlugin',
             content: {
-                id_create: 2,
-                id_create_xs_col: 12
+                id_create: 2
             }
         }))
         .thenOpen(globals.editUrl)

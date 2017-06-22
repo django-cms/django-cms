@@ -191,7 +191,7 @@ gulp.task('tests:integration', integrationTests({
     dbPath: 'testdb.sqlite',
     serverCommand: 'testserver.py',
     logger: gutil.log.bind(gutil),
-    waitForMigrations: 150 // 2.5 min
+    waitForMigrations: 20 // seconds
 }));
 
 var webpackBundle = function (opts) {
