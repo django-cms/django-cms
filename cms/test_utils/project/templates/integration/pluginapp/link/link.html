@@ -1,0 +1,4 @@
+{% load cms_tags %}{% spaceless %}
+
+{% endspaceless %}<a href="{{ link }}">{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% empty %}{{ instance.name }}{% endfor %}</a>{% spaceless %}
+{% endspaceless %}
