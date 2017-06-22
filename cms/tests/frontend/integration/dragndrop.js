@@ -14,10 +14,9 @@ casper.test.setUp(function (done) {
         .then(cms.addPage({ title: 'First page' }))
         // actually creates 3 plugins - row > col + col
         .then(cms.addPlugin({
-            type: 'GridPlugin',
+            type: 'MultiColumnPlugin',
             content: {
-                id_create: 2,
-                id_create_size: 12
+                id_create: 2
             }
         }))
         .then(cms.addPlugin({
@@ -102,7 +101,7 @@ casper.test.begin('Drag plugin to another placeholder', function (test) {
             );
             test.assertSelectorHasText(
                 '.cms-dragarea:nth-child(2) > .cms-draggables > .cms-draggable',
-                'Multi Columns (grid)',
+                'Multi Columns',
                 'Second placeholder has MultiColumns Plugin'
             );
         })
@@ -124,7 +123,7 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
         // expand the multi columns plugin
         .thenBypassIf(function () {
             // if its already expanded, skip
-            return this.visible('.cms-dragitem-text[title*="GridColumnPlugin"]');
+            return this.visible('.cms-draggable > .cms-draggables .cms-dragitem-text[title*="ColumnPlugin"]');
         }, 2)
         .then(function () {
             this.mouse.click(
@@ -134,7 +133,10 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
         // have to wait a bit because the collapse is debounced
         .wait(100)
         .then(function () {
-            test.assertVisible('.cms-dragitem-text[title*="GridColumnPlugin"]', 'Plugin expanded');
+            test.assertVisible(
+                '.cms-draggable > .cms-draggables .cms-dragitem-text[title*="ColumnPlugin"]',
+                'Plugin expanded'
+            );
         })
         // move plugin
         .then(function () {
@@ -169,13 +171,13 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
             );
 
             test.assertEvalEquals(function () {
-                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                return CMS.$('.cms-draggable .cms-draggables .cms-dragitem-text[title*=ColumnPlugin]:first')
                     .closest('.cms-dragitem')
                     .hasClass('cms-dragitem-collapsable');
             }, true, 'First grid column has a child');
 
             test.assertEvalEquals(function () {
-                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                return CMS.$('.cms-draggable .cms-draggables .cms-dragitem-text[title*=ColumnPlugin]:first')
                     .closest('.cms-draggable')
                     .find('.cms-draggables')
                     .find('.cms-dragitem-text strong').text() === 'Text';
@@ -205,7 +207,7 @@ casper.test.begin('Try to move a plugin to restricted area (not allowed)', funct
         // expand the multi columns plugin
         .thenBypassIf(function () {
             // if its already expanded, skip
-            return this.visible('.cms-dragitem-text[title*="GridColumnPlugin"]');
+            return this.visible('.cms-draggable > .cms-draggables .cms-dragitem-text[title*="ColumnPlugin"]');
         }, 2)
         .then(function () {
             this.mouse.click(
@@ -215,7 +217,10 @@ casper.test.begin('Try to move a plugin to restricted area (not allowed)', funct
         // have to wait a bit because the collapse is debounced
         .wait(100)
         .then(function () {
-            test.assertVisible('.cms-dragitem-text[title*="GridColumnPlugin"]', 'Plugin expanded');
+            test.assertVisible(
+                '.cms-draggable > .cms-draggables .cms-dragitem-text[title*="ColumnPlugin"]',
+                'Plugin expanded'
+            );
         })
         // try to move plugin to restricted area
         .then(function () {
@@ -245,19 +250,19 @@ casper.test.begin('Try to move a plugin to restricted area (not allowed)', funct
             );
 
             test.assertEvalEquals(function () {
-                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                return CMS.$('.cms-draggable .cms-draggables .cms-dragitem-text[title*=ColumnPlugin]:first')
                     .closest('.cms-dragitem')
                     .hasClass('cms-dragitem-collapsable');
             }, false, 'First grid column has no children');
 
             test.assertEvalEquals(function () {
-                return CMS.$('.cms-dragitem-text[title*=GridColumnPlugin]:last')
+                return CMS.$('.cms-draggable .cms-draggables .cms-dragitem-text[title*=ColumnPlugin]:last')
                     .closest('.cms-dragitem')
                     .hasClass('cms-dragitem-collapsable');
             }, false, 'Second grid column has no children');
 
             test.assertEvalEquals(function () {
-                return CMS.$('.cms-dragitem-text[title*=GridPlugin]:last')
+                return CMS.$('.cms-dragitem-text[title*=MultiColumnPlugin]:last')
                     .closest('.cms-draggable')
                     .find('.cms-draggables')
                     .children().length;
