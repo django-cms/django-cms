@@ -38,6 +38,21 @@
                 <span>{% filter escapejs %}{% trans "Delete" %}...{% endfilter %}</span>
             </a>
     </li>
+    {% if has_change_permission and page.is_potential_home %}
+        <li class="js-cms-tree-item-set-home">
+            <a href="{% url 'admin:cms_page_set_home' page.id %}" title="{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}">
+                <span class="cms-icon cms-icon-home"></span>
+                <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="js-cms-tree-item-set-home">
+            <a href="#" class="cms-pagetree-dropdown-item-disabled">
+                <span class="cms-icon cms-icon-home"></span>
+                <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
+            </a>
+        </li>
+    {% endif %}
     <li>
         {% if has_change_advanced_settings_permission %}
             <a href="{% url "admin:cms_page_advanced" page.id %}" title="{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}">
