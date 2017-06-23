@@ -12,7 +12,6 @@ import { throttle } from 'lodash';
  * @namespace CMS
  */
 class Navigation {
-
     constructor() {
         this._setupUI();
         this._getWidths();
@@ -69,14 +68,10 @@ class Navigation {
         var THROTTLE_TIMEOUT = 50;
 
         this.ui.window
-            .off(
-                [this.resize, this.load, this.orientationChange].join(' '),
-            )
+            .off([this.resize, this.load, this.orientationChange].join(' '))
             .on(
                 [this.resize, this.load, this.orientationChange].join(' '),
-                throttle(
-                    this._handleResize.bind(this), THROTTLE_TIMEOUT
-                )
+                throttle(this._handleResize.bind(this), THROTTLE_TIMEOUT)
             );
     }
 
@@ -96,8 +91,7 @@ class Navigation {
             rightTotalWidth: 0,
             moreButtonWidth: 0
         };
-        var leftItems = that.ui.toolbarLeftPart
-            .find('.cms-toolbar-item-navigation > li:not(.cms-toolbar-more)');
+        var leftItems = that.ui.toolbarLeftPart.find('.cms-toolbar-item-navigation > li:not(.cms-toolbar-more)');
         var rightItems = that.ui.toolbarRightPart.find('> .cms-toolbar-item');
 
         var getSize = function getSize(el, store) {
@@ -113,11 +107,11 @@ class Navigation {
             return sum + item.width;
         };
 
-        leftItems.each(function () {
+        leftItems.each(function() {
             getSize(this, that.items.left);
         });
 
-        rightItems.each(function () {
+        rightItems.each(function() {
             getSize(this, that.items.right);
         });
 
@@ -244,7 +238,7 @@ class Navigation {
      * @private
      */
     _showAllLeft() {
-        this._moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
+        this._moveOutOfDropdown(this.items.left.length - 1 - this.rightMostItemIndex);
     }
 
     /**
@@ -351,7 +345,6 @@ class Navigation {
             this.rightMostItemIndex += numberOfItems;
         }
     }
-
 }
 
 export default Navigation;

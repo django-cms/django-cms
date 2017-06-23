@@ -40,5 +40,5 @@ export default function initHelpShortcut() {
 
     keyboard.setContext('cms');
     keyboard.bind('?', openModal);
-    $('.cms-show-shortcuts').on('click.cms', openModal);
+    $('.cms-show-shortcuts').on('pointerup.cms', openModal);
 }

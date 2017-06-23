@@ -2,8 +2,8 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
-var Class = require('classjs');
+import $ from 'jquery';
+import Class from 'classjs';
 
 /**
  * Displays a message underneath the toolbar.
@@ -12,7 +12,6 @@ var Class = require('classjs');
  * @namespace CMS
  */
 var Messages = new Class({
-
     options: {
         messageDuration: 300,
         messageDelay: 3000
@@ -85,7 +84,7 @@ var Messages = new Class({
         clearTimeout(this.timer);
 
         close.hide();
-        close.off(this.click).on(this.click, function () {
+        close.off(this.click).on(this.click, function() {
             that.close();
         });
 
@@ -101,26 +100,26 @@ var Messages = new Class({
         switch (dir) {
             case 'left':
                 this.ui.messages.css({
-                    'top': top,
-                    'left': -width,
-                    'right': 'auto',
+                    top: top,
+                    left: -width,
+                    right: 'auto',
                     'margin-left': 0
                 });
                 this.ui.messages.animate({ left: 0 });
                 break;
             case 'right':
                 this.ui.messages.css({
-                    'top': top,
-                    'right': -width,
-                    'left': 'auto',
+                    top: top,
+                    right: -width,
+                    left: 'auto',
                     'margin-left': 0
                 });
                 this.ui.messages.animate({ right: 0 });
                 break;
             default:
                 this.ui.messages.css({
-                    'left': '50%',
-                    'right': 'auto',
+                    left: '50%',
+                    right: 'auto',
                     'margin-left': -(width / 2)
                 });
                 this.ui.messages.animate({ top: top });
@@ -131,7 +130,7 @@ var Messages = new Class({
             close.show();
         } else {
             // add delay to hide if delay > 0
-            this.timer = setTimeout(function () {
+            this.timer = setTimeout(function() {
                 that.close();
             }, delay);
         }
@@ -145,7 +144,6 @@ var Messages = new Class({
     close: function close() {
         this.ui.messages.fadeOut(this.options.messageDuration);
     }
-
 });
 
 export default Messages;

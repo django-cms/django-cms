@@ -3,42 +3,11 @@
  * Multiple helpers used across all CMS features
  */
 import $ from 'jquery';
-import Class from 'classjs';
 import URL from 'urijs';
+import { once, debounce, throttle } from 'lodash';
 
-/**
- * @module CMS
- */
-var CMS = {
-    $: $,
-    Class: Class,
-
-    /**
-     * @module CMS
-     * @submodule CMS.API
-     */
-    API: {},
-    /**
-     * Provides key codes for common keys.
-     *
-     * @module CMS
-     * @submodule CMS.KEYS
-     * @example
-     *     if (e.keyCode === CMS.KEYS.ENTER) { ... };
-     */
-    KEYS: {
-        SHIFT: 16,
-        TAB: 9,
-        UP: 38,
-        DOWN: 40,
-        ENTER: 13,
-        SPACE: 32,
-        ESC: 27,
-        CMD_LEFT: 91,
-        CMD_RIGHT: 93,
-        CMD_FIREFOX: 224,
-        CTRL: 17
-    }
+var _CMS = {
+    API: {}
 };
 
 /**
@@ -65,7 +34,7 @@ var _ns = function nameSpaceEvent(events) {
  * @submodule CMS.API
  * @namespace CMS.API
  */
-CMS.API.Helpers = {
+export const Helpers = {
     /**
      * See {@link reloadBrowser}
      *
@@ -73,6 +42,10 @@ CMS.API.Helpers = {
      * @private
      */
     _isReloading: false,
+
+    once,
+    debounce,
+    throttle,
 
     /**
      * Redirects to a specific url or reloads browser.
@@ -488,11 +461,33 @@ CMS.API.Helpers = {
     }
 };
 
+/**
+ * Provides key codes for common keys.
+ *
+ * @module CMS
+ * @submodule CMS.KEYS
+ * @example
+ *     if (e.keyCode === CMS.KEYS.ENTER) { ... };
+ */
+export const KEYS = {
+    SHIFT: 16,
+    TAB: 9,
+    UP: 38,
+    DOWN: 40,
+    ENTER: 13,
+    SPACE: 32,
+    ESC: 27,
+    CMD_LEFT: 91,
+    CMD_RIGHT: 93,
+    CMD_FIREFOX: 224,
+    CTRL: 17
+};
+
 // shorthand for jQuery(document).ready();
 $(function() {
     CMS._eventRoot = $('#cms-top');
     // autoinits
-    CMS.API.Helpers.preventSubmit();
+    Helpers.preventSubmit();
 });
 
-export default CMS;
+export default _CMS;

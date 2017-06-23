@@ -11,8 +11,7 @@ import DiffDOM from 'diff-dom';
 import { filter, debounce, throttle, uniq } from 'lodash';
 import Nprogress from 'nprogress';
 
-var Helpers = require('./cms.base').default.API.Helpers;
-var KEYS = require('./cms.base').default.KEYS;
+import { Helpers, KEYS } from './cms.base';
 
 var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
@@ -30,7 +29,7 @@ Nprogress.configure({
     `
 });
 
-const getPlaceholderIds = pluginRegistry =>
+export const getPlaceholderIds = pluginRegistry =>
     uniq(filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id));
 
 /**
@@ -484,7 +483,7 @@ var Toolbar = new Class({
         }
 
         // open sideframe if it was previously opened
-        if (CMS.settings.sideframe && CMS.settings.sideframe.url) {
+        if (CMS.settings.sideframe && CMS.settings.sideframe.url && CMS.config.auth) {
             var sideframe = new Sideframe();
 
             sideframe.open({
@@ -627,6 +626,8 @@ var Toolbar = new Class({
 
         switch (target) {
             case 'modal':
+                // TODO move into a static method on StructureBoard
+                $('.cms-add-plugin-placeholder').remove();
                 var modal = new Modal({
                     onClose: el.data('on-close')
                 });

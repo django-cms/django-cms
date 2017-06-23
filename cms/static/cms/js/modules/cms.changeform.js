@@ -1,9 +1,8 @@
 /* global CMS, gettext */
-var $ = require('jquery');
-var addSlugHandlers = require('./slug');
+import $ from 'jquery';
+import addSlugHandlers from './slug';
 
-$(function () {
-
+$(function() {
     // set local variables
     var title = $('#id_title');
     var slug = $('#id_slug');
@@ -11,18 +10,18 @@ $(function () {
     addSlugHandlers(title, slug);
 
     // all permissions and page states loader
-    $('div.loading').each(function () {
+    $('div.loading').each(function() {
         $(this).load($(this).attr('rel'));
     });
 
     // hide rows when hidden input fields are added
-    $('input[type="hidden"]').each(function () {
+    $('input[type="hidden"]').each(function() {
         $(this).parent('.form-row').hide();
     });
 
     // public api for changing the language tabs
     // used in admin/cms/page/change_form.html
-    window.CMS.API.changeLanguage = function (url) {
+    window.CMS.API.changeLanguage = function(url) {
         // also make sure that we will display the confirm dialog
         // in case users switch tabs while editing plugins
         var answer = true;
@@ -45,5 +44,4 @@ $(function () {
             window.location.href = url;
         }
     };
-
 });

@@ -8,6 +8,10 @@ var keyboard = require('../../../static/cms/js/modules/keyboard').default;
 window.CMS = window.CMS || CMS;
 CMS.StructureBoard = StructureBoard;
 CMS.Plugin = Plugin;
+CMS.API = CMS.API || {};
+CMS.API.Helpers = StructureBoard.__GetDependency__('Helpers');
+CMS.KEYS = StructureBoard.__GetDependency__('KEYS');
+CMS.$ = $;
 
 const pluginConstructor = jasmine.createSpy();
 const originalPlugin = StructureBoard.__GetDependency__('Plugin');
@@ -736,7 +740,7 @@ describe('CMS.StructureBoard', function() {
 
             board.ui.placeholders.remove();
             board.ui.dragareas.remove();
-            board.ui.toolbarModeSwitcher.hide();
+            board.ui.toolbarModeSwitcher.find('.cms-btn').addClass('cms-btn-disabled');
             CMS.StructureBoard._initializeGlobalHandlers();
             board = new CMS.StructureBoard();
 
@@ -748,7 +752,6 @@ describe('CMS.StructureBoard', function() {
             });
 
             expect(keyboard.bind).not.toHaveBeenCalled();
-            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
         });
     });
 

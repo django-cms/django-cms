@@ -37,7 +37,8 @@ var ChangeTracker = new Class({
 
     _setupEvents: function _setupEvents() {
         try {
-            this.ui.iframe.contents()
+            this.ui.iframe
+                .contents()
                 .find('.change-form form')
                 .find('input, textarea, select')
                 .on('change.cms.tracker keydown.cms.tracker', this._trackChange.bind(this));
@@ -121,13 +122,13 @@ var ChangeTracker = new Class({
 
             if (el.is('[multiple]')) {
                 value = [];
-                options.each(function () {
+                options.each(function() {
                     if (this.defaultSelected) {
                         value.push($(this).val());
                     }
                 });
             } else {
-                options.each(function () {
+                options.each(function() {
                     if (this.defaultSelected) {
                         value = $(this).val();
                     }
@@ -160,7 +161,7 @@ var ChangeTracker = new Class({
         var isEditorChanged = false;
 
         if (win && win.CKEDITOR && win.CKEDITOR.instances) {
-            isEditorChanged = Object.keys(win.CKEDITOR.instances).some(function (key) {
+            isEditorChanged = Object.keys(win.CKEDITOR.instances).some(function(key) {
                 return win.CKEDITOR.instances[key].checkDirty();
             });
         }

@@ -1,4 +1,4 @@
-var getDistPath = function (scriptFileName) {
+var getDistPath = function(scriptFileName) {
     var fileNameReplaceRegExp = new RegExp(scriptFileName + '.*$', 'gi');
 
     if (document.currentScript) {
@@ -6,7 +6,7 @@ var getDistPath = function (scriptFileName) {
     }
     var scripts;
     var scriptUrl;
-    var getSrc = function (listOfScripts, attr) {
+    var getSrc = function(listOfScripts, attr) {
         var fileName;
         var scriptPath;
 

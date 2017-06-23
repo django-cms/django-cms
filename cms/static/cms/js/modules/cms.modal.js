@@ -9,12 +9,10 @@ import $ from 'jquery';
 import './jquery.transition';
 import './jquery.trap';
 
-var Helpers = require('./cms.base').default.API.Helpers;
-var KEYS = require('./cms.base').default.KEYS;
+import { Helpers, KEYS } from './cms.base';
 
 var previousKeyboardContext;
 var previouslyFocusedElement;
-
 
 /**
  * The modal is triggered via API calls from the backend either
@@ -65,7 +63,7 @@ class Modal {
          * @returns {Function}
          */
         function proxy(name) {
-            return function () {
+            return function() {
                 bus[name].apply(bus, arguments);
                 return that;
             };
@@ -118,46 +116,45 @@ class Modal {
         // modal behaviours
         this.ui.minimizeButton
             .off(this.click + ' ' + this.touchEnd + ' ' + this.keyUp)
-            .on(this.click + ' ' + this.touchEnd + ' ' + this.keyUp, function (e) {
-                if (e.type !== 'keyup' || e.type === 'keyup' && e.keyCode === KEYS.ENTER) {
+            .on(this.click + ' ' + this.touchEnd + ' ' + this.keyUp, function(e) {
+                if (e.type !== 'keyup' || (e.type === 'keyup' && e.keyCode === KEYS.ENTER)) {
                     e.preventDefault();
                     that.minimize();
                 }
             });
         this.ui.maximizeButton
             .off(this.click + ' ' + this.touchEnd + ' ' + this.keyUp)
-            .on(this.click + ' ' + this.touchEnd + ' ' + this.keyUp, function (e) {
-                if (e.type !== 'keyup' || e.type === 'keyup' && e.keyCode === KEYS.ENTER) {
+            .on(this.click + ' ' + this.touchEnd + ' ' + this.keyUp, function(e) {
+                if (e.type !== 'keyup' || (e.type === 'keyup' && e.keyCode === KEYS.ENTER)) {
                     e.preventDefault();
                     that.maximize();
                 }
             });
 
-        this.ui.title.off(this.pointerDown).on(this.pointerDown, function (e) {
+        this.ui.title.off(this.pointerDown).on(this.pointerDown, function(e) {
             e.preventDefault();
             that._startMove(e);
         });
-        this.ui.title.off(this.doubleClick).on(this.doubleClick, function () {
+        this.ui.title.off(this.doubleClick).on(this.doubleClick, function() {
             that.maximize();
         });
 
-        this.ui.resize.off(this.pointerDown).on(this.pointerDown, function (e) {
+        this.ui.resize.off(this.pointerDown).on(this.pointerDown, function(e) {
             e.preventDefault();
             that._startResize(e);
         });
 
         this.ui.closeAndCancel
             .off(this.click + ' ' + this.touchEnd + ' ' + this.keyUp)
-            .on(this.click + ' ' + this.touchEnd + ' ' + this.keyUp, function (e) {
-                if (e.type !== 'keyup' || e.type === 'keyup' && e.keyCode === KEYS.ENTER) {
+            .on(this.click + ' ' + this.touchEnd + ' ' + this.keyUp, function(e) {
+                if (e.type !== 'keyup' || (e.type === 'keyup' && e.keyCode === KEYS.ENTER)) {
                     e.preventDefault();
                     that._cancelHandler();
                 }
             });
 
-
         // elements within the window
-        this.ui.breadcrumb.off(this.click, 'a').on(this.click, 'a', function (e) {
+        this.ui.breadcrumb.off(this.click, 'a').on(this.click, 'a', function(e) {
             e.preventDefault();
             that._changeIframe($(this));
         });
@@ -180,7 +177,7 @@ class Modal {
      */
     open(opts) {
         // setup internals
-        if (!(opts && opts.url || opts && opts.html)) {
+        if (!((opts && opts.url) || (opts && opts.html))) {
             throw new Error('The arguments passed to "open" were invalid.');
         }
 
@@ -248,9 +245,14 @@ class Modal {
         }
 
         // display modal
-        this._show($.extend({
-            duration: this.options.modalDuration
-        }, position));
+        this._show(
+            $.extend(
+                {
+                    duration: this.options.modalDuration
+                },
+                position
+            )
+        );
 
         keyboard.setContext('modal');
         this.ui.modal.trap();
@@ -278,8 +280,8 @@ class Modal {
         var modalWidth = opts.width || this.options.minWidth;
         var modalHeight = opts.height || this.options.minHeight;
         // screen width and height calculation, WC = width
-        var screenWidthCalc = screenWidth >= (modalWidth + widthOffset);
-        var screenHeightCalc = screenHeight >= (modalHeight + heightOffset);
+        var screenWidthCalc = screenWidth >= modalWidth + widthOffset;
+        var screenHeightCalc = screenHeight >= modalHeight + heightOffset;
 
         var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
         var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
@@ -301,8 +303,12 @@ class Modal {
         currentLeft = parseInt(currentLeft, 10);
 
         // if new width/height go out of the screen - reset position to center of screen
-        if ((width / 2 + currentLeft > screenWidth) || (height / 2 + currentTop > screenHeight) ||
-            (currentLeft - width / 2 < 0) || (currentTop - height / 2 < 0)) {
+        if (
+            width / 2 + currentLeft > screenWidth ||
+            height / 2 + currentTop > screenHeight ||
+            currentLeft - width / 2 < 0 ||
+            currentTop - height / 2 < 0
+        ) {
             newLeft = screenWidth / 2;
             newTop = screenHeight / 2;
         }
@@ -342,45 +348,46 @@ class Modal {
         var top = opts.top;
         var left = opts.left;
 
-
         if (this.ui.modal.hasClass('cms-modal-open')) {
             this.ui.modal.addClass('cms-modal-morphing');
         }
 
         this.ui.modal.css({
-            'display': 'block',
-            'width': width,
-            'height': height,
-            'top': top,
-            'left': left,
+            display: 'block',
+            width: width,
+            height: height,
+            top: top,
+            left: left,
             // TODO animate translateX if possible instead of margin
             'margin-left': -(width / 2),
             'margin-top': -(height / 2)
         });
         // setImmediate is required to go into the next frame
-        setTimeout(function () {
+        setTimeout(function() {
             that.ui.modal.addClass('cms-modal-open');
         }, 0);
 
-        this.ui.modal.one('cmsTransitionEnd', function () {
-            that.ui.modal.removeClass('cms-modal-morphing');
-            that.ui.modal.css({
-                'margin-left': -(width / 2),
-                'margin-top': -(height / 2)
-            });
+        this.ui.modal
+            .one('cmsTransitionEnd', function() {
+                that.ui.modal.removeClass('cms-modal-morphing');
+                that.ui.modal.css({
+                    'margin-left': -(width / 2),
+                    'margin-top': -(height / 2)
+                });
 
-            // check if we should maximize
-            if (that.triggerMaximized) {
-                that.maximize();
-            }
+                // check if we should maximize
+                if (that.triggerMaximized) {
+                    that.maximize();
+                }
 
-            // changed locked status to allow other modals again
-            CMS.API.locked = false;
-            that.trigger('cms.modal.shown');
-        }).emulateTransitionEnd(speed);
+                // changed locked status to allow other modals again
+                CMS.API.locked = false;
+                that.trigger('cms.modal.shown');
+            })
+            .emulateTransitionEnd(speed);
 
         // add esc close event
-        this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
+        this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function(e) {
             if (e.keyCode === KEYS.ESC && that.options.closeOnEsc) {
                 e.stopPropagation();
                 if (that._confirmDirtyEscCancel()) {
@@ -443,12 +450,14 @@ class Modal {
         this.ui.frame.empty();
         this.ui.modalBody.removeClass('cms-loader');
         this.ui.modal.removeClass('cms-modal-open');
-        this.ui.modal.one('cmsTransitionEnd', function () {
-            that.ui.modal.css('display', 'none');
-        }).emulateTransitionEnd(duration);
+        this.ui.modal
+            .one('cmsTransitionEnd', function() {
+                that.ui.modal.css('display', 'none');
+            })
+            .emulateTransitionEnd(duration);
 
         // reset maximize or minimize states for #3111
-        setTimeout(function () {
+        setTimeout(function() {
             if (that.minimized) {
                 that.minimize();
             }
@@ -481,9 +490,7 @@ class Modal {
 
         if (this.minimized === false) {
             // save initial state
-            this.ui.modal.data('css', this.ui.modal.css([
-                'left', 'top', 'margin-left', 'margin-top'
-            ]));
+            this.ui.modal.data('css', this.ui.modal.css(['left', 'top', 'margin-left', 'margin-top']));
 
             // minimize
             this.ui.body.addClass('cms-modal-minimized');
@@ -515,10 +522,10 @@ class Modal {
 
         if (this.maximized === false) {
             // save initial state
-            this.ui.modal.data('css', this.ui.modal.css([
-                'left', 'top', 'margin-left', 'margin-top',
-                'width', 'height'
-            ]));
+            this.ui.modal.data(
+                'css',
+                this.ui.modal.css(['left', 'top', 'margin-left', 'margin-top', 'width', 'height'])
+            );
 
             this.ui.body.addClass('cms-modal-maximized');
 
@@ -556,19 +563,21 @@ class Modal {
         this.ui.shim.show();
 
         // create event for stopping
-        this.ui.body.on(this.pointerUp, function (e) {
+        this.ui.body.on(this.pointerUp, function(e) {
             that._stopMove(e);
         });
 
-        this.ui.body.on(this.pointerMove, function (e) {
-            left = position.left - (pointerEvent.originalEvent.pageX - e.originalEvent.pageX);
-            top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
+        this.ui.body
+            .on(this.pointerMove, function(e) {
+                left = position.left - (pointerEvent.originalEvent.pageX - e.originalEvent.pageX);
+                top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
 
-            that.ui.modal.css({
-                left: left,
-                top: top
-            });
-        }).attr('data-touch-action', 'none');
+                that.ui.modal.css({
+                    left: left,
+                    top: top
+                });
+            })
+            .attr('data-touch-action', 'none');
     }
 
     /**
@@ -579,9 +588,7 @@ class Modal {
      */
     _stopMove() {
         this.ui.shim.hide();
-        this.ui.body
-            .off(this.pointerMove + ' ' + this.pointerUp)
-            .removeAttr('data-touch-action');
+        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp).removeAttr('data-touch-action');
     }
 
     /**
@@ -605,40 +612,42 @@ class Modal {
         var modalTop = this.ui.modal.position().top;
 
         // create event for stopping
-        this.ui.body.on(this.pointerUp, function (e) {
+        this.ui.body.on(this.pointerUp, function(e) {
             that._stopResize(e);
         });
 
         this.ui.shim.show();
 
-        this.ui.body.on(this.pointerMove, function (e) {
-            var mvX = pointerEvent.originalEvent.pageX - e.originalEvent.pageX;
-            var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
-            var w = width - (mvX * 2);
-            var h = height - (mvY * 2);
-            var wMin = that.options.minWidth;
-            var hMin = that.options.minHeight;
-            var left = mvX + modalLeft;
-            var top = mvY + modalTop;
+        this.ui.body
+            .on(this.pointerMove, function(e) {
+                var mvX = pointerEvent.originalEvent.pageX - e.originalEvent.pageX;
+                var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
+                var w = width - mvX * 2;
+                var h = height - mvY * 2;
+                var wMin = that.options.minWidth;
+                var hMin = that.options.minHeight;
+                var left = mvX + modalLeft;
+                var top = mvY + modalTop;
 
-            // add some limits
-            if (w <= wMin) {
-                w = wMin;
-                left = modalLeft + width / 2 - w / 2;
-            }
-            if (h <= hMin) {
-                h = hMin;
-                top = modalTop + height / 2 - h / 2;
-            }
+                // add some limits
+                if (w <= wMin) {
+                    w = wMin;
+                    left = modalLeft + width / 2 - w / 2;
+                }
+                if (h <= hMin) {
+                    h = hMin;
+                    top = modalTop + height / 2 - h / 2;
+                }
 
-            // set centered animation
-            that.ui.modal.css({
-                width: w,
-                height: h,
-                left: left,
-                top: top
-            });
-        }).attr('data-touch-action', 'none');
+                // set centered animation
+                that.ui.modal.css({
+                    width: w,
+                    height: h,
+                    left: left,
+                    top: top
+                });
+            })
+            .attr('data-touch-action', 'none');
     }
 
     /**
@@ -649,9 +658,7 @@ class Modal {
      */
     _stopResize() {
         this.ui.shim.hide();
-        this.ui.body
-            .off(this.pointerMove + ' ' + this.pointerUp)
-            .removeAttr('data-touch-action');
+        this.ui.body.off(this.pointerMove + ' ' + this.pointerUp).removeAttr('data-touch-action');
     }
 
     /**
@@ -678,15 +685,12 @@ class Modal {
         this.ui.modal.addClass('cms-modal-has-breadcrumb');
 
         // load breadcrumbs
-        $.each(breadcrumbs, function (index, item) {
+        $.each(breadcrumbs, function(index, item) {
             // check if the item is the last one
             var last = index >= breadcrumbs.length - 1 ? 'active' : '';
 
             // render breadcrumbs
-            crumb += template
-                .replace('{1}', item.url)
-                .replace('{2}', last)
-                .replace('{3}', item.title);
+            crumb += template.replace('{1}', item.url).replace('{2}', last).replace('{3}', item.title);
         });
 
         // attach elements
@@ -718,7 +722,7 @@ class Modal {
         var form = iframe.contents().find('form');
 
         // avoids conflict between the browser's form validation and Django's validation
-        form.on('submit', function () {
+        form.on('submit', function() {
             // default submit button was clicked
             // meaning, if you have save - it should close the iframe,
             // if you hit save and continue editing it should be default form behaviour
@@ -734,7 +738,7 @@ class Modal {
         // we need to listen to this click event to support submitting
         // a form by pressing enter inside of a field
         // click is actually triggered by submit
-        buttons.on('click', function () {
+        buttons.on('click', function() {
             if ($(this).hasClass('default')) {
                 that.hideFrame = true;
             }
@@ -753,7 +757,7 @@ class Modal {
         }
 
         // loop over input buttons
-        buttons.each(function (index, btn) {
+        buttons.each(function(index, btn) {
             var item = $(btn);
 
             item.attr('data-rel', '_' + index);
@@ -781,7 +785,7 @@ class Modal {
             var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
             // eslint-disable-next-line complexity
-            el.on(that.click + ' ' + that.touchEnd, function (e) {
+            el.on(that.click + ' ' + that.touchEnd, function(e) {
                 e.preventDefault();
 
                 if (item.is('a')) {
@@ -807,10 +811,10 @@ class Modal {
                             var action = item.closest('form').prop('action');
 
                             if (action.match(/delete-plugin/)) {
-                                that.justDeletedPlugin = (/delete-plugin\/(\d+)\//gi).exec(action)[1];
+                                that.justDeletedPlugin = /delete-plugin\/(\d+)\//gi.exec(action)[1];
                             }
                             if (action.match(/clear-placeholder/)) {
-                                that.justDeletedPlaceholder = (/clear-placeholder\/(\d+)\//gi).exec(action)[1];
+                                that.justDeletedPlaceholder = /clear-placeholder\/(\d+)\//gi.exec(action)[1];
                             }
                         }
                     }
@@ -841,12 +845,10 @@ class Modal {
                             // will and calling frm.submit() would throw NS_ERROR_UNEXPECTED
                             try {
                                 frm[0].submit();
-                            } catch (err) {
-                            }
+                            } catch (err) {}
                         }
                     }
                 }
-
             });
             el.wrap(group);
 
@@ -855,7 +857,7 @@ class Modal {
         });
 
         // manually add cancel button at the end
-        cancel.on(that.click, function (e) {
+        cancel.on(that.click, function(e) {
             e.preventDefault();
             that._cancelHandler();
         });
@@ -918,7 +920,7 @@ class Modal {
 
         // attach load event for iframe to prevent flicker effects
         // eslint-disable-next-line complexity
-        iframe.on('load', function () {
+        iframe.on('load', function() {
             clearTimeout(loaderTimeout);
             var messages;
             var messageList;
@@ -942,7 +944,7 @@ class Modal {
             }
 
             body.attr('tabindex', '0');
-            iframe.on('focus', function () {
+            iframe.on('focus', function() {
                 body.focus();
             });
 
@@ -954,13 +956,13 @@ class Modal {
             // for ckeditor we need to go deeper
             // istanbul ignore next
             if (iframe[0].contentWindow && iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
-                $(iframe[0].contentWindow.document).ready(function () {
+                $(iframe[0].contentWindow.document).ready(function() {
                     // setTimeout is required to battle CKEditor initialisation
-                    setTimeout(function () {
+                    setTimeout(function() {
                         var editor = iframe[0].contentWindow.CMS.CKEditor.editor;
 
                         if (editor) {
-                            editor.on('loaded', function (e) {
+                            editor.on('instanceReady', function(e) {
                                 Modal._setupCtrlEnterSave(
                                     $(e.editor.container.$).find('iframe')[0].contentWindow.document
                                 );
@@ -975,7 +977,8 @@ class Modal {
             // in case message didn't appear, assume that admin page is actually a success
             // istanbul ignore if
             if (!saveSuccess) {
-                saveSuccess = Boolean(contents.find('.dashboard #content-main').length) &&
+                saveSuccess =
+                    Boolean(contents.find('.dashboard #content-main').length) &&
                     !contents.find('.messagelist .error').length;
             }
 
@@ -1014,9 +1017,10 @@ class Modal {
             that._setButtons($(this));
 
             // when an error occurs, reset the saved status so the form can be checked and validated again
-            if (contents.find('.errornote').length ||
+            if (
+                contents.find('.errornote').length ||
                 contents.find('.errorlist').length ||
-                that.saved && !saveSuccess
+                (that.saved && !saveSuccess)
             ) {
                 that.saved = false;
             }
@@ -1033,7 +1037,7 @@ class Modal {
                         true
                     );
                 } else {
-                    setTimeout(function () {
+                    setTimeout(function() {
                         if (that.justDeleted && (that.justDeletedPlugin || that.justDeletedPlaceholder)) {
                             CMS.API.StructureBoard.invalidateState(
                                 that.justDeletedPlaceholder ? 'CLEAR_PLACEHOLDER' : 'DELETE',
@@ -1045,9 +1049,7 @@ class Modal {
                             );
                         }
                         // hello ckeditor
-                        CMS.API.Helpers.removeEventListener(
-                            'modal-close.text-plugin'
-                        );
+                        CMS.API.Helpers.removeEventListener('modal-close.text-plugin');
                         that.close();
                     }, 150); // eslint-disable-line
                     // FIXME must be more than 100ms
@@ -1078,7 +1080,7 @@ class Modal {
                 iframe.data('ready', true);
 
                 // attach close event
-                body.on('keydown.cms', function (e) {
+                body.on('keydown.cms', function(e) {
                     if (e.keyCode === KEYS.ESC && that.options.closeOnEsc) {
                         e.stopPropagation();
                         if (that._confirmDirtyEscCancel()) {
@@ -1139,9 +1141,7 @@ class Modal {
      */
     _confirmDirtyEscCancel() {
         if (this.tracker && this.tracker.isFormChanged()) {
-            return Helpers.secureConfirm(
-                CMS.config.lang.confirmDirty + '\n\n' + CMS.config.lang.confirmDirtyESC
-            );
+            return Helpers.secureConfirm(CMS.config.lang.confirmDirty + '\n\n' + CMS.config.lang.confirmDirtyESC);
         }
         return true;
     }
@@ -1218,31 +1218,29 @@ class Modal {
         var cmdPressed = false;
         var mac = navigator.platform.toLowerCase().indexOf('mac') + 1;
 
-        $(doc).on('keydown.cms.submit', function (e) {
-            if (e.ctrlKey && e.keyCode === KEYS.ENTER && !mac) {
-                $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
-            }
-
-            if (mac) {
-                if (e.keyCode === KEYS.CMD_LEFT ||
-                    e.keyCode === KEYS.CMD_RIGHT ||
-                    e.keyCode === KEYS.CMD_FIREFOX) {
-                    cmdPressed = true;
-                }
-
-                if (e.keyCode === KEYS.ENTER && cmdPressed) {
+        $(doc)
+            .on('keydown.cms.submit', function(e) {
+                if (e.ctrlKey && e.keyCode === KEYS.ENTER && !mac) {
                     $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
                 }
-            }
-        }).on('keyup.cms.submit', function (e) {
-            if (mac) {
-                if (e.keyCode === KEYS.CMD_LEFT ||
-                    e.keyCode === KEYS.CMD_RIGHT ||
-                    e.keyCode === KEYS.CMD_FIREFOX) {
-                    cmdPressed = false;
+
+                if (mac) {
+                    if (e.keyCode === KEYS.CMD_LEFT || e.keyCode === KEYS.CMD_RIGHT || e.keyCode === KEYS.CMD_FIREFOX) {
+                        cmdPressed = true;
+                    }
+
+                    if (e.keyCode === KEYS.ENTER && cmdPressed) {
+                        $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
+                    }
                 }
-            }
-        });
+            })
+            .on('keyup.cms.submit', function(e) {
+                if (mac) {
+                    if (e.keyCode === KEYS.CMD_LEFT || e.keyCode === KEYS.CMD_RIGHT || e.keyCode === KEYS.CMD_FIREFOX) {
+                        cmdPressed = false;
+                    }
+                }
+            });
     }
 }
 
@@ -1256,6 +1254,5 @@ Modal.options = {
     maximizable: true,
     minimizable: true
 };
-
 
 export default Modal;

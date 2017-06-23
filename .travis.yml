@@ -80,7 +80,7 @@ script:
   - if [ "$FRONTEND" != 1 ] && ([ "$TEST_DOCS" == 1 ] && [ "$ONLY_DOCS" == 0 ] || [ "$ONLY_DOCS" != 0 ]); then coverage run --parallel-mode manage.py test; fi;
   - if [ "$FRONTEND" != 1 ] && ([ "$TEST_DOCS" == 1 ] && [ "$ONLY_DOCS" == 0 ] || [ "$ONLY_DOCS" != 0 ]); then coverage combine; fi;
 
-after_success: coveralls
+after_success: if [ "$FRONTEND" != 1 ]; then coveralls; fi;
 
 notifications:
   irc:

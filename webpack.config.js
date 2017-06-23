@@ -109,6 +109,7 @@ module.exports = function (opts) {
             new webpack.DefinePlugin({
                 __DEV__: 'false'
             }),
+            new webpack.optimize.ModuleConcatenationPlugin(),
             new webpack.optimize.UglifyJsPlugin({
                 comments: false,
                 compressor: {

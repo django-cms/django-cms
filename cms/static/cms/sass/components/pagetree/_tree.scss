@@ -6,9 +6,6 @@
 
 .cms-admin-sideframe:not(.djangocms-admin-style) {
     margin-top: $toolbar-height;
-    &.cms-debug {
-        margin-top: $toolbar-height + $toolbar-debug-height;
-    }
 }
 
 // HELPERS

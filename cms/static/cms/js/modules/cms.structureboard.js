@@ -5,10 +5,12 @@
 import $ from 'jquery';
 import keyboard from './keyboard';
 import Plugin from './cms.plugins';
+import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
 import URI from 'urijs';
 import DiffDOM from 'diff-dom';
 import { find, findIndex, once, remove, uniqWith, compact, isEqual } from 'lodash';
+import ls from 'local-storage';
 
 import './jquery.ui.custom';
 import './jquery.ui.touchpunch';
@@ -17,14 +19,14 @@ import './jquery.ui.nestedsortable';
 import measureScrollbar from './scrollbar';
 import preloadImagesFromMarkup from './preload-images';
 
-const Helpers = require('./cms.base').default.API.Helpers;
-var KEYS = require('./cms.base').default.KEYS;
+import { Helpers, KEYS } from './cms.base';
 
 let dd;
 const DOMParser = window.DOMParser; // needed only for testing
-const storageKey = 'cms.structure';
+const storageKey = 'cms-structure';
 
-var placeholders;
+let placeholders;
+let originalPluginContainer;
 
 const triggerWindowResize = () => {
     try {
@@ -53,9 +55,7 @@ class StructureBoard {
         this.state = false;
         this.dragging = false;
         this.latestAction = [];
-        if (Helpers._isStorageSupported) {
-            localStorage.removeItem(storageKey);
-        }
+        ls.remove(storageKey);
 
         dd = new DiffDOM();
 
@@ -129,14 +129,18 @@ class StructureBoard {
             that._loadedContent = true;
         }
 
+        if (CMS.config.settings.legacy_mode) {
+            that._loadedStructure = true;
+            that._loadedContent = true;
+        }
+
         // check if modes should be visible
-        if (this.ui.dragareas.length || this.ui.placeholders.length) {
+        if (this.ui.dragareas.not('.cms-clipboard .cms-dragarea').length || this.ui.placeholders.length) {
             // eslint-disable-line
             this.ui.toolbarModeSwitcher.find('.cms-btn').removeClass('cms-btn-disabled');
         }
 
         // add drag & drop functionality
-        StructureBoard.actualizeEmptyPlaceholders();
         // istanbul ignore next
         $('.cms-draggable').one(
             'pointerover.cms.drag',
@@ -190,22 +194,24 @@ class StructureBoard {
         const modes = this.ui.toolbarModeLinks;
         let cmdPressed;
 
-        $(Helpers._getWindow()).on(this.keyUpAndDown, e => {
-            if (
-                e.keyCode === KEYS.CMD_LEFT ||
-                e.keyCode === KEYS.CMD_RIGHT ||
-                e.keyCode === KEYS.CMD_FIREFOX ||
-                e.keyCode === KEYS.SHIFT ||
-                e.keyCode === KEYS.CTRL
-            ) {
-                cmdPressed = true;
-            }
-            if (e.type === 'keyup') {
+        $(Helpers._getWindow())
+            .on(this.keyUpAndDown, e => {
+                if (
+                    e.keyCode === KEYS.CMD_LEFT ||
+                    e.keyCode === KEYS.CMD_RIGHT ||
+                    e.keyCode === KEYS.CMD_FIREFOX ||
+                    e.keyCode === KEYS.SHIFT ||
+                    e.keyCode === KEYS.CTRL
+                ) {
+                    cmdPressed = true;
+                }
+                if (e.type === 'keyup') {
+                    cmdPressed = false;
+                }
+            })
+            .on('blur', () => {
                 cmdPressed = false;
-            }
-        }).on('blur', () => {
-            cmdPressed = false;
-        });
+            });
 
         // show edit mode
         modes.on(this.click, e => {
@@ -231,7 +237,10 @@ class StructureBoard {
 
         // keyboard handling
         // only if there is a structure / content switcher
-        if (this.ui.toolbarModeSwitcher.length && this.ui.toolbarModeSwitcher.is(':visible')) {
+        if (
+            this.ui.toolbarModeSwitcher.length &&
+            !this.ui.toolbarModeSwitcher.find('.cms-btn').is('.cms-btn-disabled')
+        ) {
             keyboard.setContext('cms');
             keyboard.bind('space', e => {
                 e.preventDefault();
@@ -305,9 +314,9 @@ class StructureBoard {
             draggable
                 .parents('.cms-draggable')
                 .find('> .cms-dragitem-collapsable:not(".cms-dragitem-expanded") > .cms-dragitem-text')
-                .trigger('click');
-            doc.data('expandmode', currentExpandmode);
+                .each((i, el) => $(el).triggerHandler(Plugin.click));
 
+            setTimeout(() => doc.data('expandmode', currentExpandmode));
             setTimeout(function() {
                 var offsetParent = draggable.offsetParent();
                 var position = draggable.position().top + offsetParent.scrollTop();
@@ -688,20 +697,11 @@ class StructureBoard {
             this._makeCondensed();
         }
 
-        this.ui.window.trigger('resize');
+        if (init && !this._loadedContent) {
+            this._makeFullWidth();
+        }
 
-        // attach event
-        // var content = this.ui.content;
-        // var areas = content.find('.cms-dragarea');
-        //
-        // // lets reorder placeholders
-        // areas.each(function (index, item) {
-        //     if ($(item).hasClass('cms-dragarea-static')) {
-        //         content.append(item);
-        //     }
-        // });
-        // // now lets get the first instance and add some padding
-        // areas.filter('.cms-dragarea-static').eq(0).css('margin-top', '50px');
+        this.ui.window.trigger('resize');
     }
 
     _makeCondensed() {
@@ -711,7 +711,9 @@ class StructureBoard {
 
         url.removeSearch('structure');
 
-        history.replaceState({}, '', url.toString());
+        if (CMS.settings.mode === 'structure') {
+            history.replaceState({}, '', url.toString());
+        }
 
         var width = this.ui.toolbar.width();
         var scrollBarWidth = this.ui.window[0].innerWidth - width;
@@ -735,7 +737,9 @@ class StructureBoard {
 
         url.addSearch('structure');
 
-        history.replaceState({}, '', url.toString());
+        if (CMS.settings.mode === 'structure') {
+            history.replaceState({}, '', url.toString());
+        }
         this.ui.html.addClass('cms-overflow');
 
         this.ui.container.css('right', 0);
@@ -767,16 +771,13 @@ class StructureBoard {
      * Sets up all the sortables.
      *
      * @method _drag
+     * @param {jQuery} [elem=this.ui.sortables] which element to initialize
      * @private
      */
-    _drag() {
+    _drag(elem = this.ui.sortables) {
         var that = this;
-        var originalPluginContainer;
 
-        try {
-            this.ui.sortables.nestedSortable('destroy');
-        } catch (e) {}
-        this.ui.sortables
+        elem
             .nestedSortable({
                 items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                 placeholder: 'cms-droppable',
@@ -811,6 +812,7 @@ class StructureBoard {
                     that.ui.content.attr('data-touch-action', 'none');
 
                     originalPluginContainer = ui.item.closest('.cms-draggables');
+
                     that.dragging = true;
                     // show empty
                     StructureBoard.actualizeEmptyPlaceholders();
@@ -974,6 +976,18 @@ class StructureBoard {
             .on('cms-structure-update', StructureBoard.actualizeEmptyPlaceholders);
     }
 
+    _dragRefresh() {
+        this.ui.sortables.each((i, el) => {
+            const element = $(el);
+
+            if (element.data('mjsNestedSortable')) {
+                return;
+            }
+
+            this._drag(element);
+        });
+    }
+
     // TODO deal with already loaded states as well
     //
     //
@@ -1043,23 +1057,23 @@ class StructureBoard {
 
             // TODO update it in two secs (maybe debounce);
 
-            if (this._loadedContent) {
+            if (this._loadedContent && action !== 'COPY') {
                 this.updateContent();
             }
             return;
         }
 
         // invalidate the content mode
-        this._requestcontent = null;
-        this.updateContent();
+        if (action !== 'COPY') {
+            this._requestcontent = null;
+            this.updateContent();
+        }
     }
 
     _propagateInvalidatedState(action, data) {
         this.latestAction = [action, data];
 
-        if (Helpers._isStorageSupported) {
-            localStorage.setItem(storageKey, JSON.stringify([action, data, window.location.pathname]));
-        }
+        ls.set(storageKey, JSON.stringify([action, data, window.location.pathname]));
     }
 
     _listenToExternalUpdates() {
@@ -1067,15 +1081,11 @@ class StructureBoard {
             return;
         }
 
-        Helpers._getWindow().addEventListener('storage', e => {
-            if (e.key === storageKey && e.newValue) {
-                this._handleExternalUpdate(e);
-            }
-        });
+        ls.on(storageKey, this._handleExternalUpdate.bind(this));
     }
 
-    _handleExternalUpdate(e) {
-        const [action, data, pathname] = JSON.parse(e.newValue);
+    _handleExternalUpdate(value) {
+        const [action, data, pathname] = JSON.parse(value);
 
         if (pathname !== window.location.pathname) {
             return;
@@ -1103,10 +1113,14 @@ class StructureBoard {
     }
 
     _loadToolbar() {
+        const placeholderIds = getPlaceholderIds(CMS._plugins).map(id => `placeholders[]=${id}`).join('&');
+
         return $.ajax({
             url: Helpers.updateUrlWithPath(
-                `${CMS.config.request.toolbar}` +
-                    `?obj_id=${CMS.config.request.pk}&` +
+                `${CMS.config.request.toolbar}?` +
+                    placeholderIds +
+                    '&' +
+                    `obj_id=${CMS.config.request.pk}&` +
                     `obj_type=${encodeURIComponent(CMS.config.request.model)}`
             )
         });
@@ -1128,7 +1142,9 @@ class StructureBoard {
                 }
             }
 
-            $(`.cms-draggable-${data.plugin_parent}`).replaceWith(data.html);
+            // empty the children first because replaceWith takes too much time
+            // when it's trying to remove all the data and event handlers from potentially big tree of plugins
+            $(`.cms-draggable-${data.plugin_parent}`).html('').replaceWith(data.html);
         } else {
             // the one in the clipboard is first, so we need to take the second one,
             // that is already visually moved into correct place
@@ -1155,7 +1171,9 @@ class StructureBoard {
             }
 
             if (draggable.length) {
-                draggable.replaceWith(data.html);
+                // empty the children first because replaceWith takes too much time
+                // when it's trying to remove all the data and event handlers from potentially big tree of plugins
+                draggable.html('').replaceWith(data.html);
             } else if (data.target_placeholder_id) {
                 // copy from language
                 $(`.cms-dragarea-${data.target_placeholder_id} > .cms-draggables`).append(data.html);
@@ -1178,7 +1196,7 @@ class StructureBoard {
         }
 
         this.ui.sortables = $('.cms-draggables');
-        this._drag();
+        this._dragRefresh();
     }
 
     handleCopyPlugin(data) {
@@ -1211,7 +1229,7 @@ class StructureBoard {
         CMS.API.Clipboard._enableTriggers();
 
         this.ui.sortables = $('.cms-draggables');
-        this._drag();
+        this._dragRefresh();
     }
 
     handleCutPlugin(data) {
@@ -1307,8 +1325,8 @@ class StructureBoard {
             }
         });
 
-        window.dispatchEvent(new Event('load'));
-        window.dispatchEvent(new Event('DOMContentLoaded'));
+        Helpers._getWindow().dispatchEvent(new Event('load'));
+        $(Helpers._getWindow()).trigger('cms-content-refresh');
 
         // TODO handle the case when there is a mismatch in number of plugins/placeholders
         // TODO might be edge cases when page doesn't exist anymore (moved/removed)
@@ -1330,7 +1348,7 @@ class StructureBoard {
         });
 
         this.ui.sortables = $('.cms-draggables');
-        this._drag();
+        this._dragRefresh();
     }
 
     handleEditPlugin(data) {
@@ -1347,7 +1365,7 @@ class StructureBoard {
         });
 
         this.ui.sortables = $('.cms-draggables');
-        this._drag();
+        this._dragRefresh();
     }
 
     handleDeletePlugin(data) {
@@ -1479,7 +1497,8 @@ class StructureBoard {
             var copyAll = placeholder.find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
 
             if (
-                placeholder.find('> .cms-draggables').children('.cms-draggable:not(.cms-draggable-is-dragging)').length
+                placeholder.find('> .cms-draggables').children('.cms-draggable').not('.cms-draggable-is-dragging')
+                    .length
             ) {
                 placeholder.removeClass('cms-dragarea-empty');
                 copyAll.removeClass('cms-submenu-item-disabled');

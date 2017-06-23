@@ -231,6 +231,7 @@ class PageToolbar(CMSToolbar):
             self.statics = StaticPlaceholder.objects.filter(
                 Q(draft__in=placeholder_ids) | Q(public__in=placeholder_ids)
             )
+            self.dirty_statics = [sp for sp in self.statics if sp.dirty]
             return
 
         if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:

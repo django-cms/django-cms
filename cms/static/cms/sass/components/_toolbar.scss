@@ -17,14 +17,14 @@
         box-shadow: $toolbar-shadow;
         top: 100%;
         left: 0;
-        right: $toolbar-height - 1px;
+        right: 0;
         height: 1px;
         margin-top: -1px;
         z-index: z(debug);
         clip: rect(0, auto, 10px, 0);
         background: $toolbar-border !important;
-        @at-root .cms-structure-mode-content & {
-            right: 0;
+        @at-root .cms-structure-mode-structure & {
+            right: $toolbar-height - 1px;
         }
     }
 
@@ -598,7 +598,7 @@
     left: 0;
 
     width: 100%;
-    height: 2px;
+    height: 3px;
 }
 
 .cms-loading-peg {

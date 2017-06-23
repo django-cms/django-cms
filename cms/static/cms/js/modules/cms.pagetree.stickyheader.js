@@ -2,9 +2,9 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
-var Class = require('classjs');
-var Helpers = require('./cms.base').default.API.Helpers;
+import $ from 'jquery';
+import Class from 'classjs';
+import { Helpers } from './cms.base';
 
 /**
  * Sticky language headers in pagetree
@@ -38,13 +38,12 @@ var PageTreeStickyHeader = new Class({
             container: container,
             window: $(window),
             headers: headers,
-            columns: container.find('.jstree-grid-column').toArray().map(function (el) {
+            columns: container.find('.jstree-grid-column').toArray().map(function(el) {
                 return $(el);
             }),
-            clones: headers.clone().toArray().map(function (el) {
+            clones: headers.clone().toArray().map(function(el) {
                 return $(el);
             })
-
         };
     },
 
@@ -59,11 +58,6 @@ var PageTreeStickyHeader = new Class({
         this.toolbarHeight = 0;
         if (this._isInSideframe()) {
             this.toolbarHeight = CMS.API.Helpers._getWindow().parent.CMS.$('.cms-toolbar').height();
-            var debug = Helpers._getWindow().parent.CMS.$('.cms-debug-bar');
-
-            if (debug.length) {
-                this.toolbarHeight += debug.outerHeight();
-            }
         } else {
             this.toolbarHeight = $('#branding').height();
         }
@@ -74,7 +68,7 @@ var PageTreeStickyHeader = new Class({
      * @returns {Boolean} are we in sideframe?
      * @private
      */
-    _isInSideframe: function () {
+    _isInSideframe: function() {
         var win = Helpers._getWindow();
 
         if (win && win.parent && win.parent !== win) {
@@ -91,10 +85,7 @@ var PageTreeStickyHeader = new Class({
      * @private
      */
     _events: function _events() {
-        this.ui.window.on(
-            [this.resize, this.scroll].join(' '),
-            this._handleResizeOrScroll.bind(this)
-        );
+        this.ui.window.on([this.resize, this.scroll].join(' '), this._handleResizeOrScroll.bind(this));
     },
 
     /**
@@ -119,7 +110,7 @@ var PageTreeStickyHeader = new Class({
      * @returns {Boolean} should headers stick
      * @private
      */
-    _shouldStick: function (scrollTop) {
+    _shouldStick: function(scrollTop) {
         return scrollTop + this.toolbarHeight >= this.headersTopOffset;
     },
 
@@ -134,7 +125,7 @@ var PageTreeStickyHeader = new Class({
 
         that._insertClones();
 
-        that.ui.headers.each(function (index) {
+        that.ui.headers.each(function(index) {
             var el = $(this);
 
             var width = that.ui.clones[index].css('width');
@@ -178,12 +169,11 @@ var PageTreeStickyHeader = new Class({
         var that = this;
 
         if (!that.areClonesInDOM) {
-            that.ui.columns.forEach(function (el, index) {
+            that.ui.columns.forEach(function(el, index) {
                 el.prepend(that.ui.clones[index]);
             });
             that.areClonesInDOM = true;
         }
-
     },
 
     /**
@@ -197,13 +187,12 @@ var PageTreeStickyHeader = new Class({
         var that = this;
 
         if (that.areClonesInDOM) {
-            that.ui.clones.forEach(function (el) {
+            that.ui.clones.forEach(function(el) {
                 el.detach();
             });
             that.areClonesInDOM = false;
         }
     }
-
 });
 
 export default PageTreeStickyHeader;

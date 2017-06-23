@@ -30,7 +30,7 @@
         {% endspaceless %}
     </div>
 
-    {% if cms_toolbar.edit_mode_active and cms_toolbar.clipboard_plugin %}
+    {% if cms_toolbar.edit_mode_active %}
         {% include 'cms/toolbar/clipboard.html' with clipboard_plugin=cms_toolbar.clipboard_plugin %}
     {% endif %}
 
