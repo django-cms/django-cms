@@ -12,6 +12,7 @@
     {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
     data-slug="{{ page.get_slug }}"
+    data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-move-permission="{{ has_move_page_permission|yesno:"true,false" }}"
     data-add-permission="{{ has_add_page_permission|yesno:"true,false" }}"
     data-colview='

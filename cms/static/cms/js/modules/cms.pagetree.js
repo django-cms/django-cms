@@ -307,7 +307,7 @@ var PageTree = new Class({
                     var instance = that.ui.tree.jstree(true);
 
                     instance._hide_grid(instance.get_node(obj.parent));
-                    if (obj.parent === '#') {
+                    if (obj.parent === '#' || obj.node && obj.node.data && obj.node.data.isHome) {
                         instance.refresh();
                     } else {
                         // have to refresh parent, because refresh only
@@ -382,6 +382,7 @@ var PageTree = new Class({
         // make sure ajax post requests are working
         this._setAjaxPost('.js-cms-tree-item-menu a');
         this._setAjaxPost('.js-cms-tree-lang-trigger');
+        this._setAjaxPost('.js-cms-tree-item-set-home a');
 
         this._setupPageView();
         that._setupStickyHeader();
@@ -724,6 +725,13 @@ var PageTree = new Class({
 
         this.ui.container.on(this.click, trigger, function (e) {
             e.preventDefault();
+
+            var element = $(this);
+
+            if (element.closest('.cms-pagetree-dropdown-item-disabled').length) {
+                return;
+            }
+
             $.ajax({
                 method: 'post',
                 url: $(this).attr('href')
