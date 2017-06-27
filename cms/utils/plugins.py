@@ -154,13 +154,12 @@ def build_plugin_tree(plugins):
                   key=attrgetter('position'))
 
 
-def copy_plugins_from_placeholder(source, target_placeholder, language):
-    plugins = source.get_plugins_list(language)
+def copy_plugins_to_placeholder(plugins, placeholder, language, root_plugin=None):
     plugin_pairs = []
     plugins_by_id = {}
 
     for source_plugin in get_bound_plugins(plugins):
-        parent = plugins_by_id.get(source_plugin.parent_id)
+        parent = plugins_by_id.get(source_plugin.parent_id, root_plugin)
         plugin_model = get_plugin_model(source_plugin.plugin_type)
 
         if plugin_model != CMSPlugin:
@@ -168,7 +167,7 @@ def copy_plugins_from_placeholder(source, target_placeholder, language):
             new_plugin.pk = None
             new_plugin.id = None
             new_plugin.language = language
-            new_plugin.placeholder = target_placeholder
+            new_plugin.placeholder = placeholder
             new_plugin.parent = parent
             new_plugin.numchild = 0
         else:
@@ -176,7 +175,7 @@ def copy_plugins_from_placeholder(source, target_placeholder, language):
                 language=language,
                 parent=parent,
                 plugin_type=source_plugin.plugin_type,
-                placeholder=target_placeholder,
+                placeholder=placeholder,
                 position=source_plugin.position,
             )
 
@@ -185,7 +184,7 @@ def copy_plugins_from_placeholder(source, target_placeholder, language):
         else:
             new_plugin = CMSPlugin.add_root(instance=new_plugin)
 
-        if plugin_model !=  CMSPlugin:
+        if plugin_model != CMSPlugin:
             new_plugin.copy_relations(source_plugin)
             plugin_pairs.append((new_plugin, source_plugin))
 
@@ -196,6 +195,7 @@ def copy_plugins_from_placeholder(source, target_placeholder, language):
     # nested plugins and need to update their content based on the new plugins.
     for new_plugin, old_plugin in plugin_pairs:
         new_plugin.post_copy(old_plugin, plugin_pairs)
+    return [pair[0] for pair in plugin_pairs]
 
 
 def get_bound_plugins(plugins):

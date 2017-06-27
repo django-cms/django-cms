@@ -601,5 +601,16 @@ class Placeholder(models.Model):
 
         return sorted(list(vary_list))
 
+    def copy_plugins(self, target_placeholder, language, root_plugin=None):
+        from cms.utils.plugins import copy_plugins_to_placeholder
+
+        new_plugins = copy_plugins_to_placeholder(
+            plugins=self.get_plugins_list(language),
+            placeholder=target_placeholder,
+            language=language,
+            root_plugin=root_plugin,
+        )
+        return new_plugins
+
 
 reversion_register(Placeholder)

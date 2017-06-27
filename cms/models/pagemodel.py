@@ -479,7 +479,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         from cms.models import CMSPlugin
         from cms.signals.utils import disable_cms_plugin_signals
-        from cms.utils.plugins import copy_plugins_from_placeholder
 
         new_placeholders = []
         target_placeholders = {}
@@ -506,11 +505,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 target_placeholder.pk = None
                 target_placeholder.save()
 
-            copy_plugins_from_placeholder(
-                source=placeholder,
-                target_placeholder=target_placeholder,
-                language=language,
-            )
+            placeholder.copy_plugins(target_placeholder, language=language)
 
         if new_placeholders:
             target.placeholders.add(*new_placeholders)
