@@ -8,7 +8,7 @@ We'll get started by setting up our environment.
 Requirements
 ************
 
-django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
+django CMS requires Django 1.8, 1.9 or 1.10 and Python 2.7, 3.3 or 3.4.
 
 ************************
 Your working environment
