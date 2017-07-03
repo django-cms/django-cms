@@ -6,6 +6,7 @@ import warnings
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.messages.storage.session import SessionStorage
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -415,21 +416,9 @@ class BaseCMSTestCase(object):
         else:
             request.current_page = None
 
-        class MockStorage(object):
+        messages = SessionStorage(request)
+        request._messages = messages
 
-            def __len__(self):
-                return 0
-
-            def __iter__(self):
-                return iter([])
-
-            def add(self, level, message, extra_tags=''):
-                pass
-
-            def update(self, response):
-                pass
-
-        request._messages = MockStorage()
         return request
 
     def check_published_page_attributes(self, page):
