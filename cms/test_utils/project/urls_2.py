@@ -28,10 +28,3 @@ urlpatterns += i18n_patterns(
     url(r'^example/$', example_view),
     url(r'^', include('cms.urls')),
 )
-
-
-if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
-    import debug_toolbar
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]

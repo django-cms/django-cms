@@ -8,7 +8,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.static import serve
 from django.views.i18n import javascript_catalog
 
-from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2, LoginForm3
 from cms.test_utils.project.placeholderapp.views import example_view, latest_view
@@ -40,10 +39,3 @@ urlpatterns += i18n_patterns(
     url(r'^plain_view/$', plain_view),
     url(r'^', include('cms.urls')),
 )
-
-
-if settings.DEBUG and is_installed('debug_toolbar'):
-    import debug_toolbar
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]

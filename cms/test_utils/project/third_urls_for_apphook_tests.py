@@ -2,7 +2,6 @@ from django.views.i18n import javascript_catalog
 from django.views.static import serve
 
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import is_installed
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
@@ -22,10 +21,3 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     url(r'^', include('cms.test_utils.project.third_cms_urls_for_apphook_tests')),
 )
-
-
-if settings.DEBUG and is_installed('debug_toolbar'):
-    import debug_toolbar
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
