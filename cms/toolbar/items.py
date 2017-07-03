@@ -159,7 +159,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
 
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
-                      side=LEFT, position=None, on_success=None):
+                      side=LEFT, position=None, on_success=None, method='POST'):
         item = AjaxItem(name, action, self.csrf_token,
                         active=active,
                         disabled=disabled,
@@ -168,6 +168,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
                         question=question,
                         side=side,
                         on_success=on_success,
+                        method=method,
         )
         self.add_item(item, position=position)
         return item
@@ -329,7 +330,7 @@ class AjaxItem(BaseItem):
 
     def __init__(self, name, action, csrf_token, data=None, active=False,
                  disabled=False, extra_classes=None,
-                 question=None, side=LEFT, on_success=None):
+                 question=None, side=LEFT, on_success=None, method='POST'):
         super(AjaxItem, self).__init__(side)
         self.name = name
         self.action = action
@@ -340,24 +341,27 @@ class AjaxItem(BaseItem):
         self.extra_classes = extra_classes or []
         self.question = question
         self.on_success = on_success
+        self.method = method
 
     def __repr__(self):
         return '<AjaxItem:%s>' % force_text(self.name)
 
     def get_context(self):
-        data = {}
-        data.update(self.data)
-        data['csrfmiddlewaretoken'] = self.csrf_token
-        data = json.dumps(data)
+        data = self.data.copy()
+
+        if self.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
+            data['csrfmiddlewaretoken'] = self.csrf_token
+
         return {
             'action': self.action,
             'name': self.name,
             'active': self.active,
             'disabled': self.disabled,
             'extra_classes': self.extra_classes,
-            'data': data,
+            'data': json.dumps(data),
             'question': self.question,
-            'on_success': self.on_success
+            'on_success': self.on_success,
+            'method': self.method,
         }
 
 

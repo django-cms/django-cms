@@ -32,7 +32,12 @@ class ViewTests(CMSTestCase):
     def setUp(self):
         clear_url_caches()
 
+    def tearDown(self):
+        super(ViewTests, self).tearDown()
+        clear_url_caches()
+
     def test_welcome_screen_debug_on(self):
+        clear_url_caches()
         with self.settings(DEBUG=True):
             response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)

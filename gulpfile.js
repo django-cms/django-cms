@@ -68,8 +68,8 @@ var INTEGRATION_TESTS = [
         'pageControl',
         'modal',
         'permissions',
-        // 'logout', // BROKEN: logout endpoint throws 405 request not allowed
-        'clipboard', // disabled tests for parent restrictions
+        'logout',
+        'clipboard',
         'link-plugin-content-mode'
     ],
     [

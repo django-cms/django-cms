@@ -13,6 +13,7 @@ from django.utils.translation import get_language_from_request
 from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
+from cms.utils.compat import DJANGO_1_10
 
 from .wizard_pool import wizard_pool
 from .forms import (
@@ -58,6 +59,9 @@ class WizardCreateView(SessionWizardView):
 
     def get_context_data(self, **kwargs):
         context = super(WizardCreateView, self).get_context_data(**kwargs)
+
+        if self.is_first_step():
+            context['DJANGO_1_10'] = DJANGO_1_10
 
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()

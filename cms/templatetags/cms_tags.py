@@ -32,6 +32,7 @@ from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticP
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_language_from_request, get_site_id
+from cms.utils.compat.dj import get_middleware
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
@@ -96,7 +97,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            mw = getattr(settings, 'MIDDLEWARE', getattr(settings, 'MIDDLEWARE_CLASSES'))
+            mw = get_middleware()
             if getattr(settings, 'SEND_BROKEN_LINK_EMAILS', False):
                 mail_managers(subject, body, fail_silently=True)
             elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in mw:
@@ -178,7 +179,7 @@ def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_m
 
     if not items:
         return ''
-    return template.render(Context({'items': items}))
+    return template.render({'items': items})
 
 
 @register.simple_tag(takes_context=True)

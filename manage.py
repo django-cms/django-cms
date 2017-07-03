@@ -83,6 +83,7 @@ if __name__ == '__main__':
     else:
         MIGRATION_MODULES = {
             'auth': None,
+            'admin': None,
             'contenttypes': None,
             'sessions': None,
             'sites': None,
@@ -139,9 +140,6 @@ if __name__ == '__main__':
         'cms.middleware.toolbar.ToolbarMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
     ]
-    if 'server' not in sys.argv:
-        INSTALLED_APPS.insert(0, 'debug_toolbar')
-        MIDDLEWARES.insert(-1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
     if not DJANGO_1_9:
         dynamic_configs['MIDDLEWARE'] = MIDDLEWARES
     else:

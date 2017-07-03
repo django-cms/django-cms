@@ -185,7 +185,13 @@ class BasicToolbar(CMSToolbar):
         user_name = self.get_username()
         logout_menu_text = _('Logout %s') % user_name if user_name else _('Logout')
 
-        parent.add_ajax_item(logout_menu_text, action=admin_reverse('logout'), active=True, on_success=on_success)
+        parent.add_ajax_item(
+            logout_menu_text,
+            action=admin_reverse('logout'),
+            active=True,
+            on_success=on_success,
+            method='GET',
+        )
 
     def add_language_menu(self):
         if settings.USE_I18N and not self._language_menu:
