@@ -2,4 +2,3 @@
 Django>=1.8,<1.9
 django-hvad==1.5
 django-formtools
-django-debug-toolbar

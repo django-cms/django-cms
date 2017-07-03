@@ -3,7 +3,6 @@ from django.views.static import serve
 
 from cms.test_utils.project.placeholderapp.views import example_view
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import is_installed
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
@@ -24,10 +23,3 @@ urlpatterns += i18n_patterns(
     url(r'^content/', include('cms.urls')),
     url(r'^example/$', example_view, name='example_view'),
 )
-
-
-if settings.DEBUG and is_installed('debug_toolbar'):
-    import debug_toolbar
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]

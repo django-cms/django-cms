@@ -1,4 +1,6 @@
 from django.apps import apps
+from django.conf import settings
+
 
 __all__ = ['is_installed', 'installed_apps', 'get_apps', 'get_app_paths']
 
@@ -25,3 +27,7 @@ def get_app_paths():
 
 def get_apps():
     return [app.models_module for app in apps.get_app_configs()]
+
+
+def get_middleware():
+    return getattr(settings, 'MIDDLEWARE', getattr(settings, 'MIDDLEWARE_CLASSES'))

@@ -1,7 +1,5 @@
 -r requirements_base.txt
-Django>=1.11,<1.12
+Django>=1.11,<2.0
 django-reversion>=2.0
-https://github.com/divio/djangocms-attributes-field/archive/master.zip
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip
 django-formtools
-django-debug-toolbar
