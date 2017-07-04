@@ -4,9 +4,9 @@ import os
 
 from django.forms import Form
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import NoReverseMatch
-
 from django.template.response import SimpleTemplateResponse
 from django.utils.translation import get_language_from_request
 
@@ -33,6 +33,13 @@ class WizardCreateView(SessionWizardView):
         # the real form will be loaded after step 0
         ('1', Form),
     ]
+
+    def dispatch(self, *args, **kwargs):
+        user = self.request.user
+
+        if not user.is_active or not user.is_staff:
+            raise PermissionDenied
+        return super(WizardCreateView, self).dispatch(*args, **kwargs)
 
     def get_current_step(self):
         """Returns the current step, if possible, else None."""
