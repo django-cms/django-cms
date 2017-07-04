@@ -1,6 +1,7 @@
 === 3.4.5 (unreleased) ===
 
 * Fixed a bug where slug wouldn't be generated in the creation wizard
+* Fixed a bug where the add page endpoint rendered ``Change page`` as the html title.
 
 
 === 3.4.4 (unreleased) ===
