@@ -111,16 +111,22 @@ class TemplatetagTests(CMSTestCase):
         stored when using static file manifests.
         """
         mock_storage.url.side_effect = lambda x: '/static/' + x
-        expected = 'cms/css/%(version)s/cms.base.css'
-        expected = expected % {'version': cms.__version__}
 
         template = (
-            """{% load cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
+            """{% load staticfiles cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
             """type="text/javascript"></script>"""
         )
 
-        self.render_template_obj(template, {}, None)
-        mock_storage.url.assert_called_with(expected)
+        output = self.render_template_obj(template, {}, None)
+        # If the manifest is used for looking up the static file (Django 1.10
+        # and later), it needs to be looked up with a proper path.
+        versioned_filename = 'cms/css/%s/cms.base.css' % cms.__version__
+        if mock_storage.url.called:
+            mock_storage.url.assert_called_with(versioned_filename)
+
+        expected = '<script src="/static/%s" type="text/javascript"></script>'
+        expected = expected % versioned_filename
+        self.assertEqual(expected, output)
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
