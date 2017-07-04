@@ -5,7 +5,7 @@
 * Fixed an issue where non-staff users could request the wizard create endpoint.
 
 
-=== 3.4.4 (unreleased) ===
+=== 3.4.4 (2017-06-15) ===
 
 * Fixed a bug in which cancelling the publishing dialog wasn't respected.
 * Fixed a bug causing post-login redirection to an incorrect URL on single-language sites.
