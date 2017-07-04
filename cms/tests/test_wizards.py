@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
@@ -130,6 +131,17 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
         self.assertEqual(self.user_settings_wizard.get_model(), UserSettings)
         with self.assertRaises(ImproperlyConfigured):
             self.title_wizard.get_model()
+
+    def test_endpoint_auth_required(self):
+        endpoint = reverse('cms_wizard_create')
+        staff_active = self._create_user("staff-active", is_staff=True, is_superuser=False, is_active=True)
+
+        response = self.client.get(endpoint)
+        self.assertEqual(response.status_code, 403)
+
+        with self.login_user_context(staff_active):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
 
 
 class TestWizardPool(WizardTestMixin, CMSTestCase):
