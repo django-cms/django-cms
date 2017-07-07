@@ -11,7 +11,7 @@ from django.views.i18n import javascript_catalog
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2, LoginForm3
-from cms.test_utils.project.placeholderapp.views import example_view
+from cms.test_utils.project.placeholderapp.views import example_view, latest_view
 from cms.test_utils.project.sampleapp.views import plain_view
 
 admin.autodiscover()
@@ -36,6 +36,7 @@ urlpatterns += i18n_patterns(
         kwargs={'authentication_form': LoginForm3}),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^example/$', example_view),
+    url(r'^example/latest/$', latest_view),
     url(r'^plain_view/$', plain_view),
     url(r'^', include('cms.urls')),
 )
