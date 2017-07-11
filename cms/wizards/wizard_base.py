@@ -13,7 +13,7 @@ from django.utils.translation import (
     ugettext as _
 )
 
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 
 class WizardBase(object):

@@ -3,14 +3,15 @@
 {# INFO: columns are defined in base.html options #}
 {% spaceless %}
 <li class="cms-tree-node {{ css_class }}
-    {% if page.pk in open_nodes %} jstree-open{% elif children %} jstree-closed{% endif %}
+    {% if follow_descendants %}{% if descendants %} jstree-open{% elif node.is_branch %} jstree-closed{% endif %}{% endif %}
     {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
-    {% if page.level == 0 %} cms-tree-node-top{% endif %}
+    {% if node.depth == 0 %} cms-tree-node-top{% endif %}
     {% if filtered %} cms-tree-node-filtered{% endif %}
     {% if has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     "
     {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
+    data-node-id="{{ node.pk }}"
     data-slug="{{ page.get_slug }}"
     data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-move-permission="{{ has_move_page_permission|yesno:"true,false" }}"
@@ -33,7 +34,7 @@
                         <div class="cms-tree-item-inner">
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                                 data-cms-tooltip="{% autoescape on %}{% trans 'Softroot' %}{% endautoescape %}">
-                                <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                                <a href="{% url opts|admin_urlname:'advanced' page.id %}">
                                     <span class="cms-icon cms-icon-sitemap"></span>
                                 </a>
                             </div>
@@ -45,7 +46,7 @@
                         <div class="cms-tree-item-inner">
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                                 data-cms-tooltip="{% autoescape on %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endautoescape %}">
-                                <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                                <a href="{% url opts|admin_urlname:'advanced' page.id %}">
                                     <span class="cms-icon cms-icon-puzzle"></span>
                                 </a>
                             </div>
@@ -61,7 +62,7 @@
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
-                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page_languages %} target="_top"{% endif %}">
+                    <a class="js-cms-pagetree-page-view" href="{% url opts|admin_urlname:'preview_page' page.id lang %}"{% if lang in page_languages %} target="_top"{% endif %}">
                         <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
                     </a>
                 </div>
@@ -74,7 +75,7 @@
             <div class="cms-tree-item {% if not has_publish_permission %} cms-tree-item-disabled{% endif %} cms-tree-item-lang">
                 <div class="cms-tree-item-inner cms-pagetree-dropdown{% if has_publish_permission %} js-cms-pagetree-dropdown{% endif %}">
                     {% if has_publish_permission %}
-                        <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
+                        <a href="{% url opts|admin_urlname:'preview_page' page.id lang %}"
                             class="cms-pagetree-dropdown-trigger js-cms-pagetree-dropdown-trigger"
                             {# INFO: delegate click event to parent window when in sideframe #}
                             {% if lang in page_languages %} target="_top"{% endif %}>
@@ -85,17 +86,17 @@
                         <div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top js-cms-pagetree-dropdown-menu">
                             <ul class="cms-pagetree-dropdown-menu-inner">
                                 <li>
-                                    <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
+                                    <a href="{% url opts|admin_urlname:'preview_page' page.id lang %}" class="js-cms-pagetree-page-view" target="_top">
                                         <span class="cms-icon cms-icon-eye" title="{% autoescape on %}{% blocktrans with lang|upper as language %}Preview this page in {{ language }} {% endblocktrans %}{% endautoescape %}"></span>
                                         <span>{% autoescape on %}{% trans "Preview" %}{% endautoescape %}</span>
                                     </a>
                                 </li>
                                 {# hide if page is empty #}
                                 {% if lang in page_languages %}
-                                    {% if page|all_ancestors_are_published:lang %}
+                                    {% if ancestors|nodes_are_published:lang %}
                                         {% if page|is_dirty:lang or not page|is_published:lang %}
                                             <li>
-                                                <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
+                                                <a href="{% url opts|admin_urlname:'publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
                                                     <span class="cms-icon cms-icon-check-o"></span>
                                                     <span>{% autoescape on %}{% trans "Publish" %}{% endautoescape %}</span>
                                                 </a>
@@ -103,7 +104,7 @@
                                         {% endif %}
                                         {% if page|is_published:lang %}
                                             <li>
-                                                <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
+                                                <a href="{% url opts|admin_urlname:'unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
                                                     <span class="cms-icon cms-icon-forbidden"></span>
                                                     <span>{% autoescape on %}{% trans "Unpublish" %}{% endautoescape %}</span>
                                                 </a>
@@ -112,7 +113,7 @@
                                     {% endif %}
                                 {% else %}
                                     <li>
-                                        <a href="{% url 'admin:cms_page_change' page.id %}?language={{ lang }}">
+                                        <a href="{% url opts|admin_urlname:'change' page.id %}?language={{ lang }}">
                                             <span class="cms-icon cms-icon-cogs"></span>
                                             <span>{% autoescape on %}{% trans "Configure" %}{% endautoescape %}</span>
                                         </a>
@@ -135,7 +136,7 @@
             <div class="cms-tree-item cms-tree-item-menu{% if not has_change_permission %} cms-tree-item-disabled{% endif %} js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
                     {% if has_change_permission %}
-                        <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
+                        <a href="{% url opts|admin_urlname:'change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                     {% endif %}
                         {% if page.in_navigation %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
@@ -162,10 +163,10 @@
                     <div{% if has_change_permission and has_change_advanced_settings_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% autoescape on %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endautoescape %}"{% endif %}>
                         {% if has_change_permission or has_change_advanced_settings_permission %}
-                        <a {% if has_change_permission %}href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" {% endif %}
+                        <a {% if has_change_permission %}href="{% url opts|admin_urlname:'change' page.id %}?language={{ preview_language }}" {% endif %}
                             class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
                             {% if has_change_advanced_settings_permission %}
-                            data-url="{% url 'admin:cms_page_advanced' page.id %}"
+                            data-url="{% url opts|admin_urlname:'advanced' page.id %}"
                             {% endif %}
                             >
                         {% else %}
@@ -181,7 +182,7 @@
                     <div{% if has_add_page_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}"{% endif %}>
                         {% if has_add_page_permission %}
-                            <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"
+                            <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk }}"
                                 class="cms-btn cms-btn-default cms-icon cms-icon-plus">
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled cms-icon cms-icon-plus">
@@ -194,7 +195,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url 'admin:cms_page_actions_menu' page.id %}">
+                <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url opts|admin_urlname:'actions_menu' page.id %}">
                     <a data-id="{{ page.pk }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                         <span class="sr-only">{% autoescape on %}{% trans "Options" %}{% endautoescape %}</span>
                     </a>
@@ -255,9 +256,9 @@
     {% endlanguage %}
 
     {# INFO render children #}
-    {% if page.pk in open_nodes and children %}
+    {% if descendants %}
         <ul>
-            {% show_admin_menu_for_pages children %}
+            {% show_admin_menu_for_pages descendants depth=node.depth|add:1 %}
         </ul>
     {% endif %}
 </li>

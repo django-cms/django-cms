@@ -13,16 +13,11 @@ from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 
 from cms import constants
-from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
-from cms.constants import (
-    PUBLISHER_STATE_DEFAULT,
-    PUBLISHER_STATE_DIRTY,
-    PUBLISHER_STATE_PENDING,
-)
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
-from cms.models.pagemodel import Page
+from cms.models.pagemodel import Page, PageNode
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
@@ -31,10 +26,10 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
 )
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import installed_apps
 from cms.utils.i18n import force_language
-from cms.utils.page_resolver import get_page_from_request
+from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
 
@@ -201,9 +196,9 @@ class PageTest(PageTestBase):
 
             title_home = Title.objects.drafts().get(slug=page_1['slug'])
 
-            page_2 = self.get_new_page_data(parent_id=title_home.page.pk)
-            page_3 = self.get_new_page_data(parent_id=title_home.page.pk)
-            page_4 = self.get_new_page_data(parent_id=title_home.page.pk)
+            page_2 = self.get_new_page_data(parent_id=title_home.page.node.pk)
+            page_3 = self.get_new_page_data(parent_id=title_home.page.node.pk)
+            page_4 = self.get_new_page_data(parent_id=title_home.page.node.pk)
 
             response = self.client.post(URL_CMS_PAGE_ADD, page_2)
             self.assertRedirects(response, URL_CMS_PAGE)
@@ -223,14 +218,24 @@ class PageTest(PageTestBase):
         # create first page
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            # Home
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            # Second root
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            new_page_id = Page.objects.only('id').latest('id').pk
+            expected_error = (
+                '<ul class="errorlist"><li>Page '
+                '<a href="{}" target="_blank">test page 1</a> '
+                'has the same url \'test-page-1\' as current page.</li></ul>'
+            ).format(self.get_admin_url(Page, 'change', new_page_id))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
-            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+            self.assertContains(response, expected_error)
 
     def test_child_slug_collision(self):
         """
@@ -238,40 +243,52 @@ class PageTest(PageTestBase):
         """
         root = create_page("home", 'nav_playground.html', "en", published=True)
         page = create_page("page", 'nav_playground.html', "en")
-        subPage = create_page("subpage", 'nav_playground.html', "en", parent=page)
-        create_page("child-page", 'nav_playground.html', "en", parent=root)
+        sub_page = create_page("subpage", 'nav_playground.html', "en", parent=page)
+        child_page = create_page("child-page", 'nav_playground.html', "en", parent=root)
+        Page.set_homepage(root)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-
-            response = self.client.get(URL_CMS_PAGE_ADD+"?target=%s&position=right&site=1" % subPage.pk)
-            self.assertContains(response, 'value="%s"' % page.pk)
-
             # slug collision between two child pages of the same node
-            page_data = self.get_new_page_data(page.pk)
+            page_data = self.get_new_page_data(page.node.pk)
             page_data['slug'] = 'subpage'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            expected_markup = (
+                '<ul class="errorlist">'
+                '<li>Page <a href="{}" target="_blank">subpage</a> '
+                'has the same url \'page/subpage\' as current page.</li></ul>'
+            ).format(self.get_admin_url(Page, 'change', sub_page.pk))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
-            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+            self.assertContains(response, expected_markup)
 
-            # slug collision between page with no parent and a child page of root
+            # slug collision between page with no parent and a child page of home-page
             page_data = self.get_new_page_data()
             page_data['slug'] = 'child-page'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            expected_markup = (
+                '<ul class="errorlist">'
+                '<li>Page <a href="{}" target="_blank">child-page</a> '
+                'has the same url \'child-page\' as current page.</li></ul>'
+            ).format(self.get_admin_url(Page, 'change', child_page.pk))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
-            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+            self.assertContains(response, expected_markup)
 
             # slug collision between two top-level pages
             page_data = self.get_new_page_data()
             page_data['slug'] = 'page'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            expected_markup = (
+                '<ul class="errorlist">'
+                '<li>Page <a href="{}" target="_blank">page</a> '
+                'has the same url \'page\' as current page.</li></ul>'
+            ).format(self.get_admin_url(Page, 'change', page.pk))
 
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
-            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+            self.assertContains(response, expected_markup)
 
     def test_edit_page(self):
         """
@@ -336,6 +353,7 @@ class PageTest(PageTestBase):
                 self.assertTrue(page.reload().is_dirty('en'), change_message.format(field))
 
             endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+            page_data['template'] = page.template
 
             for field, values in advanced_fields.items():
                 # Set the initial value
@@ -359,7 +377,7 @@ class PageTest(PageTestBase):
             self.client.post(URL_CMS_PAGE_ADD, data)
 
         page = Page.objects.get(title_set__slug=data['slug'], publisher_is_draft=True)
-
+        data = {'template': page.template}
         endpoint = URL_CMS_PAGE_ADVANCED_CHANGE % page.pk
         redirect_to = URL_CMS_PAGE
 
@@ -415,6 +433,7 @@ class PageTest(PageTestBase):
             page = Page.objects.get(title_set__slug=page_data['slug'])
             response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
             self.assertEqual(response.status_code, 200)
+            page_data['template'] = page.template
             page_data['overwrite_url'] = '/hello/'
             page_data['has_url_overwrite'] = True
             response = self.client.post(URL_CMS_PAGE_ADVANCED_CHANGE % page.id, page_data)
@@ -540,20 +559,22 @@ class PageTest(PageTestBase):
         page_b = create_page("page_b", "nav_playground.html", "en", parent=page_a)
         page_c = create_page("page_c", "nav_playground.html", "en", parent=page_b)
         with self.login_user_context(self.get_superuser()):
-            self.copy_page(page_b, page_b)
+            self.copy_page(page_b, page_b, position=1)
         self.assertEqual(Page.objects.drafts().count(), 5)
-        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
-        page_d = Page.objects.filter(parent=page_b)[0]
-        page_e = Page.objects.get(parent=page_d)
-        self.assertEqual(page_d.path, '000100010001')
-        self.assertEqual(page_e.path, '0001000100010001')
-        page_e.delete()
-        page_d.delete()
+        self.assertEqual(page_b.node.get_children().count(), 2)
+        node_d = page_b.node.get_children()[1]
+        node_e = node_d.get_children()[0]
+        self.assertEqual(node_d.path, '000100010002')
+        self.assertEqual(node_e.path, '0001000100020001')
+        node_e.page.delete()
+        node_d.page.delete()
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c)
-        self.assertEqual(Page.objects.filter(parent=page_c).count(), 1)
-        self.assertEqual(Page.objects.filter(parent=page_b).count(), 1)
-        Page.objects.filter(parent=page_c).delete()
+        self.assertEqual(page_c.node.get_children().count(), 1)
+        self.assertEqual(page_b.node.get_children().count(), 1)
+        page_ids = list(page_c.node.get_descendants().values_list('page', flat=True))
+        page_c.node.get_descendants().delete()
+        Page.objects.filter(pk__in=page_ids).delete()
         self.assertEqual(Page.objects.all().count(), 3)
         page_b = page_b.reload()
         page_c = page_c.reload()
@@ -563,8 +584,6 @@ class PageTest(PageTestBase):
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en", published=True)
         self.assertEqual(page.get_admin_tree_title(), 'page_a')
-        page.title_cache = {}
-        self.assertEqual("Empty", force_text(page.get_admin_tree_title()))
         languages = {
             1: [
                 {
@@ -599,7 +618,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            pk = Page.objects.all()[0].pk
+            pk = Page.objects.drafts().first().pk
             response = self.client.get(URL_CMS_PAGE_CHANGE % pk, {"language": "en"})
             self.assertEqual(response.status_code, 200)
             response = self.client.get(URL_CMS_PAGE_CHANGE % pk, {"language": "de"})
@@ -616,19 +635,17 @@ class PageTest(PageTestBase):
             self.client.post(URL_CMS_PAGE_ADD, page_data2)
             page_data3 = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data3)
-            home = Page.objects.all()[0]
-            page1 = Page.objects.all()[2]
-            page2 = Page.objects.all()[3]
-            page3 = Page.objects.all()[4]
+            home = PageNode.objects.all()[0].page
+            page1 = PageNode.objects.all()[1].page
+            page2 = PageNode.objects.all()[2].page
+            page3 = PageNode.objects.all()[3].page
 
             # move pages
-            response = self.client.post(URL_CMS_PAGE_MOVE % page3.pk,
-                                        {"target": page2.pk, "position": "last-child"})
+            response = self.client.post(URL_CMS_PAGE_MOVE % page3.pk, {"target": page2.pk, "position": "0"})
             self.assertEqual(response.status_code, 200)
 
             page3 = Page.objects.get(pk=page3.pk)
-            response = self.client.post(URL_CMS_PAGE_MOVE % page2.pk,
-                                        {"target": page1.pk, "position": "last-child"})
+            response = self.client.post(URL_CMS_PAGE_MOVE % page2.pk, {"target": page1.pk, "position": "0"})
             self.assertEqual(response.status_code, 200)
             # check page2 path and url
             page2 = Page.objects.get(pk=page2.pk)
@@ -650,9 +667,8 @@ class PageTest(PageTestBase):
 
             # Promote page1 to be the new homepage
             Page.set_homepage(page1)
-            public_page1 = page1.publisher_public
             self.assertEqual(page1.get_path(), '')
-            self.assertEqual(public_page1.get_path(), '')
+            self.assertEqual(page1.publisher_public.reload().get_path(), '')
             # check that page2 and page3 url have changed
             page2 = Page.objects.get(pk=page2.pk)
             page2.publish('en')
@@ -738,7 +754,7 @@ class PageTest(PageTestBase):
             page_child_4 = page_child_4.reload()
 
             # Ensure move worked
-            self.assertEqual(page_root.get_descendants().count(), 4)
+            self.assertEqual(page_root.node.get_descendants().count(), 4)
 
             # Ensure page_child_3 is still unpublished
             self.assertEqual(
@@ -779,130 +795,6 @@ class PageTest(PageTestBase):
             )
             self.assertEqual(page_child_2.is_published("en"), True)
 
-    def test_publish_with_pending_unpublished_descendants(self):
-        # ref: https://github.com/divio/django-cms/issues/5900
-        superuser = self.get_superuser()
-
-        # Needed because the first page created is published automatically
-        self.create_page("Home", published=False)
-        ancestor = self.create_page("Ancestor", published=False)
-        parent = self.create_page("Child", published=False, parent=ancestor)
-        child = self.create_page("Child", published=False, parent=parent)
-
-        with self.login_user_context(superuser):
-            response = self.client.post(self.get_admin_url(Page, 'publish_page', child.pk, 'en'))
-
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(
-                child.reload().get_publisher_state("en"),
-                PUBLISHER_STATE_PENDING
-            )
-
-            response = self.client.post(self.get_admin_url(Page, 'publish_page', parent.pk, 'en'))
-
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(
-                parent.reload().get_publisher_state("en"),
-                PUBLISHER_STATE_PENDING
-            )
-
-            response = self.client.post(self.get_admin_url(Page, 'publish_page', ancestor.pk, 'en'))
-
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(
-                ancestor.reload().get_publisher_state("en"),
-                PUBLISHER_STATE_DEFAULT
-            )
-            self.assertEqual(
-                parent.reload().get_publisher_state("en"),
-                PUBLISHER_STATE_DEFAULT
-            )
-            self.assertEqual(
-                child.reload().get_publisher_state("en"),
-                PUBLISHER_STATE_DEFAULT
-            )
-
-    def test_move_page_regression_5900(self):
-        # ref: https://github.com/divio/django-cms/issues/5900
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            page_home = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_home)
-
-            # Create parent page
-            page_root = create_page("Parent", 'col_three.html', "de", published=False)
-
-            # Create english translation
-            create_title(
-                "en",
-                "parent-en",
-                page=page_root,
-                slug="parent-en"
-            )
-
-            # Create child pages
-            page_child_1 = create_page(
-                "Child 1",
-                template=constants.TEMPLATE_INHERITANCE_MAGIC,
-                language="de",
-                parent=page_root,
-                published=False
-            )
-
-            # Create english translation
-            create_title(
-                "en",
-                "child-1-en",
-                page=page_child_1,
-                slug="child-1-en"
-            )
-
-            # Try to publish child english translation
-            publish_endpoint = self.get_admin_url(Page, 'publish_page', page_child_1.pk, 'en')
-
-            self.client.post(publish_endpoint)
-
-            self.assertEqual(
-                page_child_1.get_publisher_state("en"),
-                PUBLISHER_STATE_PENDING,
-            )
-
-            # Publish the german translations for both the parent and child pages.
-            # This will create the public versions for both.
-            page_root.publish('de')
-            page_child_1.publish('de')
-
-            # Move page_child_1 to the root
-            data = {
-                "id": page_child_1.pk,
-                "position": "2",
-            }
-
-            response = self.client.post(
-                URL_CMS_PAGE_MOVE % page_child_1.pk,
-                data,
-            )
-            self.assertEqual(response.status_code, 200)
-
-            # Ensure move worked
-            self.assertEqual(page_root.reload().get_descendants().count(), 0)
-
-            # Move page_child_1 under its old parent
-            # page_child_1 does not have a public version of its english translation
-            data = {
-                "id": page_child_1.pk,
-                "target": page_root.pk,
-                "position": "0",
-            }
-            response = self.client.post(
-                URL_CMS_PAGE_MOVE % page_child_1.pk,
-                data,
-            )
-            self.assertEqual(response.status_code, 200)
-
-            # Ensure move worked
-            self.assertEqual(page_root.reload().get_descendants().count(), 1)
-
     def test_edit_page_other_site_and_language(self):
         """
         Test that a page can edited via the admin when your current site is
@@ -935,59 +827,50 @@ class PageTest(PageTestBase):
         page = get_page_from_request(request)
         self.assertEqual(page, mock_page)
 
+    @override_settings(CMS_PERMISSION=False)
     def test_existing_overwrite_url(self):
-        with self.settings(CMS_PERMISSION=False):
-            create_page('home', 'nav_playground.html', 'en', published=True)
-            create_page('boo', 'nav_playground.html', 'en', published=True)
-            data = {
-                'title': 'foo',
+        superuser = self.get_superuser()
+
+        create_page('home', 'nav_playground.html', 'en', published=True)
+        boo = create_page('boo', 'nav_playground.html', 'en', published=True)
+        hoo = create_page('hoo', 'nav_playground.html', 'en', published=True)
+        expected_error = (
+            '<ul class="errorlist"><li>Page '
+            '<a href="{}" target="_blank">boo</a> '
+            'has the same url \'boo\' as current page "hoo".</li></ul>'
+        ).format(self.get_admin_url(Page, 'change', boo.pk))
+
+        with self.login_user_context(superuser):
+            endpoint = self.get_admin_url(Page, 'advanced', hoo.pk)
+            page_data = {
                 'overwrite_url': '/boo/',
-                'slug': 'foo',
-                'language': 'en',
-                'template': 'nav_playground.html',
-                'site': 1,
+                'template': hoo.template,
             }
-            form = AdvancedSettingsForm(data)
-            self.assertFalse(form.is_valid())
-            self.assertTrue('overwrite_url' in form.errors)
+            response = self.client.post(endpoint, page_data)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, expected_error, html=True)
 
     def test_advanced_settings_form(self):
-        site = Site.objects.get_current()
+        superuser = self.get_superuser()
         page = create_page('Page 1', 'nav_playground.html', 'en')
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk)
 
         # First we provide fully valid conditions to make sure
         # the form is working.
         page_data = {
-            'language': 'en',
-            'site': site.pk,
             'template': 'col_two.html',
         }
 
-        form = AdvancedSettingsForm(
-            data=page_data,
-            instance=page,
-            files=None,
-        )
-        self.assertTrue(form.is_valid())
-
-        # Now switch it up by adding german as the current language
-        # Note that german has not been created as page translation.
-        page_data['language'] = 'de'
-
-        form = AdvancedSettingsForm(
-            data=page_data,
-            instance=page,
-            files=None,
-        )
-        no_translation_error = (u"Please create the German page translation "
-                                u"before editing its advanced settings.")
-        self.assertFalse(form.is_valid())
-        self.assertIn('__all__', form.errors)
-        self.assertEqual(1, len(form.errors['__all__']))
-        # Make sure we get the correct error when the given language
-        # is not an existing page translation.
-        self.assertEqual([no_translation_error],
-                         form.errors['__all__'])
+        with self.login_user_context(superuser):
+            redirect_to = self.get_admin_url(Page, 'change', page.pk) + '?language=de'
+            # Add german as the current language
+            # Note that german has not been created as page translation.
+            response = self.client.post(endpoint + '?language=de', page_data, follow=True)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                [m.message for m in response.context['messages']],
+                ["Please create the German page translation before editing it's advanced settings."]
+            )
 
         de_translation = create_title('de', title='Page 1', page=page)
         de_translation.slug = ''
@@ -996,20 +879,15 @@ class PageTest(PageTestBase):
         # First make sure the title has no slug
         self.assertEqual(de_translation.slug, '')
 
-        form = AdvancedSettingsForm(
-            data=page_data,
-            instance=page,
-            files=None,
+        expected_error = (
+            '<ul class="errorlist">'
+            '<li>Please set the German slug before editing its advanced settings.</li></ul>'
         )
-        no_translation_error = (u"Please set the German slug before "
-                                u"editing its advanced settings.")
-        self.assertFalse(form.is_valid())
-        self.assertIn('__all__', form.errors)
-        self.assertEqual(1, len(form.errors['__all__']))
-        # Make sure we get the correct error when the given language
-        # is not an existing page translation.
-        self.assertEqual([no_translation_error],
-                         form.errors['__all__'])
+
+        with self.login_user_context(superuser):
+            response = self.client.post(endpoint + '?language=de', page_data)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, expected_error)
 
     def test_advanced_settings_form_apphook(self):
         superuser = self.get_superuser()
@@ -1108,7 +986,7 @@ class PageTest(PageTestBase):
 
         with self.login_user_context(superuser):
             with force_language('de'):
-                endpoint = admin_reverse('get_tree')
+                endpoint = self.get_admin_url(Page, 'get_tree')
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
@@ -1117,7 +995,7 @@ class PageTest(PageTestBase):
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
-        endpoint = admin_reverse('get_tree')
+        endpoint = self.get_admin_url(Page, 'get_tree')
 
         create_page('Home', 'nav_playground.html', 'en')
         alpha = create_page('Alpha', 'nav_playground.html', 'en')
@@ -1140,7 +1018,7 @@ class PageTest(PageTestBase):
 
     def test_page_get_tree_endpoint_nested(self):
         superuser = self.get_superuser()
-        endpoint = admin_reverse('get_tree')
+        endpoint = self.get_admin_url(Page, 'get_tree')
 
         create_page('Home', 'nav_playground.html', 'en')
         alpha = create_page('Alpha', 'nav_playground.html', 'en')
@@ -1159,7 +1037,7 @@ class PageTest(PageTestBase):
         )
 
         data = {
-            'openNodes[]': [alpha.pk, gamma.pk]
+            'openNodes[]': [alpha.node.pk, gamma.node.pk]
         }
 
         with self.login_user_context(superuser):

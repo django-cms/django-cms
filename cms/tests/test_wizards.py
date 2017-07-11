@@ -15,8 +15,15 @@ from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
+from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
+
+
+CreateCMSPageForm = step2_form_factory(
+    mixin_cls=WizardStep2BaseForm,
+    entry_form_class=CreateCMSPageForm,
+)
 
 
 class WizardForm(forms.Form):
@@ -206,10 +213,13 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             'slug': 'page_1',
             'page_type': None,
         }
-        form = CreateCMSPageForm(data=data)
-        form.page = None
-        form.language_code = 'en'
-        form.user = superuser
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+            wizard_page_node=None,
+        )
         self.assertTrue(form.is_valid())
         page = form.save()
 
@@ -232,10 +242,13 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             'slug': 'page_1',
             'page_type': None,
         }
-        form = CreateCMSPageForm(data=data)
-        form.page = None
-        form.language_code = 'en'
-        form.user = superuser
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+            wizard_page_node=None,
+        )
 
         self.assertTrue(form.is_valid())
         self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
@@ -274,10 +287,13 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 'page_type': None,
                 'content': content,
             }
-            form = CreateCMSPageForm(data=data)
-            form.page = page
-            form.language_code = 'en'
-            form.user = superuser
+            form = CreateCMSPageForm(
+                data=data,
+                wizard_page=page,
+                wizard_user=superuser,
+                wizard_language='en',
+                wizard_page_node=page.node,
+            )
             self.assertTrue(form.is_valid())
             page = form.save()
             page.publish('en')
@@ -320,10 +336,13 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 'page_type': None,
                 'content': content,
             }
-            form = CreateCMSPageForm(data=data)
-            form.page = page
-            form.language_code = 'en'
-            form.user = superuser
+            form = CreateCMSPageForm(
+                data=data,
+                wizard_page=page,
+                wizard_user=superuser,
+                wizard_language='en',
+                wizard_page_node=page.node,
+            )
             self.assertTrue(form.is_valid())
             page = form.save()
             page.publish('en')

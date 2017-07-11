@@ -11,10 +11,10 @@ from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
-from cms.models import Page
+from cms.models import Page, PageType
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 from cms.test_utils.project.extensionapp.models import MultiTablePageExtension, MultiTableTitleExtension
-from cms.test_utils.testcases import CMSTestCase as TestCase, URL_CMS_PAGE_ADD
+from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.tests.test_admin import AdminTestsBase
 
 
@@ -119,8 +119,7 @@ class ExtensionsTestCase(TestCase):
         # asserting original extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_title_extensions()), 2)
-
-        copied_page = page.copy_page(None, page.site, position='last-child')
+        copied_page = page.copy_with_descendants(page.site, target_node=None, position='last-child')
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
@@ -129,7 +128,8 @@ class ExtensionsTestCase(TestCase):
         # testing extension content
         old_page_extensions = [page_extension, subpage_extension]
         old_title_extension = [title_extension, subtitle_extension]
-        for index, new_page in enumerate([copied_page] + list(copied_page.get_descendants())):
+        for index, new_node in enumerate([copied_page.node] + list(copied_page.node.get_descendants())):
+            new_page = new_node.page
             self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
                              old_page_extensions[index].extra)
             self.assertEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].extra_title,
@@ -181,7 +181,7 @@ class ExtensionsTestCase(TestCase):
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_title_extensions()), 2)
 
-        copied_page = page.copy_page(None, page.site, position='last-child')
+        copied_page = page.copy_with_descendants(page.site, target_node=None, position='last-child')
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
@@ -190,7 +190,8 @@ class ExtensionsTestCase(TestCase):
         # testing extension content
         old_page_extensions = [page_extension, subpage_extension]
         old_title_extension = [title_extension, subtitle_extension]
-        for index, new_page in enumerate([copied_page] + list(copied_page.get_descendants())):
+        for index, node in enumerate([copied_page.node] + list(copied_page.node.get_descendants())):
+            new_page = node.page
             copied_page_extension = extension_pool.get_page_extensions(new_page)[0]
             copied_title_extension = extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0]
             self.assertEqual(copied_page_extension.extension_parent_field,
@@ -365,46 +366,39 @@ class ExtensionAdminTestCase(AdminTestsBase):
             # create page copy
             page_data = {
                 'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
-                'site': 1, 'language': 'en'
+                'site': 1, 'language': 'en', 'source': self.page.pk,
             }
             self.assertEqual(Page.objects.all().count(), 2)
             self.assertEqual(MyPageExtension.objects.all().count(), 1)
             self.assertEqual(MyTitleExtension.objects.all().count(), 1)
-            self.client.post(
-                "%s?position=first-child&copy_target=%s&language=en" % (
-                    URL_CMS_PAGE_ADD, self.page.pk
-                ),
-                data=page_data)
+            response = self.client.post(
+                self.get_admin_url(Page, 'duplicate', self.page.pk),
+                data=page_data,
+            )
             # Check that page and its extensions have been copied
+            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
             self.assertEqual(Page.objects.all().count(), 3)
             self.assertEqual(MyPageExtension.objects.all().count(), 2)
             self.assertEqual(MyTitleExtension.objects.all().count(), 2)
 
     def test_page_type_extensions(self):
         with self.login_user_context(self.admin):
-            self.client.get(
-                "%s?copy_target=%s&language=%s" % (
-                    admin_reverse("cms_page_add_page_type"), self.page.pk, 'en'
-                )
-            )
-            page_types = Page.objects.get(reverse_id='page_types')
-
             # create page copy
             page_data = {
                 'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
-                'site': 1, 'language': 'en'
+                'site': 1, 'language': 'en', 'source': self.page.pk,
             }
-            self.assertEqual(Page.objects.all().count(), 3)
+            self.assertEqual(Page.objects.all().count(), 2)
             self.assertEqual(MyPageExtension.objects.all().count(), 1)
             self.assertEqual(MyTitleExtension.objects.all().count(), 1)
-            self.client.post(
-                "%s?target=%s&position=first-child&add_page_type=1"
-                "&copy_target=%s&language=en" % (
-                    URL_CMS_PAGE_ADD, page_types.pk, self.page.pk
-                ),
-                data=page_data)
+            response = self.client.post(
+                self.get_admin_url(PageType, 'add'),
+                data=page_data,
+            )
+            self.assertRedirects(response, self.get_admin_url(PageType, 'changelist'))
             # Check that new page type has extensions from source page
             self.assertEqual(Page.objects.all().count(), 4)
+            self.assertEqual(Page.objects.filter(is_page_type=True).count(), 2)
             self.assertEqual(MyPageExtension.objects.all().count(), 2)
             self.assertEqual(MyTitleExtension.objects.all().count(), 2)
 

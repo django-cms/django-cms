@@ -23,7 +23,7 @@ def disable_cms_plugin_signals():
 
     from cms.plugin_pool import plugin_pool
 
-    plugins = plugin_pool.get_all_plugins()
+    plugins = plugin_pool.registered_plugins
 
     for signal, handler, dispatch_id in plugin_signals:
         signal.disconnect(

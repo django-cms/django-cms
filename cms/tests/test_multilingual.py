@@ -14,7 +14,7 @@ from cms.models import Page, Title, EmptyTitle
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_languages
 
 from menus.menu_pool import menu_pool
@@ -152,9 +152,9 @@ class MultilingualTestCase(CMSTestCase):
         TESTLANG2 = get_secondary_language()
         page = create_page("mlpage-%s" % TESTLANG, "nav_playground.html", TESTLANG)
         create_title(TESTLANG2, "mlpage-%s" % TESTLANG2, page, slug=page.get_slug())
-        page2 = create_page("mlpage-2-%s" % TESTLANG, "nav_playground.html", TESTLANG, parent=page)
         page.publish(TESTLANG)
         page.publish(TESTLANG2)
+        page2 = create_page("mlpage-2-%s" % TESTLANG, "nav_playground.html", TESTLANG, parent=page)
         page2.publish(TESTLANG)
 
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
@@ -395,7 +395,7 @@ class MultilingualTestCase(CMSTestCase):
                 ]},
             ):
             try:
-                update_site_and_page_choices(lang='en-us')
+                update_site_and_page_choices(language='en-us')
             except LanguageError:
                 self.fail("LanguageError raised")
 

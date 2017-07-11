@@ -11,7 +11,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 
-from cms.utils import get_cms_setting, get_language_from_request
+from cms.utils import get_language_from_request
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load
 from cms.utils.moderator import use_draft
 

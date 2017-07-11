@@ -10,7 +10,7 @@ from sekizai.helpers import validate_template
 
 from cms import constants
 from cms.models import AliasPluginModel
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import DEPRECATED_CMS_SETTINGS

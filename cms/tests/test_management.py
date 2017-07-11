@@ -13,7 +13,7 @@ from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models import Page, StaticPlaceholder
+from cms.models import Page, PageNode, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
@@ -69,17 +69,17 @@ class ManagementTestCase(CMSTestCase):
     def test_fix_tree(self):
         create_page("home", "nav_playground.html", "en")
         page1 = create_page("page", "nav_playground.html", "en")
-        page1.depth = 3
-        page1.numchild = 4
-        page1.path = "00100010"
-        page1.save()
+        page1.node.depth = 3
+        page1.node.numchild = 4
+        page1.node.path = "00100010"
+        page1.node.save()
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
         self.assertEqual(out.getvalue(), 'fixing page tree\nfixing plugin tree\nall done\n')
         page1 = page1.reload()
-        self.assertEqual(page1.path, "0002")
-        self.assertEqual(page1.depth, 1)
-        self.assertEqual(page1.numchild, 0)
+        self.assertEqual(page1.node.path, "0002")
+        self.assertEqual(page1.node.depth, 1)
+        self.assertEqual(page1.node.numchild, 0)
 
     def test_fix_tree_regression_5641(self):
         # ref: https://github.com/divio/django-cms/issues/5641
@@ -89,19 +89,13 @@ class ManagementTestCase(CMSTestCase):
         delta = create_page("Delta", "nav_playground.html", "en", published=True)
         theta = create_page("Theta", "nav_playground.html", "en", published=True)
 
-        beta.move_page(alpha, position='last-child')
-        gamma.move_page(beta.reload(), position='last-child')
-        delta.move_page(gamma.reload(), position='last-child')
-        theta.move_page(delta.reload(), position='last-child')
+        beta.move_page(alpha.node, position='last-child')
+        gamma.move_page(beta.node, position='last-child')
+        delta.move_page(gamma.node, position='last-child')
+        theta.move_page(delta.node, position='last-child')
 
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
-
-        alpha = alpha.reload()
-        beta = beta.reload()
-        gamma = gamma.reload()
-        delta = delta.reload()
-        theta = theta.reload()
 
         tree = [
             (alpha, '0001'),
@@ -109,84 +103,10 @@ class ManagementTestCase(CMSTestCase):
             (gamma, '000100010001'),
             (delta, '0001000100010001'),
             (theta, '00010001000100010001'),
-            (alpha.publisher_public, '0002'),
-            (delta.publisher_public, '0003'),
-            (theta.publisher_public, '00030001'),
         ]
 
         for page, path in tree:
-            self.assertEqual(page.path, path)
-
-    def test_fix_tree_regression_5752(self):
-        # ref: https://github.com/divio/django-cms/issues/5752
-        # Draft tree
-        #   Home
-        #       Alpha
-        #       Beta
-        #       Delta
-
-        home = create_page("Home", "nav_playground.html", "en", published=True)
-        alpha = create_page(
-            "Alpha",
-            "nav_playground.html",
-            "en",
-            published=True,
-            parent=home.reload(),
-        )
-        beta = create_page(
-            "Beta",
-            "nav_playground.html",
-            "en",
-            published=True,
-            parent=home.reload(),
-        )
-        delta = create_page(
-            "Delta",
-            "nav_playground.html",
-            "en",
-            published=True,
-            parent=home.reload(),
-        )
-
-        self.assertEqual(home.path, '0001')
-        self.assertEqual(alpha.path, '00010001')
-        self.assertEqual(beta.path, '00010002')
-        self.assertEqual(delta.path, '00010003')
-
-        # Public tree (corrupted)
-        #   Home
-        #       Delta
-        #       Beta
-        #       Alpha
-
-        delta.publisher_public.move(
-            target=home.publisher_public.reload(),
-            pos='first-child',
-        )
-        beta.publisher_public.move(
-            target=delta.publisher_public.reload(),
-            pos='right',
-        )
-        alpha.publisher_public.move(
-            target=beta.publisher_public.reload(),
-            pos='right',
-        )
-
-        # We corrupted the public tree above and now assert that is correctly
-        # corrupted.
-        self.assertEqual(home.publisher_public.reload().path, '0002')
-        self.assertEqual(delta.publisher_public.reload().path, '00020001')
-        self.assertEqual(beta.publisher_public.reload().path, '00020002')
-        self.assertEqual(alpha.publisher_public.reload().path, '00020003')
-
-        out = StringIO()
-        management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
-
-        # fix-tree should fix the public tree to match the draft tree
-        self.assertEqual(home.publisher_public.reload().path, '0002')
-        self.assertEqual(alpha.publisher_public.reload().path, '00020001')
-        self.assertEqual(beta.publisher_public.reload().path, '00020002')
-        self.assertEqual(delta.publisher_public.reload().path, '00020003')
+            self.assertEqual(page.node.path, path)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
@@ -457,7 +377,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
 
-        root_page = Page.objects.on_site(site).get_home()
+        root_page = Page.objects.get_home(site)
         root_plugins = CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
 
         first_plugin_en, _ = root_plugins.get(language='en', parent=None).get_plugin_instance()
@@ -502,7 +422,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), 0)
 
-        root_page = Page.objects.on_site(site).get_home()
+        root_page = Page.objects.get_home(site)
         root_plugins = CMSPlugin.objects.filter(
             placeholder=root_page.placeholders.get(slot="body"))
 
@@ -531,6 +451,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
          * the top-most plugin are of the same type
         """
         site_1_pk = 1
+        site_1 = Site.objects.get(pk=site_1_pk)
         site_2 = Site.objects.create(name='site 2')
         site_2_pk = site_2.pk
         phs = []
@@ -547,11 +468,12 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             page.publish('en')
         for page in Page.objects.on_site(site_2_pk).drafts():
             page.publish('en')
-        pages_1 = list(Page.objects.on_site(site_1_pk).drafts())
-        pages_2 = list(Page.objects.on_site(site_2_pk).drafts())
-        for index, page in enumerate(pages_1):
-            self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
-            self.assertEqual(page.depth, pages_2[index].depth)
+
+        nodes_1 = list(PageNode.objects.get_for_site(site_1).select_related('page'))
+        nodes_2 = list(PageNode.objects.get_for_site(site_2).select_related('page'))
+        for index, node in enumerate(nodes_1):
+            self.assertEqual(node.page.get_title('en'), nodes_2[index].page.get_title('en'))
+            self.assertEqual(node.depth, nodes_2[index].depth)
 
         phs_1 = []
         phs_2 = []
@@ -564,8 +486,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
 
-        root_page_1 = Page.objects.on_site(site_1_pk).get_home(site_1_pk)
-        root_page_2 = Page.objects.on_site(site_2_pk).get_home(site_2_pk)
+        root_page_1 = Page.objects.get_home(site_1)
+        root_page_2 = Page.objects.get_home(site_2)
         root_plugins_1 = CMSPlugin.objects.filter(placeholder=root_page_1.placeholders.get(slot="body"))
         root_plugins_2 = CMSPlugin.objects.filter(placeholder=root_page_2.placeholders.get(slot="body"))
 
@@ -589,7 +511,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_start_plugins = CMSPlugin.objects.all().count()
 
         # create an empty title language
-        root_page = Page.objects.on_site(site).get_home()
+        root_page = Page.objects.get_home(site)
         create_title("de", "root page de", root_page)
 
         out = StringIO()
@@ -601,7 +523,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
 
         # Original Title untouched
-        self.assertEqual("root page de", Page.objects.on_site(site).get_home().get_title("de"))
+        self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
 
         # Plugins still copied
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
@@ -617,7 +539,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_start_plugins = CMSPlugin.objects.all().count()
 
         # create an empty title language
-        root_page = Page.objects.on_site(site).get_home()
+        root_page = Page.objects.get_home(site)
         create_title("de", "root page de", root_page)
         ph = root_page.placeholders.get(slot="body")
         add_plugin(ph, "TextPlugin", "de", body="Hello World")
@@ -641,7 +563,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_start_plugins = CMSPlugin.objects.all().count()
 
         # create an empty title language
-        root_page = Page.objects.on_site(site).get_home()
+        root_page = Page.objects.get_home(site)
         create_title("de", "root page de", root_page)
         ph = root_page.placeholders.get(slot="body")
         add_plugin(ph, "TextPlugin", "de", body="Hello World")

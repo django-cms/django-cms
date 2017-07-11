@@ -16,13 +16,13 @@ from cms.appresolver import get_app_urls
 from cms.cache.page import get_page_cache
 from cms.forms.login import CMSToolbarLoginForm
 from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
-from cms.utils import get_language_code, get_language_from_request, get_cms_setting
+from cms.utils import get_current_site, get_language_code, get_language_from_request
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (get_fallback_languages, force_language, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             is_language_prefix_patterns_used)
-from cms.utils.page import get_pages_queryset
+from cms.utils.page import get_node_queryset, get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
-from cms.utils.page_resolver import get_page_from_request
 
 
 def details(request, slug):
@@ -50,10 +50,11 @@ def details(request, slug):
             return response
 
     # Get a Page model object from the request
+    site = get_current_site()
     page = get_page_from_request(request, use_path=slug)
-    draft_pages =  get_pages_queryset(draft=True)
+    page_nodes = get_node_queryset(site)
 
-    if not page and not slug and not draft_pages.exists():
+    if not page and not slug and not page_nodes.exists():
         # render the welcome page if the requested path is root "/"
         # and there's no pages
         return _render_welcome_page(request)

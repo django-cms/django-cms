@@ -78,10 +78,8 @@ class Placeholder(models.Model):
 
     def get_label(self):
         from cms.utils.placeholder import get_placeholder_conf
-        if self.page:
-            template = self.page.get_template()
-        else:
-            template = None
+
+        template = self.page.get_template() if self.page else None
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
@@ -134,13 +132,13 @@ class Placeholder(models.Model):
         """
         from cms.utils.permissions import get_model_permission_codename
 
-        if user.is_superuser:
-            return True
-
         attached_models = self._get_attached_models()
 
         if not attached_models:
-            return False
+            # technically if placeholder is not attached to anything,
+            # user should not be able to change it but if is superuser
+            # then we "should" allow it.
+            return user.is_superuser
 
         attached_objects = self._get_attached_objects()
 
@@ -578,7 +576,7 @@ class Placeholder(models.Model):
 
         return sorted(list(vary_list))
 
-    def copy_plugins(self, target_placeholder, language, root_plugin=None):
+    def copy_plugins(self, target_placeholder, language=None, root_plugin=None):
         from cms.utils.plugins import copy_plugins_to_placeholder
 
         new_plugins = copy_plugins_to_placeholder(

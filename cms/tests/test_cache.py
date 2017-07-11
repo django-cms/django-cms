@@ -34,7 +34,7 @@ from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
 
 
@@ -67,7 +67,7 @@ class CacheTestCase(CMSTestCase):
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             self.render_template_obj(template, {}, request)
         # toolbar
         with self.login_user_context(self.get_superuser()):
@@ -77,7 +77,7 @@ class CacheTestCase(CMSTestCase):
             request.toolbar = CMSToolbar(request)
             request.toolbar.show_toolbar = True
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             self.render_template_obj(template, {}, request)
         page1.publish('en')
         exclude = [
@@ -174,7 +174,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(4):
+            with self.assertNumQueries(5):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
                 with self.assertNumQueries(FuzzyInt(8, 14)):

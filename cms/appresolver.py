@@ -3,7 +3,6 @@ from collections import OrderedDict
 from importlib import import_module
 
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
                                       RegexURLPattern)
@@ -13,6 +12,7 @@ from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
+from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_1_8, DJANGO_1_9
 from cms.utils.i18n import get_language_list
 
@@ -186,7 +186,8 @@ def get_patterns_for_title(path, title):
 
 def get_app_patterns():
     try:
-        return _get_app_patterns()
+        site = get_current_site()
+        return _get_app_patterns(site)
     except (OperationalError, ProgrammingError):
         # ignore if DB is not ready
         # Starting with Django 1.9 this code gets called even when creating
@@ -194,7 +195,7 @@ def get_app_patterns():
         return []
 
 
-def _get_app_patterns():
+def _get_app_patterns(site):
     """
     Get a list of patterns for all hooked apps.
 
@@ -214,24 +215,19 @@ def _get_app_patterns():
     """
     from cms.models import Title
 
-    try:
-        current_site = Site.objects.get_current()
-    except Site.DoesNotExist:
-        current_site = None
     included = []
 
     # we don't have a request here so get_page_queryset() can't be used,
     # so use public() queryset.
     # This can be done because url patterns are used just in frontend
-
-    title_qs = Title.objects.public().filter(page__site=current_site)
+    title_qs = Title.objects.public().filter(page__publisher_public__nodes__site=site)
 
     hooked_applications = OrderedDict()
 
     # Loop over all titles with an application hooked to them
     titles = (title_qs.exclude(page__application_urls=None)
-                      .exclude(page__application_urls='')
-                      .order_by('-page__path').select_related())
+              .exclude(page__application_urls='')
+              .order_by('-page__publisher_public__nodes__path').select_related())
     # TODO: Need to be fixed for django-treebeard when forward ported to 3.1
     for title in titles:
         path = title.path

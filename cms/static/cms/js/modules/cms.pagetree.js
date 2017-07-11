@@ -126,9 +126,9 @@ var PageTree = new Class({
                     // care about `obj.openNodes`, in the following case
                     // we are requesting a specific node
                     if (node.id === '#') {
-                        obj.pageId = null;
+                        obj.nodeId = null;
                     } else {
-                        obj.pageId = that._storeNodeId(node.data.id);
+                        obj.nodeId = that._storeNodeId(node.data.nodeId);
                     }
 
                     // we need to store the opened items inside the localstorage
@@ -218,12 +218,12 @@ var PageTree = new Class({
         var that = this;
 
         // set events for the nodeId updates
-        this.ui.tree.on('after_close.jstree', function(e, el) {
-            that._removeNodeId(el.node.data.id);
+        this.ui.tree.on('after_close.jstree', function (e, el) {
+            that._removeNodeId(el.node.data.nodeId);
         });
 
-        this.ui.tree.on('after_open.jstree', function(e, el) {
-            that._storeNodeId(el.node.data.id);
+        this.ui.tree.on('after_open.jstree', function (e, el) {
+            that._storeNodeId(el.node.data.nodeId);
 
             // `after_open` event can be triggered when pasting
             // is in progress (meaning we are pasting into a leaf node

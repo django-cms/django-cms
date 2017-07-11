@@ -35,7 +35,6 @@ def setup():
     Gather all checks and validations
     """
     from cms.plugin_pool import plugin_pool
-    plugin_pool.set_plugin_meta()
     validate_dependencies()
     validate_settings()
     plugin_pool.validate_templates()

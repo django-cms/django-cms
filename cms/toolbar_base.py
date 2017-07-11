@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.contrib.sites.models import Site
 from django.forms import MediaDefiningClass
 from django.utils import six
 
 from cms.exceptions import LanguageError
-from cms.utils import get_language_from_request
+from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import get_language_object
 
 
@@ -16,7 +15,7 @@ class CMSToolbar(six.with_metaclass(MediaDefiningClass)):
         self.toolbar = toolbar
         self.is_current_app = is_current_app
         self.app_path = app_path
-        self.current_site = Site.objects.get_current()
+        self.current_site = get_current_site()
         try:
             self.current_lang = get_language_object(get_language_from_request(self.request), self.current_site.pk)['code']
         except LanguageError:

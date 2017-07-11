@@ -14,7 +14,7 @@ from django.utils import six
 from sekizai.helpers import get_varname, is_variable_extend_node
 
 from cms.exceptions import DuplicatePlaceholderWarning
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 
 def _get_nodelist(tpl):

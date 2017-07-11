@@ -5,7 +5,6 @@ from datetime import datetime
 
 from django import template
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from django.db.models import Model
@@ -31,11 +30,11 @@ from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils import get_language_from_request, get_site_id
+from cms.utils import get_current_site, get_language_from_request, get_site_id
 from cms.utils.compat.dj import get_middleware
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
-from cms.utils.page_resolver import get_page_queryset
+from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
 
@@ -87,9 +86,11 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 else:
                     return page
         else:
-            return get_page_queryset(request).get(**page_lookup)
+            site = get_current_site()
+            pages = get_page_queryset(site, draft=use_draft(request))
+            return pages.get(**page_lookup)
     except Page.DoesNotExist:
-        site = Site.objects.get_current()
+        site = get_current_site()
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
                  "The URL of the request was: http://%(host)s%(path)s") \
@@ -872,7 +873,7 @@ class StaticPlaceholderNode(Tag):
             }
 
             if 'site' in extra_bits:
-                kwargs['site'] = Site.objects.get_current()
+                kwargs['site'] = get_current_site()
             else:
                 kwargs['site_id__isnull'] = True
             static_placeholder = StaticPlaceholder.objects.get_or_create(**kwargs)[0]

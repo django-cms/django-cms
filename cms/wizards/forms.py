@@ -29,6 +29,7 @@ class BaseFormMixin(object):
 
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop('wizard_page', None)
+        self.page_node = kwargs.pop('wizard_page_node', None)
         self.user = kwargs.pop('wizard_user', None)
         self.language_code = kwargs.pop('wizard_language')
         super(BaseFormMixin, self).__init__(*args, **kwargs)
@@ -75,8 +76,11 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     def __init__(self, *args, **kwargs):
         super(WizardStep1Form, self).__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
-        self.fields['entry'].choices = entry_choices(user=self.user,
-                                                     page=self.page)
+        self.fields['entry'].choices = entry_choices(
+            user=self.user,
+            page=self.page,
+            page_node=self.page_node,
+        )
 
     def get_wizard_entries(self):
         for entry in self['entry']:

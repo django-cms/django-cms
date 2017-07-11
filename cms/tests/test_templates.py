@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 PATH_PREFIX = os.path.join('inner_dir', 'custom_templates')
 GOOD_PATH = os.path.join(settings.PROJECT_PATH, 'project', 'templates', PATH_PREFIX)

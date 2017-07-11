@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 
 def _site_cache_key(lang):

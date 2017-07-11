@@ -12,11 +12,11 @@ from .forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 
 class CMSPageWizard(Wizard):
 
-    def user_has_add_permission(self, user, page=None, **kwargs):
-        if page and page.parent_id:
+    def user_has_add_permission(self, user, page=None, page_node=None, **kwargs):
+        if page_node and page_node.parent_page:
             # User is adding a page which will be a right
             # sibling to the current page.
-            has_perm = user_can_add_subpage(user, target=page.parent)
+            has_perm = user_can_add_subpage(user, target=page_node.parent_page)
         else:
             has_perm = user_can_add_page(user)
         return has_perm
@@ -24,7 +24,7 @@ class CMSPageWizard(Wizard):
 
 class CMSSubPageWizard(Wizard):
 
-    def user_has_add_permission(self, user, page=None, **kwargs):
+    def user_has_add_permission(self, user, page=None, page_node=None, **kwargs):
         if not page or page.application_urls:
             # We can't really add a sub-page to a non-existent page. Or to an
             # app-hooked page.

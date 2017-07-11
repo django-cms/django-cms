@@ -5,8 +5,8 @@ from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
 
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _
 from django.utils.lru_cache import lru_cache
+from django.utils.translation import ugettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
@@ -15,7 +15,7 @@ from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
-from cms.utils.placeholder import (get_placeholder_conf, get_placeholders)
+from cms.utils.placeholder import get_placeholder_conf
 
 
 @lru_cache(maxsize=None)
@@ -183,7 +183,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     return (child_classes, parent_classes)
 
 
-def copy_plugins_to_placeholder(plugins, placeholder, language, root_plugin=None):
+def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin=None):
     plugin_pairs = []
     plugins_by_id = {}
 
@@ -195,13 +195,13 @@ def copy_plugins_to_placeholder(plugins, placeholder, language, root_plugin=None
             new_plugin = deepcopy(source_plugin)
             new_plugin.pk = None
             new_plugin.id = None
-            new_plugin.language = language
+            new_plugin.language = language or new_plugin.language
             new_plugin.placeholder = placeholder
             new_plugin.parent = parent
             new_plugin.numchild = 0
         else:
             new_plugin = plugin_model(
-                language=language,
+                language=(language or source_plugin.language),
                 parent=parent,
                 plugin_type=source_plugin.plugin_type,
                 placeholder=placeholder,
@@ -329,18 +329,6 @@ def reorder_plugins(placeholder, parent_id, language, order):
         for position, plugin in enumerate(plugins.iterator()):
             plugin.update(position=position)
     return plugins
-
-
-def get_plugins_for_page(request, page, lang=None):
-    if not page:
-        return []
-    lang = lang or get_language_from_request(request)
-    if not hasattr(page, '_%s_plugins_cache' % lang):
-        slots = [pl.slot for pl in get_placeholders(page.get_template())]
-        setattr(page, '_%s_plugins_cache' % lang, get_cmsplugin_queryset(request).filter(
-            placeholder__page=page, placeholder__slot__in=slots, language=lang, parent__isnull=True
-        ).order_by('placeholder', 'position').select_related())
-    return getattr(page, '_%s_plugins_cache' % lang)
 
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):

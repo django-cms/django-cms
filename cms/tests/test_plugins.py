@@ -44,7 +44,7 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import force_language
-from cms.utils.plugins import get_plugins_for_page, get_plugins
+from cms.utils.plugins import get_plugins
 from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
@@ -55,6 +55,10 @@ from djangocms_text_ckeditor.utils import plugin_to_tag
 def register_plugins(*plugins):
     for plugin in plugins:
         plugin_pool.register_plugin(plugin)
+
+    # clear cached properties
+    plugin_pool._clear_cached()
+
     try:
         yield
     finally:
@@ -95,7 +99,9 @@ plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 
 class PluginsTestBaseCase(CMSTestCase):
+
     def setUp(self):
+        plugin_pool._clear_cached()
         self.super_user = self._create_user("test", True, True)
         self.slave = self._create_user("slave", True)
 
@@ -128,9 +134,9 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-    def _create_text_plugin_on_page(self, page):
+    def _create_text_plugin_on_page(self, page, slot='col_left'):
         plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot="body"),
+            placeholder=page.placeholders.get(slot=slot),
             plugin_type='TextPlugin',
             language=settings.LANGUAGES[0][0],
             body=''
@@ -158,7 +164,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a new text plugin
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         created_plugin_id = self._create_text_plugin_on_page(page)
         # now edit the plugin
         txt = self._edit_text_plugin(created_plugin_id, "Hello World")
@@ -233,7 +239,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.all()[0]
+            page = Page.objects.drafts().first()
             installed_plugins = plugin_pool.get_all_plugins('body', page)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertNotIn('TextPlugin', installed_plugins)
@@ -249,7 +255,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.all()[0]
+            page = Page.objects.drafts().first()
             installed_plugins = plugin_pool.get_all_plugins('body', page)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertNotIn('TextPlugin', installed_plugins)
@@ -258,18 +264,18 @@ class PluginsTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertEqual(response.status_code, 302)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
         created_plugin_id = self._create_text_plugin_on_page(page)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), False)
         self._edit_text_plugin(created_plugin_id, "Hello World")
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
 
     def test_plugin_order(self):
@@ -660,7 +666,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             template='nav_playground.html'
         )
         plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot="body"),
+            placeholder=page.placeholders.get(slot='body'),
             language='en',
             plugin_type='TextPlugin',
             body=''
@@ -752,7 +758,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 400)
 
     def test_register_plugin_twice_should_raise(self):
-        number_of_plugins_before = len(plugin_pool.get_all_plugins())
+        number_of_plugins_before = len(plugin_pool.registered_plugins)
         # The first time we register the plugin is should work
         with register_plugins(DumbFixturePlugin):
             # Let's add it a second time. We should catch and exception
@@ -763,11 +769,11 @@ class PluginsTestCase(PluginsTestBaseCase):
                 raised = True
             self.assertTrue(raised)
         # Let's make sure we have the same number of plugins as before:
-        number_of_plugins_after = len(plugin_pool.get_all_plugins())
+        number_of_plugins_after = len(plugin_pool.registered_plugins)
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
     def test_unregister_non_existing_plugin_should_raise(self):
-        number_of_plugins_before = len(plugin_pool.get_all_plugins())
+        number_of_plugins_before = len(plugin_pool.registered_plugins)
         raised = False
         try:
             # There should not be such a plugin registered if the others tests
@@ -777,7 +783,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             raised = True
         self.assertTrue(raised)
         # Let's count, to make sure we didn't remove a plugin accidentally.
-        number_of_plugins_after = len(plugin_pool.get_all_plugins())
+        number_of_plugins_after = len(plugin_pool.registered_plugins)
         self.assertEqual(number_of_plugins_before, number_of_plugins_after)
 
     def test_search_pages(self):
@@ -911,7 +917,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
-        plugin_id = self._create_text_plugin_on_page(page)
+        plugin_id = self._create_text_plugin_on_page(page, slot='body')
         plugin = self._edit_text_plugin(plugin_id, "fnord")
 
         actual_last_modification_time = CMSSitemap().lastmod(title)
@@ -948,19 +954,6 @@ class PluginsTestCase(PluginsTestBaseCase):
 
             from cms.utils.plugins import build_plugin_tree
             build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
-
-    def test_get_plugins_for_page(self):
-        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                  slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
-        # This placeholder is not in the template.
-        ph_en_not_used = page_en.placeholders.create(slot="not_used")
-        text_plugin_2 = api.add_plugin(ph_en_not_used, "TextPlugin", "en", body="I'm inside a non-existent placeholder.")
-        page_plugins = get_plugins_for_page(None, page_en, page_en.get_title_obj_attribute('language'))
-        db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
-        self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
-        self.assertEqual(db_text_plugin_1.pk, text_plugin_1.pk)
 
     def test_custom_plugin_urls(self):
         plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')
@@ -1004,7 +997,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
 
         toolbar_struct = get_toolbar_plugin_struct(
-            plugins=plugin_pool.get_all_plugins(),
+            plugins=plugin_pool.registered_plugins,
             slot=placeholder.slot,
             page=page,
         )
@@ -1126,7 +1119,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a new text plugin
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         created_plugin_id = self._create_text_plugin_on_page(page)
 
         # now edit the plugin
@@ -1204,9 +1197,9 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         page.publish('en')
-        placeholder = page.placeholders.get(slot="body")
+        placeholder = page.placeholders.get(slot='col_left')
         add_url = self.get_add_plugin_uri(
             placeholder=placeholder,
             plugin_type='ArticlePlugin',
@@ -1230,8 +1223,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         response = self.client.post(URL_CMS_PAGE_ADD, page_data)
         self.assertEqual(response.status_code, 302)
-        page = Page.objects.all()[0]
-        placeholder = page.placeholders.get(slot="body")
+        page = Page.objects.drafts().first()
+        placeholder = page.placeholders.get(slot='col_left')
 
         # add a plugin
         data = {
@@ -1524,7 +1517,7 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
 
         # Create a page
         page = create_page("Test", "nav_playground.html", settings.LANGUAGES[0][0])
-        placeholder = page.placeholders.get(slot="body")
+        placeholder = page.placeholders.get(slot='body')
 
         # Add the MTI plugin
         add_url = self.get_add_plugin_uri(

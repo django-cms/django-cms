@@ -6,7 +6,6 @@ from django.utils.six.moves import input
 
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 
 from .base import SubcommandsCommand
 
@@ -44,7 +43,6 @@ class UninstallPluginsCommand(LabelCommand):
     missing_args_message = 'foo bar'
 
     def handle_label(self, label, **options):
-        plugin_pool.get_all_plugins()
         queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()
 
