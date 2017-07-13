@@ -21,7 +21,7 @@ You should end up with a folder structure similar to this::
 
     env/
         src/
-            django-polls/
+            polls/
                 polls/
                     __init__.py
                     admin.py
