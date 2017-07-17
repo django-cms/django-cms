@@ -62,7 +62,7 @@ class PlaceholderToolbar(CMSToolbar):
 
     def init_placeholders(self):
         content_renderer = self.toolbar.content_renderer
-        self.placeholders = content_renderer.get_rendered_editable_placeholders()
+        self.editable_placeholders = content_renderer.get_rendered_editable_placeholders()
         self.statics = content_renderer.get_rendered_static_placeholders()
 
     def populate(self):
@@ -79,7 +79,7 @@ class PlaceholderToolbar(CMSToolbar):
             if page_permissions.user_can_change_page(self.request.user, page=self.page):
                 return self.add_structure_mode_item()
 
-        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
+        elif any(ph for ph in self.editable_placeholders if ph.has_change_permission(self.request.user)):
             return self.add_structure_mode_item()
 
         for sp in self.statics:
@@ -267,7 +267,7 @@ class PageToolbar(CMSToolbar):
 
     def init_placeholders(self):
         content_renderer = self.toolbar.content_renderer
-        self.placeholders = content_renderer.get_rendered_editable_placeholders()
+        self.placeholders = content_renderer.get_rendered_placeholders()
         self.statics = content_renderer.get_rendered_static_placeholders()
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 

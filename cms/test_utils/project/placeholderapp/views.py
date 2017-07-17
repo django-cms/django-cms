@@ -69,6 +69,11 @@ def detail_view(request, pk, template_name='detail.html', item_name="char_1",
     return _base_detail(request, instance, template_name, item_name, template_string)
 
 
+def latest_view(request):
+    example = Example1.objects.latest('id')
+    return detail_view(request, pk=example.pk)
+
+
 def detail_view_char(request, pk, template_name='detail.html', item_name="char_1",
                      template_string='',):
     instance = CharPksExample.objects.get(pk=pk)
