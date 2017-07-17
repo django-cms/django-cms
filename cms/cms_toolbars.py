@@ -79,7 +79,7 @@ class ToolbarBase(CMSToolbar):
             renderer = toolbar.structure_renderer
         else:
             renderer = toolbar.get_content_renderer()
-        self.placeholders = renderer.get_rendered_editable_placeholders()
+        self.editable_placeholders = renderer.get_rendered_editable_placeholders()
         self.statics = renderer.get_rendered_static_placeholders()
 
     def populate(self):
@@ -105,7 +105,7 @@ class PlaceholderToolbar(ToolbarBase):
             if page_permissions.user_can_change_page(self.request.user, page=self.page):
                 return self.add_structure_mode_item()
 
-        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
+        elif any(ph for ph in self.editable_placeholders if ph.has_change_permission(self.request.user)):
             return self.add_structure_mode_item()
 
         for sp in self.statics:
@@ -280,7 +280,31 @@ class PageToolbar(ToolbarBase):
         self.permissions_activated = get_cms_setting('PERMISSION')
 
     def init_placeholders(self):
-        super(PageToolbar, self).init_placeholders()
+        request = self.request
+        toolbar = self.toolbar
+
+        if request.method == 'GET':
+            is_api_call = 'placeholders[]' in request.GET and request.is_ajax()
+        else:
+            is_api_call = False
+
+        if is_api_call:
+            # AJAX request to reload page structure
+            placeholder_ids = request.GET.getlist("placeholders[]")
+            self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)
+            self.statics = StaticPlaceholder.objects.filter(
+                Q(draft__in=placeholder_ids) | Q(public__in=placeholder_ids)
+            )
+            return
+
+        if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
+            # User has explicitly requested structure mode
+            # and the object (page, blog, etc..) allows for the non-legacy structure mode
+            renderer = toolbar.structure_renderer
+        else:
+            renderer = toolbar.get_content_renderer()
+        self.placeholders = renderer.get_rendered_placeholders()
+        self.statics = renderer.get_rendered_static_placeholders()
         self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 
     def get_title(self):

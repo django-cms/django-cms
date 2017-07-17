@@ -235,6 +235,30 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, '<div id="cms-top"')
         self.assertContains(response, 'cms.base.css')
 
+    def test_live_draft_markup_on_app_page(self):
+        """
+        Checks that the "edit page" button shows up
+        on non-cms pages with app placeholders and no static placeholders.
+        """
+        superuser = self.get_superuser()
+
+        output = (
+            '<a class="cms-btn cms-btn-action cms-btn-switch-edit" '
+            'href="/en/example/latest/?{}">Edit page</a>'
+        ).format(get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+
+        Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
+
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/example/latest/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, output, html=True)
+
     def test_markup_generic_module(self):
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
         page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
