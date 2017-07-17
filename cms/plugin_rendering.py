@@ -20,7 +20,7 @@ from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.django_load import iterload_objects
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
- 
+
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
@@ -301,6 +301,8 @@ class ContentRenderer(object):
             # it means its cache was never primed as it wasn't necessary.
             return content
 
+        cache_enabled = self.placeholder_cache_is_enabled()
+
         for page in _get_page_ancestors(current_page):
             page_placeholders = self._placeholders_by_page_cache[page.pk]
 
@@ -309,7 +311,22 @@ class ContentRenderer(object):
             except KeyError:
                 continue
 
-            if getattr(placeholder, '_plugins_cache', None):
+            try:
+                has_prefetched_plugins = bool(placeholder._plugins_cache)
+            except AttributeError:
+                has_prefetched_plugins = False
+
+            if cache_enabled and not has_prefetched_plugins:
+                cached_content = self._get_cached_placeholder_content(
+                    placeholder=placeholder,
+                    site_id=page.site_id,
+                    language=self.request_language,
+                )
+                has_cached_content = cached_content is not None
+            else:
+                has_cached_content = False
+
+            if has_prefetched_plugins or has_cached_content:
                 # nodelist is set to None to avoid rendering the nodes inside
                 # a {% placeholder or %} block tag.
                 # When placeholder inheritance is used, we only care about placeholders
