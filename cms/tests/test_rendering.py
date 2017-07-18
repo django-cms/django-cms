@@ -560,6 +560,18 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(self.test_page6)
         self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
 
+    def test_inherit_placeholder_with_cache(self):
+        expected = u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub']
+        # Render the top-most page
+        # This will cache its contents
+        self.render(self.test_page)
+        # Render the parent page
+        # This will cache its contents
+        self.render(self.test_page5)
+        # Render the target page
+        # This should use the cached parent page content
+        self.assertEqual(self.render(self.test_page6), expected)
+
     def test_inherit_placeholder_override(self):
         # Tests that the user can override the inherited content
         # in a placeholder by adding plugins to the inherited placeholder.

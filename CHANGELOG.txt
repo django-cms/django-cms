@@ -8,6 +8,8 @@
 * Fixed an issue where non-staff users could request the wizard create endpoint.
 * Fixed an issue where the ``Edit page`` toolbar button wouldn't show on non-cms pages
   with placeholders.
+* Fixed a bug where placeholder inheritance wouldn't work if the inherited placeholder
+  is cached in an ancestor page.
 
 
 === 3.4.4 (unreleased) ===
