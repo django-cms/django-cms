@@ -6,6 +6,8 @@
 * Fixed a regression which prevented users from setting a redirect to the homepage.
 * Fixed a bug where the add page endpoint rendered ``Change page`` as the html title.
 * Fixed an issue where non-staff users could request the wizard create endpoint.
+* Fixed an issue where the ``Edit page`` toolbar button wouldn't show on non-cms pages
+  with placeholders.
 
 
 === 3.4.4 (unreleased) ===
