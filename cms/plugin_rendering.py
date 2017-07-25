@@ -12,7 +12,6 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
-from cms.exceptions import PlaceholderNotFound
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -326,73 +325,61 @@ class ContentRenderer(BaseRenderer):
         }
         return context
 
-    def render_page_placeholder(self, slot, context, inherit=False, nodelist=None):
-        current_page = self.request.current_page
-
-        if not current_page:
+    def render_page_placeholder(self, slot, context, inherit,
+                                page=None, nodelist=None, editable=True):
+        if not self.current_page:
+            # This method should only be used when rendering a cms page.
             return ''
 
-        content = self._render_page_placeholder(
-            context=context,
-            slot=slot,
-            page=current_page,
-            editable=True,
-            nodelist=nodelist,
-        )
+        current_page = page or self.current_page
+        placeholder_cache = self._placeholders_by_page_cache
 
-        if content or not current_page.parent_id:
-            return content
+        if current_page.pk not in placeholder_cache:
+            # Instead of loading plugins for this one placeholder
+            # try and load them for all placeholders on the page.
+            self._preload_placeholders_for_page(current_page)
 
-        # don't display inherited plugins in edit mode, so that the user doesn't
-        # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
-        # there for possible enhancements
-        if not inherit or self.toolbar.edit_mode_active:
-            return content
+        try:
+            placeholder = placeholder_cache[current_page.pk][slot]
+        except KeyError:
+            content = ''
+        else:
+            content = self.render_placeholder(
+                placeholder,
+                context=context,
+                page=current_page,
+                editable=editable,
+                use_cache=True,
+                nodelist=None,
+            )
 
-        if current_page.parent_id not in self._placeholders_by_page_cache:
+        should_inherit = (
+            inherit
+            and not content and current_page.parent_id
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.
-            return content
+            and current_page.parent_id in placeholder_cache
+            # don't display inherited plugins in edit mode, so that the user doesn't
+            # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
+            # there for possible enhancements
+            and not self.toolbar.edit_mode_active
+        )
 
-        cache_enabled = self.placeholder_cache_is_enabled()
+        if should_inherit:
+            # nodelist is set to None to avoid rendering the nodes inside
+            # a {% placeholder or %} block tag.
+            content = self.render_page_placeholder(
+                slot,
+                context,
+                inherit=True,
+                page=current_page.parent,
+                nodelist=None,
+                editable=False,
+            )
 
-        for page in _get_page_ancestors(current_page):
-            page_placeholders = self._placeholders_by_page_cache[page.pk]
-
-            try:
-                placeholder = page_placeholders[slot]
-            except KeyError:
-                continue
-
-            try:
-                has_prefetched_plugins = bool(placeholder._plugins_cache)
-            except AttributeError:
-                has_prefetched_plugins = False
-
-            if cache_enabled and not has_prefetched_plugins:
-                cached_content = self._get_cached_placeholder_content(
-                    placeholder=placeholder,
-                    language=self.request_language,
-                )
-                has_cached_content = cached_content is not None
-            else:
-                has_cached_content = False
-
-            if has_prefetched_plugins or has_cached_content:
-                # nodelist is set to None to avoid rendering the nodes inside
-                # a {% placeholder or %} block tag.
-                # When placeholder inheritance is used, we only care about placeholders
-                # with plugins.
-                inherited_content = self.render_placeholder(
-                    placeholder,
-                    context=context,
-                    page=page,
-                    editable=False,
-                    use_cache=True,
-                    nodelist=None,
-                )
-                return inherited_content
+        if not content and nodelist:
+            return nodelist.render(context)
         return content
 
     def render_static_placeholder(self, static_placeholder, context, nodelist=None):
@@ -492,44 +479,6 @@ class ContentRenderer(BaseRenderer):
                 # Anything else is a valid value
                 language_cache[placeholder.pk] = cached_value
         return language_cache.get(placeholder.pk)
-
-    def _get_page_placeholder(self, context, page, slot):
-        """
-        Returns a Placeholder instance attached to page that
-        matches the given slot.
-
-        A PlaceholderNotFound is raised if the placeholder is
-        not present on the page template.
-        """
-        placeholder_cache = self._placeholders_by_page_cache
-
-        if page.pk not in placeholder_cache:
-            # Instead of loading plugins for this one placeholder
-            # try and load them for all placeholders on the page.
-            self._preload_placeholders_for_page(page)
-
-        try:
-            placeholder = placeholder_cache[page.pk][slot]
-        except KeyError:
-            message = '"%s" placeholder not found' % slot
-            raise PlaceholderNotFound(message)
-        return placeholder
-
-    def _render_page_placeholder(self, context, slot, page, editable=True, nodelist=None):
-        """
-        Renders a placeholder attached to a page.
-        """
-        placeholder = self._get_page_placeholder(context, page, slot)
-
-        content = self.render_placeholder(
-            placeholder,
-            context=context,
-            page=page,
-            editable=editable,
-            use_cache=True,
-            nodelist=nodelist,
-        )
-        return content
 
     def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
         """

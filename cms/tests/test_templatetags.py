@@ -246,10 +246,17 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         request = self.get_request(page=page)
         context = SekizaiContext()
         context['request'] = request
+
+        self.assertObjectDoesNotExist(page.placeholders.all(), slot='col_right')
+        context = self.get_context(page=page)
         renderer = self.get_content_renderer(request)
-        self.assertFalse(page.placeholders.filter(slot='col_right').exists())
-        renderer._render_page_placeholder(context, 'col_right', page)
-        self.assertTrue(page.placeholders.filter(slot='col_right').exists())
+        renderer.render_page_placeholder(
+            'col_right',
+            context,
+            inherit=False,
+            page=page,
+        )
+        self.assertObjectExist(page.placeholders.all(), slot='col_right')
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):

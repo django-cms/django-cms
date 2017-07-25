@@ -18,6 +18,7 @@ from cms.views import details
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 INHERIT_TEMPLATE_NAME = 'tests/rendering/inherit.html'
+INHERIT_WITH_OR_TEMPLATE_NAME = 'tests/rendering/inherit_with_or.html'
 
 
 def sample_plugin_processor(instance, placeholder, rendered_content, original_context):
@@ -42,6 +43,7 @@ def sample_plugin_context_processor(instance, placeholder, original_context):
     CMS_TEMPLATES=[
         (TEMPLATE_NAME, TEMPLATE_NAME),
         (INHERIT_TEMPLATE_NAME, INHERIT_TEMPLATE_NAME),
+        (INHERIT_WITH_OR_TEMPLATE_NAME, INHERIT_WITH_OR_TEMPLATE_NAME),
         ('extra_context.html', 'extra_context.html')
     ],
 )
@@ -88,6 +90,30 @@ class RenderingTestCase(CMSTestCase):
                 'slug': u'RenderingTestCase-slug6',
                 'reverse_id': u'renderingtestcase-reverse-id6',
                 'text_sub': u'RenderingTestCase-sub6',
+            }
+            self.test_data7 = {
+                'title': u'RenderingTestCase-title7',
+                'slug': u'RenderingTestCase-slug7',
+                'reverse_id': u'renderingtestcase-reverse-id7',
+                'text_sub': u'RenderingTestCase-sub7',
+            }
+            self.test_data8 = {
+                'title': u'RenderingTestCase-title8',
+                'slug': u'RenderingTestCase-slug8',
+                'reverse_id': u'renderingtestcase-reverse-id8',
+                'text_sub': u'RenderingTestCase-sub8',
+            }
+            self.test_data9 = {
+                'title': u'RenderingTestCase-title9',
+                'slug': u'RenderingTestCase-slug9',
+                'reverse_id': u'renderingtestcase-reverse-id9',
+                'text_sub': u'RenderingTestCase-sub9',
+            }
+            self.test_data10 = {
+                'title': u'RenderingTestCase-title10',
+                'slug': u'RenderingTestCase-slug10',
+                'reverse_id': u'renderingtestcase-reverse-id10',
+                'text_sub': u'RenderingTestCase-sub10',
             }
             self.insert_test_content()
 
@@ -163,6 +189,19 @@ class RenderingTestCase(CMSTestCase):
         add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en',
                    body=self.test_data6['text_sub'])
         p6.publish('en')
+        p7 = create_page(self.test_data7['title'], INHERIT_TEMPLATE_NAME, 'en',
+                         slug=self.test_data7['slug'], parent=p6,
+                         reverse_id=self.test_data7['reverse_id'], published=True)
+        p8 = create_page(self.test_data8['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
+                         slug=self.test_data8['slug'], parent=p7,
+                         reverse_id=self.test_data8['reverse_id'], published=True)
+
+        p9 = create_page(self.test_data9['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
+                         slug=self.test_data9['slug'],
+                         reverse_id=self.test_data9['reverse_id'], published=True)
+        p10 = create_page(self.test_data10['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
+                         slug=self.test_data10['slug'], parent=p9,
+                         reverse_id=self.test_data10['reverse_id'], published=True)
 
         # Reload test pages
         self.test_page = self.reload(p.publisher_public)
@@ -171,6 +210,10 @@ class RenderingTestCase(CMSTestCase):
         self.test_page4 = self.reload(p4.publisher_public)
         self.test_page5 = self.reload(p5.publisher_public)
         self.test_page6 = self.reload(p6.publisher_public)
+        self.test_page7 = self.reload(p7.publisher_public)
+        self.test_page8 = self.reload(p8.publisher_public)
+        self.test_page9 = self.reload(p9.publisher_public)
+        self.test_page10 = self.reload(p10.publisher_public)
 
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
@@ -561,7 +604,8 @@ class RenderingTestCase(CMSTestCase):
         self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
 
     def test_inherit_placeholder_with_cache(self):
-        expected = u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub']
+        expected_6 = u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub']
+        expected_7 = u'|' + self.test_data5['text_main'] + '|'
         # Render the top-most page
         # This will cache its contents
         self.render(self.test_page)
@@ -570,7 +614,22 @@ class RenderingTestCase(CMSTestCase):
         self.render(self.test_page5)
         # Render the target page
         # This should use the cached parent page content
-        self.assertEqual(self.render(self.test_page6), expected)
+        self.assertEqual(self.render(self.test_page6), expected_6)
+        self.assertEqual(self.render(self.test_page7), expected_7)
+
+        self.render(self.test_page9)
+        # This should use the cached parent page content
+        self.assertEqual(self.render(self.test_page10), u'|<p>Ultimate fallback</p>|')
+
+    def test_inherit_placeholder_with_or(self):
+        # Tests that the "or" statement used in a {% placeholder %}
+        # declaration is used as the last fallback when inheritance
+        # fails to find content.
+        expected_8 = u'|' + self.test_data5['text_main'] + '|'
+        self.assertEqual(self.render(self.test_page8), expected_8)
+
+        expected_10 = u'|<p>Ultimate fallback</p>|'
+        self.assertEqual(self.render(self.test_page10), expected_10)
 
     def test_inherit_placeholder_override(self):
         # Tests that the user can override the inherited content
