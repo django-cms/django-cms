@@ -373,7 +373,6 @@ class ContentRenderer(BaseRenderer):
             if cache_enabled and not has_prefetched_plugins:
                 cached_content = self._get_cached_placeholder_content(
                     placeholder=placeholder,
-                    site_id=page.site_id,
                     language=self.request_language,
                 )
                 has_cached_content = cached_content is not None
