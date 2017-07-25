@@ -253,11 +253,16 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             current_page = page
             GET = {'language': 'en'}
 
+        self.assertObjectDoesNotExist(page.placeholders.all(), slot='col_right')
         context = self.get_context(page=page)
         content_renderer = context['cms_content_renderer']
-        placeholder = content_renderer._get_page_placeholder(context, page, 'col_right')
-        page.placeholders.get(slot='col_right')
-        self.assertEqual(placeholder.slot, 'col_right')
+        content_renderer.render_page_placeholder(
+            'col_right',
+            context,
+            inherit=False,
+            page=page,
+        )
+        self.assertObjectExist(page.placeholders.all(), slot='col_right')
 
     def test_render_plugin_toolbar_config(self):
         """
