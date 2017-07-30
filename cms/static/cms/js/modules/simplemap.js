@@ -1,19 +1,20 @@
-require('../polyfills/array.prototype.findindex');
+import '../polyfills/array.prototype.findindex';
 
 /**
  * Simplistic `Map` implementation, without
  * all the power features.
+ * TODO: get rid of this, use Map from babel
  *
  * @class SimpleMap
  * @private
  */
-var SimpleMap = function () {
+var SimpleMap = function() {
     this._keys = [];
     this._values = [];
 };
 
 SimpleMap.prototype.set = function set(key, value) {
-    var index = this._keys.findIndex(function (item) {
+    var index = this._keys.findIndex(function(item) {
         return item === key;
     });
 
@@ -27,7 +28,7 @@ SimpleMap.prototype.set = function set(key, value) {
 };
 
 SimpleMap.prototype.get = function get(key) {
-    var index = this._keys.findIndex(function (item) {
+    var index = this._keys.findIndex(function(item) {
         return item === key;
     });
 
@@ -35,7 +36,7 @@ SimpleMap.prototype.get = function get(key) {
 };
 
 SimpleMap.prototype.has = function has(key) {
-    var index = this._keys.findIndex(function (item) {
+    var index = this._keys.findIndex(function(item) {
         return item === key;
     });
 

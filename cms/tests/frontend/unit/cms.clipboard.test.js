@@ -4,24 +4,28 @@ import $ from 'jquery';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 
 window.CMS = window.CMS || CMS;
+CMS.$ = $;
+CMS.API = CMS.API || {};
+CMS.API.Helpers = Clipboard.__GetDependency__('Helpers');
 CMS.Clipboard = Clipboard;
+CMS._instances = [];
 
-describe('CMS.Clipboard', function () {
+describe('CMS.Clipboard', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    it('creates a Clipboard class', function () {
+    it('creates a Clipboard class', function() {
         expect(CMS.Clipboard).toBeDefined();
     });
 
-    it('has public API', function () {
+    it('has public API', function() {
         expect(CMS.Clipboard.prototype.clear).toEqual(jasmine.any(Function));
     });
 
-    describe('instance', function () {
+    describe('instance', function() {
         var clipboard;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('clipboard.html');
-            $(function () {
+            $(function() {
                 clipboard = new CMS.Clipboard();
                 spyOn(clipboard, 'populate');
                 spyOn(clipboard, '_handleExternalUpdate');
@@ -29,15 +33,15 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('has no options', function () {
+        it('has no options', function() {
             expect(clipboard.options).toEqual(undefined);
         });
 
-        it('has ui', function () {
+        it('has ui', function() {
             expect(clipboard.ui).toEqual(jasmine.any(Object));
             expect(Object.keys(clipboard.ui)).toContain('clipboard');
             expect(Object.keys(clipboard.ui)).toContain('triggers');
@@ -47,14 +51,14 @@ describe('CMS.Clipboard', function () {
             expect(Object.keys(clipboard.ui).length).toEqual(5);
         });
 
-        it('has its own private modal instance', function () {
+        it('has its own private modal instance', function() {
             expect(clipboard.modal).toEqual(jasmine.any(Object));
             // there's no reliable way to check if it's really modal,
             // since Class.js has no instanceof, but this will suffice
             expect(clipboard.modal.ui.modal).toEqual(jasmine.any(Object));
         });
 
-        it('sets up events to open the modal (enabled)', function () {
+        it('sets up events to open the modal (enabled)', function() {
             expect(clipboard.ui.triggers).toHandle('click.cms.clipboard');
 
             spyOn(clipboard.modal, 'open');
@@ -67,7 +71,7 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        it('sets up events to open the modal (disabled)', function () {
+        it('sets up events to open the modal (disabled)', function() {
             expect(clipboard.ui.triggers).toHandle('click.cms.clipboard');
             spyOn(clipboard.modal, 'open');
             clipboard.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
@@ -75,10 +79,10 @@ describe('CMS.Clipboard', function () {
             expect(clipboard.modal.open).not.toHaveBeenCalled();
         });
 
-        it('sets up events to open the modal which trigger click on document', function (done) {
+        it('sets up events to open the modal which trigger click on document', function(done) {
             expect(clipboard.ui.triggers).toHandle('click.cms.clipboard');
             spyOn(clipboard.modal, 'open');
-            $(document).on('click.cms.toolbar', function () {
+            $(document).on('click.cms.toolbar', function() {
                 $(this).off('click.cms.toolbar');
                 done();
             });
@@ -86,9 +90,8 @@ describe('CMS.Clipboard', function () {
             clipboard.ui.triggers.trigger('click.cms.clipboard');
         });
 
-
-        it('sets up events to clear the clipboard (enabled)', function () {
-            spyOn(clipboard, 'clear').and.callFake(function (callback) {
+        it('sets up events to clear the clipboard (enabled)', function() {
+            spyOn(clipboard, 'clear').and.callFake(function(callback) {
                 expect(callback).not.toBeDefined();
                 clipboard._cleanupDOM();
             });
@@ -107,8 +110,8 @@ describe('CMS.Clipboard', function () {
             expect(click).toHaveBeenTriggered();
         });
 
-        it('sets up events to clear the clipboard (enabled) 2', function () {
-            spyOn(clipboard, 'clear').and.callFake(function (callback) {
+        it('sets up events to clear the clipboard (enabled) 2', function() {
+            spyOn(clipboard, 'clear').and.callFake(function(callback) {
                 expect(callback).not.toBeDefined();
                 clipboard._cleanupDOM();
             });
@@ -127,8 +130,8 @@ describe('CMS.Clipboard', function () {
             expect(click).toHaveBeenTriggered();
         });
 
-        it('sets up events to clear the clipboard (disabled)', function () {
-            spyOn(clipboard, 'clear').and.callFake(function (callback) {
+        it('sets up events to clear the clipboard (disabled)', function() {
+            spyOn(clipboard, 'clear').and.callFake(function(callback) {
                 expect(callback).not.toBeDefined();
                 clipboard._cleanupDOM();
             });
@@ -143,7 +146,7 @@ describe('CMS.Clipboard', function () {
             expect(click).not.toHaveBeenTriggered();
         });
 
-        it('sets up events to clear "add plugin" placeholder', function () {
+        it('sets up events to clear "add plugin" placeholder', function() {
             $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
             clipboard.modal.trigger('cms.modal.loaded');
             expect($('.cms-add-plugin-placeholder')).not.toExist();
@@ -153,7 +156,7 @@ describe('CMS.Clipboard', function () {
             expect($('.cms-add-plugin-placeholder')).not.toExist();
         });
 
-        it('sets up events to move pluginList back to the modal', function () {
+        it('sets up events to move pluginList back to the modal', function() {
             $('<div class="cms-modal"></div>').prependTo(fixture.el);
             clipboard = new CMS.Clipboard();
 
@@ -187,38 +190,33 @@ describe('CMS.Clipboard', function () {
         });
 
         it('sets up event to handle external updates', () => {
-            Clipboard.__Rewire__('Helpers', { _getWindow() {
-                return {
-                    addEventListener(name, fn) {
-                        expect(name).toEqual('storage');
-                        fn({});
-                    }
-                };
-            } });
+            Clipboard.__Rewire__('ls', {
+                on(name) {
+                    expect(name).toEqual('cms-clipboard');
+                }
+            });
             spyOn(CMS.Clipboard.prototype, '_handleExternalUpdate');
 
             clipboard = new CMS.Clipboard();
             expect(CMS.Clipboard.prototype._handleExternalUpdate).not.toHaveBeenCalled();
 
-            Clipboard.__Rewire__('Helpers', { _getWindow() {
-                return {
-                    addEventListener(name, fn) {
-                        expect(name).toEqual('storage');
-                        fn({ key: 'cms.clipboard', x: 1 });
-                    }
-                };
-            } });
+            Clipboard.__Rewire__('ls', {
+                on(name, fn) {
+                    expect(name).toEqual('cms-clipboard');
+                    fn({ x: 1 });
+                }
+            });
             clipboard = new CMS.Clipboard();
             expect(CMS.Clipboard.prototype._handleExternalUpdate).toHaveBeenCalledWith({
-                key: 'cms.clipboard', x: 1
+                x: 1
             });
-            Clipboard.__ResetDependency__('Helpers');
+            Clipboard.__ResetDependency__('ls');
         });
     });
 
-    describe('.clear()', function () {
+    describe('.clear()', function() {
         var clipboard;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('clipboard.html');
             CMS.API.Toolbar = {
                 openAjax: jasmine.createSpy()
@@ -229,7 +227,7 @@ describe('CMS.Clipboard', function () {
                     url: 'clear-clipboard'
                 }
             };
-            $(function () {
+            $(function() {
                 clipboard = new CMS.Clipboard();
                 spyOn(clipboard, 'populate');
                 spyOn(clipboard, '_handleExternalUpdate');
@@ -237,11 +235,11 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('makes a request to the API', function () {
+        it('makes a request to the API', function() {
             clipboard.clear();
             expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
                 url: 'clear-clipboard?cms_path=%2Fcontext.html',
@@ -260,7 +258,7 @@ describe('CMS.Clipboard', function () {
             expect($.noop).toHaveBeenCalled();
         });
 
-        it('resets plugins "paste" menu item to show correct tooltip', function () {
+        it('resets plugins "paste" menu item to show correct tooltip', function() {
             var statesBefore = [
                 {
                     empty: 'none',
@@ -290,9 +288,9 @@ describe('CMS.Clipboard', function () {
                 disabled: 'none'
             };
 
-            statesBefore.forEach(function (obj, index) {
+            statesBefore.forEach(function(obj, index) {
                 var el = $('#submenu-item-' + (index + 1));
-                Object.keys(obj).forEach(function (key) {
+                Object.keys(obj).forEach(function(key) {
                     var value = obj[key];
                     expect(el.find('.cms-submenu-item-paste-tooltip-' + key)).toHaveCss({
                         display: value
@@ -302,9 +300,9 @@ describe('CMS.Clipboard', function () {
 
             clipboard.clear();
 
-            statesBefore.forEach(function (obj, index) {
+            statesBefore.forEach(function(obj, index) {
                 var el = $('#submenu-item-' + (index + 1));
-                Object.keys(stateAfter).forEach(function (key) {
+                Object.keys(stateAfter).forEach(function(key) {
                     var value = stateAfter[key];
                     expect(el.find('.cms-submenu-item-paste-tooltip-' + key)).toHaveCss({
                         display: value
@@ -314,9 +312,9 @@ describe('CMS.Clipboard', function () {
         });
     });
 
-    describe('_isClipboardModalOpen()', function () {
+    describe('_isClipboardModalOpen()', function() {
         var clipboard;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('clipboard.html');
             CMS.API.Toolbar = {
                 openAjax: jasmine.createSpy()
@@ -327,7 +325,7 @@ describe('CMS.Clipboard', function () {
                     url: 'clear-clipboard'
                 }
             };
-            $(function () {
+            $(function() {
                 $('<div class="cms-modal"><div class="cms-modal-body"></div></div>').prependTo(fixture.el);
                 clipboard = new CMS.Clipboard();
                 spyOn(clipboard, 'populate');
@@ -336,22 +334,22 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $('.cms-modal').remove();
             fixture.cleanup();
         });
 
-        it('returns true if modal is open', function () {
+        it('returns true if modal is open', function() {
             clipboard.modal.ui.modalBody.append('<div class="cms-clipboard-containers"></div>');
             expect(clipboard._isClipboardModalOpen()).toEqual(true);
         });
 
-        it('returns false if modal is closed', function () {
+        it('returns false if modal is closed', function() {
             expect(clipboard._isClipboardModalOpen()).toEqual(false);
         });
     });
 
-    describe('_handleExternalUpdate()', function () {
+    describe('_handleExternalUpdate()', function() {
         var clipboard;
         const pluginConstructor = jasmine.createSpy();
         class FakePlugin {
@@ -360,9 +358,9 @@ describe('CMS.Clipboard', function () {
             }
         }
         FakePlugin._updateClipboard = jasmine.createSpy();
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('clipboard.html');
-            $(function () {
+            $(function() {
                 clipboard = new CMS.Clipboard();
                 spyOn(clipboard, 'populate');
                 spyOn(clipboard, '_cleanupDOM');
@@ -372,25 +370,27 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             pluginConstructor.calls.reset();
             FakePlugin._updateClipboard.calls.reset();
             Clipboard.__ResetDependency__('Plugin');
             fixture.cleanup();
         });
 
-        it('does not do anything if the timestamp is lower', function () {
+        it('does not do anything if the timestamp is lower', function() {
             clipboard.currentClipboardData = {
                 html: 'no matter',
                 data: {},
                 timestamp: 10
             };
 
-            expect(clipboard._handleExternalUpdate({
-                newValue: JSON.stringify({
-                    timestamp: 1
-                })
-            })).not.toBeDefined();
+            expect(
+                clipboard._handleExternalUpdate(
+                    JSON.stringify({
+                        timestamp: 1
+                    })
+                )
+            ).not.toBeDefined();
 
             expect(pluginConstructor).not.toHaveBeenCalled();
             expect(FakePlugin._updateClipboard).not.toHaveBeenCalled();
@@ -401,21 +401,23 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        it('does not do anything if the plugin id is the same as it currently was', function () {
+        it('does not do anything if the plugin id is the same as it currently was', function() {
             clipboard.currentClipboardData = {
                 html: 'no matter',
                 data: { plugin_id: 1 },
                 timestamp: 10
             };
 
-            expect(clipboard._handleExternalUpdate({
-                newValue: JSON.stringify({
-                    timestamp: 15,
-                    data: {
-                        plugin_id: 1
-                    }
-                })
-            })).not.toBeDefined();
+            expect(
+                clipboard._handleExternalUpdate(
+                    JSON.stringify({
+                        timestamp: 15,
+                        data: {
+                            plugin_id: 1
+                        }
+                    })
+                )
+            ).not.toBeDefined();
 
             expect(pluginConstructor).not.toHaveBeenCalled();
             expect(FakePlugin._updateClipboard).not.toHaveBeenCalled();
@@ -429,20 +431,22 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        it('cleans up the dom if the clipboard was cleared on external update', function () {
+        it('cleans up the dom if the clipboard was cleared on external update', function() {
             clipboard.currentClipboardData = {
                 html: 'no matter',
                 data: { plugin_id: 1 },
                 timestamp: 10
             };
 
-            expect(clipboard._handleExternalUpdate({
-                newValue: JSON.stringify({
-                    timestamp: 15,
-                    data: {},
-                    html: ''
-                })
-            })).not.toBeDefined();
+            expect(
+                clipboard._handleExternalUpdate(
+                    JSON.stringify({
+                        timestamp: 15,
+                        data: {},
+                        html: ''
+                    })
+                )
+            ).not.toBeDefined();
 
             expect(pluginConstructor).not.toHaveBeenCalled();
             expect(FakePlugin._updateClipboard).not.toHaveBeenCalled();
@@ -455,21 +459,22 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        it('enables the clipboard menu items if the clipboard was updated externally', function () {
+        it('enables the clipboard menu items if the clipboard was updated externally', function() {
             clipboard.currentClipboardData = {
                 html: '',
                 data: {},
                 timestamp: 10
             };
 
-            expect(clipboard._handleExternalUpdate({
-                newValue: JSON.stringify({
-                    timestamp: 15,
-                    data: { plugin_id: 1 },
-                    html: '<div></div>'
-                })
-            })).not.toBeDefined();
-
+            expect(
+                clipboard._handleExternalUpdate(
+                    JSON.stringify({
+                        timestamp: 15,
+                        data: { plugin_id: 1 },
+                        html: '<div></div>'
+                    })
+                )
+            ).not.toBeDefined();
 
             expect(pluginConstructor).toHaveBeenCalled();
             expect(FakePlugin._updateClipboard).toHaveBeenCalled();
@@ -482,20 +487,22 @@ describe('CMS.Clipboard', function () {
             });
         });
 
-        it('updates the clipboard with the new plugin', function () {
+        it('updates the clipboard with the new plugin', function() {
             clipboard.currentClipboardData = {
                 html: '<span></span>',
                 data: { plugin_id: 10 },
                 timestamp: 10
             };
 
-            expect(clipboard._handleExternalUpdate({
-                newValue: JSON.stringify({
-                    timestamp: 15,
-                    data: { plugin_id: 11 },
-                    html: '<div></div>'
-                })
-            })).not.toBeDefined();
+            expect(
+                clipboard._handleExternalUpdate(
+                    JSON.stringify({
+                        timestamp: 15,
+                        data: { plugin_id: 11 },
+                        html: '<div></div>'
+                    })
+                )
+            ).not.toBeDefined();
 
             expect(pluginConstructor).toHaveBeenCalled();
             expect(FakePlugin._updateClipboard).toHaveBeenCalled();
@@ -509,22 +516,22 @@ describe('CMS.Clipboard', function () {
         });
     });
 
-    describe('_enableTriggers()', function () {
+    describe('_enableTriggers()', function() {
         var clipboard;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('clipboard.html');
-            $(function () {
+            $(function() {
                 clipboard = new CMS.Clipboard();
                 spyOn(clipboard, 'populate');
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             fixture.cleanup();
         });
 
-        it('removes disabled classes from menu items', function () {
+        it('removes disabled classes from menu items', function() {
             clipboard.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
             clipboard.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
 

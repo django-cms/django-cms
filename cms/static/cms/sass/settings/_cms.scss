@@ -64,7 +64,6 @@ $z-layers: (
         "resize":       102,
     ),
     "messages":         999999,
-    "toolbar-trigger":  9999999,
     "toolbar": (
         "base":         9999999,
         "left":         10,
@@ -212,16 +211,10 @@ $toolbar-shadow: 0 0 5px rgba($black, 0.2);
 $toolbar-left-space: 15px;
 $toolbar-border: $gray-lighter;
 
-$toolbar-debug-height: 5px;
-$toolbar-debug-bgsize: 10px 10px;
-$toolbar-debug-bgcolor: #fcd200;
+$toolbar-debug-height: 3px;
+$toolbar-debug-bgcolor: #fad507;
 
 $toolbar-logo-height: 21px;
-
-$toolbar-trigger-width: $toolbar-height;
-$toolbar-trigger-height: $toolbar-height;
-$toolbar-trigger-icon-size: 10px;
-$toolbar-trigger-loader-size: 20px;
 
 $toolbar-right-space: 15px;
 

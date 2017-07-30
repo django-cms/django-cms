@@ -14,11 +14,11 @@ var shortcutAreas = [
     {
         title: 'CMS Wide Shortcuts',
         shortcuts: {
-            'help': {
+            help: {
                 shortcut: '?',
                 desc: 'Bring up this help dialog'
             },
-            'esc': {
+            esc: {
                 shortcut: 'ESC',
                 desc: 'Close / cancel'
             },
@@ -34,7 +34,7 @@ var shortcutAreas = [
                 shortcut: 'alt+c',
                 desc: 'Open \u0022Create\u0022 dialog'
             },
-            'toolbar': {
+            toolbar: {
                 shortcut: 'f > t / alt+t'
             }
         }
@@ -77,39 +77,39 @@ CMS.config.lang.shortcutAreas = shortcutAreas;
 
 window.CMS = CMS;
 
-describe('shortcuts', function () {
+describe('shortcuts', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    beforeEach(function (done) {
+    beforeEach(function(done) {
         spyOn(keyboard, 'bind');
         spyOn(keyboard, 'setContext');
         fixture.load('plugins.html');
 
-        $(function () {
+        $(function() {
             CMS.config.lang.shortcutAreas = shortcutAreas;
             done();
         });
     });
 
-    afterEach(function () {
+    afterEach(function() {
         fixture.cleanup();
     });
 
-    it('does not explode', function () {
+    it('does not explode', function() {
         expect(initShortcuts).not.toThrow();
     });
 
-    describe('help', function () {
-        it('binds the shortcut', function () {
+    describe('help', function() {
+        it('binds the shortcut', function() {
             initHelpModal();
             expect(keyboard.setContext).toHaveBeenCalledWith('cms');
             expect(keyboard.bind).toHaveBeenCalledWith('?', jasmine.any(Function));
         });
 
-        it('shortcut opens modal', function () {
+        it('shortcut opens modal', function() {
             spyOn(Modal.prototype, 'open');
             initHelpModal();
-            keyboard.bind.calls.mostRecent().args[1]();
+            keyboard.bind.calls.mostRecent().args[1]({ preventDefault() {} });
             expect(Modal.prototype.open).toHaveBeenCalledTimes(1);
             expect(Modal.prototype.open).toHaveBeenCalledWith({
                 width: jasmine.any(Number),
@@ -117,21 +117,20 @@ describe('shortcuts', function () {
                 title: CMS.config.lang.shortcuts,
                 html: jasmine.any(String)
             });
-
         });
     });
 
-    describe('create-modal', function () {
-        it('binds the shortcut', function () {
+    describe('create-modal', function() {
+        it('binds the shortcut', function() {
             initCreateModal();
             expect(keyboard.setContext).toHaveBeenCalledWith('cms');
             expect(keyboard.bind).toHaveBeenCalledWith('alt+c', jasmine.any(Function));
         });
 
-        it('shortcut triggers click on create button', function (done) {
+        it('shortcut triggers click on create button', function(done) {
             $(fixture.el).append('<div class="cms-btn" href="wizard"></div>');
             initCreateModal();
-            $('.cms-btn').on('click', function () {
+            $('.cms-btn').on('click', function() {
                 done();
             });
             keyboard.bind.calls.mostRecent().args[1]();

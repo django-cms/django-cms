@@ -3,41 +3,11 @@
  * Multiple helpers used across all CMS features
  */
 import $ from 'jquery';
-import Class from 'classjs';
+import URL from 'urijs';
+import { once, debounce, throttle } from 'lodash';
 
-/**
- * @module CMS
- */
-var CMS = {
-    $: $,
-    Class: Class,
-
-    /**
-     * @module CMS
-     * @submodule CMS.API
-     */
-    API: {},
-    /**
-     * Provides key codes for common keys.
-     *
-     * @module CMS
-     * @submodule CMS.KEYS
-     * @example
-     *     if (e.keyCode === CMS.KEYS.ENTER) { ... };
-     */
-    KEYS: {
-        SHIFT: 16,
-        TAB: 9,
-        UP: 38,
-        DOWN: 40,
-        ENTER: 13,
-        SPACE: 32,
-        ESC: 27,
-        CMD_LEFT: 91,
-        CMD_RIGHT: 93,
-        CMD_FIREFOX: 224,
-        CTRL: 17
-    }
+var _CMS = {
+    API: {}
 };
 
 /**
@@ -47,9 +17,12 @@ var CMS = {
  * @returns {String} string containing space separated namespaced event names
  */
 var _ns = function nameSpaceEvent(events) {
-    return events.split(/\s+/g).map(function (eventName) {
-        return 'cms-' + eventName;
-    }).join(' ');
+    return events
+        .split(/\s+/g)
+        .map(function(eventName) {
+            return 'cms-' + eventName;
+        })
+        .join(' ');
 };
 
 /**
@@ -61,8 +34,7 @@ var _ns = function nameSpaceEvent(events) {
  * @submodule CMS.API
  * @namespace CMS.API
  */
-CMS.API.Helpers = {
-
+export const Helpers = {
     /**
      * See {@link reloadBrowser}
      *
@@ -70,6 +42,10 @@ CMS.API.Helpers = {
      * @private
      */
     _isReloading: false,
+
+    once,
+    debounce,
+    throttle,
 
     /**
      * Redirects to a specific url or reloads browser.
@@ -86,7 +62,7 @@ CMS.API.Helpers = {
      * @returns {Boolean|void}
      */
     // eslint-disable-next-line max-params
-    reloadBrowser: function (url, timeout, ajax, data) {
+    reloadBrowser: function(url, timeout, ajax, data) {
         var that = this;
         // is there a parent window?
         var win = this._getWindow();
@@ -107,7 +83,7 @@ CMS.API.Helpers = {
                     model: parent.CMS.config.request.model,
                     pk: parent.CMS.config.request.pk
                 },
-                success: function (response) {
+                success: function(response) {
                     parent.CMS.API.locked = false;
 
                     if (response === '' && !url) {
@@ -131,7 +107,7 @@ CMS.API.Helpers = {
         }
 
         // add timeout if provided
-        parent.setTimeout(function () {
+        parent.setTimeout(function() {
             if (url && url !== parent.location.href) {
                 // location.reload() takes precedence over this, so we
                 // don't want to reload the page if we need a redirect
@@ -149,11 +125,14 @@ CMS.API.Helpers = {
      * @function onPluginSave
      * @public
      */
-    onPluginSave: function () {
+    onPluginSave: function() {
         var data = this.dataBridge;
-        var editedPlugin = data && data.plugin_id && window.CMS._instances.some(function (plugin) {
-            return Number(plugin.options.plugin_id) === Number(data.plugin_id);
-        });
+        var editedPlugin =
+            data &&
+            data.plugin_id &&
+            window.CMS._instances.some(function(plugin) {
+                return Number(plugin.options.plugin_id) === Number(data.plugin_id);
+            });
         var addedPlugin = !editedPlugin && data && data.plugin_id;
 
         if (editedPlugin || addedPlugin) {
@@ -173,17 +152,19 @@ CMS.API.Helpers = {
      *
      * @method preventSubmit
      */
-    preventSubmit: function () {
+    preventSubmit: function() {
         var forms = $('.cms-toolbar').find('form');
         var SUBMITTED_OPACITY = 0.5;
 
-        forms.submit(function () {
+        forms.submit(function() {
             // show loader
             CMS.API.Toolbar.showLoader();
             // we cannot use disabled as the name action will be ignored
-            $('input[type="submit"]').on('click', function (e) {
-                e.preventDefault();
-            }).css('opacity', SUBMITTED_OPACITY);
+            $('input[type="submit"]')
+                .on('click', function(e) {
+                    e.preventDefault();
+                })
+                .css('opacity', SUBMITTED_OPACITY);
         });
     },
 
@@ -193,9 +174,9 @@ CMS.API.Helpers = {
      * @method csrf
      * @param {String} csrf_token
      */
-    csrf: function (csrf_token) {
+    csrf: function(csrf_token) {
         $.ajaxSetup({
-            beforeSend: function (xhr) {
+            beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRFToken', csrf_token);
             }
         });
@@ -211,7 +192,7 @@ CMS.API.Helpers = {
      * @param {Object} newSettings
      * @returns {Object}
      */
-    setSettings: function (newSettings) {
+    setSettings: function(newSettings) {
         // merge settings
         var settings = JSON.stringify($.extend({}, window.CMS.config.settings, newSettings));
 
@@ -240,7 +221,7 @@ CMS.API.Helpers = {
                     csrfmiddlewaretoken: window.CMS.config.csrf,
                     settings: settings
                 },
-                success: function (data) {
+                success: function(data) {
                     CMS.API.locked = false;
                     // determine if logged in or not
                     settings = data ? JSON.parse(data) : window.CMS.config.settings;
@@ -249,7 +230,7 @@ CMS.API.Helpers = {
                         CMS.API.Toolbar.hideLoader();
                     }
                 },
-                error: function (jqXHR) {
+                error: function(jqXHR) {
                     CMS.API.Messages.open({
                         message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
@@ -272,7 +253,7 @@ CMS.API.Helpers = {
      * @method getSettings
      * @returns {Object}
      */
-    getSettings: function () {
+    getSettings: function() {
         var settings;
 
         // istanbul ignore else
@@ -283,7 +264,7 @@ CMS.API.Helpers = {
         // use local storage or session
         if (this._isStorageSupported) {
             // get from local storage
-            settings = JSON.parse(localStorage.getItem('cms_cookie'));
+            settings = JSON.parse(localStorage.getItem('cms_cookie') || 'null');
             // istanbul ignore else
             if (CMS.API.Toolbar) {
                 CMS.API.Toolbar.hideLoader();
@@ -295,7 +276,7 @@ CMS.API.Helpers = {
                 async: false,
                 type: 'GET',
                 url: window.CMS.config.urls.settings,
-                success: function (data) {
+                success: function(data) {
                     CMS.API.locked = false;
                     // determine if logged in or not
                     settings = data ? JSON.parse(data) : window.CMS.config.settings;
@@ -304,7 +285,7 @@ CMS.API.Helpers = {
                         CMS.API.Toolbar.hideLoader();
                     }
                 },
-                error: function (jqXHR) {
+                error: function(jqXHR) {
                     CMS.API.Messages.open({
                         message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
@@ -330,161 +311,27 @@ CMS.API.Helpers = {
      *
      * @method makeURL
      * @param {String} url original url
-     * @param {String[]} [params] array of `param=value` strings to update the url
+     * @param {Array[]} [params] array of [`param`, `value`] arrays to update the url
      * @returns {String}
      */
-    // TODO get rid of this
-    makeURL: function makeURL(url, params) {
-        var arr = [];
-        var keys = [];
-        var values = [];
-        var tmp = '';
-        var urlArray = [];
-        var urlParams = [];
-        var hashParts = url.split('#');
-        var origin = hashParts.shift();
+    makeURL: function makeURL(url, params = []) {
+        let newUrl = new URL(URL.decode(url.replace(/&amp;/g, '&')));
 
-        // return url if there is no param
-        if (url.split('?').length > 1) {
-            // setup local vars
-            urlArray = url.split('?');
-            urlParams = urlArray[1].replace(/&(?:amp;)/g, '&').split('&');
-            origin = urlArray[0];
-        }
+        params.forEach(pair => {
+            const [key, value] = pair;
 
-        // loop through the available params
-        $.each(urlParams, function (index, param) {
-            arr.push({
-                param: param.split('=')[0],
-                value: param.split('=')[1]
-            });
-        });
-        // loop through the new params
-        if (params && params.length) {
-            $.each(params, function (index, param) {
-                arr.push({
-                    param: param.split('=')[0],
-                    value: param.split('=')[1]
-                });
-            });
-        }
-
-        // merge manually because jquery...
-        $.each(arr, function (index, item) {
-            var i = $.inArray(item.param, keys);
-
-            if (i === -1) {
-                keys.push(item.param);
-                values.push(item.value);
-            } else {
-                values[i] = item.value;
-            }
+            newUrl.removeSearch(key);
+            newUrl.addSearch(key, value);
         });
 
-        // merge new url
-        $.each(keys, function (index, key) {
-            tmp += '&' + key + '=' + values[index];
-        });
-        tmp = tmp.replace('&', '?');
-        var newUrl = origin + tmp;
-
-        newUrl = [newUrl.replace(/&/g, '&amp;')].concat(hashParts).join('#');
-
-        return newUrl;
+        return newUrl
+            .toString()
+            .split('#')
+            .map((part, i) => {
+                return i === 0 ? part.replace(/&/g, '&amp;') : part;
+            })
+            .join('#');
     },
-
-    /**
-     * Creates a debounced function that delays invoking `func`
-     * until after `wait` milliseconds have elapsed since
-     * the last time the debounced function was invoked.
-     * Optionally can be invoked first time immediately.
-     *
-     * @method debounce
-     * @param {Function} func function to debounce
-     * @param {Number} wait time in ms to wait
-     * @param {Object} [opts]
-     * @param {Boolean} [opts.immediate] trigger func immediately?
-     * @returns {Function}
-     */
-    /* eslint-disable */
-    debounce: function debounce(func, wait, opts) {
-        var timeout;
-        return function () {
-            var context = this, args = arguments;
-            var later = function () {
-                timeout = null;
-                if (!opts || !opts.immediate) {
-                    func.apply(context, args);
-                }
-            };
-            var callNow = opts && opts.immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
-        };
-    },
-
-    /**
-     * Returns a function that when invoked, will only be triggered
-     * at most once during a given window of time. Normally, the
-     * throttled function will run as much as it can, without ever
-     * going more than once per `wait` duration, but if you’d like to
-     * disable the execution on the leading edge, pass `{leading: false}`.
-     * To disable execution on the trailing edge, ditto.
-     *
-     * @method throttle
-     * @param {Function} func function to throttle
-     * @param {Number} wait time window
-     * @param {Object} [opts]
-     * @param {Boolean} [opts.leading=true] execute on the leading edge
-     * @param {Boolean} [opts.trailing=true] execute on the trailing edge
-     * @returns {Function}
-     */
-    throttle: function throttle(func, wait, opts) {
-        var context, args, result;
-        var timeout = null;
-        var previous = 0;
-        if (!opts) {
-            opts = {};
-        }
-        var later = function () {
-            previous = opts.leading === false ? 0 : $.now();
-            timeout = null;
-            result = func.apply(context, args);
-            // istanbul ignore else
-            if (!timeout) {
-                context = args = null;
-            }
-        };
-        return function () {
-            var now = $.now();
-            if (!previous && opts.leading === false) {
-                previous = now;
-            }
-            var remaining = wait - (now - previous);
-            context = this;
-            args = arguments;
-            if (remaining <= 0 || remaining > wait) {
-                // istanbul ignore if
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-                previous = now;
-                result = func.apply(context, args);
-                // istanbul ignore else
-                if (!timeout) {
-                    context = args = null;
-                }
-            } else if (!timeout && opts.trailing !== false) {
-                timeout = setTimeout(later, remaining);
-            }
-            return result;
-        };
-    },
-    /* eslint-enable */
 
     /**
      * Browsers allow to "Prevent this page form creating additional
@@ -501,7 +348,7 @@ CMS.API.Helpers = {
         var end = Number(new Date());
         var MINIMUM_DELAY = 10;
 
-        return end < (start + MINIMUM_DELAY) || result === true;
+        return end < start + MINIMUM_DELAY || result === true;
     },
 
     /**
@@ -564,29 +411,6 @@ CMS.API.Helpers = {
     },
 
     /**
-     * Returns a function that wraps the passed function so the wrapped function
-     * is executed only once, no matter how many times the wrapper function is executed.
-     *
-     * @method once
-     * @param {Function} fn function to be executed only once
-     * @returns {Function}
-     */
-    once: function once(fn) {
-        var result;
-        var didRunOnce = false;
-
-        return function () {
-            if (didRunOnce) {
-                fn = undefined; // eslint-disable-line
-            } else {
-                didRunOnce = true;
-                result = fn.apply(this, arguments);
-            }
-            return result;
-        };
-    },
-
-    /**
      * Prevents scrolling with touch in an element.
      *
      * @method preventTouchScrolling
@@ -594,7 +418,7 @@ CMS.API.Helpers = {
      * @param {String} namespace so we don't mix events from two different places on the same element
      */
     preventTouchScrolling: function preventTouchScrolling(element, namespace) {
-        element.on('touchmove.cms.preventscroll.' + namespace, function (e) {
+        element.on('touchmove.cms.preventscroll.' + namespace, function(e) {
             e.preventDefault();
         });
     },
@@ -617,7 +441,7 @@ CMS.API.Helpers = {
      * @private
      * @returns {Window}
      */
-    _getWindow: function () {
+    _getWindow: function() {
         return window;
     },
 
@@ -629,19 +453,41 @@ CMS.API.Helpers = {
      * @param {String} url url
      * @returns {String} modified url
      */
-    updateUrlWithPath: function (url) {
+    updateUrlWithPath: function(url) {
         var win = this._getWindow();
         var path = win.location.pathname + win.location.search;
 
-        return this.makeURL(url, ['cms_path=' + encodeURIComponent(path)]);
+        return this.makeURL(url, [['cms_path', path]]);
     }
 };
 
+/**
+ * Provides key codes for common keys.
+ *
+ * @module CMS
+ * @submodule CMS.KEYS
+ * @example
+ *     if (e.keyCode === CMS.KEYS.ENTER) { ... };
+ */
+export const KEYS = {
+    SHIFT: 16,
+    TAB: 9,
+    UP: 38,
+    DOWN: 40,
+    ENTER: 13,
+    SPACE: 32,
+    ESC: 27,
+    CMD_LEFT: 91,
+    CMD_RIGHT: 93,
+    CMD_FIREFOX: 224,
+    CTRL: 17
+};
+
 // shorthand for jQuery(document).ready();
-$(function () {
+$(function() {
     CMS._eventRoot = $('#cms-top');
     // autoinits
-    CMS.API.Helpers.preventSubmit();
+    Helpers.preventSubmit();
 });
 
-export default CMS;
+export default _CMS;

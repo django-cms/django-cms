@@ -206,19 +206,18 @@ class ViewTests(CMSTestCase):
 
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        structure_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
 
         with self.login_user_context(user):
             response = self.client.get("/fr/?{}".format(edit_on))
+            expected = """
+                <a href="?structure" class="cms-btn cms-btn-disabled" title="Toggle structure"
+                data-cms-structure-btn='{ "url": "/fr/?structure", "name": "Structure" }'
+                data-cms-content-btn='{ "url": "/fr/?edit", "name": "Content" }'>
+                <span class="cms-icon cms-icon-plugins"></span></a>
+            """
             self.assertContains(
                 response,
-                '<a href="/fr/?{}" class="cms-btn">Structure</a>'.format(structure_on),
-                count=1,
-                html=True,
-            )
-            self.assertContains(
-                response,
-                '<a href="/fr/?{}" class="cms-btn cms-btn-active">Content</a>'.format(edit_on),
+                expected,
                 count=1,
                 html=True,
             )
@@ -232,13 +231,7 @@ class ViewTests(CMSTestCase):
             response = self.client.get("/fr/?{}".format(edit_off))
             self.assertContains(
                 response,
-                '<a href="/fr/?{}" class="cms-btn">Structure</a>'.format(structure_on),
-                count=1,
-                html=True,
-            )
-            self.assertContains(
-                response,
-                '<a href="/fr/?{}" class="cms-btn">Content</a>'.format(edit_on),
+                expected,
                 count=1,
                 html=True,
             )

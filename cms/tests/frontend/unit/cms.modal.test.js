@@ -7,24 +7,24 @@ var $ = require('jquery');
 window.CMS = window.CMS || CMS;
 CMS.Modal = Modal;
 
-describe('CMS.Modal', function () {
+describe('CMS.Modal', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    beforeEach(function () {
-        CMS.ChangeTracker = function () {
+    beforeEach(function() {
+        CMS.ChangeTracker = function() {
             return {
-                isFormChanged: function () {
+                isFormChanged: function() {
                     return false;
                 }
             };
         };
     });
 
-    it('creates a Modal class', function () {
+    it('creates a Modal class', function() {
         expect(CMS.Modal).toBeDefined();
     });
 
-    it('has public API', function () {
+    it('has public API', function() {
         expect(CMS.Modal.prototype.open).toEqual(jasmine.any(Function));
         expect(CMS.Modal.prototype.close).toEqual(jasmine.any(Function));
         expect(CMS.Modal.prototype.minimize).toEqual(jasmine.any(Function));
@@ -32,9 +32,9 @@ describe('CMS.Modal', function () {
         expect(CMS.Modal._setupCtrlEnterSave).toEqual(jasmine.any(Function));
     });
 
-    describe('instance', function () {
-        it('has ui', function (done) {
-            $(function () {
+    describe('instance', function() {
+        it('has ui', function(done) {
+            $(function() {
                 var modal = new CMS.Modal();
                 expect(modal.ui).toEqual(jasmine.any(Object));
                 expect(Object.keys(modal.ui)).toContain('modal');
@@ -58,8 +58,8 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('has options', function (done) {
-            $(function () {
+        it('has options', function(done) {
+            $(function() {
                 var modal = new CMS.Modal();
                 expect(modal.options).toEqual({
                     onClose: false,
@@ -89,9 +89,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('.open()', function () {
+    describe('.open()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -104,47 +104,47 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal();
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('throws an error when no url or html options were passed', function () {
+        it('throws an error when no url or html options were passed', function() {
             spyOn(modal, '_loadIframe');
-            expect(modal.open.bind(modal)).toThrowError(
-                Error, 'The arguments passed to "open" were invalid.'
-            );
-            expect(modal.open.bind(modal, {})).toThrowError(
-                Error, 'The arguments passed to "open" were invalid.'
-            );
+            expect(modal.open.bind(modal)).toThrowError(Error, 'The arguments passed to "open" were invalid.');
+            expect(modal.open.bind(modal, {})).toThrowError(Error, 'The arguments passed to "open" were invalid.');
             expect(modal.open.bind(modal, { html: '' })).toThrowError(
-                Error, 'The arguments passed to "open" were invalid.'
+                Error,
+                'The arguments passed to "open" were invalid.'
             );
             expect(modal.open.bind(modal, { url: '' })).toThrowError(
-                Error, 'The arguments passed to "open" were invalid.'
+                Error,
+                'The arguments passed to "open" were invalid.'
             );
             expect(modal.open.bind(modal, { html: '<div></div>' })).not.toThrow();
-            expect(modal.open.bind(modal, {
-                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
-            })).not.toThrow();
+            expect(
+                modal.open.bind(modal, {
+                    url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+                })
+            ).not.toThrow();
         });
 
-        it('should be chainable', function () {
+        it('should be chainable', function() {
             expect(modal.open({ html: '<div></div>' })).toEqual(modal);
         });
 
-        it('hides the tooltip', function () {
+        it('hides the tooltip', function() {
             modal.open({ html: '<div></div>' });
             expect(CMS.API.Tooltip.hide).toHaveBeenCalled();
         });
 
-        it('triggers load events on instance and the DOM node', function () {
+        it('triggers load events on instance and the DOM node', function() {
             spyOn(modal, 'trigger');
             var spyEvent = spyOnEvent(modal.ui.modal, 'cms.modal.load');
             modal.open({ html: '<div></div>' });
@@ -154,7 +154,7 @@ describe('CMS.Modal', function () {
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.loaded');
         });
 
-        it('applies correct state to modal controls 1', function () {
+        it('applies correct state to modal controls 1', function() {
             modal.open({ html: '<div></div>' });
             // here and in others we cannot use `.toBeVisible` matcher,
             // because it uses jQuery's `:visible` selector which relies
@@ -165,7 +165,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
-        it('applies correct state to modal controls 2', function () {
+        it('applies correct state to modal controls 2', function() {
             modal = new CMS.Modal({ resizable: false });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toHaveCss({ display: 'none' });
@@ -173,7 +173,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
-        it('applies correct state to modal controls 3', function () {
+        it('applies correct state to modal controls 3', function() {
             modal = new CMS.Modal({ resizable: true });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toHaveCss({ display: 'block' });
@@ -181,7 +181,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
-        it('applies correct state to modal controls 4', function () {
+        it('applies correct state to modal controls 4', function() {
             modal = new CMS.Modal({ minimizable: false });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toHaveCss({ display: 'block' });
@@ -189,7 +189,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
-        it('applies correct state to modal controls 5', function () {
+        it('applies correct state to modal controls 5', function() {
             modal = new CMS.Modal({ minimizable: true });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toHaveCss({ display: 'block' });
@@ -197,7 +197,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
-        it('applies correct state to modal controls 6', function () {
+        it('applies correct state to modal controls 6', function() {
             modal = new CMS.Modal({ maximizable: false });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toHaveCss({ display: 'block' });
@@ -205,7 +205,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'none' });
         });
 
-        it('applies correct state to modal controls 7', function () {
+        it('applies correct state to modal controls 7', function() {
             modal = new CMS.Modal({ maximizable: true });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toHaveCss({ display: 'block' });
@@ -213,7 +213,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
-        it('resets minimized state if the modal was already minimized', function () {
+        it('resets minimized state if the modal was already minimized', function() {
             modal.open({ html: '<div></div>' });
             modal.minimize();
             expect(modal.minimized).toEqual(true);
@@ -226,7 +226,7 @@ describe('CMS.Modal', function () {
             expect(modal.minimize.calls.count()).toEqual(1);
         });
 
-        it('clears breadcrumbs and buttons if they exist', function () {
+        it('clears breadcrumbs and buttons if they exist', function() {
             modal.ui.modal.addClass('cms-modal-has-breadcrumb');
             modal.ui.modalButtons.html('<div>button</div>');
             modal.ui.breadcrumb.html('<div>breadcrumbs</div>');
@@ -238,9 +238,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('.minimize()', function () {
+    describe('.minimize()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -250,18 +250,18 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal();
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('minimizes the modal', function () {
+        it('minimizes the modal', function() {
             expect(modal.minimized).toEqual(false);
             modal.open({ html: '<div></div>' });
             modal.minimize();
@@ -275,15 +275,7 @@ describe('CMS.Modal', function () {
             modal.minimize(); // restore
         });
 
-        it('opens the toolbar', function () {
-            modal.open({ html: '<div></div>' });
-            modal.minimize();
-
-            expect(CMS.API.Toolbar.open).toHaveBeenCalled();
-            modal.minimize(); // restore
-        });
-
-        it('stores the css data to be able to restore a modal', function () {
+        it('stores the css data to be able to restore a modal', function() {
             modal.open({ html: '<div></div>' });
             modal.minimize();
 
@@ -297,14 +289,14 @@ describe('CMS.Modal', function () {
             modal.minimize(); // restore
         });
 
-        it('does not minimize maximized modal', function () {
+        it('does not minimize maximized modal', function() {
             modal.maximized = true;
             expect(modal.minimize()).toEqual(false);
             expect(CMS.API.Toolbar.open).not.toHaveBeenCalled();
             expect(modal.ui.body).not.toHaveClass('cms-modal-minimized');
         });
 
-        it('restores modal if it was already minimized', function () {
+        it('restores modal if it was already minimized', function() {
             modal.open({ html: '<div></div>' });
             modal.minimize();
 
@@ -319,9 +311,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('.maximize()', function () {
+    describe('.maximize()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -331,19 +323,19 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal();
                 done();
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             modal.close();
             fixture.cleanup();
         });
 
-        it('maximizes the modal', function () {
+        it('maximizes the modal', function() {
             modal.open({ html: '<div></div>' });
 
             modal.maximize();
@@ -352,7 +344,7 @@ describe('CMS.Modal', function () {
             modal.maximize(); // restore
         });
 
-        it('stores the css data to be able to restore a modal', function () {
+        it('stores the css data to be able to restore a modal', function() {
             modal.open({ html: '<div></div>' });
             modal.maximize();
 
@@ -368,11 +360,11 @@ describe('CMS.Modal', function () {
             modal.maximize(); // restore
         });
 
-        it('dispatches the modal-maximized event', function (done) {
+        it('dispatches the modal-maximized event', function(done) {
             modal.open({ html: '<div></div>' });
 
             CMS._eventRoot = $('#cms-top');
-            CMS.API.Helpers.addEventListener('modal-maximized', function (e, data) {
+            CMS.API.Helpers.addEventListener('modal-maximized', function(e, data) {
                 CMS.API.Helpers.removeEventListener('modal-maximized');
                 expect(data.instance).toEqual(modal);
                 done();
@@ -382,7 +374,7 @@ describe('CMS.Modal', function () {
             modal.maximize(); // restore
         });
 
-        it('does not maximize minimized modal', function () {
+        it('does not maximize minimized modal', function() {
             modal.open({ html: '<div></div>' });
             modal.minimize();
 
@@ -392,7 +384,7 @@ describe('CMS.Modal', function () {
             modal.minimize(); // restore
         });
 
-        it('restores modal if it was already maximized', function () {
+        it('restores modal if it was already maximized', function() {
             modal.open({ html: '<div></div>' });
 
             modal.maximize();
@@ -402,11 +394,11 @@ describe('CMS.Modal', function () {
             expect(modal.maximized).toEqual(false);
         });
 
-        it('dispatches modal-restored event when it restores the modal', function (done) {
+        it('dispatches modal-restored event when it restores the modal', function(done) {
             modal.open({ html: '<div></div>' });
 
             CMS._eventRoot = $('#cms-top');
-            CMS.API.Helpers.addEventListener('modal-restored', function (e, data) {
+            CMS.API.Helpers.addEventListener('modal-restored', function(e, data) {
                 CMS.API.Helpers.removeEventListener('modal-restored');
                 expect(true).toEqual(true);
                 expect(data.instance).toEqual(modal);
@@ -418,9 +410,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('.close()', function () {
+    describe('.close()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -430,7 +422,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -438,13 +430,13 @@ describe('CMS.Modal', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('returns false if modal-close event is prevented', function () {
-            CMS.API.Helpers.addEventListener('modal-close', function (e, opts) {
+        it('returns false if modal-close event is prevented', function() {
+            CMS.API.Helpers.addEventListener('modal-close', function(e, opts) {
                 e.preventDefault();
                 expect(opts.instance).toEqual(modal);
             });
@@ -456,7 +448,7 @@ describe('CMS.Modal', function () {
             CMS.API.Helpers.removeEventListener('modal-close');
         });
 
-        it('removes content preserving handlers', function () {
+        it('removes content preserving handlers', function() {
             var removeEventListener = jasmine.createSpy();
 
             spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
@@ -469,15 +461,15 @@ describe('CMS.Modal', function () {
             expect(removeEventListener).toHaveBeenCalledWith('beforeunload', modal._beforeUnloadHandler);
         });
 
-        it('closes the modal', function (done) {
+        it('closes the modal', function(done) {
             modal.open({ html: '<div></div>' });
 
             spyOn(modal, '_hide').and.callThrough();
 
-            setTimeout(function () {
+            setTimeout(function() {
                 modal.close();
                 expect(modal._hide).toHaveBeenCalled();
-                setTimeout(function () {
+                setTimeout(function() {
                     expect(modal.ui.modal).not.toHaveClass('cms-modal-open');
                     expect(modal.ui.modal).toHaveCss({ display: 'none' });
                     done();
@@ -485,10 +477,10 @@ describe('CMS.Modal', function () {
             }, 10);
         });
 
-        it('reloads the browser if onClose is provided', function (done) {
+        it('reloads the browser if onClose is provided', function(done) {
             modal = new CMS.Modal({ onClose: '/this-url' });
             modal.open({ html: '<div></div>' });
-            spyOn(CMS.API.Helpers, 'reloadBrowser').and.callFake(function (url, timeout, ajax) {
+            spyOn(CMS.API.Helpers, 'reloadBrowser').and.callFake(function(url, timeout, ajax) {
                 expect(url).toEqual('/this-url');
                 expect(timeout).toEqual(false);
                 expect(ajax).toEqual(true);
@@ -498,9 +490,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('._events()', function () {
+    describe('._events()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -510,7 +502,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -524,12 +516,12 @@ describe('CMS.Modal', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('attaches new events', function () {
+        it('attaches new events', function() {
             expect(modal.ui.minimizeButton).not.toHandle(modal.click);
             expect(modal.ui.minimizeButton).not.toHandle(modal.touchEnd);
             expect(modal.ui.maximizeButton).not.toHandle(modal.click);
@@ -557,7 +549,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.breadcrumb).toHandle(modal.click);
         });
 
-        it('removes previous events', function () {
+        it('removes previous events', function() {
             var spy = jasmine.createSpy();
 
             modal.ui.breadcrumb.html('<a></a>');
@@ -587,7 +579,7 @@ describe('CMS.Modal', function () {
             expect(spy).not.toHaveBeenCalled();
         });
 
-        it('calls correct methods', function () {
+        it('calls correct methods', function() {
             modal.ui.breadcrumb.html('<a></a>');
 
             modal._events();
@@ -620,9 +612,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_calculateNewPosition()', function () {
+    describe('_calculateNewPosition()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -632,7 +624,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -645,12 +637,12 @@ describe('CMS.Modal', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('fits the modal to the screen if there is enough space', function () {
+        it('fits the modal to the screen if there is enough space', function() {
             spyOn($.fn, 'css').and.returnValue(0);
 
             expect(modal._calculateNewPosition({})).toEqual({
@@ -677,7 +669,7 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('respects params', function () {
+        it('respects params', function() {
             modal.ui.window.css({
                 width: 900,
                 height: 500
@@ -685,20 +677,24 @@ describe('CMS.Modal', function () {
             // so it resets to middle of the screen
             spyOn($.fn, 'css').and.returnValue(0);
 
-            expect(modal._calculateNewPosition({
-                width: 300,
-                height: 300
-            })).toEqual({
+            expect(
+                modal._calculateNewPosition({
+                    width: 300,
+                    height: 300
+                })
+            ).toEqual({
                 width: 300,
                 height: 300,
                 top: 250,
                 left: 450
             });
 
-            expect(modal._calculateNewPosition({
-                width: 1000,
-                height: 500
-            })).toEqual({
+            expect(
+                modal._calculateNewPosition({
+                    width: 1000,
+                    height: 500
+                })
+            ).toEqual({
                 width: 1000,
                 height: 500,
                 top: 250,
@@ -706,7 +702,7 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('respects minWidth and minHeight', function () {
+        it('respects minWidth and minHeight', function() {
             modal.ui.window.css({
                 width: 900,
                 height: 500
@@ -721,8 +717,7 @@ describe('CMS.Modal', function () {
             });
         });
 
-
-        it('handles 50% left and top position case', function () {
+        it('handles 50% left and top position case', function() {
             spyOn($.fn, 'css').and.returnValue('50%');
 
             expect(modal._calculateNewPosition({})).toEqual({
@@ -733,7 +728,7 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('moves modal to the middle of the screen if it does not fit the screen', function () {
+        it('moves modal to the middle of the screen if it does not fit the screen', function() {
             spyOn($.fn, 'css').and.returnValue(850);
             expect(modal._calculateNewPosition({})).toEqual({
                 width: 1700,
@@ -750,7 +745,7 @@ describe('CMS.Modal', function () {
                 left: undefined
             });
 
-            $.fn.css.and.callFake(function (prop) {
+            $.fn.css.and.callFake(function(prop) {
                 return {
                     left: 850,
                     top: 2000 - 850
@@ -763,7 +758,7 @@ describe('CMS.Modal', function () {
                 left: undefined
             });
 
-            $.fn.css.and.callFake(function (prop) {
+            $.fn.css.and.callFake(function(prop) {
                 return {
                     left: 2000 - 850,
                     top: 850
@@ -776,7 +771,7 @@ describe('CMS.Modal', function () {
                 left: undefined
             });
 
-            $.fn.css.and.callFake(function (prop) {
+            $.fn.css.and.callFake(function(prop) {
                 return {
                     left: 849,
                     top: 849
@@ -789,7 +784,7 @@ describe('CMS.Modal', function () {
                 left: 1000
             });
 
-            $.fn.css.and.callFake(function (prop) {
+            $.fn.css.and.callFake(function(prop) {
                 return {
                     left: 2000 - 849,
                     top: 2000 - 849
@@ -802,7 +797,7 @@ describe('CMS.Modal', function () {
                 left: 1000
             });
 
-            $.fn.css.and.callFake(function (prop) {
+            $.fn.css.and.callFake(function(prop) {
                 return {
                     left: 849,
                     top: 2000 - 849
@@ -815,7 +810,7 @@ describe('CMS.Modal', function () {
                 left: 1000
             });
 
-            $.fn.css.and.callFake(function (prop) {
+            $.fn.css.and.callFake(function(prop) {
                 return {
                     left: 2000 - 849,
                     top: 849
@@ -829,7 +824,7 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('maximizes the modal if it goes out of the screen', function () {
+        it('maximizes the modal if it goes out of the screen', function() {
             expect(modal.triggerMaximized).not.toEqual(true);
             modal.ui.window.css({
                 width: 900,
@@ -865,9 +860,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_show()', function () {
+    describe('_show()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -877,7 +872,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -888,19 +883,19 @@ describe('CMS.Modal', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('add morphing class if modal is already open', function (done) {
+        it('add morphing class if modal is already open', function(done) {
             modal.ui.modal.show();
             expect(modal.ui.modal).not.toHaveClass('cms-modal-morphing');
             expect(modal.ui.modal).not.toHaveClass('cms-modal-open');
 
             modal.ui.modal.addClass('cms-modal-open');
-            modal.ui.modal.one('cmsTransitionEnd', function () {
-                setTimeout(function () {
+            modal.ui.modal.one('cmsTransitionEnd', function() {
+                setTimeout(function() {
                     expect(modal.ui.modal).not.toHaveClass('cms-modal-morphing');
                     done();
                 }, 0);
@@ -909,10 +904,10 @@ describe('CMS.Modal', function () {
             expect(modal.ui.modal).toHaveClass('cms-modal-morphing');
         });
 
-        it('positions modal by given params', function (done) {
+        it('positions modal by given params', function(done) {
             spyOn($.fn, 'css');
-            modal.ui.modal.one('cmsTransitionEnd', function () {
-                setTimeout(function () {
+            modal.ui.modal.one('cmsTransitionEnd', function() {
+                setTimeout(function() {
                     expect($.fn.css).toHaveBeenCalledWith({
                         'margin-left': -10,
                         'margin-top': -1.5
@@ -928,19 +923,19 @@ describe('CMS.Modal', function () {
             });
 
             expect($.fn.css).toHaveBeenCalledWith({
-                'display': 'block',
-                'width': 20,
-                'height': 3,
-                'top': 123,
-                'left': 456,
+                display: 'block',
+                width: 20,
+                height: 3,
+                top: 123,
+                left: 456,
                 'margin-left': -10,
                 'margin-top': -1.5
             });
         });
 
-        it('maximizes the modal if required', function (done) {
-            modal.ui.modal.one('cmsTransitionEnd', function () {
-                setTimeout(function () {
+        it('maximizes the modal if required', function(done) {
+            modal.ui.modal.one('cmsTransitionEnd', function() {
+                setTimeout(function() {
                     expect(modal.maximize).toHaveBeenCalled();
                     done();
                 }, 0);
@@ -949,9 +944,9 @@ describe('CMS.Modal', function () {
             modal._show({});
         });
 
-        it('does not maximize the modal if not required', function (done) {
-            modal.ui.modal.one('cmsTransitionEnd', function () {
-                setTimeout(function () {
+        it('does not maximize the modal if not required', function(done) {
+            modal.ui.modal.one('cmsTransitionEnd', function() {
+                setTimeout(function() {
                     expect(modal.maximize).not.toHaveBeenCalled();
                     done();
                 }, 0);
@@ -960,9 +955,9 @@ describe('CMS.Modal', function () {
             modal._show({});
         });
 
-        it('triggers cms.modal.shown', function (done) {
-            modal.ui.modal.one('cmsTransitionEnd', function () {
-                setTimeout(function () {
+        it('triggers cms.modal.shown', function(done) {
+            modal.ui.modal.one('cmsTransitionEnd', function() {
+                setTimeout(function() {
                     expect(modal.trigger).toHaveBeenCalledWith('cms.modal.shown');
                     done();
                 }, 0);
@@ -970,7 +965,7 @@ describe('CMS.Modal', function () {
             modal._show({});
         });
 
-        it('adds an event handler to close the modal by pressing ESC', function () {
+        it('adds an event handler to close the modal by pressing ESC', function() {
             var spy = jasmine.createSpy();
 
             modal.ui.body.on('keydown.cms.close', spy);
@@ -991,7 +986,7 @@ describe('CMS.Modal', function () {
             expect(modal.options.onClose).toEqual(null);
         });
 
-        it('adds an event handler to close the modal by pressing ESC if closeOnEsc is set', function () {
+        it('adds an event handler to close the modal by pressing ESC if closeOnEsc is set', function() {
             var spy = jasmine.createSpy();
 
             modal.ui.body.on('keydown.cms.close', spy);
@@ -1013,7 +1008,7 @@ describe('CMS.Modal', function () {
             expect(modal.options.onClose).toEqual('stuff');
         });
 
-        it('adds an event handler to close the modal by pressing ESC if confirmed', function () {
+        it('adds an event handler to close the modal by pressing ESC if confirmed', function() {
             var spy = jasmine.createSpy();
 
             modal.ui.body.on('keydown.cms.close', spy);
@@ -1029,7 +1024,7 @@ describe('CMS.Modal', function () {
             expect(modal.options.onClose).toEqual(null);
         });
 
-        it('adds an event handler to not close the modal by pressing ESC if not confirmed', function () {
+        it('adds an event handler to not close the modal by pressing ESC if not confirmed', function() {
             var spy = jasmine.createSpy();
 
             modal.ui.body.on('keydown.cms.close', spy);
@@ -1045,7 +1040,7 @@ describe('CMS.Modal', function () {
             expect(modal.options.onClose).toEqual('stuff');
         });
 
-        it('focuses the modal', function () {
+        it('focuses the modal', function() {
             spyOn($.fn, 'focus');
 
             modal._show({});
@@ -1054,9 +1049,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_hide()', function () {
+    describe('_hide()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1066,7 +1061,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 jasmine.clock().install();
                 modal = new CMS.Modal({
                     modalDuration: 0
@@ -1078,40 +1073,40 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
             jasmine.clock().uninstall();
         });
 
-        it('empties the frame', function () {
+        it('empties the frame', function() {
             modal.ui.frame.html('<div></div>');
             expect(modal.ui.frame).not.toBeEmpty();
             modal._hide();
             expect(modal.ui.frame).toBeEmpty();
         });
 
-        it('removes loader', function () {
+        it('removes loader', function() {
             modal.ui.modalBody.addClass('cms-loader');
             expect(modal.ui.modalBody).toHaveClass('cms-loader');
             modal._hide();
             expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
         });
 
-        it('triggers cms.modal.closed', function () {
+        it('triggers cms.modal.closed', function() {
             modal._hide({ duration: 10000000 });
             expect(modal.trigger).not.toHaveBeenCalled();
             jasmine.clock().tick(modal.options.duration);
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.closed');
         });
 
-        it('hides tooblar loader', function () {
+        it('hides tooblar loader', function() {
             modal._hide({ duration: 10000000 });
             jasmine.clock().tick(modal.options.duration);
             expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
         });
 
-        it('resets minimize state', function () {
+        it('resets minimize state', function() {
             modal.minimized = true;
             modal._hide();
             expect(modal.minimize).not.toHaveBeenCalled();
@@ -1119,7 +1114,7 @@ describe('CMS.Modal', function () {
             expect(modal.minimize).toHaveBeenCalled();
         });
 
-        it('resets maximize state', function () {
+        it('resets maximize state', function() {
             modal.maximized = true;
             modal._hide();
             expect(modal.maximize).not.toHaveBeenCalled();
@@ -1127,7 +1122,7 @@ describe('CMS.Modal', function () {
             expect(modal.maximize).toHaveBeenCalled();
         });
 
-        it('removes the handler to close by ESC', function () {
+        it('removes the handler to close by ESC', function() {
             var spy = jasmine.createSpy();
 
             modal.ui.body.on('keydown.cms.close', spy);
@@ -1139,8 +1134,8 @@ describe('CMS.Modal', function () {
             expect(spy).not.toHaveBeenCalled();
         });
 
-        it('triggers modal-closed event', function (done) {
-            CMS.API.Helpers.addEventListener('modal-closed', function (e, opts) {
+        it('triggers modal-closed event', function(done) {
+            CMS.API.Helpers.addEventListener('modal-closed', function(e, opts) {
                 expect(opts.instance).toEqual(modal);
                 CMS.API.Helpers.removeEventListener('modal-closed');
                 done();
@@ -1150,9 +1145,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_startMove()', function () {
+    describe('_startMove()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1162,7 +1157,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1171,7 +1166,7 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             modal.ui.body.removeAttr('data-touch-action');
             modal.ui.body.off(modal.pointerMove);
@@ -1179,23 +1174,23 @@ describe('CMS.Modal', function () {
             fixture.cleanup();
         });
 
-        it('returns false if modal is maximized', function () {
+        it('returns false if modal is maximized', function() {
             modal.maximized = true;
             expect(modal._startMove()).toEqual(false);
         });
 
-        it('returns false if modal is minimized', function () {
+        it('returns false if modal is minimized', function() {
             modal.minimized = true;
             expect(modal._startMove()).toEqual(false);
         });
 
-        it('shows the shim', function () {
+        it('shows the shim', function() {
             expect(modal.ui.shim).not.toBeVisible();
             modal._startMove();
             expect(modal.ui.shim).toBeVisible();
         });
 
-        it('adds stopMove handler', function () {
+        it('adds stopMove handler', function() {
             modal._startMove();
             modal.ui.body.trigger(modal.pointerUp.split(' ')[0]);
             expect(modal._stopMove).toHaveBeenCalled();
@@ -1203,7 +1198,7 @@ describe('CMS.Modal', function () {
             expect(modal._stopMove).toHaveBeenCalledTimes(2);
         });
 
-        it('adds mousemove handler that repositions the modal', function (done) {
+        it('adds mousemove handler that repositions the modal', function(done) {
             var event = new $.Event(modal.pointerMove, {
                 originalEvent: {
                     pageX: 23,
@@ -1216,9 +1211,13 @@ describe('CMS.Modal', function () {
                 top: 30
             });
 
-            spyOn($.fn, 'css').and.callFake(function (props) {
-                if (props && typeof props.left !== 'undefined' &&
-                    typeof props.top !== 'undefined' && Object.keys(props).length === 2) {
+            spyOn($.fn, 'css').and.callFake(function(props) {
+                if (
+                    props &&
+                    typeof props.left !== 'undefined' &&
+                    typeof props.top !== 'undefined' &&
+                    Object.keys(props).length === 2
+                ) {
                     expect(props).toEqual({
                         left: 20 - (100 - 23),
                         top: 30 - (100 - 28)
@@ -1234,21 +1233,21 @@ describe('CMS.Modal', function () {
                 }
             });
 
-            setTimeout(function () {
+            setTimeout(function() {
                 modal.ui.body.trigger(event);
             }, 1000);
         });
 
-        it('adds data-touch-action attribute', function () {
+        it('adds data-touch-action attribute', function() {
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
             modal._startMove();
             expect(modal.ui.body).toHaveAttr('data-touch-action');
         });
     });
 
-    describe('_stopMove()', function () {
+    describe('_stopMove()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1258,7 +1257,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1267,18 +1266,18 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('hides the shim', function () {
+        it('hides the shim', function() {
             expect(modal.ui.shim).toBeVisible();
             modal._stopMove();
             expect(modal.ui.shim).not.toBeVisible();
         });
 
-        it('removes event handlers', function () {
+        it('removes event handlers', function() {
             expect(modal.ui.body).toHandle(modal.pointerMove);
             expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[0]);
             expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[1]);
@@ -1288,16 +1287,16 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
         });
 
-        it('removes data-touch-action attribute', function () {
+        it('removes data-touch-action attribute', function() {
             expect(modal.ui.body).toHaveAttr('data-touch-action');
             modal._stopMove();
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
         });
     });
 
-    describe('_startResize()', function () {
+    describe('_startResize()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1307,7 +1306,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1317,7 +1316,7 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             modal.ui.body.removeAttr('data-touch-action');
             modal.ui.body.off(modal.pointerMove);
@@ -1325,24 +1324,24 @@ describe('CMS.Modal', function () {
             fixture.cleanup();
         });
 
-        it('returns false if the modal is maximized', function () {
+        it('returns false if the modal is maximized', function() {
             modal.maximized = true;
             expect(modal._startResize()).toEqual(false);
         });
 
-        it('shows the shim', function () {
+        it('shows the shim', function() {
             expect(modal.ui.shim).not.toBeVisible();
             modal._startResize();
             expect(modal.ui.shim).toBeVisible();
         });
 
-        it('adds handler for pointermove to reposition the modal', function () {
+        it('adds handler for pointermove to reposition the modal', function() {
             expect(modal.ui.body).not.toHandle(modal.pointerMove);
             modal._startResize();
             expect(modal.ui.body).toHandle(modal.pointerMove);
         });
 
-        it('does not let the modal to be resized smaller than min height or min width', function (done) {
+        it('does not let the modal to be resized smaller than min height or min width', function(done) {
             var events = [
                 new $.Event(modal.pointerMove, {
                     originalEvent: {
@@ -1382,7 +1381,7 @@ describe('CMS.Modal', function () {
             });
 
             var eventsHappened = 0;
-            spyOn($.fn, 'css').and.callFake(function (props) {
+            spyOn($.fn, 'css').and.callFake(function(props) {
                 switch (eventsHappened) {
                     case 0: {
                         expect(props).toEqual({
@@ -1419,12 +1418,12 @@ describe('CMS.Modal', function () {
                 eventsHappened++;
             });
 
-            events.forEach(function (event) {
+            events.forEach(function(event) {
                 modal.ui.body.trigger(event);
             });
         });
 
-        it('adds handler for pointerup to stop resizing', function () {
+        it('adds handler for pointerup to stop resizing', function() {
             expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[0]);
             expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
             modal._startResize();
@@ -1435,16 +1434,16 @@ describe('CMS.Modal', function () {
             expect(modal._stopResize).toHaveBeenCalledTimes(2);
         });
 
-        it('adds data-touch-action attribute', function () {
+        it('adds data-touch-action attribute', function() {
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
             modal._startResize();
             expect(modal.ui.body).toHaveAttr('data-touch-action');
         });
     });
 
-    describe('_stopResize()', function () {
+    describe('_stopResize()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1454,7 +1453,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1463,18 +1462,18 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('hides the shim', function () {
+        it('hides the shim', function() {
             expect(modal.ui.shim).toBeVisible();
             modal._stopResize();
             expect(modal.ui.shim).not.toBeVisible();
         });
 
-        it('removes event handlers', function () {
+        it('removes event handlers', function() {
             expect(modal.ui.body).toHandle(modal.pointerMove);
             expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[0]);
             expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[1]);
@@ -1484,21 +1483,21 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
         });
 
-        it('removes data-touch-action attribute', function () {
+        it('removes data-touch-action attribute', function() {
             expect(modal.ui.body).toHaveAttr('data-touch-action');
             modal._stopResize();
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
         });
     });
 
-    describe('_setBreadcrumb()', function () {
+    describe('_setBreadcrumb()', function() {
         var modal;
         var validBreadcrumbs = [
             { title: 'first', url: '#first' },
             { title: 'second', url: '#second' },
             { title: 'last', url: '#last' }
         ];
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1508,7 +1507,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1516,51 +1515,55 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('returns false if there is no breadcrumbs', function () {
+        it('returns false if there is no breadcrumbs', function() {
             expect(modal._setBreadcrumb()).toEqual(false);
         });
 
-        it('returns false if there is only one breadcrumb', function () {
+        it('returns false if there is only one breadcrumb', function() {
             expect(modal._setBreadcrumb([])).toEqual(false);
             expect(modal._setBreadcrumb([{}])).toEqual(false);
         });
 
-        it('returns false if first breadcrumb does not have title', function () {
+        it('returns false if first breadcrumb does not have title', function() {
             expect(modal._setBreadcrumb([{}, { title: 'breadcrumb', url: '#' }])).toEqual(false);
         });
 
-        it('adds class to the modal', function () {
+        it('adds class to the modal', function() {
             expect(modal.ui.modal).not.toHaveClass('cms-modal-has-breadcrumb');
             modal._setBreadcrumb(validBreadcrumbs);
             expect(modal.ui.modal).toHaveClass('cms-modal-has-breadcrumb');
         });
 
-        it('creates appropriate markup for breadcrumbs', function () {
+        it('creates appropriate markup for breadcrumbs', function() {
             expect(modal.ui.breadcrumb.html()).toEqual('');
             modal._setBreadcrumb(validBreadcrumbs);
             // depending on the browser classes can be in different places or
             // not exist at all
-            expect(modal.ui.breadcrumb.html()).toMatch(new RegExp([
-                '<a href="#first"\( class=""\)\?><span>first</span></a>',
-                '<a href="#second"\( class=""\)\?><span>second</span></a>',
-                '<a\( class="active"\)\? href="#last"\( class="active"\)\?><span>last</span></a>'
-            ].join('')));
+            expect(modal.ui.breadcrumb.html()).toMatch(
+                new RegExp(
+                    [
+                        '<a href="#first"( class="")?><span>first</span></a>',
+                        '<a href="#second"( class="")?><span>second</span></a>',
+                        '<a( class="active")? href="#last"( class="active")?><span>last</span></a>'
+                    ].join('')
+                )
+            );
         });
 
-        it('makes last breadcrumb active', function () {
+        it('makes last breadcrumb active', function() {
             modal._setBreadcrumb(validBreadcrumbs);
             expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
         });
     });
 
-    describe('_setButtons()', function () {
+    describe('_setButtons()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.config = {
                 lang: {
@@ -1575,7 +1578,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1585,46 +1588,50 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('renders buttons from the iframe to the modal', function () {
+        it('renders buttons from the iframe to the modal', function() {
             expect(modal.ui.modalButtons).toBeEmpty();
             modal._setButtons($('.buttons-test-iframe'));
             expect(modal.ui.modalButtons).not.toBeEmpty();
             /* eslint-disable indent */
-            expect(modal.ui.modalButtons.html()).toMatch(new RegExp([
-                '<div class="cms-modal-buttons-inner">',
-                    '<div class="cms-modal-item-buttons">',
-                        '<a\( href="#"\)\? class="cms-btn cms-btn-action default"\( href="#"\)\?>default</a>',
-                    '</div>',
-                    '<div class="cms-modal-item-buttons">',
-                        '<a\( href="#"\)\? class="cms-btn undefined"\( href="#"\)\?>whatever correct</a>',
-                    '</div>',
-                    '<div class="cms-modal-item-buttons">',
-                        '<a\( href="#"\)\? class="cms-btn undefined"\( href="#"\)\?>link</a>',
-                    '</div>',
-                    '<div class="cms-modal-item-buttons">',
-                        '<a\( href="#"\)\? class="cms-btn cms-btn-caution deletelink"\( href="#"\)\?>caution</a>',
-                    '</div>',
-                    '<div class="cms-modal-item-buttons">',
-                        '<a\( href="#"\)\? class="cms-btn"\( href="#"\)\?>Cancel!</a>',
-                    '</div>',
-                '</div>'
-            ].join('')));
+            expect(modal.ui.modalButtons.html()).toMatch(
+                new RegExp(
+                    [
+                        '<div class="cms-modal-buttons-inner">',
+                        '<div class="cms-modal-item-buttons">',
+                        '<a( href="#")? class="cms-btn cms-btn-action default"( href="#")?>default</a>',
+                        '</div>',
+                        '<div class="cms-modal-item-buttons">',
+                        '<a( href="#")? class="cms-btn undefined"( href="#")?>whatever correct</a>',
+                        '</div>',
+                        '<div class="cms-modal-item-buttons">',
+                        '<a( href="#")? class="cms-btn undefined"( href="#")?>link</a>',
+                        '</div>',
+                        '<div class="cms-modal-item-buttons">',
+                        '<a( href="#")? class="cms-btn cms-btn-caution deletelink"( href="#")?>caution</a>',
+                        '</div>',
+                        '<div class="cms-modal-item-buttons">',
+                        '<a( href="#")? class="cms-btn"( href="#")?>Cancel!</a>',
+                        '</div>',
+                        '</div>'
+                    ].join('')
+                )
+            );
             /* eslint-enable indent */
         });
 
-        it('adds handlers to the newly created buttons', function () {
+        it('adds handlers to the newly created buttons', function() {
             modal._setButtons($('.buttons-test-iframe'));
             expect(modal.ui.modalButtons.find('a')).toHandle(modal.click);
             expect(modal.ui.modalButtons.find('a')).toHandle(modal.touchEnd);
             var spy = jasmine.createSpy();
             spyOn($.fn, 'hide');
 
-            $('.buttons-test-iframe').find('a, input, button').on('click', function (e) {
+            $('.buttons-test-iframe').find('a, input, button').on('click', function(e) {
                 e.preventDefault();
                 spy();
             });
@@ -1657,8 +1664,9 @@ describe('CMS.Modal', function () {
             expect(spy).toHaveBeenCalledTimes(2);
             expect(modal.saved).toEqual(true);
             expect(modal.hideFrame).toEqual(undefined);
-            expect($.fn.hide.calls.mostRecent().object.selector)
-                .toEqual(modal.ui.modal.find('.cms-modal-frame iframe').selector);
+            expect($.fn.hide.calls.mostRecent().object.selector).toEqual(
+                modal.ui.modal.find('.cms-modal-frame iframe').selector
+            );
 
             modal.saved = false;
             modal.hideFrame = undefined;
@@ -1675,7 +1683,7 @@ describe('CMS.Modal', function () {
             expect($.fn.hide).toHaveBeenCalledTimes(1);
         });
 
-        it('submits the form vs clicking on button if there is only one submit button', function () {
+        it('submits the form vs clicking on button if there is only one submit button', function() {
             $('.buttons-test-iframe').find('input, a').remove();
 
             modal._setButtons($('.buttons-test-iframe'));
@@ -1683,11 +1691,11 @@ describe('CMS.Modal', function () {
             var clickSpy = jasmine.createSpy();
             var submitSpy = jasmine.createSpy();
 
-            $('.buttons-test-iframe').find('button').on('click', function (e) {
+            $('.buttons-test-iframe').find('button').on('click', function(e) {
                 e.preventDefault();
                 clickSpy();
             });
-            $('#iframe-form').on('submit', function (e) {
+            $('#iframe-form').on('submit', function(e) {
                 e.preventDefault();
                 submitSpy();
             });
@@ -1697,9 +1705,9 @@ describe('CMS.Modal', function () {
             expect(submitSpy).toHaveBeenCalledTimes(1);
         });
 
-        it('adds submit handlers to the form', function () {
+        it('adds submit handlers to the form', function() {
             modal._setButtons($('.buttons-test-iframe'));
-            var form = $('#iframe-form').on('submit', function (e) {
+            var form = $('#iframe-form').on('submit', function(e) {
                 e.preventDefault();
             });
 
@@ -1717,14 +1725,14 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_changeIframe()', function () {
+    describe('_changeIframe()', function() {
         var modal;
         var breadcrumbs = [
             { title: 'first', url: '#first' },
             { title: 'second', url: '#second' },
             { title: 'last', url: '#last' }
         ];
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1734,7 +1742,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1744,53 +1752,52 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('returns false if element was active', function () {
+        it('returns false if element was active', function() {
             expect(modal._changeIframe(modal.ui.breadcrumb.find('a:last'))).toEqual(false);
         });
-        it('changes the class if element was not active', function () {
+        it('changes the class if element was not active', function() {
             expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
             modal._changeIframe(modal.ui.breadcrumb.find('a:first'));
             expect(modal.ui.breadcrumb.find('a:last')).not.toHaveClass('active');
             expect(modal.ui.breadcrumb.find('a:first')).toHaveClass('active');
         });
-        it('loads the iframe', function () {
+        it('loads the iframe', function() {
             modal._changeIframe(modal.ui.breadcrumb.find('a:first'));
             expect(modal._loadIframe).toHaveBeenCalledWith({
                 url: '#first'
             });
         });
-        it('changes titlePrefix', function () {
+        it('changes titlePrefix', function() {
             expect(modal.ui.titlePrefix.text()).toEqual('');
             modal._changeIframe(modal.ui.breadcrumb.find('a:eq(1)'));
             expect(modal.ui.titlePrefix.text()).toEqual('second');
         });
     });
 
-    describe('CMS.Modal._setupCtrlEnterSave()', function () {
+    describe('CMS.Modal._setupCtrlEnterSave()', function() {
         var spy;
         var button;
         var doc = $(document);
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
-            $(function () {
+            $(function() {
                 spy = jasmine.createSpy();
-                button = $('<div class="cms-btn-action"></div>')
-                    .on('click', spy);
+                button = $('<div class="cms-btn-action"></div>').on('click', spy);
                 button.appendTo('.cms-modal-buttons');
                 done();
             });
         });
-        afterEach(function () {
+        afterEach(function() {
             doc.off('keydown.cms.submit keyup.cms.submit');
             fixture.cleanup();
         });
 
-        it('adds handlers to the document', function () {
+        it('adds handlers to the document', function() {
             expect(doc).not.toHandle('keydown.cms.submit');
             expect(doc).not.toHandle('keyup.cms.submit');
             CMS.Modal._setupCtrlEnterSave(document);
@@ -1798,7 +1805,7 @@ describe('CMS.Modal', function () {
             expect(doc).toHandle('keyup.cms.submit');
         });
 
-        it('triggers modal action if ctrl+enter is pressed on win', function () {
+        it('triggers modal action if ctrl+enter is pressed on win', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);
 
@@ -1811,7 +1818,7 @@ describe('CMS.Modal', function () {
             expect(spy).toHaveBeenCalledTimes(1);
         });
 
-        it('does not trigger modal action if ctrl+enter is pressed on mac', function () {
+        it('does not trigger modal action if ctrl+enter is pressed on mac', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
@@ -1824,7 +1831,7 @@ describe('CMS.Modal', function () {
             expect(spy).not.toHaveBeenCalled();
         });
 
-        it('triggers modal action if cmd+enter is pressed on mac', function () {
+        it('triggers modal action if cmd+enter is pressed on mac', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
@@ -1847,7 +1854,7 @@ describe('CMS.Modal', function () {
             expect(spy).toHaveBeenCalledTimes(3);
         });
 
-        it('does not trigger modal action if cmd enter was pressed on mac through subsequent keystrokes', function () {
+        it('does not trigger modal action if cmd enter was pressed on mac through subsequent keystrokes', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
@@ -1870,7 +1877,7 @@ describe('CMS.Modal', function () {
             expect(spy).not.toHaveBeenCalled();
         });
 
-        it('does not trigger modal action if cmd+enter is pressed on win', function () {
+        it('does not trigger modal action if cmd+enter is pressed on win', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);
 
@@ -1894,9 +1901,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_loadIframe()', function () {
+    describe('_loadIframe()', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -1909,7 +1916,7 @@ describe('CMS.Modal', function () {
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal();
                 modal.ui.modal.show();
                 spyOn(CMS.API.Helpers, 'reloadBrowser');
@@ -1921,12 +1928,12 @@ describe('CMS.Modal', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('adds appropriate classes', function () {
+        it('adds appropriate classes', function() {
             jasmine.clock().install();
             expect(modal.ui.modal).not.toHaveClass('cms-modal-iframe');
             expect(modal.ui.modal).not.toHaveClass('cms-modal-markup');
@@ -1945,7 +1952,7 @@ describe('CMS.Modal', function () {
             jasmine.clock().uninstall();
         });
 
-        it('adds correct title while loading', function () {
+        it('adds correct title while loading', function() {
             expect(modal.ui.titlePrefix.text()).toEqual('');
             expect(modal.ui.titleSuffix.text()).toEqual('');
 
@@ -1965,15 +1972,15 @@ describe('CMS.Modal', function () {
             expect(modal.ui.titleSuffix.text()).toEqual('');
         });
 
-        it('opens error message and closes the iframe if its contents cannot be accessed', function (done) {
+        it('opens error message and closes the iframe if its contents cannot be accessed', function(done) {
             CMS.config.lang.errorLoadingEditForm = 'Cannot access contents';
-            spyOn($.fn, 'contents').and.callFake(function () {
+            spyOn($.fn, 'contents').and.callFake(function() {
                 throw new Error('Cannot access contents');
             });
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).toHaveBeenCalled();
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({
                     message: '<strong>Cannot access contents</strong>',
@@ -1984,11 +1991,11 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('sets up ctrl + enter save', function (done) {
+        it('sets up ctrl + enter save', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(CMS.Modal._setupCtrlEnterSave).toHaveBeenCalledWith(
                     modal.ui.frame.find('iframe')[0].contentDocument
                 );
@@ -1996,24 +2003,24 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('shows and hides the loader', function (done) {
+        it('shows and hides the loader', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
             expect(CMS.API.Toolbar.hideLoader).not.toHaveBeenCalled();
             expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
                 expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
                 done();
             });
         });
 
-        it('shows messages if iframe contains them', function (done) {
+        it('shows messages if iframe contains them', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({
                     message: 'Django CMS is amazing!'
                 });
@@ -2021,70 +2028,70 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('adds cms-admin cms-admin-modal classes to the iframe body', function (done) {
+        it('adds cms-admin cms-admin-modal classes to the iframe body', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect($(this).contents().find('body')).toHaveClass('cms-admin');
                 expect($(this).contents().find('body')).toHaveClass('cms-admin-modal');
                 done();
             });
         });
 
-        it('removes cms-loader class when iframe is loaded', function (done) {
+        it('removes cms-loader class when iframe is loaded', function(done) {
             jasmine.clock().install();
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             jasmine.clock().tick(501);
             expect(modal.ui.modalBody).toHaveClass('cms-loader');
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
                 jasmine.clock().uninstall();
                 done();
             });
         });
 
-        describe('reloading', function () {
-            it('does not reload the page if not required', function (done) {
+        describe('reloading', function() {
+            it('does not reload the page if not required', function(done) {
                 modal._loadIframe({
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
-                modal.ui.modal.find('iframe').on('load', function () {
+                modal.ui.modal.find('iframe').on('load', function() {
                     expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
                     done();
                 });
             });
-            it('does not reload the page if not required', function (done) {
+            it('does not reload the page if not required', function(done) {
                 modal.enforceReload = true;
                 modal._loadIframe({
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
                 });
-                modal.ui.modal.find('iframe').on('load', function () {
+                modal.ui.modal.find('iframe').on('load', function() {
                     expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
                     done();
                 });
             });
 
-            xit('does reload the page if required', function (done) {
+            xit('does reload the page if required', function(done) {
                 modal.enforceReload = true;
                 modal._loadIframe({
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
-                modal.ui.modal.find('iframe').on('load', function () {
+                modal.ui.modal.find('iframe').on('load', function() {
                     expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
                     done();
                 });
             });
 
-            xit('does show loaders if reload the page if required', function (done) {
+            xit('does show loaders if reload the page if required', function(done) {
                 modal.enforceReload = true;
                 expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
                 modal._loadIframe({
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
-                modal.ui.modal.find('iframe').on('load', function () {
+                modal.ui.modal.find('iframe').on('load', function() {
                     expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(2);
                     expect(modal.ui.modalBody).toHaveClass('cms-loader');
                     done();
@@ -2092,161 +2099,153 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('does not close the modal if not required', function (done) {
+        it('does not close the modal if not required', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
                 done();
             });
         });
-        it('does not close the modal if not required', function (done) {
+        it('does not close the modal if not required', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
                 done();
             });
         });
 
-        it('does not close the modal if not required', function (done) {
+        it('does not close the modal if not required', function(done) {
             modal.enforceClose = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
                 done();
             });
         });
 
-        it('closes the modal if required', function (done) {
+        it('closes the modal if required', function(done) {
             modal.enforceClose = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).toHaveBeenCalledTimes(1);
                 done();
             });
         });
 
-        it('resets django viewsitelink to open in the top level window', function (done) {
+        it('resets django viewsitelink to open in the top level window', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.close).not.toHaveBeenCalled();
                 expect($(this).contents().find('.viewsitelink')).toHaveAttr('target', '_top');
                 done();
             });
         });
 
-        it('sets the buttons', function (done) {
+        it('sets the buttons', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal._setButtons).toHaveBeenCalledWith($(this));
                 done();
             });
         });
 
-        it('does not reset the saved state if there is no form errors', function (done) {
+        it('does not reset the saved state if there is no form errors', function(done) {
             modal.saved = 'custom';
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual('custom');
                 done();
             });
         });
 
-        it('resets the saved state if there is a form error loaded in the iframe', function (done) {
+        it('resets the saved state if there is a form error loaded in the iframe', function(done) {
             modal.saved = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_errornote.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual(false);
                 done();
             });
         });
 
-        it('resets the saved state if there was no success message in the frame', function (done) {
+        it('resets the saved state if there was no success message in the frame', function(done) {
             modal.saved = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_no_success.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual(false);
                 done();
             });
         });
 
-        it('resets the saved state if there is a form error loaded in the iframe', function (done) {
+        it('resets the saved state if there is a form error loaded in the iframe', function(done) {
             modal.saved = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_errorlist.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.saved).toEqual(false);
                 done();
             });
         });
 
-        xit('reloads browser if iframe was saved and there is no delete confirmation', function (done) {
+        xit('reloads browser if iframe was saved and there is no delete confirmation', function(done) {
             modal.saved = true;
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
-                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(
-                    jasmine.any(String),
-                    false,
-                    true
-                );
+            modal.ui.modal.find('iframe').on('load', function() {
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(jasmine.any(String), false, true);
                 done();
             });
         });
 
-        xit('reloads browser if iframe was saved and there is no delete confirmation', function (done) {
+        xit('reloads browser if iframe was saved and there is no delete confirmation', function(done) {
             modal.saved = true;
             modal.options.onClose = '/custom-on-close';
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
-                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(
-                    '/custom-on-close',
-                    false,
-                    true
-                );
+            modal.ui.modal.find('iframe').on('load', function() {
+                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/custom-on-close', false, true);
                 done();
             });
         });
 
-        xit('shows loaders when reloads browser if iframe was saved', function (done) {
+        xit('shows loaders when reloads browser if iframe was saved', function(done) {
             modal.saved = true;
             expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(2);
                 expect(modal.ui.modalBody).toHaveClass('cms-loader');
                 done();
             });
         });
 
-        it('updates the title of the modal if required', function (done) {
+        it('updates the title of the modal if required', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.ui.titlePrefix.text()).toEqual('I am a title');
                 expect(modal.ui.titleSuffix.text()).toEqual('');
                 expect($(this).contents().find('h1').length).toEqual(1);
@@ -2254,12 +2253,12 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('updates the title of the modal if required', function (done) {
+        it('updates the title of the modal if required', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html',
                 title: 'Test title'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.ui.titlePrefix.text()).toEqual('Test title');
                 expect(modal.ui.titleSuffix.text()).toEqual('I am a title');
                 expect($(this).contents().find('h1').length).toEqual(1);
@@ -2267,12 +2266,12 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('updates the title of the modal if required', function (done) {
+        it('updates the title of the modal if required', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html',
                 title: '     '
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal.ui.titlePrefix.text()).toEqual('I am a title');
                 expect(modal.ui.titleSuffix.text()).toEqual('');
                 expect($(this).contents().find('h1').length).toEqual(1);
@@ -2280,31 +2279,31 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('sets iframe data ready', function (done) {
+        it('sets iframe data ready', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             expect(modal.ui.frame.find('iframe').data('ready')).toEqual(undefined);
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect($(this).data('ready')).toEqual(true);
                 done();
             });
         });
 
-        it('adds keydown event to close the modal if ESC is pressed inside of the iframe', function (done) {
+        it('adds keydown event to close the modal if ESC is pressed inside of the iframe', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 var body = $(this).contents().find('body');
                 expect(body).toHandle('keydown.cms');
 
-                body.on('keydown.cms', function () {
+                body.on('keydown.cms', function() {
                     if (modal.close.calls.count()) {
                         // have to wait till next frame here
                         // because Edge is too fast and it cleans up
                         // the test case _before_ second trigger call finishes
-                        setTimeout(function () {
+                        setTimeout(function() {
                             done();
                         }, 0);
                     }
@@ -2315,16 +2314,16 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('adds keydown event that does not close if not confirmed', function (done) {
+        it('adds keydown event that does not close if not confirmed', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             spyOn(modal, '_confirmDirtyEscCancel').and.returnValue(false);
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 var body = $(this).contents().find('body');
                 expect(body).toHandle('keydown.cms');
 
-                body.on('keydown.cms', function () {
+                body.on('keydown.cms', function() {
                     expect(modal._confirmDirtyEscCancel).toHaveBeenCalledTimes(1);
                     expect(modal.close).not.toHaveBeenCalled();
                     done();
@@ -2334,35 +2333,35 @@ describe('CMS.Modal', function () {
             });
         });
 
-        it('does not adjust content if object-tools are not available', function (done) {
+        it('does not adjust content if object-tools are not available', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             spyOn($.fn, 'css');
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect($.fn.css).not.toHaveBeenCalledWith('padding-top', 38);
                 done();
             });
         });
 
-        it('adjusts content if object-tools available', function (done) {
+        it('adjusts content if object-tools available', function(done) {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
             spyOn($.fn, 'css');
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect($.fn.css).toHaveBeenCalledWith('padding-top', 38);
                 done();
             });
         });
 
-        it('attaches content preserving handlers', function (done) {
+        it('attaches content preserving handlers', function(done) {
             spyOn(modal, '_attachContentPreservingHandlers');
 
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
             });
-            modal.ui.modal.find('iframe').on('load', function () {
+            modal.ui.modal.find('iframe').on('load', function() {
                 expect(modal._attachContentPreservingHandlers).toHaveBeenCalledTimes(1);
                 expect(modal._attachContentPreservingHandlers).toHaveBeenCalledWith(this);
                 done();
@@ -2370,9 +2369,9 @@ describe('CMS.Modal', function () {
         });
     });
 
-    describe('_attachContentPreservingHandlers', function () {
+    describe('_attachContentPreservingHandlers', function() {
         var modal;
-        beforeEach(function (done) {
+        beforeEach(function(done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
@@ -2391,7 +2390,7 @@ describe('CMS.Modal', function () {
                     confirmDirtyESC: 'Smth changed and you are pressing ESC'
                 }
             };
-            $(function () {
+            $(function() {
                 modal = new CMS.Modal();
                 modal.ui.modal.show();
                 spyOn(CMS.API.Helpers, 'reloadBrowser');
@@ -2403,18 +2402,18 @@ describe('CMS.Modal', function () {
             });
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.removeEventListener('beforeunload', modal._beforeUnloadHandler);
             fixture.cleanup();
         });
 
-        it('creates the tracker', function () {
+        it('creates the tracker', function() {
             expect(modal.tracker).not.toBeDefined();
             modal._attachContentPreservingHandlers($());
             expect(modal.tracker).toEqual(jasmine.any(Object));
         });
 
-        it('adds the evnet listener to the window', function () {
+        it('adds the evnet listener to the window', function() {
             var addEventListener = jasmine.createSpy();
             spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
                 addEventListener: addEventListener
@@ -2425,10 +2424,10 @@ describe('CMS.Modal', function () {
             expect(addEventListener).toHaveBeenCalledWith('beforeunload', modal._beforeUnloadHandler);
         });
 
-        describe('_beforeUnloadHandler', function () {
-            it('returns a warning if form has changed', function () {
+        describe('_beforeUnloadHandler', function() {
+            it('returns a warning if form has changed', function() {
                 modal.tracker = {
-                    isFormChanged: function () {
+                    isFormChanged: function() {
                         return true;
                     }
                 };
@@ -2436,9 +2435,9 @@ describe('CMS.Modal', function () {
                 expect(modal._beforeUnloadHandler({})).toEqual('Smth changed!');
             });
 
-            it('assigns return value to the event if form has changed', function () {
+            it('assigns return value to the event if form has changed', function() {
                 modal.tracker = {
-                    isFormChanged: function () {
+                    isFormChanged: function() {
                         return true;
                     }
                 };
@@ -2447,9 +2446,9 @@ describe('CMS.Modal', function () {
                 expect(event.returnValue).toEqual('Smth changed!');
             });
 
-            it('does not do anything if form did not change', function () {
+            it('does not do anything if form did not change', function() {
                 modal.tracker = {
-                    isFormChanged: function () {
+                    isFormChanged: function() {
                         return false;
                     }
                 };
@@ -2457,19 +2456,19 @@ describe('CMS.Modal', function () {
             });
         });
 
-        describe('_confirmDirtyEscCancel', function () {
-            beforeEach(function () {
+        describe('_confirmDirtyEscCancel', function() {
+            beforeEach(function() {
                 spyOn(CMS.API.Helpers, 'secureConfirm');
             });
 
-            it('returns true if there is no tracker', function () {
+            it('returns true if there is no tracker', function() {
                 expect(modal._confirmDirtyEscCancel()).toEqual(true);
                 expect(CMS.API.Helpers.secureConfirm).not.toHaveBeenCalled();
             });
 
-            it('returns true if there is a tracker but form did not change', function () {
+            it('returns true if there is a tracker but form did not change', function() {
                 modal.tracker = {
-                    isFormChanged: function () {
+                    isFormChanged: function() {
                         return false;
                     }
                 };
@@ -2478,11 +2477,11 @@ describe('CMS.Modal', function () {
                 expect(CMS.API.Helpers.secureConfirm).not.toHaveBeenCalled();
             });
 
-            it('returns result of the confirmation if there is a tracker and form changed', function () {
+            it('returns result of the confirmation if there is a tracker and form changed', function() {
                 CMS.API.Helpers.secureConfirm.and.returnValue(true);
 
                 modal.tracker = {
-                    isFormChanged: function () {
+                    isFormChanged: function() {
                         return true;
                     }
                 };

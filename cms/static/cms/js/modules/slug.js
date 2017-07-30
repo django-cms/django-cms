@@ -14,7 +14,7 @@ module.exports = function addSlugHandlers(title, slug) {
     }
 
     // always bind the title > slug generation and do the validation inside for better ux
-    title.on('keyup keypress', function () {
+    title.on('keyup keypress', function() {
         var value = title.val();
 
         // international language handling
@@ -39,8 +39,7 @@ module.exports = function addSlugHandlers(title, slug) {
     title.focus();
 
     // add changed data bindings to elements
-    slug.add(title).bind('change', function () {
+    slug.add(title).bind('change', function() {
         $(this).data('changed', true);
     });
-
 };

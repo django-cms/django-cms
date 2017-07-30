@@ -21,7 +21,7 @@
         {# plugin child classes here #}
     </div>
 
-    <div class="cms-dragbar-title">
+    <div class="cms-dragbar-title" title="{{ placeholder.get_label }}">
         {{ placeholder.get_label }}
         {% if placeholder.is_static %}<span class="cms-hover-tooltip cms-hover-tooltip-right" tabindex="-1" data-cms-tooltip="{% trans 'This is a static placeholder' %}"><span class="cms-icon cms-icon-pin cms-dragarea-static-icon"></span></span>{% endif %}
         <span class="cms-dragbar-toggler">

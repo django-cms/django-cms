@@ -1,3 +1,5 @@
+{% load i18n %}
+<div class="cms-submenu-item cms-submenu-item-highlight"><a href="#" data-rel="highlight" data-cms-icon="highlight">{{ plugin }}{% trans "Highlight" %}</a></div>
 {% for item in items %}
 <div class="cms-submenu-item"><a href="{{ item.url }}" data-rel="{{ item.action }}"{% if item.data %} data-post="{{ item.data }}"{% endif %}{% if question %} data-text="{{ question }}"{% endif %} data-on-success="REFRESH_PAGE" {% for key, attr in item.attributes.items %}data-{{ key }}="{{ attr }}" {% endfor %}>{{ item.name }}</a></div>
 {% endfor %}

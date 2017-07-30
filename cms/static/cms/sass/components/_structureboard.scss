@@ -46,7 +46,7 @@
         overflow-y: scroll;
         top: 0;
         left: 0;
-        padding: ($toolbar-height + 40px) 5%;
+        padding: $toolbar-height 5%;
         z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
@@ -71,10 +71,28 @@
         padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
     }
 
+    .cms-dragbar .cms-submenu-item-highlight {
+        display: none;
+    }
+
     .cms-dragarea-static {
+        > .cms-draggables {
+            display: none;
+        }
+        > .cms-dragbar > .cms-btn {
+            display: none;
+        }
         .cms-dragarea-static-icon {
             position: relative;
             top: 2px;
+        }
+    }
+    .cms-dragarea-static-expanded {
+        > .cms-draggables {
+            display: block;
+        }
+        > .cms-dragbar > .cms-btn {
+            display: block;
         }
     }
 
@@ -92,25 +110,32 @@
         border-radius: $border-radius-base;
 
         .cms-dragbar-title {
-            display: inline-block;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             position: relative;
             color: $structure-dragbar-color;
             font-size: $font-size-large;
             font-weight: bold;
             line-height: $structure-dragbar-height;
             height: $structure-dragbar-height;
-            margin-right: $submenu-icon-area-size;
+            margin-right: $submenu-icon-area-size * 2 + 25px;
         }
         .cms-dragbar-toggler {
+            position: absolute;
+            right: 0;
+            background-image: linear-gradient(to right, rgba($structure-bgcolor, 0) 0, $structure-bgcolor 40px);
+            padding-left: 50px;
             font-weight: normal;
             text-transform: uppercase;
             margin-left: 30px;
             cursor: pointer;
             a {
-                color: $color-primary !important;
+                color: $btn-default-color !important;
                 font-size: $font-size-small !important;
                 &:hover {
-                    color: darken($color-primary, 10%) !important;
+                    color: darken($btn-default-color, 10%) !important;
                 }
             }
         }
@@ -437,6 +462,71 @@
         display: block !important;
         opacity: 0.3;
     }
+
+    &.cms-structure-condensed {
+        width: 416px;
+        right: 0;
+        box-shadow: 0 0 5px 0 rgba(0,0,0,.2);
+        .cms-structure-content {
+            padding-left: 15px;
+            padding-right: 15px;
+            overflow-x: hidden;
+        }
+        .cms-draggables .cms-draggables {
+            padding-left: 15px;
+        }
+
+        .cms-dragitem {
+            line-height: 24px;
+            background-size: 8px 28px;
+        }
+        .cms-dragitem-text {
+            padding-top: 8px;
+            padding-bottom: 8px;
+            margin-right: 110px;
+            padding-right: 5px;
+        }
+        .cms-dragarea-empty .cms-draggables-root {
+            min-height: 43px;
+        }
+        .cms-draggables-empty {
+            line-height: 40px;
+        }
+        .cms-dragarea-empty > .cms-draggables-root > .cms-add-plugin-placeholder {
+            height: 44px;
+        }
+        .cms-add-plugin-placeholder {
+            line-height: 38px;
+        }
+        .cms-submenu-btn {
+            width: 32px;
+            height: 32px;
+            margin-top: -16px;
+        }
+        .cms-submenu-add {
+            right: 39px;
+        }
+        .cms-submenu-edit {
+            right: 39px + 32px + 4px;
+        }
+        .cms-submenu-dropdown-settings .cms-submenu-item a {
+            &,
+            &:before {
+                line-height: 40px;
+                min-height: 40px;
+            }
+        }
+
+        .cms-dragarea {
+            padding: 0;
+        }
+        .cms-dragbar-title {
+            margin-right: $submenu-icon-area-size * 2 + 10px;
+        }
+        .cms-draggable-stack {
+            height: $structure-dragitem-fullheight - 6px !important;
+        }
+    }
 }
 
 @at-root .cms-dragitem-success {
@@ -450,11 +540,26 @@
     background: mix(white, $color-primary, 80%) !important;
     border-radius: $border-radius-base;
     opacity: 0.6;
+
+    &.cms-plugin-overlay-see-through {
+        top: -3px;
+        right: -3px;
+        left: -3px;
+        bottom: -3px;
+        border-width: 3px !important;
+        background: none !important;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    &.cms-plugin-overlay-prominent {
+        box-shadow: 0px 0px 20px $color-primary;
+    }
 }
 
 
 @at-root .cms-structure-mode-structure {
-    overflow: hidden;
+    // overflow: hidden;
+
     // min-height is necessary for iOS9
     // when we have a page that has content
     // that takes less than a screen structureboard
@@ -470,4 +575,19 @@
 }
 @at-root .ui-sortable-helper.cms-draggable .cms-draggables {
     display: none !important;
+}
+
+@at-root .cms-overflow {
+    overflow: hidden !important;
+}
+
+@at-root .cms-content-reloading {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #fff !important;
+    opacity: .5;
+    z-index: 9999;
 }

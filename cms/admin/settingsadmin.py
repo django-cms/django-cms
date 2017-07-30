@@ -87,8 +87,14 @@ class SettingsAdmin(ModelAdmin):
         if attached_obj and current_page and not (attached_obj == current_page):
             return HttpResponseBadRequest('Generic object does not match current page')
 
+        data = QueryDict(query_string=origin_url.query, mutable=True)
+        placeholders = request.GET.getlist("placeholders[]")
+
+        if placeholders:
+            data.setlist('placeholders[]', placeholders)
+
         request = copy.copy(request)
-        request.GET = QueryDict(query_string=origin_url.query)
+        request.GET = data
         request.current_page = current_page
         request.toolbar = CMSToolbar(request, request_path=origin_url.path)
         request.toolbar.set_object(attached_obj or current_page)

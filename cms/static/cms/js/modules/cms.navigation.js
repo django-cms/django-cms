@@ -2,20 +2,17 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
-var Class = require('classjs');
-var Helpers = require('./cms.base').default.API.Helpers;
+import $ from 'jquery';
+import { throttle } from 'lodash';
 
 /**
  * Responsible for creating usable navigation for narrow screens.
  *
  * @class Navigation
  * @namespace CMS
- * @uses CMS.API.Helpers
  */
-var Navigation = new Class({
-
-    initialize: function initialize() {
+class Navigation {
+    constructor() {
         this._setupUI();
         this._getWidths();
 
@@ -38,7 +35,7 @@ var Navigation = new Class({
         this.orientationChange = 'orientationchange.cms.navigation';
 
         this._events();
-    },
+    }
 
     /**
      * Cache UI jquery objects.
@@ -46,7 +43,7 @@ var Navigation = new Class({
      * @method _setupUI
      * @private
      */
-    _setupUI: function _setupUI() {
+    _setupUI() {
         var container = $('.cms');
         var trigger = container.find('.cms-toolbar-more');
 
@@ -59,7 +56,7 @@ var Navigation = new Class({
             toolbarTrigger: container.find('.cms-toolbar-trigger'),
             logo: container.find('.cms-toolbar-item-logo')
         };
-    },
+    }
 
     /**
      * Setup resize handler to construct the dropdown.
@@ -67,20 +64,16 @@ var Navigation = new Class({
      * @method _events
      * @private
      */
-    _events: function _events() {
+    _events() {
         var THROTTLE_TIMEOUT = 50;
 
         this.ui.window
-            .off(
-                [this.resize, this.load, this.orientationChange].join(' '),
-            )
+            .off([this.resize, this.load, this.orientationChange].join(' '))
             .on(
                 [this.resize, this.load, this.orientationChange].join(' '),
-                Helpers.throttle(
-                    this._handleResize.bind(this), THROTTLE_TIMEOUT
-                )
+                throttle(this._handleResize.bind(this), THROTTLE_TIMEOUT)
             );
-    },
+    }
 
     /**
      * Calculates all the movable menu items widths.
@@ -88,7 +81,7 @@ var Navigation = new Class({
      * @method _getWidths
      * @private
      */
-    _getWidths: function _getWidths() {
+    _getWidths() {
         var that = this;
 
         that.items = {
@@ -98,8 +91,7 @@ var Navigation = new Class({
             rightTotalWidth: 0,
             moreButtonWidth: 0
         };
-        var leftItems = that.ui.toolbarLeftPart
-            .find('.cms-toolbar-item-navigation > li:not(.cms-toolbar-more)');
+        var leftItems = that.ui.toolbarLeftPart.find('.cms-toolbar-item-navigation > li:not(.cms-toolbar-more)');
         var rightItems = that.ui.toolbarRightPart.find('> .cms-toolbar-item');
 
         var getSize = function getSize(el, store) {
@@ -115,18 +107,18 @@ var Navigation = new Class({
             return sum + item.width;
         };
 
-        leftItems.each(function () {
+        leftItems.each(function() {
             getSize(this, that.items.left);
         });
 
-        rightItems.each(function () {
+        rightItems.each(function() {
             getSize(this, that.items.right);
         });
 
         that.items.leftTotalWidth = that.items.left.reduce(sumWidths, 0);
         that.items.rightTotalWidth = that.items.right.reduce(sumWidths, 0);
         that.items.moreButtonWidth = that.ui.trigger.outerWidth();
-    },
+    }
 
     /**
      * Calculates available width based on the state of the page.
@@ -135,12 +127,12 @@ var Navigation = new Class({
      * @private
      * @returns {Number} available width in px
      */
-    _calculateAvailableWidth: function _calculateAvailableWidth() {
+    _calculateAvailableWidth() {
         var fullWidth = this.ui.window.width();
         var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.outerWidth(true);
 
         return fullWidth - reduce;
-    },
+    }
 
     /**
      * Shows the dropdown.
@@ -148,9 +140,9 @@ var Navigation = new Class({
      * @method _showDropdown
      * @private
      */
-    _showDropdown: function _showDropdown() {
+    _showDropdown() {
         this.ui.trigger.css('display', 'list-item');
-    },
+    }
 
     /**
      * Hides the dropdown.
@@ -158,9 +150,9 @@ var Navigation = new Class({
      * @method _hideDropdown
      * @private
      */
-    _hideDropdown: function _hideDropdown() {
+    _hideDropdown() {
         this.ui.trigger.css('display', 'none');
-    },
+    }
 
     /**
      * Figures out if we need to show/hide/modify the dropdown.
@@ -168,7 +160,7 @@ var Navigation = new Class({
      * @method _handleResize
      * @private
      */
-    _handleResize: function _handleResize() {
+    _handleResize() {
         var remainingWidth;
         var availableWidth = this._calculateAvailableWidth();
 
@@ -225,7 +217,7 @@ var Navigation = new Class({
                 this.ui.dropdown.removeClass('cms-more-dropdown-full');
             }
         }
-    },
+    }
 
     /**
      * Hides and empties dropdown.
@@ -233,11 +225,11 @@ var Navigation = new Class({
      * @method _showAll
      * @private
      */
-    _showAll: function _showAll() {
+    _showAll() {
         this._showAllLeft();
         this._showAllRight();
         this._hideDropdown();
-    },
+    }
 
     /**
      * Show all items in the left part of the toolbar.
@@ -245,9 +237,9 @@ var Navigation = new Class({
      * @method _showAllLeft
      * @private
      */
-    _showAllLeft: function _showAllLeft() {
-        this._moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
-    },
+    _showAllLeft() {
+        this._moveOutOfDropdown(this.items.left.length - 1 - this.rightMostItemIndex);
+    }
 
     /**
      * Show all items in the right part of the toolbar.
@@ -255,9 +247,9 @@ var Navigation = new Class({
      * @method _showAllRight
      * @private
      */
-    _showAllRight: function _showAllRight() {
+    _showAllRight() {
         this._moveOutOfDropdown(this.leftMostItemIndex, 'right');
-    },
+    }
 
     /**
      * Moves items into the dropdown, reducing menu right-to-left in case it's a left part of toolbar
@@ -268,7 +260,7 @@ var Navigation = new Class({
      * @param {Number} numberOfItems how many items to move to dropdown
      * @param {String} part from which part to move to dropdown (defaults to left)
      */
-    _moveToDropdown: function _moveToDropdown(numberOfItems, part) {
+    _moveToDropdown(numberOfItems, part) {
         if (numberOfItems <= 0) {
             return;
         }
@@ -304,7 +296,7 @@ var Navigation = new Class({
 
             this.rightMostItemIndex -= numberOfItems;
         }
-    },
+    }
 
     /**
      * Moves items out of the dropdown.
@@ -314,7 +306,7 @@ var Navigation = new Class({
      * @param {Number} numberOfItems how many items to move out of the dropdown
      * @param {String} part to which part to move out of dropdown (defaults to left)
      */
-    _moveOutOfDropdown: function _moveOutOfDropdown(numberOfItems, part) {
+    _moveOutOfDropdown(numberOfItems, part) {
         if (numberOfItems <= 0) {
             return;
         }
@@ -353,7 +345,6 @@ var Navigation = new Class({
             this.rightMostItemIndex += numberOfItems;
         }
     }
-
-});
+}
 
 export default Navigation;

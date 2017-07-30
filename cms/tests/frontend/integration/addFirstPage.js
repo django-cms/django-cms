@@ -57,18 +57,9 @@ casper.test.begin('Add First Page with wizard', function (test) {
             test.assertSelectorHasText('.cms-plugin', content.text,
                 'The new page has been created and its content is correct');
 
-            // handles confirm popup
-            this.setFilter('page.confirm', function () {
-                return true;
-            });
-
-            this.click('.cms-btn-publish');
-        })
-        .waitForSelector('.cms-btn-switch-edit', function () {
-            test.assertExists('.cms-btn-switch-edit', 'The new page has been published');
+            test.assertExists('.cms-btn-switch-save', 'The new page has been published');
         })
         .run(function () {
-            this.removeAllFilters('page.confirm');
             test.done();
         });
 });

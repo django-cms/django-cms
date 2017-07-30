@@ -1,5 +1,5 @@
-var $ = require('jquery');
-var Class = require('classjs');
+import $ from 'jquery';
+import Class from 'classjs';
 
 /**
  * Dropdowns in the pagetree.
@@ -46,7 +46,7 @@ var PageTreeDropdowns = new Class({
         var that = this;
 
         // attach event to the trigger
-        this.ui.container.on(this.click, this.options.triggerSelector, function (e) {
+        this.ui.container.on(this.click, this.options.triggerSelector, function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
@@ -54,15 +54,15 @@ var PageTreeDropdowns = new Class({
         });
 
         // stop propagation on the element
-        this.ui.container.on(this.click, that.options.menuSelector, function (e) {
+        this.ui.container.on(this.click, that.options.menuSelector, function(e) {
             e.stopImmediatePropagation();
         });
 
-        this.ui.container.on(this.click, that.options.menuSelector + ' a', function () {
+        this.ui.container.on(this.click, that.options.menuSelector + ' a', function() {
             that.closeAllDropdowns();
         });
 
-        this.ui.document.on(this.click, function () {
+        this.ui.document.on(this.click, function() {
             that.closeAllDropdowns();
         });
     },
@@ -104,14 +104,14 @@ var PageTreeDropdowns = new Class({
             return false;
         }
 
-        var loaderTimeout = setTimeout(function () {
+        var loaderTimeout = setTimeout(function() {
             dropdown.find('.js-cms-pagetree-dropdown-loader').addClass('cms-loader');
         }, LOADER_SHOW_TIMEOUT);
 
         $.ajax({
             url: data.lazyUrl,
             data: data.lazyUrlData
-        }).done(function (response) {
+        }).done(function(response) {
             dropdown.find('.js-cms-pagetree-dropdown-menu').html(response);
             dropdown.data('loaded', true);
             clearTimeout(loaderTimeout);

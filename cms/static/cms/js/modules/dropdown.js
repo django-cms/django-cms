@@ -9,7 +9,7 @@
 /* eslint-disable complexity, semi, no-param-reassign, no-magic-numbers, require-jsdoc, curly, wrap-regex, eqeqeq,
     new-cap, no-multi-spaces, no-bitwise, no-extra-parens */
 // modified for cms purposes - event names, parent resolutions, class names
-var $ = require('jquery');
+import $ from 'jquery';
 
 // DROPDOWN CLASS DEFINITION
 // =========================

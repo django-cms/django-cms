@@ -3,16 +3,16 @@
  */
 
 import Modal from './cms.modal';
-var $ = require('jquery');
-var Class = require('classjs');
-var Helpers = require('./cms.base').default.API.Helpers;
-var storageKey = 'cms.clipboard';
-var Plugin = require('./cms.plugins').default;
+import $ from 'jquery';
+import { Helpers } from './cms.base';
+import Plugin from './cms.plugins';
+import Class from 'classjs';
+import ls from 'local-storage';
+var storageKey = 'cms-clipboard';
 
 var MIN_WIDTH = 400;
 // FIXME kind of a magic number for 1 item in clipboard
 var MIN_HEIGHT = 117;
-
 
 /**
  * Handles copy & paste in the structureboard.
@@ -22,10 +22,9 @@ var MIN_HEIGHT = 117;
  * @uses CMS.API.Helpers
  */
 var Clipboard = new Class({
-
     implement: [Helpers],
 
-    initialize: function () {
+    initialize: function() {
         this._setupUI();
 
         // states
@@ -33,6 +32,7 @@ var Clipboard = new Class({
 
         // setup events
         this._events();
+        this.currentClipboardData = {};
     },
 
     /**
@@ -59,7 +59,7 @@ var Clipboard = new Class({
      * @method _events
      * @private
      */
-    _events: function () {
+    _events: function() {
         var that = this;
 
         that.modal = new Modal({
@@ -71,20 +71,22 @@ var Clipboard = new Class({
             closeOnEsc: false
         });
 
-        that.modal.on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
-            // cannot be cached
-            $('.cms-add-plugin-placeholder').remove();
-        }).on('cms.modal.closed cms.modal.load', function () {
-            that.ui.pluginsList.prependTo(that.ui.clipboard);
-        }).ui.modal.on('cms.modal.load', function () {
-            that.ui.pluginsList.prependTo(that.ui.clipboard);
-        });
+        that.modal
+            .on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
+                // cannot be cached
+                $('.cms-add-plugin-placeholder').remove();
+            })
+            .on('cms.modal.closed cms.modal.load', function() {
+                that.ui.pluginsList.prependTo(that.ui.clipboard);
+            })
+            .ui.modal.on('cms.modal.load', function() {
+                that.ui.pluginsList.prependTo(that.ui.clipboard);
+            });
 
-        Helpers._getWindow().addEventListener('storage', function (e) {
-            if (e.key === storageKey) {
-                that._handleExternalUpdate(e);
-            }
-        });
+        try {
+            ls.off(storageKey);
+        } catch (e) {}
+        ls.on(storageKey, value => this._handleExternalUpdate(value));
 
         this._toolbarEvents();
     },
@@ -92,7 +94,7 @@ var Clipboard = new Class({
     _toolbarEvents() {
         var that = this;
 
-        that.ui.triggers.off(that.click).on(that.click, function (e) {
+        that.ui.triggers.off(that.click).on(that.click, function(e) {
             e.preventDefault();
             e.stopPropagation();
             if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -109,7 +111,7 @@ var Clipboard = new Class({
         });
 
         // add remove event
-        that.ui.triggerRemove.off(that.click).on(that.click, function (e) {
+        that.ui.triggerRemove.off(that.click).on(that.click, function(e) {
             e.preventDefault();
             e.stopPropagation();
             if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -117,21 +119,22 @@ var Clipboard = new Class({
             }
             that.clear();
         });
-
     },
 
     /**
      * _handleExternalUpdate
      *
      * @private
-     * @param {StorageEvent} e event
+     * @param {String} value event new value
      */
-    _handleExternalUpdate: function _handleExternalUpdate(e) {
+    _handleExternalUpdate: function _handleExternalUpdate(value) {
         var that = this;
-        var clipboardData = JSON.parse(e.newValue);
+        var clipboardData = JSON.parse(value);
 
-        if (clipboardData.timestamp < that.currentClipboardData.timestamp ||
-            that.currentClipboardData.data.plugin_id === clipboardData.data.plugin_id) {
+        if (
+            clipboardData.timestamp < that.currentClipboardData.timestamp ||
+            that.currentClipboardData.data.plugin_id === clipboardData.data.plugin_id
+        ) {
             that.currentClipboardData = clipboardData;
             return;
         }
@@ -148,7 +151,7 @@ var Clipboard = new Class({
 
         that.ui.pluginsList.html(clipboardData.html);
         Plugin._updateClipboard();
-        new Plugin('cms-plugin-' + clipboardData.data.plugin_id, clipboardData.data);
+        CMS._instances.push(new Plugin(`cms-plugin-${clipboardData.data.plugin_id}`, clipboardData.data));
 
         that.currentClipboardData = clipboardData;
     },
@@ -170,9 +173,12 @@ var Clipboard = new Class({
      */
     _cleanupDOM: function _cleanupDOM() {
         var that = this;
-        var pasteItems = $('.cms-submenu-item [data-rel=paste]').attr('tabindex', '-1').parent()
+        var pasteItems = $('.cms-submenu-item [data-rel=paste]')
+            .attr('tabindex', '-1')
+            .parent()
             .addClass('cms-submenu-item-disabled');
 
+        pasteItems.find('> a').attr('aria-disabled', 'true');
         pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');
         pasteItems.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
 
@@ -210,7 +216,7 @@ var Clipboard = new Class({
      * @method clear
      * @param {Function} [callback]
      */
-    clear: function (callback) {
+    clear: function(callback) {
         var that = this;
         // post needs to be a string, it will be converted using JSON.parse
         var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
@@ -221,7 +227,7 @@ var Clipboard = new Class({
         CMS.API.Toolbar.openAjax({
             url: Helpers.updateUrlWithPath(CMS.config.clipboard.url),
             post: post,
-            callback: function () {
+            callback: function() {
                 var args = Array.prototype.slice.call(arguments);
 
                 that.populate('', {});
@@ -240,16 +246,14 @@ var Clipboard = new Class({
      * @param {String} html markup of the clipboard draggable
      * @param {Object} pluginData data of the plugin in the clipboard
      */
-    populate: function (html, pluginData) {
+    populate: function(html, pluginData) {
         this.currentClipboardData = {
             data: pluginData,
             timestamp: Date.now(),
             html: html
         };
 
-        if (Helpers._isStorageSupported) {
-            localStorage.setItem(storageKey, JSON.stringify(this.currentClipboardData));
-        }
+        ls.set(storageKey, JSON.stringify(this.currentClipboardData));
     }
 });
 

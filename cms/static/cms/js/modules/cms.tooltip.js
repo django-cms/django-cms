@@ -4,9 +4,9 @@
 
 /* eslint-disable max-params */
 
-var $ = require('jquery');
-var Class = require('classjs');
-var Helpers = require('./cms.base').default.API.Helpers;
+import $ from 'jquery';
+import Class from 'classjs';
+import { once } from 'lodash';
 
 /**
  * The tooltip is the element which shows over plugins
@@ -16,7 +16,6 @@ var Helpers = require('./cms.base').default.API.Helpers;
  * @namespace CMS
  */
 var Tooltip = new Class({
-
     initialize: function initialize() {
         this.body = $('body');
         /**
@@ -32,7 +31,7 @@ var Tooltip = new Class({
          */
         this.domElem = this._pick();
 
-        this._forceTouchOnce = Helpers.once(this._forceTouch);
+        this._forceTouchOnce = once(this._forceTouch);
         this._checkTouch();
     },
 
@@ -57,7 +56,7 @@ var Tooltip = new Class({
         this.domElem = this._pick();
 
         // attach tooltip event for touch devices
-        this.domElem.on('touchstart.cms', function () {
+        this.domElem.on('touchstart.cms', function() {
             var id = $(this).data('plugin_id');
             var plugin = $('.cms-plugin-' + id);
 
@@ -105,10 +104,7 @@ var Tooltip = new Class({
         var that = this;
 
         // change css and attributes
-        tooltip.css('visibility', 'visible')
-            .data('plugin_id', id || null)
-            .show()
-            .find('span').html(name);
+        tooltip.css('visibility', 'visible').data('plugin_id', id || null).show().find('span').html(name);
 
         if (this.isTouch) {
             this.position(e.originalEvent, tooltip);
@@ -116,7 +112,7 @@ var Tooltip = new Class({
             // attaches move event
             // this sets the correct position for the edit tooltip
             that.position(e.originalEvent, tooltip);
-            this.body.on('mousemove.cms.tooltip', function (mouseMoveEvent) {
+            this.body.on('mousemove.cms.tooltip', function(mouseMoveEvent) {
                 that.position(mouseMoveEvent, tooltip);
             });
         }

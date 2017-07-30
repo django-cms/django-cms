@@ -1,31 +1,43 @@
 'use strict';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
-var Navigation = require('../../../static/cms/js/modules/cms.navigation').default;
 var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
 var Messages = require('../../../static/cms/js/modules/cms.messages').default;
 var $ = require('jquery');
-import Toolbar, { __RewireAPI__ as ToolbarRewireAPI } from '../../../static/cms/js/modules/cms.toolbar';
+import Toolbar from '../../../static/cms/js/modules/cms.toolbar';
 import Modal from '../../../static/cms/js/modules/cms.modal';
 
 window.CMS = window.CMS || CMS;
 CMS.Toolbar = Toolbar;
-CMS.Navigation = Navigation;
 CMS.Modal = Modal;
 CMS.Sideframe = Sideframe;
 CMS.Messages = Messages;
 
+class Navigation {}
+
+const Nprogress = {
+    configure: jasmine.createSpy(),
+    start: jasmine.createSpy(),
+    done: jasmine.createSpy()
+};
 
 describe('CMS.Toolbar', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
+
+    beforeEach(() => {
+        Toolbar.__Rewire__('Nprogress', Nprogress);
+        Toolbar.__Rewire__('Navigation', Navigation);
+    });
+
+    afterEach(() => {
+        Toolbar.__ResetDependency__('Nprogress');
+        Toolbar.__ResetDependency__('Navigation');
+    });
 
     it('creates a Toolbar class', function () {
         expect(CMS.Toolbar).toBeDefined();
     });
 
     it('has public API', function () {
-        expect(CMS.Toolbar.prototype.toggle).toEqual(jasmine.any(Function));
-        expect(CMS.Toolbar.prototype.open).toEqual(jasmine.any(Function));
-        expect(CMS.Toolbar.prototype.close).toEqual(jasmine.any(Function));
         expect(CMS.Toolbar.prototype.showLoader).toEqual(jasmine.any(Function));
         expect(CMS.Toolbar.prototype.hideLoader).toEqual(jasmine.any(Function));
         expect(CMS.Toolbar.prototype.openAjax).toEqual(jasmine.any(Function));
@@ -37,9 +49,6 @@ describe('CMS.Toolbar', function () {
             fixture.load('toolbar.html');
 
             $(function () {
-                spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                    return {};
-                });
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
                 spyOn(toolbar, 'setSettings').and.callFake(function (input) {
@@ -60,7 +69,6 @@ describe('CMS.Toolbar', function () {
             expect(Object.keys(toolbar.ui)).toContain('window');
             expect(Object.keys(toolbar.ui)).toContain('document');
             expect(Object.keys(toolbar.ui)).toContain('toolbar');
-            expect(Object.keys(toolbar.ui)).toContain('toolbarTrigger');
             expect(Object.keys(toolbar.ui)).toContain('navigations');
             expect(Object.keys(toolbar.ui)).toContain('buttons');
             expect(Object.keys(toolbar.ui)).toContain('messages');
@@ -85,6 +93,7 @@ describe('CMS.Toolbar', function () {
         // class and event is sufficient
         it('initializes the states', function (done) {
             CMS.Toolbar.prototype._initialStates.and.callThrough();
+            CMS.Toolbar.prototype._initialStates.calls.reset();
             CMS.settings = { sideframe: {}, version: 'fake' };
             CMS.config = { settings: { version: 'fake' }, auth: true };
             jasmine.clock().install();
@@ -94,9 +103,9 @@ describe('CMS.Toolbar', function () {
                 jasmine.clock().uninstall();
                 done();
             });
-            expect(toolbar._initialStates).not.toHaveBeenCalled();
+            expect(CMS.Toolbar.prototype._initialStates).not.toHaveBeenCalled();
             jasmine.clock().tick(200);
-            expect(toolbar._initialStates).toHaveBeenCalled();
+            expect(CMS.Toolbar.prototype._initialStates).toHaveBeenCalled();
             expect(toolbar.ui.body).toHaveClass('cms-ready');
         });
 
@@ -109,323 +118,6 @@ describe('CMS.Toolbar', function () {
         });
     });
 
-    describe('.toggle()', function () {
-        var toolbar;
-        beforeEach(function (done) {
-            fixture.load('toolbar.html');
-            $(function () {
-                CMS.settings = $.extend(CMS.settings, {
-                    toolbar: 'collapsed'
-                });
-                spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                    return {};
-                });
-                spyOn(CMS.Toolbar.prototype, '_initialStates');
-                toolbar = new CMS.Toolbar();
-                done();
-            });
-        });
-
-        afterEach(function () {
-            fixture.cleanup();
-        });
-
-        it('delegates to `open()`', function () {
-            spyOn(toolbar, 'open');
-            spyOn(toolbar, 'close');
-            toolbar.toggle();
-            expect(toolbar.open).toHaveBeenCalled();
-            expect(toolbar.close).not.toHaveBeenCalled();
-        });
-
-        it('delegates to `close()`', function () {
-            CMS.settings.toolbar = 'expanded';
-            spyOn(toolbar, 'open');
-            spyOn(toolbar, 'close');
-            toolbar.toggle();
-            expect(toolbar.open).not.toHaveBeenCalled();
-            expect(toolbar.close).toHaveBeenCalled();
-        });
-    });
-
-    describe('.open', function () {
-        var toolbar;
-        beforeEach(function (done) {
-            fixture.load('toolbar.html');
-            CMS.config = {};
-            CMS.settings = $.extend(CMS.settings, {
-                toolbar: 'collapsed'
-            });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
-            spyOn(CMS.Toolbar.prototype, '_initialStates');
-            $(function () {
-                toolbar = new CMS.Toolbar();
-                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
-                    return $.extend(true, CMS.settings, input);
-                });
-                done();
-            });
-        });
-
-        afterEach(function () {
-            fixture.cleanup();
-        });
-
-        it('opens toolbar and remembers the state', function () {
-            expect(CMS.settings.toolbar).toEqual('collapsed');
-            spyOn(toolbar, '_show');
-            toolbar.open();
-            expect(toolbar._show).toHaveBeenCalled();
-            expect(CMS.settings.toolbar).toEqual('expanded');
-        });
-
-        it('animates toolbar with correct duration', function () {
-            spyOn($.fn, 'css').and.callThrough();
-            toolbar.open();
-            expect($.fn.css).toHaveBeenCalledWith({
-                'transition': 'margin-top 200ms',
-                'margin-top': 0
-            });
-
-            toolbar.open({ duration: 10 });
-            expect($.fn.css).toHaveBeenCalledWith({
-                'transition': 'margin-top 10ms',
-                'margin-top': 0
-            });
-        });
-
-        it('animates toolbar and body to correct position', function () {
-            spyOn($.fn, 'css').and.callThrough();
-            spyOn($.fn, 'animate').and.callThrough();
-
-            toolbar.open();
-            expect($.fn.css).toHaveBeenCalledWith({
-                'transition': 'margin-top 200ms',
-                'margin-top': 0
-            });
-            expect($.fn.animate).toHaveBeenCalledWith(
-                jasmine.any(Object),
-                200,
-                'linear',
-                jasmine.any(Function)
-            );
-            // here we have to use toBeCloseTo because different browsers report different values
-            // e.g. FF reports 45.16666
-            expect($.fn.animate.calls.mostRecent().args[0]['margin-top']).toBeCloseTo(45, 0);
-        });
-
-        it('animates toolbar and body to correct position if debug is true', function () {
-            spyOn($.fn, 'css').and.callThrough();
-            spyOn($.fn, 'animate').and.callThrough();
-
-            $('<div class="cms-debug-bar"></div>').css({
-                height: '15px'
-            }).prependTo('#cms-top');
-
-            toolbar.open();
-            expect($.fn.css).toHaveBeenCalledWith({
-                'transition': 'margin-top 200ms',
-                'margin-top': 0
-            });
-            expect($.fn.animate).toHaveBeenCalledWith(
-                jasmine.any(Object),
-                200,
-                'linear',
-                jasmine.any(Function)
-            );
-            // here we have to use toBeCloseTo because different browsers report different values
-            // e.g. FF reports 45.16666
-            expect($.fn.animate.calls.mostRecent().args[0]['margin-top']).toBeCloseTo(60, 0);
-        });
-
-        it('turns the disclosure triangle into correct position', function (done) {
-            // have to cleanup here because previous test `animate` call isn't finished yet
-            toolbar.ui.body.removeClass('cms-toolbar-collapsing cms-toolbar-expanded cms-toolbar-expanding');
-            // eslint-disable-next-line max-params
-            spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
-                expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
-                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanding');
-                callback();
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
-                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
-                done();
-            });
-            toolbar.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
-            toolbar.ui.body.removeClass('cms-toolbar-expanded');
-            toolbar.open();
-        });
-    });
-
-    describe('.close()', function () {
-        var toolbar;
-        beforeEach(function (done) {
-            fixture.load('toolbar.html');
-            CMS.config = {};
-            CMS.settings = $.extend(CMS.settings, {
-                toolbar: 'expanded'
-            });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
-            $(function () {
-                spyOn(CMS.Toolbar.prototype, '_initialStates');
-                toolbar = new CMS.Toolbar();
-                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
-                    return $.extend(true, CMS.settings, input);
-                });
-                done();
-            });
-        });
-
-        afterEach(function () {
-            fixture.cleanup();
-        });
-
-        it('closes toolbar and remembers state', function () {
-            expect(CMS.settings.toolbar).toEqual('expanded');
-            spyOn(toolbar, '_hide');
-            toolbar.close();
-            expect(toolbar._hide).toHaveBeenCalled();
-            expect(CMS.settings.toolbar).toEqual('collapsed');
-        });
-
-        it('does not close toolbar if it is locked', function () {
-            // eslint-disable-next-line max-params
-            spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
-                callback();
-            });
-            toolbar.open();
-            toolbar._lock(true);
-            // can only check it this way, since we don't propagate
-            // this value to `.close()`
-            expect(toolbar._hide()).toEqual(false);
-            toolbar.close();
-            expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
-            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
-
-            toolbar._lock(false);
-            expect(toolbar._hide()).not.toBeDefined();
-            toolbar.close();
-            expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
-            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
-        });
-
-        it('animates toolbar and body to correct position', function () {
-            toolbar.open();
-
-            spyOn($.fn, 'css').and.callThrough();
-            spyOn($.fn, 'animate').and.callThrough();
-
-            toolbar.close();
-            expect($.fn.css).toHaveBeenCalledWith(
-                'transition', 'margin-top 200ms'
-            );
-            expect($.fn.css).toHaveBeenCalledWith(
-                'margin-top', jasmine.any(Number)
-            );
-
-            expect($.fn.animate).toHaveBeenCalledWith(
-                { 'margin-top': 0 },
-                200,
-                'linear',
-                jasmine.any(Function)
-            );
-            // here we have to use toBeCloseTo because different browsers report different values
-            // e.g. FF reports -55.16666
-            expect($.fn.css.calls.argsFor(1)[1]).toBeCloseTo(-55, 0);
-        });
-
-        it('animates toolbar and body to correct position if debug is true', function () {
-            CMS.config = CMS.config || {};
-            CMS.config.debug = true;
-            $('<div class="cms-debug-bar"></div>').css({
-                height: '15px'
-            }).prependTo('#cms-top');
-
-            toolbar.open();
-
-            spyOn($.fn, 'animate').and.callThrough();
-
-            toolbar.close();
-
-            expect($.fn.animate).toHaveBeenCalledWith(
-                { 'margin-top': 5 },
-                200,
-                'linear',
-                jasmine.any(Function)
-            );
-        });
-
-        it('turns the disclosure triangle into correct position', function (done) {
-            // eslint-disable-next-line max-params
-            spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
-                expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
-                callback();
-                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
-            });
-
-            toolbar.open();
-
-            // eslint-disable-next-line max-params
-            $.fn.animate.and.callFake(function (opts, timeout, easing, callback) {
-                expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
-                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
-                expect(toolbar.ui.body).toHaveClass('cms-toolbar-collapsing');
-                callback();
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
-                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
-                done();
-            });
-
-            toolbar.close();
-        });
-    });
-
-    describe('.showLoader() / hideLoader()', function () {
-        var toolbar;
-        beforeEach(function (done) {
-            fixture.load('toolbar.html');
-            CMS.config = {};
-            CMS.settings = $.extend(CMS.settings, {
-                toolbar: 'expanded'
-            });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
-            $(function () {
-                spyOn(CMS.Toolbar.prototype, '_initialStates');
-                toolbar = new CMS.Toolbar();
-                spyOn(toolbar, 'setSettings').and.callFake(function (input) {
-                    return $.extend(true, CMS.settings, input);
-                });
-                done();
-            });
-        });
-
-        afterEach(function () {
-            fixture.cleanup();
-        });
-
-        it('shows the loader', function () {
-            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-loader');
-            toolbar.showLoader();
-            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-loader');
-        });
-        it('hides the loader', function () {
-            toolbar.showLoader();
-            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-loader');
-            toolbar.hideLoader();
-            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-loader');
-        });
-    });
-
     describe('.openAjax()', function () {
         var toolbar;
         beforeEach(function (done) {
@@ -434,13 +126,12 @@ describe('CMS.Toolbar', function () {
             CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
             });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
             jasmine.Ajax.install();
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
+                spyOn(toolbar, 'showLoader');
+                spyOn(toolbar, 'hideLoader');
                 spyOn(toolbar, 'setSettings').and.callFake(function (input) {
                     return $.extend(true, CMS.settings, input);
                 });
@@ -468,7 +159,6 @@ describe('CMS.Toolbar', function () {
         });
 
         it('shows the loader before making the request', function () {
-            spyOn(toolbar, 'showLoader');
             expect(toolbar.openAjax({ url: '/url' })).toEqual(jasmine.any(Object));
             expect(toolbar.showLoader).toHaveBeenCalled();
         });
@@ -482,7 +172,6 @@ describe('CMS.Toolbar', function () {
                     }
                 };
             });
-            spyOn(toolbar, 'hideLoader');
 
             var callback = jasmine.createSpy();
 
@@ -507,8 +196,6 @@ describe('CMS.Toolbar', function () {
             });
 
             spyOn(CMS.API.Helpers, 'reloadBrowser');
-            spyOn(toolbar, 'showLoader');
-            spyOn(toolbar, 'hideLoader');
 
             toolbar.openAjax({
                 url: '/url',
@@ -684,9 +371,6 @@ describe('CMS.Toolbar', function () {
             CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
             });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
@@ -699,26 +383,6 @@ describe('CMS.Toolbar', function () {
 
         afterEach(function () {
             fixture.cleanup();
-        });
-
-        it('attaches event handlers to toolbar trigger', function () {
-            toolbar.ui.toolbarTrigger.off(toolbar.pointerUp);
-            toolbar.ui.toolbarTrigger.off(toolbar.click);
-
-            toolbar._events();
-
-            expect(toolbar.ui.toolbarTrigger).toHandle(toolbar.pointerUp);
-            expect(toolbar.ui.toolbarTrigger).toHandle(toolbar.click);
-
-            spyOn(toolbar, 'toggle');
-
-            toolbar.ui.document.off(toolbar.click);
-            toolbar.ui.document.on(toolbar.click, function () {
-                expect(toolbar.toggle).toHaveBeenCalled();
-            });
-
-            toolbar.ui.toolbarTrigger.trigger(toolbar.pointerUp);
-            toolbar.ui.toolbarTrigger.trigger(toolbar.click);
         });
 
         it('attaches event handlers to navigation menu links', function () {
@@ -857,7 +521,7 @@ describe('CMS.Toolbar', function () {
             spyOn($.Event.prototype, 'stopImmediatePropagation').and.callThrough();
             spyOn(CMS.API.Helpers, 'secureConfirm').and.returnValues(false, true);
 
-            var publishButton = toolbar.ui.buttons.eq(3).find('.cms-publish-page');
+            var publishButton = toolbar.ui.buttons.eq(2).find('.cms-publish-page');
             publishButton.trigger(toolbar.click);
             expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
             expect($.Event.prototype.stopImmediatePropagation).toHaveBeenCalledTimes(1);
@@ -874,9 +538,6 @@ describe('CMS.Toolbar', function () {
             CMS.config = {};
             CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
             });
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
@@ -921,13 +582,10 @@ describe('CMS.Toolbar', function () {
                     search: ''
                 }
             };
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
-                ToolbarRewireAPI.__Rewire__('Modal', FakeModal);
+                Toolbar.__Rewire__('Modal', FakeModal);
                 spyOn(CMS.Sideframe.prototype, 'initialize');
                 spyOn(toolbar, 'openAjax');
                 spyOn(CMS.API.Helpers, '_getWindow').and.returnValue(fakeWindow);
@@ -940,7 +598,7 @@ describe('CMS.Toolbar', function () {
         });
 
         afterEach(function (done) {
-            ToolbarRewireAPI.__ResetDependency__('Modal');
+            Toolbar.__ResetDependency__('Modal');
             fixture.cleanup();
             setTimeout(function () {
                 done();
@@ -1025,9 +683,6 @@ describe('CMS.Toolbar', function () {
             CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
             });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
-            });
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
@@ -1106,9 +761,6 @@ describe('CMS.Toolbar', function () {
             };
             CMS.settings = $.extend(CMS.settings, {
                 toolbar: 'expanded'
-            });
-            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
-                return {};
             });
             $(function () {
                 Toolbar.__Rewire__('Navigation', FakeNavigation);

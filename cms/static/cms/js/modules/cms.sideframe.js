@@ -2,10 +2,9 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-var $ = require('jquery');
-var Class = require('classjs');
-var Helpers = require('./cms.base').default.API.Helpers;
-var KEYS = require('./cms.base').default.KEYS;
+import $ from 'jquery';
+import Class from 'classjs';
+import { Helpers, KEYS } from './cms.base';
 
 /**
  * The sideframe is triggered via API calls from the backend either
@@ -17,7 +16,6 @@ var KEYS = require('./cms.base').default.KEYS;
  * @uses CMS.API.Helpers
  */
 var Sideframe = new Class({
-
     options: {
         onClose: false,
         sideframeDuration: 300
@@ -76,17 +74,17 @@ var Sideframe = new Class({
             forward: []
         };
 
-        this.ui.close.off(this.click).on(this.click, function () {
+        this.ui.close.off(this.click).on(this.click, function() {
             that.close();
         });
 
         // close sideframe when clicking on the dimmer
-        this.ui.dimmer.off(this.click).on(this.click, function () {
+        this.ui.dimmer.off(this.click).on(this.click, function() {
             that.close();
         });
 
         // attach events to the back button
-        this.ui.historyBack.off(this.click).on(this.click, function () {
+        this.ui.historyBack.off(this.click).on(this.click, function() {
             if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
                 return false;
             }
@@ -94,7 +92,7 @@ var Sideframe = new Class({
         });
 
         // attach events to the forward button
-        this.ui.historyForward.off(this.click).on(this.click, function () {
+        this.ui.historyForward.off(this.click).on(this.click, function() {
             if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
                 return false;
             }
@@ -121,8 +119,8 @@ var Sideframe = new Class({
         var animate = opts.animate;
 
         // setup internals
-        var language = 'language=' + CMS.config.request.language;
-        var page_id = 'page_id=' + CMS.config.request.page_id;
+        var language = ['language', CMS.config.request.language];
+        var page_id = ['page_id', CMS.config.request.page_id];
         var params = [];
 
         // We have to rebind events every time we open a sideframe
@@ -180,7 +178,7 @@ var Sideframe = new Class({
         var holder = this.ui.frame;
         var contents;
         var body;
-        var iOS = (/iPhone|iPod|iPad/).test(navigator.userAgent);
+        var iOS = /iPhone|iPod|iPad/.test(navigator.userAgent);
 
         // istanbul ignore next
         /**
@@ -205,18 +203,18 @@ var Sideframe = new Class({
             var w = that.ui.sideframe.width();
 
             that.ui.sideframe.animate({ width: w + 1 }, 0);
-            setTimeout(function () {
+            setTimeout(function() {
                 that.ui.sideframe.animate({ width: w }, 0);
                 // eslint-disable-next-line no-magic-numbers
                 that.ui.shim.css('z-index', 20);
-                setTimeout(function () {
+                setTimeout(function() {
                     that.ui.shim.css('z-index', 1);
                 }, 0);
             }, 0);
         }
 
         // attach load event to iframe
-        iframe.hide().on('load', function () {
+        iframe.hide().on('load', function() {
             // check if iframe can be accessed
             try {
                 iframe.contents();
@@ -250,20 +248,16 @@ var Sideframe = new Class({
                 body.addClass('cms-debug');
             }
 
-            // save url in settings
-            CMS.settings.sideframe.url = iframe[0].contentWindow.location.href;
-            CMS.settings = Helpers.setSettings(CMS.settings);
-
             // This essentially hides the toolbar dropdown when
             // click happens inside of a sideframe iframe
-            contents.on(that.click, function () {
+            contents.on(that.click, function() {
                 // using less specific namespace event because
                 // toolbar dropdowns closing handlers are attached to `click.cms.toolbar`
                 $(document).trigger('click.cms');
             });
 
             // attach close event
-            body.on('keydown.cms', function (e) {
+            body.on('keydown.cms', function(e) {
                 if (e.keyCode === KEYS.ESC) {
                     that.close();
                 }
@@ -275,6 +269,24 @@ var Sideframe = new Class({
             // update history
             that._addToHistory(this.contentWindow.location.href);
         });
+
+        let iframeUrl = url;
+
+        CMS.settings.sideframe.url = iframeUrl;
+        CMS.settings = Helpers.setSettings(CMS.settings);
+
+        this.pageLoadInterval = setInterval(() => {
+            try {
+                const currentUrl = iframe[0].contentWindow.location.href;
+
+                if (currentUrl !== iframeUrl) {
+                    // save url in settings
+                    CMS.settings.sideframe.url = currentUrl;
+                    CMS.settings = Helpers.setSettings(CMS.settings);
+                    iframeUrl = currentUrl;
+                }
+            } catch (e) {}
+        }, 100); // eslint-disable-line
 
         // clear the frame (removes all the handlers)
         holder.empty();
@@ -297,10 +309,13 @@ var Sideframe = new Class({
 
         // otherwise do normal behaviour
         if (animate) {
-            this.ui.sideframe.animate({
-                width: width,
-                overflow: 'visible'
-            }, this.options.sideframeDuration);
+            this.ui.sideframe.animate(
+                {
+                    width: width,
+                    overflow: 'visible'
+                },
+                this.options.sideframeDuration
+            );
         } else {
             this.ui.sideframe.css('width', width);
         }
@@ -308,13 +323,11 @@ var Sideframe = new Class({
         // istanbul ignore else: always trigger API handlers
         if (CMS.API && CMS.API.Toolbar) {
             // FIXME: initialization needs to be done after our libs are loaded
-            CMS.API.Toolbar.open();
             CMS.API.Toolbar.hideLoader();
-            CMS.API.Toolbar._lock(true);
         }
 
         // add esc close event
-        this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
+        this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function(e) {
             if (e.keyCode === KEYS.ESC) {
                 that.options.onClose = null;
                 that.close();
@@ -349,6 +362,8 @@ var Sideframe = new Class({
         this._hide({
             duration: this.options.sideframeDuration / 2
         });
+
+        clearInterval(this.pageLoadInterval);
     },
 
     /**
@@ -366,15 +381,10 @@ var Sideframe = new Class({
             duration = opts.duration;
         }
 
-        this.ui.sideframe.animate({ width: 0 }, duration, function () {
+        this.ui.sideframe.animate({ width: 0 }, duration, function() {
             $(this).hide();
         });
         this.ui.frame.removeClass('cms-loader');
-
-        // istanbul ignore else
-        if (CMS.API && CMS.API.Toolbar) {
-            CMS.API.Toolbar._lock(false);
-        }
 
         this.ui.body.off('keydown.cms.close');
 
