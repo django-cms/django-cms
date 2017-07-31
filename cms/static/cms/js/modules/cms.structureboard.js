@@ -1294,10 +1294,9 @@ class StructureBoard {
         }
 
         // TODO handle the case when there is a plugin count mismatch but not generics mismatch
-        var diff = dd.diff(document.body, newDoc.body);
         var headDiff = dd.diff(document.head, newDoc.head);
 
-        dd.apply(document.body, diff);
+        document.body.innerHTML = newDoc.body.innerHTML;
         dd.apply(document.head, headDiff);
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
