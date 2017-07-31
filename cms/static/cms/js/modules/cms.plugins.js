@@ -1949,7 +1949,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
 
         if (e.type === 'touchstart') {
             CMS.API.Tooltip._forceTouchOnce();
-            doc.off('touchstart.cms.plugin', '.cms-plugin');
         }
         var name = options.plugin_name;
         var id = options.plugin_id;
