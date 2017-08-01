@@ -30,6 +30,7 @@ from cms.utils.permissions import (
     get_subordinate_groups,
     get_user_permission_level,
 )
+from cms.utils.title import has_redirect_loop
 from menus.menu_pool import menu_pool
 
 
@@ -409,6 +410,13 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if application_config and not apphook:
             self.cleaned_data['application_configs'] = None
+
+        redirect = cleaned_data['redirect']
+        if redirect:
+            if has_redirect_loop(title, language, redirect):
+                self._errors['redirect'] = ErrorList([
+                    _('This redirect configuration may create an infinite redirect loop.')
+                ])
 
         return self.cleaned_data
 
