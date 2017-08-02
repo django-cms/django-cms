@@ -360,6 +360,8 @@ class StructureBoard {
         }
         // apply new settings
         CMS.settings.mode = 'structure';
+        Helpers.setSettings(CMS.settings);
+
         if (!init && saveState) {
             this._saveStateInURL();
         }
