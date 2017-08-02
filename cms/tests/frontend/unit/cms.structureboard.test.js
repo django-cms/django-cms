@@ -279,14 +279,14 @@ describe('CMS.StructureBoard', function() {
             });
         });
 
-        it('does not set state through settings', function(done) {
+        it('does set state through settings', function(done) {
             CMS.API.Helpers.setSettings.and.callFake(function(input) {
                 return input;
             });
             expect(CMS.settings.mode).toEqual('edit');
             board.show().then(() => {
                 expect(CMS.settings.mode).toEqual('structure');
-                expect(CMS.API.Helpers.setSettings).not.toHaveBeenCalled();
+                expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
                 done();
             });
         });
@@ -449,6 +449,7 @@ describe('CMS.StructureBoard', function() {
             CMS.API.Helpers.setSettings.and.callFake(function(input) {
                 return input;
             });
+            CMS.API.Helpers.setSettings.calls.reset();
             board.hide();
             expect(CMS.settings.mode).toEqual('edit');
             expect(CMS.API.Helpers.setSettings).not.toHaveBeenCalled();
@@ -1112,21 +1113,18 @@ describe('CMS.StructureBoard', function() {
                 expect(randomPlugin.find('> .cms-dragitem')).toHaveClass('cms-dragitem-expanded');
             });
 
-            it(
-                'returns false if we moved plugin inside same container and the event is fired on the container',
-                function() {
-                    var textPlugin = $('.cms-draggable-1');
-                    var helper = options.helper(null, textPlugin);
-                    var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
+            it('returns false if we moved plugin inside same container and the event is fired on the container', () => {
+                var textPlugin = $('.cms-draggable-1');
+                var helper = options.helper(null, textPlugin);
+                var placeholderDraggables = $('.cms-dragarea-1').find('> .cms-draggables');
 
-                    // and one more time
-                    options.start(null, { item: textPlugin, helper: helper });
-                    board.state = true;
+                // and one more time
+                options.start(null, { item: textPlugin, helper: helper });
+                board.state = true;
 
-                    textPlugin.prependTo(placeholderDraggables);
-                    expect(options.update.bind(textPlugin)(null, { item: textPlugin, helper: helper })).toEqual(false);
-                }
-            );
+                textPlugin.prependTo(placeholderDraggables);
+                expect(options.update.bind(textPlugin)(null, { item: textPlugin, helper: helper })).toEqual(false);
+            });
 
             it('triggers event on the plugin when necessary', function() {
                 var textPlugin = $('.cms-draggable-1');
@@ -2451,6 +2449,8 @@ describe('CMS.StructureBoard', function() {
             StructureBoard.__Rewire__('DOMParser', FakeDOMParser);
 
             board = new StructureBoard();
+
+            spyOn(StructureBoard, '_replaceBodyWithHTML');
 
             CMS.API.Messages = {
                 open: jasmine.createSpy()
