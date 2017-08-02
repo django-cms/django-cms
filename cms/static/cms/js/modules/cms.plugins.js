@@ -340,7 +340,13 @@ var Plugin = new Class({
             });
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
-            doc.on(Plugin.doubleClick, `.cms-plugin-${this.options.plugin_id}`, this._dblClickToEditHandler.bind(this));
+            doc
+                .off(Plugin.doubleClick, `.cms-plugin-${this.options.plugin_id}`)
+                .on(
+                    Plugin.doubleClick,
+                    `.cms-plugin-${this.options.plugin_id}`,
+                    this._dblClickToEditHandler.bind(this)
+                );
         }
     },
 
@@ -1895,6 +1901,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
                 doc.data('expandmode', true);
                 try {
                     $('.cms-plugin:hover').last().trigger('mouseenter');
+                    $('.cms-dragitem:hover').last().trigger('mouseenter');
                 } catch (err) {}
             }
         })
