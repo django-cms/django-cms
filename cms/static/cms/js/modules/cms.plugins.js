@@ -340,7 +340,13 @@ var Plugin = new Class({
             });
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
-            doc.on(Plugin.doubleClick, `.cms-plugin-${this.options.plugin_id}`, this._dblClickToEditHandler.bind(this));
+            doc
+                .off(Plugin.doubleClick, `.cms-plugin-${this.options.plugin_id}`)
+                .on(
+                    Plugin.doubleClick,
+                    `.cms-plugin-${this.options.plugin_id}`,
+                    this._dblClickToEditHandler.bind(this)
+                );
         }
     },
 
@@ -1551,7 +1557,7 @@ var Plugin = new Class({
     _toggleCollapsable: function toggleCollapsable(el) {
         var that = this;
         var id = that._getId(el.parent());
-        var draggable = this.ui.draggable;
+        var draggable = el.closest('.cms-draggable');
         var items;
 
         var settings = CMS.settings;
@@ -1884,21 +1890,26 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     }, 0);
 
     doc
-        .on('pointerup.cms.plugin', function() {
+        .off(Plugin.pointerUp)
+        .off(Plugin.keyDown)
+        .off(Plugin.keyUp)
+        .off(Plugin.click, '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin')
+        .on(Plugin.pointerUp, function() {
             // call it as a static method, because otherwise we trigger it the
             // amount of times CMS.Plugin is instantiated,
             // which does not make much sense.
             Plugin._hideSettingsMenu();
         })
-        .on('keydown.cms.plugin', function(e) {
+        .on(Plugin.keyDown, function(e) {
             if (e.keyCode === KEYS.SHIFT) {
                 doc.data('expandmode', true);
                 try {
                     $('.cms-plugin:hover').last().trigger('mouseenter');
+                    $('.cms-dragitem:hover').last().trigger('mouseenter');
                 } catch (err) {}
             }
         })
-        .on('keyup.cms.plugin', function(e) {
+        .on(Plugin.keyUp, function(e) {
             if (e.keyCode === KEYS.SHIFT) {
                 doc.data('expandmode', false);
                 try {
@@ -1906,7 +1917,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
                 } catch (err) {}
             }
         })
-        .on('click.cms.plugin', '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin', function(e) {
+        .on(Plugin.click, '.cms-plugin a, a:has(.cms-plugin), a.cms-plugin', function(e) {
             var DOUBLECLICK_DELAY = 300;
 
             // prevents single click from messing up the edit call
@@ -1933,8 +1944,8 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     // have to delegate here because there might be plugins that
     // have their content replaced by something dynamic. in case that tool
     // copies the classes - double click to edit would still work
-    doc.on('click.cms.plugin', '.cms-plugin', Plugin._clickToHighlightHandler);
-    doc.on('pointerover.cms.plugin pointerout.cms.plugin touchstart.cms.plugin', '.cms-plugin', function(e) {
+    doc.on(Plugin.click, '.cms-plugin', Plugin._clickToHighlightHandler);
+    doc.on(`${Plugin.pointerOverAndOut} ${Plugin.touchStart}`, '.cms-plugin', function(e) {
         // required for both, click and touch
         // otherwise propagation won't work to the nested plugin
         e.stopPropagation();
@@ -1949,7 +1960,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
 
         if (e.type === 'touchstart') {
             CMS.API.Tooltip._forceTouchOnce();
-            doc.off('touchstart.cms.plugin', '.cms-plugin');
         }
         var name = options.plugin_name;
         var id = options.plugin_id;

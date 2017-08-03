@@ -360,6 +360,8 @@ class StructureBoard {
         }
         // apply new settings
         CMS.settings.mode = 'structure';
+        Helpers.setSettings(CMS.settings);
+
         if (!init && saveState) {
             this._saveStateInURL();
         }
@@ -1296,7 +1298,7 @@ class StructureBoard {
         // TODO handle the case when there is a plugin count mismatch but not generics mismatch
         var headDiff = dd.diff(document.head, newDoc.head);
 
-        document.body.innerHTML = newDoc.body.innerHTML;
+        StructureBoard._replaceBodyWithHTML(newDoc.body.innerHTML);
         dd.apply(document.head, headDiff);
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
@@ -1547,6 +1549,10 @@ class StructureBoard {
                 pluginDragItem.removeClass('cms-dragitem-collapsable');
             }
         });
+    }
+
+    static _replaceBodyWithHTML(html) {
+        document.body.innerHTML = html;
     }
 
     highlightPluginFromUrl() {
