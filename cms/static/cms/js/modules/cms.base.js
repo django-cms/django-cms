@@ -294,7 +294,9 @@ export const Helpers = {
             });
         }
 
-        if (!settings) {
+        // edit_off is a random flag that should be available on the page, but sometimes can
+        // be not set when settings are carried over from pagetree
+        if (!settings || !settings.edit_off) {
             settings = this.setSettings(window.CMS.config.settings);
         }
 

@@ -579,12 +579,6 @@ describe('cms.base.js', function() {
                 }
                 jasmine.Ajax.install();
 
-                jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
-                    status: 200,
-                    contentType: 'text/plain',
-                    responseText: '{"serverSetting":true}'
-                });
-
                 jasmine.Ajax.stubRequest('/my-settings-url-with-empty-response').andReturn({
                     status: 200,
                     contentType: 'text/plain',
@@ -594,7 +588,7 @@ describe('cms.base.js', function() {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: '{"serverSetting":true}'
+                    responseText: '{"serverSetting":true,"edit_off":1}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-broken-settings-url').andReturn({
@@ -612,7 +606,7 @@ describe('cms.base.js', function() {
                     pending('Localstorage is not supported, skipping');
                 }
 
-                localStorage.setItem('cms_cookie', JSON.stringify({ presetSetting: true }));
+                localStorage.setItem('cms_cookie', JSON.stringify({ presetSetting: true, edit_off: 1 }));
                 CMS.settings = {};
                 CMS.config = {
                     settings: {}
@@ -622,10 +616,33 @@ describe('cms.base.js', function() {
                     hideLoader: jasmine.createSpy()
                 };
 
-                expect(CMS.API.Helpers.getSettings()).toEqual({ presetSetting: true });
+                expect(CMS.API.Helpers.getSettings()).toEqual({ presetSetting: true, edit_off: 1 });
 
                 expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
                 expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+            });
+
+            it('should get settings from localStorage and cms.config if required settings are not there', function() {
+                if (!_isLocalStorageSupported) {
+                    pending('Localstorage is not supported, skipping');
+                }
+
+                localStorage.setItem('cms_cookie', JSON.stringify({ presetSetting: true }));
+                CMS.settings = {};
+                CMS.config = {
+                    settings: {
+                        fromConfig: true
+                    }
+                };
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
+                expect(CMS.API.Helpers.getSettings()).toEqual({ fromConfig: true });
+
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
             });
 
             it('should first set settings from CMS.config is there are no settings in localstorage', function() {
@@ -664,7 +681,7 @@ describe('cms.base.js', function() {
                     hideLoader: jasmine.createSpy()
                 };
 
-                expect(CMS.API.Helpers.getSettings()).toEqual({ serverSetting: true });
+                expect(CMS.API.Helpers.getSettings()).toEqual({ serverSetting: true, edit_off: 1 });
 
                 expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
                 expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
@@ -687,8 +704,8 @@ describe('cms.base.js', function() {
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ defaultSetting: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
             });
 
             it('makes a synchronous request which can fail', function() {
