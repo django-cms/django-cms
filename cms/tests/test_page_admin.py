@@ -366,7 +366,9 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             data['redirect'] = '/'
             response = self.client.post(endpoint, data)
-            self.assertRedirects(response, redirect_to)
+            validation_error = \
+                '<ul class="errorlist"><li>This redirect configuration may create an infinite redirect loop.</li></ul>'
+            self.assertContains(response, validation_error, html=True)
 
         with self.login_user_context(superuser):
             data['redirect'] = '/hello'
