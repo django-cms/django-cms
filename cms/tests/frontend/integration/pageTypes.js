@@ -129,7 +129,7 @@ casper.test.begin('PageType can be created and used', function(test) {
         .then(function() {
             this.click('.cms-modal-item-buttons .cms-btn-action');
         })
-        .waitForResource(/add_page_type/)
+        .waitForResource(/cms\/pagetype\/add/)
         .waitForUrl(/page_types/)
         .then(function() {
             test.assertUrlMatch(/page_types\/two-column-layout/, 'Page Type created');
@@ -169,7 +169,7 @@ casper.test.begin('PageType can be created and used', function(test) {
                     {
                         title: 'New Shiny Page',
                         slug: 'new-shiny-page',
-                        page_type: pageType
+                        source: pageType
                     },
                     false
                 );
@@ -198,7 +198,30 @@ casper.test.begin('PageType can be created and used', function(test) {
             );
         })
         // cleanup before teardown
-        .then(cms.removePage({ title: 'Page Types' }))
+        // TODO remove page type
+        .thenOpen(globals.adminPagesUrl.replace('page', 'pagetype'))
+        .waitUntilVisible('.js-cms-pagetree-options')
+        .then(cms.expandPageTree())
+        .then(function () {
+            var data = '';
+            var href = '';
+
+            return this.then(function () {
+                this.click('.cms-pagetree-jstree .js-cms-pagetree-options' + data);
+            })
+            .then(cms.waitUntilActionsDropdownLoaded())
+            .then(function () {
+                this.click('.cms-pagetree-jstree [href*="delete"]' + href);
+            });
+        })
+        .waitForUrl(/delete/)
+        .waitUntilVisible('input[type=submit]')
+        .then(function () {
+            this.click('input[type=submit]');
+        })
+        .wait(1000)
+        .then(cms.waitUntilAllAjaxCallsFinish())
+
         .then(cms.removePage({ title: 'New Shiny Page' }))
         .run(function() {
             test.done();

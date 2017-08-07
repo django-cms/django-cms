@@ -153,14 +153,14 @@
                     <div class="cms-pagetree-section-nav">
                         {% if has_add_permission %}
                             <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
-                                <a href="#root" data-id="#root" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                                <a href="#root" data-node-id="#root" data-id="#root" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                                     <span class="sr-only">{% trans "Options" %}</span>
                                 </a>
 
                                 <div class="js-cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top">
                                     <ul class="cms-pagetree-dropdown-menu-inner">
                                         <li>
-                                            <a href="#" data-id="#root" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
+                                            <a href="#" data-node-id="#root" data-id="#root" class="js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled">
                                                 <span class="cms-icon cms-icon-alias"></span>
                                                 <span>{% trans "Paste" %}</span>
                                             </a>
@@ -219,7 +219,10 @@
                             }, {% endfor %} {
                                 "title": "{{ _('Menu')|escapejs }}",
                                 "key": "menu"
-                            }, {
+                            },
+                            {% block extra_cols %}
+                            {% endblock %}
+                            {
                                 "title": "&nbsp;",
                                 "key": "options"
                             }]
