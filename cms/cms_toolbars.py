@@ -147,7 +147,7 @@ class BasicToolbar(CMSToolbar):
             self.add_users_button(self._admin_menu)
 
             # sites menu
-            sites_queryset = get_user_sites_queryset(self.request.user)
+            sites_queryset = get_user_sites_queryset(self.request.user).order_by('name')
 
             if len(sites_queryset) > 1:
                 sites_menu = self._admin_menu.get_or_create_menu('sites', _('Sites'))
