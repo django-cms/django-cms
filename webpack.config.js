@@ -1,6 +1,6 @@
 var webpack = require('webpack');
 
-module.exports = function (opts) {
+module.exports = function(opts) {
     'use strict';
 
     var PROJECT_PATH = opts.PROJECT_PATH;
@@ -12,7 +12,7 @@ module.exports = function (opts) {
         watch: !!opts.watch,
         entry: {
             // CMS frontend
-            'toolbar': PROJECT_PATH.js + '/toolbar.js',
+            toolbar: PROJECT_PATH.js + '/toolbar.js',
             // CMS admin
             'admin.base': PROJECT_PATH.js + '/admin.base.js',
             'admin.pagetree': PROJECT_PATH.js + '/admin.pagetree.js',
@@ -35,10 +35,7 @@ module.exports = function (opts) {
             // include deps already required in admin.base bundle
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'admin.base',
-                chunks: [
-                    'admin.pagetree',
-                    'admin.changeform'
-                ]
+                chunks: ['admin.pagetree', 'admin.changeform']
             })
         ],
         resolve: {
