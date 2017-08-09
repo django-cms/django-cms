@@ -1,7 +1,8 @@
 var webpack = require('webpack');
 var path = require('path');
+var Webpack2Polyfill = require('webpack2-polyfill-plugin');
 
-module.exports = function (opts) {
+module.exports = function(opts) {
     'use strict';
 
     var PROJECT_PATH = opts.PROJECT_PATH;
@@ -17,7 +18,7 @@ module.exports = function (opts) {
         watch: !!opts.watch,
         entry: {
             // CMS frontend
-            'toolbar': PROJECT_PATH.js + '/toolbar.js',
+            toolbar: PROJECT_PATH.js + '/toolbar.js',
             // CMS admin
             'admin.base': PROJECT_PATH.js + '/admin.base.js',
             'admin.pagetree': PROJECT_PATH.js + '/admin.pagetree.js',
@@ -36,14 +37,12 @@ module.exports = function (opts) {
             jsonpFunction: 'cmsWebpackJsonp'
         },
         plugins: [
+            new Webpack2Polyfill(),
             // this way admin.pagetree bundle won't
             // include deps already required in admin.base bundle
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'admin.base',
-                chunks: [
-                    'admin.pagetree',
-                    'admin.changeform'
-                ]
+                chunks: ['admin.pagetree', 'admin.changeform']
             })
         ],
         resolve: {
@@ -58,38 +57,46 @@ module.exports = function (opts) {
                 // must be first
                 {
                     test: /\.js$/,
-                    use: [{
-                        loader: 'babel-loader',
-                        options: {
-                            retainLines: true
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                retainLines: true
+                            }
                         }
-                    }],
+                    ],
                     exclude: /(node_modules|libs|addons\/jquery.*)/,
                     include: path.join(__dirname, 'cms')
                 },
                 {
                     test: /(modules\/jquery|libs\/pep|select2\/select2)/,
-                    use: [{
-                        loader: 'imports-loader',
-                        options: {
-                            jQuery: 'jquery'
+                    use: [
+                        {
+                            loader: 'imports-loader',
+                            options: {
+                                jQuery: 'jquery'
+                            }
                         }
-                    }]
+                    ]
                 },
                 {
                     test: /class.min.js/,
-                    use: [{
-                        loader: 'exports-loader',
-                        options: {
-                            Class: true
+                    use: [
+                        {
+                            loader: 'exports-loader',
+                            options: {
+                                Class: true
+                            }
                         }
-                    }]
+                    ]
                 },
                 {
                     test: /.html$/,
-                    use: [{
-                        loader: 'raw-loader'
-                    }]
+                    use: [
+                        {
+                            loader: 'raw-loader'
+                        }
+                    ]
                 }
             ]
         },

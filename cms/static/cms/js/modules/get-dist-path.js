@@ -20,7 +20,7 @@ var getDistPath = function(scriptFileName) {
             }
             fileName = scriptPath;
             fileName = fileName.split('?')[0].split('/').pop(); // get script filename
-            if (fileName === scriptFileName) {
+            if (fileName.match(fileNameReplaceRegExp)) {
                 return scriptPath;
             }
         }

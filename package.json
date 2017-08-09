@@ -52,6 +52,7 @@
     "local-storage": "^1.4.2",
     "lodash": "^4.17.4",
     "nprogress": "^0.2.0",
-    "urijs": "^1.18.10"
+    "urijs": "^1.18.10",
+    "webpack2-polyfill-plugin": "0.0.2"
   }
 }
