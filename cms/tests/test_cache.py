@@ -835,8 +835,8 @@ class PlaceholderCacheTestCase(CMSTestCase):
             # Prove that it is hashed...
             crazy_cache_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, en_crazy_request)
             key_length = len(crazy_cache_key)
-            # 213 = 180 (prefix length) + 1 (separator) + 32 (md5 hash)
-            self.assertTrue('render_placeholder' not in crazy_cache_key and key_length == 213)
+            # 221 = 180 (prefix length) + 1 (separator) + 40 (sha1 hash)
+            self.assertTrue('render_placeholder' not in crazy_cache_key and key_length == 221)
 
             # Prove it still works as expected
             cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', 1, en_crazy_request)

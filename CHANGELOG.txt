@@ -12,6 +12,7 @@
   is cached in an ancestor page.
 * Fixed a regression where the code following a ``{% placeholder x or %}`` declaration,
   was rendered before attempting to inherit content from parent pages.
+* Changed page/placeholder cache keys to use sha1 hash instead of md5 to be FIPS compliant.
 
 
 === 3.4.4 (unreleased) ===
