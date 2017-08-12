@@ -47,7 +47,7 @@ def _get_placeholder_cache_version_key(placeholder, lang, site_id):
     if len(key) > 250:
         key = '{prefix}|{hash}'.format(
             prefix=prefix,
-            hash=hashlib.md5(key.encode('utf-8')).hexdigest(),
+            hash=hashlib.sha1(key.encode('utf-8')).hexdigest(),
         )
     return key
 
@@ -131,7 +131,7 @@ def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
     if len(cache_key) > 250:
         cache_key = '{prefix}|{hash}'.format(
             prefix=prefix,
-            hash=hashlib.md5(cache_key.encode('utf-8')).hexdigest(),
+            hash=hashlib.sha1(cache_key.encode('utf-8')).hexdigest(),
         )
 
     return cache_key
