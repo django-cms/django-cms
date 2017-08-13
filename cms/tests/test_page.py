@@ -1044,6 +1044,9 @@ class PageTreeTests(CMSTestCase):
         parent.publish('en')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=parent)
         child.publish('en')
+        grandchild = create_page('grandchild', 'nav_playground.html', 'en', slug='grandchild', published=True,
+                                 parent=child)
+        grandchild.publish('en')
 
         page_title = Title.objects.get(page=parent)
         page_title.slug = "father"
@@ -1055,6 +1058,8 @@ class PageTreeTests(CMSTestCase):
 
         self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
         self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/father/child/')
+        self.assertEqual(grandchild.get_absolute_url(language='en'), '/en/father/child/grandchild/')
+        self.assertEqual(grandchild.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild/')
 
 
     def test_move_node(self):
