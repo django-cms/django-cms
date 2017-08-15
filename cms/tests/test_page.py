@@ -1056,7 +1056,7 @@ class PageTreeTests(CMSTestCase):
         self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
         self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/father/child/')
 
-        def test_rename_node_alters_descendants(self):
+    def test_rename_node_alters_descendants(self):
         create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
         child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=parent)
