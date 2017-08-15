@@ -1058,27 +1058,25 @@ class PageTreeTests(CMSTestCase):
 
     def test_rename_node_alters_descendants(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
-        home.publish('en')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
-        parent.publish('en')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=parent)
-        child.publish('en')
-        grandchild = create_page('grandchild', 'nav_playground.html', 'en', slug='grandchild', published=True,
+        grandchild_1 = create_page('grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1', published=True,
                                  parent=child)
-        grandchild.publish('en')
+        grandchild_2 = create_page('grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', published=True,
+                                 parent=child.reload())
+        grandchild_3 = create_page('grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', published=True,
+                                 parent=child.reload())
 
         page_title = Title.objects.get(page=parent)
         page_title.slug = "father"
         page_title.save()
 
-        parent = Page.objects.get(pk=parent.pk)
-        parent.publish('en')
-        child = Page.objects.get(pk=child.pk)
-
-        self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
-        self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/father/child/')
-        self.assertEqual(grandchild.get_absolute_url(language='en'), '/en/father/child/grandchild/')
-        self.assertEqual(grandchild.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild/')
+        self.assertEqual(grandchild_1.get_absolute_url(language='en'), '/en/father/child/grandchild-1/')
+        self.assertEqual(grandchild_1.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild-1/')
+        self.assertEqual(grandchild_2.get_absolute_url(language='en'), '/en/father/child/grandchild-2/')
+        self.assertEqual(grandchild_2.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild-2/')
+        self.assertEqual(grandchild_3.get_absolute_url(language='en'), '/en/father/child/grandchild-3/')
+        self.assertEqual(grandchild_3.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild-3/')
 
     def test_move_node(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
