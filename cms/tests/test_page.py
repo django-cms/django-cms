@@ -1065,6 +1065,32 @@ class PageTreeTests(CMSTestCase):
         self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
         self.assertEqual(child.publisher_public.get_absolute_url(language='en'), '/en/father/child/')
 
+    def test_rename_node_alters_descendants(self):
+        create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)
+        parent = create_page('parent', 'nav_playground.html', 'en', slug='parent', published=True)
+        child = create_page('child', 'nav_playground.html', 'en', slug='child', published=True, parent=parent)
+        grandchild_1 = create_page('grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1', published=True,
+                                 parent=child)
+        grandchild_2 = create_page('grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', published=True,
+                                 parent=child.reload())
+        grandchild_3 = create_page('grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', published=True,
+                                 parent=child.reload())
+
+        page_title = Title.objects.get(page=parent)
+        page_title.slug = "father"
+        page_title.save()
+
+        # Draft pages
+        self.assertEqual(grandchild_1.get_absolute_url(language='en'), '/en/father/child/grandchild-1/')
+        self.assertEqual(grandchild_2.get_absolute_url(language='en'), '/en/father/child/grandchild-2/')
+        self.assertEqual(grandchild_3.get_absolute_url(language='en'), '/en/father/child/grandchild-3/')
+
+        parent.reload().publish('en')
+
+        # Public pages
+        self.assertEqual(grandchild_1.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild-1/')
+        self.assertEqual(grandchild_2.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild-2/')
+        self.assertEqual(grandchild_3.publisher_public.get_absolute_url(language='en'), '/en/father/child/grandchild-3/')
 
     def test_move_node(self):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home', published=True)

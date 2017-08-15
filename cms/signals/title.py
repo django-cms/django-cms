@@ -51,8 +51,7 @@ def pre_save_title(instance, raw, **kwargs):
 
 def post_save_title(instance, raw, created, **kwargs):
     # Update descendants only if path changed
-    prevent_descendants = hasattr(instance, 'tmp_prevent_descendant_update')
-    if instance.path != getattr(instance, 'tmp_path', None) and not prevent_descendants:
+    if instance.path != getattr(instance, 'tmp_path', None):
         child_titles = Title.objects.filter(
             page__depth=instance.page.depth + 1,
             page__path__range=Page._get_children_path_interval(instance.page.path),
@@ -62,14 +61,11 @@ def post_save_title(instance, raw, created, **kwargs):
 
         for child_title in child_titles:
             child_title.path = ''  # just reset path
-            child_title.tmp_prevent_descendant_update = True
             child_title._publisher_keep_state = True
             child_title.save()
             # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
         del instance.tmp_path
-    if prevent_descendants:
-        del instance.tmp_prevent_descendant_update
     apphook_post_title_checker(instance, **kwargs)
 
 
