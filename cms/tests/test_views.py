@@ -224,7 +224,7 @@ class ViewTests(CMSTestCase):
             self.assertContains(
                 response,
                 '<a class="cms-btn cms-btn-switch-save" href="/fr/?{}">'
-                '<span>View published page</span></a>'.format(edit_off),
+                '<span>View published</span></a>'.format(edit_off),
                 count=1,
                 html=True,
             )
@@ -237,7 +237,7 @@ class ViewTests(CMSTestCase):
             )
             self.assertContains(
                 response,
-                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{}">Edit page</a>'.format(edit_on),
+                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{}">Edit</a>'.format(edit_on),
                 count=1,
                 html=True,
             )

@@ -244,7 +244,7 @@ class ToolbarTests(ToolbarTestBase):
 
         output = (
             '<a class="cms-btn cms-btn-action cms-btn-switch-edit" '
-            'href="/en/example/latest/?{}">Edit page</a>'
+            'href="/en/example/latest/?{}">Edit</a>'
         ).format(get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
 
         Example1.objects.create(

@@ -1662,7 +1662,7 @@ msgstr "Available plugins"
 #: templates/cms/toolbar/items/live_draft.html:6
 #, fuzzy
 #| msgid "View published"
-msgid "View published page"
+msgid "View published"
 msgstr "View published"
 
 #: templates/cms/toolbar/items/live_draft.html:11
