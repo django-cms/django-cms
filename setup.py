@@ -34,8 +34,8 @@ INSTALL_REQUIREMENTS = [
 ]
 
 setup(
-    author='Patrick Lauber',
-    author_email='digi@treepy.com',
+    author='Divio AG and contributors',
+    author_email='info@divio.ch',
     name='django-cms',
     version=cms.__version__,
     description='An Advanced Django CMS',

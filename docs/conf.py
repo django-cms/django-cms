@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django cms'
-copyright = u'2009-2015, Patrick Lauber'
+copyright = u'2009-2017, Divio AG and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -212,7 +212,7 @@ latex_paper_size = 'a4'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index', 'djangocms.tex', u'django cms Documentation',
-     u'Patrick Lauber', 'manual'),
+     u'Divio AG and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top
