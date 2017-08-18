@@ -66,7 +66,7 @@ If you fail to this, then any templates in the application that invoke URLs usin
 or views that call (for example) ``reverse('myapp:index')`` will throw a ``NoReverseMatch`` error.
 
 *Unless* the class that defines the apphook specifies an ``app_name``, it can be attached only to one page at a time.
-Attempting to apply it a second times will cause an error. See :ref:`multi_apphook` for more on having multiple apphook
+Attempting to apply it a second time will cause an error. See :ref:`multi_apphook` for more on having multiple apphook
 instances.
 
 
