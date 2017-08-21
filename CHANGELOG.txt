@@ -14,6 +14,7 @@
   was rendered before attempting to inherit content from parent pages.
 * Changed page/placeholder cache keys to use sha1 hash instead of md5 to be FIPS compliant.
 * Fixed a bug where the change of a slug would not propagate to all descendant pages
+* Rename publish buttons to no longer reference "page"
 
 
 === 3.4.4 (unreleased) ===

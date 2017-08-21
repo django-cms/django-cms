@@ -3,12 +3,12 @@
     {% if cms_toolbar.edit_mode_active %}
     <a class="cms-btn cms-btn-switch-save"
         href="{% firstof cms_toolbar.get_object_public_url cms_toolbar.request_path %}?{{ cms_toolbar.edit_mode_url_off }}">
-        <span>{% trans "View published page" %}</span>
+        <span>{% trans "View published" %}</span>
     </a>
     {% else %}
     <a class="cms-btn cms-btn-action cms-btn-switch-edit"
         href="{% firstof cms_toolbar.get_object_draft_url cms_toolbar.request_path %}?{{ cms_toolbar.edit_mode_url_on }}">
-        {% trans "Edit page" %}
+        {% trans "Edit" %}
     </a>
     {% endif %}
 </div>
