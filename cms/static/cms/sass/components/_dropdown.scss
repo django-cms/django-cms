@@ -218,9 +218,14 @@
     > .cms-btn {
         &.cms-btn-action:last-child {
             border-left: 1px solid darken($color-primary, 10%);
+
         }
         &.cms-btn-caution:last-child {
             border-left: 1px solid darken($color-danger, 10%);
         }
     }
+}
+
+&.cms.cms-toolbar-debug .cms-btn-group > .cms-btn.cms-btn-action:last-child {
+    border-left: 1px solid darken($toolbar-debug-bgcolor, 10%) !important;
 }

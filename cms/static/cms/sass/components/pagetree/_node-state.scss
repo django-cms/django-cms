@@ -8,7 +8,21 @@
     border: 2px solid $white;
     background: $white;
     vertical-align: top;
+
 }
+.cms-btn {
+    .cms-pagetree-node-state {
+        vertical-align: middle;
+        margin-right: 5px;
+        margin-top: -4px;
+    }
+    &:hover {
+        .cms-pagetree-node-state-dirty {
+            box-shadow: 0 0 0 1px white;
+        }
+    }
+}
+
 .cms-pagetree-node-state {
     &-empty {
         border-color: $gray-light;
@@ -27,6 +41,10 @@
         animation: pulsate 2.5s ease-out infinite;
         border-color: $color-primary;
         background-color: $color-primary;
+    }
+    &-deletion {
+        border-color: $color-danger;
+        background-color: $color-danger;
     }
 }
 
