@@ -20,7 +20,7 @@
         right: 0;
         height: 1px;
         margin-top: -1px;
-        z-index: z(debug);
+        z-index: z(default);
         clip: rect(0, auto, 10px, 0);
         background: $toolbar-border !important;
         @at-root .cms-structure-mode-structure & {
@@ -87,6 +87,12 @@
         background-color: $toolbar-debug-bgcolor;
         border-color: $toolbar-debug-bgcolor;
         color: $black;
+        &:active,
+        &:focus {
+            background-color: $toolbar-debug-bgcolor;
+            border-color: $toolbar-debug-bgcolor;
+            color: black;
+        }
     }
 }
 
@@ -310,7 +316,7 @@
         border-top: 0 !important;
         border-right: 0 !important;
         width: $toolbar-height;
-        height: $toolbar-height + 20px;
+        height: $toolbar-height - 1px;
         display: block;
         border-radius: 0;
         border-bottom: 0;
@@ -324,6 +330,7 @@
             font-size: 20px !important;
         }
         &.cms-btn-active {
+            height: $toolbar-height;
             &,
             &:active,
             &:focus {
