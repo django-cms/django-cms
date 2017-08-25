@@ -315,6 +315,17 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.filter(site_id=site.pk, depth=1).count(), 2)
         self.assertEqual(Page.objects.filter(site_id=site.pk).count(), 6)
 
+    def test_copy_page_removes_duplicate_overwrite_url(self):
+        """
+        Test that a page with overwrite url can be copied via the admin
+        """
+        page = create_page("page_a", "nav_playground.html", "en", published=False, overwrite_url='test-overwrite-url')
+        site = Site.objects.create(domain='whatever.com', name='whatever')
+        copied_page = page.copy_page(None, site)
+
+        self.assertTrue(page.get_path("en") != copied_page.get_path("en"))
+        self.assertEqual(Page.objects.filter(title_set__path=page.get_path("en")).count(), 1)
+
     def test_public_exceptions(self):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_b = create_page("page_b", "nav_playground.html", "en")

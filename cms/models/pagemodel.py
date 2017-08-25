@@ -590,6 +590,10 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 title.pk = None  # setting pk = None creates a new instance
                 title.page = page
                 title.published = False
+                # update title's path before generating slug or MaxRecursionDepth exception might be raised
+                if title.has_url_overwrite:
+                    title.has_url_overwrite = False
+                    title.update_path()
                 # create slug-copy for standard copy
                 title.slug = page_utils.get_available_slug(title)
 
@@ -633,7 +637,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         old_page = next(pages)
         old_page_id = old_page.pk
-
         new_page = _do_copy(old_page, parent=parent)
 
         if target:
