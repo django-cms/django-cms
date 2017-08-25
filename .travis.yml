@@ -33,9 +33,9 @@ env:
   matrix:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
-    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
-    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
-    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.11 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
@@ -126,11 +126,11 @@ matrix:
     - python: 2.7
       env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 2.7
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 2.7
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 2.7
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 2.7
       env: FRONTEND=1 UNIT=1
     - python: 2.7
@@ -177,11 +177,11 @@ matrix:
     - python: 3.3
       env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.3
       env: FRONTEND=1 UNIT=1
     - python: 3.3
@@ -226,11 +226,11 @@ matrix:
     - python: 3.4
       env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.4
       env: FRONTEND=1 UNIT=1
     - python: 3.4
@@ -275,11 +275,11 @@ matrix:
     - python: 3.6
       env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.6
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.6
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.6
-      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
     - python: 3.6
       env: FRONTEND=1 UNIT=1
     - python: 3.6
