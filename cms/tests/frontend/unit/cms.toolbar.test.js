@@ -206,6 +206,26 @@ describe('CMS.Toolbar', function () {
             expect(toolbar.hideLoader).not.toHaveBeenCalled();
         });
 
+        it('uses custom onSuccess url from request success', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback({ url: '/redirect-url' });
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+
+            toolbar.openAjax({
+                url: '/url',
+                onSuccess: 'FOLLOW_REDIRECT'
+            });
+
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/redirect-url');
+        });
+
         it('uses custom onSuccess url after request succeeds', function () {
             spyOn($, 'ajax').and.callFake(function () {
                 return {
