@@ -1018,6 +1018,103 @@ class PagesTestCase(CMSTestCase):
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
 
+    def test_page_used_on_request(self):
+        """
+        The rendered page changes depending on request and
+        user permissions.
+        """
+        superuser = self.get_superuser()
+        staff_with_no_permissions = self.get_staff_user_with_no_permissions()
+        draft_text = '<p>text only in draft</p>'
+        public_text = '<p>text in draft &amp; live</p>'
+        cms_page = create_page(
+            title='home',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='home',
+            xframe_options=Page.X_FRAME_OPTIONS_DENY
+        )
+        placeholder = cms_page.placeholders.all()[0]
+        add_plugin(cms_page.placeholders.all()[0], 'TextPlugin', 'en', body=public_text)
+        cms_page.publish('en')
+        add_plugin(placeholder, 'TextPlugin', 'en', body=draft_text)
+        endpoint = cms_page.get_absolute_url('en')
+
+        with self.login_user_context(superuser):
+            # staff user with change permissions
+            # draft page is always used
+            resp = self.client.get(endpoint)
+            self.assertContains(resp, public_text)
+            self.assertContains(resp, draft_text)
+
+        with self.login_user_context(superuser):
+            # staff user with change permissions
+            # draft page is used regardless of edit
+            resp = self.client.get(endpoint + '?edit_off')
+            self.assertContains(resp, public_text)
+            self.assertContains(resp, draft_text)
+
+        with self.login_user_context(superuser):
+            # staff user with change permissions
+            # draft page is used regardless of edit
+            resp = self.client.get(endpoint + '?toolbar_off')
+            self.assertContains(resp, public_text)
+            self.assertContains(resp, draft_text)
+
+        with self.login_user_context(superuser):
+            # staff user with change permissions
+            # public page is used because of explicit ?preview
+            resp = self.client.get(endpoint + '?preview')
+            self.assertContains(resp, public_text)
+            self.assertNotContains(resp, draft_text)
+
+        with self.login_user_context(superuser):
+            # staff user with change permissions
+            # public page is used because of preview disables edit
+            resp = self.client.get(endpoint + '?preview&edit')
+            self.assertContains(resp, public_text)
+            self.assertNotContains(resp, draft_text)
+
+        with self.login_user_context(staff_with_no_permissions):
+            # staff user with no change permissions
+            # public page is always used
+            resp = self.client.get(endpoint)
+            self.assertContains(resp, public_text)
+            self.assertNotContains(resp, draft_text)
+
+    def test_page_preview_persists(self):
+        """
+        Page preview persists in the user session to allow users
+        to navigate the site in public mode.
+        """
+        superuser = self.get_superuser()
+        draft_text = '<p>text only in draft</p>'
+        public_text = '<p>text in draft &amp; live</p>'
+        cms_page = create_page(
+            title='home',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='home',
+            xframe_options=Page.X_FRAME_OPTIONS_DENY
+        )
+        placeholder = cms_page.placeholders.all()[0]
+        add_plugin(cms_page.placeholders.all()[0], 'TextPlugin', 'en', body=public_text)
+        cms_page.publish('en')
+        add_plugin(placeholder, 'TextPlugin', 'en', body=draft_text)
+        endpoint = cms_page.get_absolute_url('en')
+
+        with self.login_user_context(superuser):
+            # staff user with change permissions
+            # public page is used because of explicit ?preview
+            resp = self.client.get(endpoint + '?preview')
+            self.assertContains(resp, public_text)
+            self.assertNotContains(resp, draft_text)
+            resp = self.client.get(endpoint)
+            self.assertContains(resp, public_text)
+            self.assertNotContains(resp, draft_text)
+
 
 class PreviousFilteredSiblingsTests(CMSTestCase):
 

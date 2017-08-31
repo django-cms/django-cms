@@ -370,7 +370,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         public_page = self.get_page(1)
         draft_page = public_page.publisher_public
         edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        edit_off_path = public_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        edit_off_path = public_page.get_absolute_url() + '?preview&%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         superuser = self.get_superuser()
 
         # Prime the draft menu cache
@@ -383,6 +383,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         with self.login_user_context(superuser):
             context = self.get_context(path=edit_off_path, page=public_page)
             context['request'].session['cms_edit'] = False
+            context['request'].session['cms_preview'] = True
             Template("{% load menu_tags %}{% show_menu %}").render(context)
 
         # All nodes should be public nodes

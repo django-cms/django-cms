@@ -228,12 +228,12 @@ class ViewTests(CMSTestCase):
             )
             self.assertContains(
                 response,
-                '<a class="cms-btn cms-btn-switch-save" href="/fr/?{}">'
+                '<a class="cms-btn cms-btn-switch-save" href="/fr/?preview&{}">'
                 '<span>View published</span></a>'.format(edit_off),
                 count=1,
                 html=True,
             )
-            response = self.client.get("/fr/?{}".format(edit_off))
+            response = self.client.get("/fr/?preview&{}".format(edit_off))
             self.assertContains(
                 response,
                 expected,
