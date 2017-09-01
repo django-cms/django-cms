@@ -741,8 +741,8 @@ class StructureBoard {
 
         if (CMS.settings.mode === 'structure') {
             history.replaceState({}, '', url.toString());
+            this.ui.html.addClass('cms-overflow');
         }
-        this.ui.html.addClass('cms-overflow');
 
         this.ui.container.css('right', 0);
     }
