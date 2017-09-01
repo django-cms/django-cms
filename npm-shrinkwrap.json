@@ -6022,6 +6022,11 @@
       "resolved": "https://registry.npmjs.org/progress/-/progress-1.1.8.tgz",
       "dev": true
     },
+    "promise-polyfill": {
+      "version": "6.0.2",
+      "from": "promise-polyfill@6.0.2",
+      "resolved": "https://registry.npmjs.org/promise-polyfill/-/promise-polyfill-6.0.2.tgz"
+    },
     "prr": {
       "version": "0.0.0",
       "from": "prr@>=0.0.0 <0.1.0",
@@ -6626,8 +6631,7 @@
     "source-map": {
       "version": "0.5.6",
       "from": "source-map@>=0.5.6 <0.6.0",
-      "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.5.6.tgz",
-      "dev": true
+      "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.5.6.tgz"
     },
     "source-map-resolve": {
       "version": "0.3.1",
@@ -6792,8 +6796,7 @@
     "strip-json-comments": {
       "version": "2.0.1",
       "from": "strip-json-comments@>=2.0.1 <2.1.0",
-      "resolved": "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz",
-      "dev": true
+      "resolved": "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
     },
     "supports-color": {
       "version": "3.2.3",
@@ -7501,6 +7504,28 @@
       "from": "webpack-sources@>=1.0.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/webpack-sources/-/webpack-sources-1.0.1.tgz",
       "dev": true
+    },
+    "webpack2-polyfill-plugin": {
+      "version": "0.0.2",
+      "from": "webpack2-polyfill-plugin@0.0.2",
+      "resolved": "https://registry.npmjs.org/webpack2-polyfill-plugin/-/webpack2-polyfill-plugin-0.0.2.tgz",
+      "dependencies": {
+        "object-assign": {
+          "version": "4.1.1",
+          "from": "object-assign@>=4.1.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz"
+        },
+        "source-list-map": {
+          "version": "0.1.8",
+          "from": "source-list-map@>=0.1.7 <0.2.0",
+          "resolved": "https://registry.npmjs.org/source-list-map/-/source-list-map-0.1.8.tgz"
+        },
+        "webpack-sources": {
+          "version": "0.1.5",
+          "from": "webpack-sources@>=0.1.2 <0.2.0",
+          "resolved": "https://registry.npmjs.org/webpack-sources/-/webpack-sources-0.1.5.tgz"
+        }
+      }
     },
     "which": {
       "version": "1.2.14",
