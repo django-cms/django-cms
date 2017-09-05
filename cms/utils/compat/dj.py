@@ -30,4 +30,6 @@ def get_apps():
 
 
 def get_middleware():
-    return getattr(settings, 'MIDDLEWARE', getattr(settings, 'MIDDLEWARE_CLASSES'))
+    # order is important.
+    # django sets MIDDLEWARE to None which prevents MIDDLEWARE_CLASSES from being used.
+    return getattr(settings, 'MIDDLEWARE_CLASSES', getattr(settings, 'MIDDLEWARE'))
