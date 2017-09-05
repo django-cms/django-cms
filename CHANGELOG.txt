@@ -15,6 +15,8 @@
 * Changed page/placeholder cache keys to use sha1 hash instead of md5 to be FIPS compliant.
 * Fixed a bug where the change of a slug would not propagate to all descendant pages
 * Rename publish buttons to no longer reference "page"
+* Page rendering will now use the draft page instead of public page for logged in
+  users with change permissions, unless the ``preview`` GET parameter is used.
 
 
 === 3.4.4 (unreleased) ===

@@ -45,7 +45,7 @@ from cms.views import details
 class ToolbarTestBase(CMSTestCase):
 
     def get_page_request(self, page, user, path=None, edit=False,
-                         structure=False, lang_code='en', disable=False):
+                         preview=False, structure=False, lang_code='en', disable=False):
         if not path:
             path = page.get_absolute_url()
 
@@ -54,6 +54,9 @@ class ToolbarTestBase(CMSTestCase):
 
         if structure:
             path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+
+        if preview:
+            path += '?preview'
 
         request = RequestFactory().get(path)
         request.session = {}
@@ -317,12 +320,12 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('%s?%s' % (
                 page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
+        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
             page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         ))
         # check when in live mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
+            response = self.client.get('%s?preview&%s' % (
                 page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="%s?%s"' % (
@@ -338,12 +341,12 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('%s?%s' % (
                 page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
+        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
             page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         ))
         # check when in live mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
+            response = self.client.get('%s?preview&%s' % (
                 page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="%s?%s"' % (
@@ -1007,11 +1010,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, superuser, edit=True)
         response = detail_view(request, ex1.pk)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
+        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
             ex1.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         ))
         # check when in live mode
-        request = self.get_page_request(page, superuser, edit=False)
+        request = self.get_page_request(page, superuser, preview=True)
         response = detail_view(request, ex1.pk)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="%s?%s"' % (
