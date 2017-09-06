@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import warnings
 
-from collections import deque
+from collections import OrderedDict
 
 from functools import partial
 
@@ -48,14 +48,23 @@ def _get_page_ancestors(page):
 
 
 class RenderedPlaceholder(object):
-    __slots__ = ('placeholder', 'language', 'site_id', 'cached', 'editable')
+    __slots__ = (
+        'language',
+        'site_id',
+        'cached',
+        'editable',
+        'placeholder',
+        'has_content',
+    )
 
-    def __init__(self, placeholder, language, site_id, cached=False, editable=False):
-        self.placeholder = placeholder
+    def __init__(self, placeholder, language, site_id, cached=False,
+                 editable=False, has_content=False):
         self.language = language
         self.site_id = site_id
         self.cached = cached
         self.editable = editable
+        self.placeholder = placeholder
+        self.has_content = has_content
 
     def __eq__(self, other):
         # The same placeholder rendered with different
@@ -78,8 +87,8 @@ class ContentRenderer(object):
         self._cached_templates = {}
         self._placeholders_content_cache = {}
         self._placeholders_by_page_cache = {}
-        self._rendered_placeholders = deque()
-        self._rendered_static_placeholders = deque()
+        self._rendered_placeholders = OrderedDict()
+        self._rendered_static_placeholders = OrderedDict()
         self._rendered_plugins_by_placeholder = {}
         self._placeholders_are_editable = self.user_is_on_edit_mode()
 
@@ -146,13 +155,15 @@ class ContentRenderer(object):
         return self._rendered_plugins_by_placeholder.get(placeholder.pk, blank)
 
     def get_rendered_placeholders(self):
-        return [r.placeholder for r in self._rendered_placeholders]
+        rendered = list(self._rendered_placeholders.values())
+        return [r.placeholder for r in rendered]
 
     def get_rendered_editable_placeholders(self):
-        return [r.placeholder for r in self._rendered_placeholders if r.editable]
+        rendered = list(self._rendered_placeholders.values())
+        return [r.placeholder for r in rendered if r.editable]
 
     def get_rendered_static_placeholders(self):
-        return self._rendered_static_placeholders
+        return list(self._rendered_static_placeholders.values())
 
     def render_placeholder(self, placeholder, context, language=None, page=None,
                            editable=False, use_cache=False, nodelist=None, width=None):
@@ -256,9 +267,10 @@ class ContentRenderer(object):
             site_id=site_id,
             cached=use_cache,
             editable=editable,
+            has_content=bool(placeholder_content),
         )
 
-        if rendered_placeholder not in self._rendered_placeholders:
+        if placeholder.pk not in self._rendered_placeholders:
             # First time this placeholder is rendered
             if not self.toolbar._cache_disabled:
                 # The toolbar middleware needs to know if the response
@@ -266,7 +278,7 @@ class ContentRenderer(object):
                 # Set the _cache_disabled flag to the value of cache_placeholder
                 # only if the flag is False (meaning cache is enabled).
                 self.toolbar._cache_disabled = not use_cache
-            self._rendered_placeholders.append(rendered_placeholder)
+            self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
         context.pop()
         return mark_safe(toolbar_content + placeholder_content)
@@ -289,6 +301,7 @@ class ContentRenderer(object):
             placeholder = placeholder_cache[current_page.pk][slot]
         except KeyError:
             content = ''
+            placeholder = None
         else:
             content = self.render_placeholder(
                 placeholder,
@@ -324,7 +337,17 @@ class ContentRenderer(object):
                 editable=False,
             )
 
-        if not content and nodelist:
+        if placeholder and (editable and self._placeholders_are_editable):
+            # In edit mode, the contents of the placeholder are mixed with our
+            # internal toolbar markup, so the content variable will always be True.
+            # Use the rendered placeholder has_content flag instead.
+            has_content = self._rendered_placeholders[placeholder.pk].has_content
+        else:
+            # User is not in edit mode or the placeholder doesn't exist.
+            # Either way, we can trust the content variable.
+            has_content = bool(content)
+
+        if not has_content and nodelist:
             return nodelist.render(context)
         return content
 
@@ -351,9 +374,9 @@ class ContentRenderer(object):
             nodelist=nodelist,
         )
 
-        if static_placeholder not in self._rendered_static_placeholders:
+        if static_placeholder.pk not in self._rendered_static_placeholders:
             # First time this static placeholder is rendered
-            self._rendered_static_placeholders.append(static_placeholder)
+            self._rendered_static_placeholders[static_placeholder.pk] = static_placeholder
         return content
 
     def render_plugin(self, instance, context, placeholder=None, editable=False):
