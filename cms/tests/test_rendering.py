@@ -219,9 +219,10 @@ class RenderingTestCase(CMSTestCase):
         return content.strip().replace(u"\n", u"")
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
-    def render(self, page, template=None, context_vars=None):
-        request = self.get_request(page=page)
-        request.toolbar = CMSToolbar(request)
+    def render(self, page, template=None, context_vars=None, request=None):
+        if request is None:
+            request = self.get_request(page=page)
+            request.toolbar = CMSToolbar(request)
 
         if context_vars is None:
             context_vars = {}
@@ -314,6 +315,22 @@ class RenderingTestCase(CMSTestCase):
         t = u'{% load cms_tags %}' + \
             u'|{% placeholder "empty" or %}No content{% endplaceholder %}'
         r = self.render(self.test_page, template=t)
+        self.assertEqual(r, u'|No content')
+
+    def test_placeholder_or_in_edit_mode(self):
+        """
+        Tests the {% placeholder or %} templatetag in edit mode.
+        """
+        t = u'{% load cms_tags %}' + \
+            u'|{% placeholder "empty" or %}No content{% endplaceholder %}'
+        superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            endpoint = self.test_page.get_absolute_url() + '?edit'
+            request = self.get_request(endpoint, page=self.test_page)
+            request.session['cms_edit'] = True
+            request.toolbar = CMSToolbar(request)
+        r = self.render(self.test_page, template=t, request=request)
         self.assertEqual(r, u'|No content')
 
     def test_render_placeholder_tag(self):
