@@ -19,11 +19,11 @@ For feature requests, please use our developers' email list: https://groups.goog
 
 
 
-#### Actual behaviour
+### Actual behaviour
 
 
 
-#### Environment
+### Environment
 
 * Python version:
 * Django version:
