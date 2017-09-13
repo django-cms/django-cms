@@ -1,0 +1,9 @@
+{% load cms_tags %}
+
+<cite
+    {% if instance.classes %} class="{{ instance.classes }}"{% endif %}
+    {{ instance.attributes_str }}>
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</cite>

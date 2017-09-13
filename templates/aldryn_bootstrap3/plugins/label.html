@@ -1,0 +1,3 @@
+{% load cms_tags %}<span class="label
+    {% if instance.context %} label-{{ instance.context }}{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}" {{ instance.attributes_str }}>{{ instance.label }}{% for plugin in instance.child_plugin_instances %} {% render_plugin plugin %} {% endfor %}</span>

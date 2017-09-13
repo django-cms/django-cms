@@ -1,0 +1,31 @@
+{% load cms_tags %}<a href="{{ instance.get_link_url }}"
+   {% if instance.type == 'btn' or instance.txt_context or instance.classes %}
+   class="
+        {% if instance.type == 'btn' %}
+            btn{% if instance.btn_context %} btn-{{ instance.btn_context }}{% endif %}
+            {% if instance.btn_size %} btn-{{ instance.btn_size }}{% endif %}
+            {% if instance.btn_block %} btn-block{% endif %}
+        {% else %}
+            {% if instance.txt_context %}txt-{{ instance.txt_context }}{% endif %}
+        {% endif %}
+        {% if instance.classes %} {{ instance.classes }}{% endif %}
+    "
+    {% endif %}
+    {% if instance.type == 'btn' %}
+        role="button"
+    {% endif %}
+    {% if instance.link_target %}
+        target="{{ instance.link_target }}"
+    {% endif %}
+    {{ instance.link_attributes_str }}
+    >{% spaceless %}
+    {% if instance.icon_left %}{% with icon_class=instance.icon_left %}{% include 'aldryn_bootstrap3/plugins/includes/icon.html' %}{% endwith %}{% endif %}
+
+    {{ instance.label }}
+
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+
+    {% if instance.icon_right %}{% with icon_class=instance.icon_right %}{% include 'aldryn_bootstrap3/plugins/includes/icon.html' %}{% endwith %}{% endif %}
+{% endspaceless %}</a>

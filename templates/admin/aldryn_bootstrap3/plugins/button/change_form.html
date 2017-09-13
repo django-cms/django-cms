@@ -1,0 +1,22 @@
+{% extends "admin/aldryn_bootstrap3/base.html" %}
+{% load i18n %}
+
+{% block field_sets %}
+    <div class="aldryn-bootstrap3 aldryn-bootstrap3-button">
+        <div class="well text-center">
+            <p class="text-muted">
+                <span class="fa fa-fw fa-eye"></span>
+                {% trans "Preview" %}
+            </p>
+            <p class="preview-btn js-preview-btn">
+                <span class="js-button btn">
+                    <i class="pre"></i>
+                    <span>&nbsp;</span>
+                    <i class="post"></i>
+                </span>
+            </p>
+        </div>
+    </div>
+
+    {{ block.super }}
+{% endblock %}

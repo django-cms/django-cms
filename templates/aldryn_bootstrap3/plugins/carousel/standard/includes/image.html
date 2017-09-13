@@ -1,0 +1,16 @@
+{% load cms_tags thumbnail %}
+<img class="center-block"
+    {% with main_src=srcset.lg %}
+        {% thumbnail image.file main_src.size crop=main_src.crop upscale=main_src.upscale subject_location=image.subject_location as main_thumb %}
+        src="{{ main_thumb.url }}"
+    {% endwith %}
+    alt="{{ image.default_alt_text|default:'' }}"
+    {% comment %}
+    {# INFO: needs proper attributes for validation #}
+    srcset="{% for device, src in srcset.items %}
+        {% if not forloop.first %}
+            {% thumbnail image.file src.size crop=src.crop upscale=src.upscale subject_location=image.subject_location as thumb %}{{ thumb.url }} {{ src.width_str }}{% if not forloop.last %},{% endif %}
+        {% endif %}
+    {% endfor %}"
+    {% endcomment %}
+>

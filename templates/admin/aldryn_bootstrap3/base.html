@@ -1,0 +1,17 @@
+{% extends "admin/cms/page/plugin/change_form.html" %}
+{% load staticfiles %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'aldryn_bootstrap3/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'aldryn_bootstrap3/css/bootstrap-iconpicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'aldryn_bootstrap3/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'aldryn_bootstrap3/css/base.css' %}">
+
+    <script src="{% static 'aldryn_bootstrap3/js/jquery.min.js' %}"></script>
+    <script src="{% static 'aldryn_bootstrap3/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'aldryn_bootstrap3/js/iconset/iconset-glyphicon.min.js' %}"></script>
+    <script src="{% static 'aldryn_bootstrap3/js/iconset/iconset-fontawesome-4.2.0.min.js' %}"></script>
+    <script src="{% static 'aldryn_bootstrap3/js/bootstrap-iconpicker.min.js' %}"></script>
+    <script src="{% static 'aldryn_bootstrap3/js/base.js' %}"></script>
+{% endblock %}

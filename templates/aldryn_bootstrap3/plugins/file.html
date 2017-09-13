@@ -1,0 +1,25 @@
+<a href="{{ instance.file.url }}"
+    {% if instance.open_new_window %} target="_blank"{% endif %}
+    {% if instance.classes %} class="{{ instance.classes }}"{% endif %}
+    {{ instance.attributes_str }}>
+    {% if instance.icon_left %}
+        {% with icon_class=instance.icon_left extra_css_classes=instance.icon_left.classes %}
+            {% include 'aldryn_bootstrap3/plugins/includes/icon.html' %}
+        {% endwith %}
+    {% endif %}
+
+    {% if instance.name %}
+        {{ instance.name }}
+    {% else %}
+        {{ instance.file }}
+    {% endif %}
+    {% if instance.show_file_size %}
+        <span class="label label-default">{{ instance.file.size|filesizeformat }}</span>
+    {% endif %}
+
+    {% if instance.icon_right %}
+        {% with icon_class=instance.icon_right extra_css_classes=instance.icon_right.classes %}
+            {% include 'aldryn_bootstrap3/plugins/includes/icon.html' %}
+        {% endwith %}
+    {% endif %}
+</a>

@@ -1,0 +1,74 @@
+{% comment %}
+
+NOTE: Drag and drop support has been removed for now, this file is kept
+for reference on the old implementation / assets
+
+DOCS: https://html.spec.whatwg.org/multipage/embedded-content.html#introduction-3:viewport-based-selection-2
+the browser assumes size="100vw" by default, which means
+"assume this image will be displayed at full width on the
+current viewport and pick an image from srcset accordingly".
+
+{# only load js and css required for dnd upload if toolbar is available #}
+{% if request.toolbar and request.toolbar.show_toolbar and request.toolbar.edit_mode %}
+    {% addtoblock "css" %}<link rel="stylesheet" href="{% static 'aldryn_bootstrap3/css/base.css' %}">{% endaddtoblock %}
+    {% addtoblock "js" %}<script src="{% static 'aldryn_bootstrap3/js/dropzone.min.js' %}"></script>{% endaddtoblock %}
+    {% addtoblock "js" %}<script src="{% static 'aldryn_bootstrap3/js/dropzone.init.js' %}"></script>{% endaddtoblock %}
+{% endif %}
+
+{% endcomment %}
+
+{% comment %}
+# attached before the image
+{% if request.toolbar and request.toolbar.show_toolbar and request.toolbar.edit_mode %}
+    {% if has_dnd_support %}
+        <span class="js-filer-dropzone filer-dropzone filer-dropzone-image-plugin" data-filer-url="{% url 'admin:bootstrap3_image_ajax_upload' pk=instance.pk %}">
+    {% endif %}
+{% endif %}
+
+# attached after the image
+{% if request.toolbar and request.toolbar.show_toolbar and request.toolbar.edit_mode %}
+    {% if has_dnd_support %}
+            <span class="filer-dropzone-info-message js-filer-dropzone-info-message" style="display: none">
+                <span class="filer-dropzone-icon"><span class="fa fa-cloud-upload"></span></span>
+
+                <span class="filer-dropzone-upload-welcome js-filer-dropzone-upload-welcome">
+                    <span class="text">{% trans 'Drop your file to change image:' %}</span>
+                </span>
+
+                <span class="filer-dropzone-upload-info js-filer-dropzone-upload-info" style="display: none">
+                    <span class="js-filer-dropzone-file-name filer-dropzone-file-name"></span>
+                    <span class="filer-dropzone-progress js-filer-dropzone-progress"></span>
+                </span>
+
+                <span class="js-filer-dropzone-upload-success" style="display: none">
+                    {% trans 'Upload success!' %}
+                </span>
+            </span>
+            <span class="filer-dropzone-error-message js-filer-dropzone-error-message" style="display: none">
+                <span class="icon"><span class="fa fa-cloud-upload"></span></span>
+                <span class="js-filer-dropzone-upload-accept filer-dropzone-text">
+                    {% trans 'Error! Files of this type are not accepted.' %}
+                </span>
+            </span>
+        </span>
+    {% endif %}{# has_dnd_support #}
+{% endif %}
+
+# attached to the css
+{% if request.toolbar and request.toolbar.show_toolbar and request.toolbar.edit_mode %}js-original-image {% endif %}
+{% endcomment %}
+
+{% comment %}
+The raw image (original image) can be accessed via:
+    * {{ instance.file.url }}
+There are additional parameters available for thumbnailing purposes:
+    * {{ instance.srcset.lg }} large
+    * {{ instance.srcset.md }} medium
+    * {{ instance.srcset.sm }} small
+    * {{ instance.srcset.xs }} extra small
+Example: {% thumbnail instance.file instance.srcset.lg.size ... %}
+
+In addition, an iterable object is available via ``instance.srcset.items`` to
+access all size settings at once.
+Example: {% for device, src in instance.srcset.items %}
+{% endcomment %}

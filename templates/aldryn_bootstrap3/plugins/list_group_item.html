@@ -1,0 +1,16 @@
+{% load cms_tags %}
+
+<div class="{% if list_group_instance.add_list_group_class %}list-group-item{% else %}list-item{% endif %}
+    {% if instance.context %} list-group-item-{{ instance.context }}{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}
+    {% if instance.state %} {{ instance.state }}{% endif %}"
+    {{ instance.attributes_str }}>
+
+    {% if instance.title %}
+        <h4 class="list-group-item-heading">{{ instance.title }}</h4>
+    {% endif %}
+
+    {% for plugin in item.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</div>

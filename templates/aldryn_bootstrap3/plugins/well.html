@@ -1,0 +1,11 @@
+{% load cms_tags %}
+
+<div class="well
+    {% if instance.size %} well-{{ instance.size }}{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}"
+    {{ instance.attributes_str }}>
+
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</div>

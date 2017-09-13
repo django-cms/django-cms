@@ -1,0 +1,29 @@
+{% load cms_tags %}
+
+{# INFO: slide for a SlideCMSPlugin instance #}
+<div class="item
+    {% if forloop.first %} active{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}">
+    {% with link=instance.get_link_url image=instance.image %}
+        {% if link %}
+            <a href="{{ link }}"{% if instance.link_target %} target="{{ instance.link_target }}"{% endif %} {{ instance.attributes_str }}>
+                {% if image %}
+                    {% with image=instance.image srcset=carousel.srcset %}{% include 'aldryn_bootstrap3/plugins/carousel/standard/includes/image.html' %}{% endwith %}
+                {% else %}
+                    {{ instance.link_text }}
+                {% endif %}
+            </a>
+        {% elif image %}
+            {% with image=instance.image srcset=carousel.srcset %}{% include 'aldryn_bootstrap3/plugins/carousel/standard/includes/image.html' %}{% endwith %}
+        {% endif %}
+    {% endwith %}
+
+    {% if instance.content or instance.child_plugin_instances %}
+        <div class="carousel-caption">
+            {{ instance.content|safe }}
+            {% for plugin in instance.child_plugin_instances %}
+                {% render_plugin plugin %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

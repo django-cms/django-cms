@@ -1,0 +1,5 @@
+{% load aldryn_bootstrap3_tags %}
+
+<span class="icon {{ icon_class|iconset_from_class }} {{ icon_class }}{% if extra_css_classes %} {{ extra_css_classes }}{% endif %}"
+    aria-hidden="true"
+    {{ instance.attributes_str }}></span>

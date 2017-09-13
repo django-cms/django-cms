@@ -1,0 +1,60 @@
+{% load i18n %}
+
+<div class="aldryn-bootstrap3 aldryn-bootstrap3-responsive js-aldryn-bootstrap3-responsive">
+    <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-default js-responsive-choice"
+            data-cls="visible-print">
+            <span class="fa fa-fw fa-2x fa-print"></span><br>
+            <span class="js-on">{% trans "Visible" %}</span>
+            <span class="js-off">{% trans "Hidden" %}</span>
+        </label>
+        <label class="btn btn-primary dropdown-toggle js-responsive-config"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="fa fa-fw fa-2x fa-cog"></span><br>
+            <span class="text">{% trans "Default" %}</span> <span class="caret"></span>
+        </label>
+        <ul class="dropdown-menu js-responsive-config-dropdown">
+            <li class="active"><a href="#">{% trans "Default" %}</a></li>
+            <li><a href="#-block">{% trans "Block" %}</a></li>
+            <li><a href="#-inline">{% trans "Inline" %}</a></li>
+            <li><a href="#-inline-block">{% trans "Inline block" %}</a></li>
+        </ul>
+    </div>
+
+    <div class="textarea-field hidden">
+        {{ widget_html }}
+    </div>
+</div>
+
+{% comment %}
+<div>
+    Data structure that can be used to build the UI (only use it if it is helpful. Might be easier to just
+    hardcode all in the template).
+    Make sure to prefix the name of any <code>input</code> created here, so the names don't clash with real fields in
+    the form.
+    <ul>
+        {% for value, verbose_name in choices %}
+            <li>{{ verbose_name }} (<code>{{ value }}</code>)</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div>
+Save the resulting selection as a class name into the textarea with
+<code>name={{ name }}</code>. It expects something like:
+<pre>
+visible-print-block
+</pre>
+
+</div>
+{{ widget_html }}
+
+<div>
+Other Template variables:
+<pre>
+    id: {{ id }} (css id of the textarea)
+    name: {{ name }}
+    value: {{ value }}
+</pre>
+</div>
+{% endcomment %}

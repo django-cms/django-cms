@@ -1,0 +1,251 @@
+@charset "utf-8";
+/*!
+ * @copyright: https://github.com/divio/django-cms
+ */
+
+/*##############################################################################
+// CONTEXT WIDGET */
+/* used in aldryn_bootstrap3/widgets/context.html */
+.aldryn-bootstrap3-context {
+    margin-left: 3px;
+}
+.aldryn-bootstrap3-context label {
+    position: relative !important;
+    z-index: 1 !important;
+}
+.aldryn-bootstrap3-context label.active {
+    z-index: 10 !important;
+    outline: 3px solid #000;
+    border-radius: 0;
+}
+.aldryn-bootstrap3-context label.btn-link {
+    border-color: #ccc;
+}
+
+/*##############################################################################
+// ICON WIDGET */
+/* used in aldryn_bootstrap3/widgets/icon.html */
+.aldryn-bootstrap3-icon select.form-control {
+    width: auto !important;
+}
+.aldryn-bootstrap3-icon .icon-widgets label {
+    display: inline !important;
+}
+.aldryn-bootstrap3-icon select {
+    margin: 0;
+}
+.aldryn-bootstrap3-icon button.iconpicker {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+}
+
+.iconpicker-popover .search-control {
+    width: 100% !important;
+}
+.iconpicker-popover table tfoot tr td {
+   padding-top: 10px;
+   border-top: 0;
+   background: none;
+}
+.iconpicker-popover .page-count {
+    display: inline-block;
+    padding-top: 8px;
+}
+/* the first entry uses ".glyphicon-" to deselect any icons */
+.iconpicker-popover .glyphicon-,
+.iconpicker-popover .fa- {
+    width: 14px;
+}
+
+/*##############################################################################
+// BUTTON WIDGET */
+/* used in aldryn_bootstrap3/widgets/link_or_button.html */
+.aldryn-bootstrap3-button .preview-btn {
+    margin: 0;
+}
+.field-btn_block .checkbox-row {
+    padding-top: 0 !important;
+    border: none !important;
+}
+.field-txt_context .btn-muted {
+    color: #ccc !important;
+    border: 1px solid #ccc !important;
+}
+.field-btn_context .btn-link {
+    border-radius: 0 3px 3px 0;
+}
+
+/*##############################################################################
+// SIZES WIDGET */
+/* used in aldryn_bootstrap3/widgets/size.html */
+.btn-group-sizes label {
+    line-height: 20px;
+}
+.btn-group-sizes .text-lg {
+    font-size: 18px;
+}
+.btn-group-sizes .text-md {
+    font-size: 14px;
+}
+.btn-group-sizes .text-sm {
+    font-size: 12px;
+}
+.btn-group-sizes .text-sm .glyphicon {
+    top: 2px;
+}
+.btn-group-sizes .text-xs {
+    font-size: 10px;
+}
+.btn-group-sizes .text-xs .glyphicon {
+    top: 3px;
+}
+
+/*##############################################################################
+// RESPONSIVE WIDGET */
+/* used in aldryn_bootstrap3/widgets/responsive.html */
+/* used in aldryn_bootstrap3/widgets/responsive_print.html */
+.aldryn-bootstrap3-responsive .fa {
+    margin: 4px 0;
+}
+.aldryn-bootstrap3-responsive .btn-group label {
+    min-width: 90px;
+}
+.aldryn-bootstrap3-responsive .btn-group .dropdown-menu {
+    right: 0;
+    left: auto;
+    padding: 0;
+    margin: 5px 0;
+    border: none;
+}
+.aldryn-bootstrap3-responsive .btn-group .dropdown-menu li {
+    padding: 5px 0;
+}
+.aldryn-bootstrap3-responsive .btn-group .dropdown-menu li:first-child {
+    border-top: none;
+}
+
+/*##############################################################################
+// GRID PLUGIN */
+/* used in aldryn_bootstrap3/plugins/column/change_form.html */
+/* used in aldryn_bootstrap3/plugins/row/change_form.html */
+.aldryn-bootstrap3-grid input[type="number"] {
+    margin-right: 10px;
+}
+.aldryn-bootstrap3-grid .module {
+    margin-bottom: 20px;
+}
+.aldryn-bootstrap3-grid .form-row {
+    overflow: hidden;
+    padding: 14px 0 10px;
+}
+.aldryn-bootstrap3-grid fieldset:first-child .form-row {
+    border-bottom: 1px solid #ddd !important;
+}
+.aldryn-bootstrap3-grid .help {
+    display: none;
+}
+.aldryn-bootstrap3-grid .form-row-icon {
+    float: left;
+    font-size: 35px;
+    line-height: 40px;
+    margin-right: 10px;
+}
+
+.aldryn-bootstrap3-grid .field-create label {
+    float: left;
+    display: inline-block;
+    width: 150px !important;
+}
+.aldryn-bootstrap3-grid .field-create input {
+    width: 70px !important;
+}
+
+.aldryn-bootstrap3-grid .field-box label {
+    float: left;
+    display: inline-block;
+    text-transform: lowercase;
+    text-align: right;
+    width: 70px !important;
+}
+.aldryn-bootstrap3-grid .field-box input {
+    width: auto !important;
+}
+
+/*##############################################################################
+// LABEL PLUGIN */
+/* used in aldryn_bootstrap3/plugins/label/change_form.html */
+.aldryn-bootstrap3-label .label-preview {
+    font-size: 18px !important;
+    margin: 0;
+}
+
+/*##############################################################################
+// BLOCKQUOTE PLUGIN */
+/* used in aldryn_bootstrap3/plugins/blockquote/change_form.html */
+#boostrap3blockquoteplugin_form .checkbox-row {
+    padding-top: 0 !important;
+    border: none !important;
+}
+
+/*##############################################################################
+// IMAGE PLUGIN WITH DRAG AND DROP FEATURE */
+.filer-dropzone-image-plugin {
+    display: inline-block;
+}
+.filer-dropzone.dz-drag-hover {
+    background: #E5F8FF;
+    box-shadow: 0 0 0 2px #00BAFF;
+}
+.popup .filer-dropzone.dz-drag-hover {
+    box-shadow: none;
+}
+.filer-dropzone.dz-drag-hover img {
+    opacity: 0.3;
+}
+.filer-dropzone-info-message,
+.filer-dropzone-error-message {
+    position: fixed;
+    display: block;
+    left: 50%;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 2;
+    color: #000;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+    text-align: center;
+    width: 270px;
+    margin: 0 0 50px -150px;
+    padding: 15px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,0.2);
+}
+.filer-dropzone-info-message .filer-dropzone-icon,
+.filer-dropzone-error-message .filer-dropzone-icon {
+    display: block;
+    font-size: 35px;
+    color: #0bf;
+}
+.filer-dropzone-info-message .filer-dropzone-text,
+.filer-dropzone-error-message .filer-dropzone-text {
+    display: block;
+    margin: 5px 0 10px 0;
+}
+.filer-dropzone-upload-info {
+    display: block;
+    margin-top: 10px;
+}
+.filer-dropzone-upload-info  .filer-dropzone-file-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.filer-dropzone-progress {
+    display: block;
+    height: 5px;
+    margin-top: 5px;
+    background-color: #0bf;
+}

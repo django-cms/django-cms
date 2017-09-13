@@ -1,0 +1,45 @@
+{% load i18n cms_tags thumbnail staticfiles sekizai_tags %}{% comment %}
+The raw image (original image) can be accessed via:
+    * {{ instance.file.url }}
+There are additional parameters available for thumbnailing purposes:
+    * {{ instance.srcset.lg }} large
+    * {{ instance.srcset.md }} medium
+    * {{ instance.srcset.sm }} small
+    * {{ instance.srcset.xs }} extra small
+Example: {% thumbnail instance.file instance.srcset.lg.size ... %}
+
+In addition, an iterable object is available via ``instance.srcset.items`` to
+access all size settings at once.
+Example: {% for device, src in instance.srcset.items %}
+{% endcomment %}<img
+    {% if instance.use_original_image %}
+        src="{{ instance.file.url }}"
+    {% else %}
+        {% with main_src=instance.srcset.lg %}
+            {% thumbnail instance.file main_src.size crop=main_src.crop upscale=main_src.upscale subject_location=main_src.subject_location as main_thumb %}
+            src="{{ main_thumb.url }}"
+        {% endwith %}
+    {% endif %}
+    alt="{{ instance.alt }}"
+    {% if instance.title %} title="{{ instance.title }}"{% endif %}
+    {% if instance.img_responsive or instance.shape or instance.thumbnail or instance.classes or request.toolbar %}
+        class="
+            {% if instance.img_responsive %}img-responsive {% endif %}
+            {% if instance.shape %}img-{{ instance.shape }} {% endif %}
+            {% if instance.thumbnail %}img-thumbnail {% endif %}
+            {% if instance.classes %}{{ instance.classes }} {% endif %}
+            {% if request.toolbar and request.toolbar.show_toolbar and request.toolbar.edit_mode and has_dnd_support %} js-aldryn-bootstrap3-image-dnd{% endif %}
+        "
+    {% endif %}
+    {% if request.toolbar and request.toolbar.show_toolbar and request.toolbar.edit_mode and has_dnd_support %}
+        data-dnd-filer-url="{% url 'admin:bootstrap3_image_ajax_upload' pk=instance.pk %}"
+    {% endif %}
+    {% if srcset_support %}
+        srcset="{% for device, src in instance.srcset.items %}
+            {% if not forloop.first %}
+                {% thumbnail instance.file src.size crop=src.crop upscale=src.upscale subject_location=src.subject_location as thumb %}{{ thumb.url }} {{ src.width_str }}{% if not forloop.last %},{% endif %}
+            {% endif %}
+        {% endfor %}"
+    {% endif %}
+    {{ instance.attributes_str }}
+>{# include "admin/aldryn_bootstrap3/widgets/dragndrop.html" #}

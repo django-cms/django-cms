@@ -1,0 +1,8 @@
+{% load cms_tags %}<div class="{{ instance.device_breakpoints }}
+    {% if instance.print_breakpoints %}{% if not instance.device_breakpoints %} visible-print{% endif %}{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}"
+    {{ instance.attributes_str }}>
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</div>

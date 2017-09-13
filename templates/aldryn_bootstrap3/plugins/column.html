@@ -1,0 +1,10 @@
+{% load cms_tags %}
+
+<{{ instance.tag }} class="{{ instance.get_column_classes }}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}"
+    {{ instance.attributes_str }}>
+
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</{{ instance.tag }}>

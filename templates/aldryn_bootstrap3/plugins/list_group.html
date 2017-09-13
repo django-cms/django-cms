@@ -1,0 +1,10 @@
+{% load cms_tags %}
+
+<div class="{% if instance.add_list_group_class %}list-group{% else %}list{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}"
+    {{ instance.attributes_str }}>
+
+    {% for plugin in instance.child_plugin_instances %}
+        {% with parentloop=forloop list_group_instance=instance %}{% render_plugin plugin %}{% endwith %}
+    {% endfor %}
+</div>

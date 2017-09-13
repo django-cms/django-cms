@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<div class="aldryn-bootstrap3 aldryn-bootstrap3-icon"
+    data-name="{{ name }}"
+    data-iconset="{{ iconset }}">
+    {% if not iconsets %}
+        <div class="alert alert-danger">
+            {% trans "No Iconsets configured. Please configure at least one Iconset before using this widget." %}
+        </div>
+    {% else %}
+        <div class="icon js-icon js-icon-{{ name }} form-inline">
+            {# label "icon" relates to elements ID #}
+            {% if not is_required %}
+                <input id="id_{{ name }}" class="checkbox js-icon-enable{% if is_required %} hidden{% endif %}" name="icons-enabled-{{ name }}" type="checkbox"{% if value or is_required %} checked="checked"{% endif %}>
+            {% endif %}
+
+            <span class="icon-widgets js-icon-widgets{% if not is_required %} hidden{% endif %}">
+                <label>
+                    <select class="form-control js-iconset">
+                        {% for iconpicker_iconset, prefix, verbose_name in iconsets %}
+                            <option value="{{ iconpicker_iconset }}" data-prefix="{{ prefix }}"{% if iconset == prefix %} selected="selected"{% endif %}>{{ verbose_name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="iconpicker iconpicker-wrapper js-icon-picker">
+                    <button{% if is_required %} id="id_{{ name }}"{% endif %}
+                        name="{{ name }}"
+                        data-iconset="{{ iconset }}"
+                        data-icon="{{ value }}">
+                    </button>
+                </label>
+            </span>
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,25 @@
+{% load cms_tags %}
+
+<div class="tabs
+    {% if instance.classes %} {{ instance.classes }}{% endif %}"
+    {{ instance.attributes_str }}>
+
+    <ul class="nav {{ instance.style }}" role="tablist">
+        {% for plugin in instance.child_plugin_instances %}
+            <li role="presentation"{% if instance.index == forloop.counter %} class="active"{% endif %}>
+                <a href="#tab-{{ plugin.pk }}" aria-controls="tab-{{ plugin.pk }}" role="tab" data-toggle="tab">
+                    {% if plugin.icon %}
+                        {% include "aldryn_bootstrap3/plugins/includes/icon.html" with icon_class=plugin.icon %}
+                    {% endif %}
+                    {{ plugin.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+    </div>
+</div>

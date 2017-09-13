@@ -1,0 +1,4 @@
+{# INFO: slide for a filer.Image instance #}
+<div class="item{% if forloop.first %} active{% endif %}">
+    {% with srcset=carousel.srcset %}{% include 'aldryn_bootstrap3/plugins/carousel/standard/includes/image.html' %}{% endwith %}
+</div>

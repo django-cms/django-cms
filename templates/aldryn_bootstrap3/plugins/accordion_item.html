@@ -1,0 +1,31 @@
+{% load cms_tags %}
+
+<div class="panel
+    {% if instance.context %} panel-{{ instance.context }}{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}"
+    {{ instance.attributes_str }}>
+
+    <div class="panel-heading" role="tab" id="heading-{{ item.title|slugify }}-{{ item.pk }}">
+        <h4 class="panel-title">
+            <a href="#collapse-{{ item.title|slugify }}-{{ item.pk }}"
+                class="{% if index == forloop.counter %}{% else %}collapsed{% endif %}"
+                data-toggle="collapse"
+                data-parent="#{{ accordion_id }}"
+                aria-expanded="{% if index == forloop.counter %}true{% else %}false{% endif %}"
+                aria-controls="collapse-{{ item.title|slugify }}-{{ item.pk }}">
+                {{ item.title }}
+            </a>
+        </h4>
+    </div>
+
+    <div class="panel-collapse collapse{% if index == forloop.counter %} in{% endif %}"
+        id="collapse-{{ item.title|slugify }}-{{ item.pk }}"
+        role="tabpanel"
+        aria-labelledby="heading-{{ item.title|slugify }}-{{ item.pk }}">
+        <div class="panel-body">
+            {% for plugin in item.child_plugin_instances %}
+                {% render_plugin plugin %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

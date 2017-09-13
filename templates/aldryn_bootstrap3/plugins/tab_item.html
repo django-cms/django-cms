@@ -1,0 +1,14 @@
+{% load cms_tags %}
+
+<div role="tabpanel"
+    id="tab-{{ instance.pk }}"
+    class="tab-pane
+    {% if tab_plugin.index == forloop.counter %} in active{% endif %}
+    {% if instance.classes %} {{ instance.classes }}{% endif %}
+    {% if tab_plugin.effect %} fade{% endif %}"
+    {{ instance.attributes_str }}>
+
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</div>
