@@ -1,0 +1,12 @@
+{% extends "fullwidth.html" %}
+{% load static sekizai_tags %}
+
+{% block content %}
+<div class="styleguide">
+    {% include "divio_styleguide/styleguide/includes/navigation.html" %}
+    {% include "divio_styleguide/styleguide/includes/sections.html" %}
+</div>
+
+{% include "divio_styleguide/styleguide/includes/html_beautify.js.html" %}
+{% include "divio_styleguide/styleguide/includes/interaction.html" %}
+{% endblock %}

@@ -1,0 +1,1327 @@
+<section data-id="templates" hidden="hidden">
+    <h2>Online Styleguide</h2>
+    <p class="lead">The Online Styleguide is a uniformed compendium for project managers, web publisher, designers or
+        developers of how to maintain, update or further develop a website. This section is covering an overview
+        of all available templates developed for this website.</p>
+
+    {% include "divio_styleguide/styleguide/templates.html" %}
+
+    <h4>Browser Support</h4>
+    <div class="alert alert-warning" role="alert">
+        <p><span class="icon icon-fw icon-info"></span> <strong>Google Chrome</strong>*, <strong>Mozilla Firefox</strong>*, <strong>Apple Safari</strong>, <strong>Internet Explorer 9+</strong>
+            <small class="pull-right">* latest 3 iterations</small></p>
+    </div>
+</section>
+
+<section data-id="typography" hidden="hidden">
+    <h2>Typography</h2>
+    <p class="lead">This section defines default stylings and behaviours for HTML and CSS that can be used within a
+        <abbr title="What you see is what you get">wysiwyg</abbr> text editor. A full documentation and detailed
+        examples can be found within the <a href="http://getbootstrap.com/css/">Bootstrap</a> documentation.
+        We only display the most important elements here.
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Headings</h3>
+            <p>Headings have to follow a chronologically order. For example a <code>&lt;h1&gt;</code> is followed by <code>&lt;h2&gt;</code>
+                than <code>&lt;h3&gt;</code> and so on. You should <strong>not</strong> use different headings just because of
+                their styling. So placing first a <code>&lt;h2&gt;</code> and than a <code>&lt;h4&gt;</code> causes SEO problems.</p>
+            <p>You should avoid the overuse of <code>&lt;h1&gt;</code> tags. In contrary to some beliefs, it is no problem to use
+                multiple <code>&lt;h1&gt;</code> tags however the <a href="http://gsnedders.html5.org/outliner/">html outline</a> should always be respected.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <section class="code-container">
+                <h1>h1. Sample Heading</h1>
+                <h2>h2. Sample Heading</h2>
+                <h3>h3. Sample Heading</h3>
+                <h4>h4. Sample Heading</h4>
+                <h5>h5. Sample Heading</h5>
+                <h6>h6. Sample Heading <small>Secondary text</small></h6>
+            </section>
+            <p><code>h1, h2, h3, h4, h5, h6, h6.small</code></p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Body Text</h3>
+            <p>The main content part of an area. Always be wary that the most important aspect of SEO is to have well
+                written and structured content. The best design and code will not help your ranking with a bad content
+                strategy.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <p class="lead">This is a lead text describing the start of a content area to get the attention of the reader.</p>
+                <p>Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient
+                    montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.</p>
+                <p><small>This line of text is meant to be treated as fine print.</small></p>
+            </div>
+            <p><code>p.lead, p, small</code></p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Colors</h3>
+            <p>The color palette defines the main look &amp; feel of a website and is mostly adapted from an available
+                <abbr title="Corporate Identity">CI</abbr> &amp; <abbr title="Corporate Design">CD</abbr></p>
+            <p>In addition to Bootstrap's defaults, we added the <code>.brand-secondary</code> class to the list as many
+                brands have at least two main colours.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container clearfix">
+                <span title="primary" class="color-swatch brand-primary"></span>
+                <span title="secondary" class="color-swatch brand-secondary"></span>
+                <span title="success" class="color-swatch brand-success"></span>
+                <span title="info" class="color-swatch brand-info"></span>
+                <span title="warning" class="color-swatch brand-warning"></span>
+                <span title="danger" class="color-swatch brand-danger"></span>
+                <span title="muted" class="color-swatch brand-muted"></span>
+                <div class="clearfix"></div>
+                <span title="gray-lighter" class="color-swatch brand-gray-lighter"></span>
+                <span title="gray-light" class="color-swatch brand-gray-light"></span>
+                <span title="gray" class="color-swatch brand-gray"></span>
+                <span title="gray-dark" class="color-swatch brand-gray-dark"></span>
+                <span title="gray-darker" class="color-swatch brand-gray-darker"></span>
+            </div>
+            <div class="spacer"></div>
+            <div class="code-container clearfix">
+                <span title="primary" class="text-primary">primary</span>,
+                <span title="secondary" class="text-secondary">secondary</span>,
+                <span title="success" class="text-success">success</span>,
+                <span title="info" class="text-info">info</span>,
+                <span title="warning" class="text-warning">warning</span>,
+                <span title="danger" class="text-danger">danger</span>,
+                <span title="muted" class="text-muted">muted</span>
+            </div>
+            <div class="spacer"></div>
+            <p><code>.text-{name}</code> for text color<br />
+                <code>.brand-{name}</code> for background color<br />
+                <br />
+                {name} can be:<br />
+                <code>primary, secondary, success, info, warning, danger, muted</code></p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Lists</h3>
+            <p>Lists are a great way of displaying structured informations. If this data has a specific order
+                use the <code>&lt;ol&gt;</code> (ordered list) tag otherwise the <code>&lt;ul&gt;</code> (unordered list) tag.</p>
+            <p>Sometimes you have information that leads to an explanation or more information. For this
+                the definition list is the markup to choose from. Simple nest a definition term <code>&lt;dt&gt;</code>
+                and than the definition description <code>&lt;dd&gt;</code> within the definition list <code>&lt;dl&gt;</code>.
+                There can be multiple definition description follow after a definition term.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="code-container">
+                        <h4>Unordered</h4>
+                        <ul>
+                            <li>Lorem ipsum dolor</li>
+                            <li>
+                                Facilisis in pretium
+                                <ul>
+                                    <li>Nulla volutpat aliquam</li>
+                                    <li>
+                                        <a href="#">Facilisis in pretium</a>
+                                        <ul>
+                                            <li>Nulla volutpat aliquam</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>Eget porttitor</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="code-container">
+                    <h4>Ordered</h4>
+                        <ol>
+                            <li>Lorem ipsum dolor</li>
+                            <li>
+                                Facilisis in pretium
+                                <ul>
+                                    <li>Nulla volutpat aliquam</li>
+                                    <li>
+                                        <a href="#">Facilisis in pretium</a>
+                                        <ul>
+                                            <li>Nulla volutpat aliquam</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>Eget porttitor</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="code-container">
+                <h4>Description</h4>
+                <dl>
+                    <dt>Euismod Dolor</dt>
+                    <dd>A description list is perfect for defining terms. Etiam porta sem malesuada Etiam porta sem malesuada magna mollis euismod. magna mollis euismod. Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod.</dd>
+                    <dd>Donec id elit non mi porta gravida at eget metus.</dd>
+                    <dt>Malesuada porta</dt>
+                    <dd>Etiam porta sem malesuada magna mollis euismod.</dd>
+                    <dd>Donec id elit non mi porta gravida at eget metus.</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Emphasis</h3>
+            <p>In addition to the main elements described above, you can utilise an even broader set of html tags listed here
+                in the emphasis section.</p>
+            <p>Most <abbr title="What You See Is What You Get">WYSIWYG</abbr> editors are able to produce them simply by
+                pressing a button, but it is wise to study them and eventually add missing tags through the source
+                code mode.</p>
+            <p>A full list and detailed description can be found within the <a href="http://www.w3.org/TR/html-markup/elements.html">W3C HTML5</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="row">
+                <div class="col-md-12 code-container">
+                    <p>The <a href="#">hyperlink</a> element<br />
+                        <code>&lt;a href="#">My text&lt;/a></code></p>
+                    <p>The <abbr title="abbreviation">abbr</abbr> element<br />
+                        <code>&lt;abbr title="#">TXT&lt;/abbr></code></p>
+                    <address class="spacer">
+                        <strong>The address</strong> element<br />
+                        <code>&lt;address>My text&lt;address></code>
+                    </address>
+                    <p>The <cite>cite</cite> element<br />
+                        <code>&lt;cite>My text&lt;/cite></code></p>
+                    <p>The <code>code</code> element<br />
+                        <code>&lt;code>My text&lt;/code></code></p>
+                    <p>The <del>delete</del> element<br />
+                        <code>&lt;del>My text&lt;/del></code></p>
+                    <p>The <dfn>definition</dfn> element<br />
+                        <code>&lt;dfn>My text&lt;/dfn></code></p>
+                    <p>The <em>emphasis</em> element<br />
+                        <code>&lt;em>My text&lt;/em></code></p>
+                    <p>The <ins>insert</ins> element<br />
+                        <code>&lt;ins>My text&lt;/ins></code></p>
+                    <p>The <kbd>keyboard</kbd> element<br />
+                        <code>&lt;kbd>My text&lt;/kbd></code></p>
+                    <p>The <mark>mark</mark> element<br />
+                        <code>&lt;mark>My text&lt;/mark></code></p>
+                </div>
+                <div class="col-md-12 code-container">
+                    <p>The <s>strikethrough</s> element<br />
+                        <code>&lt;s>My text&lt;/s></code></p>
+                    <p>The <samp>sample</samp> element<br />
+                        <code>&lt;samp>My text&lt;/samp></code></p>
+                    <p>The <small>small</small> element<br />
+                        <code>&lt;small>My text&lt;/small></code></p>
+                    <p>The <span>span</span> element<br />
+                        <code>&lt;span>My text&lt;/span></code></p>
+                    <p>The <strong>strong</strong> element<br />
+                        <code>&lt;strong>My text&lt;/strong></code></p>
+                    <p>The <sub>subscript</sub> element<br />
+                        <code>&lt;sub>My text&lt;/sub></code></p>
+                    <p>The <sup>superscript</sup> element<br />
+                        <code>&lt;sup>My text&lt;/sup></code></p>
+                    <p>The time <time>10:00</time> element<br />
+                        <code>&lt;time>My text&lt;/time></code></p>
+                    <p>The <u>underline</u> element<br />
+                        <code>&lt;u>My text&lt;/u></code></p>
+                    <p>The <var>variable</var> element<br />
+                        <code>&lt;var>My text&lt;/var></code></p>
+                    <p>The <wbr>word break<wbr> element<br />
+                        <code>&lt;wbr>My text&lt;wbr></code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Block quotes</h3>
+            <p>Per definition block-quotes are cites extracted from resources such as books or articles. They generally
+                consist of a body text and the authors name.</p>
+            <p>Through Bootstrap's utilities they can be left- or right-aligned. More options are also available through
+                different classes.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <blockquote>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                    <small>Someone famous in <cite title="Source Title">Source Title</cite></small>
+                </blockquote>
+            </div>
+            <div class="code-container">
+                <blockquote class="pull-right">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                    <small>Someone famous in <cite title="Source Title">Source Title</cite></small>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Spacing</h3>
+            <p>There are also some extra tags and classes which might be helpful when creating your pages in order
+                to manage spacing in between content areas.</p>
+            <p>Add the <code>.spacer</code> classes to the <code>&lt;hr /&gt;</code> in order do increase or decrease the
+                spacing. This can be used on almost every element.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <h4>Linebreak</h4>
+            <hr />
+            <code>&lt;hr /&gt;</code>
+            <h4>Margins</h4>
+            <p><code>.spacer-zero</code> sets margin-top and margin-bottom to <strong>0</strong>.</p>
+            <p><code>.spacer-xs</code> sets margin-top and margin-bottom to <strong>$line-height-computed / 4</strong>.</p>
+            <p><code>.spacer</code> sets margin-top and margin-bottom to <strong>$line-height-computed / 2</strong>.</p>
+            <p><code>.spacer-lg</code> sets margin-top and margin-bottom to <strong>$line-height-computed</strong>.</p>
+        </div>
+    </div>
+
+    {% include "divio_styleguide/styleguide/typography.html" %}
+</section>
+
+<section data-id="iconography" hidden="hidden">
+    <h2>Iconography</h2>
+    <p class="lead">Generate font icons using the <a href="http://fontastic.me/">fontastic.me</a>
+        service. The following icons are available throughout your website. Implement them using
+        <code>&lt;span class="icon icon-{name}"&gt;&lt;/span&gt;</code> and replace {name} with the icon name.
+        Additional utilities can be used as described underneath. All Icons are compatible with Bootstrap.</p>
+
+    <div class="row">
+        <div class="col-xs-24"><div class="iconlist-render"></div></div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Sizes</h3>
+            <p>Similar to the buttons there are various classes to increase the icons sizes. <code>.code-fw</code>
+                fixes the with of an icon.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <p>
+                <span class="icon icon-star icon-lg"></span> <code>.icon-lg</code>
+                <span class="icon icon-star icon-2x"></span> <code>.icon-2x</code>
+                <span class="icon icon-star icon-3x"></span> <code>.icon-3x</code>
+                <span class="icon icon-star icon-4x"></span> <code>.icon-4x</code>
+                <span class="icon icon-star icon-5x"></span> <code>.icon-5x</code>
+            </p>
+            <p><span class="icon icon-star icon-fw"></span> <code>.icon-fw</code> Icon with fixed width
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Lists &amp; Styles</h3>
+            <p>You can place icons just about anywhere using the CSS Prefix <code>.icon</code> and the icon's name.
+                Icons are designed to be used with inline elements through the <code>&lt;span&gt;</code> tag.</p>
+            <p>More examples can be found within the <a href="http://fortawesome.github.io/Font-Awesome/examples/">Font Awesome</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="row">
+                <div class="col-md-8">
+                    <ul class="icon-ul">
+                        <li><span class="icon-li icon icon-arrow-right"></span>List icon</li>
+                        <li><span class="icon-li icon icon-arrow-right"></span>List icon</li>
+                        <li><span class="icon-li icon icon-arrow-right"></span>List icon</li>
+                        <li><span class="icon-li icon icon-arrow-right"></span>List icon</li>
+                    </ul>
+                    <code>.icon-ul, .icon-li</code>
+                </div>
+                <div class="col-md-16">
+                    <p><span class="icon icon-star icon-3x icon-border pull-left"></span>
+                        ...tomorrow we will run iconster, stretch out our arms iconrther...
+                        And then one fine morning— So we beat on, boats against the
+                        current, borne back ceaselessly into the past.</p>
+                    <code>.icon-border, .pull-left</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Animation, Rotation &amp; Stacks</h3>
+            <p>There are simple classes available to manipulate any giving icon. Simply flip them around, use animation
+                or even combine two different icons to create a new look.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="row">
+                <div class="col-md-8">
+                    <p><span class="icon icon-spinner icon-spin"></span></p>
+                    <p><span class="icon icon-star icon-spin"></span></p>
+                    <p><span class="icon icon-arrow-left icon-spin"></span></p>
+                    <code>.icon-spin</code>
+                </div>
+                <div class="col-md-8">
+                    <p><span class="icon icon-arrow-left icon-rotate-90"></span> <code>.icon-rotate-90</code><br></p>
+                    <p><span class="icon icon-arrow-left icon-rotate-180"></span> <code>.icon-rotate-180</code><br></p>
+                    <p><span class="icon icon-arrow-left icon-rotate-270"></span> <code>.icon-rotate-270</code><br></p>
+                    <p><span class="icon icon-arrow-left icon-flip-horizontal"></span> <code>.icon-flip-horizontal</code><br></p>
+                    <p><span class="icon icon-arrow-left icon-flip-vertical"></span> <code>.icon-flip-vertical</code></p>
+                </div>
+                <div class="col-md-8">
+                    <p><span class="icon-stack">
+                        <span class="icon icon-square icon-stack-2x"></span>
+                        <span class="icon icon-terminal icon-stack-1x icon-inverse"></span>
+                    </span><br />
+                    <code>.icon-stack, .icon-inverse</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "divio_styleguide/styleguide/iconography.html" %}
+</section>
+
+<section data-id="tables" hidden="hidden">
+    <h2>Tables</h2>
+    <p class="lead">For basic styling — light padding and only horizontal dividers — add the base class <code>.table</code>
+        to any <code>&lt;table&gt;</code>. It may seem super redundant, but given the widespread use of tables
+        we've opted to isolate our custom table styles. For complete reference, please visit the
+        <a href="http://getbootstrap.com/css/#tables">Bootstrap</a> documentation.</p>
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Basic Table</h3>
+            <p>The basic table is the default behaviour when using the <code>.table</code> class. Not adding a class will
+                result in a table without styles at all.</p>
+            <p>To ensure a table is responsive, add the wrapper class <code>.table-responsive</code> to an element
+                <strong>around</strong> the table. For example a <code>&lt;div&gt;</code>.</p>
+            <p>More about the basics of a table can be found within the <a href="http://getbootstrap.com/css/#tables-example">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <div class="table-responsive">
+                    {% with cls="table" %}
+                    {% include "divio_styleguide/styleguide/components/table.html" %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Striped Rows</h3>
+            <p>Sometimes it is necessary to distinguish content form within a table from one another. For this add the
+                class <code>.table-striped</code> to the table and visual even and odd colours are added.</p>
+            <p>Use this on larger table where content is difficult to read and a clear separation might be required.</p>
+            <p>More about striped rows can be found within the <a href="http://getbootstrap.com/css/#tables-striped">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <div class="table-responsive">
+                    {% with cls="table table-striped" %}
+                    {% include "divio_styleguide/styleguide/components/table.html" %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Bordered Tables</h3>
+            <p>These tables are used for displaying table data rather than just general listings or informations.
+                Simply add the class <code>.table-bordered</code> to the table and a border is added around the table.</p>
+            <p>Use this on tables where structured data is displayed or the context of the table is separated from the
+                surrounding content.</p>
+            <p>More about bordered tables can be found within the <a href="http://getbootstrap.com/css/#tables-bordered">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <div class="table-responsive">
+                    {% with cls="table table-bordered" %}
+                    {% include "divio_styleguide/styleguide/components/table.html" %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Contextual Classes</h3>
+            <p>At any given time, you can combine one or more table styles as described above. But always keep the use cases
+                of each individual style in mind.</p>
+            <p>Additionally you are able to add contextual classes to the table to highlight single rows. These can be
+                <code>.active</code>, <code>.success</code>, <code>.info</code>, <code>.warning</code> and <code>.danger</code>.
+                Simply add them to the <code>&lt;tr&gt;</code> element of the table.</p>
+            <p>More about bordered tables can be found within the <a href="http://getbootstrap.com/css/#tables-contextual-classes">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <div class="table-responsive">
+                    {% with cls="table table-bordered table-striped table-hover" extras="true" %}
+                    {% include "divio_styleguide/styleguide/components/table.html" %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "divio_styleguide/styleguide/tables.html" %}
+</section>
+
+<section data-id="forms" hidden="hidden">
+    <h2>Forms</h2>
+    <p class="lead">Individual form controls automatically receive some global styling. All textual <code>&lt;input&gt;</code>,
+        <code>&lt;textarea&gt;</code>, and <code>&lt;select&gt;</code> elements with <code>.form-control</code> are set
+        to <code>width: 100%;</code> by default. Wrap labels and controls in <code>.form-group</code> for optimum spacing.
+        For complete reference, please visit the
+        <a href="http://getbootstrap.com/css/#forms">Bootstrap</a> documentation.</p>
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Buttons</h3>
+            <p>There are various button sizes and colours to choose from. It is imperative however that you structure
+                the usage according to the importance of the action. When using two actions together, decide
+                which one is of more importance and make it slightly bigger.</p>
+            <p>For color usage also consider the individual use case. A red button is ideal for cancellation actions while the
+                green counterpart signifies a success action. Please refer to the button names for its descriptive
+                meaning.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <h4>Colors</h4>
+            <p class="code-container">
+                <button type="button" class="btn btn-default">Default</button>
+                <button type="button" class="btn btn-primary">Primary</button>
+                <button type="button" class="btn btn-success">Success</button>
+                <button type="button" class="btn btn-info">Info</button>
+                <button type="button" class="btn btn-warning">Warning</button>
+                <button type="button" class="btn btn-danger">Danger</button>
+                <button type="button" class="btn btn-link">Link</button>
+            </p>
+            <p class="code-container">
+                <button type="button" class="btn btn-outline btn-default">Default</button>
+                <button type="button" class="btn btn-outline btn-primary">Primary</button>
+                <button type="button" class="btn btn-outline btn-success">Success</button>
+                <button type="button" class="btn btn-outline btn-info">Info</button>
+                <button type="button" class="btn btn-outline btn-warning">Warning</button>
+                <button type="button" class="btn btn-outline btn-danger">Danger</button>
+                <button type="button" class="btn btn-outline btn-link">Link</button>
+            </p>
+            <h4>Active</h4>
+            <p class="code-container">
+                <button type="button" class="btn btn-default active">Default</button>
+                <button type="button" class="btn btn-primary active">Primary</button>
+                <button type="button" class="btn btn-success active">Success</button>
+                <button type="button" class="btn btn-info active">Info</button>
+                <button type="button" class="btn btn-warning active">Warning</button>
+                <button type="button" class="btn btn-danger active">Danger</button>
+                <button type="button" class="btn btn-link active">Link</button>
+            </p>
+            <h4>Disabled</h4>
+            <p class="code-container">
+                <button type="button" class="btn btn-default disabled">Default</button>
+                <button type="button" class="btn btn-primary disabled">Primary</button>
+                <button type="button" class="btn btn-success disabled">Success</button>
+                <button type="button" class="btn btn-info disabled">Info</button>
+                <button type="button" class="btn btn-warning disabled">Warning</button>
+                <button type="button" class="btn btn-danger disabled">Danger</button>
+                <button type="button" class="btn btn-link disabled">Link</button>
+            </p>
+            <h4>Sizes</h4>
+            <p class="code-container">
+                <button type="button" class="btn btn-default btn-lg">Large button</button>
+                <button type="button" class="btn btn-default">Default button</button>
+                <button type="button" class="btn btn-default btn-sm">Small button</button>
+                <button type="button" class="btn btn-default btn-xs">Mini button</button>
+            </p>
+            <h4>Types</h4>
+            <p class="code-container">
+                <a class="btn btn-default" href="#" role="button">Link</a>
+                <button class="btn btn-default" type="submit">Button</button>
+                <input class="btn btn-default" type="button" value="Input" />
+                <input class="btn btn-default" type="submit" value="Submit" />
+            </p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Button Utilities</h3>
+            <p>There are additional combinations possible using the button system. You can easily add drop-down menus, icons
+                or append more buttons to one another.</p>
+            <p>More about button utilities can be found within the <a href="http://getbootstrap.com/css/#buttons">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <p><button type="button" class="btn btn-default btn-lg btn-block">Block level button</button></p>
+            </div>
+            <div class="code-container">
+                <div class="btn-group btn-group-justified">
+                    <a href="#" class="btn btn-default">Left</a>
+                    <a href="#" class="btn btn-default">Middle</a>
+                    <a href="#" class="btn btn-default">Right</a>
+                </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="code-container">
+                <div class="btn-toolbar" role="toolbar">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default">Back</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default">1</button>
+                        <button type="button" class="btn btn-default">2</button>
+                        <button type="button" class="btn btn-default">3</button>
+                        <button type="button" class="btn btn-default">4</button>
+                        <button type="button" class="btn btn-default">5</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default">Next</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default btn-flat"><span class="icon icon-check"></span> Success</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default btn-flat"><span class="icon icon-star"></span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="code-container">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">Button <span class="caret"></span></button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation"><a href="#" role="menuitem" tabindex="-1" >Dropdown link</a></li>
+                        <li role="presentation"><a href="#" role="menuitem" tabindex="-1" >Dropdown link</a></li>
+                        <li role="presentation"><a href="#" role="menuitem" tabindex="-1" >Dropdown link</a></li>
+                    </ul>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default">Button</button>
+                    <button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown"><span class="caret"></span></button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
+                        <li role="presentation"><a href="#" role="menuitem" tabindex="-1" >Dropdown link</a></li>
+                        <li role="presentation"><a href="#" role="menuitem" tabindex="-1" >Dropdown link</a></li>
+                        <li role="presentation"><a href="#" role="menuitem" tabindex="-1" >Dropdown link</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Basic Elements</h3>
+            <p>The basics of a form element include text inputs and basic controls. A form always starts with the <code>&lt;form&gt;</code>
+                element followed with a <code>&lt;fieldset&gt;</code>. A fieldset can be the ideal element to create a
+                two column form. Also always ensure to add the class <code>.form</code> to the forms class.</p>
+            <p>The entire form can also be easily displayed <a href="http://getbootstrap.com/css/#forms-horizontal">horizontally</a>
+                or <a href="http://getbootstrap.com/css/#forms-inline">vertically</a>.
+                Simply add either <code>.form-horizontal</code> or <code>.form-inline</code> to the forms class.</p>
+            <p>More about forms can be found within the <a href="http://getbootstrap.com/css/#forms">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak code-container">
+            <form role="form">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="field-text">Text Input</label>
+                        <input class="form-control" id="field-text" />
+                        <p class="help-block">Example block-level help text here.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-placeholder">Text Input with Placeholder</label>
+                        <input class="form-control" id="field-placeholder" placeholder="Enter text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Static Control</label>
+                        <p class="form-control-static">email@example.com</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-file">File input</label>
+                        <input type="file" id="field-file" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-textarea">Text area</label>
+                        <textarea class="form-control" id="field-textarea" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-default">Submit Button</button>
+                    <button type="reset" class="btn btn-default">Reset Button</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Selection Elements</h3>
+            <p>These elements are ideally used for user choices. They might also be helpful when facing a lot of data such
+                as countries to choose from.</p>
+            <p>Use the popular jQuery select2 component to make it easier for the user to choose between multiple options.</p>
+            <p>More about controls can be found within the <a href="http://getbootstrap.com/css/#forms-controls">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <div class="code-container">
+                <form role="form">
+                    <fieldset>
+                        <div class="form-group">
+                            <label>Checkboxes</label>
+                            <div class="checkbox">
+                                <label><span class="sr-only">wai</span><input type="checkbox" checked="checked" />Checkbox 1</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><span class="sr-only">wai</span><input type="checkbox" />Checkbox 2</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><span class="sr-only">wai</span><input type="checkbox" />Checkbox 3</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Inline Checkboxes</label>
+                            <label class="checkbox-inline"><span class="sr-only">wai</span><input type="checkbox" checked="checked" />1</label>
+                            <label class="checkbox-inline"><span class="sr-only">wai</span><input type="checkbox" />2</label>
+                            <label class="checkbox-inline"><span class="sr-only">wai</span><input type="checkbox" />3</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Radio Buttons</label>
+                            <div class="radio">
+                                <label><span class="sr-only">wai</span><input type="radio" name="optionsRadios" checked="checked" />Radio 1</label>
+                            </div>
+                            <div class="radio">
+                                <label><span class="sr-only">wai</span><input type="radio" name="optionsRadios" />Radio 2</label>
+                            </div>
+                            <div class="radio">
+                                <label><span class="sr-only">wai</span><input type="radio" name="optionsRadios" />Radio 3</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Inline Radio Buttons</label>
+                            <label class="radio-inline"><span class="sr-only">wai</span><input type="radio" name="optionsRadiosInline" checked="checked" />1</label>
+                            <label class="radio-inline"><span class="sr-only">wai</span><input type="radio" name="optionsRadiosInline" />2</label>
+                            <label class="radio-inline"><span class="sr-only">wai</span><input type="radio" name="optionsRadiosInline" />3</label>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+            <div class="code-container">
+                <form role="form">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="field-select">Selects</label>
+                            <select class="form-control" id="field-select">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field-multiple">Multiple Selects</label>
+                            <select multiple="multiple" class="form-control" id="field-multiple">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field-select2"><a href="http://ivaynberg.github.io/select2/">jQuery select2</a> Select</label>
+                            <select class="form-control" id="field-select2">
+                                <optgroup label="Alaskan/Hawaiian Time Zone">
+                                    <option value="AK">Alaska</option>
+                                    <option value="HI">Hawaii</option>
+                                </optgroup>
+                                <optgroup label="Pacific Time Zone">
+                                    <option value="CA">California</option>
+                                    <option value="NV">Nevada</option>
+                                    <option value="OR">Oregon</option>
+                                    <option value="WA">Washington</option>
+                                </optgroup>
+                                <optgroup label="Mountain Time Zone">
+                                    <option value="AZ">Arizona</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="MT">Montana</option><option value="NE">Nebraska</option>
+                                    <option value="NM">New Mexico</option>
+                                    <option value="ND">North Dakota</option>
+                                    <option value="UT">Utah</option>
+                                    <option value="WY">Wyoming</option>
+                                </optgroup>
+                                <optgroup label="Central Time Zone">
+                                    <option value="AL">Alabama</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IA">Iowa</option>
+                                    <option value="KS">Kansas</option>
+                                    <option value="KY">Kentucky</option>
+                                    <option value="LA">Louisiana</option>
+                                    <option value="MN">Minnesota</option>
+                                    <option value="MS">Mississippi</option>
+                                    <option value="MO">Missouri</option>
+                                    <option value="OK">Oklahoma</option>
+                                    <option value="SD">South Dakota</option>
+                                    <option value="TX">Texas</option>
+                                    <option value="TN">Tennessee</option>
+                                    <option value="WI">Wisconsin</option>
+                                </optgroup>
+                                <optgroup label="Eastern Time Zone">
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="IN">Indiana</option>
+                                    <option value="ME">Maine</option>
+                                    <option value="MD">Maryland</option>
+                                    <option value="MA">Massachusetts</option>
+                                    <option value="MI">Michigan</option>
+                                    <option value="NH">New Hampshire</option><option value="NJ">New Jersey</option>
+                                    <option value="NY">New York</option>
+                                    <option value="NC">North Carolina</option>
+                                    <option value="OH">Ohio</option>
+                                    <option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option>
+                                    <option value="VT">Vermont</option><option value="VA">Virginia</option>
+                                    <option value="WV">West Virginia</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Disabled States</h3>
+            <p>Various states can be helpful to restrict user actions prior to certain requirements. They can also
+                be helpful to just display data without the ability to change the form itself.</p>
+            <p>More about states can be found within the <a href="http://getbootstrap.com/css/#forms-control-disabled">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak code-container">
+            <form role="form">
+                <fieldset disabled="disabled">
+                    <div class="form-group">
+                        <label for="field-disabled-input">Disabled input</label>
+                        <input type="text" class="form-control" id="field-disabled-input" placeholder="Disabled input" disabled="disabled" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-read-only">Readonly input</label>
+                        <input type="text" class="form-control" id="field-read-only" placeholder="Readonly input" readonly="readonly" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-disabled-select">Disabled select menu</label>
+                        <select class="form-control" id="field-disabled-select" disabled="disabled">
+                            <option>Disabled select</option>
+                        </select>
+                    </div>
+
+                    <div class="checkbox">
+                        <label><span class="sr-only">wai</span><input type="checkbox" />Disabled Checkbox</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Disabled Button</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Validation States</h3>
+            <p>Validation helps the user to understand what went wrong. It is recommended to display a message as well
+                as to highlight the specific error within input.</p>
+            <p>These states can either be shown directly using <abbr title="Asynchronous JavaScript and XML">AJAX</abbr> or after a page reload from the server side.</p>
+            <p>More about validation can be found within the <a href="http://getbootstrap.com/css/#forms-control-validation">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <h4>Controls</h4>
+            <div class="code-container">
+                <form role="form">
+                    <div class="form-group has-success has-feedback">
+                        <label class="control-label" for="inputIcon">Input with success <span class="text-muted">with icon</span></label>
+                        <input type="text" class="form-control" id="inputIcon" />
+                        <span class="icon icon-check form-control-feedback"></span>
+                    </div>
+
+                    <div class="form-group has-warning">
+                        <label class="control-label" for="inputWarning">Input with warning <span class="text-muted">without icon</span></label>
+                        <input type="text" class="form-control" id="inputWarning" />
+                    </div>
+
+                    <div class="form-group has-error">
+                        <label class="control-label" for="inputError">Input with error <span class="text-muted">without icon</span></label>
+                        <input type="text" class="form-control" id="inputError" />
+                    </div>
+                </form>
+            </div>
+
+            <h4>Messages</h4>
+            <div class="code-container">
+                <div class="alert alert-success" role="alert">
+                    <strong>Well done!</strong> You successfully read this important alert message.
+                </div>
+                <div class="alert alert-info" role="alert">
+                    <strong>Heads up!</strong> This alert needs your attention, but it's not super important.
+                </div>
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning!</strong> Better check yourself, you're not looking too good.
+                </div>
+                <div class="alert alert-danger" role="alert">
+                    <strong>Oh snap!</strong> Change a few things up and try submitting again.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Input Groups</h3>
+            <p>We simply allow the extension of buttons or icons within form controls. It is also possible to combine
+                these elements with other components such as drop-down's or select2.</p>
+            <p>Do not mix form groups or grid column classes directly with input groups. Instead,
+                nest the input group inside of the form group or grid-related element.</p>
+            <p>More about validation can be found within the <a href="http://getbootstrap.com/components/#input-groups">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <form role="form">
+                <div class="code-container">
+                    <div class="form-group">
+                        <label for="field-group-1" class="sr-only">Accessibility text</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">@</span>
+                            <input type="text" class="form-control" id="field-group-1" placeholder="Username" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-group-3" class="sr-only">Accessibility text</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="icon icon-search"></span></span>
+                            <input type="text" class="form-control" id="field-group-3" placeholder="Font icon" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-group-2" class="sr-only">Accessibility text</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="field-group-2" />
+                            <span class="input-group-addon">.00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-group-4" class="sr-only">Accessibility text</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">$</span>
+                            <input type="text" class="form-control" id="field-group-4" />
+                            <span class="input-group-addon">.00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field-group-5" class="sr-only">Accessibility text</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="field-group-5" />
+                            <span class="input-group-btn"><button class="btn btn-default" type="button"><span class="icon icon-search"></span></button></span>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Sizing</h4>
+                <fieldset class="form-inline">
+                    <div class="code-container">
+                        <div class="form-group">
+                            <label for="input-combo-large" class="sr-only">Large</label>
+                            <input type="text" class="form-control input-lg" id="input-combo-large" placeholder="input-large">
+                            <label><span class="sr-only">Large</span><select class="form-control input-lg"><option>Dropdown</option></select></label>
+                            <button type="submit" class="btn btn-default btn-lg">Button</button>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="form-group">
+                            <label for="input-combo-default" class="sr-only">Default</label>
+                            <input type="text" class="form-control" id="input-combo-default" placeholder="input-default">
+                            <label><span class="sr-only">Default</span><select class="form-control"><option>Dropdown</option></select></label>
+                            <button type="submit" class="btn btn-default">Button</button>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="form-group">
+                            <label for="input-combo-small" class="sr-only">Small</label>
+                            <input type="text" class="form-control input-sm" id="input-combo-small" placeholder="input-small">
+                            <label><span class="sr-only">Small</span><select class="form-control input-sm"><option>Dropdown</option></select></label>
+                            <button type="submit" class="btn btn-default btn-sm">Button</button>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <p>There is no <code>input-xs</code> option available as of Bootstrap 3.</p>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    {% include "divio_styleguide/styleguide/forms.html" %}
+</section>
+
+<section data-id="grid" hidden="hidden">
+    <h2>Grid</h2>
+    <p class="lead">Bootstrap includes a responsive, mobile first fluid grid system that appropriately scales up to
+        <strong>24 columns</strong> as the device or viewport size increases. It includes <a href="http://getbootstrap.com/css/#grid-example-basic">predefined classes</a> for easy
+        layout options,  as well as powerful mix-ins for generating more semantic layouts. For complete reference,
+        please visit the <a href="http://getbootstrap.com/css/#grid">Bootstrap</a> documentation.</p>
+
+    <h3>Standard Grid</h3>
+    <div class="code-container styleguide-grid">
+        <div class="row">{% for col in 123456|make_list %}
+            <div class="col-md-4"><p>.col-md-4</p></div>{% endfor %}
+        </div>
+        <div class="row show-grid">
+            <div class="col-md-16"><p>.col-md-16</p></div>
+            <div class="col-md-8"><p>.col-md-8</p></div>
+        </div>
+        <div class="row show-grid">{% for col in 123|make_list %}
+            <div class="col-md-8"><p>.col-md-8</p></div>{% endfor %}
+        </div>
+        <div class="row show-grid">
+            <div class="col-md-12"><p>.col-md-12</p></div>
+            <div class="col-md-12"><p>.col-md-12</p></div>
+        </div>
+    </div>
+
+    <h3>Advanced Grid</h3>
+    <div class="code-container styleguide-grid">
+        <div class="row">{% for col in 123456|make_list %}
+            <div class="col-sm-8 col-lg-4">
+                <p>
+                    <span class="visible-sm visible-md">col-md-8</span>
+                    <span class="visible-lg">col-lg-4</span>
+                    <span class="visible-xs">col-xs-24</span>
+                    <span class="hidden-lg">Example of what we can do with bootstrap.</span>
+                </p>
+            </div>{% endfor %}
+        </div>
+    </div>
+    <div class="code-container styleguide-grid">
+        <div class="row">{% for col in 1234|make_list %}
+            <div class="col-sm-8 col-lg-6">
+                <p>
+                    <span class="visible-sm visible-md">col-md-8</span>
+                    <span class="visible-lg">col-lg-6</span>
+                    <span class="visible-xs">col-xs-24</span>
+                    <span class="hidden-lg">Example of what we can do with bootstrap.</span>
+                </p>
+            </div>{% endfor %}
+        </div>
+    </div>
+    <div class="code-container styleguide-grid">
+        <div class="row">{% for col in 123|make_list %}
+            <div class="col-sm-12 col-lg-8">
+                <p>
+                    <span class="visible-sm visible-md">col-md-12</span>
+                    <span class="visible-lg">col-lg-8</span>
+                    <span class="visible-xs">col-xs-24</span>
+                    <span class="hidden-lg">Example of what we can do with bootstrap.</span>
+                </p>
+            </div>{% endfor %}
+        </div>
+    </div>
+    <div class="code-container styleguide-grid">
+        <div class="row">{% for col in 12|make_list %}
+            <div class="col-sm-12">
+                <p>
+                    <span class="visible-sm visible-md">col-md-12</span>
+                    <span class="visible-lg">col-lg-12</span>
+                    <span class="visible-xs">col-xs-24</span>
+                    <span class="hidden-lg">Example of what we can do with bootstrap.</span>
+                </p>
+            </div>{% endfor %}
+        </div>
+    </div>
+    <div class="code-container styleguide-grid">
+        <div class="row">
+            <div class="col-lg-24">
+                <p>
+                    <span>col-lg-24</span>
+                    <span class="hidden-lg">Example of what we can do with bootstrap.</span>
+                </p>
+                <p class="hidden-md hidden-sm hidden-lg">Grid System allows you to use some responsive helpers classes to hide or show depending of the device size.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-id="components" hidden="hidden">
+    {% include "divio_styleguide/styleguide/components/jumbotron.html" %}
+
+    <div class="spacer-lg"></div>
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Tabs</h3>
+            <p>Tabs are controlled over the <code>data-toggle="tab"</code> attribute and a reference name <code>href="#home"</code>
+                which points to a container with the corresponding <code>id="home"</code></p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#nav-tabs">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/tabs.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Pills</h3>
+            <p>Pills behave similar to tabs, they just use another class <code>.nav-pills</code> for styling.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#nav-pills">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/pills.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Breadcrumbs</h3>
+            <p>Indicate the current page's location within a navigational hierarchy.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#breadcrumbs">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/breadcrumbs.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Pagination</h3>
+            <p>Used for navigating within multiple pages like the search results page.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#breadcrumb">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/pagination.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Labels &amp; Badges</h3>
+            <p>Adds additional information to a specific context.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#labels">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/labels.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Thumbnails</h3>
+            <p>Extend Bootstrap's grid system with the thumbnail component to easily display grids of images, videos, text, and more.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#thumbnails">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/thumbnails.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Media Object</h3>
+            <p>Abstract object styles for building various types of components (like blog comments, Tweets, etc) that
+                feature a left- or right-aligned image alongside textual content.</p>
+            <p>As of Bootstrap 3.3.0 there are additional alignment options for the media object available such as
+                <code>media-top</code>, <code>media-middle</code> and <code>media-bottom</code>.</p>
+            <p>More about the media object can be found within the <a href="http://getbootstrap.com/components/#media">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/media.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>List Groups</h3>
+            <p>Abstract object styles for building various types of components (like blog comments, Tweets, etc) that
+                feature a left- or right-aligned image alongside textual content.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#list-group">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/lists.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Panels</h3>
+            <p>While not always necessary, sometimes you need to put your DOM in a box. For those situations, try the panel component.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#panels">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/panels.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Wells</h3>
+            <p>Use the well as a simple effect on an element to give it an inset effect.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#wells">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/wells.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Tooltips &amp; Popovers</h3>
+            <p>Add small overlays of content, like those on the iPad, to any element for housing secondary information.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/javascript/#popovers">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            <h3>Tooltips</h3>
+            {% include "divio_styleguide/styleguide/components/tooltips.html" %}
+            <h3>Popovers</h3>
+            {% include "divio_styleguide/styleguide/components/popovers.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Collapse</h3>
+            <p>Get base styles and flexible support for collapsible components like accordions and navigation.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/javascript/#collapse">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/collapse.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Carousel</h3>
+            <p>Provide up-to-date feedback on the progress of a workflow or action with simple yet flexible progress bars.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/javascript/#carousel">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/carousel.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Modals</h3>
+            <p>Modals are streamlined, but flexible, dialog prompts with the minimum required functionality and smart defaults.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/javascript/#modals">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/modals.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-md-10">
+            <h3>Progress Bars</h3>
+            <p>Provide up-to-date feedback on the progress of a workflow or action with simple yet flexible progress bars.</p>
+            <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#modals">Bootstrap</a> documentation.</p>
+        </div>
+        <div class="col-md-14 col-linebreak">
+            {% include "divio_styleguide/styleguide/components/progress.html" %}
+        </div>
+    </div>
+
+    <hr />
+
+    <h3>Navbar</h3>
+    {% with cls="navbar-default" %}{% include "divio_styleguide/styleguide/components/navbar.html" %}{% endwith %}
+    {% with cls="navbar-inverse" %}{% include "divio_styleguide/styleguide/components/navbar.html" %}{% endwith %}
+
+    {% include "divio_styleguide/styleguide/components.html" %}
+</section>

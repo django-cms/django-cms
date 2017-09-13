@@ -1,0 +1,135 @@
+{% load static sekizai_tags %}
+
+<div class="modal fade code-modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Source Code</h4>
+            </div>
+            <div class="modal-body">
+                <pre contenteditable></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% addtoblock "js" %}<script src="{% static 'js/addons/jquery.select2.min.js' %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script>
+/* global StyleguideIcons */
+jQuery(document).ready(function () {
+    // ensure namespace is available
+    window.Cl = window.Cl || {};
+    Cl.Styleguide = {
+
+        init: function () {
+            this.container = $('.styleguide');
+            // load modules
+            this.menu();
+            this.icons();
+            this.copy();
+            this.forms();
+        },
+
+        menu: function () {
+            var that = this;
+            var lists = this.container.find('.navbar-styleguide li');
+            var triggers = lists.find('a');
+            var hash, container;
+
+            triggers.on('click', function (e) {
+                e.preventDefault();
+
+                // reset active classes
+                lists.removeClass('active');
+                $(this).parent().addClass('active');
+
+                // handle containers
+                that.container.find('> section').hide();
+                hash = $(this).attr('href').replace('#', '');
+                container = that.container.find('> section[data-id="' + hash + '"]');
+                container.show();
+
+                // update history
+                if (window.history && window.history.replaceState) {
+                    history.replaceState('styleguide', hash, '#' + hash);
+                }
+            });
+
+            // setup first element
+            if (window.history && history.state === 'styleguide' || window.history && window.location.hash) {
+                lists.find('a[href="' + window.location.hash + '"]').trigger('click');
+            } else {
+                triggers.eq(0).trigger('click');
+            }
+        },
+
+        icons: function () {
+            var output = '';
+            var container = this.container.find('.iconlist-render');
+            var icons = StyleguideIcons;
+            for (var key in icons) {
+                output += '<h3>' + key + '</h3><div class="row">';
+                for (var i = 0; i < icons[key].length; i++) {
+                    output += '<div class="col-lg-6 col-md-8 col-sm-12"><p><span class="icon icon-lg icon-fw ' + icons[key][i] + '"></span> <code>' + icons[key][i] + '</code></p></div>';
+                }
+                output += '</div>';
+            }
+            container.html(output);
+        },
+
+        copy: function () {
+            var tpl = '<div class="btn btn-primary btn-xs code-button">Copy</div>';
+            var button = $(tpl).on('click', function () {
+                var html = $(this).parent().clone()
+                    .find('.code-button').remove().end()
+                    .html();
+                html = cleanSource(html);
+                $('.code-modal pre').text(html);
+                $('.code-modal').modal();
+            });
+
+            $('.code-container [data-toggle="popover"]').popover();
+            $('.code-container [data-toggle="tooltip"]').tooltip();
+
+            $('.code-container').hover(function () {
+                $(this).append(button);
+                button.show();
+            }, function () {
+                button.hide();
+            });
+
+            function cleanSource(html) {
+                return html_beautify(html, {
+                    preserve_newlines: false
+                });
+            }
+        },
+
+        forms: function () {
+            // add select2 if available
+            if (jQuery.fn.select2) {
+                $('#field-select2').select2();
+            }
+        }
+
+    };
+    Cl.Styleguide.init();
+});
+</script>
+{% endaddtoblock %}
+{% addtoblock "css" %}
+<style>
+.iconlist-render h3 { text-transform:capitalize; }
+.iconlist-render p:hover span { transform:scale(2); }
+
+.color-swatch { float:left; width:50px; height:50px; margin:0 5px 5px 0; border-radius:3px; }
+.code-container { position:relative; }
+.code-button { position:absolute; right:0; top:0; z-index:9999; }
+
+.styleguide-grid .row > div { background:#e4f0f5; border:1px solid #e4f0f5; }
+.styleguide-grid .row > div p { display:block; color:white; font-size:90%; text-align:center; margin:0;
+    padding:15px 0; background:#069; opacity:0.5; }
+</style>
+{% endaddtoblock %}
