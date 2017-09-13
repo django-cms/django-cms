@@ -1,23 +1,38 @@
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from distutils.version import LooseVersion
+
 from aldryn_client import forms
 
 
 class Form(forms.BaseForm):
+    enable_livereload = forms.CheckboxField(
+        'Enable Livereload',
+        required=False,
+        initial=False,
+        help_text='Auto reloads the website on changes made in local development.'
+    )
 
     def to_settings(self, data, settings):
+        import django
         from django.core.urlresolvers import reverse_lazy
 
         from aldryn_addons.utils import djsenv
 
         env = partial(djsenv, settings=settings)
+        django_version = LooseVersion(django.get_version())
 
         cloud_sync_key = env('CMSCLOUD_SYNC_KEY')
         credential_url = env('LIVERELOAD_CREDENTIAL_URL')
 
-        if 'aldryn_snake.template_api.template_processor' not in settings['TEMPLATE_CONTEXT_PROCESSORS']:
-            settings['TEMPLATE_CONTEXT_PROCESSORS'].append('aldryn_snake.template_api.template_processor')
+        if django_version >= LooseVersion('1.8'):
+            TEMPLATE_CONTEXT_PROCESSORS = settings['TEMPLATES'][0]['OPTIONS']['context_processors']
+        else:
+            TEMPLATE_CONTEXT_PROCESSORS = settings['TEMPLATE_CONTEXT_PROCESSORS']
+
+        if 'aldryn_snake.template_api.template_processor' not in TEMPLATE_CONTEXT_PROCESSORS:
+            TEMPLATE_CONTEXT_PROCESSORS.append('aldryn_snake.template_api.template_processor')
 
         if cloud_sync_key and credential_url:
             settings['LIVERELOAD_CREDENTIAL_URL'] = credential_url
@@ -43,4 +58,6 @@ class Form(forms.BaseForm):
         settings['LAST_BOILERPLATE_COMMIT'] = env('LAST_BOILERPLATE_COMMIT')
         settings['SYNC_CHANGED_FILES_URL'] = env('SYNC_CHANGED_FILES_URL')
         settings['SYNC_CHANGED_FILES_SIGNATURE_MAX_AGE'] = 60  # seconds
+
+        settings['ALDRYN_DEVSYNC_ENABLE_LIVERELOAD'] = data['enable_livereload']
         return settings
