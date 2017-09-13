@@ -7,6 +7,7 @@ INSTALLED_ADDONS = [
     'aldryn-sso',
     'aldryn-django-cms',
     'aldryn-devsync',
+    'divio-styleguide',
     'djangocms-history',
     'djangocms-modules',
     'djangocms-snippet',
