@@ -1,0 +1,19 @@
+{% load cms_tags i18n %}{% if modules_page %}
+<h3 class="cms-modules-page-heading" id="{{ instance|slugify }}">
+    <a class="cms-modules-page-heading-link" href="#{{ instance|slugify }}">#</a>
+    <span class="cms-modules-page-heading-inner">
+        <span>{{ instance }}</span>
+        <a class="cms-modules-copy js-cms-modules-copy" href="#">
+            {% trans "Copy" %}
+        </a>
+    </span>
+</h3>
+<hr>
+<div class="cms-modules-page-module">
+    {% with modules_page=False %}
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+    {% endwith %}
+</div>
+{% else %}{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% endfor %}{% endif %}

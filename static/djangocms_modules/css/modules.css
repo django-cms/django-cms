@@ -1,0 +1,73 @@
+div.cms .cms-structure .cms-submenu-item a[data-icon=modules]:before {
+    position: absolute;
+    content: '';
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+    background-image: url('../img/icon.png') !important;
+    background-size: 16px 32px !important;
+    top: 15px !important;
+    overflow: hidden !important;
+    line-height: 16px !important;
+    min-height: 16px !important;
+}
+.cms-modules-icon {
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+    background-image: url('../img/icon.png') !important;
+    background-size: 16px 32px !important;
+    text-indent: -9999px !important;
+}
+div.cms .cms-plugin-picker .cms-submenu-item span.cms-submenu-item-title-module {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: row-reverse;
+            flex-direction: row-reverse;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+
+}
+div.cms .cms-structure .cms-submenu-item a[data-icon=modules]:hover:before,
+div.cms .cms-structure .cms-submenu-item a[data-icon=modules]:focus:before {
+    background-position: 0 -16px;
+}
+div.cms .cms-structure.cms-structure-condensed .cms-submenu-item a[data-icon=modules]:before {
+    top: 12px !important;
+}
+
+.cms-modules-page-heading-inner {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.cms-modules-page-heading .cms-modules-page-heading-link {
+    position: absolute;
+    margin-left: -30px;
+    width: 100px;
+    display: none;
+}
+.cms-modules-page-heading:hover .cms-modules-page-heading-link {
+    display: block;
+    text-decoration: none;
+}
+.cms-modules-page-heading:before {
+    display: block;
+    content: " ";
+    margin-top: -66px;
+    height: 66px;
+    visibility: hidden;
+    z-index: -1;
+}
+
+.cms-modules-copy {
+    font-size: 16px;
+}

@@ -1,0 +1,23 @@
+{% extends "djangocms_modules/base.html" %}
+{% load cms_tags djangocms_modules_tags %}
+
+{% block modules_content %}
+    <div class="cms-modules-page container">
+        <h1 class="cms-modules-page-h1"><a href="{% url "pages-root" %}">Modules</a></h1>
+        <hr>
+        {% get_default_language as default_language %}
+        {% for category in categories %}
+            <h2 class="cms-modules-page-heading" id="{{ category.name|slugify }}">
+                <span class="cms-modules-page-heading-inner">
+                    <a class="cms-modules-page-heading-link" href="#{{ category.name|slugify }}">#</a>
+                    {{ category.name }}
+                </span>
+            </h2>
+            <div class="cms-modules-category">
+                {% with modules_page=True category_name=category.name %}
+                    {% render_placeholder category.modules_placeholder language default_language %}
+                {% endwith %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock modules_content %}

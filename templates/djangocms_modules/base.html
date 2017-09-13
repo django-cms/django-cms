@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n static sekizai_tags %}
+
+{% block title %}{% trans "Modules" %}{% endblock %}
+
+{% block content %}
+    <div class="modules">
+        {% block modules_content %}
+        {% endblock modules_content %}
+    </div>
+{% endblock content %}

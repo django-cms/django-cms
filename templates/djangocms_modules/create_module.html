@@ -1,0 +1,34 @@
+{% extends "admin/change_form.html" %}
+{% load cms_admin cms_static i18n %}
+
+{% block content %}
+    <h1>{% trans "Create module" %}</h1>
+    {% if form.errors %}
+        <p class="errornote">
+            {% blocktrans count form.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+        </p>
+        {{ form.non_field_errors }}
+    {% endif %}
+    <form action="." method="post">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div>
+            <fieldset class="module aligned">
+                {% for field in form.visible_fields %}
+                    <div class="form-row">
+                        <div{% if field.errors %} class="errors"{% endif %}>
+                            {% if field.errors %}{{ field.errors }}{% endif %}
+                            {{ field.label_tag }}
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="{% trans "Create" %}" class="default" name="create">
+        </div>
+    </form>
+{% endblock %}

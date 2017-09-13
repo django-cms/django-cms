@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+{% load cms_admin cms_static i18n djangocms_modules_tags %}
+
+{% block content %}
+    <h1>{% trans "Add module" %}</h1>
+    {% get_module_url module as module_link %}
+    <form action="." method="post">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div>
+            <fieldset class="module aligned">
+                {% with module_name=module.module_name %}
+                <p>{% blocktrans %}Are you sure you want to add module <a href="{{ module_link }}">{{ module_name }}</a>?{% endblocktrans %}</p>
+                {% endwith %}
+                {% for field in form.visible_fields %}
+                    <div class="form-row">
+                        <div{% if field.errors %} class="errors"{% endif %}>
+                            {% if field.errors %}{{ field.errors }}{% endif %}
+                            {{ field.label_tag }}
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="{% trans "Add" %}" class="default" name="add">
+        </div>
+    </form>
+{% endblock %}
