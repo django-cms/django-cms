@@ -4,7 +4,7 @@ https://control.divio.com/api/v1/apps/serve/aldryn-django/1.8.18.1/a5f01ce3-ea7c
 https://control.divio.com/api/v1/apps/serve/aldryn-sso/1.1.16/dbe0c45a-c981-4beb-8624-b0d2c4196aa0/aldryn-sso-1.1.16.tar.gz#egg=aldryn-sso==1.1.16
 https://control.divio.com/api/v1/apps/serve/aldryn-django-cms/3.4.4.2/588d3412-b422-4b93-b57d-df6b5e6b5ac1/aldryn-django-cms-3.4.4.2.tar.gz#egg=aldryn-django-cms==3.4.4.2
 https://control.divio.com/api/v1/apps/serve/aldryn-devsync/1.1.4/a71c18c8-4738-497c-a3da-46ab59106ab8/aldryn-devsync-1.1.4.tar.gz#egg=aldryn-devsync==1.1.4
-https://control.divio.com/api/v1/apps/serve/djangocms-history/0.3.0/b158e5f6-4d7b-4a0b-9396-9a40be3a8b0f/djangocms-history-0.3.0.tar.gz#egg=djangocms-history==0.3.0
+https://control.divio.com/api/v1/apps/serve/djangocms-history/0.4.0/2f09a6d5-fae4-4899-b39d-0ccf99e4f5d1/djangocms-history-0.4.0.tar.gz#egg=djangocms-history==0.4.0
 https://control.divio.com/api/v1/apps/serve/djangocms-snippet/1.9.2/50843c7e-43d2-45ec-97ad-0ca7b283d5d2/djangocms-snippet-1.9.2.tar.gz#egg=djangocms-snippet==1.9.2
 https://control.divio.com/api/v1/apps/serve/djangocms-style/2.0.2/51797e49-ec8c-461d-92e0-1cc274eb96af/djangocms-style-2.0.2.tar.gz#egg=djangocms-style==2.0.2
 https://control.divio.com/api/v1/apps/serve/djangocms-text-ckeditor/3.4.0.1/95e1686d-82e8-429c-aff8-cf11ef59bacf/djangocms-text-ckeditor-3.4.0.1.tar.gz#egg=djangocms-text-ckeditor==3.4.0.1
