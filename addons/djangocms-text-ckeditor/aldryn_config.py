@@ -26,7 +26,7 @@ class Form(forms.BaseForm):
             'height': 300,
             'language': '{{ language }}',
             'toolbar': 'CMS',
-            'skin': 'moono',
+            'skin': 'moono-lisa',
             'extraPlugins': 'cmsplugins',
             'toolbar_HTMLField': [
                 ['Undo', 'Redo'],
