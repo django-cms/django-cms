@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "aldryn_bootstrap3"
+    ], 
+    "package-name": "aldryn-bootstrap3"
+}
