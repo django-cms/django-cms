@@ -249,3 +249,23 @@
     margin-top: 5px;
     background-color: #0bf;
 }
+
+.table-icons .aldryn-bootstrap3-svg-icon:before {
+    content: none;
+}
+.aldryn-bootstrap3-svg-icon {
+    font-size: 20px;
+}
+.aldryn-bootstrap3-svg-icon svg {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: top;
+}
+.table-icons .disabled {
+    /*
+     work around the bug in the icon picker when disabled buttons could
+     be clicked which would result in icon page overflow errors
+     */
+    pointer-events: none !important;
+}

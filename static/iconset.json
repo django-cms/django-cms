@@ -1,0 +1,11 @@
+{
+    "svg": true,
+    "spritePath": "sprites/icons.svg",
+    "iconClass": "icon",
+    "iconClassFix": "icon-",
+    "icons": [
+        "info",
+        "notification",
+        "question"
+    ]
+}

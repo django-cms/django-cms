@@ -1,0 +1,1 @@
+webpackJsonp([0],{15:function(n,c){var e=CMS.$;e(window).on("cms-content-refresh",function(){e("svg").each(function(n,c){e(c).replaceWith(e(c).clone().wrap("<div></div>").parent().html())})})}},[15]);

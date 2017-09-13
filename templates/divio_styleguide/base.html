@@ -1,11 +1,19 @@
-{% extends "fullwidth.html" %}
+{% extends "content.html" %}
 {% load static sekizai_tags %}
 
 {% block content %}
-<div class="styleguide">
-    {% include "divio_styleguide/styleguide/includes/navigation.html" %}
-    {% include "divio_styleguide/styleguide/includes/sections.html" %}
+<style type="text/css">
+    .code-container {
+        margin-bottom: 20px;
+    }
+</style>
+<div class="container">
+    <div class="styleguide">
+        {% include "divio_styleguide/styleguide/includes/navigation.html" %}
+        {% include "divio_styleguide/styleguide/includes/sections.html" %}
+    </div>
 </div>
+<div class="spacer-lg"></div>
 
 {% include "divio_styleguide/styleguide/includes/html_beautify.js.html" %}
 {% include "divio_styleguide/styleguide/includes/interaction.html" %}

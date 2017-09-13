@@ -8,13 +8,19 @@
 
     .navbar-brand {
         float: left;
-        height: 66px;
         padding: 0;
-        margin: 33px 0;
+        display: flex;
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+        }
     }
 
     .navbar-nav {
-        margin: 55px 0;
+        margin: 25px 0;
     }
 
     button {

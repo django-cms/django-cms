@@ -1,0 +1,8 @@
+{% load static %}<span class="icon icon-{{ icon|cut:"icon-" }}{% if color %} icon-{{ color }}{% endif %}{% if class %} {{ class }}{% endif %}">
+    <svg role="presentation">
+        {% if sprite %}<use xlink:href="{% static "sprites/"|add:sprite %}.svg#{{ icon|cut:"icon-" }}"></use>{% else %}<use xlink:href="{% static "sprites/icons.svg" %}#{{ icon|cut:"icon-" }}"></use>{% endif %}
+    </svg>
+    {% if title %}
+        <span class="sr-only">{{ title }}</span>
+    {% endif %}
+</span>

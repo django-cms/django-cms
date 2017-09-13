@@ -1,7 +1,7 @@
 const cleanCSS = require('gulp-clean-css');
+const concat = require('gulp-concat-util');
 const criticalSplit = require('postcss-critical-split');
 const gulpif = require('gulp-if');
-const header = require('gulp-header');
 const postcss = require('gulp-postcss');
 const sourcemaps = require('gulp-sourcemaps');
 
@@ -22,7 +22,7 @@ module.exports = function (gulp, opts) {
                 rebase: false,
             })))
             // this information is added on top of the generated .css file
-            .pipe(header(
+            .pipe(concat.header(
                 '/*\n    This file is generated.\n' +
                 '    Do not edit directly.\n' +
                 '    Edit original files in\n' +

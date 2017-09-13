@@ -14,11 +14,11 @@
     </div>
 </div>
 
-{% addtoblock "js" %}<script src="{% static 'js/addons/jquery.select2.min.js' %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script defer src="{% static 'js/addons/jquery.select2.min.js' %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}
-<script>
+<script defer>
 /* global StyleguideIcons */
-jQuery(document).ready(function () {
+window.onload = function () {
     // ensure namespace is available
     window.Cl = window.Cl || {};
     Cl.Styleguide = {
@@ -66,17 +66,24 @@ jQuery(document).ready(function () {
         },
 
         icons: function () {
-            var output = '';
-            var container = this.container.find('.iconlist-render');
-            var icons = StyleguideIcons;
-            for (var key in icons) {
-                output += '<h3>' + key + '</h3><div class="row">';
-                for (var i = 0; i < icons[key].length; i++) {
-                    output += '<div class="col-lg-6 col-md-8 col-sm-12"><p><span class="icon icon-lg icon-fw ' + icons[key][i] + '"></span> <code>' + icons[key][i] + '</code></p></div>';
+            $.ajax('{% static "iconset.json" %}').then((response) => {
+                var output = '';
+                var container = this.container.find('.iconlist-render');
+                var icons = StyleguideIcons;
+
+                icons['Divio Icons'] = response.icons;
+                for (var key in icons) {
+                    var spriteName = {
+                        'Divio Icons': 'icons',
+                    }[key];
+                    output += '<h3>' + key + '</h3><div class="row">';
+                    for (var i = 0; i < icons[key].length; i++) {
+                        output += '<div class="col-lg-3 col-md-4 col-sm-6"><p><span style="vertical-align: middle; font-size: 30px; margin-right: 10px;" class="icon icon-' + icons[key][i] + '"><svg role="presentation"><use xlink:href="{% static "sprites/" %}' + spriteName + '.svg#' + icons[key][i] + '"></use></svg></span> <code style="display: inline-block; vertical-align: middle">' + icons[key][i] + '</code></p></div>';
+                    }
+                    output += '</div>';
                 }
-                output += '</div>';
-            }
-            container.html(output);
+                container.html(output);
+            });
         },
 
         copy: function () {
@@ -116,7 +123,10 @@ jQuery(document).ready(function () {
 
     };
     Cl.Styleguide.init();
-});
+    setTimeout(function () {
+        $(window).trigger('resize');
+    });
+};
 </script>
 {% endaddtoblock %}
 {% addtoblock "css" %}

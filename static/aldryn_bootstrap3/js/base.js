@@ -4,18 +4,112 @@
 
 // #############################################################################
 // ALDRYN-BOOTSTRAP3
-(function ($) {
+(function($) {
     'use strict';
+    var staticUrl = '/static/';
+
+    try {
+        staticUrl = window.top.CMS.config.urls.static;
+    } catch (e) {}
+
+    $.fn.iconpicker.Constructor.prototype.select = function(icon) {
+        var op = this.options;
+        var el = this.$element;
+        op.selected = $.inArray(icon.replace(op.iconClassFix, ''), op.icons);
+        if (op.selected === -1) {
+            op.selected = 0;
+            icon = op.iconClassFix + op.icons[op.selected];
+        }
+        if (icon !== '' && op.selected >= 0) {
+            op.icon = icon;
+            if (op.inline === false) {
+                var v = op.icons[op.selected];
+                el.find('input').val(icon);
+                el
+                    .find('i')
+                    .attr('class', '')
+                    .addClass(op.iconClass)
+                    .addClass(icon)
+                    .html(
+                        '<i class="icon icon-' +
+                            v +
+                            '"><span style="font-size: 20px;" class="' +
+                            op.iconClass +
+                            ' icon-' +
+                            v +
+                            '">' +
+                            '<svg style="display: inline-block; width: 1em; height: 1em; vertical-align: top;" role="presentation">' +
+                            '<use xlink:href="' +
+                            staticUrl +
+                            'sprites/icons.svg#' +
+                            v +
+                            '"></use>' +
+                            '</svg>' +
+                            '</span></i>'
+                    );
+            }
+            if (icon === op.iconClassFix) {
+                el.trigger({ type: 'change', icon: 'empty' });
+            } else {
+                el.trigger({ type: 'change', icon: icon });
+            }
+            op.table.find('button.' + op.selectedClass).removeClass(op.selectedClass);
+        }
+    };
+    $.fn.iconpicker.Constructor.prototype.updateIcons = function(page) {
+        var op = this.options;
+        var tbody = op.table.find('tbody').empty();
+        var offset = (page - 1) * this.totalIconsPerPage();
+        var length = op.rows;
+        if (op.rows === 0) {
+            length = op.icons.length;
+        }
+        for (var i = 0; i < length; i++) {
+            var tr = $('<tr></tr>');
+            for (var j = 0; j < op.cols; j++) {
+                var pos = offset + i * op.cols + j;
+                var btn = $('<button class="btn ' + op.unselectedClass + ' btn-icon"></button>').hide();
+                if (pos < op.icons.length) {
+                    var v = op.icons[pos];
+                    btn
+                        .val(v)
+                        .attr('title', v)
+                        .append(
+                            '<i class="icon icon-' +
+                                v +
+                                '"><span style="font-size: 20px;" class="' +
+                                op.iconClass +
+                                ' icon-' +
+                                v +
+                                '">' +
+                                '<svg style="display: inline-block; width: 1em; height: 1em; vertical-align: top" role="presentation">' +
+                                '<use xlink:href="' +
+                                staticUrl +
+                                'sprites/icons.svg#' +
+                                v +
+                                '"></use>' +
+                                '</svg>' +
+                                '</span></i>'
+                        )
+                        .show();
+                    if (op.icon === v) {
+                        btn.addClass(op.selectedClass).addClass('btn-icon-selected');
+                    }
+                }
+                tr.append($('<td></td>').append(btn));
+            }
+            tbody.append(tr);
+        }
+    };
 
     // shorthand for jQuery(document).ready();
-    $(function () {
+    $(function() {
         /**
          * Handles all reauired JavaScript for the aldryn-bootstrap3 addon.
          *
          * @class bootstrap3
          */
         var bootstrap3 = {
-
             /**
              * Widget used in aldryn_bootstrap3/widgets/context.html.
              * Provides a button group list and enables the user
@@ -30,7 +124,7 @@
                 var contextInputs = element.find('.js-btn-group-context-' + fieldName + ' label');
                 var selectedContextInput;
 
-                contextInputs.find('input').each(function (index, item) {
+                contextInputs.find('input').each(function(index, item) {
                     var input = $(item);
                     var label = input.parent();
                     var element = contextInputs.find('input[value="default"]');
@@ -53,7 +147,7 @@
                     }
 
                     // set active states
-                    label.on('click', function () {
+                    label.on('click', function() {
                         var input = $(this).find('input');
 
                         selectedContextInput.prop('checked', false);
@@ -61,7 +155,6 @@
 
                         selectedContextInput = input;
                     });
-
                 });
             },
 
@@ -87,41 +180,43 @@
                 try {
                     // in case custom iconset is used
                     initialIconset = JSON.parse(initialIconset);
-                } catch (e) {
-                }
+                } catch (e) {}
 
                 // initialize bootstrap iconpicker functionality
                 iconPickerButton.iconpicker({
                     arrowClass: 'btn-default',
                     icon: initialValue,
-                    iconset: initialIconset
+                    iconset: initialIconset,
                 });
 
                 // show label instead of dropdown if there is only one choice available
                 if (iconSet.find('option').length === 1) {
                     iconSet.hide();
-                    iconSet.parent().prepend('' +
-                        '<label class="form-control-static">' +
-                            iconSet.find('option').text() +
-                        '</label>');
+                    iconSet
+                        .parent()
+                        .prepend(
+                            '' + '<label class="form-control-static">' + iconSet.find('option').text() + '</label>'
+                        );
                 }
 
                 // set correct iconset when switching the font via dropdown
-                iconSet.on('change', function () {
+                iconSet.on('change', function() {
                     iconPickerButton.iconpicker('setIconset', $(this).val());
                 });
 
                 // checkbox is shown if field is not required, switches visibility
                 // of icon selection to on/off
-                enableIconCheckbox.on('change', function () {
-                    if ($(this).prop('checked')) {
-                        widgets.removeClass('hidden');
-                        iconPicker.trigger('change');
-                    } else {
-                        widgets.addClass('hidden');
-                        iconPickerButton.find('input').val('');
-                    }
-                }).trigger('change');
+                enableIconCheckbox
+                    .on('change', function() {
+                        if ($(this).prop('checked')) {
+                            widgets.removeClass('hidden');
+                            iconPicker.trigger('change');
+                        } else {
+                            widgets.addClass('hidden');
+                            iconPickerButton.find('input').val('');
+                        }
+                    })
+                    .trigger('change');
             },
 
             /**
@@ -138,7 +233,7 @@
                 var typeState = '';
                 var blockClass = '';
                 var sizeClass = '';
-                var timer = function () {};
+                var timer = function() {};
                 var timeout = 50;
 
                 // helper references
@@ -147,92 +242,132 @@
                 var sizeContext = $('.field-btn_size');
                 var btnContext = $('.field-btn_context');
                 var colorContext = $('.field-txt_context');
-                var blockContext = $('.field-btn_block');
+                var blockContext = $('.field-btn_block:not(.field-icon_left');
                 var iconContext = $('.js-icon-picker button');
 
                 // attach event to the label
-                labelContext.on('keydown', function () {
-                    clearTimeout(timer);
-                    timer = setTimeout(function () {
-                        updatePreview({
-                            type: 'text',
-                            text: labelContext.val()
-                        });
-                    }, timeout);
-                }).trigger('keydown');
+                labelContext
+                    .on('keydown', function() {
+                        clearTimeout(timer);
+                        timer = setTimeout(function() {
+                            updatePreview({
+                                type: 'text',
+                                text: labelContext.val(),
+                            });
+                        }, timeout);
+                    })
+                    .trigger('keydown');
 
                 // attach event to the link/button switch
-                typeContext.on('change', function () {
+                typeContext.on('change', function() {
                     updatePreview({
                         type: 'markup',
-                        context: $(this).val()
+                        context: $(this).val(),
                     });
                 });
 
                 // handle button context selection
                 // autotrigger will be handled by link/button switcher
-                btnContext.find('label').on('click', function () {
+                btnContext.find('label').on('click', function() {
                     updatePreview({
                         type: 'context',
-                        cls: cleanClass($(this).attr('class'))
+                        cls: cleanClass($(this).attr('class')),
                     });
                 });
 
                 // handle text color button context selection
-                colorContext.find('label').on('click', function () {
+                colorContext.find('label').on('click', function() {
                     updatePreview({
                         type: 'context',
-                        cls: cleanClass($(this).attr('class'))
+                        cls: cleanClass($(this).attr('class')),
                     });
                 });
 
                 // handle block checkbox
-                blockContext.find('input').on('change', function () {
+                blockContext.find('input').on('change', function() {
                     updatePreview({
                         type: 'block',
-                        state: $(this).prop('checked')
+                        state: $(this).prop('checked'),
                     });
                 });
 
                 // handle size selection
-                sizeContext.find('label').on('click', function () {
+                sizeContext.find('label').on('click', function() {
                     updatePreview({
                         type: 'size',
-                        cls: cleanClass($(this).attr('class'))
+                        cls: cleanClass($(this).attr('class')),
                     });
                 });
 
                 // handle icon picker
-                iconContext.on('change', function () {
-                    var el = $(this);
-                    if (el.attr('name') === 'icon_left') {
-                        // icon left alignment
-                        previewBtn.find('.pre').attr('class', 'pre ' + el.find('i').attr('class'));
-                    } else {
-                        // icon right alignment
-                        previewBtn.find('.post').attr('class', 'post ' + el.find('i').attr('class'));
-                    }
-                }).trigger('change');
+                iconContext
+                    .on('change', function() {
+                        var el = $(this);
+                        var iconClass = el.find('i').attr('class');
+
+                        if (el.attr('name') === 'icon_left') {
+                            // icon left alignment
+                            previewBtn
+                                .find('.pre')
+                                .attr('class', 'pre ' + el.find('i').attr('class'))
+                                .html(
+                                    '<span class="' +
+                                        iconClass +
+                                        '">' +
+                                        '<svg style="display: inline-block; width: 1em; height: 1em; vertical-align: middle;" role="presentation">' +
+                                        '<use xlink:href="' +
+                                        staticUrl +
+                                        'sprites/icons.svg#' +
+                                        iconClass.replace(/icon./g, '') +
+                                        '"></use>' +
+                                        '</svg>' +
+                                        '</span>'
+                                );
+                        } else {
+                            // icon right alignment
+                            previewBtn
+                                .find('.post')
+                                .attr('class', 'post ' + el.find('i').attr('class'))
+                                .html(
+                                    '<span class="' +
+                                        iconClass +
+                                        '">' +
+                                        '<svg style="display: inline-block; width: 1em; height: 1em; vertical-align: middle;" role="presentation">' +
+                                        '<use xlink:href="' +
+                                        staticUrl +
+                                        'sprites/icons.svg#' +
+                                        iconClass.replace(/icon./g, '') +
+                                        '"></use>' +
+                                        '</svg>' +
+                                        '</span>'
+                                );
+                        }
+                    })
+                    .trigger('change');
 
                 // control visibility of icons
-                $('#id_icon_left').on('change', function () {
-                    if ($(this).is(':checked')) {
-                        previewBtn.find('.pre').show();
-                    } else {
-                        previewBtn.find('.pre').hide();
-                    }
-                }).trigger('change');
+                $('#id_icon_left')
+                    .on('change', function() {
+                        if ($(this).is(':checked')) {
+                            previewBtn.find('.pre').show();
+                        } else {
+                            previewBtn.find('.pre').hide();
+                        }
+                    })
+                    .trigger('change');
 
-                $('#id_icon_right').on('change', function () {
-                    if ($(this).is(':checked')) {
-                        previewBtn.find('.post').show();
-                    } else {
-                        previewBtn.find('.post').hide();
-                    }
-                }).trigger('change');
+                $('#id_icon_right')
+                    .on('change', function() {
+                        if ($(this).is(':checked')) {
+                            previewBtn.find('.post').show();
+                        } else {
+                            previewBtn.find('.post').hide();
+                        }
+                    })
+                    .trigger('change');
 
                 // certain elements can only be loaded after a timeout
-                setTimeout(function () {
+                setTimeout(function() {
                     blockContext.find('input:checked').trigger('change');
                     typeContext.filter(':checked').trigger('change');
                     sizeContext.find('input:checked').parent().trigger('click');
@@ -310,7 +445,6 @@
                         .replace(' ', '');
                     return cls;
                 }
-
             },
 
             /**
@@ -325,7 +459,7 @@
                 var sizesInputs = element.find('label input');
                 var selectedSizesInput;
 
-                sizesInputs.each(function (index, item) {
+                sizesInputs.each(function(index, item) {
                     var input = $(item);
                     var label = input.parent();
 
@@ -339,11 +473,10 @@
                     label.addClass('btn btn-default text-' + item.value);
 
                     // Add icon
-                    $('<span class="glyphicon glyphicon-record"></span>')
-                        .insertAfter(input);
+                    $('<span class="glyphicon glyphicon-record"></span>').insertAfter(input);
 
                     // Set active states
-                    label.on('click', function () {
+                    label.on('click', function() {
                         var input = $(this).find('input');
 
                         selectedSizesInput.prop('checked', false);
@@ -351,7 +484,6 @@
 
                         selectedSizesInput = input;
                     });
-
                 });
             },
 
@@ -376,7 +508,7 @@
                 function getCleanCSS(string) {
                     var tmp = string.split(' ');
 
-                    tmp.forEach(function (item, index) {
+                    tmp.forEach(function(item, index) {
                         tmp[index] = tmp[index].replace('-block', '');
                         tmp[index] = tmp[index].replace('-inline', '');
                     });
@@ -388,16 +520,16 @@
                 function getChoice() {
                     // tmpChoices represent the active states of:
                     // ------------------------
-                    // XS | SM | MD | LG | Type
+                    // XS | SM | MD | LG | Type
                     // x    x    x    x    choice (0 = off, 1 = on)
-                    // visible-xs | visible-sm | visible-md | visible-lg
+                    // visible-xs | visible-sm | visible-md | visible-lg
                     var tmpChoices = [0, 0, 0, 0];
                     var tmp = inputElement.val();
 
                     tmp = getCleanCSS(tmp);
 
                     // loop through items
-                    tmp.forEach(function (item) {
+                    tmp.forEach(function(item) {
                         switch (item) {
                             case 'visible-xs':
                                 tmpChoices[0] = 1;
@@ -439,7 +571,7 @@
                             default:
                                 break;
                         }
-                    // if its longer then 4 it's inline-block
+                        // if its longer then 4 it's inline-block
                     } else if (tmpVal.length === 4) {
                         tmpConfig = 3;
                     }
@@ -452,7 +584,7 @@
                     var cls = [];
                     currentChoice = choices;
 
-                    choices.forEach(function (choice, index) {
+                    choices.forEach(function(choice, index) {
                         if (choice) {
                             var tmp = choiceElements.eq(index).data('cls');
 
@@ -461,7 +593,7 @@
                                 return;
                             }
 
-                            switch(config) {
+                            switch (config) {
                                 case 1:
                                     tmp = tmp + '-block';
                                     break;
@@ -489,21 +621,19 @@
                     var els = configElementDropdown.find('li');
 
                     // update choices
-                    choices.forEach(function (choice, index) {
+                    choices.forEach(function(choice, index) {
                         // reset the element
-                        choiceElements.eq(index)
+                        choiceElements
+                            .eq(index)
                             .removeClass('btn-default')
                             .removeClass('btn-danger')
                             .removeClass('btn-success')
-                            .find('.js-on, .js-off').addClass('hidden')
+                            .find('.js-on, .js-off')
+                            .addClass('hidden');
                         if (choice) {
-                            choiceElements.eq(index)
-                                .addClass('btn-success')
-                                .find('.js-on').removeClass('hidden');
+                            choiceElements.eq(index).addClass('btn-success').find('.js-on').removeClass('hidden');
                         } else {
-                            choiceElements.eq(index)
-                                .addClass('btn-danger')
-                                .find('.js-off').removeClass('hidden');
+                            choiceElements.eq(index).addClass('btn-danger').find('.js-off').removeClass('hidden');
                         }
                     });
 
@@ -513,12 +643,11 @@
                 }
 
                 // attach event handler to size buttons
-                choiceElements.on('click', function (e) {
+                choiceElements.on('click', function(e) {
                     e.preventDefault();
 
                     var choiceIndex = choiceElements.index(this);
-                    var configIndex = configElementDropdown.find('li')
-                        .index(configElementDropdown.find('li.active'));
+                    var configIndex = configElementDropdown.find('li').index(configElementDropdown.find('li.active'));
 
                     if (currentChoice[choiceIndex] >= 1) {
                         currentChoice[choiceIndex] = 0;
@@ -526,7 +655,7 @@
                         currentChoice[choiceIndex] = 1;
                     }
 
-                    update(currentChoice, configIndex)
+                    update(currentChoice, configIndex);
                 });
 
                 // attach event handler to config button
@@ -556,7 +685,7 @@
                 var tpl = $('<span class="form-row-icon fa fa-fw"></span>');
 
                 // set tooltips and labels
-                fieldBoxes.each(function (index, item) {
+                fieldBoxes.each(function(index, item) {
                     var el = $(item);
                     var tooltip = el.find('.help');
                     var label = el.find('label');
@@ -566,16 +695,20 @@
 
                     // only create tooltip if one is present
                     if (tooltip.length) {
-                        el.append('' +
-                            '<span class="fa fa-question-circle" ' +
-                            '   data-toggle="tooltip" ' +
-                            '   data-placement="right" ' +
-                            '   title="' + tooltip.text() + '">' +
-                            '</span>');
+                        el.append(
+                            '' +
+                                '<span class="fa fa-question-circle" ' +
+                                '   data-toggle="tooltip" ' +
+                                '   data-placement="right" ' +
+                                '   title="' +
+                                tooltip.text() +
+                                '">' +
+                                '</span>'
+                        );
                     }
                 });
 
-                formRows.each(function (index, item) {
+                formRows.each(function(index, item) {
                     var el = $(item);
                     // set fieldbox icons
                     if (el.hasClass('field-create_xs_col')) {
@@ -612,7 +745,7 @@
                 var container = $('.aldryn-bootstrap3-label');
                 var previewBtn = container.find('.js-label-preview span');
                 var defaultBtnText = previewBtn.text();
-                var timer = function () {};
+                var timer = function() {};
                 var timeout = 50;
 
                 // helper references
@@ -620,22 +753,24 @@
                 var btnContext = $('.field-context');
 
                 // attach event to the label
-                labelContext.on('keydown', function () {
-                    clearTimeout(timer);
-                    timer = setTimeout(function () {
-                        updatePreview({
-                            type: 'text',
-                            text: labelContext.val()
-                        });
-                    }, timeout);
-                }).trigger('keydown');
+                labelContext
+                    .on('keydown', function() {
+                        clearTimeout(timer);
+                        timer = setTimeout(function() {
+                            updatePreview({
+                                type: 'text',
+                                text: labelContext.val(),
+                            });
+                        }, timeout);
+                    })
+                    .trigger('keydown');
 
                 // handle button context selection
                 // autotrigger will be handled by link/button switcher
-                btnContext.find('label').on('click', function () {
+                btnContext.find('label').on('click', function() {
                     updatePreview({
                         type: 'context',
-                        cls: cleanClass($(this).attr('class'))
+                        cls: cleanClass($(this).attr('class')),
                     });
                 });
 
@@ -662,24 +797,20 @@
 
                 // make sure we only pass the required class argument
                 function cleanClass(cls) {
-                    cls = cls
-                        .replace('btn btn-', '')
-                        .replace('active', '')
-                        .replace('text-', '')
-                        .replace(' ', '');
+                    cls = cls.replace('btn btn-', '').replace('active', '').replace('text-', '').replace(' ', '');
                     return cls;
                 }
-            }
+            },
         };
 
         // auto initialize widgets
         if ($('.aldryn-bootstrap3-context').length) {
-            $('.aldryn-bootstrap3-context').each(function () {
+            $('.aldryn-bootstrap3-context').each(function() {
                 bootstrap3.contextWidget($(this));
             });
         }
         if ($('.aldryn-bootstrap3-icon').length) {
-            $('.aldryn-bootstrap3-icon').each(function () {
+            $('.aldryn-bootstrap3-icon').each(function() {
                 bootstrap3.iconWidget($(this));
             });
         }
@@ -687,12 +818,12 @@
             bootstrap3.buttonPreview();
         }
         if ($('.js-btn-group-sizes').length) {
-            $('.js-btn-group-sizes').each(function () {
+            $('.js-btn-group-sizes').each(function() {
                 bootstrap3.sizeWidget($(this));
             });
         }
         if ($('.js-aldryn-bootstrap3-responsive').length) {
-            $('.js-aldryn-bootstrap3-responsive').each(function () {
+            $('.js-aldryn-bootstrap3-responsive').each(function() {
                 bootstrap3.responsiveWidget($(this));
             });
         }

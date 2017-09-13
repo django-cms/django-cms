@@ -4,7 +4,15 @@
         <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="collapseHeader{{ forloop.counter }}">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">Collapsible Group Item #{{ forloop.counter }}</a>
+                    <a
+                        class="link-wrapper {% if forloop.first %}{% else %}collapsed{% endif %}"
+                        data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                        {% include "includes/icon.html" with icon="minus" color="brand-primary" %}
+                        {% include "includes/icon.html" with icon="plus" color="brand-primary" %}
+                        <span class="link-inner">
+                            Collapsible Group Item #{{ forloop.counter }}
+                        </span>
+                    </a>
                 </h4>
             </div>
             <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse{% if forloop.first %} in{% endif %}" role="tabpanel" aria-labelledby="collapseHeader{{ forloop.counter }}">

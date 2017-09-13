@@ -1,21 +1,22 @@
 const argv = require('minimist')(process.argv.slice(2));
 const plugins = [];
 const webpack = require('webpack');
+const WebpackPolyfillPlugin = require('webpack2-polyfill-plugin');
 const path = require('path');
-
 
 // TODO check if polling is still required https://github.com/divio/djangocms-boilerplate-webpack/blob/master/webpack.config.debug.js#L16
 
-process.env.NODE_ENV = (argv.debug) ? 'development' : 'production';
+process.env.NODE_ENV = argv.debug ? 'development' : 'production';
+
+plugins.push(new WebpackPolyfillPlugin());
 
 // Bundle splitting. Don't forget to {% addtoblock "js" %} afterwards
-//
-// plugins.push(
-//     new webpack.optimize.CommonsChunkPlugin({
-//         name: 'base',
-//         chunks: ['base', 'detail'],
-//     })
-// );
+plugins.push(
+    new webpack.optimize.CommonsChunkPlugin({
+        name: 'base',
+        chunks: ['base', 'cms'],
+    })
+);
 
 // add plugins depending on if we are debugging or not
 if (argv.debug) {
@@ -31,6 +32,7 @@ if (argv.debug) {
         })
     );
 } else {
+    plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
     plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
     plugins.push(
         new webpack.LoaderOptionsPlugin({
@@ -62,10 +64,11 @@ module.exports = {
     devtool: argv.debug ? 'cheap-module-eval-source-map' : false,
     entry: {
         base: path.join(__dirname, 'base.js'),
+        cms: path.join(__dirname, 'cms.js'),
         // detail: path.join(__dirname, 'detail.js'),
     },
     output: {
-        path: path.join(__dirname, '..', '..', 'static', 'js'),
+        path: path.join(__dirname, '..', '..', 'static', 'js', 'dist'),
         filename: '[name].bundle.js',
         publicPath: '/static/',
     },
@@ -82,37 +85,42 @@ module.exports = {
         rules: [
             {
                 test: /\.js$/,
-                use: [{
-                    loader: 'babel-loader',
-                    options: {
-                        retainLines: true,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            retainLines: true,
+                        },
                     },
-                }],
+                ],
                 exclude: /(node_modules|vendor|libs|addons\/jquery.*)/,
                 include: __dirname,
             },
             {
                 test: /outdatedBrowser/,
-                use: [{
-                    loader: 'exports-loader',
-                    options: {
-                        outdatedBrowser: true,
+                use: [
+                    {
+                        loader: 'exports-loader',
+                        options: {
+                            outdatedBrowser: true,
+                        },
                     },
-                }],
-
+                ],
             },
             {
                 test: /bootstrap-sass/,
-                use: [{
-                    loader: 'imports-loader',
-                    options: {
-                        jQuery: 'jquery',
+                use: [
+                    {
+                        loader: 'imports-loader',
+                        options: {
+                            jQuery: 'jquery',
+                        },
                     },
-                }],
+                ],
             },
         ],
     },
-}
+};
 
 // disable DeprecationWarning: loaderUtils.parseQuery() DeprecationWarning
-process.noDeprecation = true
+process.noDeprecation = true;

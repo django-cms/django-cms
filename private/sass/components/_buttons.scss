@@ -46,3 +46,33 @@
         @include button-variant-outline($btn-danger-bg, $btn-danger-border);
     }
 }
+
+.btn {
+    display: inline-flex;
+    flex-direction: row;
+    white-space: nowrap;
+    align-items: center;
+    justify-content: center;
+
+    .icon {
+        margin-right: 10px;
+        font-size: 18px;
+
+        &:only-child {
+            margin: 0;
+        }
+
+        use {
+            fill: currentColor;
+        }
+    }
+
+    span + .icon {
+        margin-left: 10px;
+        margin-right: 0;
+    }
+}
+
+.btn-block {
+    display: flex;
+}

@@ -1,0 +1,14 @@
+/* stylelint-disable */
+
+.icon {
+    display: inline-block;
+    vertical-align: top;
+    width: 1em;
+    height: 1em;
+
+    svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}

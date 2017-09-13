@@ -9,21 +9,30 @@ const sourcemaps = require('gulp-sourcemaps');
 // Version 0.7 is required as bootstrap-sass pinns it in their package.json.
 const Eyeglass = require('eyeglass').Eyeglass;
 const eyeglass = new Eyeglass({
-    importer: function (uri, prev, done) {
+    importer: function(uri, prev, done) {
         done(sass.compiler.types.NULL);
     },
+    // important to have no rounding errors
+    precision: 10,
 });
 
-
-module.exports = function (gulp, opts) {
-    return function () {
-        return gulp.src(opts.PROJECT_PATTERNS.sass)
+module.exports = function(gulp, opts) {
+    return function() {
+        return gulp
+            .src(opts.PROJECT_PATTERNS.sass)
             .pipe(gulpif(opts.argv.debug, sourcemaps.init()))
             .pipe(sass(eyeglass.sassOptions()))
-            .on('error', function (error) {
-                gutil.log(gutil.colors.red(
-                    'Error (' + error.plugin + '): ' + error.messageFormatted)
-                );
+            .on('error', function(error) {
+                gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
+
+                // used on Divio Cloud to inform divio app about the errors in
+                // SASS compilation
+                if (process.env.EXIT_ON_ERRORS) {
+                    process.exit(1); // eslint-disable-line
+                } else {
+                    // in dev mode - just continue
+                    this.emit('end');
+                }
             })
             .pipe(
                 postcss([

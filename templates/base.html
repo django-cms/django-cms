@@ -20,11 +20,20 @@
     {% endblock meta_tags %}
     <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
     <!--[if IE]><link rel="shortcut icon" href="{% static 'favicon.ico' %}"><![endif]-->
-    {% include "includes/critical_css.html" %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% render_block "css" %}
     {% block extrahead %}{% endblock %}
     {{ ALDRYN_SNAKE.render_head }}
+    {% if request.toolbar and request.toolbar.edit_mode_active %}
+        <style type="text/css">
+            /* TMP */
+            @media (min-width: 1602px) {
+                .cms-structure-mode-structure {
+                    width: calc(100% - 402px);
+                }
+            }
+        </style>
+    {% endif %}
 </head>
 <body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
 {% include "includes/analytics.html" %}
@@ -32,7 +41,8 @@
 
 {% block extend_root %}{% endblock %}
 
-<script defer src="{% static 'js/base.bundle.js' %}"></script>
+{# TODO defer as soon as styleguide is fixed #}
+<script src="{% static 'js/dist/base.bundle.js' %}"></script>
 {% render_block "js" %}
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}

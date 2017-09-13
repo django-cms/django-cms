@@ -1,0 +1,8 @@
+.cms-toolbar-expanded {
+    margin-top: 0 !important;
+    padding-top: 46px;
+
+    .header .navbar-collapse {
+        top: 50px + 46px !important;
+    }
+}
