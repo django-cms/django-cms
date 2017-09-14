@@ -13,7 +13,7 @@ module.exports = function(gulp, opts) {
             .pipe(gulpif(opts.argv.debug, sourcemaps.init()))
             .pipe(sass({
                 importer: importer,
-                precision: 10
+                precision: 10,
             }))
             .on('error', function(error) {
                 gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));

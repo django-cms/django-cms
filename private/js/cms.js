@@ -1,3 +1,4 @@
+/* global CMS */
 const $ = CMS.$;
 
 $(window).on('cms-content-refresh', () => {

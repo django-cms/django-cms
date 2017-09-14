@@ -2,46 +2,6 @@
 // HELPERS
 // helper classes for the general layout
 
-// HELPERS/spacer
-// .spacer {
-//     margin-top: $line-height-computed;
-//     margin-bottom: $line-height-computed;
-// }
-//
-// .spacer-xs {
-//     margin-top: $line-height-computed / 2;
-//     margin-bottom: $line-height-computed / 2;
-// }
-//
-// .spacer-sm {
-//     margin-top: $line-height-computed / 1.5;
-//     margin-bottom: $line-height-computed / 1.5;
-// }
-//
-// .spacer-md {
-//     @extend .spacer;
-// }
-//
-// .spacer-lg {
-//     margin-top: $line-height-computed * 2;
-//     margin-bottom: $line-height-computed * 2;
-// }
-//
-// .spacer-zero {
-//     margin: 0;
-// }
-//
-// .spacer:after,
-// .spacer-xs:after,
-// .spacer-sm:after,
-// .spacer-md:after,
-// .spacer-lg:after,
-// .spacer-zero:after {
-//     content: "";
-//     display: table;
-//     clear: both;
-// }
-
 // HELPERS/accessibility
 .skip-links {
     position: absolute;

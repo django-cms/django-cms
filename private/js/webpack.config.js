@@ -117,9 +117,9 @@ module.exports = {
                             'window.jQuery': 'jquery',
                             jQuery: 'jquery',
                             PopperModule: 'popper.js',
-                            Popper: '>PopperModule.default'
+                            Popper: '>PopperModule.default',
                         },
-                    }
+                    },
                 ],
             },
         ],

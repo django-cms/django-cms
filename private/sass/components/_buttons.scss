@@ -23,6 +23,7 @@
         }
     }
 
+    // stylelint-disable-next-line selector-max-type
     span + .icon {
         margin-left: 10px;
         margin-right: 0;
