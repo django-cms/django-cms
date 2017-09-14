@@ -108,12 +108,15 @@ module.exports = {
                 ],
             },
             {
-                test: /bootstrap-sass/,
+                test: /bootstrap/,
                 use: [
                     {
                         loader: 'imports-loader',
                         options: {
+                            $: 'jquery',
+                            'window.jQuery': 'jquery',
                             jQuery: 'jquery',
+                            '{default:Popper}': 'popper.js'
                         },
                     },
                 ],

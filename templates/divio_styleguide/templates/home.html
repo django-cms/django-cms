@@ -1,6 +1,9 @@
 {% extends "content.html" %}
 
 {% block content %}
+    {% include "divio_styleguide/includes/card.html" with x=1 y=2 %}
+    {% include "divio_styleguide/includes/card.html" with x=2 %}
+    {% include "divio_styleguide/includes/card.html" with cls=' my-other-style-of-component '%}
 <div class="container">
 <h1>Example template</h1>
 <pre>

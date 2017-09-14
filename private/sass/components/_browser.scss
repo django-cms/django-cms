@@ -5,6 +5,7 @@
 // removed id references to be more compliant
 /* stylelint-disable selector-no-type, selector-no-universal */
 
+$line-height-computed: $font-size-base * $line-height-base;
 .browser-outdated {
     display: none;
     position: fixed;
@@ -17,7 +18,7 @@
     // do not add paddings or margins on the container
     width: 100%;
     height: auto;
-    background-color: $brand-danger;
+    background-color: theme-color(danger);
 
     h3,
     p {
@@ -29,7 +30,7 @@
         border: 2px solid #fff;
 
         &:hover {
-            color: $brand-danger;
+            color: theme-color(danger);
             background: #fff;
         }
     }

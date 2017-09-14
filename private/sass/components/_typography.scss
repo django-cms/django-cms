@@ -5,77 +5,11 @@
 // you can use <link rel="stylesheet" href="//basehold.it/22"> for visual help
 // $line-height-computed represents the base-rythm
 
-h1 {
-    color: $brand-primary;
-    line-height: 55px;
-    font-weight: 300;
-    margin-top: $line-height-computed;
-    margin-bottom: $line-height-computed;
+html {
+    padding-top: 86px;
+    overflow-y: scroll;
 }
 
-h2 {
-    color: $brand-primary;
-    line-height: 34px;
-    font-weight: 300;
-    margin-top: $line-height-computed + 11;
-    margin-bottom: $line-height-computed - 11;
-}
+.navbar-container {
 
-h3 {
-    color: $brand-primary;
-    line-height: 30px;
-    font-weight: 300;
-    margin-top: $line-height-computed + 11;
-    margin-bottom: $line-height-computed - 11;
-}
-
-h4 {
-    color: $brand-primary;
-    line-height: 30px;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-top: $line-height-computed + 11;
-    margin-bottom: $line-height-computed - 11;
-}
-
-h5 {
-    color: $gray-dark;
-    line-height: 26px;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-top: $line-height-computed + 11;
-    margin-bottom: $line-height-computed - 11;
-}
-
-h6 {
-    color: $gray-dark;
-    line-height: 22px;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-top: $line-height-computed + 11;
-    margin-bottom: $line-height-computed - 11;
-}
-
-p,
-ul,
-ol {
-    font-weight: 300;
-    line-height: $line-height-computed;
-    margin-top: 0;
-    margin-bottom: $line-height-computed;
-}
-
-// lead and context text
-small {
-    color: $gray;
-    font-size: $font-size-small;
-    line-height: 20px;
-}
-
-.lead {
-    font-size: $font-size-large;
-    font-weight: 300;
-    line-height: 28px;
-    margin-top: $line-height-computed - 11;
-    margin-bottom: $line-height-computed + 11;
 }

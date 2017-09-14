@@ -46,10 +46,10 @@ window.onload = function () {
                 $(this).parent().addClass('active');
 
                 // handle containers
-                that.container.find('> section').hide();
+                that.container.find('> section').attr('hidden', 'hidden');
                 hash = $(this).attr('href').replace('#', '');
                 container = that.container.find('> section[data-id="' + hash + '"]');
-                container.show();
+                container.removeAttr('hidden');
 
                 // update history
                 if (window.history && window.history.replaceState) {

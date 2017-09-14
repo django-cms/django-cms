@@ -7,6 +7,27 @@
 {% block extend_root %}
 {% block header %}
     {# DOCS: http://getbootstrap.com/components/#navbar #}
+    <header class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+        <a class="navbar-brand" href="{% url "pages-root" %}">
+            <span class="sr-only">{{ request.site.name }}</span>
+            <img src="{% static "img/logo-divio-black.svg" %}" width="200px" alt="{{ request.site.name }}" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {% render_model_block request.current_page "changelist" %}
+                {% with dropdown="true" %}
+                    <ul class="navbar-nav mx-auto">
+                        {% show_menu 0 1 100 100 'includes/navigation.html' %}
+                    </ul>
+                {% endwith %}
+            {% endrender_model_block %}
+        </div>
+    </header>
+    {% comment %}
+    this is old, no need to touch it yet
     <header class="navbar navbar-head">
         <div class="container">
             {# INFO: the logo should be placed first for seo reasons #}
@@ -46,7 +67,8 @@
                 {% endblock navbar %}
             </div>
         </div>
-    </header>
+        </header>
+        {% endcomment %}
 {% endblock header %}
 
 {# DOCS: http://getbootstrap.com/components/#breadcrumbs #}

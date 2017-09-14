@@ -1,0 +1,15 @@
+{% load menu_tags %}
+
+{% for child in children %}
+    <li class="nav-item {% if child.children and dropdown %}dropdown{% endif %}{% if child.selected %} active{% endif %}">
+        <a
+            class="nav-link {% if child.children and dropdown %}dropdown-toggle{% endif %}"
+            {% if child.children and dropdown %} data-toggle="dropdown"{% endif %}
+            href="{{ child.attr.redirect_url|default:child.get_absolute_url }}">{{ child.get_menu_title }}</a>
+        {% if child.children and dropdown %}
+            <div class="dropdown-menu">
+                {% show_menu from_level to_level extra_inactive extra_active "includes/dropdown.html" "" "" child %}
+            </div>
+        {% endif %}
+    </li>
+{% endfor %}
