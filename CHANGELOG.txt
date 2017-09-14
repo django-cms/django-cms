@@ -12,6 +12,8 @@
   was rendered before attempting to inherit content from parent pages.
 * Changed page/placeholder cache keys to use sha1 hash instead of md5 to be FIPS compliant.
 * Fixed a bug where the change of a slug would not propagate to all descendant pages
+* Fixed a ``ValueError`` raised when using ``ManifestStaticFilesStorage`` or similar for static files.
+  This only affects Django >= 1.10
 
 
 === 3.4.4 (2017-06-15) ===
@@ -44,8 +46,6 @@
 * Fixed a bug in which the placeholder cache was not consistently cleared when a page was published.
 * Enhanced the plugin menu to not show plugins the user does not have permission to add.
 * Fixed a regression which prevented users from setting a redirect to the homepage.
-* Fixed a ``ValueError`` raised when using ``ManifestStaticFilesStorage`` or similar for static files.
-  This only affects Django >= 1.10
 
 
 === 3.4.3 (2017-04-24) ===
