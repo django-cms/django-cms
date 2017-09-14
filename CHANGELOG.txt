@@ -48,6 +48,9 @@
 * Removed the internal ``reset_to_public`` page method in favour of the ``revert_to_live`` method.
 * Fixed a bug where the placeholder cache was not consistently cleared when a page was published.
 * Enhanced the plugin menu to not show plugins the user does not have permission to add.
+* Fixed a regression which prevented users from setting a redirect to the homepage.
+* Fixed a ``ValueError`` raised when using ``ManifestStaticFilesStorage`` or similar for static files.
+  This only affects Django >= 1.10
 
 
 === 3.4.3 (2017-04-24) ===

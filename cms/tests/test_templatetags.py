@@ -7,9 +7,12 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
+from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
+from mock import patch
 
 import cms
 from cms.api import create_page, create_title, add_plugin
@@ -92,6 +95,31 @@ class TemplatetagTests(CMSTestCase):
         )
 
         output = self.render_template_obj(template, {}, None)
+        self.assertEqual(expected, output)
+
+    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+    @patch('django.contrib.staticfiles.storage.staticfiles_storage')
+    def test_static_with_version_manifest(self, mock_storage):
+        """
+        Check that static files are looked up at the location where they are
+        stored when using static file manifests.
+        """
+        mock_storage.url.side_effect = lambda x: '/static/' + x
+
+        template = (
+            """{% load staticfiles cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
+            """type="text/javascript"></script>"""
+        )
+
+        output = self.render_template_obj(template, {}, None)
+        # If the manifest is used for looking up the static file (Django 1.10
+        # and later), it needs to be looked up with a proper path.
+        versioned_filename = 'cms/css/%s/cms.base.css' % cms.__version__
+        if mock_storage.url.called:
+            mock_storage.url.assert_called_with(versioned_filename)
+
+        expected = '<script src="/static/%s" type="text/javascript"></script>'
+        expected = expected % versioned_filename
         self.assertEqual(expected, output)
 
 
