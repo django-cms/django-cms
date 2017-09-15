@@ -46,7 +46,7 @@ descendant of the current active node.
 The fourth parameter, ``extra_active`` (default=100), specifies how
 many levels of descendants of the currently active node should be displayed.
 
-The fifth parameter,  ``namespace`` specifies the namespace of the menu. if empty will use all namespaces.
+The fifth parameter, ``namespace``, is currently not implemented.
 
 The sixth parameter ``root_id`` specifies the id of the root node.
 
