@@ -337,7 +337,7 @@ Menu system classes and function
 
         * **auth_required** (*bool*) – is authentication required to access this page
         * **is_page** (*bool*) – Always True
-        * **navigation_extenders** (*list*) – navigation extenders connected to this node (including Apphooks)
+        * **navigation_extenders** (*list*) – navigation extenders connected to this node
         * **redirect_url** (*str*) – redirect URL of page (if any)
         * **reverse_id** (*str*) – unique identifier for the page
         * **soft_root** (*bool*) – whether page is a soft root
