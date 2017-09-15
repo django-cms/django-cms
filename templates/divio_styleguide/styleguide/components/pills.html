@@ -1,35 +1,35 @@
 <div class="code-container">
-    <ul class="nav nav-pills" role="tablist">
-        <li role="presentation" class="active"><a href="#">Home</a></li>
-        <li role="presentation"><a href="#">Profile</a></li>
-        <li role="presentation" class="disabled"><a href="#">Disabled</a></li>
-        <li role="presentation" class="dropdown">
-            <a class="dropdown-toggle" id="pillsDropdownMenu1" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="pillsDropdownMenu1">
-                <li><a href="#" role="menuitem" tabindex="-1">Action</a></li>
-                <li><a href="#" role="menuitem" tabindex="-1">Another action</a></li>
-                <li><a href="#" role="menuitem" tabindex="-1">Something else here</a></li>
-                <li class="divider"></li>
-                <li><a href="#" role="menuitem" tabindex="-1">Separated link</a></li>
-            </ul>
+    <ul class="nav nav-pills" role="tablist ">
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li role="presentation"><a class="nav-link" href="#">Profile</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">Disabled</a></li>
+        <li role="presentation" class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="pillsDropdownMenu1" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>
+            <div class="dropdown-menu" role="menu" aria-labelledby="pillsDropdownMenu1">
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Action</a>
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Another action</a>
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Separated link</a>
+            </div>
         </li>
     </ul>
 
-    <div class="spacer"></div>
+    <div class="mt-4 mb-4"></div>
 
-    <ul class="nav nav-pills nav-stacked" role="tablist">
-        <li role="presentation" class="active"><a href="#">Home</a></li>
-        <li role="presentation"><a href="#">Profile</a></li>
-        <li role="presentation" class="disabled"><a href="#">Disabled</a></li>
-        <li role="presentation" class="dropdown">
-            <a class="dropdown-toggle" id="pillsDropdownMenu2" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="pillsDropdownMenu2">
-                <li><a href="#" role="menuitem" tabindex="-1">Action</a></li>
-                <li><a href="#" role="menuitem" tabindex="-1">Another action</a></li>
-                <li><a href="#" role="menuitem" tabindex="-1">Something else here</a></li>
-                <li class="divider"></li>
-                <li><a href="#" role="menuitem" tabindex="-1">Separated link</a></li>
-            </ul>
+    <ul class="nav nav-pills flex-column flex-md-row" role="tablist">
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Column up to md</a></li>
+        <li role="presentation"><a class="nav-link" href="#">Profile</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">Disabled</a></li>
+        <li role="presentation" class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="pillsDropdownMenu1" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>
+            <div class="dropdown-menu" role="menu" aria-labelledby="pillsDropdownMenu1">
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Action</a>
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Another action</a>
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Separated link</a>
+            </div>
         </li>
     </ul>
 </div>
