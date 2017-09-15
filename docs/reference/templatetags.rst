@@ -15,10 +15,14 @@ top of your template::
 
     {% load cms_tags %}
 
+
+Placeholders
+============
+
 ..  templatetag:: placeholder
 
 placeholder
-===========
+-----------
 
 .. versionchanged:: 2.1
 
@@ -67,17 +71,29 @@ pages have plugins that generate content::
 See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extra
 context variables and change some other placeholder behaviour.
 
+..  important::
+
+    ``{% placeholder %}`` will only work inside the template's ``<body>``.
+
+
 ..  templatetag:: static_placeholder
 
 static_placeholder
-==================
+------------------
+
 .. versionadded:: 3.0
 
-The static_placeholder template tag can be used anywhere in any template and is not bound to any
-page or model. It needs a name and it will create a placeholder that you can fill with plugins
-afterwards. The static_placeholder tag is normally used to display the same content on multiple
-locations or inside of apphooks or other third party apps. Static_placeholder need to be published to
-show up on live pages.
+The ``{% static_placeholder %}`` template tag can be used anywhere in a template element after
+the ``{% cms_toolbar %}`` tag. A static placeholder instance is not bound to any particular page
+or model - in other words, everywhere it appears, a static placeholder will hold exactly the same
+content.
+
+The ``{% static_placeholder %}`` tag is normally used to display the same content on multiple
+locations or inside of apphooks or other third party apps.
+
+Otherwise, a static placeholder behaves like a "normal" placeholder, to which plugins can be added.
+
+A static placeholder needs to be published to show up on live pages, and requires a name.
 
 Example::
 
@@ -88,7 +104,7 @@ Example::
 
 .. warning::
 
-    Static_placeholders are not included in the undo/redo and page history pages
+    Static placeholders are not included in the undo/redo and page history pages
 
 If you want additional content to be displayed in case the static placeholder is
 empty, use the ``or`` argument and an additional ``{% endstatic_placeholder %}``
@@ -112,12 +128,17 @@ Example::
 Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and
 ``SITE_ID`` *must* be set in ``settings.py`` for this (not to mention other aspects of django CMS) to work correctly.
 
+..  important::
+
+    ``{% static_placeholder %}`` will only work inside the template's ``<body>``.
+
+
 ..  templatetag:: render_placeholder
 
 render_placeholder
 ==================
 
-`{% render_placeholder %}` is used if you have a PlaceholderField in your own model and want
+``{% render_placeholder %}`` is used if you have a PlaceholderField in your own model and want
 to render it in the template.
 
 The :ttag:`render_placeholder` tag takes the following parameters:
@@ -795,8 +816,8 @@ function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
 
-..  templatetag:: language_chooser
 
+..  templatetag:: language_chooser
 
 language_chooser
 ================
@@ -838,10 +859,14 @@ Toolbar template tags
 
 .. highlightlang:: html+django
 
-The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the
-required CSS and javascript to the sekizai blocks in the base template. The template tag
-has to be placed after the ``<body>`` tag and before any ``{% placeholder %}`` occurrences
-within your HTML.
+The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the required
+CSS and javascript to the sekizai blocks in the base template. The template tag must be placed
+before any ``{% placeholder %}`` occurrences within your HTML.
+
+..  important::
+
+    ``{% cms_toolbar %}`` will only work correctly inside the template's ``<body>``.
+
 
 Example::
 
@@ -851,9 +876,8 @@ Example::
     ...
 
 
-.. note::
+..  note::
 
-    Be aware that you can not surround the cms_toolbar tag with block tags.
+    Be aware that you cannot surround the ``cms_toolbar`` tag with block tags.
     The toolbar tag will render everything below it to collect all plugins and placeholders, before
     it renders itself. Block tags interfere with this.
-
