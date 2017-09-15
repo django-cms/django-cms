@@ -1,15 +1,20 @@
 {% extends "content.html" %}
 
+{% block breadcrumb %}{% endblock %}
+
 {% block content %}
-    {% include "divio_styleguide/includes/card.html" with x=1 y=2 %}
-    {% include "divio_styleguide/includes/card.html" with x=2 %}
-    {% include "divio_styleguide/includes/card.html" with cls=' my-other-style-of-component '%}
-<div class="container">
-<h1>Example template</h1>
-<pre>
- meow     |\__/,|   (`\
-        _.|o o  |_   ) )
--------(((---(((---------
-</pre>
+<div class="container mb-5">
+    <h1>Example template</h1>
+    <div class="row">
+        <div class="col-sm-4">
+            {% include "divio_styleguide/includes/card.html" with cls='text-white bg-secondary' card_title='Custom title' %}
+        </div>
+        <div class="col-sm-4">
+            {% include "divio_styleguide/includes/card.html" with cls='text-white bg-primary' card_title='Custom title 2' %}
+        </div>
+        <div class="col-sm-4">
+            {% include "divio_styleguide/includes/card.html" with cls='' %}
+        </div>
+    </div>
 </div>
 {% endblock %}

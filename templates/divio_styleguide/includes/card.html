@@ -1,4 +1,6 @@
-<div class="card {{ cls }}">i'm a card {{ x }} {{ y }}</div>
-{% if x == 2 %}
-x is 2
-{% endif %}
+<div class="card {{ cls }}">
+    <div class="card-body">
+        <h4 class="card-title">{{ card_title|default:'Card title' }}</h4>
+        <p class="mb-0">i'm a card body</p>
+    </div>
+</div>
