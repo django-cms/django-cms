@@ -32,10 +32,6 @@ EXPIRE_NOW = 0
 # HTTP Specification says max caching should only be up to one year.
 MAX_EXPIRATION_TTL = 365 * 24 * 3600
 
-PLUGIN_TOOLBAR_JS = "CMS._plugins.push([\"cms-plugin-%(pk)s\", %(config)s]);\n"
-
-PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push([\"cms-placeholder-%(pk)s\", %(config)s]);"
-
 # In the permissions system we use user levels to determine
 # the depth in which the user has permissions.
 # This constant represents a user that can see pages at all depths.

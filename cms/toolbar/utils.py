@@ -6,7 +6,6 @@ from django.utils.encoding import force_text
 from django.utils.six import text_type
 from django.utils.translation import ugettext
 
-from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils.i18n import force_language
 
 
@@ -17,20 +16,22 @@ def get_placeholder_toolbar_js(placeholder, request_language,
         'Add plugin to placeholder "%(placeholder_label)s"'
     ) % {'placeholder_label': label}
 
-    data = {
-        'type': 'placeholder',
-        'name': force_text(label),
-        'page_language': request_language,
-        'placeholder_id': text_type(placeholder.pk),
-        'plugin_language': request_language,
-        'plugin_restriction': allowed_plugins or [],
-        'addPluginHelpTitle': force_text(help_text),
-        'urls': {
-            'add_plugin': placeholder.get_add_url(),
-            'copy_plugin': placeholder.get_copy_url(),
+    return [
+        'cms-placeholder-{}'.format(placeholder.pk),
+        {
+            'type': 'placeholder',
+            'name': force_text(label),
+            'page_language': request_language,
+            'placeholder_id': text_type(placeholder.pk),
+            'plugin_language': request_language,
+            'plugin_restriction': allowed_plugins or [],
+            'addPluginHelpTitle': force_text(help_text),
+            'urls': {
+                'add_plugin': placeholder.get_add_url(),
+                'copy_plugin': placeholder.get_copy_url(),
+            }
         }
-    }
-    return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
+    ]
 
 
 def get_plugin_toolbar_info(plugin, request_language, children=None, parents=None):
@@ -49,13 +50,15 @@ def get_plugin_toolbar_info(plugin, request_language, children=None, parents=Non
 
 
 def get_plugin_toolbar_js(plugin, request_language, children=None, parents=None):
-    data = get_plugin_toolbar_info(
-        plugin,
-        request_language=request_language,
-        children=children,
-        parents=parents,
-    )
-    return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
+    return [
+        'cms-plugin-{}'.format(plugin.pk),
+        get_plugin_toolbar_info(
+            plugin,
+            request_language=request_language,
+            children=children,
+            parents=parents,
+        )
+    ]
 
 
 def get_plugin_tree_as_json(request, plugins):

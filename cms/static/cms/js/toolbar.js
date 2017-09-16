@@ -8,7 +8,7 @@ import './libs/pep';
 import './modules/dropdown';
 
 // CMS Core
-import { Helpers, KEYS } from './modules/cms.base';
+import CMS, { Helpers, KEYS } from './modules/cms.base';
 import $ from 'jquery';
 import Class from 'classjs';
 
@@ -23,7 +23,8 @@ import StructureBoard from './modules/cms.structureboard';
 import Toolbar from './modules/cms.toolbar';
 import Tooltip from './modules/cms.tooltip';
 
-// CMS by this time is a global that has `_plugins` property
+CMS._plugins = CMS._plugins || [];
+
 CMS.Messages = Messages;
 CMS.ChangeTracker = ChangeTracker;
 CMS.Modal = Modal;
@@ -41,6 +42,30 @@ CMS.KEYS = KEYS;
 CMS.$ = $;
 CMS.Class = Class;
 
+// The DOM probably isn't finished loading, but the config should nevertheless be available
+CMS.config = JSON.parse(document.getElementById('cms-config').text);
+
 initHelpShortcuts();
 
 window.CMS = CMS;
+
+$(function () {
+    $('.cms-plugin-data').each(function(i, plugin_elements) {
+        CMS._plugins = CMS._plugins.concat(JSON.parse(plugin_elements.text));
+    });
+
+    $('.cms-placeholder-data').each(function(i, placeholder_element) {
+        CMS._plugins.push(JSON.parse(placeholder_element.text));
+    });
+
+    CMS.settings = CMS.API.Helpers.getSettings();
+
+    // extends API
+    CMS.API.Toolbar = new CMS.Toolbar();
+    CMS.API.Clipboard = new CMS.Clipboard();
+    CMS.API.StructureBoard = new CMS.StructureBoard();
+    CMS.API.Messages = new CMS.Messages();
+    CMS.API.Tooltip = new CMS.Tooltip();
+
+    CMS.Plugin._initializeTree();
+});

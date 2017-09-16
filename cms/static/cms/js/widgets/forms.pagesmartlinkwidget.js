@@ -93,8 +93,8 @@ require.ensure([], function (require) {
     });
 
     $(function () {
-        CMS.Widgets._pageSmartLinkWidgets.forEach(function (widget) {
-            new CMS.PageSmartLinkWidget(widget);
+        $('.cms-pagesmartlink-data').each(function(i, widget_element) {
+            new CMS.PageSmartLinkWidget(JSON.parse(widget_element.text));
         });
     });
 }, 'admin.widget');

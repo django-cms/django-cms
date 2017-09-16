@@ -4,6 +4,8 @@ from collections import OrderedDict
 
 from functools import partial
 
+import json
+
 from classytags.utils import flatten_context
 
 from django.contrib.sites.models import Site
@@ -209,7 +211,8 @@ class ContentRenderer(BaseRenderer):
     placeholder_edit_template = (
         '{content} '
         '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div> '
-        '<script data-cms>{plugin_js}\n{placeholder_js}</script>'
+        '<script data-cms type="application/json" class="cms-plugin-data">{plugin_js}</script>'
+        '<script data-cms type="application/json" class="cms-placeholder-data">{placeholder_js}</script>'
     )
 
     def __init__(self, request):
@@ -328,11 +331,11 @@ class ContentRenderer(BaseRenderer):
             language=language,
             page=page,
         )
-        plugin_toolbar_js_bits = (self.get_plugin_toolbar_js(plugin, page=page)
-                                  for plugin in placeholder_cache['plugins'])
+        plugin_toolbar_js_bits = list((self.get_plugin_toolbar_js(plugin, page=page)
+                                  for plugin in placeholder_cache['plugins']))
         context = {
-            'plugin_js': ''.join(plugin_toolbar_js_bits),
-            'placeholder_js': placeholder_toolbar_js,
+            'plugin_js': json.dumps(plugin_toolbar_js_bits),
+            'placeholder_js': json.dumps(placeholder_toolbar_js),
             'placeholder_id': placeholder.pk,
         }
         return context
@@ -583,7 +586,8 @@ class StructureRenderer(BaseRenderer):
         <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
             {plugin_menu_js}
         </script>
-        <script data-cms>{plugin_js}\n{placeholder_js}</script>
+        <script data-cms type="application/json">{plugin_js}</script>
+        <script data-cms type="application/json">{placeholder_js}</script>
         """
     )
 
@@ -653,7 +657,7 @@ class StructureRenderer(BaseRenderer):
     def render_plugin(self, instance, page=None):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(instance.placeholder_id, {})
         placeholder_cache.setdefault('plugins', []).append(instance)
-        return self.get_plugin_toolbar_js(instance, page=page)
+        return json.dumps(self.get_plugin_toolbar_js(instance, page=page))
 
     def render_plugins(self, placeholder, language, page=None):
         template = page.get_template() if page else None
@@ -667,14 +671,11 @@ class StructureRenderer(BaseRenderer):
 class LegacyRenderer(ContentRenderer):
 
     placeholder_edit_template = (
-        """
-        {content}
-        <div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>
-        <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
-            {plugin_menu_js}
-        </script>
-        <script data-cms>{plugin_js}\n{placeholder_js}</script>
-        """
+        '{content} '
+        '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>'
+        '<script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">{plugin_menu_js}</script>'
+        '<script data-cms type="application/json" class="cms-plugin-data">{plugin_js}</script>'
+        '<script data-cms type="application/json" class="cms-placeholder-data">{placeholder_js}</script>'
     )
 
     def get_editable_placeholder_context(self, placeholder, language, page=None):

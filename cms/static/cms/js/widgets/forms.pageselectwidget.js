@@ -80,8 +80,8 @@ require.ensure(
 
         // init
         $(function() {
-            CMS.Widgets._pageSelectWidgets.forEach(function(widget) {
-                new CMS.PageSelectWidget(widget);
+            $('.cms-pageselectwidget-data').each(function(i, widget_element) {
+                new CMS.PageSelectWidget(JSON.parse(widget_element.text));
             });
         });
     },

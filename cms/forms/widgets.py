@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from cms.utils.compat import DJANGO_1_10
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.auth import get_permission_codename
@@ -79,17 +81,7 @@ class PageSelectWidget(MultiWidget):
         )
 
     def _build_script(self, name, value, attrs={}):
-        return r"""<script type="text/javascript">
-                var CMS = window.CMS || {};
-
-                CMS.Widgets = CMS.Widgets || {};
-                CMS.Widgets._pageSelectWidgets = CMS.Widgets._pageSelectWidgets || [];
-                CMS.Widgets._pageSelectWidgets.push({
-                    name: '%(name)s'
-                });
-            </script>""" % {
-                'name': name
-            }
+        return '<script data-cms type="application/json" class="cms-pageselectwidget-data">{}</script>'.format(json.dumps({'name': name}))
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
@@ -155,23 +147,13 @@ class PageSmartLinkWidget(TextInput):
             )
 
     def _build_script(self, name, value, attrs={}):
-        return r"""<script type="text/javascript">
-            var CMS = window.CMS || {};
-
-            CMS.Widgets = CMS.Widgets || {};
-            CMS.Widgets._pageSmartLinkWidgets = CMS.Widgets._pageSmartLinkWidgets || [];
-            CMS.Widgets._pageSmartLinkWidgets.push({
-                id: '%(element_id)s',
-                text: '%(placeholder_text)s',
-                lang: '%(language_code)s',
-                url: '%(ajax_url)s'
-            });
-        </script>""" % {
-            'element_id': attrs.get('id', ''),
-            'placeholder_text': attrs.get('placeholder_text', ''),
-            'language_code': self.language,
-            'ajax_url': force_text(self.ajax_url)
+        widget = {
+            'id': attrs.get('id', ''),
+            'text': force_text(attrs.get('placeholder_text', '')),
+            'lang': self.language,
+            'url': force_text(self.ajax_url)
         }
+        return '<script data-cms type="application/json" class="cms-pagesmartlinkwidget-data">{}</script>'.format(json.dumps(widget))
 
     def get_context(self, name, value, attrs):
         context = super(PageSmartLinkWidget, self).get_context(name, value, attrs)
@@ -257,7 +239,7 @@ class ApplicationConfigSelect(Select):
     Special widget -populate by javascript- that shows application configurations
     depending on selected Apphooks.
 
-    Required data are injected in the page as javascript data that cms.app_hook_select.js
+    Required data are injected in the page as javascript data that forms.apphookselect.js
     uses to create the appropriate data structure.
 
     A stub 'add-another' link is created and filled in with the correct URL by the same
@@ -275,26 +257,19 @@ class ApplicationConfigSelect(Select):
         super(ApplicationConfigSelect, self).__init__(attrs, choices)
 
     def _build_script(self, name, value, attrs={}):
-        configs = []
-        urls = []
+        configs = {}
+        urls = {}
         for application, cms_app in self.app_configs.items():
-            configs.append("'%s': [%s]" % (application, ",".join(
-                ["['%s', '%s']" % (config.pk, escapejs(escape(config))) for config in cms_app.get_configs()])))  # noqa
+            configs[str(application)] = [(config.pk, escape(config)) for config in cms_app.get_configs()]
         for application, cms_app in self.app_configs.items():
-            urls.append("'%s': '%s'" % (application, cms_app.get_config_add_url()))
-        return r"""<script type="text/javascript">
-            var apphooks_configuration = {
-                %(apphooks_configurations)s
-            };
-            var apphooks_configuration_url = {
-                %(apphooks_url)s
-            };
-            var apphooks_configuration_value = '%(apphooks_value)s';
-        </script>""" % {
-            'apphooks_configurations': ','.join(configs),
-            'apphooks_url': ','.join(urls),
-            'apphooks_value': value,
-        }
+            urls[str(application)] = cms_app.get_config_add_url()
+        return '<script data-cms type="application/json" id="apphooks-data">{}</script>'.format(json.dumps(
+            {
+                'configs': configs,
+                'urls': urls,
+                'value': value
+            }
+        ))
 
     def get_context(self, name, value, attrs):
         context = super(ApplicationConfigSelect, self).get_context(name, value, attrs)

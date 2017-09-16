@@ -11,10 +11,23 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.apph
 // APP HOOK SELECT
 require.ensure([], function (require) {
     var $ = require('jquery');
-    var apphooks_configuration = window.apphooks_configuration || {};
+
+    var configs = {},
+        config_value = '',
+        config_urls = {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
+        var data = document.getElementById('apphooks-data');
+        if (data !== null) {
+            // Parse the JSON
+            data = JSON.parse(data.text);
+
+            configs = data['configs'];
+            config_value = data['value'];
+            config_urls = data['urls'];
+        }
+
         var appHooks = $('#application_urls, #id_application_urls');
         var selected = appHooks.find('option:selected');
         var appNsRow = $('.form-row.application_namespace, .form-row.field-application_namespace');
@@ -28,21 +41,21 @@ require.ensure([], function (require) {
         appHooks.setupNamespaces = function () {
             var opt = $(this).find('option:selected');
 
-            if ($(appCfgs).length > 0 && apphooks_configuration[opt.val()]) {
+            if ($(appCfgs).length > 0 && configs[opt.val()]) {
                 appCfgs.html('');
-                for (var i = 0; i < apphooks_configuration[opt.val()].length; i++) {
+                for (var i = 0; i < configs[opt.val()].length; i++) {
                     var selectedCfgs = '';
 
-                    if (apphooks_configuration[opt.val()][i][0] === window.apphooks_configuration_value) {
+                    if (configs[opt.val()][i][0] === config_value) {
                         selectedCfgs = 'selected="selected"';
                     }
                     appCfgs.append(
-                        '<option ' + selectedCfgs + ' value="' + apphooks_configuration[opt.val()][i][0] + '">' +
-                            apphooks_configuration[opt.val()][i][1] +
+                        '<option ' + selectedCfgs + ' value="' + configs[opt.val()][i][0] + '">' +
+                            configs[opt.val()][i][1] +
                         '</option>'
                     );
                 }
-                appCfgsAdd.attr('href', window.apphooks_configuration_url[opt.val()] +
+                appCfgsAdd.attr('href', config_urls[opt.val()] +
                     // Here we check if we are on django>=1.8 by checking if the method introduced in that version
                     // exists, and if it does - we add `_popup` ourselves, because otherwise the popup with
                     // apphook creation form will not be dismissed correctly
