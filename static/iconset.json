@@ -6,6 +6,23 @@
     "icons": [
         "info",
         "notification",
-        "question"
+        "question",
+        "arrowRight",
+        "chat",
+        "check",
+        "close",
+        "email",
+        "downloadIcon",
+        "info",
+        "menu",
+        "phone",
+        "question",
+        "quote",
+        "shield",
+        "socialFacebook",
+        "socialGithub",
+        "socialGplus",
+        "socialLinkedin",
+        "socialTwitter"
     ]
 }

@@ -1,0 +1,35 @@
+{% extends "content.html" %} {% block breadcrumb %}{% endblock %} {% load i18n staticfiles cms_tags menu_tags %} {% block content %}
+
+
+<header class="pageHero">
+    <div class="stripe stripeTop stripeGradient">
+    </div>
+    <img class="mw1250 w-100" src="{% static "img/placeholders/codeImage.png" %}" alt="" />
+</header>
+
+<div class="container mb-5">
+    <div class="row  justify-content-center text-center">
+        <div class="col-12">
+            {% include "includes/icon.html" with icon="code" class="mx-auto d-block mt-3 productIcon productIconShadow" title="Code" %}
+
+            <p class="mb-0 mt-4 text-secondary">Get your local setup in minutes</p>
+            <h1 class="display-1 mb-7">Code</h1>
+
+            <div class="row circleWrap circleWrapArrows">
+                <div class="col-12 col-md-4 px-lg-5">
+                    {% include "divio_styleguide/includes/circles.html" with cls='circleBg1' circle_icon='DOWNLOAD' circle_title='Download App' circle_desc='Develop with confidence, knowing that what works locally will also work in the cloud.' %}
+                </div>
+
+                <div class="col-12 col-md-4 px-lg-5">
+                    {% include "divio_styleguide/includes/circles.html" with cls='circleBg2' circle_icon='SETUP' circle_title='Setup Project' circle_desc='Our projects are pre-configured and optimised out-of-the-box for performance and security.' %}
+                </div>
+
+                <div class="col-12 col-md-4 px-lg-5">
+                    {% include "divio_styleguide/includes/circles.html" with cls='circleBg3' circle_icon='PUSH' circle_title='Push Changes' circle_desc='Enjoy a modern fully-versioned project development workflow using Git: detailed change logs.' %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

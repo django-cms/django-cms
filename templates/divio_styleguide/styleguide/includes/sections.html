@@ -3,16 +3,19 @@
     .bd-example-row {
         margin-bottom: 2rem;
     }
-    .bd-example-row .row + .row {
+
+    .bd-example-row .row+.row {
         margin-top: 1rem;
     }
-    .bd-example-row .row > .col,
-    .bd-example-row .row > [class^="col-"] {
+
+    .bd-example-row .row>.col,
+    .bd-example-row .row>[class^="col-"] {
         padding-top: .75rem;
         padding-bottom: .75rem;
         background-color: rgba(0, 187, 255, 0.15);
         border: 1px solid rgba(0, 187, 255, 0.15);
     }
+
     .bd-example-row .flex-items-top,
     .bd-example-row .flex-items-middle,
     .bd-example-row .flex-items-bottom {
@@ -29,14 +32,13 @@
         background-color: rgba(0, 187, 255, 0.15);
         border: 1px solid rgba(0, 187, 255, 0.15);
     }
-
 </style>
 
 <section data-id="templates" hidden="hidden">
     <h2>Online Styleguide</h2>
-    <p class="lead mb-4">The Online Styleguide is a uniformed compendium for project managers, web publisher, designers or
-        developers of how to maintain, update or further develop a website. This section is covering an overview
-        of all available templates developed for this website.</p>
+    <p class="lead mb-4">The Online Styleguide is a uniformed compendium for project managers, web publisher, designers or developers of how to maintain, update or further develop a website. This section is covering an overview of all available templates developed for this
+        website.
+    </p>
 
     {% include "divio_styleguide/styleguide/templates.html" %}
 
@@ -51,385 +53,383 @@
 <section data-id="typography" hidden="hidden">
     <h2>Typography</h2>
     <p class="lead">This section defines default stylings and behaviours for HTML and CSS that can be used within a
-        <abbr title="What you see is what you get">wysiwyg</abbr> text editor. A full documentation and detailed
-        examples can be found within the <a href="http://getbootstrap.com/css/">Bootstrap</a> documentation.
-        We only display the most important elements here.
+        <abbr title="What you see is what you get">wysiwyg</abbr> text editor. A full documentation and detailed examples can be found within the <a href="http://getbootstrap.com/css/">Bootstrap</a> documentation. We only display the most important elements
+        here.
 
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Headings</h3>
-            <p>Headings have to follow a chronologically order. For example a <code>&lt;h1&gt;</code> is followed by <code>&lt;h2&gt;</code>
-                than <code>&lt;h3&gt;</code> and so on. You should <strong>not</strong> use different headings just because of
-                their styling. So placing first a <code>&lt;h2&gt;</code> and than a <code>&lt;h4&gt;</code> causes SEO problems.</p>
-            <p>You should avoid the overuse of <code>&lt;h1&gt;</code> tags. In contrary to some beliefs, it is no problem to use
-                multiple <code>&lt;h1&gt;</code> tags however the <a href="http://gsnedders.html5.org/outliner/">html outline</a> should always be respected.</p>
-            <p>Classes <code>.h1-.h6</code> are also available</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <section class="code-container">
-                <h1>h1. Sample Heading</h1>
-                <h2>h2. Sample Heading</h2>
-                <h3>h3. Sample Heading</h3>
-                <h4>h4. Sample Heading</h4>
-                <h5>h5. Sample Heading</h5>
-                <h6>h6. Sample Heading <small class="text-muted">Secondary text</small></h6>
-            </section>
-            <p><code>h1, h2, h3, h4, h5, h6, h6 + small.text-muted</code></p>
-        </div>
-    </div>
-
-    <hr />
-
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Display headings</h3>
-            <p>Traditional heading elements are designed to work best in the meat of your page content. When you need a heading to stand out, consider using a display heading—a larger, slightly more opinionated heading style.</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <section class="code-container">
-                <h1 class="display-1">Display 1</h1>
-                <h2 class="display-2">Display 2</h2>
-                <h3 class="display-3">Display 3</h3>
-                <h4 class="display-4">Display 4</h4>
-            </section>
-            <p>
-            <code>.display-1, .display-2, .display-3, .display-4</code>
-            </p>
-        </div>
-    </div>
-
-    <hr />
-
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Body Text</h3>
-            <p>The main content part of an area. Always be wary that the most important aspect of SEO is to have well
-                written and structured content. The best design and code will not help your ranking with a bad content
-                strategy.</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="code-container">
-                <p class="lead">This is a lead text describing the start of a content area to get the attention of the reader.</p>
-                <p>Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient
-                    montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.</p>
-                <p><small>This line of text is meant to be treated as fine print.</small></p>
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Headings</h3>
+                <p>Headings have to follow a chronologically order. For example a <code>&lt;h1&gt;</code> is followed by <code>&lt;h2&gt;</code> than <code>&lt;h3&gt;</code> and so on. You should <strong>not</strong> use different headings just because of
+                    their styling. So placing first a <code>&lt;h2&gt;</code> and than a <code>&lt;h4&gt;</code> causes SEO problems.</p>
+                <p>You should avoid the overuse of <code>&lt;h1&gt;</code> tags. In contrary to some beliefs, it is no problem to use multiple <code>&lt;h1&gt;</code> tags however the <a href="http://gsnedders.html5.org/outliner/">html outline</a> should
+                    always be respected.</p>
+                <p>Classes <code>.h1-.h6</code> are also available</p>
             </div>
-            <p><code>p.lead, p, small</code></p>
+            <div class="col-md-8 col-linebreak">
+                <section class="code-container">
+                    <h1>h1. Sample Heading</h1>
+                    <h2>h2. Sample Heading</h2>
+                    <h3>h3. Sample Heading</h3>
+                    <h4>h4. Sample Heading</h4>
+                    <h5>h5. Sample Heading</h5>
+                    <h6>h6. Sample Heading <small class="text-muted">Secondary text</small></h6>
+                </section>
+                <p><code>h1, h2, h3, h4, h5, h6, h6 + small.text-muted</code></p>
+            </div>
         </div>
-    </div>
 
-    <hr />
+        <hr />
 
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Colors</h3>
-            <p>The color palette defines the main look &amp; feel of a website and is mostly adapted from an available
-                <abbr class="initialism" title="Corporate Identity">CI</abbr> &amp; <abbr class="initialism" title="Corporate Design">CD</abbr></p>
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Display headings</h3>
+                <p>Traditional heading elements are designed to work best in the meat of your page content. When you need a heading to stand out, consider using a display heading—a larger, slightly more opinionated heading style.</p>
+            </div>
+            <div class="col-md-8 col-linebreak">
+                <section class="code-container">
+                    <h1 class="display-1">Display 1</h1>
+                    <h2 class="display-2">Display 2</h2>
+                    <h3 class="display-3">Display 3</h3>
+                    <h4 class="display-4">Display 4</h4>
+                </section>
+                <p>
+                    <code>.display-1, .display-2, .display-3, .display-4</code>
+                </p>
+            </div>
         </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="code-container clearfix">
+
+        <hr />
+
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Body Text</h3>
+                <p>The main content part of an area. Always be wary that the most important aspect of SEO is to have well written and structured content. The best design and code will not help your ranking with a bad content strategy.
+                </p>
+            </div>
+            <div class="col-md-8 col-linebreak">
+                <div class="code-container">
+                    <p class="lead">This is a lead text describing the start of a content area to get the attention of the reader.</p>
+                    <p>Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.</p>
+                    <p><small>This line of text is meant to be treated as fine print.</small></p>
+                </div>
+                <p><code>p.lead, p, small</code></p>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Colors</h3>
+                <p>The color palette defines the main look &amp; feel of a website and is mostly adapted from an available
+                    <abbr class="initialism" title="Corporate Identity">CI</abbr> &amp; <abbr class="initialism" title="Corporate Design">CD</abbr></p>
+            </div>
+            <div class="col-md-8 col-linebreak">
+                <div class="code-container clearfix">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-primary text-white">.bg-primary</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-secondary text-white">.bg-secondary</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-success text-white">.bg-success</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-danger text-white">.bg-danger</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-warning text-white">.bg-warning</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-info text-white">.bg-info</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-light text-gray-dark">.bg-light</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-dark text-white">.bg-dark</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 mb-2 bg-white text-gray-dark">.bg-white</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="spacer"></div>
+                <div class="code-container clearfix">
+                    <span title="primary" class="text-primary">primary</span>,
+                    <span title="secondary" class="text-secondary">secondary</span>,
+                    <span title="success" class="text-success">success</span>,
+                    <span title="info" class="text-info">info</span>,
+                    <span title="warning" class="text-warning">warning</span>,
+                    <span title="danger" class="text-danger">danger</span>,
+                    <span title="muted" class="text-muted">muted</span>,
+                    <span title="muted" class="text-dark">dark</span>,
+                    <span title="muted" class="text-light">light</span>
+                </div>
+                <div class="spacer"></div>
+                <p><code>.text-{name}</code> for text color<br />
+                    <code>.bg-{name}</code> for background color<br />
+                    <br /> {name} can be:<br />
+                    <code>primary, secondary, success, info, warning, danger, [muted]</code></p>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Lists</h3>
+                <p>Lists are a great way of displaying structured informations. If this data has a specific order use the <code>&lt;ol&gt;</code> (ordered list) tag otherwise the <code>&lt;ul&gt;</code> (unordered list) tag.</p>
+                <p>Sometimes you have information that leads to an explanation or more information. For this the definition list is the markup to choose from. Simple nest a definition term <code>&lt;dt&gt;</code> and than the definition description <code>&lt;dd&gt;</code>                    within the definition list <code>&lt;dl&gt;</code>. There can be multiple definition description follow after a definition term.</p>
+            </div>
+            <div class="col-md-8 col-linebreak">
                 <div class="row">
-                    <div class="col-6"><div class="p-3 mb-2 bg-primary text-white">.bg-primary</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-secondary text-white">.bg-secondary</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-success text-white">.bg-success</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-danger text-white">.bg-danger</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-warning text-white">.bg-warning</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-info text-white">.bg-info</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-light text-gray-dark">.bg-light</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-dark text-white">.bg-dark</div></div>
-                    <div class="col-6"><div class="p-3 mb-2 bg-white text-gray-dark">.bg-white</div></div>
-                </div>
-            </div>
-            <div class="spacer"></div>
-            <div class="code-container clearfix">
-                <span title="primary" class="text-primary">primary</span>,
-                <span title="secondary" class="text-secondary">secondary</span>,
-                <span title="success" class="text-success">success</span>,
-                <span title="info" class="text-info">info</span>,
-                <span title="warning" class="text-warning">warning</span>,
-                <span title="danger" class="text-danger">danger</span>,
-                <span title="muted" class="text-muted">muted</span>,
-                <span title="muted" class="text-dark">dark</span>,
-                <span title="muted" class="text-light">light</span>
-            </div>
-            <div class="spacer"></div>
-            <p><code>.text-{name}</code> for text color<br />
-                <code>.bg-{name}</code> for background color<br />
-                <br />
-                {name} can be:<br />
-                <code>primary, secondary, success, info, warning, danger, [muted]</code></p>
-        </div>
-    </div>
-
-    <hr />
-
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Lists</h3>
-            <p>Lists are a great way of displaying structured informations. If this data has a specific order
-                use the <code>&lt;ol&gt;</code> (ordered list) tag otherwise the <code>&lt;ul&gt;</code> (unordered list) tag.</p>
-            <p>Sometimes you have information that leads to an explanation or more information. For this
-                the definition list is the markup to choose from. Simple nest a definition term <code>&lt;dt&gt;</code>
-                and than the definition description <code>&lt;dd&gt;</code> within the definition list <code>&lt;dl&gt;</code>.
-                There can be multiple definition description follow after a definition term.</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="code-container">
-                        <h4>Unordered</h4>
-                        <ul>
-                            <li>Lorem ipsum dolor</li>
-                            <li>
-                                Facilisis in pretium
-                                <ul>
-                                    <li>Nulla volutpat aliquam</li>
-                                    <li>
-                                        <a href="#">Facilisis in pretium</a>
-                                        <ul>
-                                            <li>Nulla volutpat aliquam</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>Eget porttitor</li>
-                        </ul>
+                    <div class="col-md-6">
+                        <div class="code-container">
+                            <h4>Unordered</h4>
+                            <ul>
+                                <li>Lorem ipsum dolor</li>
+                                <li>
+                                    Facilisis in pretium
+                                    <ul>
+                                        <li>Nulla volutpat aliquam</li>
+                                        <li>
+                                            <a href="#">Facilisis in pretium</a>
+                                            <ul>
+                                                <li>Nulla volutpat aliquam</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Eget porttitor</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="code-container">
+                            <h4>Ordered</h4>
+                            <ol>
+                                <li>Lorem ipsum dolor</li>
+                                <li>
+                                    Facilisis in pretium
+                                    <ul>
+                                        <li>Nulla volutpat aliquam</li>
+                                        <li>
+                                            <a href="#">Facilisis in pretium</a>
+                                            <ul>
+                                                <li>Nulla volutpat aliquam</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Eget porttitor</li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="code-container">
-                    <h4>Ordered</h4>
-                        <ol>
-                            <li>Lorem ipsum dolor</li>
-                            <li>
-                                Facilisis in pretium
-                                <ul>
-                                    <li>Nulla volutpat aliquam</li>
-                                    <li>
-                                        <a href="#">Facilisis in pretium</a>
-                                        <ul>
-                                            <li>Nulla volutpat aliquam</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>Eget porttitor</li>
-                        </ol>
-                    </div>
+
+                <hr />
+
+                <div class="code-container">
+                    <h4>Description</h4>
+                    <dl>
+                        <dt>Euismod Dolor</dt>
+                        <dd>A description list is perfect for defining terms. Etiam porta sem malesuada Etiam porta sem malesuada magna mollis euismod. magna mollis euismod. Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna
+                            mollis euismod.</dd>
+                        <dd>Donec id elit non mi porta gravida at eget metus.</dd>
+                        <dt>Malesuada porta</dt>
+                        <dd>Etiam porta sem malesuada magna mollis euismod.</dd>
+                        <dd>Donec id elit non mi porta gravida at eget metus.</dd>
+                    </dl>
                 </div>
             </div>
+        </div>
 
-            <hr />
+        <hr />
 
-            <div class="code-container">
-                <h4>Description</h4>
-                <dl>
-                    <dt>Euismod Dolor</dt>
-                    <dd>A description list is perfect for defining terms. Etiam porta sem malesuada Etiam porta sem malesuada magna mollis euismod. magna mollis euismod. Donec id elit non mi porta gravida at eget metus. Etiam porta sem malesuada magna mollis euismod.</dd>
-                    <dd>Donec id elit non mi porta gravida at eget metus.</dd>
-                    <dt>Malesuada porta</dt>
-                    <dd>Etiam porta sem malesuada magna mollis euismod.</dd>
-                    <dd>Donec id elit non mi porta gravida at eget metus.</dd>
-                </dl>
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Emphasis</h3>
+                <p>In addition to the main elements described above, you can utilise an even broader set of html tags listed here in the emphasis section.</p>
+                <p>Most <abbr title="What You See Is What You Get">WYSIWYG</abbr> editors are able to produce them simply by pressing a button, but it is wise to study them and eventually add missing tags through the source code mode.</p>
+                <p>A full list and detailed description can be found within the <a href="http://www.w3.org/TR/html-markup/elements.html">W3C HTML5</a> documentation.</p>
             </div>
-        </div>
-    </div>
-
-    <hr />
-
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Emphasis</h3>
-            <p>In addition to the main elements described above, you can utilise an even broader set of html tags listed here
-                in the emphasis section.</p>
-            <p>Most <abbr title="What You See Is What You Get">WYSIWYG</abbr> editors are able to produce them simply by
-                pressing a button, but it is wise to study them and eventually add missing tags through the source
-                code mode.</p>
-            <p>A full list and detailed description can be found within the <a href="http://www.w3.org/TR/html-markup/elements.html">W3C HTML5</a> documentation.</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="row">
-                <div class="col-md-6 code-container">
-                    <p>The <a href="#">hyperlink</a> element<br />
-                        <code>&lt;a href="#">My text&lt;/a></code></p>
-                    <p>The <abbr title="abbreviation">abbr</abbr> element<br />
-                        <code>&lt;abbr title="#">TXT&lt;/abbr></code></p>
-                    <address class="spacer">
+            <div class="col-md-8 col-linebreak">
+                <div class="row">
+                    <div class="col-md-6 code-container">
+                        <p>The <a href="#">hyperlink</a> element<br />
+                            <code>&lt;a href="#">My text&lt;/a></code></p>
+                        <p>The <abbr title="abbreviation">abbr</abbr> element<br />
+                            <code>&lt;abbr title="#">TXT&lt;/abbr></code></p>
+                        <address class="spacer">
                         <strong>The address</strong> element<br />
                         <code>&lt;address>My text&lt;address></code>
                     </address>
-                    <p>The <cite>cite</cite> element<br />
-                        <code>&lt;cite>My text&lt;/cite></code></p>
-                    <p>The <code>code</code> element<br />
-                        <code>&lt;code>My text&lt;/code></code></p>
-                    <p>The <del>delete</del> element<br />
-                        <code>&lt;del>My text&lt;/del></code></p>
-                    <p>The <dfn>definition</dfn> element<br />
-                        <code>&lt;dfn>My text&lt;/dfn></code></p>
-                    <p>The <em>emphasis</em> element<br />
-                        <code>&lt;em>My text&lt;/em></code></p>
-                    <p>The <ins>insert</ins> element<br />
-                        <code>&lt;ins>My text&lt;/ins></code></p>
-                    <p>The <kbd>keyboard</kbd> element<br />
-                        <code>&lt;kbd>My text&lt;/kbd></code></p>
-                    <p>The <mark>mark</mark> element<br />
-                        <code>&lt;mark>My text&lt;/mark></code></p>
+                        <p>The <cite>cite</cite> element<br />
+                            <code>&lt;cite>My text&lt;/cite></code></p>
+                        <p>The <code>code</code> element<br />
+                            <code>&lt;code>My text&lt;/code></code></p>
+                        <p>The <del>delete</del> element<br />
+                            <code>&lt;del>My text&lt;/del></code></p>
+                        <p>The <dfn>definition</dfn> element<br />
+                            <code>&lt;dfn>My text&lt;/dfn></code></p>
+                        <p>The <em>emphasis</em> element<br />
+                            <code>&lt;em>My text&lt;/em></code></p>
+                        <p>The <ins>insert</ins> element<br />
+                            <code>&lt;ins>My text&lt;/ins></code></p>
+                        <p>The <kbd>keyboard</kbd> element<br />
+                            <code>&lt;kbd>My text&lt;/kbd></code></p>
+                        <p>The <mark>mark</mark> element<br />
+                            <code>&lt;mark>My text&lt;/mark></code></p>
+                    </div>
+                    <div class="col-md-6 code-container">
+                        <p>The <s>strikethrough</s> element<br />
+                            <code>&lt;s>My text&lt;/s></code></p>
+                        <p>The <samp>sample</samp> element<br />
+                            <code>&lt;samp>My text&lt;/samp></code></p>
+                        <p>The <small>small</small> element<br />
+                            <code>&lt;small>My text&lt;/small></code></p>
+                        <p>The <span>span</span> element<br />
+                            <code>&lt;span>My text&lt;/span></code></p>
+                        <p>The <strong>strong</strong> element<br />
+                            <code>&lt;strong>My text&lt;/strong></code></p>
+                        <p>The <sub>subscript</sub> element<br />
+                            <code>&lt;sub>My text&lt;/sub></code></p>
+                        <p>The <sup>superscript</sup> element<br />
+                            <code>&lt;sup>My text&lt;/sup></code></p>
+                        <p>The time <time>10:00</time> element<br />
+                            <code>&lt;time>My text&lt;/time></code></p>
+                        <p>The <u>underline</u> element<br />
+                            <code>&lt;u>My text&lt;/u></code></p>
+                        <p>The <var>variable</var> element<br />
+                            <code>&lt;var>My text&lt;/var></code></p>
+                        <p>The <wbr>word break<wbr> element<br />
+                            <code>&lt;wbr>My text&lt;wbr></code></p>
+                    </div>
                 </div>
-                <div class="col-md-6 code-container">
-                    <p>The <s>strikethrough</s> element<br />
-                        <code>&lt;s>My text&lt;/s></code></p>
-                    <p>The <samp>sample</samp> element<br />
-                        <code>&lt;samp>My text&lt;/samp></code></p>
-                    <p>The <small>small</small> element<br />
-                        <code>&lt;small>My text&lt;/small></code></p>
-                    <p>The <span>span</span> element<br />
-                        <code>&lt;span>My text&lt;/span></code></p>
-                    <p>The <strong>strong</strong> element<br />
-                        <code>&lt;strong>My text&lt;/strong></code></p>
-                    <p>The <sub>subscript</sub> element<br />
-                        <code>&lt;sub>My text&lt;/sub></code></p>
-                    <p>The <sup>superscript</sup> element<br />
-                        <code>&lt;sup>My text&lt;/sup></code></p>
-                    <p>The time <time>10:00</time> element<br />
-                        <code>&lt;time>My text&lt;/time></code></p>
-                    <p>The <u>underline</u> element<br />
-                        <code>&lt;u>My text&lt;/u></code></p>
-                    <p>The <var>variable</var> element<br />
-                        <code>&lt;var>My text&lt;/var></code></p>
-                    <p>The <wbr>word break<wbr> element<br />
-                        <code>&lt;wbr>My text&lt;wbr></code></p>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Block quotes</h3>
+                <p>Per definition block-quotes are cites extracted from resources such as books or articles. They generally consist of a body text and the authors name.</p>
+                <p>Through Bootstrap's utilities they can be left- or right-aligned. More options are also available through different classes.</p>
+            </div>
+            <div class="col-md-8 col-linebreak">
+                <div class="code-container mb-5">
+                    <blockquote class="blockquote">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
+                        <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+                    </blockquote>
+                </div>
+                <div class="code-container mb-5">
+                    <blockquote class="blockquote text-center">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
+                        <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+                    </blockquote>
+                </div>
+                <div class="code-container mb-5">
+                    <blockquote class="blockquote text-right">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
+                        <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+                    </blockquote>
                 </div>
             </div>
         </div>
-    </div>
 
-    <hr />
+        <hr />
 
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Block quotes</h3>
-            <p>Per definition block-quotes are cites extracted from resources such as books or articles. They generally
-                consist of a body text and the authors name.</p>
-            <p>Through Bootstrap's utilities they can be left- or right-aligned. More options are also available through
-                different classes.</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="code-container mb-5">
-                <blockquote class="blockquote">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
-                    <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                </blockquote>
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Spacing</h3>
+                <p>There are also some extra tags and classes which might be helpful when creating your pages in order to manage spacing in between content areas.</p>
+                <h4>How it works</h4>
+                <p>Assign responsive-friendly margin or padding values to an element or a subset of its sides with shorthand classes. Includes support for individual properties, all properties, and vertical and horizontal properties. </p>
             </div>
-            <div class="code-container mb-5">
-                <blockquote class="blockquote text-center">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
-                    <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                </blockquote>
+            <div class="col-md-8 col-linebreak">
+
+                <h3 id="notation">Notation</h3>
+
+                <p>Spacing utilities that apply to all breakpoints, from <code class="highlighter-rouge">xs</code> to <code class="highlighter-rouge">xl</code>, have no breakpoint abbreviation in them. This is because those classes are applied from
+                    <code class="highlighter-rouge">min-width: 0</code> and up, and thus are not bound by a media query. The remaining breakpoints, however, do include a breakpoint abbreviation.</p>
+
+                <p>The classes are named using the format <code class="highlighter-rouge"><span class="p">{</span><span class="err">property</span><span class="p">}{</span><span class="err">sides</span><span class="p">}</span><span class="err">-</span><span class="p">{</span><span class="err">size</span><span class="p">}</span></code>                    for <code class="highlighter-rouge">xs</code> and <code class="highlighter-rouge"><span class="p">{</span><span class="err">property</span><span class="p">}{</span><span class="err">sides</span><span class="p">}</span><span class="err">-</span><span class="p">{</span><span class="err">breakpoint</span><span class="p">}</span><span class="err">-</span><span class="p">{</span><span class="err">size</span><span class="p">}</span></code>                    for <code class="highlighter-rouge">sm</code>, <code class="highlighter-rouge">md</code>, <code class="highlighter-rouge">lg</code>, and <code class="highlighter-rouge">xl</code>.</p>
+
+                <p>Where <em>property</em> is one of:</p>
+
+                <ul>
+                    <li><code class="highlighter-rouge">m</code> - for classes that set <code class="highlighter-rouge">margin</code></li>
+                    <li><code class="highlighter-rouge">p</code> - for classes that set <code class="highlighter-rouge">padding</code></li>
+                </ul>
+
+                <p>Where <em>sides</em> is one of:</p>
+
+                <ul>
+                    <li><code class="highlighter-rouge">t</code> - for classes that set <code class="highlighter-rouge">margin-top</code> or <code class="highlighter-rouge">padding-top</code></li>
+                    <li><code class="highlighter-rouge">b</code> - for classes that set <code class="highlighter-rouge">margin-bottom</code> or <code class="highlighter-rouge">padding-bottom</code></li>
+                    <li><code class="highlighter-rouge">l</code> - for classes that set <code class="highlighter-rouge">margin-left</code> or <code class="highlighter-rouge">padding-left</code></li>
+                    <li><code class="highlighter-rouge">r</code> - for classes that set <code class="highlighter-rouge">margin-right</code> or <code class="highlighter-rouge">padding-right</code></li>
+                    <li><code class="highlighter-rouge">x</code> - for classes that set both <code class="highlighter-rouge">*-left</code> and <code class="highlighter-rouge">*-right</code></li>
+                    <li><code class="highlighter-rouge">y</code> - for classes that set both <code class="highlighter-rouge">*-top</code> and <code class="highlighter-rouge">*-bottom</code></li>
+                    <li>blank - for classes that set a <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> on all 4 sides of the element</li>
+                </ul>
+
+                <p>Where <em>size</em> is one of:</p>
+
+                <ul>
+                    <li><code class="highlighter-rouge">0</code> - for classes that eliminate the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> by setting it to <code class="highlighter-rouge">0</code></li>
+                    <li><code class="highlighter-rouge">1</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * .25</code></li>
+                    <li><code class="highlighter-rouge">2</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * .5</code></li>
+                    <li><code class="highlighter-rouge">3</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer</code></li>
+                    <li><code class="highlighter-rouge">4</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * 1.5</code></li>
+                    <li><code class="highlighter-rouge">5</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * 3</code></li>
+                </ul>
+
+                <p>(You can add more sizes by adding entries to the <code class="highlighter-rouge">$spacers</code> Sass map variable.)</p>
+
+                <h3 id="horizontal-centering">Horizontal centering</h3>
+                <p>Additionally, Bootstrap also includes an <code class="highlighter-rouge">.mx-auto</code> class for horizontally centering fixed-width block level content—that is, content that has <code class="highlighter-rouge">display: block</code> and
+                    a <code class="highlighter-rouge">width</code> set—by setting the horizontal margins to <code class="highlighter-rouge">auto</code>.</p>
+
             </div>
-            <div class="code-container mb-5">
-                <blockquote class="blockquote text-right">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
-                    <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                </blockquote>
-            </div>
         </div>
-    </div>
 
-    <hr />
-
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Spacing</h3>
-            <p>There are also some extra tags and classes which might be helpful when creating your pages in order
-                to manage spacing in between content areas.</p>
-            <h4>How it works</h4>
-            <p>Assign responsive-friendly margin or padding values to an element or a subset of its sides with shorthand classes.
-Includes support for individual properties, all properties, and vertical and horizontal properties. </p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-
-            <h3 id="notation">Notation</h3>
-
-            <p>Spacing utilities that apply to all breakpoints, from <code class="highlighter-rouge">xs</code> to <code class="highlighter-rouge">xl</code>, have no breakpoint abbreviation in them. This is because those classes are applied from <code class="highlighter-rouge">min-width: 0</code> and up, and thus are not bound by a media query. The remaining breakpoints, however, do include a breakpoint abbreviation.</p>
-
-            <p>The classes are named using the format <code class="highlighter-rouge"><span class="p">{</span><span class="err">property</span><span class="p">}{</span><span class="err">sides</span><span class="p">}</span><span class="err">-</span><span class="p">{</span><span class="err">size</span><span class="p">}</span></code> for <code class="highlighter-rouge">xs</code> and <code class="highlighter-rouge"><span class="p">{</span><span class="err">property</span><span class="p">}{</span><span class="err">sides</span><span class="p">}</span><span class="err">-</span><span class="p">{</span><span class="err">breakpoint</span><span class="p">}</span><span class="err">-</span><span class="p">{</span><span class="err">size</span><span class="p">}</span></code> for <code class="highlighter-rouge">sm</code>, <code class="highlighter-rouge">md</code>, <code class="highlighter-rouge">lg</code>, and <code class="highlighter-rouge">xl</code>.</p>
-
-            <p>Where <em>property</em> is one of:</p>
-
-            <ul>
-            <li><code class="highlighter-rouge">m</code> - for classes that set <code class="highlighter-rouge">margin</code></li>
-            <li><code class="highlighter-rouge">p</code> - for classes that set <code class="highlighter-rouge">padding</code></li>
-            </ul>
-
-            <p>Where <em>sides</em> is one of:</p>
-
-            <ul>
-            <li><code class="highlighter-rouge">t</code> - for classes that set <code class="highlighter-rouge">margin-top</code> or <code class="highlighter-rouge">padding-top</code></li>
-            <li><code class="highlighter-rouge">b</code> - for classes that set <code class="highlighter-rouge">margin-bottom</code> or <code class="highlighter-rouge">padding-bottom</code></li>
-            <li><code class="highlighter-rouge">l</code> - for classes that set <code class="highlighter-rouge">margin-left</code> or <code class="highlighter-rouge">padding-left</code></li>
-            <li><code class="highlighter-rouge">r</code> - for classes that set <code class="highlighter-rouge">margin-right</code> or <code class="highlighter-rouge">padding-right</code></li>
-            <li><code class="highlighter-rouge">x</code> - for classes that set both <code class="highlighter-rouge">*-left</code> and <code class="highlighter-rouge">*-right</code></li>
-            <li><code class="highlighter-rouge">y</code> - for classes that set both <code class="highlighter-rouge">*-top</code> and <code class="highlighter-rouge">*-bottom</code></li>
-            <li>blank - for classes that set a <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> on all 4 sides of the element</li>
-            </ul>
-
-            <p>Where <em>size</em> is one of:</p>
-
-            <ul>
-            <li><code class="highlighter-rouge">0</code> - for classes that eliminate the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> by setting it to <code class="highlighter-rouge">0</code></li>
-            <li><code class="highlighter-rouge">1</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * .25</code></li>
-            <li><code class="highlighter-rouge">2</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * .5</code></li>
-            <li><code class="highlighter-rouge">3</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer</code></li>
-            <li><code class="highlighter-rouge">4</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * 1.5</code></li>
-            <li><code class="highlighter-rouge">5</code> - (by default) for classes that set the <code class="highlighter-rouge">margin</code> or <code class="highlighter-rouge">padding</code> to <code class="highlighter-rouge">$spacer * 3</code></li>
-            </ul>
-
-            <p>(You can add more sizes by adding entries to the <code class="highlighter-rouge">$spacers</code> Sass map variable.)</p>
-
-            <h3 id="horizontal-centering">Horizontal centering</h3>
-            <p>Additionally, Bootstrap also includes an <code class="highlighter-rouge">.mx-auto</code> class for horizontally centering fixed-width block level content—that is, content that has <code class="highlighter-rouge">display: block</code> and a <code class="highlighter-rouge">width</code> set—by setting the horizontal margins to <code class="highlighter-rouge">auto</code>.</p>
-
-        </div>
-    </div>
-
-    {% include "divio_styleguide/styleguide/typography.html" %}
+        {% include "divio_styleguide/styleguide/typography.html" %}
 </section>
 
 <section data-id="iconography" hidden="hidden">
     <h2>Iconography</h2>
-    <p class="lead">Generate font icons using the <code>gulp icons</code>
-        command. The following icons are available throughout your website. Implement them using
+    <p class="lead">Generate font icons using the <code>gulp icons</code> command. The following icons are available throughout your website. Implement them using
         <code>{% verbatim %}{% include "includes/icon.html" with icon="{name}" [color="{color}" title="{title}" sprite="{sprite}"] %}{% endverbatim %}</code> and replace {name} with the icon name.
     </p>
 
     <div class="iconlist-render"></div>
 
-    <hr />
-
-    {% include "divio_styleguide/styleguide/iconography.html" %}
+    <hr /> {% include "divio_styleguide/styleguide/iconography.html" %}
 </section>
 
 <section data-id="tables" hidden="hidden">
     <h2>Tables</h2>
-    <p class="lead">For basic styling — light padding and only horizontal dividers — add the base class <code>.table</code>
-        to any <code>&lt;table&gt;</code>. It may seem super redundant, but given the widespread use of tables
-        we've opted to isolate our custom table styles. For complete reference, please visit the
+    <p class="lead">For basic styling — light padding and only horizontal dividers — add the base class <code>.table</code> to any <code>&lt;table&gt;</code>. It may seem super redundant, but given the widespread use of tables we've opted to isolate our custom table
+        styles. For complete reference, please visit the
         <a href="http://getbootstrap.com/css/#tables">Bootstrap</a> documentation.</p>
 
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Basic Table</h3>
-            <p>The basic table is the default behaviour when using the <code>.table</code> class. Not adding a class will
-                result in a table without styles at all.</p>
-                <p>To ensure a table is responsive, add the wrapper class <code>.table-responsive</code> to the table.</p>
+            <p>The basic table is the default behaviour when using the <code>.table</code> class. Not adding a class will result in a table without styles at all.</p>
+            <p>To ensure a table is responsive, add the wrapper class <code>.table-responsive</code> to the table.</p>
             <p>More about the basics of a table can be found within the <a href="http://getbootstrap.com/css/#tables-example">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="code-container">
                 <div class="table-responsive">
-                    {% with cls="table" %}
-                    {% include "divio_styleguide/styleguide/components/table.html" %}
-                    {% endwith %}
+                    {% with cls="table" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
                 </div>
             </div>
         </div>
@@ -439,17 +439,14 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Basic Table</h3>
-            <p>The basic table is the default behaviour when using the <code>.table</code> class. Not adding a class will
-                result in a table without styles at all.</p>
-                <p>To ensure a table is responsive, add the wrapper class <code>.table-responsive</code> to the table.</p>
+            <p>The basic table is the default behaviour when using the <code>.table</code> class. Not adding a class will result in a table without styles at all.</p>
+            <p>To ensure a table is responsive, add the wrapper class <code>.table-responsive</code> to the table.</p>
             <p>More about the basics of a table can be found within the <a href="http://getbootstrap.com/css/#tables-example">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="code-container">
                 <div class="table-responsive">
-                    {% with cls="table table-inverse" %}
-                    {% include "divio_styleguide/styleguide/components/table.html" %}
-                    {% endwith %}
+                    {% with cls="table table-inverse" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
                 </div>
             </div>
         </div>
@@ -459,17 +456,14 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Striped Rows</h3>
-            <p>Sometimes it is necessary to distinguish content form within a table from one another. For this add the
-                class <code>.table-striped</code> to the table and visual even and odd colours are added.</p>
+            <p>Sometimes it is necessary to distinguish content form within a table from one another. For this add the class <code>.table-striped</code> to the table and visual even and odd colours are added.</p>
             <p>Use this on larger table where content is difficult to read and a clear separation might be required.</p>
             <p>More about striped rows can be found within the <a href="http://getbootstrap.com/css/#tables-striped">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="code-container">
                 <div class="table-responsive">
-                    {% with cls="table table-striped" %}
-                    {% include "divio_styleguide/styleguide/components/table.html" %}
-                    {% endwith %}
+                    {% with cls="table table-striped" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
                 </div>
             </div>
         </div>
@@ -480,18 +474,14 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Bordered Tables</h3>
-            <p>These tables are used for displaying table data rather than just general listings or informations.
-                Simply add the class <code>.table-bordered</code> to the table and a border is added around the table.</p>
-            <p>Use this on tables where structured data is displayed or the context of the table is separated from the
-                surrounding content.</p>
+            <p>These tables are used for displaying table data rather than just general listings or informations. Simply add the class <code>.table-bordered</code> to the table and a border is added around the table.</p>
+            <p>Use this on tables where structured data is displayed or the context of the table is separated from the surrounding content.</p>
             <p>More about bordered tables can be found within the <a href="http://getbootstrap.com/css/#tables-bordered">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="code-container">
                 <div class="table-responsive">
-                    {% with cls="table table-bordered" %}
-                    {% include "divio_styleguide/styleguide/components/table.html" %}
-                    {% endwith %}
+                    {% with cls="table table-bordered" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
                 </div>
             </div>
         </div>
@@ -502,19 +492,15 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Contextual Classes</h3>
-            <p>At any given time, you can combine one or more table styles as described above. But always keep the use cases
-                of each individual style in mind.</p>
+            <p>At any given time, you can combine one or more table styles as described above. But always keep the use cases of each individual style in mind.</p>
             <p>Additionally you are able to add contextual classes to the table to highlight single rows. These can be
-                <code>.active</code>, <code>.success</code>, <code>.info</code>, <code>.warning</code> and <code>.danger</code>.
-                Simply add them to the <code>&lt;tr&gt;</code> element of the table.</p>
+                <code>.active</code>, <code>.success</code>, <code>.info</code>, <code>.warning</code> and <code>.danger</code>. Simply add them to the <code>&lt;tr&gt;</code> element of the table.</p>
             <p>More about bordered tables can be found within the <a href="http://getbootstrap.com/css/#tables-contextual-classes">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="code-container">
                 <div class="table-responsive">
-                    {% with cls="table table-bordered table-striped table-hover" extras="true" %}
-                    {% include "divio_styleguide/styleguide/components/table.html" %}
-                    {% endwith %}
+                    {% with cls="table table-bordered table-striped table-hover" extras="true" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
                 </div>
             </div>
         </div>
@@ -530,9 +516,7 @@ Includes support for individual properties, all properties, and vertical and hor
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="code-container">
-                {% with cls="table table-sm table-responsive table-hover" %}
-                {% include "divio_styleguide/styleguide/components/table.html" %}
-                {% endwith %}
+                {% with cls="table table-sm table-responsive table-hover" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
             </div>
         </div>
     </div>
@@ -543,20 +527,17 @@ Includes support for individual properties, all properties, and vertical and hor
 <section data-id="forms" hidden="hidden">
     <h2>Forms</h2>
     <p class="lead">Individual form controls automatically receive some global styling. All textual <code>&lt;input&gt;</code>,
-        <code>&lt;textarea&gt;</code>, and <code>&lt;select&gt;</code> elements with <code>.form-control</code> are set
-        to <code>width: 100%;</code> by default. Wrap labels and controls in <code>.form-group</code> for optimum spacing.
-        For complete reference, please visit the
+        <code>&lt;textarea&gt;</code>, and <code>&lt;select&gt;</code> elements with <code>.form-control</code> are set to <code>width: 100%;</code> by default. Wrap labels and controls in <code>.form-group</code> for optimum spacing. For complete reference,
+        please visit the
         <a href="http://getbootstrap.com/css/#forms">Bootstrap</a> documentation.</p>
 
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Buttons</h3>
-            <p>There are various button sizes and colours to choose from. It is imperative however that you structure
-                the usage according to the importance of the action. When using two actions together, decide
-                which one is of more importance and make it slightly bigger.</p>
-            <p>For color usage also consider the individual use case. A red button is ideal for cancellation actions while the
-                green counterpart signifies a success action. Please refer to the button names for its descriptive
-                meaning.</p>
+            <p>There are various button sizes and colours to choose from. It is imperative however that you structure the usage according to the importance of the action. When using two actions together, decide which one is of more importance and make it
+                slightly bigger.</p>
+            <p>For color usage also consider the individual use case. A red button is ideal for cancellation actions while the green counterpart signifies a success action. Please refer to the button names for its descriptive meaning.
+            </p>
             <p>The Spot framework only defines Default and Primary buttons, so use of others is discouraged.</p>
         </div>
         <div class="col-md-8 col-linebreak">
@@ -616,8 +597,7 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Button Utilities</h3>
-            <p>There are additional combinations possible using the button system. You can easily add drop-down menus, icons
-                or append more buttons to one another.</p>
+            <p>There are additional combinations possible using the button system. You can easily add drop-down menus, icons or append more buttons to one another.</p>
             <p>More about button utilities can be found within the <a href="http://getbootstrap.com/css/#buttons">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
@@ -664,9 +644,9 @@ Includes support for individual properties, all properties, and vertical and hor
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">Button</button>
                     <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1" >Dropdown link</a>
-                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1" >Dropdown link</a>
-                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1" >Dropdown link</a>
+                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1">Dropdown link</a>
+                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1">Dropdown link</a>
+                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1">Dropdown link</a>
                     </div>
                 </div>
 
@@ -674,9 +654,9 @@ Includes support for individual properties, all properties, and vertical and hor
                     <button type="button" class="btn btn-secondary">Button</button>
                     <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown"></button>
                     <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
-                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1" >Dropdown link</a>
-                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1" >Dropdown link</a>
-                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1" >Dropdown link</a>
+                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1">Dropdown link</a>
+                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1">Dropdown link</a>
+                        <a href="#" class="dropdown-item" role="menuitem" tabindex="-1">Dropdown link</a>
                     </div>
                 </div>
             </div>
@@ -688,12 +668,10 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Basic Elements</h3>
-            <p>The basics of a form element include text inputs and basic controls. A form always starts with the <code>&lt;form&gt;</code>
-                element followed with a <code>&lt;fieldset&gt;</code>. A fieldset can be the ideal element to create a
-                two column form. Also always ensure to add the class <code>.form</code> to the forms class.</p>
-            <p>The entire form can also be easily displayed <a href="http://getbootstrap.com/css/#forms-horizontal">horizontally</a>
-                or <a href="http://getbootstrap.com/css/#forms-inline">vertically</a>.
-                Simply add either <code>.form-horizontal</code> or <code>.form-inline</code> to the forms class.</p>
+            <p>The basics of a form element include text inputs and basic controls. A form always starts with the <code>&lt;form&gt;</code> element followed with a <code>&lt;fieldset&gt;</code>. A fieldset can be the ideal element to create a two column
+                form. Also always ensure to add the class <code>.form</code> to the forms class.</p>
+            <p>The entire form can also be easily displayed <a href="http://getbootstrap.com/css/#forms-horizontal">horizontally</a> or <a href="http://getbootstrap.com/css/#forms-inline">vertically</a>. Simply add either <code>.form-horizontal</code> or
+                <code>.form-inline</code> to the forms class.</p>
             <p>More about forms can be found within the <a href="http://getbootstrap.com/css/#forms">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak code-container">
@@ -923,8 +901,7 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Disabled States</h3>
-            <p>Various states can be helpful to restrict user actions prior to certain requirements. They can also
-                be helpful to just display data without the ability to change the form itself.</p>
+            <p>Various states can be helpful to restrict user actions prior to certain requirements. They can also be helpful to just display data without the ability to change the form itself.</p>
             <p>More about states can be found within the <a href="http://getbootstrap.com/css/#forms-control-disabled">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak code-container">
@@ -966,8 +943,7 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Validation States</h3>
-            <p>Validation helps the user to understand what went wrong. It is recommended to display a message as well
-                as to highlight the specific error within input.</p>
+            <p>Validation helps the user to understand what went wrong. It is recommended to display a message as well as to highlight the specific error within input.</p>
             <p>These states can either be shown directly using <abbr title="Asynchronous JavaScript and XML">AJAX</abbr> or after a page reload from the server side.</p>
             <p>More about validation can be found within the <a href="http://getbootstrap.com/css/#forms-control-validation">Bootstrap</a> documentation.</p>
         </div>
@@ -1041,10 +1017,8 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Input Groups</h3>
-            <p>We simply allow the extension of buttons or icons within form controls. It is also possible to combine
-                these elements with other components such as drop-down's or select2.</p>
-            <p>Do not mix form groups or grid column classes directly with input groups. Instead,
-                nest the input group inside of the form group or grid-related element.</p>
+            <p>We simply allow the extension of buttons or icons within form controls. It is also possible to combine these elements with other components such as drop-down's or select2.</p>
+            <p>Do not mix form groups or grid column classes directly with input groups. Instead, nest the input group inside of the form group or grid-related element.</p>
             <p>More about validation can be found within the <a href="http://getbootstrap.com/components/#input-groups">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
@@ -1097,8 +1071,7 @@ Includes support for individual properties, all properties, and vertical and hor
                     <div class="code-container">
                         <div class="form-group mb-3">
                             <label for="input-combo-large" class="sr-only">Large</label>
-                            <input type="text" class="form-control mr-3 form-control-lg" id="input-combo-large"
-                            placeholder="form-control-lg">
+                            <input type="text" class="form-control mr-3 form-control-lg" id="input-combo-large" placeholder="form-control-lg">
                             <label><span class="sr-only">Large</span><select class="form-control mr-3 custom-select form-control-lg"><option>Dropdown</option></select></label>
                             <button type="submit" class="btn btn-secondary btn-lg">Button</button>
                         </div>
@@ -1129,555 +1102,559 @@ Includes support for individual properties, all properties, and vertical and hor
 <section data-id="grid" hidden="hidden">
     <h2>Grid</h2>
     <p class="lead">Bootstrap includes a responsive, mobile first fluid grid system that appropriately scales up to
-        <strong>12 columns</strong> as the device or viewport size increases. It includes <a href="http://getbootstrap.com/css/#grid-example-basic">predefined classes</a> for easy
-        layout options,  as well as powerful mix-ins for generating more semantic layouts. For complete reference,
-        please visit the <a href="http://getbootstrap.com/css/#grid">Bootstrap</a> documentation.</p>
+        <strong>12 columns</strong> as the device or viewport size increases. It includes <a href="http://getbootstrap.com/css/#grid-example-basic">predefined classes</a> for easy layout options, as well as powerful mix-ins for generating more semantic
+        layouts. For complete reference, please visit the <a href="http://getbootstrap.com/css/#grid">Bootstrap</a> documentation.</p>
 
-        <div>
-            <h2 id="how-it-works">How it works</h2>
+    <div>
+        <h2 id="how-it-works">How it works</h2>
 
-            <p>Bootstrap’s grid system uses a series of containers, rows, and columns to layout and align content. It’s built with flexbox and is fully responsive. Below is an example and an in-depth look at how the grid comes together.</p>
+        <p>Bootstrap’s grid system uses a series of containers, rows, and columns to layout and align content. It’s built with flexbox and is fully responsive. Below is an example and an in-depth look at how the grid comes together.</p>
 
-            <div class="bd-example bd-example-row code-container">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm">
-                            One of three columns
-                        </div>
-                        <div class="col-sm">
-                            One of three columns
-                        </div>
-                        <div class="col-sm">
-                            One of three columns
-                        </div>
+        <div class="bd-example bd-example-row code-container">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                        One of three columns
+                    </div>
+                    <div class="col-sm">
+                        One of three columns
+                    </div>
+                    <div class="col-sm">
+                        One of three columns
                     </div>
                 </div>
-            </div>
-
-            <p>The above example creates three equal-width columns on small, medium, large, and extra large devices using our predefined grid classes. Those columns are centered in the page with the parent <code class="highlighter-rouge">.container</code>.</p>
-
-            <p>Breaking it down, here’s how it works:</p>
-
-            <ul>
-                <li>Containers provide a means to center your site’s contents. Use <code class="highlighter-rouge">.container</code> for fixed width or <code class="highlighter-rouge">.container-fluid</code> for full width.</li>
-                <li>Rows are horizontal groups of columns that ensure your columns are lined up properly. We use the negative margin method on <code class="highlighter-rouge">.row</code> to ensure all your content is aligned properly down the left side.</li>
-                <li>Content should be placed within columns, and only columns may be immediate children of rows.</li>
-                <li>Thanks to flexbox, grid columns without a set width will automatically layout with equal widths. For example, four instances of <code class="highlighter-rouge">.col-sm</code> will each automatically be 25% wide for small breakpoints.</li>
-                <li>Column classes indicate the number of columns you’d like to use out of the possible 12 per row. So, if you want three equal-width columns, you can use <code class="highlighter-rouge">.col-sm-4</code>.</li>
-                <li>Column <code class="highlighter-rouge">width</code>s are set in percentages, so they’re always fluid and sized relative to their parent element.</li>
-                <li>Columns have horizontal <code class="highlighter-rouge">padding</code> to create the gutters between individual columns, however, you can remove the <code class="highlighter-rouge">margin</code> from rows and <code class="highlighter-rouge">padding</code> from columns with <code class="highlighter-rouge">.no-gutters</code> on the <code class="highlighter-rouge">.row</code>.</li>
-                <li>There are five grid tiers, one for each <a href="https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints">responsive breakpoint</a>: all breakpoints (extra small), small, medium, large, and extra large.</li>
-                <li>Grid tiers are based on minimum widths, meaning they apply to that one tier and all those above it (e.g., <code class="highlighter-rouge">.col-sm-4</code> applies to small, medium, large, and extra large devices).</li>
-                <li>You can use predefined grid classes or Sass mixins for more semantic markup.</li>
-            </ul>
-
-            <p>Be aware of the limitations and <a href="https://github.com/philipwalton/flexbugs">bugs around flexbox</a>, like the <a href="https://github.com/philipwalton/flexbugs#9-some-html-elements-cant-be-flex-containers">inability to use some HTML elements as flex containers</a>.</p>
-
-            <p>Sounds good? Great, let’s move on to seeing all that in an example.</p>
-
-            <h2 id="grid-options">Grid options</h2>
-
-            <p>While Bootstrap uses <code class="highlighter-rouge">em</code>s or <code class="highlighter-rouge">rem</code>s for defining most sizes, <code class="highlighter-rouge">px</code>s are used for grid breakpoints and container widths. This is because the viewport width is in pixels and does not change with the <a href="https://drafts.csswg.org/mediaqueries-3/#units">font size</a>.</p>
-
-            <p>See how aspects of the Bootstrap grid system work across multiple devices with a handy table.</p>
-
-            <table class="table table-bordered table-striped table-responsive">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th class="text-center">
-                            Extra small<br />
-                            <small>&lt;576px</small>
-                        </th>
-                        <th class="text-center">
-                            Small<br />
-                            <small>&ge;576px</small>
-                        </th>
-                        <th class="text-center">
-                            Medium<br />
-                            <small>&ge;768px</small>
-                        </th>
-                        <th class="text-center">
-                            Large<br />
-                            <small>&ge;992px</small>
-                        </th>
-                        <th class="text-center">
-                            Extra large<br />
-                            <small>&ge;1200px</small>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th class="text-nowrap" scope="row">Max container width</th>
-                        <td>None (auto)</td>
-                        <td>540px</td>
-                        <td>720px</td>
-                        <td>960px</td>
-                        <td>1140px</td>
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap" scope="row">Class prefix</th>
-                        <td><code>.col-</code></td>
-                        <td><code>.col-sm-</code></td>
-                        <td><code>.col-md-</code></td>
-                        <td><code>.col-lg-</code></td>
-                        <td><code>.col-xl-</code></td>
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap" scope="row"># of columns</th>
-                        <td colspan="5">12</td>
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap" scope="row">Gutter width</th>
-                        <td colspan="5">30px (15px on each side of a column)</td>
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap" scope="row">Nestable</th>
-                        <td colspan="5">Yes</td>
-                    </tr>
-                    <tr>
-                        <th class="text-nowrap" scope="row">Column ordering</th>
-                        <td colspan="5">Yes</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2 id="auto-layout-columns">Auto-layout columns</h2>
-
-            <p>Utilize breakpoint-specific column classes for easy column sizing without an explicit numbered class like <code class="highlighter-rouge">.col-sm-6</code>.</p>
-
-            <h3 id="equal-width">Equal-width</h3>
-
-            <p>For example, here are two grid layouts that apply to every device and viewport, from <code class="highlighter-rouge">xs</code> to <code class="highlighter-rouge">xl</code>. Add any number of unit-less classes for each breakpoint you need and every column will be the same width.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col">
-                                1 of 2
-                            </div>
-                            <div class="col">
-                                2 of 2
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                1 of 3
-                            </div>
-                            <div class="col">
-                                2 of 3
-                            </div>
-                            <div class="col">
-                                3 of 3
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <p>Equal-width columns can be broken into multiple lines, but there is a <a href="https://github.com/philipwalton/flexbugs#11-min-and-max-size-declarations-are-ignored-when-wrapping-flex-items">Safari flexbox bug</a> that prevents this from working without an explicit <code class="highlighter-rouge">flex-basis</code> or <code class="highlighter-rouge">border</code>. Our example works thanks to the <code class="highlighter-rouge">border</code> being set; you can do the same with <code class="highlighter-rouge">.col { border: 1px solid transparent; }</code>. Alternatively, you can set the flex-basis to the width of the column (e.g., <code class="highlighter-rouge">.col { flex: 1 0 50%; }</code>).</p>
-
-            <p>Both these fixes have been documented in a <a href="https://output.jsbin.com/micohor">reduced test case outside Bootstrap</a>.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col">Column</div>
-                            <div class="col">Column</div>
-                            <div class="w-100"></div>
-                            <div class="col">Column</div>
-                            <div class="col">Column</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="setting-one-column-width">Setting one column width</h3>
-
-            <p>Auto-layout for flexbox grid columns also means you can set the width of one column and have the sibling columns automatically resize around it. You may use predefined grid classes (as shown below), grid mixins, or inline widths. Note that the other columns will resize no matter the width of the center column.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col">
-                                1 of 3
-                            </div>
-                            <div class="col-6">
-                                2 of 3 (wider)
-                            </div>
-                            <div class="col">
-                                3 of 3
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                1 of 3
-                            </div>
-                            <div class="col-5">
-                                2 of 3 (wider)
-                            </div>
-                            <div class="col">
-                                3 of 3
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="variable-width-content">Variable width content</h3>
-
-            <p>Use <code class="highlighter-rouge">col-{breakpoint}-auto</code> classes to size columns based on the natural width of their content.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row justify-content-md-center">
-                            <div class="col col-lg-2">
-                                1 of 3
-                            </div>
-                            <div class="col-md-auto">
-                                Variable width content
-                            </div>
-                            <div class="col col-lg-2">
-                                3 of 3
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                1 of 3
-                            </div>
-                            <div class="col-md-auto">
-                                Variable width content
-                            </div>
-                            <div class="col col-lg-2">
-                                3 of 3
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="equal-width-multi-row">Equal-width multi-row</h3>
-
-            <p>Create equal-width columns that span multiple rows by inserting a <code
-                class="highlighter-rouge">.w-100</code> where you want the columns to break to a new line. Make the
-            breaks responsive by mixing the <code class="highlighter-rouge">.w-100</code> with some <a href="https://getbootstrap.com/docs/4.0/utilities/display/">responsive display utilities</a>.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="row">
-                        <div class="col">col</div>
-                        <div class="col">col</div>
-                        <div class="w-100"></div>
-                        <div class="col">col</div>
-                        <div class="col">col</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h2 id="responsive-classes">Responsive classes</h2>
-
-            <p>Bootstrap’s grid includes five tiers of predefined classes for building complex responsive layouts. Customize the size of your columns on extra small, small, medium, large, or extra large devices however you see fit.</p>
-
-            <h3 id="all-breakpoints">All breakpoints</h3>
-
-            <p>For grids that are the same from the smallest of devices to the largest, use the <code class="highlighter-rouge">.col</code> and <code class="highlighter-rouge">.col-*</code> classes. Specify a numbered class when you need a particularly sized column; otherwise, feel free to stick to <code class="highlighter-rouge">.col</code>.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="row">
-                        <div class="col">col</div>
-                        <div class="col">col</div>
-                        <div class="col">col</div>
-                        <div class="col">col</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-8">col-8</div>
-                        <div class="col-4">col-4</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="stacked-to-horizontal">Stacked to horizontal</h3>
-
-            <p>Using a single set of <code class="highlighter-rouge">.col-sm-*</code> classes, you can create a basic grid system that starts out stacked on extra small devices before becoming horizontal on desktop (medium) devices.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="row">
-                        <div class="col-sm-8">col-sm-8</div>
-                        <div class="col-sm-4">col-sm-4</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm">col-sm</div>
-                        <div class="col-sm">col-sm</div>
-                        <div class="col-sm">col-sm</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="mix-and-match">Mix and match</h3>
-
-            <p>Don’t want your columns to simply stack in some grid tiers? Use a combination of different classes for each tier as needed. See the example below for a better idea of how it all works.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <!-- Stack the columns on mobile by making one full-width and the other half-width -->
-                    <div class="row">
-                        <div class="col-12 col-md-8">.col-12 .col-md-8</div>
-                        <div class="col-6 col-md-4">.col-6 .col-md-4</div>
-                    </div>
-
-                    <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
-                    <div class="row">
-                        <div class="col-6 col-md-4">.col-6 .col-md-4</div>
-                        <div class="col-6 col-md-4">.col-6 .col-md-4</div>
-                        <div class="col-6 col-md-4">.col-6 .col-md-4</div>
-                    </div>
-
-                    <!-- Columns are always 50% wide, on mobile and desktop -->
-                    <div class="row">
-                        <div class="col-6">.col-6</div>
-                        <div class="col-6">.col-6</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h2 id="alignment">Alignment</h2>
-
-            <p>Use flexbox alignment utilities to vertically and horizontally align columns.</p>
-
-            <h3 id="vertical-alignment">Vertical alignment</h3>
-
-            <div class="bd-example-row code-container bd-example-row-flex-cols">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row align-items-start">
-                            <div class="col">
-                                One of three columns
-                            </div>
-                            <div class="col">
-                                One of three columns
-                            </div>
-                            <div class="col">
-                                One of three columns
-                            </div>
-                        </div>
-                        <div class="row align-items-center">
-                            <div class="col">
-                                One of three columns
-                            </div>
-                            <div class="col">
-                                One of three columns
-                            </div>
-                            <div class="col">
-                                One of three columns
-                            </div>
-                        </div>
-                        <div class="row align-items-end">
-                            <div class="col">
-                                One of three columns
-                            </div>
-                            <div class="col">
-                                One of three columns
-                            </div>
-                            <div class="col">
-                                One of three columns
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="bd-example-row code-container bd-example-row-flex-cols">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col align-self-start">
-                                One of three columns
-                            </div>
-                            <div class="col align-self-center">
-                                One of three columns
-                            </div>
-                            <div class="col align-self-end">
-                                One of three columns
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="horizontal-alignment">Horizontal alignment</h3>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row justify-content-start">
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                        </div>
-                        <div class="row justify-content-end">
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                        </div>
-                        <div class="row justify-content-around">
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                        </div>
-                        <div class="row justify-content-between">
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                            <div class="col-4">
-                                One of two columns
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="column-resets">Column resets</h3>
-
-            <p>With the handful of grid tiers available, you’re bound to run into issues where, at certain breakpoints,
-            your columns don’t clear quite right as one is taller than the other. To fix that, use a combination of a
-            <code class="highlighter-rouge">.clearfix</code> and our <a href="https://getbootstrap.com/docs/4.0/utilities/display/">responsive display utilities</a>.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="row">
-                        <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
-                        <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
-
-                        <!-- Add the extra clearfix for only the required viewport -->
-                        <div class="clearfix d-none d-sm-block"></div>
-
-                        <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
-                        <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h2 id="reordering">Reordering</h2>
-
-            <h3 id="flex-order">Flex order</h3>
-
-            <p>Use <code class="highlighter-rouge">.order-</code> classes for controlling the <strong>visual order</strong> of your content. These classes are responsive, so you can set the <code class="highlighter-rouge">order</code> by breakpoint (e.g., <code class="highlighter-rouge">.order-1.order-md-2</code>). Includes support for <code class="highlighter-rouge">1</code> through <code class="highlighter-rouge">12</code> across all five grid tiers.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col">
-                                First, but unordered
-                            </div>
-                            <div class="col order-12">
-                                Second, but last
-                            </div>
-                            <div class="col order-1">
-                                Third, but first
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h3 id="offsetting-columns">Offsetting columns</h3>
-
-            <p>With the move to flexbox in v4, we no longer have v3’s style of offset classes. Instead, use margin utilities like <code class="highlighter-rouge">.mr-auto</code> to force sibling columns away from one another.</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="row">
-                        <div class="col-md-4">.col-md-4</div>
-                        <div class="col-md-4 ml-auto">.col-md-4 .ml-auto</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 ml-md-auto">.col-md-3 .ml-md-auto</div>
-                        <div class="col-md-3 ml-md-auto">.col-md-3 .ml-md-auto</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-auto mr-auto">.col-auto .mr-auto</div>
-                        <div class="col-auto">.col-auto</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <h2 id="nesting">Nesting</h2>
-
-            <p>To nest your content with the default grid, add a new <code class="highlighter-rouge">.row</code> and set of <code class="highlighter-rouge">.col-sm-*</code> columns within an existing <code class="highlighter-rouge">.col-sm-*</code> column. Nested rows should include a set of columns that add up to 12 or fewer (it is not required that you use all 12 available columns).</p>
-
-            <div class="bd-example-row code-container">
-
-                <div class="bd-example" data-example-id="">
-                    <div class="row">
-                        <div class="col-sm-9">
-                            Level 1: .col-sm-9
-                            <div class="row">
-                                <div class="col-8 col-sm-6">
-                                    Level 2: .col-8 .col-sm-6
-                                </div>
-                                <div class="col-4 col-sm-6">
-                                    Level 2: .col-4 .col-sm-6
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
+
+        <p>The above example creates three equal-width columns on small, medium, large, and extra large devices using our predefined grid classes. Those columns are centered in the page with the parent <code class="highlighter-rouge">.container</code>.</p>
+
+        <p>Breaking it down, here’s how it works:</p>
+
+        <ul>
+            <li>Containers provide a means to center your site’s contents. Use <code class="highlighter-rouge">.container</code> for fixed width or <code class="highlighter-rouge">.container-fluid</code> for full width.</li>
+            <li>Rows are horizontal groups of columns that ensure your columns are lined up properly. We use the negative margin method on <code class="highlighter-rouge">.row</code> to ensure all your content is aligned properly down the left side.</li>
+            <li>Content should be placed within columns, and only columns may be immediate children of rows.</li>
+            <li>Thanks to flexbox, grid columns without a set width will automatically layout with equal widths. For example, four instances of <code class="highlighter-rouge">.col-sm</code> will each automatically be 25% wide for small breakpoints.</li>
+            <li>Column classes indicate the number of columns you’d like to use out of the possible 12 per row. So, if you want three equal-width columns, you can use <code class="highlighter-rouge">.col-sm-4</code>.</li>
+            <li>Column <code class="highlighter-rouge">width</code>s are set in percentages, so they’re always fluid and sized relative to their parent element.</li>
+            <li>Columns have horizontal <code class="highlighter-rouge">padding</code> to create the gutters between individual columns, however, you can remove the <code class="highlighter-rouge">margin</code> from rows and <code class="highlighter-rouge">padding</code>                from columns with <code class="highlighter-rouge">.no-gutters</code> on the <code class="highlighter-rouge">.row</code>.</li>
+            <li>There are five grid tiers, one for each <a href="https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints">responsive breakpoint</a>: all breakpoints (extra small), small, medium, large, and extra large.</li>
+            <li>Grid tiers are based on minimum widths, meaning they apply to that one tier and all those above it (e.g., <code class="highlighter-rouge">.col-sm-4</code> applies to small, medium, large, and extra large devices).</li>
+            <li>You can use predefined grid classes or Sass mixins for more semantic markup.</li>
+        </ul>
+
+        <p>Be aware of the limitations and <a href="https://github.com/philipwalton/flexbugs">bugs around flexbox</a>, like the <a href="https://github.com/philipwalton/flexbugs#9-some-html-elements-cant-be-flex-containers">inability to use some HTML elements as flex containers</a>.</p>
+
+        <p>Sounds good? Great, let’s move on to seeing all that in an example.</p>
+
+        <h2 id="grid-options">Grid options</h2>
+
+        <p>While Bootstrap uses <code class="highlighter-rouge">em</code>s or <code class="highlighter-rouge">rem</code>s for defining most sizes, <code class="highlighter-rouge">px</code>s are used for grid breakpoints and container widths. This is because
+            the viewport width is in pixels and does not change with the <a href="https://drafts.csswg.org/mediaqueries-3/#units">font size</a>.</p>
+
+        <p>See how aspects of the Bootstrap grid system work across multiple devices with a handy table.</p>
+
+        <table class="table table-bordered table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="text-center">
+                        Extra small<br />
+                        <small>&lt;576px</small>
+                    </th>
+                    <th class="text-center">
+                        Small<br />
+                        <small>&ge;576px</small>
+                    </th>
+                    <th class="text-center">
+                        Medium<br />
+                        <small>&ge;768px</small>
+                    </th>
+                    <th class="text-center">
+                        Large<br />
+                        <small>&ge;992px</small>
+                    </th>
+                    <th class="text-center">
+                        Extra large<br />
+                        <small>&ge;1200px</small>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="text-nowrap" scope="row">Max container width</th>
+                    <td>None (auto)</td>
+                    <td>540px</td>
+                    <td>720px</td>
+                    <td>960px</td>
+                    <td>1140px</td>
+                </tr>
+                <tr>
+                    <th class="text-nowrap" scope="row">Class prefix</th>
+                    <td><code>.col-</code></td>
+                    <td><code>.col-sm-</code></td>
+                    <td><code>.col-md-</code></td>
+                    <td><code>.col-lg-</code></td>
+                    <td><code>.col-xl-</code></td>
+                </tr>
+                <tr>
+                    <th class="text-nowrap" scope="row"># of columns</th>
+                    <td colspan="5">12</td>
+                </tr>
+                <tr>
+                    <th class="text-nowrap" scope="row">Gutter width</th>
+                    <td colspan="5">30px (15px on each side of a column)</td>
+                </tr>
+                <tr>
+                    <th class="text-nowrap" scope="row">Nestable</th>
+                    <td colspan="5">Yes</td>
+                </tr>
+                <tr>
+                    <th class="text-nowrap" scope="row">Column ordering</th>
+                    <td colspan="5">Yes</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 id="auto-layout-columns">Auto-layout columns</h2>
+
+        <p>Utilize breakpoint-specific column classes for easy column sizing without an explicit numbered class like <code class="highlighter-rouge">.col-sm-6</code>.</p>
+
+        <h3 id="equal-width">Equal-width</h3>
+
+        <p>For example, here are two grid layouts that apply to every device and viewport, from <code class="highlighter-rouge">xs</code> to <code class="highlighter-rouge">xl</code>. Add any number of unit-less classes for each breakpoint you need and every
+            column will be the same width.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            1 of 2
+                        </div>
+                        <div class="col">
+                            2 of 2
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            1 of 3
+                        </div>
+                        <div class="col">
+                            2 of 3
+                        </div>
+                        <div class="col">
+                            3 of 3
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <p>Equal-width columns can be broken into multiple lines, but there is a <a href="https://github.com/philipwalton/flexbugs#11-min-and-max-size-declarations-are-ignored-when-wrapping-flex-items">Safari flexbox bug</a> that prevents this from working
+            without an explicit <code class="highlighter-rouge">flex-basis</code> or <code class="highlighter-rouge">border</code>. Our example works thanks to the <code class="highlighter-rouge">border</code> being set; you can do the same with
+            <code class="highlighter-rouge">.col { border: 1px solid transparent; }</code>. Alternatively, you can set the flex-basis to the width of the column (e.g., <code class="highlighter-rouge">.col { flex: 1 0 50%; }</code>).</p>
+
+        <p>Both these fixes have been documented in a <a href="https://output.jsbin.com/micohor">reduced test case outside Bootstrap</a>.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">Column</div>
+                        <div class="col">Column</div>
+                        <div class="w-100"></div>
+                        <div class="col">Column</div>
+                        <div class="col">Column</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="setting-one-column-width">Setting one column width</h3>
+
+        <p>Auto-layout for flexbox grid columns also means you can set the width of one column and have the sibling columns automatically resize around it. You may use predefined grid classes (as shown below), grid mixins, or inline widths. Note that the
+            other columns will resize no matter the width of the center column.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            1 of 3
+                        </div>
+                        <div class="col-6">
+                            2 of 3 (wider)
+                        </div>
+                        <div class="col">
+                            3 of 3
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            1 of 3
+                        </div>
+                        <div class="col-5">
+                            2 of 3 (wider)
+                        </div>
+                        <div class="col">
+                            3 of 3
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="variable-width-content">Variable width content</h3>
+
+        <p>Use <code class="highlighter-rouge">col-{breakpoint}-auto</code> classes to size columns based on the natural width of their content.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col col-lg-2">
+                            1 of 3
+                        </div>
+                        <div class="col-md-auto">
+                            Variable width content
+                        </div>
+                        <div class="col col-lg-2">
+                            3 of 3
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            1 of 3
+                        </div>
+                        <div class="col-md-auto">
+                            Variable width content
+                        </div>
+                        <div class="col col-lg-2">
+                            3 of 3
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="equal-width-multi-row">Equal-width multi-row</h3>
+
+        <p>Create equal-width columns that span multiple rows by inserting a <code class="highlighter-rouge">.w-100</code> where you want the columns to break to a new line. Make the breaks responsive by mixing the <code class="highlighter-rouge">.w-100</code>            with some <a href="https://getbootstrap.com/docs/4.0/utilities/display/">responsive display utilities</a>.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="row">
+                    <div class="col">col</div>
+                    <div class="col">col</div>
+                    <div class="w-100"></div>
+                    <div class="col">col</div>
+                    <div class="col">col</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 id="responsive-classes">Responsive classes</h2>
+
+        <p>Bootstrap’s grid includes five tiers of predefined classes for building complex responsive layouts. Customize the size of your columns on extra small, small, medium, large, or extra large devices however you see fit.</p>
+
+        <h3 id="all-breakpoints">All breakpoints</h3>
+
+        <p>For grids that are the same from the smallest of devices to the largest, use the <code class="highlighter-rouge">.col</code> and <code class="highlighter-rouge">.col-*</code> classes. Specify a numbered class when you need a particularly sized
+            column; otherwise, feel free to stick to <code class="highlighter-rouge">.col</code>.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="row">
+                    <div class="col">col</div>
+                    <div class="col">col</div>
+                    <div class="col">col</div>
+                    <div class="col">col</div>
+                </div>
+                <div class="row">
+                    <div class="col-8">col-8</div>
+                    <div class="col-4">col-4</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="stacked-to-horizontal">Stacked to horizontal</h3>
+
+        <p>Using a single set of <code class="highlighter-rouge">.col-sm-*</code> classes, you can create a basic grid system that starts out stacked on extra small devices before becoming horizontal on desktop (medium) devices.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="row">
+                    <div class="col-sm-8">col-sm-8</div>
+                    <div class="col-sm-4">col-sm-4</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm">col-sm</div>
+                    <div class="col-sm">col-sm</div>
+                    <div class="col-sm">col-sm</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="mix-and-match">Mix and match</h3>
+
+        <p>Don’t want your columns to simply stack in some grid tiers? Use a combination of different classes for each tier as needed. See the example below for a better idea of how it all works.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+                <div class="row">
+                    <div class="col-12 col-md-8">.col-12 .col-md-8</div>
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                </div>
+
+                <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                <div class="row">
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                </div>
+
+                <!-- Columns are always 50% wide, on mobile and desktop -->
+                <div class="row">
+                    <div class="col-6">.col-6</div>
+                    <div class="col-6">.col-6</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 id="alignment">Alignment</h2>
+
+        <p>Use flexbox alignment utilities to vertically and horizontally align columns.</p>
+
+        <h3 id="vertical-alignment">Vertical alignment</h3>
+
+        <div class="bd-example-row code-container bd-example-row-flex-cols">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row align-items-start">
+                        <div class="col">
+                            One of three columns
+                        </div>
+                        <div class="col">
+                            One of three columns
+                        </div>
+                        <div class="col">
+                            One of three columns
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col">
+                            One of three columns
+                        </div>
+                        <div class="col">
+                            One of three columns
+                        </div>
+                        <div class="col">
+                            One of three columns
+                        </div>
+                    </div>
+                    <div class="row align-items-end">
+                        <div class="col">
+                            One of three columns
+                        </div>
+                        <div class="col">
+                            One of three columns
+                        </div>
+                        <div class="col">
+                            One of three columns
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bd-example-row code-container bd-example-row-flex-cols">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row">
+                        <div class="col align-self-start">
+                            One of three columns
+                        </div>
+                        <div class="col align-self-center">
+                            One of three columns
+                        </div>
+                        <div class="col align-self-end">
+                            One of three columns
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="horizontal-alignment">Horizontal alignment</h3>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                    </div>
+                    <div class="row justify-content-end">
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                    </div>
+                    <div class="row justify-content-around">
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                    </div>
+                    <div class="row justify-content-between">
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                        <div class="col-4">
+                            One of two columns
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="column-resets">Column resets</h3>
+
+        <p>With the handful of grid tiers available, you’re bound to run into issues where, at certain breakpoints, your columns don’t clear quite right as one is taller than the other. To fix that, use a combination of a
+            <code class="highlighter-rouge">.clearfix</code> and our <a href="https://getbootstrap.com/docs/4.0/utilities/display/">responsive display utilities</a>.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="row">
+                    <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
+                    <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
+
+                    <!-- Add the extra clearfix for only the required viewport -->
+                    <div class="clearfix d-none d-sm-block"></div>
+
+                    <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
+                    <div class="col-6 col-sm-3">.col-6 .col-sm-3</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 id="reordering">Reordering</h2>
+
+        <h3 id="flex-order">Flex order</h3>
+
+        <p>Use <code class="highlighter-rouge">.order-</code> classes for controlling the <strong>visual order</strong> of your content. These classes are responsive, so you can set the <code class="highlighter-rouge">order</code> by breakpoint (e.g.,
+            <code class="highlighter-rouge">.order-1.order-md-2</code>). Includes support for <code class="highlighter-rouge">1</code> through <code class="highlighter-rouge">12</code> across all five grid tiers.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            First, but unordered
+                        </div>
+                        <div class="col order-12">
+                            Second, but last
+                        </div>
+                        <div class="col order-1">
+                            Third, but first
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h3 id="offsetting-columns">Offsetting columns</h3>
+
+        <p>With the move to flexbox in v4, we no longer have v3’s style of offset classes. Instead, use margin utilities like <code class="highlighter-rouge">.mr-auto</code> to force sibling columns away from one another.</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="row">
+                    <div class="col-md-4">.col-md-4</div>
+                    <div class="col-md-4 ml-auto">.col-md-4 .ml-auto</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 ml-md-auto">.col-md-3 .ml-md-auto</div>
+                    <div class="col-md-3 ml-md-auto">.col-md-3 .ml-md-auto</div>
+                </div>
+                <div class="row">
+                    <div class="col-auto mr-auto">.col-auto .mr-auto</div>
+                    <div class="col-auto">.col-auto</div>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 id="nesting">Nesting</h2>
+
+        <p>To nest your content with the default grid, add a new <code class="highlighter-rouge">.row</code> and set of <code class="highlighter-rouge">.col-sm-*</code> columns within an existing <code class="highlighter-rouge">.col-sm-*</code> column. Nested
+            rows should include a set of columns that add up to 12 or fewer (it is not required that you use all 12 available columns).</p>
+
+        <div class="bd-example-row code-container">
+
+            <div class="bd-example" data-example-id="">
+                <div class="row">
+                    <div class="col-sm-9">
+                        Level 1: .col-sm-9
+                        <div class="row">
+                            <div class="col-8 col-sm-6">
+                                Level 2: .col-8 .col-sm-6
+                            </div>
+                            <div class="col-4 col-sm-6">
+                                Level 2: .col-4 .col-sm-6
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </section>
 
 <section data-id="components" hidden="hidden">
@@ -1688,8 +1665,7 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Tabs</h3>
-            <p>Tabs are controlled over the <code>data-toggle="tab"</code> attribute and a reference name <code>href="#home"</code>
-                which points to a container with the corresponding <code>id="home"</code></p>
+            <p>Tabs are controlled over the <code>data-toggle="tab"</code> attribute and a reference name <code>href="#home"</code> which points to a container with the corresponding <code>id="home"</code></p>
             <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#nav-tabs">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
@@ -1767,8 +1743,7 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Media Object</h3>
-            <p>Abstract object styles for building various types of components (like blog comments, Tweets, etc) that
-                feature a left- or right-aligned image alongside textual content.</p>
+            <p>Abstract object styles for building various types of components (like blog comments, Tweets, etc) that feature a left- or right-aligned image alongside textual content.</p>
             <p>More about the media object can be found within the <a href="http://getbootstrap.com/components/#media">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
@@ -1781,8 +1756,7 @@ Includes support for individual properties, all properties, and vertical and hor
     <div class="row my-5">
         <div class="col-md-4">
             <h3>List Groups</h3>
-            <p>Abstract object styles for building various types of components (like blog comments, Tweets, etc) that
-                feature a left- or right-aligned image alongside textual content.</p>
+            <p>Abstract object styles for building various types of components (like blog comments, Tweets, etc) that feature a left- or right-aligned image alongside textual content.</p>
             <p>More about tabs can be found within the <a href="http://getbootstrap.com/components/#list-group">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
@@ -1812,10 +1786,8 @@ Includes support for individual properties, all properties, and vertical and hor
             <p>More about tabs can be found within the <a href="http://getbootstrap.com/javascript/#popovers">Bootstrap</a> documentation.</p>
         </div>
         <div class="col-md-8 col-linebreak">
-            <h3>Tooltips</h3>
-            {% include "divio_styleguide/styleguide/components/tooltips.html" %}
-            <h3>Popovers</h3>
-            {% include "divio_styleguide/styleguide/components/popovers.html" %}
+            <h3>Tooltips</h3> {% include "divio_styleguide/styleguide/components/tooltips.html" %}
+            <h3>Popovers</h3> {% include "divio_styleguide/styleguide/components/popovers.html" %}
         </div>
     </div>
 
@@ -1871,15 +1843,12 @@ Includes support for individual properties, all properties, and vertical and hor
         </div>
     </div>
 
-    <hr />
-
-    {% include "divio_styleguide/styleguide/components.html" %}
+    <hr /> {% include "divio_styleguide/styleguide/components.html" %}
 </section>
 
 <section data-id="utilities" hidden="hidden">
     <h2>Utility classes</h2>
-    <p class="lead">There is a number of utility classes provided, both bootstrap and custom to help with building
-    pages apart from spacers and the ones covered in "Typography" and "Iconography"</p>
+    <p class="lead">There is a number of utility classes provided, both bootstrap and custom to help with building pages apart from spacers and the ones covered in "Typography" and "Iconography"</p>
     <p>The utilities provided by bootstrap are described <a href="https://getbootstrap.com/docs/4.0/utilities/borders/">here</a></p>
 
     <table class="table">
@@ -1905,8 +1874,27 @@ Includes support for individual properties, all properties, and vertical and hor
         </tr>
         <tr>
             <td><code>text-truncate</code></td>
-            <td><div class="text-truncate" style="max-width: 500px;">Truncates the text with the ellipsis if it's too long Dolor aliquam amet et architecto ipsam Est itaque neque nostrum sequi sunt. Tenetur consequuntur veniam quibusdam enim maiores, corrupti Nostrum et mollitia esse temporibus vitae! Expedita impedit reprehenderit porro molestiae.</div></td>
+            <td>
+                <div class="text-truncate" style="max-width: 500px;">Truncates the text with the ellipsis if it's too long Dolor aliquam amet et architecto ipsam Est itaque neque nostrum sequi sunt. Tenetur consequuntur veniam quibusdam enim maiores, corrupti Nostrum et mollitia esse temporibus vitae! Expedita
+                    impedit reprehenderit porro molestiae.</div>
+            </td>
         </tr>
 
     </table>
+</section>
+
+
+<section data-id="customcomponents" hidden="hidden">
+    <h2>Custom Components</h2>
+
+    <div class="row my-5">
+        <div class="col-md-4">
+            <h3></h3>
+        </div>
+        <div class="col-md-8 col-linebreak">
+            <div class="row">
+
+            </div>
+        </div>
+    </div>
 </section>

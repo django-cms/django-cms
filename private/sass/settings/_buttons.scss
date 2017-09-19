@@ -1,0 +1,31 @@
+// #############################################################################
+
+//BUTTON OVERRIDES & CUSTOM STYLES
+
+$btn-font-weight:                700;
+$btn-box-shadow:                 none;
+
+$border-width:                   0;
+$border-color:                   transparent;
+
+
+//radio buttons
+$custom-control-indicator-disabled-bg:       $gray-200;
+$custom-control-description-disabled-color:  $gray-600;
+
+$custom-control-indicator-checked-color:      $white;
+$custom-control-indicator-checked-bg:         $azure;
+$custom-control-indicator-checked-box-shadow: none;
+
+$custom-control-indicator-focus-box-shadow: 0 0 0 1px $body-bg, 0 0 0 3px $azure;
+
+$custom-control-indicator-active-color:      $white;
+$custom-control-indicator-active-bg:         lighten($azure, 35%);
+$custom-control-indicator-active-box-shadow: none;
+
+$custom-checkbox-indicator-indeterminate-bg: $azure;
+
+$component-active-bg:                  $azure;
+
+$pagination-active-bg:                 $azure;
+$pagination-active-border-color:       $azure;

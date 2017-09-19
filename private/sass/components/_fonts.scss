@@ -110,3 +110,17 @@ $font-path: '../fonts/museo-sans';
 //     font-weight: 700;
 //     font-style: italic;
 // }
+
+
+@font-face {
+    font-family: "Museo Sans";
+    src: url($font-path + "/MuseoSans-900.eot?#iefix");
+    src:
+        url($font-path + "/MuseoSans-900.eot?#iefix") format("eot"),
+        url($font-path + "/MuseoSans-900.woff2") format("woff2"),
+        url($font-path + "/MuseoSans-900.woff") format("woff"),
+        url($font-path + "/MuseoSans-900.ttf") format("truetype"),
+        url($font-path + "/MuseoSans-900.svg") format("svg");
+    font-weight: 900;
+    font-style: normal;
+}

@@ -1,0 +1,54 @@
+// #############################################################################
+
+//COLOR OVERRIDES & CUSTOM STYLES
+
+$blue:    #00BBFF;
+$azure:   #00BBFF;
+$indigo:  #6610f2;
+$purple:  #6f42c1;
+$pink:    #e83e8c;
+$red:     #dc3545;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #21C3A8;
+$teal:    #20c997;
+$cyan:    #17a2b8;
+$snow:    #EDF1F5;
+$stone:   #D4DCE5;
+$slate:   #8392A4;
+$twilight:#2D3146;
+$night:   #25293D;
+
+$gradient1: #00A3FF;
+$gradient2: #3B74FC;
+$gradient3: #595AFA;
+$gradient4: #8139F8;
+
+
+$colors: (
+  blue: $azure,
+  indigo: $indigo,
+  purple: $purple,
+  pink: $pink,
+  red: $red,
+  orange: $orange,
+  yellow: $yellow,
+  green: $green,
+  teal: $teal,
+  cyan: $cyan,
+  white: $white,
+  gray: $slate,
+  gray-dark: $twilight
+);
+
+$theme-colors: (
+  primary: $azure,
+  secondary: $slate,
+  success: $green,
+  info:  $night,
+  warning: $yellow,
+  danger: $red,
+  light: $gray-100,
+  dark: $twilight,
+  darker: $night
+);
