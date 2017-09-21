@@ -58,6 +58,9 @@ var Plugin = new Class({
         }
     },
 
+    // these properties will be filled later
+    modal: null,
+
     initialize: function initialize(container, options) {
         this.options = $.extend(true, {}, this.options, options);
 
@@ -814,7 +817,12 @@ var Plugin = new Class({
     destroy() {
         // close the plugin modal if it was open
         // TODO: shouldn't the modal be destroyed as well at this point?
-        this.ui.modal.close();
+        if (this.modal) {
+            this.modal.close();
+            // unsubscribe to all the modal events
+            this.modal.off();
+        }
+
         // remove all the plugin UI DOM elements
         // notice that $.remove will remove also all the ui specific events
         // previously attached to them
@@ -1118,8 +1126,8 @@ var Plugin = new Class({
             var isPlaceholder = !dragItem.length;
             var childrenList;
 
-            // make sure also the modal is part of the ui collection
-            this.ui.modal = modal = new Modal({
+            // make sure also the modal is available to this instance
+            this.modal = modal = new Modal({
                 minWidth: 400,
                 minHeight: 400
             });
@@ -1245,20 +1253,21 @@ var Plugin = new Class({
     /**
      * Returns a specific plugin namespaced event postfixing the plugin uid to it
      * in order to properly manage it via jQuery $.on and $.off
+     * TODO: move this in cms.base.js
      *
      * @method _getNamepacedEvent
      * @private
-     * @param {String} type - plugin event type
+     * @param {String} base - plugin event type
      * @param {String} additionalNS - additional namespace (like '.traverse' for example)
      * @returns {String} a specific plugin event
      *
      * @example
      *
-     * plugin._getNamepacedEvent(Plugin.click); // 'click.cms.plugin.uid-42'
-     * plugin._getNamepacedEvent(Plugin.keyDown, '.traverse'); // 'keydown.cms.plugin.traverse.uid-42'
+     * plugin._getNamepacedEvent(Plugin.click); // 'click.cms.plugin.42'
+     * plugin._getNamepacedEvent(Plugin.keyDown, '.traverse'); // 'keydown.cms.plugin.traverse.42'
      */
-    _getNamepacedEvent(type, additionalNS = '') {
-        return `${ Plugin[type] }${ additionalNS ? '.'.concat(additionalNS) : '' }.uid-${ this.uid }`;
+    _getNamepacedEvent(base, additionalNS = '') {
+        return `${ base }${ additionalNS ? '.'.concat(additionalNS) : '' }.${ this.uid }`;
     },
 
     /**

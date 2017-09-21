@@ -31,8 +31,8 @@ export const $window = $(window);
 export const $document = $(document);
 
 /**
- * Creates always an unique identifier if calles
- * @returns {Numner} incremental numbers starting from 0
+ * Creates always an unique identifier if called
+ * @returns {Number} incremental numbers starting from 0
  */
 export const uid = (function() {
     let i = 0;
