@@ -102,6 +102,20 @@
 
         <div class="row my-5">
             <div class="col-md-4">
+                <h3>Heading Block</h3>
+                <p>To be used on marketing pages as a heading
+                </p>
+            </div>
+            <div class="col-md-8 col-linebreak">
+                <div class="code-container">
+                    {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
+                </div>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row my-5">
+            <div class="col-md-4">
                 <h3>Body Text</h3>
                 <p>The main content part of an area. Always be wary that the most important aspect of SEO is to have well written and structured content. The best design and code will not help your ranking with a bad content strategy.
                 </p>
@@ -1889,12 +1903,96 @@
 
     <div class="row my-5">
         <div class="col-md-4">
-            <h3></h3>
+            <h3>Circle Blocks</h3>
+            <p>Add class <code>circle-wrap-arrows</code> to parent to have dotted line &amp; arrow background</p>
+            <code>% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon=' ' circle_title=' ' circle_desc=' ' %</code>
+            <p>Background color of circle can be set with <code>circle-bg1</code>, <code>circle-bg2</code> etc there are 4 and should be used in order</p>
         </div>
         <div class="col-md-8 col-linebreak">
-            <div class="row">
+              <div class="row circle-wrap circle-wrap-arrows">
+                  <div class="col-12 col-md-6">
+                      {% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon='DOWNLOAD' circle_title='Download App' circle_desc='Develop with confidence, knowing that what works locally will also work in the cloud.' %}
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                      {% include "divio_styleguide/includes/circles.html" with cls='circle-bg2' circle_icon='SETUP' circle_title='Setup Project' circle_desc='Our projects are pre-configured and optimised out-of-the-box for performance and security.' %}
+                  </div>
 
             </div>
         </div>
     </div>
+
+
+    <div class="row my-5">
+        <div class="col-md-4">
+            <h3>Blocks</h3>
+            <p>Buttons &amp; icon are optional</p>
+            <code>"divio_styleguide/includes/block.html" </code>
+        </div>
+        <div class="col-md-8 col-linebreak">
+            <div class="row">
+              <div class="col-sm-12 col-md-6 d-flex">
+                  {% include "divio_styleguide/includes/block.html" with cls='' block_title='Default text block' icon_type='windows' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.' block_button='Download for Windows'  block_button_icon='download-icon'  %}
+              </div>
+              <div class="col-sm-12 col-md-6 d-flex">
+                  {% include "divio_styleguide/includes/block.html" with cls='' block_title='Default text block'  block_link='Read more' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.'   %}
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="row my-5">
+        <div class="col-md-4">
+            <h3>Blocks Left Aligned</h3>
+            <p>Buttons &amp; icon are optional</p>
+            <code>"divio_styleguide/includes/block-left.html" </code>
+        </div>
+        <div class="col-md-8 col-linebreak">
+            <div class="row">
+              <div class="col-sm-12 col-md-6 d-flex">
+                  {% include "divio_styleguide/includes/block-left.html" with cls='' block_title='Left aligned text block' icon_type='windows' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.' block_button='Download for Windows'  %}
+              </div>
+              <div class="col-sm-12 col-md-6 d-flex">
+                  {% include "divio_styleguide/includes/block-left.html" with cls='' block_title='Left aligned text block' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.'  block_link='Read more'  %}
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-5">
+        <div class="col-md-4">
+            <h3>Diagonal backgrounds</h3>
+            <p>Diagonal stripes can be set with classes.</p>
+             <p>Background colour options are:<br/>
+            <code>.stripe-twilight .stripe-night .stripe-pale</code></p>
+             <p>Set stripe direction:<br/>
+            <code>.stripe-down .stripe-up</code></p>
+             <p>A stripe at the top of the page must be contained within:<br/>
+            <code>.hero</code></p>
+             <p>All stripes in a group not at the top of the page must be contained within:<br/>
+            <code>.stripes-set</code></p>
+        </div>
+        <div class="col-md-8 col-linebreak">
+            <div class="row w-100 code-container">
+                <div class="stripes-set">
+                    <section class="stripe stripe-down stripe-twilight">
+                        <div class="stripe-element">
+                        </div>
+                        <div class="container">
+                          {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
+                        </div>
+                    </section>
+
+                    <section class="stripe stripe-up stripe-night">
+                        <div class="stripe-element">
+                        </div>
+                        <div class="container">
+                          {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
+                        </div>
+                    </section>
+
+        </div>
+    </div>
+    </div>
+
+
 </section>

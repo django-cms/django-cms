@@ -1,0 +1,205 @@
+// #############################################################################
+// CUSTOM SETTINGS
+// this setting file is intended for additional variables not defined within the bootstrap default
+// feel free to create additional files if settings get cluttered
+// It also includes overrides for bootstrap variables
+
+$speed-base: 200ms;
+
+// Z-INDEX
+// DOCS: http://www.sitepoint.com/better-solution-managing-z-index-sass/
+// http://sassmeister.com/gist/341c052928c956c1a751
+// use case: header { z-index: z("modal", "header"); }
+
+/*
+$z-layers: (
+    "goku":            9001,
+    "shoryuken":       8000,
+    "modal": (
+        "base":         500,
+        "close":        100,
+        "header":        50,
+        "footer":        10
+    ),
+    "default":            1,
+    "below":             -1,
+    "bottomless-pit": -9000
+);
+*/
+
+
+
+
+
+//COLORS
+$blue:    #00BBFF;
+$azure:   #00BBFF;
+$indigo:  #6610f2;
+$purple:  #6f42c1;
+$pink:    #e83e8c;
+$red:     #dc3545;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #21C3A8;
+$teal:    #20c997;
+$cyan:    #17a2b8;
+$snow:    #EDF1F5;
+$stone:   #D4DCE5;
+$slate:   #8392A4;
+$twilight:#2D3146;
+$night:   #25293D;
+
+// gradient swatches
+$gradient1: #00A3FF;
+$gradient2: #3B74FC;
+$gradient3: #595AFA;
+$gradient4: #8139F8;
+
+// gradients
+$gradient-pale: radial-gradient(at bottom, #DEE5EF 0%, #F9FBFD 100%);
+$gradient-blue: linear-gradient(212.31deg, #8834F8 0%, #00A3FF 100%);
+
+$colors: (
+  blue: $azure,
+  indigo: $indigo,
+  purple: $purple,
+  pink: $pink,
+  red: $red,
+  orange: $orange,
+  yellow: $yellow,
+  green: $green,
+  teal: $teal,
+  cyan: $cyan,
+  white: $white,
+  gray: $slate,
+  gray-dark: $twilight
+);
+
+$theme-colors: (
+  primary: $azure,
+  secondary: $slate,
+  success: $green,
+  info:  $night,
+  warning: $yellow,
+  danger: $red,
+  light: $gray-100,
+  dark: $twilight,
+  darker: $night
+);
+
+
+//TYPOGRAPHY
+$font-family-sans-serif: "Museo Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" ;
+$font-family-monospace:  "Museo Sans", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-family-base:       $font-family-sans-serif;
+
+$font-weight-light: 300;
+$font-weight-normal: 500;
+$font-weight-bold: 900;
+
+$line-height-base: 1.3;
+$font-weight-base: $font-weight-normal;
+
+$h1-font-size: 1.7rem;
+$h2-font-size: 1.3rem;
+$h3-font-size: 1.2rem;
+$h4-font-size: 1.2rem;
+$h5-font-size: 1.125rem;
+$h6-font-size: 1.125rem;
+
+
+$headings-font-family:   inherit;
+$headings-font-weight:   900;
+$h4-font-weight:   700;
+
+$display1-size: 1.8rem;
+$display2-size: 1.6rem;
+$display3-size: 1.6rem;
+$display4-size: 1.6rem;
+
+$display1-weight:     900;
+$display2-weight:     900;
+$display3-weight:     900;
+$display4-weight:     900;
+
+$lead-font-size:   1.125rem;
+$lead-font-weight: 700;
+$link-color:       $azure;
+
+//DESKTOP HEADINGS
+$d-display1-size: 2.5rem;
+$d-display2-size: 2.2rem;
+$d-display3-size: 2rem;
+$d-display4-size: 1.8rem;
+
+$d-h1-font-size: 1.9rem;
+$d-h2-font-size: 1.6rem;
+$d-h3-font-size: 1.3rem;
+$d-h4-font-size: 1.3rem;
+$d-h5-font-size: 1.125rem;
+$d-h6-font-size: 1.125rem;
+
+$d-line-height-base: 1.4;
+
+//BUTTONS
+$btn-font-weight:                700;
+$btn-box-shadow:                 none;
+
+$border-width:                   0;
+$border-color:                   transparent;
+
+
+//RADIO BUTTONS
+$custom-control-indicator-disabled-bg:       $gray-200;
+$custom-control-description-disabled-color:  $gray-600;
+
+$custom-control-indicator-checked-color:      $white;
+$custom-control-indicator-checked-bg:         $azure;
+$custom-control-indicator-checked-box-shadow: none;
+
+$custom-control-indicator-focus-box-shadow: 0 0 0 1px $body-bg, 0 0 0 3px $azure;
+
+$custom-control-indicator-active-color:      $white;
+$custom-control-indicator-active-bg:         lighten($azure, 35%);
+$custom-control-indicator-active-box-shadow: none;
+
+$custom-checkbox-indicator-indeterminate-bg: $azure;
+
+$component-active-bg:                  $azure;
+
+$pagination-active-bg:                 $azure;
+$pagination-active-border-color:       $azure;
+
+
+
+// SPACING
+
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: ($spacer * .25),
+  2: ($spacer * .5),
+  3: $spacer,
+  4: ($spacer * 1.5),
+  5: ($spacer * 3),
+  6: ($spacer * 5),
+  7: ($spacer * 7)
+);
+
+
+$maxwidth: 100, 150, 200, 250, 300, 350, 400, 450, 550, 800, 1250;
+
+@each $i in $maxwidth {
+  .mw#{$i}{
+    max-width: #{$i}px;
+    display: block;
+    margin:0 auto;
+  }
+}
+
+
+
+// CARD DEFAULT
+$card-border-color:        transparent;
+$card-cap-bg:              transparent;
+$card-bg:                  transparent;

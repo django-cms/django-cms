@@ -1,0 +1,174 @@
+// #############################################################################
+// BACKGROUND
+// all the styles for the diagonal backgrounds are delcared within this file
+
+.hero {
+    position: relative;
+}
+//
+// hero with a central image
+
+.hero-img-c {
+    text-align: center;
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        margin: 0 auto;
+    }
+}
+//
+// Hero with central text
+
+.stripe {
+    position: relative;
+
+    &::after {
+        content: '';
+        height: 100%;
+        display: block;
+        position: absolute;
+        bottom: -35%;
+        left: 0;
+        right: 0;
+        z-index: -1;
+    }
+}
+//
+// Stripe background
+
+.stripe-element {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0;
+    position: absolute;
+    z-index: -1;
+}
+//stripe background colors
+
+.stripes-set {
+    width: 100%;
+
+    > .stripe:last-child {
+        //padding: 60px 0 0;
+
+        &::after {
+            display: none;
+        }
+    }
+}
+
+.stripe-gradient .stripe-element {
+    background: $gradient-pale;
+}
+
+.stripe-twilight {
+    .stripe-element {
+        background: $twilight;
+    }
+
+    &::after {
+        background: $twilight;
+    }
+}
+
+.stripe-night {
+    .stripe-element {
+        background: $night;
+    }
+
+    &::after {
+        background: $night;
+    }
+}
+
+.stripe-snow {
+    .stripe-element {
+        background: $snow;
+    }
+
+    &::after {
+        background: $snow;
+    }
+}
+
+.stripe-white {
+    .stripe-element {
+        background: $white;
+    }
+
+    &::after {
+        background: $white;
+    }
+}
+
+
+.stripe-night,
+.stripe-twilight {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    p {
+        color: white;
+    }
+}
+//
+// stripe direction
+
+.stripe-up {
+    .stripe-element {
+        transform: skewY(-8deg);
+    }
+}
+
+.stripe-down {
+    .stripe-element {
+        transform: skewY(8deg);
+    }
+}
+
+.stripe-up:not(.hero) {
+    .stripe-element {
+        transform: skewY(-8deg) translate(0,0);
+    }
+}
+
+.stripe-down:not(.hero) {
+    .stripe-element {
+        transform: skewY(8deg) translate(0,0);
+    }
+}
+
+.stripe:not(.hero) {
+    margin-top: 100px;
+    padding: 50px 0 20px;
+
+    .stripe-element {
+        height: calc(100% + 100px);
+        top: 0;
+        transform-origin: top;
+    }
+
+    .container {
+        padding: 40px 0;
+    }
+}
+// Different styling if Stipe is immediately after another
+
+.stripe + .stripe {
+    margin-top: 0;
+}
+//
+// Hero
+@include media-breakpoint-up(sm) {
+    .hero {
+        max-height: 70vh;
+        height: 100%;
+
+        img {
+            max-height: 70vh;
+        }
+    }
+}

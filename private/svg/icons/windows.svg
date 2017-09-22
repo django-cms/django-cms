@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="63px" height="64px" viewBox="0 0 63 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>windows</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1">
+        <g id="Icon-/-Windows" transform="translate(-2.000000, -4.000000)">
+            <g id="windows" transform="translate(0.016432, 0.000000)">
+                <rect id="BG" fill-opacity="0" fill="#D8D8D8" opacity="0.505774457" x="0.983774885" y="0.629979823" width="63" height="70"></rect>
+                <polygon id="Fill-4"  points="64.0788868 34.7100578 64.0788868 4.62818183 29.5254315 9.66820882 29.5254315 34.7100578"></polygon>
+                <polygon id="Fill-6"  points="27.0916588 10.0235357 2.00018844 13.6835853 2.00018844 34.7098693 27.0916588 34.7098693"></polygon>
+                <polygon id="Fill-8"  points="2 37.144019 2 58.4372536 27.0914704 62.1393871 27.0914704 37.144019"></polygon>
+                <polygon id="Fill-10"  points="29.52562 62.4991109 64.0790752 67.5969248 64.0790752 37.1438305 29.52562 37.1438305"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

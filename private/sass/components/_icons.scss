@@ -1,3 +1,6 @@
+// #############################################################################
+// ICONS
+// all styles related to the icons are declared here
 /* stylelint-disable */
 .icon {
     display: inline-block;
@@ -12,104 +15,58 @@
     }
 }
 
+//
+// Product icons
+// Gradients and shadow created with CSS not SVG
 
-// CIRCLES
-.circleWrap {
-    position: relative;
-}
-
-.circleWrapArrows {
-    &::after {
-        content: '';
-        border-top: 1px dotted $stone;
-        width: 60%;
-        height: 1px;
-        position: absolute;
-        left: 20%;
-        right: 20%;
-        top: 45px;
-        z-index: -1;
-    }
-
-    > div {
-        &::after {}
-    }
-}
-
-.circleBg {
-    text-align: center;
-}
-
-.circleBg1 {
-    .circleIcon {
-        background: $gradient1;
-    }
-}
-
-.circleBg2 {
-    .circleIcon {
-        background: $gradient2;
-    }
-}
-
-.circleBg3 {
-    .circleIcon {
-        background: $gradient3;
-    }
-}
-
-.circleBg4 {
-    .circleIcon {
-        background: $gradient4;
-    }
-}
-
-.circleIcon {
-    display: block;
-    height: 90px;
-    width: 90px;
-    margin: 0 auto;
-    border-radius: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 20px rgba(000, 000, 000, 0.2);
-
-    p {
-        color: white;
-        margin: 0 0 -3px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.4px;
-    }
-}
-
-
-// PRODUCT ICONS
-.productIcon {
+.product-icon {
     position: relative;
     width: 50px;
     height: 50px;
 
     &::before {
         content: '';
-        background: linear-gradient(212.31deg, #8834F8 0%, #00A3FF 100%);
+        background: $gradient-blue;
         width: 90%;
         height: 90%;
         display: block;
         position: absolute;
         top: 5%;
         bottom: 5%;
-        left:5%;
-        right:5%;
-        z-index:-1;
-        border-radius:100px;
+        left: 5%;
+        right: 5%;
+        z-index: 0;
+        border-radius: 100px;
+    }
+
+    svg {
+      position: relative;
+      z-index:1;
+    }
+}
+//
+//Product icons with shadow
+
+.product-icon-shadow {
+    &::before {
+        content: '';
+        box-shadow: 0 4px 20px rgba(000, 000, 000, 0.2);
     }
 }
 
-//Give it shadow
-.productIconShadow {  &::before {
-      content: '';
-      box-shadow: 0 4px 20px rgba(000, 000, 000, 0.2);
+.icon-white {
+    use {
+        fill: white;
+    }
+}
+.icon-blue {
+    use {
+        fill: $azure;
+    }
+}
+
+.icon-stone {
+  use {
+      fill: $stone;
   }
 }

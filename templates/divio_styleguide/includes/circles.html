@@ -1,5 +1,7 @@
-<div class="circleBg mw250 {{ cls }}">
-        <div class="circleIcon"><p>{{ circle_icon|default:'' }}</p></div>
-        <h2 class="mt-3">{{ circle_title }}</h2>
+<div class="circle-bg mw250 {{ cls }}">
+        <div class="circle-icon"><p>{{ circle_icon|default:'' }}</p></div>
+        <h3 class="mt-4">{{ circle_title }}</h3>
         <p>{{ circle_desc }}</p>
+
+        <div class="circle-arrow">{% include "includes/icon.html" with icon="arrow-right" title="next" color="stone" %}</div>
 </div>

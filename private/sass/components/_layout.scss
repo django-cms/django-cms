@@ -1,5 +1,29 @@
 /* stylelint-disable selector-max-type */
 html {
     overflow-y: scroll;
-    padding-top:60px;
+    padding-top: 60px;
+}
+//Footer
+
+.main-footer {
+    .footer-social {
+        li {
+            display: inline-block;
+
+            a {
+                padding: 5px;
+            }
+
+            .icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    }
+
+    .footer-links {
+        a {
+            color: $night;
+        }
+    }
 }

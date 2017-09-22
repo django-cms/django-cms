@@ -1,0 +1,131 @@
+// #############################################################################
+// CUSTOM COMPONENTS
+// all styles related to custom styled components like block, block-left & circles
+//
+// Circle Sections styling
+
+.circle-wrap {
+    position: relative;
+    //hide arrows if no class for arrows is set
+    .circle-arrow {
+        display: none;
+    }
+}
+// If arrows set
+
+.circle-wrap-arrows {
+    &::after {
+        content: '';
+        border-top: 1px dotted $stone;
+        width: 60%;
+        height: 1px;
+        position: absolute;
+        left: 20%;
+        right: 20%;
+        top: 45px;
+        z-index: -1;
+    }
+
+    .circle-arrow {
+        display: block;
+        position: absolute;
+        top: 34px;
+        right: 0;
+        background: white;
+        padding: 3px;
+        border-radius: 50px;
+    }
+}
+
+.circle-wrap-arrows > div:last-child {
+    .circle-arrow {
+        display: none;
+    }
+}
+
+.circle-bg {
+    text-align: center;
+}
+//circle background colours
+
+.circle-bg1 {
+    .circle-icon {
+        background: $gradient1;
+    }
+}
+
+.circle-bg2 {
+    .circle-icon {
+        background: $gradient2;
+    }
+}
+
+.circle-bg3 {
+    .circle-icon {
+        background: $gradient3;
+    }
+}
+
+.circle-bg4 {
+    .circleIcon {
+        background: $gradient4;
+    }
+}
+
+.circle-icon {
+    display: block;
+    height: 90px;
+    width: 90px;
+    margin: 0 auto;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(000, 000, 000, 0.2);
+
+    p {
+        color: white;
+        margin: 0 0 -3px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+    }
+}
+//
+// Custom Blocks
+//Default
+.block {
+    height: 100%;
+
+    .block-icon {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+// Left aligned block
+.block-left {
+    height: 100%;
+    padding-bottom: 2rem;
+
+    .media-body {
+        height: 100%;
+    }
+
+    .icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .block-left-icon {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+//Block button
+.block-btn {
+  padding:20px;
+  margin:5px 5px 0 0;
+  border-radius:$border-radius;
+}

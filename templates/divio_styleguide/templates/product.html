@@ -1,35 +1,231 @@
 {% extends "content.html" %} {% block breadcrumb %}{% endblock %} {% load i18n staticfiles cms_tags menu_tags %} {% block content %}
+<!-- PRODUCT PAGE TEMPLATE -->
 
-
-<header class="pageHero">
-    <div class="stripe stripeTop stripeGradient">
+<!-- Hero -->
+<header class="hero hero-img-c stripe stripe-up stripe-gradient">
+    <div class="stripe-element">
     </div>
-    <img class="mw1250 w-100" src="{% static "img/placeholders/codeImage.png" %}" alt="" />
+    <div class="container align-items-baseline">
+        <img src="{% static "img/product/codeImage.png" %}" alt="" />
+    </div>
 </header>
 
+<!-- Intro-->
 <div class="container mb-5">
-    <div class="row  justify-content-center text-center">
+    <div class="row justify-content-center text-center">
         <div class="col-12">
-            {% include "includes/icon.html" with icon="code" class="mx-auto d-block mt-3 productIcon productIconShadow" title="Code" %}
+            {% include "includes/icon.html" with icon="code" class="mx-auto d-block mt-3 product-icon product-icon-shadow" title="Code" %}
 
-            <p class="mb-0 mt-4 text-secondary">Get your local setup in minutes</p>
+            <p class="mb-1 mt-3 text-secondary">Get your local setup in minutes</p>
             <h1 class="display-1 mb-7">Code</h1>
 
-            <div class="row circleWrap circleWrapArrows">
-                <div class="col-12 col-md-4 px-lg-5">
-                    {% include "divio_styleguide/includes/circles.html" with cls='circleBg1' circle_icon='DOWNLOAD' circle_title='Download App' circle_desc='Develop with confidence, knowing that what works locally will also work in the cloud.' %}
+            <div class="row circle-wrap circle-wrap-arrows">
+                <div class="col-12 col-md-4">
+                    {% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon='DOWNLOAD' circle_title='Download App' circle_desc='Develop with confidence, knowing that what works locally will also work in the cloud.' %}
                 </div>
 
-                <div class="col-12 col-md-4 px-lg-5">
-                    {% include "divio_styleguide/includes/circles.html" with cls='circleBg2' circle_icon='SETUP' circle_title='Setup Project' circle_desc='Our projects are pre-configured and optimised out-of-the-box for performance and security.' %}
+                <div class="col-12 col-md-4">
+                    {% include "divio_styleguide/includes/circles.html" with cls='circle-bg2' circle_icon='SETUP' circle_title='Setup Project' circle_desc='Our projects are pre-configured and optimised out-of-the-box for performance and security.' %}
                 </div>
 
-                <div class="col-12 col-md-4 px-lg-5">
-                    {% include "divio_styleguide/includes/circles.html" with cls='circleBg3' circle_icon='PUSH' circle_title='Push Changes' circle_desc='Enjoy a modern fully-versioned project development workflow using Git: detailed change logs.' %}
+                <div class="col-12 col-md-4">
+                    {% include "divio_styleguide/includes/circles.html" with cls='circle-bg3' circle_icon='PUSH' circle_title='Push Changes' circle_desc='Enjoy a modern fully-versioned project development workflow using Git: detailed change logs.' %}
                 </div>
             </div>
         </div>
 
     </div>
 </div>
+
+<!-- Features-->
+<div class="stripes-set">
+    <section class="stripe stripe-down stripe-twilight">
+        <div class="stripe-element">
+        </div>
+        <div class="container">
+            {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
+
+
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    {% include "divio_styleguide/includes/block.html" with cls='' block_title='Windows' icon_type='windows' card_icon='windows' icon_color='white' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.' block_button='Download for Windows' block_button_icon='download-icon' %}
+                </div>
+
+                <div class="col-12 col-md-4">
+                    {% include "divio_styleguide/includes/block.html" with cls='' block_title='Mac OS X' icon_type='apple' icon_color='white' block_desc='Requires Apple OS X Mavericks 10.8 or above, 64-bit environment.' block_button='Download for Mac' block_button_icon='download-icon' %}
+                </div>
+
+                <div class="col-12 col-md-4">
+                    {% include "divio_styleguide/includes/block.html" with cls='' block_title='Linux' icon_type='linux' icon_color='white' block_desc='Works with common Linux-based operating systems, such as RHEL, CentOS, Ubuntu, Fedora, debian and derivatives, 64-bit environment.' block_button='Download for Linux' block_button_icon='download-icon' %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stripe stripe-up stripe-night">
+        <div class="stripe-element">
+        </div>
+        <div class="container">
+            {% include "divio_styleguide/includes/section-title.html" with title='All features at a glance' sub_title='Secure &amp; performant infrastructure' %}
+
+
+            <div class="row">
+                <div class="col-12 col-md-4 d-flex">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Automated site monitoring' icon_type='windows' icon_color='white' block_link='Read more' block_desc='Built-in monitoring alerts our team to potential issues.' %}
+                </div>
+
+                <div class="col-12 col-md-4 d-flex">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Role based access' icon_type='windows' icon_color='white' block_link='Read more' block_desc='Manage users and their roles in different projects, from administrators to clients and freelancers, all in a team-centred workflow.' %}
+                </div>
+
+                <div class="col-12 col-md-4 d-flex">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Django Hosting' icon_type='windows' icon_color='white' block_desc='State-of-the-art hosting for django CMS, Wagtail and Oscar, with one-click updates and expertly-configured projects.'%}
+                </div>
+                <div class="col-12 col-md-4 d-flex">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Automated site monitoring' block_icon='windows' icon_type='windows' icon_color='white' block_desc='Built-in monitoring alerts our team to potential issues, so they can be dealt with before they become problems.' %}
+                </div>
+
+                <div class="col-12 col-md-4 d-flex">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Role based access' icon_type='windows' icon_color='white' block_desc='Manage users and their roles in different projects, from administrators to clients and freelancers, all in a team-centred workflow.' %}
+                </div>
+
+                <div class="col-12 col-md-4 d-flex">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Django Hosting' icon_type='windows' icon_color='white' block_desc='State-of-the-art hosting for django CMS, Wagtail and Oscar, with one-click updates and expertly-configured projects.' %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stripe stripe-down stripe-twilight">
+        <div class="stripe-element">
+        </div>
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-12 col-md-5">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='See how it works' block_link='Learn more' icon_type='learn' icon_color='white' block_desc='Indepth documentation and tutorials to guide you through all the aspects of Divio Code. Hit the ground running with your next project.' %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stripe stripe-up stripe-snow">
+        <div class="stripe-element">
+        </div>
+        <div class="container">
+            {% include "divio_styleguide/includes/section-title.html" with cls='' title='One solution to empower your team'%}
+
+
+            <div class="row justify-content-center no-gutters">
+                    <div class="col-12 col-sm-6 col-md-5 col-lg-4 d-flex">
+                        {% include "divio_styleguide/includes/block-left.html" with block_title='Control' cls='block-btn bg-light' icon_type='control' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-5 col-lg-4 d-flex">
+                        {% include "divio_styleguide/includes/block-left.html" with block_title='Content' cls='block-btn bg-light' icon_type='content' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                    </div>
+              </div>
+              <div class="row justify-content-center no-gutters">
+                  <div class="col-12 col-sm-6 col-md-5 col-lg-4 d-flex">
+                      {% include "divio_styleguide/includes/block-left.html" with block_title='Cloud' cls='block-btn bg-light' icon_type='cloud' icon_class="product-icon product-icon-shadow block-left-icon"  block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                  </div>
+
+                  <div class="col-12 col-sm-6 col-md-5 col-lg-4 ">
+                    {% include "divio_styleguide/includes/block-left.html" with block_title='Code' cls='block-btn bg-light' icon_type='code' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                  </div>
+              </div>
+        </div>
+    </section>
+
+    <section class="stripe stripe-down stripe-white">
+        <div class="stripe-element">
+        </div>
+        <div class="container text-center">
+            {% include "divio_styleguide/includes/section-title.html" with cls='' title='Get started in 3 minutes' sub_title='Sign up and deploy your website in the cloud in less than 3 minutes. Its free to try out, only pay when you run a live server.'%}
+            <a href='' class="btn btn-primary">Get started for free {% include "includes/icon.html" with icon="arrow-right" color="white" %}</a>
+
+
+        </div>
+    </section>
+</div>
+
+
+<footer class="main-footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-3 pt-4 flex-last">
+        <a href="/"><img src="{% static "img/logo-divio-black.svg" %}" width="80px" alt="{{ request.site.name }}" /></a>
+        <p class="text-secondary mt-2">Your complete digital experience platform.</p>
+        <p class="h5">Keep up to date</p>
+        <ul class="list-unstyled list-inline footer-social">
+          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+        </ul>
+      </div>
+      <div class="col-12 col-sm-4 col-md-2  pt-4">
+          <ul class="list-unstyled footer-links">
+            <li><p class='h5'>Support</p></li>
+            <li><a href="" target="_blank">Support</a></li>
+            <li><a href="" target="_blank">Documentation</a></li>
+            <li><a href="" target="_blank">Academy</a></li>
+            <li><a href="" target="_blank">Status</a></li>
+          </ul>
+      </div>
+      <div class="col-12 col-sm-4 col-md-2  pt-4">
+        <ul class="list-unstyled footer-links">
+          <li><p class='h5'>Company</p></li>
+          <li><a href="" target="_blank">Partners</a></li>
+          <li><a href="" target="_blank">Customers</a></li>
+          <li><a href="" target="_blank">Press &amp; Media</a></li>
+          <li><a href="" target="_blank">Blog</a></li>
+          <li><a href="" target="_blank">About us</a></li>
+          <li><a href="" target="_blank">Careers</a></li>
+          <li><a href="" target="_blank">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-12 col-sm-4 col-md-2  pt-4">
+        <ul class="list-unstyled footer-links">
+          <li><p class='h5'>Legal</p></li>
+          <li><a href="" target="_blank">Privacy</a></li>
+          <li><a href="" target="_blank">Terms of Service</a></li>
+          <li><a href="" target="_blank">Security</a></li>
+          <li><a href="" target="_blank">Site Notice</a></li>
+        </ul>
+      </div>
+      <div class="col-12 col-sm-12 col-md-3 bg-light pt-4">
+        <p class="h5">Need help?</p>
+        <p>We’re here for you 24/7</p>
+          <div class="row pb-4">
+            <div class="col-6">
+              <p class="mb-0">USA</p>
+              <a href="">1231321</a>
+            </div>
+            <div class="col-6">
+              <p class="mb-0">Worldwide</p>
+              <a href="">1231321</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <p class="mb-0">Email</p>
+              <a href="mailto:help@divio.com">help@divio.com</a>
+            </div>
+            <div class="col-6">
+              <p class="mb-0">Chat</p>
+              <a href="">Start Chat</a>
+            </div>
+          </div>
+      </div>
+    </div>
+    <div class="row py-4">
+      <div class="col-12">
+        <p class="text-secondary mb-0"><small>This site is built with Django &amp; Powered by Divio Cloud</small></p>
+        <p class="text-secondary mb-0"><small>COPYRIGHT © 2001-2017 DIVIO AG. ALL RIGHTS RESERVED.</small></p>
+      </div>
+    </div>
+  </div>
+</footer>
+
 {% endblock %}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="7px" height="11px" viewBox="0 0 7 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>arrowRight</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1"  fill-rule="evenodd">
+        <g id="Icon/-ArrowRight" transform="translate(1.000000, 0.000000)">
+            <path d="M0.0103112324,8.89647289 C-0.381194593,9.28797871 -0.384712946,9.91921672 0.00853400922,10.3124637 L0.00853400922,10.3124637 C0.399058301,10.702988 1.03883161,10.6963796 1.42691047,10.3083008 L5.71147789,6.02373336 C6.10430129,5.63090996 6.09955675,4.98927285 5.71147789,4.60119399 L1.42691047,0.316626574 C1.03408707,-0.0761968251 0.401780965,-0.0807832835 0.00853400922,0.312463672 L0.00853400922,0.312463672 C-0.381990283,0.702987964 -0.375908057,1.34223517 0.0103112324,1.72845446 L3.59432045,5.31246367 L0.0103112324,8.89647289 Z" id="arrowRight"></path>
+        </g>
+    </g>
+</svg>
