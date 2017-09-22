@@ -154,11 +154,6 @@ var Sideframe = new Class({
         // load the iframe
         this._content(url);
 
-        // The user has performed an action that requires the
-        // sideframe to be shown, this intent outweighs any
-        // previous intent to minimize the frame.
-        CMS.settings.sideframe.hidden = false;
-
         // show iframe
         this._show(animate);
 
@@ -272,8 +267,12 @@ var Sideframe = new Class({
 
         let iframeUrl = url;
 
+        // a case when you never visited the site and first went to admin and then immediately to the page
+        // and then clicked to open a sideframe
+        CMS.settings.sideframe = CMS.settings.sideframe || {};
         CMS.settings.sideframe.url = iframeUrl;
-        CMS.settings = Helpers.setSettings(CMS.settings);
+        CMS.settings.sideframe.hidden = false;
+        CMS.settings = Helpers.setSettings(window.CMS.settings);
 
         this.pageLoadInterval = setInterval(() => {
             try {
@@ -281,8 +280,8 @@ var Sideframe = new Class({
 
                 if (currentUrl !== iframeUrl) {
                     // save url in settings
-                    CMS.settings.sideframe.url = currentUrl;
-                    CMS.settings = Helpers.setSettings(CMS.settings);
+                    window.CMS.settings.sideframe.url = currentUrl;
+                    window.CMS.settings = Helpers.setSettings(window.CMS.settings);
                     iframeUrl = currentUrl;
                 }
             } catch (e) {}
@@ -351,7 +350,7 @@ var Sideframe = new Class({
         // update settings
         CMS.settings.sideframe = {
             url: null,
-            hidden: false
+            hidden: true
         };
         CMS.settings = Helpers.setSettings(CMS.settings);
 

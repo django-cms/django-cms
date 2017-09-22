@@ -45,12 +45,8 @@ var PROJECT_PATTERNS = {
         '!' + PROJECT_PATH.js + '/modules/jquery.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
-    sass: [
-        PROJECT_PATH.sass + '/**/*.{scss,sass}'
-    ],
-    icons: [
-        PROJECT_PATH.icons + '/src/*.svg'
-    ]
+    sass: [PROJECT_PATH.sass + '/**/*.{scss,sass}'],
+    icons: [PROJECT_PATH.icons + '/src/*.svg']
 };
 
 var INTEGRATION_TESTS = [
@@ -106,52 +102,62 @@ var INTEGRATION_TESTS = [
     ]
 ];
 
-var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
-    .match(/__version__ = '(.*?)'/)[1];
+var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' }).match(/__version__ = '(.*?)'/)[1];
 
 // #####################################################################################################################
 // #TASKS#
-gulp.task('sass', function () {
-    gulp.src(PROJECT_PATTERNS.sass)
+gulp.task('sass', function() {
+    gulp
+        .src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
         .pipe(sass())
-        .on('error', function (error) {
+        .on('error', function(error) {
             gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
         })
-        .pipe(postcss([
-            autoprefixer({
-                cascade: false
+        .pipe(
+            postcss([
+                autoprefixer({
+                    cascade: false
+                })
+            ])
+        )
+        .pipe(
+            minifyCss({
+                rebase: false
             })
-        ]))
-        .pipe(minifyCss({
-            rebase: false
-        }))
+        )
         .pipe(gulpif(options.debug, sourcemaps.write()))
         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
 });
 
-gulp.task('icons', function () {
-    gulp.src(PROJECT_PATTERNS.icons)
-    .pipe(iconfontCss({
-        fontName: 'django-cms-iconfont',
-        fontPath: '../../fonts/' + CMS_VERSION + '/',
-        path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-        targetPath: '../../sass/components/_iconography.scss'
-    }))
-    .pipe(iconfont({
-        fontName: 'django-cms-iconfont',
-        normalize: true
-    }))
-    .on('glyphs', function (glyphs, opts) {
-        gutil.log.bind(glyphs, opts);
-    })
-    .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
+gulp.task('icons', function() {
+    gulp
+        .src(PROJECT_PATTERNS.icons)
+        .pipe(
+            iconfontCss({
+                fontName: 'django-cms-iconfont',
+                fontPath: '../../fonts/' + CMS_VERSION + '/',
+                path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
+                targetPath: '../../sass/components/_iconography.scss'
+            })
+        )
+        .pipe(
+            iconfont({
+                fontName: 'django-cms-iconfont',
+                normalize: true
+            })
+        )
+        .on('glyphs', function(glyphs, opts) {
+            gutil.log.bind(glyphs, opts);
+        })
+        .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
 });
 
 gulp.task('lint', ['lint:javascript']);
-gulp.task('lint:javascript', function () {
+gulp.task('lint:javascript', function() {
     // DOCS: http://eslint.org
-    return gulp.src(PROJECT_PATTERNS.js)
+    return gulp
+        .src(PROJECT_PATTERNS.js)
         .pipe(gulpif(!process.env.CI, plumber()))
         .pipe(eslint())
         .pipe(eslint.format())
@@ -162,16 +168,19 @@ gulp.task('lint:javascript', function () {
 gulp.task('tests', ['tests:unit', 'tests:integration']);
 
 // gulp tests:unit --tests=cms.base,cms.modal
-gulp.task('tests:unit', function (done) {
-    var server = new KarmaServer({
-        configFile: PROJECT_PATH.tests + '/karma.conf.js',
-        singleRun: true
-    }, done);
+gulp.task('tests:unit', function(done) {
+    var server = new KarmaServer(
+        {
+            configFile: PROJECT_PATH.tests + '/karma.conf.js',
+            singleRun: true
+        },
+        done
+    );
 
     server.start();
 });
 
-gulp.task('tests:unit:watch', function () {
+gulp.task('tests:unit:watch', function() {
     var server = new KarmaServer({
         configFile: PROJECT_PATH.tests + '/karma.conf.js'
     });
@@ -180,27 +189,30 @@ gulp.task('tests:unit:watch', function () {
 });
 
 // gulp tests:integration [--clean] [--screenshots] [--tests=loginAdmin,toolbar]
-gulp.task('tests:integration', integrationTests({
-    tests: INTEGRATION_TESTS,
-    pathToTests: PROJECT_PATH.tests,
-    argv: argv,
-    dbPath: 'testdb.sqlite',
-    serverCommand: 'testserver.py',
-    logger: gutil.log.bind(gutil),
-    waitForMigrations: 20 // seconds
-}));
+gulp.task(
+    'tests:integration',
+    integrationTests({
+        tests: INTEGRATION_TESTS,
+        pathToTests: PROJECT_PATH.tests,
+        argv: argv,
+        dbPath: 'testdb.sqlite',
+        serverCommand: 'testserver.py',
+        logger: gutil.log.bind(gutil),
+        waitForMigrations: 5 // seconds
+    })
+);
 
-var webpackBundle = function (opts) {
+var webpackBundle = function(opts) {
     var webpackOptions = opts || {};
 
     webpackOptions.PROJECT_PATH = PROJECT_PATH;
     webpackOptions.debug = options.debug;
     webpackOptions.CMS_VERSION = CMS_VERSION;
 
-    return function (done) {
+    return function(done) {
         var config = require('./webpack.config')(webpackOptions);
 
-        webpack(config, function (err, stats) {
+        webpack(config, function(err, stats) {
             if (err) {
                 throw new gutil.PluginError('webpack', err);
             }
@@ -215,7 +227,7 @@ var webpackBundle = function (opts) {
 gulp.task('bundle:watch', webpackBundle({ watch: true }));
 gulp.task('bundle', webpackBundle());
 
-gulp.task('watch', function () {
+gulp.task('watch', function() {
     gulp.start('bundle:watch');
     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);

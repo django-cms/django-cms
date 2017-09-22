@@ -1,5 +1,6 @@
 // polyfills
 import './polyfills/function.prototype.bind';
+import './polyfills/domparser';
 import initHelpShortcuts from './modules/shortcuts';
 
 // jquery plugins

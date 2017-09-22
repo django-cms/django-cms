@@ -205,11 +205,10 @@ If specified tests require different servers they will be grouped to speed
 things up, so the order might not be the same as you specify in the argument.
 
 When running locally, it sometimes helps to visualise the tests output. For that
-you can install casper-summoner utility (``npm install -g casper-summoner``),
-and run the tests with additional ``--screenshots`` argument. It will create
-``screenshots`` folder with screenshots of almost every step of each test.
-Subsequent runs will override the existing files. Note that this is experimental
-and may change in the future.
+you can install `casperjs visual debugging utility <https://github.com/vxsx/casperjs-visual-debugging>`_,
+and run the tests with additional ``--visual`` argument. It will try to
+communicate with the server and display the progress of the test, which you then
+can also rewind.
 
 It might sometimes be useful not to restart the server when creating the tests,
 for that you can run ``python testserver.py`` with necessary arguments in one
