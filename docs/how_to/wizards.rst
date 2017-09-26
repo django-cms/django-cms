@@ -49,6 +49,11 @@ do this for ``MyApp``, it might look like this::
 
     wizard_pool.register(my_app_wizard)
 
+.. note::
+
+    if your model doesn't define a ``get_absolute_url`` function then your wizard
+    will require a ``get_success_url`` function.
+
 And you need a form::
 
     # my_apps/forms.py
