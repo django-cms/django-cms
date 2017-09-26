@@ -54,6 +54,8 @@ And you need a form::
     # my_apps/forms.py
 
     from django import forms
+    
+    from .models import MyApp    
 
     class MyAppWizardForm(forms.ModelForm):
         class Meta:
