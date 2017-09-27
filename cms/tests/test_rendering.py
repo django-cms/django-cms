@@ -330,8 +330,21 @@ class RenderingTestCase(CMSTestCase):
             request = self.get_request(endpoint, page=self.test_page)
             request.session['cms_edit'] = True
             request.toolbar = CMSToolbar(request)
-        r = self.render(self.test_page, template=t, request=request)
-        self.assertEqual(r, u'|No content')
+
+        renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context['cms_content_renderer'] = renderer
+        placeholder = self.test_page.placeholders.get(slot='empty')
+        expected = renderer.render_placeholder(
+            placeholder,
+            context=context,
+            language='en',
+            page=self.test_page,
+            editable=True,
+        )
+        expected = u'|{}No content'.format(expected)
+        rendered = self.render(self.test_page, template=t, request=request)
+        self.assertEqual(rendered, self.strip_rendered(expected))
 
     def test_render_placeholder_tag(self):
         """

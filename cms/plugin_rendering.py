@@ -402,7 +402,7 @@ class ContentRenderer(BaseRenderer):
             has_content = bool(content)
 
         if not has_content and nodelist:
-            return nodelist.render(context)
+            return content + nodelist.render(context)
         return content
 
     def render_static_placeholder(self, static_placeholder, context, nodelist=None):
