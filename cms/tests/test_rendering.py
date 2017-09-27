@@ -335,10 +335,12 @@ class RenderingTestCase(CMSTestCase):
         context = SekizaiContext()
         context['cms_content_renderer'] = renderer
         placeholder = self.test_page.placeholders.get(slot='empty')
-        expected = renderer.render_editable_placeholder(
+        expected = renderer.render_placeholder(
             placeholder,
             context=context,
             language='en',
+            page=self.test_page,
+            editable=True,
         )
         expected = u'|{}No content'.format(expected)
         rendered = self.render(self.test_page, template=t, request=request)
