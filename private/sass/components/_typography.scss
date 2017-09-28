@@ -4,7 +4,7 @@
 // Hrere are some additional type styles
 
 h4, .h4 {
-    font-weight: $h4-font-weight;
+    font-weight: $font-weight-med;
 }
 
 
@@ -12,6 +12,10 @@ body h6 {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
+}
+
+.is-breakable {
+  word-break: break-word;
 }
 
 // Desktop type

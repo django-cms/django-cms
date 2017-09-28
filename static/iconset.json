@@ -4,17 +4,20 @@
     "iconClass": "icon",
     "iconClassFix": "icon-",
     "icons": [
-        "info",
-        "notification",
-        "question",
+        "apple",
         "arrow-right",
         "chat",
         "check",
         "close",
-        "email",
         "download-icon",
+        "email",
+        "info",
+        "learn",
+        "linux",
         "menu",
+        "notification",
         "phone",
+        "question",
         "quote",
         "shield",
         "social-facebook",
@@ -22,9 +25,6 @@
         "social-gplus",
         "social-linkedin",
         "social-twitter",
-        "windows",
-        "apple",
-        "linux",
-        "learn"
+        "windows"
     ]
 }

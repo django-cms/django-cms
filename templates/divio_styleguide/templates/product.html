@@ -1,12 +1,94 @@
 {% extends "content.html" %} {% block breadcrumb %}{% endblock %} {% load i18n staticfiles cms_tags menu_tags %} {% block content %}
 <!-- PRODUCT PAGE TEMPLATE -->
 
+<header class="navbar navbar-expand-lg fixed-top navbar-light bg-light main-nav">
+    <a class="navbar-brand" href="{% url "pages-root" %}">
+        <span class="sr-only">{{ request.site.name }}</span>
+        <img src="{% static "img/logo-divio-black.svg" %}" width="90px" alt="{{ request.site.name }}" />
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="main-nav">
+        {% render_model_block request.current_page "changelist" %}
+            {% with dropdown="true" %}
+                <ul class="navbar-nav mx-auto">
+                  <li class="nav-item dropdown icon-dropdown">
+                   <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Products
+                     {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
+                   </a>
+                   <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                     <a class="dropdown-item" href="#">
+                       {% include "includes/icon.html" with icon="control" class="product-icon product-icon-shadow" title="Code" %}
+                        <span class="dropdown-desc">
+                          <b>Control</b><span class="dropdown-desc-more">Create, manage and deploy project with one easy to use tool.</span>
+                        </span></a>
+                     <a class="dropdown-item" href="#">
+                         {% include "includes/icon.html" with icon="code" class="product-icon product-icon-shadow" title="Code" %}
+                         <span class="dropdown-desc">
+                           <b>Code</b><span class="dropdown-desc-more">Get a complete developer environment that stays up-to-date.</span>
+                        </span>
+                    </a>
+                     <a class="dropdown-item" href="#">
+                        {% include "includes/icon.html" with icon="content" class="product-icon product-icon-shadow" title="Code" %}
+                        <span class="dropdown-desc">
+                          <b>Content</b><span class="dropdown-desc-more">Create digital experiences with Python &amp; Django, its easy, fast &amp; extensible.</span>
+                        </span></a>
+                     <a class="dropdown-item" href="#">
+                       {% include "includes/icon.html" with icon="cloud" class="product-icon product-icon-shadow" title="Code" %}
+                       <span class="dropdown-desc">
+                         <b>Cloud</b><span class="dropdown-desc-more">Run your web projects on our platform, managed by Django experts.</span>
+                       </span></a>
+                   </div>
+                 </li>
+                 <li class="nav-item dropdown icon-dropdown">
+                  <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     Agencies
+                    {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="#">
+                      {% include "includes/icon.html" with icon="agency" class="product-icon" title="Code" %}
+                       <span class="dropdown-desc">
+                         <b>Perfect for agencies</b><span class="dropdown-desc-more">Never worry about your hosting infrastructure again.</span>
+                       </span>
+                     </a>
+                    <a class="dropdown-item" href="#">
+                        {% include "includes/icon.html" with icon="find-agency" class="product-icon" title="Code" %}
+                        <span class="dropdown-desc">
+                          <b>Find an agency</b><span class="dropdown-desc-more">Some of the most experienced Django and Python agencies.</span>
+                       </span>
+                   </a>
+                    <a class="dropdown-item" href="#">
+                       {% include "includes/icon.html" with icon="bookmark" class="product-icon" title="Code" %}
+                       <span class="dropdown-desc">
+                         <b>Become a partner</b><span class="dropdown-desc-more">Our partnership programme gives access to additional services &amp; commission</span>
+                       </span>
+                     </a>
+                  </div>
+                </li>
+                  <li class="nav-item "><a class="nav-link" href="/">Enterprise</a></li>
+                  <li class="nav-item "><a class="nav-link" href="/">Pricing</a></li>
+
+                </ul>
+                <div class="nav-btnlinks">
+                  <a class="btn btn-line-primary nav-btn">Login</a>
+                  <a class="btn btn-primary nav-btn">Get started</a>
+               </div>
+            {% endwith %}
+        {% endrender_model_block %}
+    </div>
+</header>
+
+
 <!-- Hero -->
 <header class="hero hero-img-c stripe stripe-up stripe-gradient">
     <div class="stripe-element">
     </div>
     <div class="container align-items-baseline">
-        <img src="{% static "img/product/codeImage.png" %}" alt="" />
+        <img src="{% static "img/product/code-image.png" %}" alt="" />
     </div>
 </header>
 
@@ -18,8 +100,8 @@
 
             <p class="mb-1 mt-3 text-secondary">Get your local setup in minutes</p>
             <h1 class="display-1 mb-7">Code</h1>
-
-            <div class="row circle-wrap circle-wrap-arrows">
+<!-- circle-wrap-arrows -->
+            <div class="row circle-wrap circle-wrap-dots">
                 <div class="col-12 col-md-4">
                     {% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon='DOWNLOAD' circle_title='Download App' circle_desc='Develop with confidence, knowing that what works locally will also work in the cloud.' %}
                 </div>
@@ -39,6 +121,8 @@
 
 <!-- Features-->
 <div class="stripes-set">
+
+      <!-- Example list of 3 vertically aligned blocks -->
     <section class="stripe stripe-down stripe-twilight">
         <div class="stripe-element">
         </div>
@@ -62,52 +146,97 @@
         </div>
     </section>
 
+    <!-- Example list of many left blocks showing features -->
     <section class="stripe stripe-up stripe-night">
         <div class="stripe-element">
         </div>
         <div class="container">
             {% include "divio_styleguide/includes/section-title.html" with title='All features at a glance' sub_title='Secure &amp; performant infrastructure' %}
 
-
             <div class="row">
-                <div class="col-12 col-md-4 d-flex">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='Automated site monitoring' icon_type='windows' icon_color='white' block_link='Read more' block_desc='Built-in monitoring alerts our team to potential issues.' %}
                 </div>
 
-                <div class="col-12 col-md-4 d-flex">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='Role based access' icon_type='windows' icon_color='white' block_link='Read more' block_desc='Manage users and their roles in different projects, from administrators to clients and freelancers, all in a team-centred workflow.' %}
                 </div>
 
-                <div class="col-12 col-md-4 d-flex">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='Django Hosting' icon_type='windows' icon_color='white' block_desc='State-of-the-art hosting for django CMS, Wagtail and Oscar, with one-click updates and expertly-configured projects.'%}
                 </div>
-                <div class="col-12 col-md-4 d-flex">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='Automated site monitoring' block_icon='windows' icon_type='windows' icon_color='white' block_desc='Built-in monitoring alerts our team to potential issues, so they can be dealt with before they become problems.' %}
                 </div>
 
-                <div class="col-12 col-md-4 d-flex">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='Role based access' icon_type='windows' icon_color='white' block_desc='Manage users and their roles in different projects, from administrators to clients and freelancers, all in a team-centred workflow.' %}
                 </div>
 
-                <div class="col-12 col-md-4 d-flex">
+                <div class="col-12 col-md-6 col-lg-4 d-flex">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='Django Hosting' icon_type='windows' icon_color='white' block_desc='State-of-the-art hosting for django CMS, Wagtail and Oscar, with one-click updates and expertly-configured projects.' %}
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Example large left image with text -->
+    <section class="stripe stripe-down stripe-twilight">
+        <div class="stripe-element">
+        </div>
+        <div class="container">
+            <div class="row justify-content-md-center align-items-center">
+                <div class="col-12 col-md-6 col-lg-5">
+                    <img src="{% static "img/product/project-setup.png" %}" alt="" class="img-fluid" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-5">
+                    <h3>Setup your project in minutes</h3>
+                    <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                    <ul class="list-unstyled">
+                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Point &amp; click setup</p></li>
+                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Customise to your requirements</p></li>
+                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Out-of-the-box for performance and security</p></li>
+                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Pre-configured and optimised</p></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example large right image with text -->
+    <!-- Reorders so that image will be first for mobile but on right for > MD screens -->
+    <section class="stripe stripe-up stripe-night">
+        <div class="stripe-element">
+        </div>
+        <div class="container">
+          <div class="row justify-content-md-center align-items-center">
+            <div class="col-12 col-md-6 col-lg-5 order-1 order-md-2">
+                <img src="{% static "img/product/project-setup.png" %}" alt="" class="img-fluid" />
+            </div>
+            <div class="col-12 col-md-6 col-lg-5 order-2 order-md-1">
+                <h3>Setup your project in minutes</h3>
+                <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+            </div>
+          </div>
+        </div>
+    </section>
+
+
+    <!-- Example showing 1 left block with learn more -->
     <section class="stripe stripe-down stripe-twilight">
         <div class="stripe-element">
         </div>
         <div class="container">
             <div class="row justify-content-md-center">
-                <div class="col-12 col-md-5">
+                <div class="col-12 col-md-7 col-lg-5">
                     {% include "divio_styleguide/includes/block-left.html" with block_title='See how it works' block_link='Learn more' icon_type='learn' icon_color='white' block_desc='Indepth documentation and tutorials to guide you through all the aspects of Divio Code. Hit the ground running with your next project.' %}
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Product button links -->
     <section class="stripe stripe-up stripe-snow">
         <div class="stripe-element">
         </div>
@@ -117,115 +246,34 @@
 
             <div class="row justify-content-center no-gutters">
                     <div class="col-12 col-sm-6 col-md-5 col-lg-4 d-flex">
-                        {% include "divio_styleguide/includes/block-left.html" with block_title='Control' cls='block-btn bg-light' icon_type='control' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                        {% include "divio_styleguide/includes/block-left-button.html" with block_title='Control' cls='bg-light' icon_type='control' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-5 col-lg-4 d-flex">
-                        {% include "divio_styleguide/includes/block-left.html" with block_title='Content' cls='block-btn bg-light' icon_type='content' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                        {% include "divio_styleguide/includes/block-left-button.html" with block_title='Content' cls='bg-light' icon_type='content' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
                     </div>
               </div>
               <div class="row justify-content-center no-gutters">
                   <div class="col-12 col-sm-6 col-md-5 col-lg-4 d-flex">
-                      {% include "divio_styleguide/includes/block-left.html" with block_title='Cloud' cls='block-btn bg-light' icon_type='cloud' icon_class="product-icon product-icon-shadow block-left-icon"  block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                      {% include "divio_styleguide/includes/block-left-button.html" with block_title='Cloud' cls='bg-light' icon_type='cloud' icon_class="product-icon product-icon-shadow block-left-icon"  block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
                   </div>
 
                   <div class="col-12 col-sm-6 col-md-5 col-lg-4 ">
-                    {% include "divio_styleguide/includes/block-left.html" with block_title='Code' cls='block-btn bg-light' icon_type='code' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch drag &amp; drop CMS' %}
+                    {% include "divio_styleguide/includes/block-left-button.html" with block_title='Code' cls='bg-light' icon_type='code' icon_class="product-icon product-icon-shadow block-left-icon" block_desc='Start with a ready-to-launch' %}
                   </div>
               </div>
         </div>
     </section>
 
+    <!-- Final CTA -->
     <section class="stripe stripe-down stripe-white">
         <div class="stripe-element">
         </div>
         <div class="container text-center">
-            {% include "divio_styleguide/includes/section-title.html" with cls='' title='Get started in 3 minutes' sub_title='Sign up and deploy your website in the cloud in less than 3 minutes. Its free to try out, only pay when you run a live server.'%}
+            {% include "divio_styleguide/includes/section-title.html" with title='Get started in 3 minutes' sub_title='Sign up and deploy your website in the cloud in less than 3 minutes. Its free to try out, only pay when you run a live server.'%}
             <a href='' class="btn btn-primary">Get started for free {% include "includes/icon.html" with icon="arrow-right" color="white" %}</a>
-
-
         </div>
     </section>
 </div>
-
-
-<footer class="main-footer">
-  <div class="container">
-    <div class="row">
-      <div class="col-12 col-sm-12 col-md-3 pt-4 flex-last">
-        <a href="/"><img src="{% static "img/logo-divio-black.svg" %}" width="80px" alt="{{ request.site.name }}" /></a>
-        <p class="text-secondary mt-2">Your complete digital experience platform.</p>
-        <p class="h5">Keep up to date</p>
-        <ul class="list-unstyled list-inline footer-social">
-          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-          <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-        </ul>
-      </div>
-      <div class="col-12 col-sm-4 col-md-2  pt-4">
-          <ul class="list-unstyled footer-links">
-            <li><p class='h5'>Support</p></li>
-            <li><a href="" target="_blank">Support</a></li>
-            <li><a href="" target="_blank">Documentation</a></li>
-            <li><a href="" target="_blank">Academy</a></li>
-            <li><a href="" target="_blank">Status</a></li>
-          </ul>
-      </div>
-      <div class="col-12 col-sm-4 col-md-2  pt-4">
-        <ul class="list-unstyled footer-links">
-          <li><p class='h5'>Company</p></li>
-          <li><a href="" target="_blank">Partners</a></li>
-          <li><a href="" target="_blank">Customers</a></li>
-          <li><a href="" target="_blank">Press &amp; Media</a></li>
-          <li><a href="" target="_blank">Blog</a></li>
-          <li><a href="" target="_blank">About us</a></li>
-          <li><a href="" target="_blank">Careers</a></li>
-          <li><a href="" target="_blank">Contact</a></li>
-        </ul>
-      </div>
-      <div class="col-12 col-sm-4 col-md-2  pt-4">
-        <ul class="list-unstyled footer-links">
-          <li><p class='h5'>Legal</p></li>
-          <li><a href="" target="_blank">Privacy</a></li>
-          <li><a href="" target="_blank">Terms of Service</a></li>
-          <li><a href="" target="_blank">Security</a></li>
-          <li><a href="" target="_blank">Site Notice</a></li>
-        </ul>
-      </div>
-      <div class="col-12 col-sm-12 col-md-3 bg-light pt-4">
-        <p class="h5">Need help?</p>
-        <p>We’re here for you 24/7</p>
-          <div class="row pb-4">
-            <div class="col-6">
-              <p class="mb-0">USA</p>
-              <a href="">1231321</a>
-            </div>
-            <div class="col-6">
-              <p class="mb-0">Worldwide</p>
-              <a href="">1231321</a>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-              <p class="mb-0">Email</p>
-              <a href="mailto:help@divio.com">help@divio.com</a>
-            </div>
-            <div class="col-6">
-              <p class="mb-0">Chat</p>
-              <a href="">Start Chat</a>
-            </div>
-          </div>
-      </div>
-    </div>
-    <div class="row py-4">
-      <div class="col-12">
-        <p class="text-secondary mb-0"><small>This site is built with Django &amp; Powered by Divio Cloud</small></p>
-        <p class="text-secondary mb-0"><small>COPYRIGHT © 2001-2017 DIVIO AG. ALL RIGHTS RESERVED.</small></p>
-      </div>
-    </div>
-  </div>
-</footer>
 
 {% endblock %}

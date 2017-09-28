@@ -52,3 +52,8 @@ a:not(.btn) {
     margin: 5px auto 0;
   }
 }
+
+.btn-line-primary {
+  border:1px solid $azure;
+  color: $azure;
+}

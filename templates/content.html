@@ -26,6 +26,7 @@
             {% endrender_model_block %}
         </div>
     </header>
+  
     {% comment %}
     this is old, no need to touch it yet
     <header class="navbar navbar-head">
@@ -105,6 +106,105 @@
 {# end: content #}
 
 {% block footer %}
+
+<!-- Main footer -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="row d-flex">
+        <div class="col-12 col-sm-12 col-lg-3 pt-4 order-5 order-lg-1">
+          <a href="/"><img src="{% static "img/logo-divio-black.svg" %}" width="80px" alt="{{ request.site.name }}" /></a>
+          <p class="text-secondary mt-2">Your complete digital experience platform.</p>
+          <p class="h5">Keep up to date</p>
+          <ul class="list-unstyled list-inline footer-social">
+            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+          </ul>
+        </div>
+        <div class="col-12 col-sm-4 col-lg-2  pt-4 order-2">
+            <ul class="list-unstyled footer-links">
+              <li><p class='h5'>Support</p></li>
+              <li><a href="" target="_blank">Support</a></li>
+              <li><a href="" target="_blank">Documentation</a></li>
+              <li><a href="" target="_blank">Academy</a></li>
+              <li><a href="" target="_blank">Status</a></li>
+            </ul>
+        </div>
+        <div class="col-12 col-sm-4 col-lg-2  pt-4 order-3">
+          <ul class="list-unstyled footer-links">
+            <li><p class='h5'>Company</p></li>
+            <li><a href="" target="_blank">Partners</a></li>
+            <li><a href="" target="_blank">Customers</a></li>
+            <li><a href="" target="_blank">Press &amp; Media</a></li>
+            <li><a href="" target="_blank">Blog</a></li>
+            <li><a href="" target="_blank">About us</a></li>
+            <li><a href="" target="_blank">Careers</a></li>
+            <li><a href="" target="_blank">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col-12 col-sm-4 col-lg-2  pt-4 order-4">
+          <ul class="list-unstyled footer-links">
+            <li><p class='h5'>Legal</p></li>
+            <li><a href="" target="_blank">Privacy</a></li>
+            <li><a href="" target="_blank">Terms of Service</a></li>
+            <li><a href="" target="_blank">Security</a></li>
+            <li><a href="" target="_blank">Site Notice</a></li>
+          </ul>
+        </div>
+        <div class="col-12 col-sm-12 col-lg-3 bg-light p-4 order-1 order-lg-5 footer-help">
+          <p class="h5">Need help?</p>
+          <p>We’re here for you 24/7</p>
+            <div class="row">
+              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
+                <div class="pl-2 pl-xl-0">
+                  <p class="mb-0">USA</p>
+                  <a href="">1231321</a>
+                </div>
+              </div>
+              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
+                  <div class="pl-2 pl-xl-0">
+                    <p class="mb-0">Worldwide</p>
+                    <a href="">1231321</a>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                  {% include "includes/icon.html" with icon="email" class="d-xl-none" color="slate" %}
+                  <div class="pl-2 pl-xl-0">
+                    <p class="mb-0">Email</p>
+                    <a href="mailto:help@divio.com">help@divio.com</a>
+                  </div>
+              </div>
+              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                  {% include "includes/icon.html" with icon="chat" class="d-xl-none" color="slate" %}
+                  <div class="pl-2 pl-xl-0">
+                    <p class="mb-0">Chat</p>
+                    <a href="">Start Chat</a>
+                  </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 mt-4">
+                <a href="" class="btn btn-primary">I have an emergancy</a>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="row py-4">
+        <div class="col-12">
+          <p class="text-secondary mb-0"><small>This site is built with Django &amp; Powered by Divio Cloud</small></p>
+          <p class="text-secondary mb-0"><small>COPYRIGHT © 2001-2017 DIVIO AG. ALL RIGHTS RESERVED.</small></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<!--
     <footer class="footer" role="contentinfo">
         <h1 class="sr-only" id="page-footer">{% trans "Sitemap" %}</h1>
 
@@ -116,6 +216,6 @@
                 </ul>
             {% endrender_model_block %}
         </div>
-    </footer>
+    </footer>-->
 {% endblock footer %}
 {% endblock extend_root %}

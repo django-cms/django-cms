@@ -4,8 +4,8 @@
     <title>icon / menu</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="icon-/-menu" transform="translate(-1.000000, 0.000000)" fill="#43454C">
+    <g id="Symbols" stroke="none" stroke-width="1">
+        <g id="icon-/-menu" transform="translate(-1.000000, 0.000000)">
             <g transform="translate(0.500000, 0.000000)" id="Rectangle-15">
                 <rect x="0.5" y="0.36970404" width="20" height="2" rx="1"></rect>
                 <rect x="0.5" y="7" width="20" height="2" rx="1"></rect>

@@ -11,36 +11,150 @@
         display: none;
     }
 }
-// If arrows set
 
+.circle-bg {
+  display: flex;
+  flex-direction: row;
+  max-width: 350px;
+  margin: 0 auto 50px;
+  position: relative;
+
+  .circle-contents {
+    max-width: 250px;
+    text-align: left;
+    margin-left:20px;
+  }
+}
+//If dotted background set
+.circle-wrap-dots {
+  &::after {
+      content: '';
+      position: absolute;
+      width:80px;
+      height: auto;
+      top:50px;
+      bottom:20%;
+      left:20px;
+      background:radial-gradient(ellipse farthest-corner at center, rgba(255, 255, 255, 0) 0%, #FFFFFF 60%), url('/static/img/dots.png');
+      background-size:100%, 40px;
+      z-index: -1;
+      margin-left:0;
+    }
+}
+
+
+// If arrows set
 .circle-wrap-arrows {
     &::after {
         content: '';
-        border-top: 1px dotted $stone;
-        width: 60%;
-        height: 1px;
+        border-left: 1px dotted $stone;
+        width: 1px;
+        height: auto;
         position: absolute;
-        left: 20%;
-        right: 20%;
-        top: 45px;
+        top:70px;
+        bottom:20%;
+        left:60px;
+        margin-left:0;
         z-index: -1;
     }
 
     .circle-arrow {
         display: block;
         position: absolute;
-        top: 34px;
-        right: 0;
         background: white;
         padding: 3px;
         border-radius: 50px;
+        transform: rotate(90deg);
+        top: 80%;
+        left: 32px;
+        margin-top:20px;
     }
 }
+
 
 .circle-wrap-arrows > div:last-child {
     .circle-arrow {
         display: none;
     }
+}
+
+@media (min-width:370px) {
+.circle-wrap-arrows {
+  &::after {
+      top:50px;
+      bottom:100px;
+      left:50%;
+      margin-left:-130px;
+    }
+
+    .circle-arrow {
+        top: 110px;
+        left: 32px;
+        margin-top:0;
+    }
+  }
+}
+
+@media (min-width:450px) {
+    //If dotted background set
+    .circle-wrap-dots {
+      &::after {
+          top:50px;
+          bottom:20%;
+          left:50%;
+          margin-left:-170px;
+        }
+    }
+}
+
+@include media-breakpoint-up(md) {
+  .circle-bg {
+      max-width: 250px;
+      display: block;
+      position: static;
+
+        .circle-contents {
+          text-align: center;
+          margin-left:0;
+        }
+      }
+
+    .circle-icon {
+      width:90px;
+    }
+
+  .circle-wrap-arrows {
+      &::after {
+          border-left:0;
+          width:auto;
+          border-top: 1px dotted $stone;
+          height: 1px;
+          left: 150px;
+          right: 150px;
+          top: 45px;
+          margin-left: 0;
+      }
+
+      .circle-arrow {
+          top: 34px;
+          right: -10px;
+          left:auto;
+          transform: rotate(0deg);
+      }
+    }
+
+  //If dotted background set
+  .circle-wrap-dots {
+    &::after {
+        width:auto;
+        height: 100px;
+        top:0;
+        left:100px;
+        right:100px;
+        margin-left:0;
+      }
+    }
+
 }
 
 .circle-bg {
@@ -67,7 +181,7 @@
 }
 
 .circle-bg4 {
-    .circleIcon {
+    .circle-icon {
         background: $gradient4;
     }
 }
@@ -75,7 +189,7 @@
 .circle-icon {
     display: block;
     height: 90px;
-    width: 90px;
+    flex: 0 0 90px;
     margin: 0 auto;
     border-radius: 100px;
     display: flex;
@@ -91,11 +205,21 @@
         letter-spacing: 0.4px;
     }
 }
+
+
+
 //
 // Custom Blocks
 //Default
 .block {
     height: 100%;
+    .card-body{
+      padding: 10px;
+
+    .btn {
+        white-space: normal;
+      }
+    }
 
     .block-icon {
         width: 50px;
@@ -112,10 +236,6 @@
         height: 100%;
     }
 
-    .icon {
-        width: 50px;
-        height: 50px;
-    }
 
     .block-left-icon {
         width: 50px;
@@ -128,4 +248,20 @@
   padding:20px;
   margin:5px 5px 0 0;
   border-radius:$border-radius;
+  height:calc(100% - 5px);
+  text-decoration:none !important;
+
+  h3, p {
+    color:$night;
+    text-decoration:none !important;
+  }
+}
+
+
+
+//Setion title
+.section-title + button,
+.section-title + .btn {
+    margin-top:-30px;
+    margin-bottom: 40px;
 }

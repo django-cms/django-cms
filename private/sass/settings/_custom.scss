@@ -93,8 +93,9 @@ $font-family-sans-serif: "Museo Sans", -apple-system, BlinkMacSystemFont, "Segoe
 $font-family-monospace:  "Museo Sans", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 $font-family-base:       $font-family-sans-serif;
 
-$font-weight-light: 300;
+$font-weight-light: 500;
 $font-weight-normal: 500;
+$font-weight-med: 700;
 $font-weight-bold: 900;
 
 $line-height-base: 1.3;
@@ -148,6 +149,7 @@ $btn-box-shadow:                 none;
 $border-width:                   0;
 $border-color:                   transparent;
 
+$link-color:            $azure;
 
 //RADIO BUTTONS
 $custom-control-indicator-disabled-bg:       $gray-200;
