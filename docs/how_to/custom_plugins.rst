@@ -147,12 +147,11 @@ In ``cms_plugins.py``, you place your plugins. For our example, include the foll
     from cms.models.pluginmodel import CMSPlugin
     from django.utils.translation import ugettext_lazy as _
 
+    @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
         render_template = "hello_plugin.html"
         cache = False
-
-    plugin_pool.register_plugin(HelloPlugin)
 
 Now we're almost done. All that's left is to add the template. Add the
 following into the root template directory in a file called
@@ -259,6 +258,7 @@ Now we need to change our plugin definition to use this model, so our new
 
     from .models import Hello
 
+    @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
         model = Hello
         name = _("Hello Plugin")
@@ -268,8 +268,6 @@ Now we need to change our plugin definition to use this model, so our new
         def render(self, context, instance, placeholder):
             context = super(HelloPlugin, self).render(context, instance, placeholder)
             return context
-
-    plugin_pool.register_plugin(HelloPlugin)
 
 We changed the ``model`` attribute to point to our newly created ``Hello``
 model and pass the model instance to the context.
@@ -654,6 +652,7 @@ achieve this functionality:
 
     from .models import ParentPlugin, ChildPlugin
 
+    @plugin_pool.register_plugin
     class ParentCMSPlugin(CMSPluginBase):
         render_template = 'parent.html'
         name = 'Parent'
@@ -667,9 +666,8 @@ achieve this functionality:
             context = super(ParentCMSPlugin, self).render(context, instance, placeholder)
             return context
 
-    plugin_pool.register_plugin(ParentCMSPlugin)
 
-
+    @plugin_pool.register_plugin
     class ChildCMSPlugin(CMSPluginBase):
         render_template = 'child.html'
         name = 'Child'
@@ -682,8 +680,6 @@ achieve this functionality:
         def render(self, context, instance, placeholder):
             context = super(ChildCMSPlugin, self).render(context, instance, placeholder)
             return context
-
-    plugin_pool.register_plugin(ChildCMSPlugin)
 
 
 ``parent.html``:
