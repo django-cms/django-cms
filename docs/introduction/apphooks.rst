@@ -28,14 +28,13 @@ This is a very basic example of an apphook for a django CMS application:
     from django.utils.translation import ugettext_lazy as _
 
 
+    @apphook_pool.register  # register the application
     class PollsApphook(CMSApp):
         app_name = "polls"
         name = _("Polls Application")
 
         def get_urls(self, page=None, language=None, **kwargs):
             return ["polls.urls"]
-
-    apphook_pool.register(PollsApphook)  # register the application
 
 
 Instead of defining the URL patterns in another file ``polls/urls.py``, it also is possible
