@@ -57,3 +57,21 @@ a:not(.btn) {
   border:1px solid $azure;
   color: $azure;
 }
+
+
+// style guide button
+
+.btn-styleguide {
+  position: fixed;
+  bottom: 20px;
+  left:20px;
+  z-index: 1000;
+  background:$night;
+  display: flex;
+  padding: 10px;
+  border-radius:25px;
+  color:white;
+  align-items: center;
+  box-shadow: 0 5px 15px rgba(000, 000, 000, 0.2);
+  &:hover {color: white;}
+}

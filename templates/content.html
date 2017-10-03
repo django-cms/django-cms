@@ -7,26 +7,104 @@
 {% block extend_root %}
 {% block header %}
     {# DOCS: http://getbootstrap.com/components/#navbar #}
-    <header class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
-        <a class="navbar-brand" href="{% url "pages-root" %}">
-            <span class="sr-only">{{ request.site.name }}</span>
-            <img src="{% static "img/logo-divio-black.svg" %}" width="100px" alt="{{ request.site.name }}" />
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <!-- Can we remove this? -->
+  <!--
+    <header class="navbar navbar-expand-lg navbar-light mt-3">
+        <div class="container" id="navbarSupportedContent">
             {% render_model_block request.current_page "changelist" %}
                 {% with dropdown="true" %}
-                    <ul class="navbar-nav mx-auto">
+                    <ul class="navbar-nav mx-auto flex-row">
                         {% show_menu 0 1 100 100 'includes/navigation.html' %}
                     </ul>
                 {% endwith %}
             {% endrender_model_block %}
         </div>
     </header>
-  
+-->
+
+    <header class="navbar navbar-expand-lg fixed-top navbar-light bg-light main-nav">
+        <a class="navbar-brand" href="{% url "pages-root" %}">
+            <span class="sr-only">{{ request.site.name }}</span>
+            <img src="{% static "img/logo-divio-black.svg" %}" width="90px" alt="{{ request.site.name }}" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="main-nav">
+            {% render_model_block request.current_page "changelist" %}
+                {% with dropdown="true" %}
+                    <ul class="navbar-nav mx-auto">
+                      <li class="nav-item dropdown icon-dropdown">
+                       <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Products
+                         {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
+                       </a>
+                       <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                         <a class="dropdown-item" href="#">
+                           {% include "includes/icon.html" with icon="control" class="product-icon product-icon-shadow" title="Code" %}
+                            <span class="dropdown-desc">
+                              <b>Control</b><span class="dropdown-desc-more">Create, manage and deploy project with one easy to use tool.</span>
+                            </span></a>
+                         <a class="dropdown-item" href="#">
+                             {% include "includes/icon.html" with icon="code" class="product-icon product-icon-shadow" title="Code" %}
+                             <span class="dropdown-desc">
+                               <b>Code</b><span class="dropdown-desc-more">Get a complete developer environment that stays up-to-date.</span>
+                            </span>
+                        </a>
+                         <a class="dropdown-item" href="#">
+                            {% include "includes/icon.html" with icon="content" class="product-icon product-icon-shadow" title="Code" %}
+                            <span class="dropdown-desc">
+                              <b>Content</b><span class="dropdown-desc-more">Create digital experiences with Python &amp; Django, its easy, fast &amp; extensible.</span>
+                            </span></a>
+                         <a class="dropdown-item" href="#">
+                           {% include "includes/icon.html" with icon="cloud" class="product-icon product-icon-shadow" title="Code" %}
+                           <span class="dropdown-desc">
+                             <b>Cloud</b><span class="dropdown-desc-more">Run your web projects on our platform, managed by Django experts.</span>
+                           </span></a>
+                       </div>
+                     </li>
+                     <li class="nav-item dropdown icon-dropdown">
+                      <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                         Agencies
+                        {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">
+                          {% include "includes/icon.html" with icon="agency" class="product-icon" title="Code" %}
+                           <span class="dropdown-desc">
+                             <b>Perfect for agencies</b><span class="dropdown-desc-more">Never worry about your hosting infrastructure again.</span>
+                           </span>
+                         </a>
+                        <a class="dropdown-item" href="#">
+                            {% include "includes/icon.html" with icon="find-agency" class="product-icon" title="Code" %}
+                            <span class="dropdown-desc">
+                              <b>Find an agency</b><span class="dropdown-desc-more">Some of the most experienced Django and Python agencies.</span>
+                           </span>
+                       </a>
+                        <a class="dropdown-item" href="#">
+                           {% include "includes/icon.html" with icon="bookmark" class="product-icon" title="Code" %}
+                           <span class="dropdown-desc">
+                             <b>Become a partner</b><span class="dropdown-desc-more">Our partnership programme gives access to additional services &amp; commission</span>
+                           </span>
+                         </a>
+                      </div>
+                    </li>
+                      <li class="nav-item "><a class="nav-link" href="/">Enterprise</a></li>
+                      <li class="nav-item "><a class="nav-link" href="/">Pricing</a></li>
+
+                    </ul>
+                    <div class="nav-btnlinks">
+                      <a class="btn btn-line-primary nav-btn btn-sm">Login</a>
+                      <a class="btn btn-primary nav-btn btn-sm">Get started</a>
+                   </div>
+                {% endwith %}
+            {% endrender_model_block %}
+        </div>
+    </header>
+
+
     {% comment %}
     this is old, no need to touch it yet
     <header class="navbar navbar-head">
@@ -72,6 +150,8 @@
         {% endcomment %}
 {% endblock header %}
 
+<!-- Don't think we need this breadcrumb? -->
+<!--
 {# DOCS: http://getbootstrap.com/components/#breadcrumbs #}
 {% block breadcrumb %}
     {% if not request.current_page.is_home %}
@@ -87,6 +167,12 @@
         </nav>
     {% endif %}
 {% endblock breadcrumb %}
+-->
+
+
+{% if not request.current_page.is_home %}
+  <a href="/styleguide" class="btn-circle btn-styleguide">Styleguide</a>
+{% endif %}
 
 {# start: content #}
 <hr class="sr-only" id="page-content" />

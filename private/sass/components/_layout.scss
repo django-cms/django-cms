@@ -12,7 +12,7 @@ html {
     .nav-link {
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      font-size: 0.8rem;
+      font-size: 0.875rem;
       color:$night;
     }
     .dropdown-toggle::after {
@@ -23,7 +23,7 @@ html {
       transform: rotate(90deg);
       width:8px;
       height: 8px;
-      margin-top:3px;
+      margin-top:5px;
     }
 
     .dropdown-menu {
@@ -44,9 +44,16 @@ html {
       display: flex;
       flex-direction: row;
     }
-      .nav-btn {
+    .nav-btn {
         margin: 10px;
-      }
+        font-weight: normal;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+   .navbar-brand {
+     padding-top:0;
+   }
 }
 .show.icon-dropdown .dropdown-menu {
     max-height: 500px;
@@ -60,24 +67,24 @@ html {
       transition: all 0.3s;
       max-height: 0;
       display: block;
-      overflow: hidden;
       opacity: 0;
+      overflow: hidden;
 
       a {
           display: flex;
           flex-direction: row;
-          padding:15px;
           max-width:400px;
 
         .product-icon {
             width:3rem;
             height:3rem;
             flex:0 0 3rem;
+            margin:0;
         }
 
         .dropdown-desc {
           white-space:normal;
-          line-height: 1.2rem;
+          line-height:3rem;
           margin-left:1rem;
 
           b {
@@ -92,7 +99,82 @@ html {
     }
 }
 
+// Side menu for text based pages
+.side-menu {
+  text-align: left;
+  padding:0 20px;
+  width:100%;
+  max-width:400px;
+
+  .h5 {
+    text-align: center;
+  }
+
+  ul {
+    list-style-type: none;
+    padding:10px 0 0;
+
+    a {
+      color:$night;
+      margin:0 0 10px;
+      display: block;}
+  }
+
+  #side-menu-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .side-menu-toggler {
+    color:$azure;
+
+  }
+  .icon {
+    width: 0.8rem;
+    height: 0.8rem;
+    transform: rotate(-90deg);
+    margin-top: 3px;
+  }
+  .side-menu-title {display: none;}
+}
+
+.collapsed .icon { transform: rotate(90deg);}
+
 @include media-breakpoint-up(lg) {
+  .side-menu {
+    max-width:300px;
+    position: absolute;
+    top:100%;
+    left:0;
+    padding:20px;
+    text-align: left;
+
+      &::before {
+        content:'';
+        background:$snow;
+        left:0;
+        transform: skewY(-8deg) translate(0,0);
+        width: 100%;
+        height: calc(100% + 20px);
+        bottom:-20px;
+        transform-origin: 0;
+        position: absolute;
+        z-index: -1;
+      }
+
+      .h5 {
+        text-align: left;
+      }
+
+      .side-menu-title {
+        display: block;
+      }
+
+      .side-menu-toggler {
+        display: none;
+      }
+  }
+
   .icon-dropdown {
       .dropdown-menu {
         width:350px;
@@ -114,14 +196,27 @@ html {
         content: '';
       }
 
-          a  .dropdown-desc-more {display: block;}
-    }
+          a  {
+            padding:15px;
+
+            .dropdown-desc {
+              line-height:1.2rem;
+            }
+            .dropdown-desc-more {
+              display: block;
+            }
+        }
+      }
   }
 
   .navbar-light.main-nav {
       .navbar-nav {
-        padding: 20px;
+        padding: 0;
       }
+    }
+
+  .main-nav  .nav-btn {
+      margin:0 0 0 10px;
     }
 }
 //Footer

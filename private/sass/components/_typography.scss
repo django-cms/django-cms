@@ -18,6 +18,13 @@ body h6 {
   word-break: break-word;
 }
 
+// Add standard margins if block of text
+.text-block {
+  h3, .h3 {margin-top:3rem;}
+  h4, .h4 {margin-top:2rem;}
+  h3 + h4, .h3 + .h4 {margin-top:1rem;}
+}
+
 // Desktop type
 @include media-breakpoint-up(md) {
   body {

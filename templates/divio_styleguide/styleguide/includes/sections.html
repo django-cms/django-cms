@@ -1904,9 +1904,11 @@
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Circle Blocks</h3>
-            <p>Add class <code>circle-wrap-arrows</code> to parent to have dotted line &amp; arrow background</p>
+            <p>Add class <code>circle-wrap-arrows</code> to parent to have background with a line line &amp; arrows</p>
             <code>% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon=' ' circle_title=' ' circle_desc=' ' %</code>
             <p>Background color of circle can be set with <code>circle-bg1</code>, <code>circle-bg2</code> etc there are 4 and should be used in order</p>
+
+            <p>Add class <code>circle-wrap-dots</code> to parent to have a dotted background</p>
         </div>
         <div class="col-md-8 col-linebreak">
               <div class="row circle-wrap circle-wrap-arrows">
@@ -1917,8 +1919,16 @@
                   <div class="col-12 col-md-6">
                       {% include "divio_styleguide/includes/circles.html" with cls='circle-bg2' circle_icon='SETUP' circle_title='Setup Project' circle_desc='Our projects are pre-configured and optimised out-of-the-box for performance and security.' %}
                   </div>
+              </div>
+              <div class="row circle-wrap circle-wrap-dots">
+                  <div class="col-12 col-md-6">
+                      {% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon='DOWNLOAD' circle_title='Download App' circle_desc='Develop with confidence, knowing that what works locally will also work in the cloud.' %}
+                  </div>
 
-            </div>
+                  <div class="col-12 col-md-6">
+                      {% include "divio_styleguide/includes/circles.html" with cls='circle-bg2' circle_icon='SETUP' circle_title='Setup Project' circle_desc='Our projects are pre-configured and optimised out-of-the-box for performance and security.' %}
+                  </div>
+              </div>
         </div>
     </div>
 
@@ -1943,8 +1953,9 @@
     <div class="row my-5">
         <div class="col-md-4">
             <h3>Blocks Left Aligned</h3>
-            <p>Buttons &amp; icon are optional</p>
-            <code>"divio_styleguide/includes/block-left.html" </code>
+            <p>Buttons &amp; icon are optional
+            <code>"divio_styleguide/includes/block-left.html" </code></p>
+            <br/>
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="row">
@@ -1989,10 +2000,51 @@
                           {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
                         </div>
                     </section>
+                  </div>
+              </div>
+          </div>
+      </div>
 
+
+      <div class="row my-5">
+          <div class="col-md-4">
+              <h3>Big left image</h3>
+              <p></p>
+          </div>
+          <div class="col-md-8 col-linebreak">
+            <div class="row justify-content-md-center align-items-center">
+                <div class="col-12 col-md-6 col-lg-5">
+                    <img src="../static/img/product/project-setup.png" alt="" class="img-fluid" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-5">
+                    <h3>Setup your project in minutes</h3>
+                    <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                    <ul class="list-unstyled">
+                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Point &amp; click setup</p></li>
+                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Customise to your requirements</p></li>
+                    </ul>
+                </div>
+            </div>
+            </div>
         </div>
-    </div>
-    </div>
 
+        <div class="row my-5">
+            <div class="col-md-4">
+                <h3>Big right image</h3>
+                <p>Big right image reorders for mobile/desktop so that on mobile the image is before the text.</p>
+            </div>
+            <div class="col-md-8 col-linebreak">
+                <div class="row justify-content-md-center align-items-center">
+                  <div class="col-12 col-md-6 col-lg-5 order-1 order-md-2">
+                      <img src="../static/img/product/project-setup.png" alt="" class="img-fluid" />
+                  </div>
+                  <div class="col-12 col-md-6 col-lg-5 order-2 order-md-1">
+                      <h3>Setup your project in minutes</h3>
+                      <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                      <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                  </div>
+                </div>
+              </div>
+          </div>
 
 </section>

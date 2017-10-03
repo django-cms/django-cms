@@ -21,9 +21,10 @@
       height: 50px;
 }
 
-a:not(.btn):hover .icon, a.icon:not(.btn):hover {
-   use {  fill:darken($link-color, 15%);}
+a .icon {
+   use { fill: currentColor; }
 }
+
 //
 // Product icons
 // Gradients and shadow created with CSS not SVG

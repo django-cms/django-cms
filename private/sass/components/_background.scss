@@ -19,6 +19,15 @@
 }
 //
 // Hero with central text
+.hero-text-c {
+  .container {
+    min-height:55vh;
+    padding-top:8rem;
+    padding-bottom:12rem;
+    position: relative;
+  }
+}
+
 
 .stripe {
     position: relative;
@@ -49,6 +58,7 @@
 
 .stripes-set {
     width: 100%;
+    padding-bottom:4rem;
 
     > .stripe:last-child {
         //padding: 60px 0 0;
@@ -165,7 +175,7 @@
 // Hero
 @include media-breakpoint-up(sm) {
     .hero {
-        max-height: 70vh;
+      //  max-height: 70vh;
         height: 100%;
 
         img {
