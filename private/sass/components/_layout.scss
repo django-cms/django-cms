@@ -1,49 +1,67 @@
-/* stylelint-disable selector-max-type */
+ /* stylelint-disable selector-max-type */
 html {
     overflow-y: scroll;
     padding-top: 60px;
 }
 
-// Navigation bar {
-.navbar-light.main-nav {
-    background:white !important;
+.navbar-sticky {
+    background: white;
     box-shadow: 0 0 20px rgba(000,000, 000, 0.1);
+}
 
+// Navigation bar {
+.navbar-dark.main-nav {
     .nav-link {
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      font-size: 0.875rem;
-      color:$night;
-    }
-    .dropdown-toggle::after {
-      display:none;
+      color:white;
     }
 
-    .dropdown-arrow {
-      transform: rotate(90deg);
-      width:8px;
-      height: 8px;
-      margin-top:5px;
+    .icon.navbar-logo {
+      use {
+          fill: white;
+      }
     }
-
-    .dropdown-menu {
-        border:none;
-        padding: 0;
-    }
-
-    .navbar-nav {
-      padding: 20px;
-    }
-    .btn-primary {color: white ;}
-    .btn-line-primary {color: $azure;}
-
 }
 
 .main-nav {
-    .nav-btnlinks {
-      display: flex;
-      flex-direction: row;
+      background:transparent;
+
+    .icon.navbar-logo {
+      width: 90px;
+      height: 20px;
     }
+
+    .nav-link {
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        color:$night;
+
+            .dropdown-arrow {
+                transform: rotate(90deg);
+                width:8px;
+                height: 8px;
+            }
+    }
+
+    .icon.navbar-logo {
+          use {
+              fill: $night;
+          }
+    }
+
+    .dropdown-toggle::after {
+        display:none;
+    }
+
+    .navbar-nav {
+        padding: 20px;
+    }
+
+    .nav-btnlinks {
+        display: flex;
+        flex-direction: row;
+    }
+
     .nav-btn {
         margin: 10px;
         font-weight: normal;
@@ -51,9 +69,17 @@ html {
         letter-spacing: 0.5px;
     }
 
+   .dropdown-item {padding:0;}
+
+    .dropdown-menu {
+         border:none;
+         padding: 0;
+    }
+
    .navbar-brand {
      padding-top:0;
    }
+
 }
 .show.icon-dropdown .dropdown-menu {
     max-height: 500px;
@@ -68,7 +94,7 @@ html {
       max-height: 0;
       display: block;
       opacity: 0;
-      overflow: hidden;
+      overflow: visible;
 
       a {
           display: flex;
@@ -99,16 +125,57 @@ html {
     }
 }
 
-// Side menu for text based pages
-.side-menu {
+// SUB MENU
+.sub-menu {
   text-align: left;
-  padding:0 20px;
   width:100%;
   max-width:400px;
 
-  .h5 {
-    text-align: center;
+    .h5 {
+      text-align: center;
+    }
+
+  .sub-menu-toggler {
+      color:$azure;
+
+        .icon {
+          width: 0.8rem;
+          height: 0.8rem;
+          transform: rotate(-90deg);
+          margin-top: 3px;
+        }
   }
+
+  .collapsed .icon { transform: rotate(90deg);}
+
+}
+
+// Horizontal SUB MENU for pages like blog
+.sub-menu-horizontal {
+    ul {
+      list-style-type: none;
+      padding:10px 0 0;
+      justify-content: center;
+
+        a {
+            padding:0 10px;
+            margin:0 10px 10px;
+            display: block;
+            border-left:2px solid transparent;
+        }
+
+        .active {
+            border-left:2px solid $azure;
+            @extend .text-primary;
+        }
+    }
+
+}
+
+
+// SUB MENU vertically aligned like t&cs page
+.sub-menu-vertical {
+  padding:0 20px;
 
   ul {
     list-style-type: none;
@@ -117,31 +184,38 @@ html {
     a {
       color:$night;
       margin:0 0 10px;
-      display: block;}
+      display: block;
+    }
   }
 
-  #side-menu-content {
+  #sub-menu-content {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .side-menu-toggler {
-    color:$azure;
-
-  }
-  .icon {
-    width: 0.8rem;
-    height: 0.8rem;
-    transform: rotate(-90deg);
-    margin-top: 3px;
-  }
-  .side-menu-title {display: none;}
+  .sub-menu-title {display: none;}
 }
 
-.collapsed .icon { transform: rotate(90deg);}
 
 @include media-breakpoint-up(lg) {
-  .side-menu {
+  .sub-menu-horizontal {
+      max-width:100%;
+
+      ul {
+        a {
+          padding:0;
+          border-left:none;
+          border-bottom:2px solid transparent;
+        }
+
+        .active {
+          border-left:none;
+          border-bottom:2px solid $azure;
+        }
+    }
+
+    }
+  .sub-menu-vertical {
     max-width:300px;
     position: absolute;
     top:100%;
@@ -166,13 +240,13 @@ html {
         text-align: left;
       }
 
-      .side-menu-title {
+      .sub-menu-title {
         display: block;
       }
+  }
 
-      .side-menu-toggler {
-        display: none;
-      }
+  .sub-menu-toggler {
+      display: none;
   }
 
   .icon-dropdown {
@@ -182,6 +256,7 @@ html {
         margin-top: 10px;
         background:white;
         box-shadow: 0 0rem 1rem rgba(0, 0, 0, 0.175);
+        overflow: hidden;
 
       &::before {
         position: absolute;
@@ -209,20 +284,20 @@ html {
       }
   }
 
-  .navbar-light.main-nav {
+  .main-nav {
       .navbar-nav {
         padding: 0;
       }
-    }
-
-  .main-nav  .nav-btn {
-      margin:0 0 0 10px;
+      .nav-btn {
+          margin:0 0 0 10px;
+        }
     }
 }
 //Footer
 
 .main-footer {
   padding: 1rem;
+  background:white;
 
     .footer-social {
         li {

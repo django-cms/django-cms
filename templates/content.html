@@ -23,10 +23,10 @@
     </header>
 -->
 
-    <header class="navbar navbar-expand-lg fixed-top navbar-light bg-light main-nav">
+    <header class="navbar navbar-expand-lg fixed-top {% block navbar_class %}{% endblock %} main-nav">
         <a class="navbar-brand" href="{% url "pages-root" %}">
             <span class="sr-only">{{ request.site.name }}</span>
-            <img src="{% static "img/logo-divio-black.svg" %}" width="90px" alt="{{ request.site.name }}" />
+            {% include "includes/icon.html" with icon="divio" class="navbar-logo" title="{{ request.site.name }}" %}
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -96,8 +96,8 @@
 
                     </ul>
                     <div class="nav-btnlinks">
-                      <a class="btn btn-line-primary nav-btn btn-sm">Login</a>
-                      <a class="btn btn-primary nav-btn btn-sm">Get started</a>
+                      <button class="btn btn-outline-primary nav-btn btn-sm">Login</button>
+                      <button class="btn btn-primary nav-btn btn-sm">Get started</button>
                    </div>
                 {% endwith %}
             {% endrender_model_block %}
@@ -170,9 +170,7 @@
 -->
 
 
-{% if not request.current_page.is_home %}
-  <a href="/styleguide" class="btn-circle btn-styleguide">Styleguide</a>
-{% endif %}
+<a href="/styleguide" class="btn-circle btn-styleguide">Styleguide</a>
 
 {# start: content #}
 <hr class="sr-only" id="page-content" />

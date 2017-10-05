@@ -1,0 +1,20 @@
+<div class="col-12 article-tile-long">
+    <div class="row">
+        <div class="article-tile-wrap">
+          {% if article_img %}
+            <div class="col-12 col-sm-6 col-lg-8 article-tile-img">
+                <img class="img-fluid" src="{{ article_img }}"/>
+            </div>
+          {% endif %}
+
+            <div class="col-12 col-sm-6 col-lg-4 article-tile-content">
+              <h3>{{ title }}</h3>
+              <p>{{ desc }}</p>
+              <div class="author">
+                  <img src="{{ author_img }}" alt="Written by Daniele Procida" class="rounded-circle img-fluid"/>
+                  <a href="">{{ author_name }}</a>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
