@@ -808,13 +808,13 @@ var Plugin = new Class({
     },
 
     /**
-     * Destroys the current plugin instance removing DOM elements
-     * and plugin specific (global) events
+     * Destroys the current plugin instance removing only the DOM listeners
      *
      * @method destroy
+     * @param {Boolean} mustCleanup - if true it will remove also the plugin UI components from the DOM
      * @returns {void}
      */
-    destroy() {
+    destroy(mustCleanup) {
         // close the plugin modal if it was open
         // TODO: shouldn't the modal be destroyed as well at this point?
         if (this.modal) {
@@ -823,14 +823,33 @@ var Plugin = new Class({
             this.modal.off();
         }
 
+        if (mustCleanup) {
+            this.cleanup();
+        }
+
+        // remove event bound to global elements like document or window
+        $document.off(`.${ this.uid }`);
+        $window.off(`.${ this.uid }`);
+
+        // TODO: It would be better to return something at this point
+        // but we don't do it anywhere so let's keep it void for now
+        // return this;
+    },
+
+    /**
+     * Remove the plugin specific ui elements from the DOM
+     *
+     * @method cleanup
+     * @returns {void}
+     */
+    cleanup() {
         // remove all the plugin UI DOM elements
         // notice that $.remove will remove also all the ui specific events
         // previously attached to them
         Object.keys(this.ui).forEach(el => this.ui[el].remove());
 
-        // remove event bound to global elements like document or window
-        $document.off(`.${ this.uid }`);
-        $window.off(`.${ this.uid }`);
+        // TODO: see above
+        // return this;
     },
 
     /**

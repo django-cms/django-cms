@@ -35,6 +35,7 @@ describe('CMS.Plugin', function() {
         expect(CMS.Plugin.prototype.movePlugin).toEqual(jasmine.any(Function));
         expect(CMS.Plugin.prototype.deletePlugin).toEqual(jasmine.any(Function));
         expect(CMS.Plugin.prototype.destroy).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.cleanup).toEqual(jasmine.any(Function));
         expect(CMS.Plugin.prototype.editPluginPostAjax).toEqual(jasmine.any(Function));
     });
 
@@ -1432,7 +1433,7 @@ describe('CMS.Plugin', function() {
         });
 
         it('removes all the plugin markup', function() {
-            plugin.destroy();
+            plugin.destroy(true);
             expect($('.cms-plugin-1').length).toBe(0);
         });
 
@@ -1443,6 +1444,44 @@ describe('CMS.Plugin', function() {
 
             plugin.destroy();
             CMS.API.Helpers.$document.trigger(plugin._getNamepacedEvent(Plugin.click));
+        });
+    });
+
+    describe('.cleanup()', function() {
+        var plugin;
+
+        beforeEach(function(done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function() {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('removes all the plugin markup', function() {
+            plugin.cleanup();
+            expect($('.cms-plugin-1').length).toBe(0);
         });
     });
 
