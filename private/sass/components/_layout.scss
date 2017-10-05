@@ -1,7 +1,7 @@
  /* stylelint-disable selector-max-type */
 html {
     overflow-y: scroll;
-    padding-top: 60px;
+    //padding-top:60px;
 }
 
 .navbar-sticky {
@@ -11,19 +11,20 @@ html {
 
 // Navigation bar {
 .navbar-dark.main-nav {
-    .nav-link {
+    .nav-link, .dropdown-menu a .dropdown-desc b {
       color:white;
     }
 
-    .icon.navbar-logo {
+    .icon.navbar-logo, .navbar-toggler-icon {
       use {
           fill: white;
       }
     }
 }
 
+
 .main-nav {
-      background:transparent;
+    background:white;
 
     .icon.navbar-logo {
       width: 90px;
@@ -79,8 +80,20 @@ html {
    .navbar-brand {
      padding-top:0;
    }
+   .navbar-toggler {
+     padding: 2px;
+   }
+
+   .navbar-toggler-icon {
+     background-image:none !important;
+
+     .icon {
+       margin-top: 5px;
+     }
+   }
 
 }
+
 .show.icon-dropdown .dropdown-menu {
     max-height: 500px;
     opacity: 1;
@@ -292,6 +305,12 @@ html {
           margin:0 0 0 10px;
         }
     }
+
+    .navbar-dark.main-nav {
+        .dropdown-menu a .dropdown-desc b {
+          color:$night;
+        }
+      }
 }
 //Footer
 

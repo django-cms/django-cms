@@ -23,13 +23,13 @@
     </header>
 -->
 
-    <header class="navbar navbar-expand-lg fixed-top {% block navbar_class %}{% endblock %} main-nav">
+    <header class="navbar navbar-expand-lg {% block navbar_class %}{% endblock %} main-nav">
         <a class="navbar-brand" href="{% url "pages-root" %}">
             <span class="sr-only">{{ request.site.name }}</span>
             {% include "includes/icon.html" with icon="divio" class="navbar-logo" title="{{ request.site.name }}" %}
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon">{% include "includes/icon.html" with icon="menu" %}</span>
         </button>
 
         <div class="collapse navbar-collapse" id="main-nav">
