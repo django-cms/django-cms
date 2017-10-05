@@ -811,10 +811,10 @@ var Plugin = new Class({
      * Destroys the current plugin instance removing only the DOM listeners
      *
      * @method destroy
-     * @param {Boolean} mustCleanup - if true it will remove also the plugin UI components from the DOM
+     * @param {Boolean} options.mustCleanup - if true it will remove also the plugin UI components from the DOM
      * @returns {void}
      */
-    destroy(mustCleanup) {
+    destroy({ mustCleanup }) {
         // close the plugin modal if it was open
         // TODO: shouldn't the modal be destroyed as well at this point?
         if (this.modal) {

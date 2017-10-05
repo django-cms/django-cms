@@ -1433,7 +1433,7 @@ describe('CMS.Plugin', function() {
         });
 
         it('removes all the plugin markup', function() {
-            plugin.destroy(true);
+            plugin.destroy({ mustCleanup: true });
             expect($('.cms-plugin-1').length).toBe(0);
         });
 
