@@ -315,23 +315,23 @@ var Plugin = new Class({
         this.ui.container
             .off('mouseover.cms.plugins')
             .on('mouseover.cms.plugins', e => {
-                e.stopPropagation();
                 if (!doc.data('expandmode')) {
                     return;
                 }
                 if (CMS.settings.mode !== 'structure') {
                     return;
                 }
+                e.stopPropagation();
                 $('.cms-dragitem-success').remove();
                 $('.cms-draggable-success').removeClass('cms-draggable-success');
                 CMS.API.StructureBoard._showAndHighlightPlugin(0, true); // eslint-disable-line no-magic-numbers
             })
             .off('mouseout.cms.plugins')
             .on('mouseout.cms.plugins', e => {
-                e.stopPropagation();
                 if (CMS.settings.mode !== 'structure') {
                     return;
                 }
+                e.stopPropagation();
                 if (this.ui.draggable && this.ui.draggable.length) {
                     this.ui.draggable.find('.cms-dragitem-success').remove();
                     this.ui.draggable.removeClass('cms-draggable-success');
@@ -1948,6 +1948,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     doc.on(`${Plugin.pointerOverAndOut} ${Plugin.touchStart}`, '.cms-plugin', function(e) {
         // required for both, click and touch
         // otherwise propagation won't work to the nested plugin
+
         e.stopPropagation();
         const pluginContainer = $(e.target).closest('.cms-plugin');
         const allOptions = pluginContainer.data('cms');
