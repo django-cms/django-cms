@@ -25,6 +25,21 @@ var _ns = function nameSpaceEvent(events) {
         .join(' ');
 };
 
+// Handy shortcut to cache the window and the document objects
+// in a jquery wrapper
+export const $window = $(window);
+export const $document = $(document);
+
+/**
+ * Creates always an unique identifier if called
+ * @returns {Number} incremental numbers starting from 0
+ */
+export const uid = (function() {
+    let i = 0;
+
+    return () => ++i;
+})();
+
 /**
  * Provides various helpers that are mixed in all CMS classes.
  *
@@ -42,6 +57,12 @@ export const Helpers = {
      * @private
      */
     _isReloading: false,
+
+    // aliasing the $window and the $document objects
+    $window,
+    $document,
+
+    uid,
 
     once,
     debounce,

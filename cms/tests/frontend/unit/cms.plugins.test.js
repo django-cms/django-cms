@@ -34,6 +34,8 @@ describe('CMS.Plugin', function() {
         expect(CMS.Plugin.prototype.pastePlugin).toEqual(jasmine.any(Function));
         expect(CMS.Plugin.prototype.movePlugin).toEqual(jasmine.any(Function));
         expect(CMS.Plugin.prototype.deletePlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.destroy).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.cleanup).toEqual(jasmine.any(Function));
         expect(CMS.Plugin.prototype.editPluginPostAjax).toEqual(jasmine.any(Function));
     });
 
@@ -1398,6 +1400,91 @@ describe('CMS.Plugin', function() {
         });
     });
 
+    describe('.destroy()', function() {
+        var plugin;
+
+        beforeEach(function(done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function() {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('removes all the plugin markup', function() {
+            plugin.destroy({ mustCleanup: true });
+            expect($('.cms-plugin-1').length).toBe(0);
+        });
+
+        it('removes all the plugin events', function() {
+            CMS.API.Helpers.$document.on(plugin._getNamepacedEvent(Plugin.click), function() {
+                throw new Error('This event should never be triggered');
+            });
+
+            plugin.destroy();
+            CMS.API.Helpers.$document.trigger(plugin._getNamepacedEvent(Plugin.click));
+        });
+    });
+
+    describe('.cleanup()', function() {
+        var plugin;
+
+        beforeEach(function(done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function() {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('removes all the plugin markup', function() {
+            plugin.cleanup();
+            expect($('.cms-plugin-1').length).toBe(0);
+        });
+    });
+
     describe('.editPluginPostAjax()', function() {
         var plugin;
 
@@ -1780,22 +1867,22 @@ describe('CMS.Plugin', function() {
         });
 
         afterEach(function() {
-            $(document).off(Plugin.keyDown + '.traverse');
+            $(document).off('.traverse');
             fixture.cleanup();
         });
 
         it('returns if there is no plugin picker in the modal', function() {
             expect(plugin._setupKeyboardTraversing()).toEqual(undefined);
-            expect($(document)).not.toHandle(Plugin.keyDown + '.traverse');
+            expect($(document)).not.toHandle(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'));
         });
 
         it('unbinds old traversing keydown events', function() {
             $(fixture.el).append('<div class="cms-modal-markup"></div>');
             plugin.ui.dragitem.find('.cms-plugin-picker').appendTo('.cms-modal-markup');
             var spy = jasmine.createSpy();
-            $(document).on(Plugin.keyDown + '.traverse', spy);
+            $(document).on(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'), spy);
             plugin._setupKeyboardTraversing();
-            $(document).trigger(Plugin.keyDown + '.traverse');
+            $(document).trigger(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'));
             expect(spy).not.toHaveBeenCalled();
         });
 
@@ -1804,16 +1891,16 @@ describe('CMS.Plugin', function() {
             plugin.ui.dragitem.find('.cms-plugin-picker').show().appendTo('.cms-modal-markup');
             plugin._setupKeyboardTraversing();
 
-            var down = new $.Event(Plugin.keyDown + '.traverse', {
+            var down = new $.Event(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'), {
                 keyCode: CMS.KEYS.DOWN
             });
-            var down1 = new $.Event(Plugin.keyDown + '.traverse', {
+            var down1 = new $.Event(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'), {
                 keyCode: CMS.KEYS.TAB
             });
-            var up = new $.Event(Plugin.keyDown + '.traverse', {
+            var up = new $.Event(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'), {
                 keyCode: CMS.KEYS.UP
             });
-            var up1 = new $.Event(Plugin.keyDown + '.traverse', {
+            var up1 = new $.Event(plugin._getNamepacedEvent(Plugin.keyDown, 'traverse'), {
                 keyCode: CMS.KEYS.TAB,
                 shiftKey: true
             });
@@ -2074,6 +2161,13 @@ describe('CMS.Plugin', function() {
             ]);
 
             expect($.grep).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe('_getNamepacedEvent', function() {
+        it('returns a valid namespaced string', function() {
+            expect(CMS.Plugin.prototype._getNamepacedEvent('click')).toEqual(jasmine.any(String));
+            expect(CMS.Plugin.prototype._getNamepacedEvent('click', 'traverse')).toMatch(/\.traverse/);
         });
     });
 

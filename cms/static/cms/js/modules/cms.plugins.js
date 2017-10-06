@@ -10,11 +10,9 @@ import nextUntil from './nextuntil';
 import { toPairs, isNaN, debounce, findIndex, find, uniqWith, once } from 'lodash';
 
 import Class from 'classjs';
-import { Helpers, KEYS } from './cms.base';
+import { Helpers, KEYS, $window, $document, uid } from './cms.base';
 import { filter as fuzzyFilter } from 'fuzzaldrin';
 
-var doc;
-const win = $(Helpers._getWindow());
 var clipboardDraggable;
 var path = window.location.pathname + window.location.search;
 
@@ -60,8 +58,14 @@ var Plugin = new Class({
         }
     },
 
+    // these properties will be filled later
+    modal: null,
+
     initialize: function initialize(container, options) {
         this.options = $.extend(true, {}, this.options, options);
+
+        // create an unique for this component to use it internally
+        this.uid = uid();
 
         this._setupUI(container);
         this._ensureData();
@@ -264,7 +268,7 @@ var Plugin = new Class({
             this.ui.dragitem
                 .on('mouseenter', e => {
                     e.stopPropagation();
-                    if (!doc.data('expandmode')) {
+                    if (!$document.data('expandmode')) {
                         return;
                     }
                     if (this.ui.draggable.find('> .cms-dragitem > .cms-plugin-disabled').length) {
@@ -312,10 +316,13 @@ var Plugin = new Class({
     },
 
     _setPluginContentEvents: function _setPluginContentEvents() {
+
+        const pluginDoubleClickEvent = this._getNamepacedEvent(Plugin.doubleClick);
+
         this.ui.container
             .off('mouseover.cms.plugins')
             .on('mouseover.cms.plugins', e => {
-                if (!doc.data('expandmode')) {
+                if (!$document.data('expandmode')) {
                     return;
                 }
                 if (CMS.settings.mode !== 'structure') {
@@ -340,10 +347,10 @@ var Plugin = new Class({
             });
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
-            doc
-                .off(Plugin.doubleClick, `.cms-plugin-${this.options.plugin_id}`)
+            $document
+                .off(pluginDoubleClickEvent, `.cms-plugin-${this.options.plugin_id}`)
                 .on(
-                    Plugin.doubleClick,
+                    pluginDoubleClickEvent,
                     `.cms-plugin-${this.options.plugin_id}`,
                     this._dblClickToEditHandler.bind(this)
                 );
@@ -801,6 +808,54 @@ var Plugin = new Class({
     },
 
     /**
+     * Destroys the current plugin instance removing only the DOM listeners
+     *
+     * @method destroy
+     * @param {Object}  options - destroy config options
+     * @param {Boolean} options.mustCleanup - if true it will remove also the plugin UI components from the DOM
+     * @returns {void}
+     */
+    destroy(options = {}) {
+        const mustCleanup = options.mustCleanup || false;
+
+        // close the plugin modal if it was open
+        // TODO: shouldn't the modal be destroyed as well at this point?
+        if (this.modal) {
+            this.modal.close();
+            // unsubscribe to all the modal events
+            this.modal.off();
+        }
+
+        if (mustCleanup) {
+            this.cleanup();
+        }
+
+        // remove event bound to global elements like document or window
+        $document.off(`.${ this.uid }`);
+        $window.off(`.${ this.uid }`);
+
+        // TODO: It would be better to return something at this point
+        // but we don't do it anywhere so let's keep it void for now
+        // return this;
+    },
+
+    /**
+     * Remove the plugin specific ui elements from the DOM
+     *
+     * @method cleanup
+     * @returns {void}
+     */
+    cleanup() {
+        // remove all the plugin UI DOM elements
+        // notice that $.remove will remove also all the ui specific events
+        // previously attached to them
+        Object.keys(this.ui).forEach(el => this.ui[el].remove());
+
+        // TODO: see above
+        // return this;
+    },
+
+    /**
      * Moves the plugin according to the place it should have in content mode.
      *
      * @method _setPosition
@@ -1051,7 +1106,7 @@ var Plugin = new Class({
         var duration = opts && opts.duration !== undefined ? opts.duration : DEFAULT_DURATION;
         var offset = opts && opts.offset !== undefined ? opts.offset : DEFAULT_OFFSET;
         var scrollable = el.offsetParent();
-        var scrollHeight = win.height();
+        var scrollHeight = $window.height();
         var scrollTop = scrollable.scrollTop();
         var elPosition = el.position().top;
         var elHeight = el.height();
@@ -1093,7 +1148,8 @@ var Plugin = new Class({
             var isPlaceholder = !dragItem.length;
             var childrenList;
 
-            modal = new Modal({
+            // make sure also the modal is available to this instance
+            this.modal = modal = new Modal({
                 minWidth: 400,
                 minHeight: 400
             });
@@ -1214,6 +1270,26 @@ var Plugin = new Class({
         }
 
         return plugins;
+    },
+
+    /**
+     * Returns a specific plugin namespaced event postfixing the plugin uid to it
+     * in order to properly manage it via jQuery $.on and $.off
+     * TODO: move this in cms.base.js
+     *
+     * @method _getNamepacedEvent
+     * @private
+     * @param {String} base - plugin event type
+     * @param {String} additionalNS - additional namespace (like '.traverse' for example)
+     * @returns {String} a specific plugin event
+     *
+     * @example
+     *
+     * plugin._getNamepacedEvent(Plugin.click); // 'click.cms.plugin.42'
+     * plugin._getNamepacedEvent(Plugin.keyDown, '.traverse'); // 'keydown.cms.plugin.traverse.42'
+     */
+    _getNamepacedEvent(base, additionalNS = '') {
+        return `${ base }${ additionalNS ? '.'.concat(additionalNS) : '' }.${ this.uid }`;
     },
 
     /**
@@ -1422,14 +1498,15 @@ var Plugin = new Class({
      */
     _setupKeyboardTraversing: function _setupKeyboardTraversing() {
         var dropdown = $('.cms-modal-markup .cms-plugin-picker');
+        const keyDownTraverseEvent = this._getNamepacedEvent(Plugin.keyDown, 'traverse');
 
         if (!dropdown.length) {
             return;
         }
         // add key events
-        doc.off(Plugin.keyDown + '.traverse');
+        $document.off(keyDownTraverseEvent);
         // istanbul ignore next: not really possible to reproduce focus state in unit tests
-        doc.on(Plugin.keyDown + '.traverse', function(e) {
+        $document.on(keyDownTraverseEvent, function(e) {
             var anchors = dropdown.find('.cms-submenu-item:visible a');
             var index = anchors.index(anchors.filter(':focus'));
 
@@ -1477,7 +1554,7 @@ var Plugin = new Class({
 
         // calculate dropdown positioning
         if (
-            win.height() + win.scrollTop() - nav.offset().top - dropdown.height() <= MIN_SCREEN_MARGIN &&
+            $window.height() + $window.scrollTop() - nav.offset().top - dropdown.height() <= MIN_SCREEN_MARGIN &&
             nav.offset().top - dropdown.height() >= 0
         ) {
             dropdown.removeClass('cms-submenu-dropdown-top').addClass('cms-submenu-dropdown-bottom');
@@ -1577,7 +1654,7 @@ var Plugin = new Class({
                 .find('> .cms-collapsable-container')
                 .addClass('cms-hidden');
 
-            if (doc.data('expandmode')) {
+            if ($document.data('expandmode')) {
                 items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                 if (!items.length) {
                     return false;
@@ -1598,7 +1675,7 @@ var Plugin = new Class({
                 .find('> .cms-collapsable-container')
                 .removeClass('cms-hidden');
 
-            if (doc.data('expandmode')) {
+            if ($document.data('expandmode')) {
                 items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                 if (!items.length) {
                     return false;
@@ -1614,7 +1691,7 @@ var Plugin = new Class({
         }
 
         // make sure structurboard gets updated after expanding
-        win.trigger('resize.sideframe');
+        $document.trigger('resize.sideframe');
 
         // save settings
         Helpers.setSettings(settings);
@@ -1788,6 +1865,7 @@ var Plugin = new Class({
     }
 });
 
+// TODO: It would be nicer to have them under a nested object like Plugin.events = {} IMHO
 Plugin.click = 'click.cms.plugin';
 Plugin.pointerUp = 'pointerup.cms.plugin';
 Plugin.pointerDown = 'pointerdown.cms.plugin';
@@ -1869,7 +1947,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     var timer;
     var clickCounter = 0;
 
-    doc = $(document);
     Plugin._updateClipboard();
 
     // Structureboard initialized too late
@@ -1889,7 +1966,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         }
     }, 0);
 
-    doc
+    $document
         .off(Plugin.pointerUp)
         .off(Plugin.keyDown)
         .off(Plugin.keyUp)
@@ -1902,7 +1979,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         })
         .on(Plugin.keyDown, function(e) {
             if (e.keyCode === KEYS.SHIFT) {
-                doc.data('expandmode', true);
+                $document.data('expandmode', true);
                 try {
                     $('.cms-plugin:hover').last().trigger('mouseenter');
                     $('.cms-dragitem:hover').last().trigger('mouseenter');
@@ -1911,7 +1988,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         })
         .on(Plugin.keyUp, function(e) {
             if (e.keyCode === KEYS.SHIFT) {
-                doc.data('expandmode', false);
+                $document.data('expandmode', false);
                 try {
                     $(':hover').trigger('mouseleave');
                 } catch (err) {}
@@ -1944,8 +2021,8 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     // have to delegate here because there might be plugins that
     // have their content replaced by something dynamic. in case that tool
     // copies the classes - double click to edit would still work
-    doc.on(Plugin.click, '.cms-plugin', Plugin._clickToHighlightHandler);
-    doc.on(`${Plugin.pointerOverAndOut} ${Plugin.touchStart}`, '.cms-plugin', function(e) {
+    $document.on(Plugin.click, '.cms-plugin', Plugin._clickToHighlightHandler);
+    $document.on(`${Plugin.pointerOverAndOut} ${Plugin.touchStart}`, '.cms-plugin', function(e) {
         // required for both, click and touch
         // otherwise propagation won't work to the nested plugin
 
@@ -1979,9 +2056,9 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
     });
 
-    $(window).on('blur.cms', () => {
+    $window.on('blur.cms', () => {
         // TODO should be called differently tbh
-        doc.data('expandmode', false);
+        $document.data('expandmode', false);
     });
 };
 
@@ -2105,7 +2182,7 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
     coordinates.width = Math.max(...positions.map(pos => pos.x2)) - coordinates.left;
     coordinates.height = Math.max(...positions.map(pos => pos.y2)) - coordinates.top - htmlMargin;
 
-    win.scrollTop(coordinates.top - win.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
+    $window.scrollTop(coordinates.top - $window.height() * OVERLAY_POSITION_TO_WINDOW_HEIGHT_RATIO);
 
     $(
         `
@@ -2159,6 +2236,9 @@ Plugin._initializeTree = function _initializeTree() {
     CMS._instances = CMS._plugins.map(function(args) {
         return new CMS.Plugin(args[0], args[1]);
     });
+
+    // return the cms plugin instances just created
+    return CMS._instances;
 };
 
 Plugin._updateClipboard = function _updateClipboard() {

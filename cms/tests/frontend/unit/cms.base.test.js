@@ -1,6 +1,6 @@
 'use strict';
 
-import CMS, { Helpers, KEYS } from '../../../static/cms/js/modules/cms.base';
+import CMS, { Helpers, KEYS, uid } from '../../../static/cms/js/modules/cms.base';
 var jQuery = require('jquery');
 var $ = jQuery;
 var Class = require('classjs');
@@ -38,7 +38,7 @@ describe('cms.base.js', function() {
         it('exists', function() {
             expect(CMS.API.Helpers).toEqual(jasmine.any(Object));
             // this expectation is here so no one ever forgets to add a test
-            expect(Object.keys(CMS.API.Helpers).length).toEqual(20);
+            expect(Object.keys(CMS.API.Helpers).length).toEqual(23);
         });
 
         describe('.reloadBrowser()', function() {
@@ -982,6 +982,16 @@ describe('cms.base.js', function() {
         describe('._getWindow()', function() {
             it('returns window', function() {
                 expect(CMS.API.Helpers._getWindow()).toEqual(window);
+            });
+        });
+
+        describe('.uid()', function() {
+            it('returns a number', function() {
+                expect(uid()).toEqual(jasmine.any(Number));
+            });
+
+            it('returns always different ids', function() {
+                expect(uid()).not.toBe(uid());
             });
         });
 
