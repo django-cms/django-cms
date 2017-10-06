@@ -46,7 +46,7 @@ descendant of the current active node.
 The fourth parameter, ``extra_active`` (default=100), specifies how
 many levels of descendants of the currently active node should be displayed.
 
-The fifth parameter,  ``namespace`` specifies the namespace of the menu. if empty will use all namespaces.
+The fifth parameter, ``namespace``, is currently not implemented.
 
 The sixth parameter ``root_id`` specifies the id of the root node.
 
@@ -337,7 +337,7 @@ Menu system classes and function
 
         * **auth_required** (*bool*) – is authentication required to access this page
         * **is_page** (*bool*) – Always True
-        * **navigation_extenders** (*list*) – navigation extenders connected to this node (including Apphooks)
+        * **navigation_extenders** (*list*) – navigation extenders connected to this node
         * **redirect_url** (*str*) – redirect URL of page (if any)
         * **reverse_id** (*str*) – unique identifier for the page
         * **soft_root** (*bool*) – whether page is a soft root
