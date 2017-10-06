@@ -443,6 +443,47 @@ describe('CMS.Plugin', function() {
         });
     });
 
+    describe('multiple instances of the same plugin', function() {
+        var plugin;
+        beforeEach(function(done) {
+            fixture.load('plugins_complex_markup.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+
+            $(function() {
+                plugin = new CMS.Plugin('cms-plugin-108', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+
+                done();
+            });
+        });
+
+        afterEach(function() {
+            fixture.cleanup();
+        });
+
+        it('handles it correctly', function() {
+            expect(plugin.ui.container.length).toEqual(2);
+        });
+    });
+
     describe('.addPlugin()', function() {
         var plugin;
         var modalConstructor = jasmine.createSpy();
