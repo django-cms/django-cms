@@ -118,39 +118,79 @@ var Plugin = new Class({
      * @param {String} container `cms-plugin-${id}`
      */
     _setupUI: function setupUI(container) {
-        var wrapper = $(`template.${container}`);
+        var wrapper = $(`.${container}`);
         var contents;
 
         // have to check for cms-plugin, there can be a case when there are multiple
-        // static placeholders, there could be multiple wrappers on same page
+        // static placeholders or plugins rendered twice, there could be multiple wrappers on same page
         if (wrapper.length > 1 && container.match(/cms-plugin/)) {
-            var templateStart = $('.cms-plugin-start.' + container);
-            var className = templateStart[0].className.replace('cms-plugin-start', '');
-
-            contents = $(nextUntil(templateStart[0], container));
-
-            wrapper.filter('template').remove();
-
-            contents.each(function(index, el) {
-                if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
-                    var element = $(el);
-
-                    element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
-                    contents[index] = element.parent()[0];
+            // so it's possible that multiple plugins (more often generics) are rendered
+            // in different places. e.g. page menu in the header and in the footer
+            // so first, we find all the template tags, then put them in a structure like this:
+            // [[start, end], [start, end]...]
+            //
+            // in case of plugins it means that it's aliased plugin or a plugin in a duplicated
+            // static placeholder (for whatever reason)
+            var contentWrappers = wrapper.toArray().reduce((wrappers, elem, index) => {
+                if (index === 0) {
+                    wrappers[0].push(elem);
+                    return wrappers;
                 }
-            });
 
-            // otherwise we don't really need text nodes or comment nodes
-            contents = contents.filter((i, el) => el.nodeType !== Node.TEXT_NODE && el.nodeType !== Node.COMMENT_NODE);
+                var lastWrapper = wrappers[wrappers.length - 1];
+                var lastItemInWrapper = lastWrapper[lastWrapper.length - 1];
 
-            // addClass iterates
-            contents.addClass('cms-plugin ' + className);
-        } else if (this.options.type !== 'plugin') {
-            contents = $(`.${container}`);
+                if ($(lastItemInWrapper).is('.cms-plugin-end')) {
+                    wrappers.push([elem]);
+                } else {
+                    lastWrapper.push(elem);
+                }
+
+                return wrappers;
+            }, [[]]);
+
+            // then we map that structure into an array of jquery collections
+            // from which we filter out empty ones
+            contents = contentWrappers
+                .map(items => {
+                    var templateStart = $(items[0]);
+                    var className = templateStart.attr('class').replace('cms-plugin-start', '');
+
+                    var itemContents = $(nextUntil(templateStart[0], container));
+
+                    $(items).filter('template').remove();
+
+                    itemContents.each((index, el) => {
+                        // if it's a non-space top-level text node - wrap it in `cms-plugin`
+                        if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
+                            var element = $(el);
+
+                            element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
+                            itemContents[index] = element.parent()[0];
+                        }
+                    });
+
+                    // otherwise we don't really need text nodes or comment nodes or empty text nodes
+                    itemContents = itemContents.filter(function () {
+                        return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
+                    });
+
+                    itemContents.addClass(`cms-plugin ${className}`);
+
+                    return itemContents;
+                })
+                .filter(v => v.length);
+
+            if (contents.length) {
+                // and then reduce it to one big collection
+                contents = contents.reduce((collection, items) => collection.add(items), $());
+            }
+        } else {
+            contents = wrapper;
         }
 
         // in clipboard can be non-existent
-        if (!contents || !contents.length) {
+        if (!contents.length) {
             contents = $('<div></div>');
         }
 
