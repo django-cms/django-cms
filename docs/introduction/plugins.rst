@@ -198,6 +198,7 @@ For our poll plugin, we're going to write the following plugin class:
     from django.utils.translation import ugettext as _
 
 
+    @plugin_pool.register_plugin  # register the plugin
     class PollPluginPublisher(CMSPluginBase):
         model = PollPluginModel  # model where plugin data are saved
         module = _("Polls")
@@ -207,8 +208,6 @@ For our poll plugin, we're going to write the following plugin class:
         def render(self, context, instance, placeholder):
             context.update({'instance': instance})
             return context
-
-    plugin_pool.register_plugin(PollPluginPublisher)  # register the plugin
 
 .. note::
 

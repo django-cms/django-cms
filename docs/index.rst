@@ -134,10 +134,24 @@ Software version requirements and release notes
 
 This document refers to version |release|.
 
-This release requires:
 
-* `Python`_ versions 2.7, 3.3, 3.4 or 3.5
-* `Django`_ versions 1.8.x, 1.9.x
+Django/Python compatibility table
+=================================
+
+===========  =========  =========  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===
+django CMS   Django                                      Python
+-----------  ------------------------------------------  ----------------------------
+\            1.4 & 1.5  1.6 & 1.7  1.8  1.9  1.10  1.11  2.6  2.7  3.3  3.4  3.5  3.6
+===========  =========  =========  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===
+3.0.18       ✓          ✓          ⨯    ⨯    ⨯     ⨯     ✓    ✓    ✓    ✓    ⨯    ⨯
+3.1.7        ⨯          ✓          ✓    ⨯    ⨯     ⨯     ✓    ✓    ✓    ✓    ⨯    ⨯
+3.2.0        ⨯          ✓          ✓    ⨯    ⨯     ⨯     ✓    ✓    ✓    ✓    ⨯    ⨯
+3.2.1-3.2.5  ⨯          ✓          ✓    ✓    ⨯     ⨯     ✓    ✓    ✓    ✓    ✓    ⨯
+3.3.0-3.4.1  ⨯          ⨯          ✓    ✓    ⨯     ⨯     ⨯    ✓    ✓    ✓    ✓    ⨯
+3.4.2-3.4.4  ⨯          ⨯          ✓    ✓    ✓     ⨯     ⨯    ✓    ✓    ✓    ✓    ⨯
+3.4.5        ⨯          ⨯          ✓    ✓    ✓     ✓     ⨯    ✓    ✓    ✓    ✓    ✓
+===========  =========  =========  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===
+
 
 .. _Python: https://www.python.org
 .. _Django: https://www.djangoproject.com
@@ -150,12 +164,9 @@ The :ref:`installation how-to guide <installation>` provides an overview of othe
 project.
 
 
-*****************
-Table of contents
-*****************
-
 .. toctree::
     :maxdepth: 2
+    :hidden:
 
     introduction/index
     how_to/index
@@ -164,11 +175,3 @@ Table of contents
     contributing/index
     upgrade/index
     user/index
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
