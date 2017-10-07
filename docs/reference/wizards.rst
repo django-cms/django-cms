@@ -88,7 +88,7 @@ the current page after the object is created.
 This method is called by the CMS with the parameter:
 
     :obj: The created object
-    :**kwargs: Arbitrary keyword arguments
+    :kwargs: Arbitrary keyword arguments
 
 
 get_weight
