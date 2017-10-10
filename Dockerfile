@@ -55,7 +55,7 @@ COPY . /app
 
 # <GULP>
 ENV GULP_MODE=production
-RUN gulp build; exit 0
+RUN gulp build
 # </GULP>
 
 # <STATIC>
