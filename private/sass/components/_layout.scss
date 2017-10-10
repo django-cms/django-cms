@@ -1,194 +1,6 @@
 /* stylelint-disable selector-max-type */
 html {
     overflow-y: scroll;
-
-    //padding-top:60px;
-}
-
-.navbar-sticky {
-    background: white;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-// Navigation bar {
-.navbar-dark.main-nav {
-    .nav-link,
-    .dropdown-menu a,
-    .dropdown-desc b {
-        color: white;
-    }
-
-    .icon.navbar-logo,
-    .navbar-toggler-icon {
-        use {
-            fill: white;
-        }
-    }
-}
-
-.main-nav {
-    background: white;
-
-    .icon.navbar-logo {
-        width: 90px;
-        height: 20px;
-    }
-
-    .nav-link {
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        font-size: 0.875rem;
-        color: $night;
-
-        @include media-breakpoint-up(lg) {
-            padding-left: 15px !important;
-            padding-right: 15px !important;
-        }
-
-        .dropdown-arrow {
-            transform: rotate(90deg);
-            width: 8px;
-            height: 8px;
-        }
-    }
-
-    // .nav-item {
-    //     &::before,
-    //     &::after {
-    //         position: absolute;
-    //         display: block;
-    //         width: 0;
-    //         height: 0;
-    //         left: 50%;
-    //         content: '';
-    //     }
-    //
-    //     &::before {
-    //         bottom: -10px;
-    //         margin-left: -21px;
-    //         border-right: 21px solid transparent;
-    //         border-left: 21px solid transparent;
-    //         border-bottom: 16px solid #eaeaea;
-    //     }
-    //
-    //     &::after {
-    //         bottom: -11px;
-    //         margin-left: -20px;
-    //         border-right: 20px solid transparent;
-    //         border-left: 20px solid transparent;
-    //         border-bottom: 15px solid #fff;
-    //     }
-    // }
-
-    .icon.navbar-logo {
-        use {
-            fill: $night;
-        }
-    }
-
-    .dropdown-toggle::after {
-        display: none;
-    }
-
-    .navbar-nav {
-        padding: 20px;
-    }
-
-    .nav-btnlinks {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .nav-btn {
-        margin: 10px;
-        font-weight: normal;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .dropdown-item {
-        padding: 0;
-    }
-
-    .dropdown-menu {
-        border: none;
-        padding: 0;
-    }
-
-    .navbar-brand {
-        padding-top: 0;
-    }
-
-    .navbar-toggler {
-        padding: 2px;
-    }
-
-    .navbar-toggler-icon {
-        background-image: none !important;
-
-        .icon {
-            margin-top: 5px;
-        }
-    }
-}
-
-.icon-dropdown {
-    .dropdown-menu {
-        display: block;
-        box-shadow: none;
-        background: transparent;
-        transition-property: max-height, padding, opacity;
-        transition-duration: 0.3s;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        @include media-breakpoint-down(lg) {
-            padding: 0 10px;
-            margin: 2px -10px;
-        }
-
-        .dropdown-item {
-            display: flex;
-            flex-direction: row;
-            max-width: 400px;
-
-            .product-icon {
-                width: 3rem;
-                height: 3rem;
-                flex: 0 0 3rem;
-                margin: 0;
-            }
-
-            .dropdown-desc {
-                white-space: normal;
-                line-height: 3rem;
-                margin-left: 1rem;
-
-                b {
-                    display: block;
-                    margin-bottom: 5px;
-                    font-weight: $font-weight-bold;
-                }
-            }
-
-            .dropdown-desc-more {
-                display: none;
-            }
-        }
-
-        .dropdown-item:hover,
-        .dropdown-item:focus {
-            background-color: transparent;
-        }
-    }
-}
-
-.show.icon-dropdown .dropdown-menu {
-    max-height: 999px;
-    opacity: 1;
-    @include media-breakpoint-down(lg) {
-        padding: 10px;
-    }
 }
 
 // SUB MENU
@@ -222,6 +34,7 @@ html {
     ul {
         list-style-type: none;
         padding: 10px 0 0;
+        margin-bottom: 0;
         justify-content: center;
 
         a {
@@ -229,6 +42,12 @@ html {
             margin: 0 10px 10px;
             display: block;
             border-left: 2px solid transparent;
+        }
+
+        li:last-child {
+            a {
+                margin-bottom: 0;
+            }
         }
 
         .active {
