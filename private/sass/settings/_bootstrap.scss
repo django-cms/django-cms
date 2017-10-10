@@ -75,43 +75,51 @@ $grays: (
   900: $gray-900
 );
 
-$blue:    #007bff;
+$blue:    #00BBFF;
+$azure:   #00BBFF;
 $indigo:  #6610f2;
 $purple:  #6f42c1;
 $pink:    #e83e8c;
 $red:     #dc3545;
 $orange:  #fd7e14;
 $yellow:  #ffc107;
-$green:   #28a745;
+$green:   #21C3A8;
 $teal:    #20c997;
 $cyan:    #17a2b8;
+$snow:    #EDF1F5;
+$stone:   #D4DCE5;
+$slate:   #8392A4;
+$twilight:#2D3146;
+$night:   #25293D;
 
 $colors: (
-  blue: $blue,
-  indigo: $indigo,
-  purple: $purple,
-  pink: $pink,
-  red: $red,
-  orange: $orange,
-  yellow: $yellow,
-  green: $green,
-  teal: $teal,
-  cyan: $cyan,
-  white: $white,
-  gray: $gray-600,
-  gray-dark: $gray-800
+    blue: $azure,
+    indigo: $indigo,
+    purple: $purple,
+    pink: $pink,
+    red: $red,
+    orange: $orange,
+    yellow: $yellow,
+    green: $green,
+    teal: $teal,
+    cyan: $cyan,
+    white: $white,
+    gray: $slate,
+    gray-dark: $twilight
 );
 
 $theme-colors: (
-  primary: $blue,
-  secondary: $gray-600,
-  success: $green,
-  info: $cyan,
-  warning: $yellow,
-  danger: $red,
-  light: $gray-100,
-  dark: $gray-800
+    primary: $azure,
+    secondary: $slate,
+    success: $green,
+    info:  $night,
+    warning: $yellow,
+    danger: $red,
+    light: $gray-100,
+    dark: $twilight,
+    darker: $night
 );
+
 
 // Set a specific jump point for requesting color jumps
 $theme-color-interval: 8%;
@@ -143,7 +151,9 @@ $spacers: (
   2: ($spacer * .5),
   3: $spacer,
   4: ($spacer * 1.5),
-  5: ($spacer * 3)
+  5: ($spacer * 3),
+  6: ($spacer * 5),
+  7: ($spacer * 7)
 );
 
 // This variable affects the `.h-*` and `.w-*` classes.
@@ -165,7 +175,7 @@ $body-color:    $gray-900;
 //
 // Style anchor elements.
 
-$link-color:            theme-color("primary");
+$link-color:            $azure;
 $link-decoration:       none;
 $link-hover-color:      darken($link-color, 15%);
 $link-hover-decoration: underline;
@@ -220,15 +230,15 @@ $grid-gutter-width: 30px;
 $line-height-lg:         1.5;
 $line-height-sm:         1.5;
 
-$border-width: 1px;
-$border-color: $gray-200;
+$border-width: 0;
+$border-color: transparent;
 
 $border-radius:          .25rem;
 $border-radius-lg:       .3rem;
 $border-radius-sm:       .2rem;
 
 $component-active-color: $white;
-$component-active-bg:    theme-color("primary");
+$component-active-bg:    $azure;
 
 $caret-width:            .3em;
 
@@ -241,43 +251,45 @@ $transition-collapse:    height .35s ease;
 //
 // Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-$font-family-monospace:  "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-family-sans-serif: "Museo Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-family-monospace:  "Museo Sans", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 $font-family-base:       $font-family-sans-serif;
 
 $font-size-base: 1rem; // Assumes the browser default, typically `16px`
 $font-size-lg:   1.25rem;
 $font-size-sm:   .875rem;
 
-$font-weight-light: 300;
-$font-weight-normal: normal;
-$font-weight-bold: bold;
+$font-weight-light: 500;
+$font-weight-normal: 500;
+$font-weight-bold: 900;
 
 $font-weight-base: $font-weight-normal;
 $line-height-base: 1.5;
 
-$h1-font-size: 2.5rem;
-$h2-font-size: 2rem;
-$h3-font-size: 1.75rem;
-$h4-font-size: 1.5rem;
-$h5-font-size: 1.25rem;
-$h6-font-size: 1rem;
+$h1-font-size: 1.7rem;
+$h2-font-size: 1.3rem;
+$h3-font-size: 1.2rem;
+$h4-font-size: 1.2rem;
+$h5-font-size: 1.125rem;
+$h6-font-size: 1.125rem;
+
 
 $headings-margin-bottom: ($spacer / 2);
 $headings-font-family:   inherit;
-$headings-font-weight:   500;
+$headings-font-weight:   900;
 $headings-line-height:   1.1;
 $headings-color:         inherit;
 
-$display1-size: 6rem;
-$display2-size: 5.5rem;
-$display3-size: 4.5rem;
-$display4-size: 3.5rem;
+$display1-size: 1.8rem;
+$display2-size: 1.6rem;
+$display3-size: 1.6rem;
+$display4-size: 1.6rem;
 
-$display1-weight:     300;
-$display2-weight:     300;
-$display3-weight:     300;
-$display4-weight:     300;
+$display1-weight:     900;
+$display2-weight:     900;
+$display3-weight:     900;
+$display4-weight:     900;
+
 $display-line-height: $headings-line-height;
 
 $lead-font-size:   1.25rem;
@@ -346,8 +358,8 @@ $input-btn-padding-y-lg:    .5rem;
 $input-btn-padding-x-lg:    1rem;
 $input-btn-line-height-lg:  1.5;
 
-$btn-font-weight:                $font-weight-normal;
-$btn-box-shadow:                 inset 0 1px 0 rgba($white,.15), 0 1px 1px rgba($black,.075);
+$btn-font-weight:                700;
+$btn-box-shadow:                 none;
 $btn-focus-box-shadow:           0 0 0 3px rgba(theme-color("primary"), .25);
 $btn-active-box-shadow:          inset 0 3px 5px rgba($black,.125);
 
@@ -426,19 +438,19 @@ $custom-control-indicator-disabled-bg:       $gray-200;
 $custom-control-description-disabled-color:  $gray-600;
 
 $custom-control-indicator-checked-color:      $white;
-$custom-control-indicator-checked-bg:         theme-color("primary");
+$custom-control-indicator-checked-bg:         $azure;
 $custom-control-indicator-checked-box-shadow: none;
 
-$custom-control-indicator-focus-box-shadow: 0 0 0 1px $body-bg, 0 0 0 3px theme-color("primary");
+$custom-control-indicator-focus-box-shadow: 0 0 0 1px $body-bg, 0 0 0 3px $azure;
 
 $custom-control-indicator-active-color:      $white;
-$custom-control-indicator-active-bg:         lighten(theme-color("primary"), 35%);
+$custom-control-indicator-active-bg:         lighten($azure, 35%);
 $custom-control-indicator-active-box-shadow: none;
 
 $custom-checkbox-indicator-border-radius: $border-radius;
 $custom-checkbox-indicator-icon-checked: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#{$custom-control-indicator-checked-color}' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E"), "#", "%23");
 
-$custom-checkbox-indicator-indeterminate-bg: theme-color("primary");
+$custom-checkbox-indicator-indeterminate-bg: $azure;
 $custom-checkbox-indicator-indeterminate-color: $custom-control-indicator-checked-color;
 $custom-checkbox-indicator-icon-indeterminate: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath stroke='#{$custom-checkbox-indicator-indeterminate-color}' d='M0 2h4'/%3E%3C/svg%3E"), "#", "%23");
 $custom-checkbox-indicator-indeterminate-box-shadow: none;
@@ -607,8 +619,8 @@ $pagination-hover-bg:                  $gray-200;
 $pagination-hover-border-color:        #ddd;
 
 $pagination-active-color:              $white;
-$pagination-active-bg:                 theme-color("primary");
-$pagination-active-border-color:       theme-color("primary");
+$pagination-active-bg:                 $azure;
+$pagination-active-border-color:       $azure;
 
 $pagination-disabled-color:            $gray-600;
 $pagination-disabled-bg:               $white;
@@ -627,10 +639,10 @@ $card-spacer-y:            .75rem;
 $card-spacer-x:            1.25rem;
 $card-border-width:        1px;
 $card-border-radius:       $border-radius;
-$card-border-color:        rgba($black,.125);
+$card-border-color:        transparent;
 $card-inner-border-radius: calc(#{$card-border-radius} - #{$card-border-width});
-$card-cap-bg:              rgba($black, .03);
-$card-bg:                  $white;
+$card-cap-bg:              transparent;
+$card-bg:                  transparent;
 
 $card-img-overlay-padding: 1.25rem;
 

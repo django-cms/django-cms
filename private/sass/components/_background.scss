@@ -135,25 +135,25 @@
 
 .stripe-up {
     .stripe-element {
-        transform: skewY(-8deg);
+        transform: skewY(-8deg) translateZ(0);
     }
 }
 
 .stripe-down {
     .stripe-element {
-        transform: skewY(8deg);
+        transform: skewY(8deg) translateZ(0);
     }
 }
 
 .stripe-up:not(.hero) {
     .stripe-element {
-        transform: skewY(-8deg) translate(0, 0);
+        transform: skewY(-8deg) translate3d(0, 0, 0);
     }
 }
 
 .stripe-down:not(.hero) {
     .stripe-element {
-        transform: skewY(8deg) translate(0, 0);
+        transform: skewY(8deg) translate3d(0, 0, 0);
     }
 }
 
