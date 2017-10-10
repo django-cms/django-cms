@@ -1,0 +1,34 @@
+.. _upgrade-to-3.4.5:
+
+###################
+3.4.5 release notes
+###################
+
+This version of django CMS is the first to introduce compatibility with Django 1.11, itself also a Long-Term Support release.
+
+*******************
+What's new in 3.4.5
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug where slug wouldn't be generated in the creation wizard
+* Fixed a bug where the add page endpoint rendered ``Change page`` as the html title.
+* Fixed an issue where non-staff users could request the wizard create endpoint.
+* Fixed an issue where the ``Edit page`` toolbar button wouldn't show on non-cms pages
+  with placeholders.
+* Fixed a bug where placeholder inheritance wouldn't work if the inherited placeholder
+  is cached in an ancestor page.
+* Fixed a regression where the code following a ``{% placeholder x or %}`` declaration,
+  was rendered before attempting to inherit content from parent pages.
+* Changed page/placeholder cache keys to use sha1 hash instead of md5 to be FIPS compliant.
+* Fixed a bug where the change of a slug would not propagate to all descendant pages
+* Fixed a ``ValueError`` raised when using ``ManifestStaticFilesStorage`` or similar for static files.
+  This only affects Django >= 1.10
+
+
+Improvements and new features
+=============================
+
+* Introduced Django 1.11 compatibility
