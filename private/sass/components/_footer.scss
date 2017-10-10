@@ -1,0 +1,52 @@
+/* stylelint-disable selector-max-type */
+//Footer
+.main-footer {
+    padding: 1rem;
+    background: white;
+
+    .footer-social {
+        li {
+            display: inline-block;
+
+            a {
+                padding: 5px;
+            }
+
+            .icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    }
+
+    .footer-help {
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .footer-links {
+        column-count: 2;
+
+        li:first-child {
+            column-span: all;
+        }
+
+        a {
+            color: $night;
+            line-height: 1.5rem;
+        }
+    }
+}
+
+@include media-breakpoint-up(sm) {
+    .main-footer {
+        border-top: 1px solid $snow;
+        padding-top: 2rem;
+
+        .footer-links {
+            column-count: auto;
+        }
+    }
+}
