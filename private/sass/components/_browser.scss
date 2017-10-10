@@ -4,7 +4,7 @@
 // this addon adds modified styles to the outdated browser script found
 // on outdatedbrowser.com we specifically added changes to class names and
 // removed id references to be more compliant
-/* stylelint-disable selector-no-type, selector-no-universal */
+/* stylelint-disable selector-max-type, selector-max-universal */
 
 $line-height-computed: $font-size-base * $line-height-base;
 .browser-outdated {

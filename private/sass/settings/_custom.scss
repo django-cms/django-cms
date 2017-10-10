@@ -3,6 +3,7 @@
 // this setting file is intended for additional variables not defined within the bootstrap default
 // feel free to create additional files if settings get cluttered
 // It also includes overrides for bootstrap variables
+// stylelint-disable color-hex-case, color-hex-length
 
 $speed-base: 200ms;
 
@@ -26,10 +27,6 @@ $z-layers: (
     "bottomless-pit": -9000
 );
 */
-
-
-
-
 
 //COLORS
 $blue:    #00BBFF;
@@ -60,36 +57,35 @@ $gradient-pale: radial-gradient(at 50% 180%, #DEE5EF 0%, #F9FBFD 60%);
 $gradient-blue: linear-gradient(212.31deg, #8834F8 0%, #00A3FF 100%);
 
 $colors: (
-  blue: $azure,
-  indigo: $indigo,
-  purple: $purple,
-  pink: $pink,
-  red: $red,
-  orange: $orange,
-  yellow: $yellow,
-  green: $green,
-  teal: $teal,
-  cyan: $cyan,
-  white: $white,
-  gray: $slate,
-  gray-dark: $twilight
+    blue: $azure,
+    indigo: $indigo,
+    purple: $purple,
+    pink: $pink,
+    red: $red,
+    orange: $orange,
+    yellow: $yellow,
+    green: $green,
+    teal: $teal,
+    cyan: $cyan,
+    white: $white,
+    gray: $slate,
+    gray-dark: $twilight
 );
 
 $theme-colors: (
-  primary: $azure,
-  secondary: $slate,
-  success: $green,
-  info:  $night,
-  warning: $yellow,
-  danger: $red,
-  light: $gray-100,
-  dark: $twilight,
-  darker: $night
+    primary: $azure,
+    secondary: $slate,
+    success: $green,
+    info:  $night,
+    warning: $yellow,
+    danger: $red,
+    light: $gray-100,
+    dark: $twilight,
+    darker: $night
 );
 
-
-//TYPOGRAPHY
-$font-family-sans-serif: "Museo Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" ;
+// TYPOGRAPHY
+$font-family-sans-serif: "Museo Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 $font-family-monospace:  "Museo Sans", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 $font-family-base:       $font-family-sans-serif;
 
@@ -107,7 +103,6 @@ $h3-font-size: 1.2rem;
 $h4-font-size: 1.2rem;
 $h5-font-size: 1.125rem;
 $h6-font-size: 1.125rem;
-
 
 $headings-font-family:   inherit;
 $headings-font-weight:   900;
@@ -172,34 +167,29 @@ $component-active-bg:                  $azure;
 $pagination-active-bg:                 $azure;
 $pagination-active-border-color:       $azure;
 
-
-
 // SPACING
 
 $spacer: 1rem;
 $spacers: (
-  0: 0,
-  1: ($spacer * .25),
-  2: ($spacer * .5),
-  3: $spacer,
-  4: ($spacer * 1.5),
-  5: ($spacer * 3),
-  6: ($spacer * 5),
-  7: ($spacer * 7)
+    0: 0,
+    1: ($spacer * 0.25),
+    2: ($spacer * 0.5),
+    3: $spacer,
+    4: ($spacer * 1.5),
+    5: ($spacer * 3),
+    6: ($spacer * 5),
+    7: ($spacer * 7)
 );
-
 
 $maxwidth: 100, 150, 200, 250, 300, 350, 400, 450, 550, 800, 1250;
 
 @each $i in $maxwidth {
-  .mw#{$i}{
-    max-width: #{$i}px;
-    display: block;
-    margin:0 auto;
-  }
+    .mw#{$i} {
+        max-width: #{$i}px;
+        display: block;
+        margin: 0 auto;
+    }
 }
-
-
 
 // CARD DEFAULT
 $card-border-color:        transparent;
