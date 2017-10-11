@@ -37,6 +37,7 @@ classes that extend ``cms.toolbar_base.CMSToolbar`` and are registered using :me
 The register function can be used as a decorator.
 
 These classes have four attributes:
+
 * ``toolbar`` (the toolbar object)
 * ``request`` (the current request)
 * ``is_current_app`` (a flag indicating whether the current request is handled by the same app as the function is in)
