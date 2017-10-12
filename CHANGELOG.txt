@@ -1,4 +1,4 @@
-=== 3.4.5 (unreleased) ===
+=== 3.4.5 (2017-10-12) ===
 
 * Introduced Django 1.11 compatibility
 * Fixed a bug where slug wouldn't be generated in the creation wizard
