@@ -32,7 +32,8 @@ class PlaceholderField(models.ForeignKey):
         return name, path, args, kwargs
 
     def _get_new_placeholder(self, instance):
-        return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), default_width=self.default_width)
+        return self.related_model.objects.create(
+            slot=self._get_placeholder_slot(instance), default_width=self.default_width)
 
     def _get_placeholder_slot(self, model_instance):
         from cms.utils.placeholder import validate_placeholder_name
