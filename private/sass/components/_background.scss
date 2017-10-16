@@ -64,6 +64,8 @@
     }
 
     > .stripe:last-child {
+        padding-bottom: 0;
+
         &::after {
             display: none;
         }
