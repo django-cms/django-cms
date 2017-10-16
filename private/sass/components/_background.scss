@@ -49,7 +49,6 @@
 // stripe background colors
 .stripes-set {
     width: 100%;
-    padding-bottom: 4rem;
 
     .stripe {
         &::after {
@@ -57,7 +56,7 @@
             height: 100%;
             display: block;
             position: absolute;
-            bottom: -35%;
+            bottom: -50%;
             left: 0;
             right: 0;
             z-index: -1;
@@ -65,8 +64,6 @@
     }
 
     > .stripe:last-child {
-        //padding: 60px 0 0;
-
         &::after {
             display: none;
         }
@@ -117,6 +114,16 @@
     }
 }
 
+.stripe-primary {
+    .stripe-element {
+        background: $blue;
+    }
+
+    &::after {
+        background: $blue;
+    }
+}
+
 .stripe-night,
 .stripe-twilight {
     h1,
@@ -137,29 +144,41 @@
     .stripe-element {
         transform: skewY(-8deg) translateZ(0);
     }
+
+    &.stripe-low-angle .stripe-element {
+        transform: skewY(-2deg) translateZ(0);
+    }
 }
 
 .stripe-down {
     .stripe-element {
         transform: skewY(8deg) translateZ(0);
     }
-}
 
-.stripe-up:not(.hero) {
-    .stripe-element {
-        transform: skewY(-8deg) translate3d(0, 0, 0);
+    &.stripe-low-angle .stripe-element {
+        transform: skewY(2deg) translateZ(0);
     }
 }
 
-.stripe-down:not(.hero) {
-    .stripe-element {
-        transform: skewY(8deg) translate3d(0, 0, 0);
-    }
-}
+// .stripe-up:not(.hero) {
+//     .stripe-element {
+//         transform: skewY(-8deg) translate3d(0, 0, 0);
+//     }
+// }
+//
+// .stripe-down:not(.hero) {
+//     .stripe-element {
+//         transform: skewY(8deg) translate3d(0, 0, 0);
+//     }
+// }
 
 .stripe:not(.hero) {
     margin-top: 100px;
-    padding: 50px 0 20px;
+    padding: 50px 0;
+
+    @include media-breakpoint-up(md) {
+        padding: 100px 0;
+    }
 
     .stripe-element {
         height: calc(100% + 100px);
@@ -168,7 +187,8 @@
     }
 
     .container {
-        padding: 40px 20px;
+        padding-top: 40px;
+        padding-bottom: 40px;
     }
 }
 
@@ -188,5 +208,11 @@
         img {
             max-height: 70vh;
         }
+    }
+}
+
+@each $name, $color in $colors {
+    .bg-#{$name} {
+        background-color: $color;
     }
 }
