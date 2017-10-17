@@ -114,7 +114,7 @@ html {
             content: '';
             background: $snow;
             left: 0;
-            transform: skewY(-8deg) translate(0, 0);
+            transform: skewY(-2deg) translate3d(0, 0, 0);
             width: 100%;
             height: calc(100% + 20px);
             bottom: -20px;

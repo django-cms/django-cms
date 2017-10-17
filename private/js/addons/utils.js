@@ -5,6 +5,7 @@
  */
 
 import $ from 'jquery';
+import { debounce } from 'lodash';
 
 /**
  * Localstorage shim from Modernizr
@@ -22,6 +23,10 @@ export const isStorageSupported = /*#__PURE__*/(function localStorageCheck () {
         return false;
     }
 })();
+
+export const isToolbarEnabled = debounce(() => {
+    return $('html').hasClass('cms-toolbar-expanded');
+}, 60, { leading: true, trailing: false })
 
 /**
  * Document setup for no javascript fallbacks and logging

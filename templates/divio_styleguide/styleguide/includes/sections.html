@@ -1941,10 +1941,10 @@
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="row">
-              <div class="col-sm-12 col-lg-6 d-flex">
+              <div class="col-sm-12 col-lg-6">
                   {% include "divio_styleguide/includes/block.html" with cls='' block_title='Default text block' icon_type='windows' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.' block_button='Download for Windows'  block_button_icon='download-icon'  %}
               </div>
-              <div class="col-sm-12 col-lg-6 d-flex">
+              <div class="col-sm-12 col-lg-6">
                   {% include "divio_styleguide/includes/block.html" with cls='' block_title='Default text block'  block_link='Read more' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.'   %}
               </div>
             </div>
@@ -1959,10 +1959,10 @@
         </div>
         <div class="col-md-8 col-linebreak">
             <div class="row">
-              <div class="col-sm-12 col-lg-6 d-flex">
+              <div class="col-sm-12 col-lg-6">
                   {% include "divio_styleguide/includes/block-left.html" with cls='' block_title='Left aligned text block' icon_type='windows' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.' block_button='Download for Windows'  %}
               </div>
-              <div class="col-sm-12 col-lg-6 d-flex">
+              <div class="col-sm-12 col-lg-6">
                   {% include "divio_styleguide/includes/block-left.html" with cls='' block_title='Left aligned text block' block_desc='Requires Microsoft Windows 7 Professional, Enterprise or Education 64-bit or higher. The Hyper-V package must be enabled.'  block_link='Read more'  %}
               </div>
             </div>
@@ -1974,7 +1974,7 @@
             <h3>Diagonal backgrounds</h3>
             <p>Diagonal stripes can be set with classes.</p>
              <p>Background colour options are:<br/>
-            <code>.stripe-twilight .stripe-night .stripe-pale</code></p>
+            <code>.stripe-twilight .stripe-night .stripe-pale .stripe-snow .stripe-primary .stripe-white</code></p>
              <p>Set stripe direction:<br/>
             <code>.stripe-down .stripe-up</code></p>
              <p>A stripe at the top of the page must be contained within:<br/>
@@ -1986,32 +1986,33 @@
             <div class="row w-100 code-container">
                 <div class="stripes-set">
                     <section class="stripe stripe-down stripe-twilight">
-                        <div class="stripe-element">
-                        </div>
-                        <div class="container">
-                          {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
-                        </div>
+                    <div class="stripe-element">
+                    </div>
+                    <div class="container">
+                        {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
+                    </div>
                     </section>
 
                     <section class="stripe stripe-up stripe-night">
-                        <div class="stripe-element">
-                        </div>
-                        <div class="container">
-                          {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
-                        </div>
+                    <div class="stripe-element">
+                    </div>
+                    <div class="container">
+                        {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
+                    </div>
                     </section>
-                  </div>
-              </div>
-          </div>
-      </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="py-7"></div>
 
-      <div class="row my-5">
-          <div class="col-md-4">
-              <h3>Big left image</h3>
-              <p></p>
-          </div>
-          <div class="col-md-8 col-linebreak">
+    <div class="row my-5">
+        <div class="col-md-4">
+            <h3>Big left image</h3>
+            <p></p>
+        </div>
+        <div class="col-md-8 col-linebreak">
             <div class="row justify-content-md-center align-items-center">
                 <div class="col-12 col-md-6 col-lg-5">
                     <img src="../static/img/product/project-setup.png" alt="" class="img-fluid" />
@@ -2020,31 +2021,30 @@
                     <h3>Setup your project in minutes</h3>
                     <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
                     <ul class="list-unstyled">
-                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Point &amp; click setup</p></li>
-                      <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Customise to your requirements</p></li>
+                        <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Point &amp; click setup</p></li>
+                        <li><p>{% include "includes/icon.html" with icon="check" color="blue" %} Customise to your requirements</p></li>
                     </ul>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row my-5">
+        <div class="col-md-4">
+            <h3>Big right image</h3>
+            <p>Big right image reorders for mobile/desktop so that on mobile the image is before the text.</p>
+        </div>
+        <div class="col-md-8 col-linebreak">
+            <div class="row justify-content-md-center align-items-center">
+                <div class="col-12 col-md-6 col-lg-5 order-1 order-md-2">
+                    <img src="../static/img/product/project-setup.png" alt="" class="img-fluid" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-5 order-2 order-md-1">
+                    <h3>Setup your project in minutes</h3>
+                    <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                    <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
+                </div>
             </div>
         </div>
-
-        <div class="row my-5">
-            <div class="col-md-4">
-                <h3>Big right image</h3>
-                <p>Big right image reorders for mobile/desktop so that on mobile the image is before the text.</p>
-            </div>
-            <div class="col-md-8 col-linebreak">
-                <div class="row justify-content-md-center align-items-center">
-                  <div class="col-12 col-md-6 col-lg-5 order-1 order-md-2">
-                      <img src="../static/img/product/project-setup.png" alt="" class="img-fluid" />
-                  </div>
-                  <div class="col-12 col-md-6 col-lg-5 order-2 order-md-1">
-                      <h3>Setup your project in minutes</h3>
-                      <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
-                      <p>Easy-to-use control panel, where it takes just a few clicks to create, deploy and update software, including Django and Addons.</p>
-                  </div>
-                </div>
-              </div>
-          </div>
-
+    </div>
 </section>

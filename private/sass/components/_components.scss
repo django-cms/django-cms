@@ -39,9 +39,11 @@
 // Block button
 .block-btn {
     padding: 20px;
-    margin: 5px 5px 0 0;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    height: auto;
+    flex-grow: 1;
     border-radius: $border-radius;
-    height: calc(100% - 5px);
     text-decoration: none !important;
 
     // stylelint-disable-next-line selector-max-type
@@ -57,7 +59,6 @@
 .section-title + button,
 .section-title + .btn {
     margin-top: -30px;
-    margin-bottom: 40px;
 }
 
 .bg-white-shadow {

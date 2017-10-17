@@ -35,6 +35,12 @@
     position: relative;
 }
 
+.hero {
+    .stripe-element {
+        bottom: 100px;
+    }
+}
+
 // Stripe background
 
 .stripe-element {
@@ -126,6 +132,7 @@
     }
 }
 
+.stripe-primary,
 .stripe-night,
 .stripe-twilight {
     h1,
@@ -144,33 +151,25 @@
 
 .stripe-up {
     .stripe-element {
-        transform: skewY(-8deg) translateZ(0);
-    }
-
-    &.stripe-low-angle .stripe-element {
         transform: skewY(-2deg) translateZ(0);
     }
 }
 
 .stripe-down {
     .stripe-element {
-        transform: skewY(8deg) translateZ(0);
-    }
-
-    &.stripe-low-angle .stripe-element {
         transform: skewY(2deg) translateZ(0);
     }
 }
 
 // .stripe-up:not(.hero) {
 //     .stripe-element {
-//         transform: skewY(-8deg) translate3d(0, 0, 0);
+//         transform: skewY(-2deg) translate3d(0, 0, 0);
 //     }
 // }
 //
 // .stripe-down:not(.hero) {
 //     .stripe-element {
-//         transform: skewY(8deg) translate3d(0, 0, 0);
+//         transform: skewY(2deg) translate3d(0, 0, 0);
 //     }
 // }
 

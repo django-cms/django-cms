@@ -1,19 +1,20 @@
-
 <div class="media block-left {{ cls }}">
+    {% if icon_type %}
     <div class="mr-3 d-flex align-self-middle" >
         {% if icon_type %}
-          {% include "includes/icon.html" with icon=icon_type class="icon-md" color=icon_color %}
+            {% include "includes/icon.html" with icon=icon_type class="icon-md" color=icon_color %}
         {% endif %}
     </div>
+    {% endif %}
 
     <div class="media-body d-flex flex-column">
-          <h3 class="mt-0">{{ block_title|default:'Title' }}</h3>
-        <p>{{ block_desc|default:'Description' }}</p>
+        <h3 class="mt-0">{{ block_title|default:'Title' }}</h3>
+
         {% if block_button %}
-          <a href="{{ button_href|default:'#' }}" class="mt-auto {{ block_button_class|default:'btn btn-primary' }}">{{ block_button|default:'Go to' }} {% include "includes/icon.html" with icon="download-icon" color="white" %}</a>
+            <a href="{{ button_href|default:'#' }}" class="mt-auto {{ block_button_class|default:'btn btn-primary' }}">{{ block_button|default:'Go to' }} {% include "includes/icon.html" with icon="download-icon" color="white" %}</a>
         {% endif %}
         {% if block_link %}
-          <a href="{{ link_href|default:'#' }}" class="mt-auto">{{ block_link|default:'Link to' }} {% include "includes/icon.html" with icon="arrow-right" color="blue" %}</a>
+            <a href="{{ link_href|default:'#' }}" class="mt-auto">{{ block_link|default:'Link to' }} {% include "includes/icon.html" with icon="arrow-right" color="blue" %}</a>
         {% endif %}
     </div>
 </div>

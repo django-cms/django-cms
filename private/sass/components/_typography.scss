@@ -24,6 +24,10 @@ body h6 {
     h3,
     .h3 {
         margin-top: 3rem;
+
+        &:first-child {
+            margin-top: 1rem;
+        }
     }
 
     h4,
