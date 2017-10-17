@@ -1,0 +1,29 @@
+{% extends "content.html" %}
+{% load i18n staticfiles cms_tags menu_tags %}
+
+{% block breadcrumb %}{% endblock %}
+{% block navbar_class %}navbar-dark {% endblock %}
+{% block body_class %}{{ block.super }} bg-snow{% endblock %}
+
+{% block content %}
+<header class="hero stripe stripe-up stripe-twilight hero-text-c">
+    <div class="stripe-element">
+    </div>
+    <div class="container text-center justify-content-center align-items-center d-flex flex-column">
+        {% include 'includes/icon.html' with icon='fingerprint' class="hero-icon" %}
+        {% include "divio_styleguide/includes/hero-title.html" with cls='' title='Security' sub_title='How to report issues' %}
+        <a href="#" class="btn btn-primary">Report an issue</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 text-block mb-7">
+            <h2>Did you discover a potential security issue?</h2>
+            <p>Please report any potential security issues via private email to <a href="mailto:security@divio.com">security@divio.com</a></p>
+            <p>Please do not report them to the issue tracker, and do not send them to any mailing list.</p>
+            <p>Thank you for your understanding and time</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

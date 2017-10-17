@@ -1,0 +1,29 @@
+{% extends "content.html" %}
+{% load i18n staticfiles cms_tags menu_tags %}
+
+{% block breadcrumb %}{% endblock %}
+{% block navbar_class %}navbar-light {% endblock %}
+
+{% block content %}
+<header class="hero stripe stripe-up stripe-gradient hero-text-c">
+    <div class="stripe-element">
+    </div>
+    <div class="container text-center justify-content-center align-items-center d-flex flex-column">
+        {% include "divio_styleguide/includes/hero-title.html" with cls='' title='' sub_title='Subtitle' %}
+    </div>
+</header>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 text-block">
+            <h2>Heading</h2>
+            <p>At Divio we build web applications that aim to make the life of developers easier. We would love for you to use them. We offer a free service and also paid services or products . Feel free to use these tools to create awesome new websites or applications. However be responsible in what you publish. In particular, make sure that none of the prohibited items listed below appear on your site or get linked to from your site (things like spam, viruses, or hate content).</p>
+            <p>If you find a Divio Cloud powered site that you believe violates our terms of service, please report this immediately via our Divio Support.</p>
+            <p>Elit labore iste recusandae iure ipsam eligendi Nam ipsa ea placeat voluptatum repellendus Enim tempora reprehenderit quos repudiandae pariatur voluptate Aperiam hic tempora suscipit et dolores praesentium? Consectetur eum nihil!</p>
+        </div>
+        <div class="col-12 col-lg-9">
+            <img class="img-fluid" src="{% static 'img/dummy/control-tablet@2x.jpg' %}">
+        </div>
+    </div>
+</div>
+{% endblock %}

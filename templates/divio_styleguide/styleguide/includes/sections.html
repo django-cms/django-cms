@@ -1905,7 +1905,7 @@
         <div class="col-md-4">
             <h3>Circle Blocks</h3>
             <p>Add class <code>circle-wrap-arrows</code> to parent to have background with a line line &amp; arrows</p>
-            <code>% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon=' ' circle_title=' ' circle_desc=' ' %</code>
+            <code>{% verbatim %}{% include "divio_styleguide/includes/circles.html" with cls='circle-bg1' circle_icon=' ' circle_title=' ' circle_desc=' ' %}{% endverbatim %}</code>
             <p>Background color of circle can be set with <code>circle-bg1</code>, <code>circle-bg2</code> etc there are 4 and should be used in order</p>
 
             <p>Add class <code>circle-wrap-dots</code> to parent to have a dotted background</p>
@@ -1973,13 +1973,13 @@
         <div class="col-md-4">
             <h3>Diagonal backgrounds</h3>
             <p>Diagonal stripes can be set with classes.</p>
-             <p>Background colour options are:<br/>
+            <p>Background colour options are:<br/>
             <code>.stripe-twilight .stripe-night .stripe-pale .stripe-snow .stripe-primary .stripe-white</code></p>
-             <p>Set stripe direction:<br/>
+            <p>Set stripe direction:<br/>
             <code>.stripe-down .stripe-up</code></p>
-             <p>A stripe at the top of the page must be contained within:<br/>
+            <p>A stripe at the top of the page must be contained within:<br/>
             <code>.hero</code></p>
-             <p>All stripes in a group not at the top of the page must be contained within:<br/>
+            <p>All stripes in a group not at the top of the page must be contained within:<br/>
             <code>.stripes-set</code></p>
         </div>
         <div class="col-md-8 col-linebreak">

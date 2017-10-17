@@ -3,26 +3,8 @@
 
 {% block body_class %}tpl-base{% endblock %}
 
-{# no indent for better readability on extend_root #}
 {% block extend_root %}
 {% block header %}
-    {# DOCS: http://getbootstrap.com/components/#navbar #}
-
-    <!-- Can we remove this? no -->
-  <!--
-    <header class="navbar navbar-expand-lg navbar-light mt-3">
-        <div class="container" id="navbarSupportedContent">
-            {% render_model_block request.current_page "changelist" %}
-                {% with dropdown="true" %}
-                    <ul class="navbar-nav mx-auto flex-row">
-                        {% show_menu 0 1 100 100 'includes/navigation.html' %}
-                    </ul>
-                {% endwith %}
-            {% endrender_model_block %}
-        </div>
-    </header>
--->
-
     <header class="navbar navbar-expand-lg {% block navbar_class %}{% endblock %} main-nav">
         <a class="navbar-brand" href="{% url "pages-root" %}">
             <span class="sr-only">{{ request.site.name }}</span>

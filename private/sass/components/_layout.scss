@@ -1,6 +1,9 @@
 /* stylelint-disable selector-max-type */
 html {
     overflow-y: scroll;
+    @include media-breakpoint-up(lg) {
+        padding-top: 51px;
+    }
 }
 
 // SUB MENU
@@ -114,7 +117,7 @@ html {
             content: '';
             background: $snow;
             left: 0;
-            transform: skewY(-2deg) translate3d(0, 0, 0);
+            transform: skewY(-3deg) translate3d(0, 0, 0);
             width: 100%;
             height: calc(100% + 20px);
             bottom: -20px;

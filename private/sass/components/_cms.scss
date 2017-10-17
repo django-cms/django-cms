@@ -2,8 +2,14 @@
     margin-top: 0 !important;
     padding-top: 46px !important;
 
-    .fixed-top {
-        top: 46px;
+    @include media-breakpoint-up(lg) {
+        padding-top: 51px + 46px !important;
+    }
+
+    @include media-breakpoint-up(lg) {
+        .main-nav {
+            top: 46px;
+        }
     }
 }
 

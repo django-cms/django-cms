@@ -37,7 +37,20 @@
 
 .hero {
     .stripe-element {
-        bottom: 100px;
+        height: 200%;
+        bottom: 60px;
+    }
+
+    &.stripe-up {
+        .stripe-element {
+            transform: skewY(-5deg) translateZ(0);
+        }
+    }
+
+    &.stripe-down {
+        .stripe-element {
+            transform: skewY(5deg) translateZ(0);
+        }
     }
 }
 
@@ -151,25 +164,25 @@
 
 .stripe-up {
     .stripe-element {
-        transform: skewY(-2deg) translateZ(0);
+        transform: skewY(-3deg) translateZ(0);
     }
 }
 
 .stripe-down {
     .stripe-element {
-        transform: skewY(2deg) translateZ(0);
+        transform: skewY(3deg) translateZ(0);
     }
 }
 
 // .stripe-up:not(.hero) {
 //     .stripe-element {
-//         transform: skewY(-2deg) translate3d(0, 0, 0);
+//         transform: skewY(-3deg) translate3d(0, 0, 0);
 //     }
 // }
 //
 // .stripe-down:not(.hero) {
 //     .stripe-element {
-//         transform: skewY(2deg) translate3d(0, 0, 0);
+//         transform: skewY(3deg) translate3d(0, 0, 0);
 //     }
 // }
 

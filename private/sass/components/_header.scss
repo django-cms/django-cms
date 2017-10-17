@@ -1,7 +1,6 @@
 /* stylelint-disable selector-max-type */
 .navbar-sticky {
     background: white;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 // Navigation bar {
@@ -14,6 +13,7 @@
 
     .icon.navbar-logo,
     .navbar-toggler-icon {
+        svg,
         use {
             fill: white;
         }
@@ -21,7 +21,28 @@
 }
 
 .main-nav {
-    background: white;
+    background-color: transparent;
+
+    @include media-breakpoint-up(lg) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1030;
+
+        &.main-nav-scrolled {
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+
+            &.navbar-dark {
+                background-color: $twilight;
+            }
+
+            &.navbar-light {
+                background-color: white; // #f9fbfd;
+            }
+        }
+    }
 
     .icon.navbar-logo {
         width: 90px;
@@ -46,35 +67,8 @@
         }
     }
 
-    // .nav-item {
-    //     &::before,
-    //     &::after {
-    //         position: absolute;
-    //         display: block;
-    //         width: 0;
-    //         height: 0;
-    //         left: 50%;
-    //         content: '';
-    //     }
-    //
-    //     &::before {
-    //         bottom: -10px;
-    //         margin-left: -21px;
-    //         border-right: 21px solid transparent;
-    //         border-left: 21px solid transparent;
-    //         border-bottom: 16px solid #eaeaea;
-    //     }
-    //
-    //     &::after {
-    //         bottom: -11px;
-    //         margin-left: -20px;
-    //         border-right: 20px solid transparent;
-    //         border-left: 20px solid transparent;
-    //         border-bottom: 15px solid #fff;
-    //     }
-    // }
-
     .icon.navbar-logo {
+        svg,
         use {
             fill: $night;
         }
@@ -166,11 +160,13 @@
     }
 }
 
-.navbar-toggler-icon {
-    background-image: none !important;
+.main-nav {
+    .navbar-toggler-icon {
+        background-image: none !important;
 
-    .icon {
-        margin-top: 5px;
+        .icon {
+            margin-top: 5px;
+        }
     }
 }
 
