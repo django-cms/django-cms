@@ -1,13 +1,24 @@
 {% load menu_tags %}
 
 {% for child in children %}
-    <li class="nav-item {% if child.children and dropdown %}dropdown{% endif %}{% if child.selected %} active{% endif %}">
+    <li class="nav-item {% if child.children and dropdown %}dropdown icon-dropdown{% endif %}{% if child.selected %} active{% endif %}">
         <a
-            class="nav-link px-1 {% if child.children and dropdown %}dropdown-toggle{% endif %}"
-            {% if child.children and dropdown %} data-toggle="dropdown"{% endif %}
-            href="{{ child.attr.redirect_url|default:child.get_absolute_url }}">{{ child.get_menu_title }}</a>
+            class="nav-link{% if child.children and dropdown %} dropdown-toggle{% endif %}"
+            {% if child.children and dropdown %}
+                data-toggle="dropdown"
+                id="dropdown-{{ child.get_menu_title|slugify }}"
+                href="#"
+            {% else %}
+                href="{{ child.attr.redirect_url|default:child.get_absolute_url }}"
+            {% endif %}
+            >
+            {{ child.get_menu_title }}
+            {% if child.children and dropdown %}
+                {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
+            {% endif %}
+        </a>
         {% if child.children and dropdown %}
-            <div class="dropdown-menu">
+            <div class="dropdown-menu" aria-labelledby="dropdown-{{ child.get_menu_title|slugify }}">
                 {% show_menu from_level to_level extra_inactive extra_active "includes/dropdown.html" "" "" child %}
             </div>
         {% endif %}

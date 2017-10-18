@@ -20,122 +20,19 @@
             {% render_model_block request.current_page "changelist" %}
                 {% with dropdown="true" %}
                     <ul class="navbar-nav mx-auto">
-                        <li class="nav-item dropdown icon-dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Products
-                                {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="control" class="product-icon product-icon-shadow" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Control</b><span class="dropdown-desc-more">Create, manage and deploy project with one easy to use tool.</span>
-                                </span></a>
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="code" class="product-icon product-icon-shadow" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Code</b><span class="dropdown-desc-more">Get a complete developer environment that stays up-to-date.</span>
-                                    </span>
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="content" class="product-icon product-icon-shadow" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Content</b><span class="dropdown-desc-more">Create digital experiences with Python &amp; Django, its easy, fast &amp; extensible.</span>
-                                </span></a>
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="cloud" class="product-icon product-icon-shadow" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Cloud</b><span class="dropdown-desc-more">Run your web projects on our platform, managed by Django experts.</span>
-                                </span></a>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown icon-dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Agencies
-                                {% include "includes/icon.html" with icon="arrow-right" class="dropdown-arrow"%}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="agency" class="product-icon" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Perfect for agencies</b><span class="dropdown-desc-more">Never worry about your hosting infrastructure again.</span>
-                                    </span>
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="find-agency" class="product-icon" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Find an agency</b><span class="dropdown-desc-more">Some of the most experienced Django and Python agencies.</span>
-                                    </span>
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    {% include "includes/icon.html" with icon="bookmark" class="product-icon" title="Code" %}
-                                    <span class="dropdown-desc">
-                                        <b>Become a partner</b><span class="dropdown-desc-more">Our partnership programme gives access to additional services &amp; commission</span>
-                                    </span>
-                                </a>
-                            </div>
-                        </li>
-                        <li class="nav-item "><a class="nav-link" href="/">Enterprise</a></li>
-                        <li class="nav-item "><a class="nav-link" href="/">Pricing</a></li>
+                        {% show_menu 0 1 100 100 'includes/navigation.html' %}
                     </ul>
                     <div class="nav-btnlinks">
-                        <button class="btn btn-outline-primary nav-btn btn-sm">Login</button>
-                        <button class="btn btn-primary nav-btn btn-sm">Get started</button>
+                        <a href="#" class="btn btn-outline-primary nav-btn btn-sm">Login</a>
+                        <a href="#" class="btn btn-primary nav-btn btn-sm">Get started</a>
                     </div>
                 {% endwith %}
             {% endrender_model_block %}
         </div>
     </header>
-
-
-    {% comment %}
-    this is old, no need to touch it yet
-    <header class="navbar navbar-head">
-        <div class="container">
-            {# INFO: the logo should be placed first for seo reasons #}
-            <div class="navbar-header">
-                {# INFO: the logo should be placed first for seo reasons #}
-                <h1 class="navbar-brand">
-                    <a href="{% url "pages-root" %}">
-                        <span class="sr-only">{{ request.site.name }}</span>
-                        <img src="{% static "img/logo-divio-white.svg" %}" width="200px" alt="{{ request.site.name }}" />
-                    </a>
-                </h1>
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".js-navbar-header">
-                    {% for row in 123|make_list %}<span class="icon-bar"></span>{% endfor %}
-                </button>
-            </div>
-
-            {# INFO: ensure the anchor names are callable #}
-            <h2 class="sr-only">{% trans "Shortcuts" %}</h2>
-            <ul class="skip-links">
-                <li><a href="{% url "pages-root" %}" title="[Alt + 0]" accesskey="0">{% trans "Go to home" %}</a></li>
-                <li><a href="#page-navigation" title="[Alt + 1]" accesskey="1">{% trans "Jump to navigation" %}</a></li>
-                <li><a href="#page-content" title="[Alt + 2]" accesskey="2">{% trans "Jump to content" %}</a></li>
-                <li><a href="#page-footer" title="[Alt + 3]" accesskey="3">{% trans "Contact" %}</a></li>
-            </ul>
-
-            <div class="navbar-collapse collapse js-navbar-header">
-                {% block navbar %}
-                    <nav class="nav navbar-main navbar-right" id="page-navigation" role="navigation">
-                        {% render_model_block request.current_page "changelist" %}
-                            {% with dropdown="true" %}
-                                <ul class="nav navbar-nav list-inline">
-                                    {% show_menu 0 1 100 100 %}
-                                </ul>
-                            {% endwith %}
-                        {% endrender_model_block %}
-                    </nav>
-                {% endblock navbar %}
-            </div>
-        </div>
-        </header>
-        {% endcomment %}
 {% endblock header %}
 
-<!-- Don't think we need this breadcrumb? -->
-<!--
-{# DOCS: http://getbootstrap.com/components/#breadcrumbs #}
+{% comment %}
 {% block breadcrumb %}
     {% if not request.current_page.is_home %}
         <nav class="navbar navbar-breadcrumb" role="navigation">
@@ -150,12 +47,12 @@
         </nav>
     {% endif %}
 {% endblock breadcrumb %}
--->
+{% endcomment %}
 
+{% if request.toolbar and request.toolbar.edit_mode_active %}
+    <a href="/styleguide" class="btn-circle btn-styleguide">Styleguide</a>
+{% endif %}
 
-<a href="/styleguide" class="btn-circle btn-styleguide">Styleguide</a>
-
-{# start: content #}
 <hr class="sr-only" id="page-content" />
 {% block extend_base %}
     {% block messages %}
@@ -170,119 +67,90 @@
     {% endblock %}
 {% endblock extend_base %}
 <hr class="sr-only" />
-{# end: content #}
 
 {% block footer %}
-
-<!-- Main footer -->
-  <footer class="main-footer">
+<footer class="main-footer">
     <div class="container">
-      <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-lg-3 pt-4 order-5 order-lg-1">
-          <a href="/"><img src="{% static "img/logo-divio-black.svg" %}" width="80px" alt="{{ request.site.name }}" /></a>
-          <p class="text-secondary mt-2">Your complete digital experience platform.</p>
-          <p class="h5">Keep up to date</p>
-          <ul class="list-unstyled list-inline footer-social">
-            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-            <li><a href="" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-          </ul>
-        </div>
-        <div class="col-12 col-sm-4 col-lg-2  pt-4 order-2">
-            <ul class="list-unstyled footer-links">
-              <li><p class='h5'>Support</p></li>
-              <li><a href="" target="_blank">Support</a></li>
-              <li><a href="" target="_blank">Documentation</a></li>
-              <li><a href="" target="_blank">Academy</a></li>
-              <li><a href="" target="_blank">Status</a></li>
-            </ul>
-        </div>
-        <div class="col-12 col-sm-4 col-lg-2  pt-4 order-3">
-          <ul class="list-unstyled footer-links">
-            <li><p class='h5'>Company</p></li>
-            <li><a href="" target="_blank">Partners</a></li>
-            <li><a href="" target="_blank">Customers</a></li>
-            <li><a href="" target="_blank">Press &amp; Media</a></li>
-            <li><a href="" target="_blank">Blog</a></li>
-            <li><a href="" target="_blank">About us</a></li>
-            <li><a href="" target="_blank">Careers</a></li>
-            <li><a href="" target="_blank">Contact</a></li>
-          </ul>
-        </div>
-        <div class="col-12 col-sm-4 col-lg-2  pt-4 order-4">
-          <ul class="list-unstyled footer-links">
-            <li><p class='h5'>Legal</p></li>
-            <li><a href="" target="_blank">Privacy</a></li>
-            <li><a href="" target="_blank">Terms of Service</a></li>
-            <li><a href="" target="_blank">Security</a></li>
-            <li><a href="" target="_blank">Site Notice</a></li>
-          </ul>
-        </div>
-        <div class="col-12 col-sm-12 col-lg-3 bg-light p-4 order-1 order-lg-5 footer-help">
-          <p class="h5">Need help?</p>
-          <p>We’re here for you 24/7</p>
-            <div class="row">
-              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
-                {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
-                <div class="pl-2 pl-xl-0">
-                  <p class="mb-0">USA</p>
-                  <a href="">1231321</a>
-                </div>
-              </div>
-              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
-                {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
-                  <div class="pl-2 pl-xl-0">
-                    <p class="mb-0">Worldwide</p>
-                    <a href="">1231321</a>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
-                  {% include "includes/icon.html" with icon="email" class="d-xl-none" color="slate" %}
-                  <div class="pl-2 pl-xl-0">
-                    <p class="mb-0">Email</p>
-                    <a href="mailto:help@divio.com">help@divio.com</a>
-                  </div>
-              </div>
-              <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
-                  {% include "includes/icon.html" with icon="chat" class="d-xl-none" color="slate" %}
-                  <div class="pl-2 pl-xl-0">
-                    <p class="mb-0">Chat</p>
-                    <a href="">Start Chat</a>
-                  </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12 mt-4">
-                <a href="" class="btn btn-primary">I have an emergancy</a>
-              </div>
-            </div>
-        </div>
-      </div>
-      <div class="row py-4">
-        <div class="col-12">
-          <p class="text-secondary mb-0"><small>This site is built with Django &amp; Powered by Divio Cloud</small></p>
-          <p class="text-secondary mb-0"><small>COPYRIGHT © 2001-2017 DIVIO AG. ALL RIGHTS RESERVED.</small></p>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-<!--
-    <footer class="footer" role="contentinfo">
-        <h1 class="sr-only" id="page-footer">{% trans "Sitemap" %}</h1>
-
-        <div class="container">
-            {% render_model_block request.current_page "changelist" %}
-                <ul class="list-inline">
-                    <li class="pull-right"><a href="#page-top" data-spy="scroll"><span class="fa fa-left fa-arrow-up"></span>{% trans "Back to top" %}</a></li>
-                    {% show_menu_below_id "footer" 0 0 100 100 %}
+        <div class="row d-flex">
+            <div class="col-12 col-sm-12 col-lg-3 pt-4 order-5 order-lg-1">
+                <a href="/"><img src="{% static "img/logo-divio-black.svg" %}" width="80px" alt="{{ request.site.name }}" /></a>
+                <p class="text-secondary mt-2">Your complete digital experience platform.</p>
+                <p class="h5">Keep up to date</p>
+                <ul class="list-unstyled list-inline footer-social">
+                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
                 </ul>
-            {% endrender_model_block %}
+            </div>
+            <div class="col-12 col-sm-4 col-lg-2  pt-4 order-2">
+                <ul class="list-unstyled footer-links">
+                    <li><p class="h5">Support</p></li>
+                    {% show_menu_below_id "support" %}
+                </ul>
+            </div>
+            <div class="col-12 col-sm-4 col-lg-2  pt-4 order-3">
+                <ul class="list-unstyled footer-links">
+                    <li><p class="h5">Company</p></li>
+                    {% show_menu_below_id "company" %}
+                </ul>
+            </div>
+            <div class="col-12 col-sm-4 col-lg-2  pt-4 order-4">
+                <ul class="list-unstyled footer-links">
+                    <li><p class="h5">Legal</p></li>
+                    {% show_menu_below_id "legal" %}
+                </ul>
+            </div>
+            <div class="col-12 col-sm-12 col-lg-3 bg-light p-4 order-1 order-lg-5 footer-help">
+                <p class="h5">Need help?</p>
+                <p>We’re here for you 24/7</p>
+                <div class="row">
+                    <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                        {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
+                        <div class="pl-2 pl-xl-0">
+                            <p class="mb-0">USA</p>
+                            <a href="">1231321</a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                        {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
+                        <div class="pl-2 pl-xl-0">
+                            <p class="mb-0">Worldwide</p>
+                            <a href="">1231321</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                        {% include "includes/icon.html" with icon="email" class="d-xl-none" color="slate" %}
+                        <div class="pl-2 pl-xl-0">
+                            <p class="mb-0">Email</p>
+                            <a href="mailto:help@divio.com">help@divio.com</a>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
+                        {% include "includes/icon.html" with icon="chat" class="d-xl-none" color="slate" %}
+                        <div class="pl-2 pl-xl-0">
+                            <p class="mb-0">Chat</p>
+                            <a href="">Start Chat</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-4">
+                        <a href="" class="btn btn-primary">I have an emergancy</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>-->
+        <div class="row py-4">
+            <div class="col-12">
+                <p class="text-secondary mb-0"><small>This site is built with Django &amp; Powered by Divio Cloud</small></p>
+                <p class="text-secondary mb-0"><small>COPYRIGHT © 2001-2017 DIVIO AG. ALL RIGHTS RESERVED.</small></p>
+            </div>
+        </div>
+    </div>
+</footer>
 {% endblock footer %}
 {% endblock extend_root %}

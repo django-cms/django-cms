@@ -1,5 +1,39 @@
-{% load menu_tags %}
+{% load menu_tags i18n %}
 
 {% for child in children %}
-<a class="dropdown-item" href="{{ child.attr.redirect_url|default:child.get_absolute_url }}">{{ child.get_menu_title }}</a>
+    <a class="dropdown-item" href="{{ child.attr.redirect_url|default:child.get_absolute_url }}">
+        {% if child.attr.reverse_id == 'control' %}
+            {% include "includes/icon.html" with icon="control" class="product-icon product-icon-shadow" %}
+        {% elif child.attr.reverse_id == 'code' %}
+            {% include "includes/icon.html" with icon="code" class="product-icon product-icon-shadow" %}
+        {% elif child.attr.reverse_id == 'content' %}
+            {% include "includes/icon.html" with icon="content" class="product-icon product-icon-shadow" %}
+        {% elif child.attr.reverse_id == 'cloud' %}
+            {% include "includes/icon.html" with icon="cloud" class="product-icon product-icon-shadow" %}
+        {% elif child.attr.reverse_id == 'perfect-for-agencies' %}
+            {% include "includes/icon.html" with icon="agency" class="product-icon" %}
+        {% elif child.attr.reverse_id == 'find-an-agency' %}
+            {% include "includes/icon.html" with icon="find-agency" class="product-icon" %}
+        {% elif child.attr.reverse_id == 'become-a-partner' %}
+            {% include "includes/icon.html" with icon="bookmark" class="product-icon" %}
+        {% endif %}
+        <span class="dropdown-desc">
+            <b>{{ child.get_menu_title }}</b>
+            {% if child.attr.reverse_id == 'control' %}
+                <span class="dropdown-desc-more">{% trans "Create, manage and deploy project with one easy to use tool." %}</span>
+            {% elif child.attr.reverse_id == 'code' %}
+                <span class="dropdown-desc-more">{% trans "Get a complete developer environment that stays up-to-date." %}</span>
+            {% elif child.attr.reverse_id == 'content' %}
+                <span class="dropdown-desc-more">{% trans "Create digital experiences with Python &amp; Django, its easy, fast &amp; extensible." %}</span>
+            {% elif child.attr.reverse_id == 'cloud' %}
+                <span class="dropdown-desc-more">{% trans "Run your web projects on our platform, managed by Django experts." %}</span>
+            {% elif child.attr.reverse_id == 'perfect-for-agencies' %}
+                <span class="dropdown-desc-more">{% trans "Never worry about your hosting infrastructure again." %}</span>
+            {% elif child.attr.reverse_id == 'find-an-agency' %}
+                <span class="dropdown-desc-more">{% trans "Some of the most experienced Django and Python agencies." %}</span>
+            {% elif child.attr.reverse_id == 'become-a-partner' %}
+                <span class="dropdown-desc-more">{% trans "Our partnership programme gives access to additional services &amp; commission" %}</span>
+            {% endif %}
+        </span>
+    </a>
 {% endfor %}
