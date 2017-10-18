@@ -133,7 +133,7 @@ var Clipboard = new Class({
 
         if (
             clipboardData.timestamp < that.currentClipboardData.timestamp ||
-            that.currentClipboardData.data.plugin_id === clipboardData.data.plugin_id
+            that.currentClipboardData.data && that.currentClipboardData.data.plugin_id === clipboardData.data.plugin_id
         ) {
             that.currentClipboardData = clipboardData;
             return;
