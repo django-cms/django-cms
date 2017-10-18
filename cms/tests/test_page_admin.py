@@ -1011,6 +1011,51 @@ class PageTest(PageTestBase):
         self.assertEqual([no_translation_error],
                          form.errors['__all__'])
 
+    def test_advanced_settings_form_apphook(self):
+        superuser = self.get_superuser()
+        cms_page = create_page('app', 'nav_playground.html', 'en', published=True)
+        cms_pages = Page.objects.filter(pk__in=[cms_page.pk, cms_page.publisher_public_id])
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+        page_data = {
+            "redirect": "",
+            "language": "en",
+            "reverse_id": "",
+            "navigation_extenders": "",
+            "site": "1",
+            "xframe_options": "0",
+            "application_urls": "SampleApp",
+            "application_namespace": "sampleapp",
+            "overwrite_url": "",
+            "template": "INHERIT",
+        }
+
+        with self.login_user_context(superuser):
+            # set the apphook
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='SampleApp',
+                    application_namespace='sampleapp',
+                ).count(),
+                2
+            )
+
+        with self.login_user_context(superuser):
+            # remove the apphook
+            page_data['application_urls'] = ''
+            page_data['application_namespace'] = ''
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='',
+                    application_namespace=None,
+                ).count(),
+                2,
+            )
+
     def test_form_url_page_change(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):

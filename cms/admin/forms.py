@@ -449,8 +449,8 @@ class AdvancedSettingsForm(forms.ModelForm):
         # User has changed the apphooks on the page.
         # Update the public version of the page to reflect this change immediately.
         self.instance.publisher_public.update(
-            application_urls=self.cleaned_data['application_urls'],
-            application_namespace=self.cleaned_data['application_namespace'],
+            application_urls=self.instance.application_urls,
+            application_namespace=self.instance.application_namespace,
         )
 
         # Connects the apphook restart handler to the request finished signal
