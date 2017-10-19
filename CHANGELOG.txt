@@ -3,7 +3,15 @@
 * Fixed a bug which prevented users from seeing the welcome screen when debug is
   turned off.
 * Introduced improved repr for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models.
-* Fixed a regression which prevented users from setting a redirect to the homepage.
+* Rename publish buttons to no longer reference "page"
+* Page rendering will now use the draft page instead of public page for logged in
+  users with change permissions, unless the ``preview`` GET parameter is used.
+
+
+=== 3.4.5 (2017-10-12) ===
+
+* Introduced Django 1.11 compatibility
+* Fixed a bug where slug wouldn't be generated in the creation wizard
 * Fixed a bug where the add page endpoint rendered ``Change page`` as the html title.
 * Fixed an issue where non-staff users could request the wizard create endpoint.
 * Fixed an issue where the ``Edit page`` toolbar button wouldn't show on non-cms pages
@@ -14,41 +22,38 @@
   was rendered before attempting to inherit content from parent pages.
 * Changed page/placeholder cache keys to use sha1 hash instead of md5 to be FIPS compliant.
 * Fixed a bug where the change of a slug would not propagate to all descendant pages
-* Rename publish buttons to no longer reference "page"
-* Page rendering will now use the draft page instead of public page for logged in
-  users with change permissions, unless the ``preview`` GET parameter is used.
 * Fixed a ``ValueError`` raised when using ``ManifestStaticFilesStorage`` or similar for static files.
   This only affects Django >= 1.10
 
 
-=== 3.4.4 (unreleased) ===
+=== 3.4.4 (2017-06-15) ===
 
-* Fixed a bug where canceling the publishing dialog wasn't respected.
-* Fixed a bug when after authentication us redirected on wrong url (site have only one language)
+* Fixed a bug in which cancelling the publishing dialog wasn't respected.
+* Fixed a bug causing post-login redirection to an incorrect URL on single-language sites.
 * Changed the signature for internal ``cms.plugin_base.CMSPluginBase`` methods ``get_child_classes``
   and ``get_parent_classes`` to take an optional ``instance`` parameter.
-* Fixed error in retrieving placeholder label from configuration.
-* Fixed a bug which caused certain translations to display double escaped text on the page
+* Fixed an error when retrieving placeholder label from configuration.
+* Fixed a bug which caused certain translations to display double-escaped text in the page
   list admin view.
-* Adjusted the toolbar javascript template to escape values coming from the request.
+* Adjusted the toolbar JavaScript template to escape values coming from the request.
 * Added Dropdown class to toolbar items
 * Replaced all custom markup on the ``admin/cms/page/includes/fieldset.html`` template
-  with an ``{% include %}`` call to Django's builtin ``fieldset.html`` template.
+  with an ``{% include %}`` call to Django's built-in ``fieldset.html`` template.
 * Fixed a bug which prevented a page from being marked as dirty when a placeholder was cleared.
 * Fixed an IntegrityError raised when publishing a page with no public version and whose publisher
-  state is pending.
-* Fixed an issue with JS not being able to determine correct path to async bundle
-* Fixed a ``DoesNotExist`` db error raised when moving a page marked as published but whose public
-  translation does not exist.
-* Fixed a bug where the menu would render nodes using the site session variable (set in the admin),
+  state was pending.
+* Fixed an issue with JavaScript not being able to determine correct path to the async bundle
+* Fixed a ``DoesNotExist`` database error raised when moving a page marked as published, but whose public
+  translation did not exist.
+* Fixed a bug in which the menu rendered nodes using the site session variable (set in the admin),
   instead of the current request site.
-* Fixed a race condition bug where the cache keys on the database were deleted without syncing with the
-  cache server and as a result old menu items would continue to be displayed.
-* Fixed a 404 raised when clicking the ``Delete`` button for a page or title extension on Django >= 1.9
+* Fixed a race condition bug in which the database cache keys were deleted without syncing with the
+  cache server, and as a result old menu items would continue to be displayed.
+* Fixed a 404 raised when using the ``Delete`` button for a Page or Title extension on Django >= 1.9
 * Added "How to serve multiple languages" section to documentation
 * Fixed a performance issue with nested pages when using the ``inherit`` flag on the ``{% placeholder %}`` tag.
 * Removed the internal ``reset_to_public`` page method in favour of the ``revert_to_live`` method.
-* Fixed a bug where the placeholder cache was not consistently cleared when a page was published.
+* Fixed a bug in which the placeholder cache was not consistently cleared when a page was published.
 * Enhanced the plugin menu to not show plugins the user does not have permission to add.
 * Fixed a regression which prevented users from setting a redirect to the homepage.
 
