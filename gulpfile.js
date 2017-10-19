@@ -108,9 +108,10 @@ gulp.task('webpack:watch', task('webpack/compile', { watch: true }));
  * Usage:
  * - "gulp icons" (compiles to sprites and sass)
  */
-gulp.task('icons', ['icons:sprite:icons', 'icons:sprite:flags']);
+gulp.task('icons', ['icons:sprite:icons:json', 'icons:sprite:flags']);
 gulp.task('icons:sprite:icons', task('icons/svgsprite', { svg: 'icons' }));
 gulp.task('icons:sprite:flags', task('icons/svgsprite', { svg: 'flags' }));
+gulp.task('icons:sprite:icons:json', ['icons:sprite:icons'], task('icons/json', { svg: 'icons' }))
 
 /**
  * Usage:
