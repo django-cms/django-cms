@@ -1,8 +1,17 @@
 /* stylelint-disable selector-max-type */
 html {
     overflow-y: scroll;
+}
+
+body {
     @include media-breakpoint-up(lg) {
         padding-top: 51px;
+    }
+}
+
+body.cke_editable {
+    @include media-breakpoint-up(lg) {
+        padding-top: 0;
     }
 }
 
