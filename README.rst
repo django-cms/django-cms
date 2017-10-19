@@ -5,8 +5,6 @@ django CMS
     :target: http://travis-ci.org/divio/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://img.shields.io/pypi/dm/django-cms.svg
-    :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/pypi/l/django-cms.svg
