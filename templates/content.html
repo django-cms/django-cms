@@ -17,17 +17,17 @@
         </button>
 
         <div class="collapse navbar-collapse" id="main-nav">
-            {% render_model_block request.current_page "changelist" %}
+            {# render_model_block request.current_page "changelist" #}
                 {% with dropdown="true" %}
                     <ul class="navbar-nav mx-auto">
                         {% show_menu 0 1 100 100 'includes/navigation.html' %}
                     </ul>
-                    <div class="nav-btnlinks">
-                        <a href="#" class="btn btn-outline-primary nav-btn btn-sm">Login</a>
-                        <a href="#" class="btn btn-primary nav-btn btn-sm">Get started</a>
-                    </div>
                 {% endwith %}
-            {% endrender_model_block %}
+            {# endrender_model_block #}
+            <div class="nav-btnlinks">
+                <a href="#" class="btn btn-outline-primary nav-btn btn-sm">Login</a>
+                <a href="#" class="btn btn-primary nav-btn btn-sm">Get started</a>
+            </div>
         </div>
     </header>
 {% endblock header %}
