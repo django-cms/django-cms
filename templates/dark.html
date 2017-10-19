@@ -1,0 +1,19 @@
+{% extends "content.html" %}
+{% load i18n staticfiles cms_tags menu_tags %}
+
+{% block breadcrumb %}{% endblock %}
+{% block navbar_class %}navbar-dark {% endblock %}
+
+{% block content %}
+<header class="hero stripe stripe-up stripe-twilight hero-text-c">
+    <div class="stripe-element">
+    </div>
+    <div class="container text-center justify-content-center align-items-center d-flex flex-column">
+        {% placeholder "Feature" %}
+    </div>
+</header>
+
+<div class="container">
+    {% placeholder "Content" %}
+</div>
+{% endblock %}
