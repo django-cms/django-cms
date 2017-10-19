@@ -58,37 +58,11 @@
 
 .stripe-element {
     width: 100%;
-    height: calc(100% + 120px);
+    height: 100%;
     bottom: 0;
     transform-origin: 0;
     position: absolute;
     z-index: -1;
-}
-
-// stripe background colors
-.stripes-set {
-    width: 100%;
-
-    .stripe {
-        &::after {
-            content: '';
-            height: 100%;
-            display: block;
-            position: absolute;
-            bottom: -50%;
-            left: 0;
-            right: 0;
-            z-index: -1;
-        }
-    }
-
-    > .stripe:last-child {
-        padding-bottom: 0;
-
-        &::after {
-            display: none;
-        }
-    }
 }
 
 .stripe-gradient .stripe-element {
