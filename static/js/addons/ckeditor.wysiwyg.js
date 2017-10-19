@@ -17,6 +17,11 @@
 CKEDITOR.allElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div'];
 CKEDITOR.stylesSet.add('default', [
     /* Block Styles */
+    { name: 'Display 1', element: CKEDITOR.allElements, attributes: { class: 'display-1' }},
+    { name: 'Display 2', element: CKEDITOR.allElements, attributes: { class: 'display-2' }},
+    { name: 'Display 3', element: CKEDITOR.allElements, attributes: { class: 'display-3' }},
+    { name: 'Display 4', element: CKEDITOR.allElements, attributes: { class: 'display-4' }},
+
     { name: 'Text Lead', element: CKEDITOR.allElements, attributes: { class: 'lead' }},
 
     { name: 'Text Left', element: CKEDITOR.allElements, attributes: { class: 'text-left' }},
@@ -25,14 +30,8 @@ CKEDITOR.stylesSet.add('default', [
     { name: 'Text Justify', element: CKEDITOR.allElements, attributes: { class: 'text-justify' }},
     { name: 'Text NoWrap', element: CKEDITOR.allElements, attributes: { class: 'text-nowrap' }},
 
-    { name: 'Spacer', element: 'div', attributes: { class: 'spacer' }},
-    { name: 'Spacer Small', element: 'div', attributes: { class: 'spacer-xs' }},
-    { name: 'Spacer Large', element: 'div', attributes: { class: 'spacer-lg' }},
-    { name: 'Spacer Zero', element: 'div', attributes: { class: 'spacer-zero' }},
-
     { name: 'List Unstyled', element: ['ul', 'ol'], attributes: { class: 'list-unstyled' }},
     { name: 'List Inline', element: ['ul', 'ol'], attributes: { class: 'list-inline' }},
-    { name: 'Horizontal Description', element: 'dl', attributes: { class: 'dl-horizontal' }},
 
     { name: 'Table', element: 'table', attributes: { class: 'table' }},
     { name: 'Table Responsive', element: 'table', attributes: { class: 'table-responsive' }},
@@ -55,13 +54,12 @@ CKEDITOR.stylesSet.add('default', [
     { name: 'Text Danger', element: 'span', attributes: { class: 'text-danger' }},
     { name: 'Text Muted', element: 'span', attributes: { class: 'text-muted' }},
 
-    { name: 'Image Responsive', element: 'img', attributes: { class: 'img-responsive' }},
-    { name: 'Image Rounded', element: 'img', attributes: { class: 'img-rounded' }},
-    { name: 'Image Circle', element: 'img', attributes: { class: 'img-circle' }},
-    { name: 'Image Thumbnail', element: 'img', attributes: { class: 'img-thumbnail' }},
+    { name: 'Image Fluid', element: 'img', attributes: { class: 'img-fluid' }},
+    { name: 'Image Rounded', element: 'img', attributes: { class: 'rounded' }},
+    { name: 'Image Circle', element: 'img', attributes: { class: 'rounded-circle' }},
 
-    { name: 'Pull Left', element: CKEDITOR.allElements, attributes: { class: 'pull-left' }},
-    { name: 'Pull Right', element: CKEDITOR.allElements, attributes: { class: 'pull-right' }},
+    { name: 'Pull Left', element: CKEDITOR.allElements, attributes: { class: 'float-left' }},
+    { name: 'Pull Right', element: CKEDITOR.allElements, attributes: { class: 'float-right' }},
 
     { name: 'Blockquote Reverse', element: 'blockquote', attributes: { class: 'blockquote-reverse' }},
 ]);
