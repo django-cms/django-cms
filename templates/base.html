@@ -29,8 +29,11 @@
     <meta name="msapplication-TileImage" content="{% static 'ms-icon-144x144.png' %}">
     <meta name="theme-color" content="#ffffff">
 
-
+    <link rel="preload" href="{% static "fonts/museo-sans/d9896899-f08c-4750-a874-a9e10d83c2cb.woff2" %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static "fonts/museo-sans/e2d37f34-6bca-473c-b64d-93811f4dc046.woff2" %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static "fonts/museo-sans/009ca58d-46af-4651-a359-f0ae2301085b.woff2" %}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
     {% render_block "css" %}
     {% block extrahead %}{% endblock %}
     {{ ALDRYN_SNAKE.render_head }}
@@ -52,7 +55,7 @@
 {% block extend_root %}{% endblock %}
 
 {# TODO defer as soon as styleguide is fixed #}
-<script src="{% static 'js/dist/base.bundle.js' %}"></script>
+<script defer src="{% static 'js/dist/base.bundle.js' %}"></script>
 {% render_block "js" %}
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}
