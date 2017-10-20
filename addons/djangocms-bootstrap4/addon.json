@@ -1,5 +1,7 @@
 {
     "installed-apps": [
+        "djangocms-link", 
+        "djangocms-picture", 
         "djangocms_bootstrap4", 
         "djangocms_bootstrap4.contrib.bootstrap4_alerts", 
         "djangocms_bootstrap4.contrib.bootstrap4_badge", 
