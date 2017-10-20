@@ -15,6 +15,7 @@ INSTALLED_ADDONS = [
     'divio-styleguide',
     'djangocms-bootstrap4',
     'djangocms-history',
+    'djangocms-link',
     'djangocms-modules',
     'djangocms-picture',
     'djangocms-snippet',
