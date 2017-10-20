@@ -16,6 +16,7 @@ INSTALLED_ADDONS = [
     'djangocms-bootstrap4',
     'djangocms-history',
     'djangocms-modules',
+    'djangocms-picture',
     'djangocms-snippet',
     'djangocms-style',
     'djangocms-text-ckeditor',
