@@ -13,6 +13,7 @@ INSTALLED_ADDONS = [
     'aldryn-django-cms',
     'aldryn-devsync',
     'divio-styleguide',
+    'djangocms-bootstrap4',
     'djangocms-history',
     'djangocms-modules',
     'djangocms-snippet',
