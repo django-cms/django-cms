@@ -4,7 +4,7 @@
             {% include "includes/icon.html" with icon=icon_type class="mx-auto d-block mb-4 block-icon" color=icon_color %}
         {% endif %}
         <h3 class="card-title">{{ block_title|default:'Title' }}</h3>
-        <p class="card-text">{{ block_desc|default:'Description' }}</p>
+        <p>{{ block_desc|default:'Description' }}</p>
         {% if block_button %}
             <a href="{{ block_href|default:'#' }}" class="mt-auto {{ block_button_class|default:'btn btn-primary' }}">{{ block_button|default:'Go to' }}
                 {% if block_button_icon %}
