@@ -1,0 +1,30 @@
+{% load cms_tags %}
+
+<a
+    {% if instance.target %} target="{{ instance.target }}"{% endif %}
+    class="media block-left block-btn {{ instance.attributes.class }}" href="{{ link }}">
+    {% if instance.attributes.icon %}
+    <div class="mr-3 d-flex align-self-middle">
+        {% include "includes/icon.html" with icon=instance.attributes.icon class=instance.attributes.icon_class color=instance.attributes.icon_color %}
+    </div>
+    {% endif %}
+
+    <div class="media-body d-flex flex-column">
+        <h3 class="mt-0">{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% empty %}{{ instance.name }}{% endfor %}</h3>
+        <p>{{ instance.attributes.description }}</p>
+    </div>
+    {% include "includes/icon.html" with icon="arrow-right" color="blue" class="align-self-center" %}
+</a>
+
+{% comment %}
+# https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+    {{ instance.name }}
+    {{ link }} or {{ instance.get_link }} summarizes:
+        {{ instance.external_link }}
+        {{ instance.internal_link }}
+        {{ instance.anchor }}
+        {{ instance.mailto }}
+        {{ instance.phone }}
+    {{ instance.target }}
+    {{ instance.attributes_str }}
+{% endcomment %}

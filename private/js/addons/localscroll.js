@@ -35,7 +35,8 @@ export function initLocalScroll() {
             return;
         }
 
-        const top = target.offset().top + parseInt(options.offset, 10) + (isToolbarEnabled() ? -46 : 0);
+        // TODO -50 only when navigation bar is fixed
+        const top = target.offset().top + parseInt(options.offset, 10) + (isToolbarEnabled() ? -96 : -50);
 
         scrollTo(top, options.scrollTime).then(function() {
             if (window.history.pushState) {

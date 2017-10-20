@@ -5,6 +5,9 @@ html {
 }
 
 body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
     @include media-breakpoint-up(lg) {
         padding-top: 51px;
     }

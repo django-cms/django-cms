@@ -59,6 +59,9 @@
 
 {# TODO defer as soon as styleguide is fixed #}
 <script defer src="{% static 'js/dist/base.bundle.js' %}"></script>
+{% if request.toolbar and request.toolbar.edit_mode_active %}
+    <script defer src="{% static 'js/dist/cms.bundle.js' %}"></script>
+{% endif %}
 {% render_block "js" %}
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}
