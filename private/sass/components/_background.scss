@@ -58,7 +58,7 @@
 
 .stripe-element {
     width: 100%;
-    height: 100%;
+    height: calc(100% + 120px);
     bottom: 0;
     transform-origin: 0;
     position: absolute;
