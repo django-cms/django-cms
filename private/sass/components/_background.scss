@@ -178,6 +178,22 @@
         padding-top: 40px;
         padding-bottom: 40px;
     }
+
+    margin-left: -15px;
+    margin-right: -15px;
+
+    @include media-breakpoint-up(sm) {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+
+    &.feature-image {
+        height: auto;
+    }
 }
 
 // Different styling if Stipe is immediately after another

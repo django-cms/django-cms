@@ -1,7 +1,9 @@
 {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-message{% if message.tags %} alert-{{ message.tags }}{% endif %}">
-            <p>{{ message }}</p>
-        </div>
-    {% endfor %}
+    <div data-cms-messages-container class="container">
+        {% for message in messages %}
+            <div data-cms-message data-cms-message-tags="{{ message.tags }}"  class="alert alert-message{% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                <p class="mb-0">{{ message }}</p>
+            </div>
+        {% endfor %}
+    </div>
 {% endif %}
