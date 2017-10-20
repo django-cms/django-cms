@@ -175,6 +175,10 @@
         transform-origin: top;
     }
 
+    &.stripe-standalone .stripe-element {
+        height: 100%;
+    }
+
     .container {
         padding-top: 40px;
         padding-bottom: 40px;
