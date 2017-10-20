@@ -8,5 +8,5 @@ export function initHeader() {
         } else {
             mainNav.removeClass('main-nav-scrolled');
         }
-    });
+    }).trigger('scroll');
 }
