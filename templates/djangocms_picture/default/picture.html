@@ -1,0 +1,72 @@
+{% load thumbnail %}
+
+{% if picture_link %}
+    <a href="{{ picture_link }}"
+    {% if instance.link_target %} target="{{ instance.link_target }}"{% endif %}
+    {{ instance.link_attributes_str }}>
+{% endif %}
+
+{# start render figure/figcaption #}
+{% if instance.caption_text %}
+    <figure>
+{% endif %}
+{# end render figure/figcaption #}
+
+<img src="{% spaceless %}
+    {% if instance.external_picture %}
+        {{ instance.external_picture }}
+    {% elif instance.use_no_cropping %}
+        {{ instance.picture.url }}
+    {% elif instance.picture %}
+        {% thumbnail instance.picture picture_size.size crop=picture_size.crop upscale=picture_size.upscale subject_location=instance.picture.subject_location as thumbnail %}
+        {{ thumbnail.url }}
+    {% endif %}{% endspaceless %}"
+    {% if instance.picture.default_alt_text and not instance.attributes.alt %} alt="{{ instance.picture.default_alt_text }}"{% endif %}
+    {% if instance.width %} width="{{ instance.width }}"{% endif %}
+    {% if instance.height %} height="{{ instance.height }}"{% endif %}
+    {{ instance.attributes_str }}
+>
+
+{# start render figure/figcaption #}
+{% if instance.caption_text %}
+        <figcaption>{{ instance.caption_text }}</figcaption>
+    </figure>
+{% endif %}
+{# end render figure/figcaption #}
+
+{% if picture_link %}
+    </a>
+{% endif %}
+
+{% comment %}
+    # https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img
+    # https://developer.mozilla.org/en-US/docs/Web/HTML/Element/figure
+    # https://github.com/divio/django-filer/blob/master/filer/models/imagemodels.py
+    # http://easy-thumbnails.readthedocs.io/en/2.1/usage/#templates
+    {{ instance.picture }}
+    # Available variables:
+    {{ instance.width }}
+    {{ instance.height }}
+    {{ instance.alignment }}
+    {{ instance.caption_text }}
+    {{ instance.attributes_str }}
+    # picture helper
+    {{ instance.get_size }} or {{ picture_size }}
+    # link settings
+    {{ instance.link_url }}
+    {{ instance.link_page }}
+    {{ instance.link_target }}
+    {{ instance.link_attributes_str }}
+    # link helper
+    {{ instance.get_link }} or {{ picture_link }}
+    # cropping settings
+    {{ instance.use_automatic_scaling }}
+    {{ instance.use_no_cropping }}
+    {{ instance.use_crop }}
+    {{ instance.use_upscale }}
+    {{ instance.thumbnail_options }}
+    # activate DJANGOCMS_PICTURE_NESTING to enable nested plugins:
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+{% endcomment %}
