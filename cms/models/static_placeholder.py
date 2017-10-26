@@ -41,7 +41,7 @@ class StaticPlaceholder(models.Model):
         verbose_name=_('creation_method'), choices=CREATION_METHODS,
         default=CREATION_BY_CODE, max_length=20, blank=True,
     )
-    site = models.ForeignKey(Site, null=True, blank=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = _(u'static placeholder')

@@ -88,8 +88,13 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
                                 default=TEMPLATE_DEFAULT)
-    site = models.ForeignKey(Site, help_text=_('The site the page is accessible at.'), verbose_name=_("site"),
-                             related_name='djangocms_pages')
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        help_text=_('The site the page is accessible at.'),
+        verbose_name=_('site'),
+        related_name='djangocms_pages',
+    )
 
     login_required = models.BooleanField(_("login required"), default=False)
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
@@ -105,7 +110,13 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
     # Publisher fields
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
-    publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
+    publisher_public = models.OneToOneField(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='publisher_draft',
+        null=True,
+        editable=False,
+    )
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     # If the draft is loaded from a reversion version save the revision id here.
@@ -1694,6 +1705,7 @@ class PageNode(MP_Node):
     )
     parent = models.ForeignKey(
         'self',
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name='children',
@@ -1701,6 +1713,7 @@ class PageNode(MP_Node):
     )
     site = models.ForeignKey(
         Site,
+        on_delete=models.CASCADE,
         verbose_name=_("site"),
         help_text=_('The site the page is accessible at.'),
         related_name='djangocms_page_nodes',
