@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import datetime
 import json
 import pickle
+import warnings
 
 from cms.api import create_page
 
@@ -870,6 +871,12 @@ class PluginsTestCase(PluginsTestBaseCase):
             "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
             get_page, a
         )
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            a.page
+            self.assertEqual(1, len(w))
+            self.assertIn('test_plugins.py', w[0].filename)
 
     def test_set_translatable_content(self):
         a = self.get_plugin_model('TextPlugin')(body="hello")
