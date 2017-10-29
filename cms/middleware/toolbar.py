@@ -2,7 +2,9 @@
 """
 Edit Toolbar middleware
 """
+from django import forms
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import resolve
 
 from cms.toolbar.toolbar import CMSToolbar
@@ -26,8 +28,13 @@ class ToolbarMiddleware(MiddlewareMixin):
 
         if internal_ips:
             client_ip = get_request_ip(request)
-            if client_ip not in internal_ips:
+            try:
+                client_ip = forms.GenericIPAddressField().clean(client_ip)
+            except ValidationError:
                 return False
+            else:
+                if client_ip not in internal_ips:
+                    return False
 
         if not toolbar_hide:
             return True
