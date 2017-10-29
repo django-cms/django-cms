@@ -310,7 +310,9 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         warnings.warn(
             "Don't use the page attribute on CMSPlugins! CMSPlugins are not "
             "guaranteed to have a page associated with them!",
-            DontUsePageAttributeWarning)
+            DontUsePageAttributeWarning,
+            stacklevel=2,
+        )
         return self.placeholder.page if self.placeholder_id else None
 
     def get_instance_icon_src(self):
