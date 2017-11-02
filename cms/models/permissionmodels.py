@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 from django.apps import apps
 from django.db import models
 from django.conf import settings
@@ -267,6 +268,8 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
+        if (1, 10) <= django.VERSION < (2, 0):
+            manager_inheritance_from_future = True
 
 
 reversion_register(PagePermission)
