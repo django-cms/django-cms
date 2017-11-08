@@ -2061,7 +2061,8 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     // have to delegate here because there might be plugins that
     // have their content replaced by something dynamic. in case that tool
     // copies the classes - double click to edit would still work
-    $document.on(Plugin.click, '.cms-plugin', Plugin._clickToHighlightHandler);
+    // also - do not try to highlight render_model_blocks, only actual plugins
+    $document.on(Plugin.click, '.cms-plugin:not([class*=cms-plugin-cms-])', Plugin._clickToHighlightHandler);
     $document.on(`${Plugin.pointerOverAndOut} ${Plugin.touchStart}`, '.cms-plugin', function(e) {
         // required for both, click and touch
         // otherwise propagation won't work to the nested plugin
