@@ -550,6 +550,7 @@
         border-radius: $toolbar-button-border-radius 0 0 $toolbar-button-border-radius;
     }
     a:last-child {
+        margin-left: -1px;
         border-radius: 0 $toolbar-button-border-radius $toolbar-button-border-radius 0;
     }
     a:only-child {
