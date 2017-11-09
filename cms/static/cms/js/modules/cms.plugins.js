@@ -7,7 +7,7 @@ import $ from 'jquery';
 import '../polyfills/array.prototype.findindex';
 import nextUntil from './nextuntil';
 
-import { toPairs, isNaN, debounce, findIndex, find, uniqWith, once } from 'lodash';
+import { toPairs, isNaN, debounce, findIndex, find, every, uniqWith, once, difference } from 'lodash';
 
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
@@ -171,7 +171,7 @@ var Plugin = new Class({
                     });
 
                     // otherwise we don't really need text nodes or comment nodes or empty text nodes
-                    itemContents = itemContents.filter(function () {
+                    itemContents = itemContents.filter(function() {
                         return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
                     });
 
@@ -356,7 +356,6 @@ var Plugin = new Class({
     },
 
     _setPluginContentEvents: function _setPluginContentEvents() {
-
         const pluginDoubleClickEvent = this._getNamepacedEvent(Plugin.doubleClick);
 
         this.ui.container
@@ -871,8 +870,8 @@ var Plugin = new Class({
         }
 
         // remove event bound to global elements like document or window
-        $document.off(`.${ this.uid }`);
-        $window.off(`.${ this.uid }`);
+        $document.off(`.${this.uid}`);
+        $window.off(`.${this.uid}`);
 
         // TODO: It would be better to return something at this point
         // but we don't do it anywhere so let's keep it void for now
@@ -1329,7 +1328,7 @@ var Plugin = new Class({
      * plugin._getNamepacedEvent(Plugin.keyDown, '.traverse'); // 'keydown.cms.plugin.traverse.42'
      */
     _getNamepacedEvent(base, additionalNS = '') {
-        return `${ base }${ additionalNS ? '.'.concat(additionalNS) : '' }.${ this.uid }`;
+        return `${base}${additionalNS ? '.'.concat(additionalNS) : ''}.${this.uid}`;
     },
 
     /**
@@ -1730,11 +1729,47 @@ var Plugin = new Class({
             }
         }
 
+        this._updatePlaceholderCollapseState();
+
         // make sure structurboard gets updated after expanding
         $document.trigger('resize.sideframe');
 
         // save settings
         Helpers.setSettings(settings);
+    },
+
+    _updatePlaceholderCollapseState() {
+        if (this.options.type !== 'plugin' || !this.options.placeholder_id) {
+            return;
+        }
+
+        const pluginsOfCurrentPlaceholder = CMS._plugins
+            .filter(([, o]) => o.placeholder_id === this.options.placeholder_id && o.type === 'plugin')
+            .map(([, o]) => o.plugin_id);
+
+        const openedPlugins = CMS.settings.states;
+        const closedPlugins = difference(pluginsOfCurrentPlaceholder, openedPlugins);
+        const areAllRemainingPluginsLeafs = every(closedPlugins, id => {
+            return !find(
+                CMS._plugins,
+                ([, o]) => o.placeholder_id === this.options.placeholder_id && o.plugin_parent === id
+            );
+        });
+        const el = $(`.cms-dragarea-${this.options.placeholder_id} .cms-dragbar-title`);
+        var settings = CMS.settings;
+
+        if (areAllRemainingPluginsLeafs) {
+            // meaning that all plugins in current placeholder are expanded
+            el.addClass('cms-dragbar-title-expanded');
+
+            settings.dragbars = settings.dragbars || [];
+            settings.dragbars.push(this.options.placeholder_id);
+        } else {
+            el.removeClass('cms-dragbar-title-expanded');
+
+            settings.dragbars = settings.dragbars || [];
+            settings.dragbars.splice($.inArray(this.options.placeholder_id, settings.states), 1);
+        }
     },
 
     /**
