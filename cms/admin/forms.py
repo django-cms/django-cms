@@ -301,6 +301,7 @@ class AdvancedSettingsForm(forms.ModelForm):
                     # for application_configs to avoid the field data from
                     # being validated by the field itself
                     try:
+                        self.data = self.data.copy()  # self.data is usually immutable. Copy it to make it mutable.
                         del self.data['application_configs']
                     except KeyError:
                         pass
