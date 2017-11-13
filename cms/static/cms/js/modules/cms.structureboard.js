@@ -1087,6 +1087,11 @@ class StructureBoard {
     }
 
     _handleExternalUpdate(value) {
+        // means localstorage was cleared while this page was open
+        if (!value) {
+            return;
+        }
+
         const [action, data, pathname] = JSON.parse(value);
 
         if (pathname !== window.location.pathname) {
