@@ -199,7 +199,7 @@
                         data-cms-tooltip="{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}"{% endif %}>
                         {% if has_add_page_permission %}
                             <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk }}"
-                                class="cms-btn cms-btn-default cms-icon cms-icon-plus">
+                                class="js-cms-pagetree-add-page cms-btn cms-btn-default cms-icon cms-icon-plus">
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled cms-icon cms-icon-plus">
                         {% endif %}
