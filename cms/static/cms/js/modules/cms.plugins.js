@@ -235,14 +235,6 @@ var Plugin = new Class({
             title.addClass(expanded);
         }
 
-        const dragarea = this.ui.dragbar.closest('.cms-dragarea');
-
-        if (this.ui.dragbar.closest('.cms-dragarea').hasClass('cms-dragarea-static')) {
-            this.ui.dragbar.on('click', () => {
-                dragarea.toggleClass('cms-dragarea-static-expanded');
-            });
-        }
-
         this._checkIfPasteAllowed();
     },
 
@@ -2130,6 +2122,12 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         }
 
         CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+    });
+
+    $document.on(Plugin.click, '.cms-dragarea-static .cms-dragbar', e => {
+        if (!e.isDefaultPrevented()) {
+            $(e.target).closest('.cms-dragarea').toggleClass('cms-dragarea-static-expanded');
+        }
     });
 
     $window.on('blur.cms', () => {
