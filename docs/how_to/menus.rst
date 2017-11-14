@@ -41,7 +41,7 @@ Create a ``cms_menus.py`` in your application, with the following::
 
 .. note:: Up to version 3.1 this module was named ``menu.py``. Please
           update your existing modules to the new naming convention.
-          Support for the old name will be removed in version 3.4.
+          Support for the old name will be removed in version 3.5.
 
 If you refresh a page you should now see the menu entries above.
 The ``get_nodes`` function should return a list of
