@@ -1554,9 +1554,9 @@
       "dev": true
     },
     "djangocms-casper-helpers": {
-      "version": "2.0.0",
-      "from": "djangocms-casper-helpers@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/djangocms-casper-helpers/-/djangocms-casper-helpers-2.0.0.tgz",
+      "version": "3.0.0",
+      "from": "djangocms-casper-helpers@3.0.0",
+      "resolved": "https://registry.npmjs.org/djangocms-casper-helpers/-/djangocms-casper-helpers-3.0.0.tgz",
       "dev": true,
       "dependencies": {
         "minimist": {

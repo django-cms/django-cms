@@ -34,7 +34,7 @@ casper.test.begin('copy page with apphook should not be copied', function(test) 
         .then(cms.openSideframe())
         .withFrame(0, function() {
             casper.waitUntilVisible('.cms-pagetree-jstree').wait(3000).then(cms.expandPageTree());
-            this.then(cms.triggerCopyPage({ page: cms.getPageId('apphook') }));
+            this.then(cms.triggerCopyPage({ page: cms.getPageNodeId('apphook') }));
             this.waitUntilVisible('.messagelist', function() {
                 test.assertVisible('.error', 'Message appeared');
                 test.assertSelectorHasText(

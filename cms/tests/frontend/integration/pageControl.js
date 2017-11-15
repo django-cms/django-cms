@@ -79,7 +79,7 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
         .waitUntilVisible('.cms-messages-inner', function() {
             test.assertSelectorHasText(
                 '.cms-messages-inner',
-                'The page "' + SECOND_PAGE_TITLE + '" was changed successfully. You may edit it again below.',
+                'The page "' + UPDATED_TITLE + '" was changed successfully. You may edit it again below.',
                 'Page settings can be edited through modal'
             );
         })

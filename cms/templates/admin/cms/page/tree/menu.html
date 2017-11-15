@@ -8,6 +8,13 @@
     {% if node.depth == 0 %} cms-tree-node-top{% endif %}
     {% if filtered %} cms-tree-node-filtered{% endif %}
     {% if has_add_permission %} cms-tree-node-root-allow-children{% endif %}
+    {% block extra_class %}
+        {% if is_shared_page %}
+            cms-tree-node-shared-true
+        {% else %}
+            cms-tree-node-shared-false
+        {% endif %}
+    {% endblock %}
     "
     {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
     data-id="{{ page.pk }}"
@@ -16,43 +23,52 @@
     data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-move-permission="{{ has_move_page_permission|yesno:"true,false" }}"
     data-add-permission="{{ has_add_page_permission|yesno:"true,false" }}"
+    {% block extra_data %}
+        {% if is_shared_page %}
+            data-shared-page="-true"
+        {% else %}
+            data-shared-page="-false"
+        {% endif %}
+    {% endblock %}
     data-colview='
         <div class="cms-tree-col">
             <div class="cms-tree-item-wrapper">
-                {% if page.is_home %}
-                    <div class="cms-tree-item cms-tree-item-icons">
-                        <div class="cms-tree-item-inner">
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% autoescape on %}{% trans 'Home' %}{% endautoescape %}">
-                                <span class="cms-icon cms-icon-home"></span>
+                {% block row_icon %}
+                    {% if page.is_home %}
+                        <div class="cms-tree-item cms-tree-item-icons">
+                            <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% autoescape on %}{% trans 'Home' %}{% endautoescape %}">
+                                    <span class="cms-icon cms-icon-home"></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endif %}
-                {% if page.soft_root %}
-                    <div class="cms-tree-item cms-tree-item-icons">
-                        <div class="cms-tree-item-inner">
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% autoescape on %}{% trans 'Softroot' %}{% endautoescape %}">
-                                <a href="{% url opts|admin_urlname:'advanced' page.id %}">
-                                    <span class="cms-icon cms-icon-sitemap"></span>
-                                </a>
+                    {% endif %}
+                    {% if page.soft_root %}
+                        <div class="cms-tree-item cms-tree-item-icons">
+                            <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% autoescape on %}{% trans 'Softroot' %}{% endautoescape %}">
+                                    <a href="{% url opts|admin_urlname:'advanced' page.id %}">
+                                        <span class="cms-icon cms-icon-sitemap"></span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endif %}
-                {% if page.application_urls %}
-                    <div class="cms-tree-item cms-tree-item-icons">
-                        <div class="cms-tree-item-inner">
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% autoescape on %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endautoescape %}">
-                                <a href="{% url opts|admin_urlname:'advanced' page.id %}">
-                                    <span class="cms-icon cms-icon-puzzle"></span>
-                                </a>
+                    {% endif %}
+                    {% if page.application_urls %}
+                        <div class="cms-tree-item cms-tree-item-icons">
+                            <div class="cms-tree-item-inner">
+                                <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                                    data-cms-tooltip="{% autoescape on %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endautoescape %}">
+                                    <a href="{% url opts|admin_urlname:'advanced' page.id %}">
+                                        <span class="cms-icon cms-icon-puzzle"></span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                {% endblock %}
             </div>
         </div>
     '
@@ -72,7 +88,7 @@
     {% for lang in site_languages %}
     data-col{{ lang|lower|cut:'-' }}='
         <div class="cms-tree-col">
-            <div class="cms-tree-item {% if not has_publish_permission %} cms-tree-item-disabled{% endif %} cms-tree-item-lang">
+            <div class="cms-tree-item {% if is_shared_page or not has_publish_permission %} cms-tree-item-disabled{% endif %} cms-tree-item-lang">
                 <div class="cms-tree-item-inner cms-pagetree-dropdown{% if has_publish_permission %} js-cms-pagetree-dropdown{% endif %}">
                     {% if has_publish_permission %}
                         <a href="{% url opts|admin_urlname:'preview_page' page.id lang %}"
@@ -196,7 +212,7 @@
                     </div>
                 </div>
                 <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url opts|admin_urlname:'actions_menu' page.id %}">
-                    <a data-id="{{ page.pk }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                    <a data-node-id="{{ node.pk }}" data-id="{{ page.pk }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                         <span class="sr-only">{% autoescape on %}{% trans "Options" %}{% endautoescape %}</span>
                     </a>
 
@@ -218,7 +234,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#" data-id="{{ page.pk }}" class="cms-pagetree-dropdown-item-disabled">
+                                <a href="#" data-node-id="{{ node.pk }}" data-id="{{ page.pk }}" class="cms-pagetree-dropdown-item-disabled">
                                     <span class="cms-icon cms-icon-alias"></span>
                                     <span>{% autoescape on %}{% trans "Paste" %}{% endautoescape %}</span>
                                 </a>
@@ -249,6 +265,7 @@
             </div>
         </div>
     '
+    {% block extra_cols %}{% endblock %}
     >
 
     {% language LANGUAGE_CODE %}

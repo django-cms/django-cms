@@ -49,7 +49,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                         'Second page is nested into the Homepage'
                     );
 
-                    secondPageId = cms.getPageId('Second');
+                    secondPageId = cms.getPageNodeId('Second');
 
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
@@ -66,9 +66,9 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     );
                 })
                 .then(function() {
-                    var firstPageId = cms.getPageId('Homepage');
+                    var firstPageId = cms.getPageNodeId('Homepage');
 
-                    this.click('.js-cms-pagetree-options[data-id="' + firstPageId + '"]');
+                    this.click('.js-cms-pagetree-options[data-node-id="' + firstPageId + '"]');
                 })
                 .then(cms.waitUntilActionsDropdownLoaded())
                 .then(function() {
@@ -147,7 +147,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                     // click on "Paste" to homepage
                     this.then(
                         cms.triggerPastePage({
-                            page: cms.getPageId('Homepage')
+                            page: cms.getPageNodeId('Homepage')
                         })
                     );
                 })
@@ -326,12 +326,12 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 // then try to copy sibling into a sibling (homepage into sibling "second" page)
                 .then(function() {
-                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
+                    this.then(cms.triggerCopyPage({ page: cms.getPageNodeId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .then(function() {
                     // click on "Paste" to top level "second" page
-                    var pages = cms._getPageIds('Second');
+                    var pages = cms._getPageNodeIds('Second');
 
                     this.then(
                         cms.triggerPastePage({
@@ -466,7 +466,7 @@ casper.test.begin('Pages can be copied and pasted when CMS_PERMISSION=False', fu
                 })
                 // then try to copy a page into own child
                 .then(function() {
-                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
+                    this.then(cms.triggerCopyPage({ page: cms.getPageNodeId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .then(function() {

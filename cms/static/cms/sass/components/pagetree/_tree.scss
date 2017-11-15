@@ -43,6 +43,7 @@
 //###########################################################
 // CONTAINER
 // general container around the jstree or elements
+.cms-pagetree-root,
 .cms-pagetree-root.filtered {
     min-height: 0;
     // important is to fight with admin-style
@@ -94,6 +95,7 @@
 .cms-pagetree-header {
     position: relative;
     display: table;
+    display: flex;
     width: 100%;
     box-sizing: border-box;
     z-index: z(pagetree, header);
@@ -435,6 +437,7 @@
 
 .cms-tree-item-disabled {
     opacity: 0.3;
+    pointer-events: none;
 }
 
 .cms-tree-item-wrapper {
@@ -690,6 +693,10 @@
         border: none;
         background: none;
     }
+    .jstree-grid-header {
+        z-index: 1;
+        position: relative;
+    }
     &.jstree-grid-cell {
         padding: 0;
     }
@@ -804,7 +811,10 @@
         margin-top: -1px;
         border: 1px solid $gray-lighter;
         border-right: none;
-        background: $white url('../../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+        background-color: $white;
+        background-image: url('../../img/pagetree/tree-li-drag.gif');
+        background-repeat: no-repeat;
+        background-position: -1px center;;
         image-rendering: pixelated;
 
         &:hover {
@@ -812,9 +822,9 @@
         }
     }
 
-    .jstree-node[data-move-permission="false"] .jstree-anchor {
+    .jstree-node[data-move-permission="false"] > .jstree-anchor {
         cursor: default;
-        background: $white;
+        background-image: none;
     }
 
     .jstree-open,
@@ -910,6 +920,97 @@
 }
 
 //###########################################################
+// shared pages look
+.jstree-django-cms {
+    $bg-shared: #f2f2f2;
+    .cms-tree-node-shared-true {
+        > .jstree-anchor {
+            border-style: dashed;
+            border-right: none;
+            color: #999;
+            background-color: $bg-shared !important;
+
+            &:hover {
+                color: #999 !important;
+            }
+
+            &.jstree-hovered,
+            &.jstree-clicked {
+                background-color: $bg-shared !important;
+            }
+        }
+    }
+
+    .jstree-grid-cell.jstree-hovered,
+    .jstree-grid-cell.jstree-clicked {
+        background-color: $bg-shared;
+    }
+
+    .cms-tree-node-shared-false {
+        > .jstree-anchor {
+            border-style: solid;
+            border-right: none;
+            background-color: white !important;
+            border-bottom: $pagetree-border;
+
+            &.jstree-hovered,
+            &.jstree-clicked {
+                background-color: lighten($gray-lightest, 3%) !important;
+            }
+        }
+
+        + .cms-tree-node-shared-true {
+            > .jstree-anchor {
+                border-top-style: solid;
+            }
+            &.jstree-hovered,
+            &.jstree-clicked {
+                background-color: $bg-shared;
+            }
+        }
+    }
+
+    .cms-page-tree-cell-shared--true {
+        border-style: dashed;
+        background-color: #f2f2f2;
+
+        &.jstree-grid-cell-regular-options {
+            border-left: none;
+        }
+
+        .cms-btn-no-border {
+            background-color: transparent !important;
+            &:hover {
+                background-color: #fff !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+
+        &.jstree-hovered,
+        &.jstree-clicked {
+            background-color: $bg-shared !important;
+        }
+    }
+
+    .cms-page-tree-cell-shared--false {
+        background-color: white;
+
+        &.jstree-hovered,
+        &.jstree-clicked {
+            background-color: lighten($gray-lightest, 3%) !important;
+        }
+    }
+
+    .cms-page-tree-cell-shared--true + .cms-page-tree-cell-shared--false {
+        border-top: $pagetree-border;
+        margin-top: -1px;
+        padding-top: 8px;
+        height: 47px;
+    }
+
+}
+
+//###########################################################
 // drag & drop item
 #jstree-dnd {
     box-sizing: border-box;
@@ -918,7 +1019,7 @@
     height: $pagetree-cell-height;
     padding: $pagetree-anchor-padding !important;
     margin-left: -$pagetree-marker-size + 1;
-    background: $color-primary url('../../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+    background-color: $color-primary !important;
     color: $white;
     // copy icon triggered when pressing `CMD`
     .jstree-copy {

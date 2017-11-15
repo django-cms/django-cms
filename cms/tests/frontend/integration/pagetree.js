@@ -161,6 +161,7 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                 .wait(2000)
                 .then(function() {
                     var pageId = cms.getPageId('Homepage');
+                    var pageNodeId = cms.getPageNodeId('Homepage');
 
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{ name: 'Homepage' }])),
@@ -171,7 +172,7 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                         'Page is published by default'
                     );
                     // add nested page
-                    this.click('a[href*="/admin/cms/page/add/?target=' + pageId + '"]');
+                    this.click('a[href*="/admin/cms/page/add/?parent_node=' + pageNodeId + '"]');
                 })
                 .waitForSelector('#page_form', function() {
                     this.sendKeys('#id_title', 'Nested page');
@@ -551,7 +552,7 @@ casper.test.begin('Pages can be copied and pasted', function(test) {
                         'Second page is nested into the Homepage'
                     );
 
-                    secondPageId = cms.getPageId('Second');
+                    secondPageId = cms.getPageNodeId('Second');
 
                     this.then(cms.triggerCopyPage({ page: secondPageId }));
                 })
@@ -568,9 +569,9 @@ casper.test.begin('Pages can be copied and pasted', function(test) {
                     );
                 })
                 .then(function() {
-                    var firstPageId = cms.getPageId('Homepage');
+                    var firstPageId = cms.getPageNodeId('Homepage');
 
-                    this.click('.js-cms-pagetree-options[data-id="' + firstPageId + '"]');
+                    this.click('.js-cms-pagetree-options[data-node-id="' + firstPageId + '"]');
                 })
                 .then(cms.waitUntilActionsDropdownLoaded())
                 .then(function() {
@@ -679,7 +680,7 @@ casper.test.begin('Pages can be copied and pasted', function(test) {
                 .then(function() {
                     this.then(
                         cms.triggerPastePage({
-                            page: cms.getPageId('Homepage')
+                            page: cms.getPageNodeId('Homepage')
                         })
                     );
                 })
@@ -778,7 +779,7 @@ casper.test.begin('Pages can be copied and pasted', function(test) {
                     // click on "Paste" to homepage
                     this.then(
                         cms.triggerPastePage({
-                            page: cms.getPageId('Homepage')
+                            page: cms.getPageNodeId('Homepage')
                         })
                     );
                 })
@@ -961,12 +962,12 @@ casper.test.begin('Pages can be copied and pasted', function(test) {
                 })
                 // then try to copy sibling into a sibling (homepage into sibling "second" page)
                 .then(function() {
-                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
+                    this.then(cms.triggerCopyPage({ page: cms.getPageNodeId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .then(function() {
                     // click on "Paste" to top level "second" page
-                    var pages = cms._getPageIds('Second');
+                    var pages = cms._getPageNodeIds('Second');
 
                     this.then(
                         cms.triggerPastePage({
@@ -1102,7 +1103,7 @@ casper.test.begin('Pages can be copied and pasted', function(test) {
                 })
                 // then try to copy a page into own child
                 .then(function() {
-                    this.then(cms.triggerCopyPage({ page: cms.getPageId('Homepage') }));
+                    this.then(cms.triggerCopyPage({ page: cms.getPageNodeId('Homepage') }));
                 })
                 // wait until paste buttons show up
                 .then(function() {
@@ -1170,7 +1171,7 @@ casper.test.begin('Cut helpers show up correctly', function(test) {
                         'Second page is nested into the Homepage'
                     );
 
-                    secondPageId = cms.getPageId('Second');
+                    secondPageId = cms.getPageNodeId('Second');
 
                     this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
@@ -1179,10 +1180,10 @@ casper.test.begin('Cut helpers show up correctly', function(test) {
                     var pages = ['Homepage', 'Second', 'Third', 'Fourth', 'Top sibling'];
 
                     return this.eachThen(pages, function(page) {
-                        var pageId = cms.getPageId(page.data);
+                        var pageId = cms.getPageNodeId(page.data);
 
                         this.then(function() {
-                            this.click('.js-cms-pagetree-options[data-id="' + pageId + '"]');
+                            this.click('.js-cms-pagetree-options[data-node-id="' + pageId + '"]');
                         }).then(cms.waitUntilActionsDropdownLoaded());
                     });
                 })
@@ -1210,7 +1211,7 @@ casper.test.begin('Cut helpers show up correctly', function(test) {
                         xPath(
                             getPasteHelpersXPath({
                                 visible: false,
-                                pageId: cms.getPageId('Third')
+                                pageId: cms.getPageNodeId('Third')
                             })
                         ),
                         'Paste target is not the child of the page itself'
@@ -1219,7 +1220,7 @@ casper.test.begin('Cut helpers show up correctly', function(test) {
                         xPath(
                             getPasteHelpersXPath({
                                 visible: false,
-                                pageId: cms.getPageId('Fourth')
+                                pageId: cms.getPageNodeId('Fourth')
                             })
                         ),
                         'Paste target is not the child of the child of the page itself'
@@ -1296,7 +1297,7 @@ casper.test.begin('Pages can be cut and pasted', function(test) {
                         'Initial page structure is correct'
                     );
 
-                    secondPageId = cms.getPageId('Second');
+                    secondPageId = cms.getPageNodeId('Second');
 
                     this.then(cms.triggerCutPage({ page: secondPageId }));
                 })
@@ -1412,7 +1413,7 @@ casper.test.begin('Pages can be cut and pasted', function(test) {
                 .then(function() {
                     this.then(
                         cms.triggerPastePage({
-                            page: cms.getPageId('Top sibling')
+                            page: cms.getPageNodeId('Top sibling')
                         })
                     );
                 })
@@ -1517,7 +1518,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                     );
                 })
                 .then(function() {
-                    this.click('.jstree-closed[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
+                    this.click('.jstree-closed[data-node-id="' + cms.getPageNodeId('Homepage') + '"] > .jstree-ocl');
                 })
                 .waitForResource(/get-tree/)
                 .wait(2000)
@@ -1560,7 +1561,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                     );
                 })
                 .then(function() {
-                    this.click('.jstree-open[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
+                    this.click('.jstree-open[data-node-id="' + cms.getPageNodeId('Homepage') + '"] > .jstree-ocl');
                     test.assertExists(
                         xPath(
                             createJSTreeXPathFromTree([
@@ -1663,7 +1664,7 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
                 })
                 .then(function() {
                     this.fill(
-                        '#changelist-search',
+                        '.js-cms-pagetree-header-search',
                         {
                             q: 'seco'
                         },

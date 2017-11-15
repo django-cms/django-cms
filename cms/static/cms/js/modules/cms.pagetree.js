@@ -11,6 +11,7 @@ import Class from 'classjs';
 import { Helpers, KEYS } from './cms.base';
 import PageTreeDropdowns from './cms.pagetree.dropdown';
 import PageTreeStickyHeader from './cms.pagetree.stickyheader';
+import { debounce, without } from 'lodash';
 
 /**
  * The pagetree is loaded via `/admin/cms/page` and has a custom admin
@@ -92,12 +93,16 @@ var PageTree = new Class({
                 // the first row is already populated, to avoid overwrites
                 // just leave the "key" param empty
                 columns.push({
+                    wideValueClass: obj.wideValueClass,
+                    wideValueClassPrefix: obj.wideValueClassPrefix,
                     header: obj.title,
                     width: obj.width || '1%',
                     wideCellClass: obj.cls
                 });
             } else {
                 columns.push({
+                    wideValueClass: obj.wideValueClass,
+                    wideValueClassPrefix: obj.wideValueClassPrefix,
                     header: obj.title,
                     value: function(node) {
                         // it needs to have the "colde" format and not "col-de"
@@ -218,11 +223,11 @@ var PageTree = new Class({
         var that = this;
 
         // set events for the nodeId updates
-        this.ui.tree.on('after_close.jstree', function (e, el) {
+        this.ui.tree.on('after_close.jstree', function(e, el) {
             that._removeNodeId(el.node.data.nodeId);
         });
 
-        this.ui.tree.on('after_open.jstree', function (e, el) {
+        this.ui.tree.on('after_open.jstree', function(e, el) {
             that._storeNodeId(el.node.data.nodeId);
 
             // `after_open` event can be triggered when pasting
@@ -244,6 +249,21 @@ var PageTree = new Class({
                 that.ui.container.removeClass('cms-pagetree-alt-mode');
             }
         });
+
+        $(window)
+            .on(
+                'mousemove.pagetree.alt-mode',
+                debounce(function(e) {
+                    if (e.shiftKey) {
+                        that.ui.container.addClass('cms-pagetree-alt-mode');
+                    } else {
+                        that.ui.container.removeClass('cms-pagetree-alt-mode');
+                    }
+                }, 200) // eslint-disable-line no-magic-numbers
+            )
+            .on('blur.cms', () => {
+                that.ui.container.removeClass('cms-pagetree-alt-mode');
+            });
 
         this.ui.document.on('dnd_start.vakata', function(e, data) {
             var element = $(data.element);
@@ -489,19 +509,29 @@ var PageTree = new Class({
      * @returns {String} id that has been removed
      */
     _removeNodeId: function _removeNodeId(id) {
-        var number = id;
-        var storage = this._getStoredNodeIds();
-        var index = storage.indexOf(number);
+        const instance = this.ui.tree.jstree(true);
+        const childrenIds = instance.get_node({
+            id: CMS.$(`[data-node-id=${id}]`).attr('id')
+        }).children_d;
 
-        // remove given id from storage
-        if (index !== -1) {
-            storage.splice(index, 1);
-        }
+        const idsToRemove = [id].concat(
+            childrenIds.map(childId => {
+                const node = instance.get_node({ id: childId });
+
+                if (!node || !node.data) {
+                    return node;
+                }
+
+                return node.data.nodeId;
+            })
+        );
+
+        const storage = without(this._getStoredNodeIds(), ...idsToRemove);
 
         CMS.settings.pagetree = storage;
         Helpers.setSettings(CMS.settings);
 
-        return number;
+        return id;
     },
 
     /**
@@ -1021,6 +1051,10 @@ var PageTree = new Class({
     }
 });
 
+PageTree._init = function() {
+    new PageTree();
+};
+
 // shorthand for jQuery(document).ready();
 $(function() {
     // load cms settings beforehand
@@ -1037,7 +1071,7 @@ $(function() {
     };
     window.CMS.settings = Helpers.getSettings();
     // autoload the pagetree
-    new PageTree();
+    CMS.PageTree._init();
 });
 
 export default PageTree;
