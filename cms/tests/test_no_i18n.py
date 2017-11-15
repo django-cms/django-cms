@@ -13,7 +13,7 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 overrides = dict(
     LANGUAGE_CODE='en-us',
@@ -145,7 +145,6 @@ class TestNoI18N(CMSTestCase):
             'title': 'test page 1',
             'slug': 'test-page1',
             'language': "en-us",
-            'template': 'nav_playground.html',
             'parent': '',
             'site': 1,
         }
@@ -155,11 +154,10 @@ class TestNoI18N(CMSTestCase):
                           password=getattr(self.super_user, get_user_model().USERNAME_FIELD))
 
         self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
-        page = Page.objects.all()[0]
+        page = Page.objects.drafts().first()
         self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
-        page = Page.objects.all()[0]
-
-        placeholder = page.placeholders.get(slot="body")
+        page = Page.objects.drafts().first()
+        placeholder = page.placeholders.latest('id')
         data = {'name': 'Hello', 'external_link': 'http://www.example.org/'}
         add_url = self.get_add_plugin_uri(placeholder, 'LinkPlugin', 'en-us')
 

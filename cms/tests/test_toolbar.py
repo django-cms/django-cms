@@ -335,6 +335,7 @@ class ToolbarTests(ToolbarTestBase):
 
         # page with publish != draft
         page_2.get_title_obj().slug = 'mod-page'
+        page_2.get_title_obj().path = 'top-page/mod-page'
         page_2.get_title_obj().save()
         # check when in draft mode
         with self.login_user_context(superuser):
@@ -530,7 +531,11 @@ class ToolbarTests(ToolbarTestBase):
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 3, items)
+        self.assertEqual(len(items), 4, items)
+        page_items = items[1].get_items()
+        # The page menu should only have the "Create page" item enabled.
+        self.assertFalse(page_items[0].disabled)
+        self.assertTrue(all(item.disabled for item in page_items[1:] if hasattr(item, 'disabled')))
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 14, admin_items)
 
@@ -678,18 +683,21 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url_on, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
-            page_data = self.get_new_page_data(parent_id=page.pk)
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page_data = self.get_new_page_data(parent_id=page.node.pk)
+            response = self.client.post(self.get_admin_url(Page, 'add'), page_data)
+            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+
+            public_home = Page.objects.public().get(is_home=True)
 
             # test redirection when toolbar is in edit mode
-            response = self.client.post(resolve_url_on, {'pk': Page.objects.all()[2].pk,
+            response = self.client.post(resolve_url_on, {'pk': public_home.pk,
                                                          'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
 
             self.client.post(URL_CMS_PAGE_ADD, page_data)
 
             # test redirection when toolbar is not in edit mode
-            response = self.client.post(resolve_url_off, {'pk': Page.objects.all()[2].pk,
+            response = self.client.post(resolve_url_off, {'pk': public_home.pk,
                                                           'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/')
 

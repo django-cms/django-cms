@@ -14,7 +14,7 @@ from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page
-from cms.cms_menus import get_visible_pages
+from cms.cms_menus import get_visible_nodes
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
@@ -23,7 +23,8 @@ from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils import get_cms_setting
+from cms.utils import get_current_site
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 
 
@@ -208,9 +209,6 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
 
-    def get_level(self, num):
-        return Page.objects.public().filter(level=num)
-
     def get_all_pages(self):
         return Page.objects.public()
 
@@ -267,9 +265,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
 
-    def get_level(self, num):
-        return Page.objects.public().filter(depth=num)
-
     def get_all_pages(self):
         return Page.objects.public()
 
@@ -317,11 +312,10 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_show_menu_num_queries(self):
         context = self.get_context()
         # test standard show_menu
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
             The queries should be:
-                get all public pages
-                get all draft pages from public pages
+                get all page nodes
                 get all page permissions
                 get all titles
                 get the menu cache key
@@ -400,10 +394,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         context['request'].session['cms_edit'] = False
 
         # Prime the cache
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             # The queries should be:
-            #     get all public pages
-            #     get all draft pages from public pages
+            #     get all page nodes
             #     get all page permissions
             #     get all titles
             #     get the menu cache key
@@ -423,13 +416,12 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         CacheKey.objects.all().delete()
 
         # The menu should be recalculated
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             # The queries should be:
-            #     get all public pages
-            #     get all draft pages from public pages
+            #     check if cache key exists
+            #     get all page nodes
             #     get all page permissions
-            #     get all titles
-            #     get the menu cache key
+            #     get all title objects
             #     set the menu cache key
             Template("{% load menu_tags %}{% show_menu %}").render(context)
 
@@ -482,12 +474,16 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(node.children), 0)
 
     def test_only_level_one(self):
+        site = get_current_site()
         context = self.get_context()
         # test standard show_menu
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
-        self.assertEqual(len(nodes), len(self.get_level(2)))
+        level_2_public_pages = Page.objects.public().filter(
+            publisher_public__in=Page.objects.filter(nodes__depth=2, site=site)
+        )
+        self.assertEqual(len(nodes), level_2_public_pages.count())
         for node in nodes:
             self.assertEqual(len(node.children), 0)
 
@@ -691,12 +687,13 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         When we render P6, there should be a menu entry for P7 and P8 if the
         tag parameters are "1 XXX XXX XXX"
         """
+        site = get_current_site()
         page6 = self.get_page(6)
         context = self.get_context(page6.get_absolute_url(), page=page6)
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
-        number_of_p6_children = len(page6.children.filter(in_navigation=True))
+        number_of_p6_children = page6.get_child_pages(site).filter(in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p6_children)
 
         page7 = self.get_page(7)
@@ -709,7 +706,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 2 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
-        number_of_p7_children = len(page7.children.filter(in_navigation=True))
+        number_of_p7_children = page7.get_child_pages(site).filter(in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p7_children)
 
     def test_show_breadcrumb_invisible(self):
@@ -927,15 +924,9 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         # assert the two trees are equal in terms of 'level' and 'title'
         self.assertTreeQuality(hard_root, soft_root, 'level', 'title')
 
-    def test_top_in_nav(self):
+    def test_menu_tree_without_soft_root(self):
         """
-        top: in navigation
-
         tag: show_menu 0 100 0 100
-
-        context shared: current page is aaa
-        context 1: root is NOT a softroot
-        context 2: root IS a softroot
 
         expected result 1:
             0:top
@@ -946,14 +937,6 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
                            5:ddd
                      3:222
                   2:bbb
-        expected result 2:
-            0:root
-               1:aaa
-                  2:111
-                     3:ccc
-                        4:ddd
-                  2:222
-               1:bbb
         """
         aaa = self.get_page('aaa')
         # root is NOT a soft root
@@ -977,6 +960,20 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
             ])
         ]
         self.assertTreeQuality(hard_root, mock_tree)
+
+    def test_menu_tree_with_soft_root(self):
+        """
+        tag: show_menu 0 100 0 100
+
+        expected result 2:
+            0:root
+               1:aaa
+                  2:111
+                     3:ccc
+                        4:ddd
+                  2:222
+               1:bbb
+        """
         # root IS a soft root
         root = self.get_page('root')
         root.soft_root = True
@@ -1032,11 +1029,10 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
         context = self.get_context(page.get_absolute_url(), page=page)
 
         # test standard show_menu
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
             The queries should be:
-                get all public pages
-                get all draft pages for public pages
+                get all page nodes
                 get all page permissions
                 get all titles
                 get the menu cache key
@@ -1207,11 +1203,10 @@ class ShowMenuBelowIdTests(BaseMenuTest):
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
-            with self.assertNumQueries(6):
+            with self.assertNumQueries(5):
                 """
                 The queries should be:
-                    get all public pages
-                    get all draft pages for public pages
+                    get all page nodes
                     get all page permissions
                     get all titles
                     get the menu cache key
@@ -1270,7 +1265,9 @@ class ViewPermissionMenuTests(CMSTestCase):
     def setUp(self):
         self.page = create_page('page', 'nav_playground.html', 'en')
         self.pages = [self.page]
+        self.nodes = [self.page.node]
         self.user = self.get_standard_user()
+        self.site = get_current_site()
 
     def get_request(self, user=None):
         attrs = {
@@ -1293,8 +1290,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             GlobalPagePermission query
             PagePermission count query
             """
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
     @override_settings(CMS_PUBLIC_FOR='all')
     def test_public_for_all(self):
@@ -1308,8 +1306,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             GlobalPagePermission query
             PagePermission query for affected pages
             """
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
     @override_settings(CMS_PUBLIC_FOR='all')
     def test_unauthed(self):
@@ -1319,8 +1318,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             The query is:
             PagePermission query for affected pages
             """
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
     def test_authed_basic_perm(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_page'))
@@ -1332,8 +1332,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             User permissions
             Content type
             """
-            result = get_visible_pages(request, self.pages, self.page.site)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
     def test_authed_no_access(self):
         request = self.get_request(self.user)
@@ -1346,15 +1347,15 @@ class ViewPermissionMenuTests(CMSTestCase):
             User permissions
             Content type
             """
-            result = get_visible_pages(request, self.pages, self.page.site)
-            self.assertEqual(result, [])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, [])
 
     def test_unauthed_no_access(self):
         request = self.get_request()
 
         with self.assertNumQueries(0):
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, [])
 
     def test_page_permissions(self):
         request = self.get_request(self.user)
@@ -1368,8 +1369,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             Content type
             GlobalpagePermission query for user
             """
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
     def test_page_permissions_view_groups(self):
         group = Group.objects.create(name='testgroup')
@@ -1386,8 +1388,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             GlobalpagePermission query for user
             Group query via PagePermission
             """
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
     def test_global_permission(self):
         GlobalPagePermission.objects.create(can_view=True, user=self.user)
@@ -1402,8 +1405,9 @@ class ViewPermissionMenuTests(CMSTestCase):
             Content type
             GlobalpagePermission query for user
             """
-            result = get_visible_pages(request, self.pages)
-            self.assertEqual(result, [self.page.pk])
+            nodes = get_visible_nodes(request, self.nodes, self.site)
+            self.assertEqual(nodes, self.nodes)
+            self.assertEqual([node.page for node in nodes], self.pages)
 
 
 @override_settings(
@@ -1429,6 +1433,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         c3 = create_page('c3', l, 'en', parent=b2, **kw)
         c4 = create_page('c4', l, 'en', parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
+        self.nodes = [page.node for page in self.pages]
         self.site = a.site
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
@@ -1447,21 +1452,41 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         self.request = type('Request', (object,), attrs)
 
     def test_draft_list_access(self):
-        result = get_visible_pages(self.request, self.pages, self.site)
-        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
-        pages = list(pages)
+        nodes = get_visible_nodes(self.request, self.nodes, self.site)
+        page_ids = [node.page_id for node in nodes]
+        pages = (
+            Page
+            .objects
+            .filter(id__in=page_ids)
+            .values_list('title_set__title', flat=True)
+        )
+        pages = sorted(pages)
         self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
 
     def test_draft_qs_access(self):
-        result = get_visible_pages(self.request, Page.objects.drafts(), self.site)
-        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
-        pages = list(pages)
+        nodes = get_visible_nodes(self.request, self.nodes, self.site)
+        page_ids = [node.page_id for node in nodes]
+        pages = (
+            Page
+            .objects
+            .drafts()
+            .filter(id__in=page_ids)
+            .values_list('title_set__title', flat=True)
+        )
+        pages = sorted(pages)
         self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
 
     def test_public_qs_access(self):
-        result = get_visible_pages(self.request, Page.objects.public(), self.site)
-        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
-        pages = list(pages)
+        nodes = get_visible_nodes(self.request, self.nodes, self.site)
+        result = [node.page.publisher_public_id for node in nodes]
+        pages = (
+            Page
+            .objects
+            .public()
+            .filter(id__in=result)
+            .values_list('title_set__title', flat=True)
+        )
+        pages = sorted(pages)
         self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
 
 

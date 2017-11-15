@@ -17,7 +17,7 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(function () {
 
-        var pageTypeField = $('.form-row.page_type select');
+        var pageTypeField = $('.form-row.source select');
         var contentGroup = $('.form-row.content');
         var contentField = contentGroup.find('textarea');
 

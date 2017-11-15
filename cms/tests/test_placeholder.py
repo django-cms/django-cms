@@ -27,7 +27,7 @@ from cms.test_utils.project.placeholderapp.models import (
     TwoPlaceholderExample,
 )
 from cms.test_utils.project.sampleapp.models import Category
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
@@ -51,7 +51,7 @@ def _render_placeholder(placeholder, context, **kwargs):
     return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
-class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
+class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def setUp(self):
         u = self._create_user("test", True, True)
 

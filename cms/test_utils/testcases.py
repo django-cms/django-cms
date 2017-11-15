@@ -22,6 +22,11 @@ from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT,
+    PUBLISHER_STATE_DIRTY,
+    PUBLISHER_STATE_PENDING,
+)
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
@@ -263,16 +268,7 @@ class BaseCMSTestCase(object):
         page_data = {
             'title': 'test page %d' % self.counter,
             'slug': 'test-page-%d' % self.counter,
-            'language': settings.LANGUAGES[0][0],
-            'template': 'nav_playground.html',
-            'parent': parent_id,
-            'site': 1,
-            'pagepermission_set-TOTAL_FORMS': 0,
-            'pagepermission_set-INITIAL_FORMS': 0,
-            'pagepermission_set-MAX_NUM_FORMS': 0,
-            'pagepermission_set-2-TOTAL_FORMS': 0,
-            'pagepermission_set-2-INITIAL_FORMS': 0,
-            'pagepermission_set-2-MAX_NUM_FORMS': 0
+            'parent_node': parent_id,
         }
         # required only if user haves can_change_permission
         self.counter += 1
@@ -346,20 +342,24 @@ class BaseCMSTestCase(object):
         data = {
             'position': position,
             'target': target_page.pk,
-            'site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
-
+        source_translation = page.title_set.all()[0]
+        parent_translation = target_page.title_set.all()[0]
+        language = source_translation.language
+        copied_page_path = source_translation.get_path_for_base(parent_translation.path)
+        new_page_slug = get_available_slug(page.site, copied_page_path, language)
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEqual(response.status_code, 200)
-        title = page.title_set.all()[0]
-        copied_slug = get_available_slug(title)
-        parent = target_page
-        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=parent)
-        # Altered to reflect the new django-js jsonified response messages
-        expected = {"id": copied_page.pk}
-        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
+        response_data = json.loads(response.content.decode('utf8'))
+        copied_page = self.assertObjectExist(
+            Page.objects.all(),
+            pk=response_data['id'],
+        )
+        self.assertObjectExist(page.title_set.filter(language=language), slug=new_page_slug)
+        page._clear_node_cache(page.site)
+        target_page._clear_node_cache(target_page.site)
         return copied_page
 
     def create_homepage(self, *args, **kwargs):
@@ -368,7 +368,7 @@ class BaseCMSTestCase(object):
         return homepage.reload()
 
     def move_page(self, page, target_page, position="first-child"):
-        page.move_page(target_page, position)
+        page.move_page(target_page.node, position)
         return self.reload_page(page)
 
     def reload_page(self, page):
@@ -440,24 +440,6 @@ class BaseCMSTestCase(object):
 
         request._messages = MockStorage()
         return request
-
-    def check_published_page_attributes(self, page):
-        public_page = page.publisher_public
-
-        if page.parent:
-            self.assertEqual(page.parent_id, public_page.parent.publisher_draft.id)
-
-        self.assertEqual(page.depth, public_page.depth)
-
-        draft_siblings = list(Page.objects.filter(parent_id=page.parent_id, publisher_is_draft=True).order_by('path'))
-        public_siblings = list(Page.objects.filter(parent_id=public_page.parent_id, publisher_is_draft=False).order_by('path'))
-        skip = 0
-        for i, sibling in enumerate(draft_siblings):
-            if not sibling.publisher_public_id:
-                skip += 1
-                continue
-            self.assertEqual(sibling.id,
-                             public_siblings[i - skip].publisher_draft.id)
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
@@ -640,8 +622,55 @@ class BaseCMSTestCase(object):
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
-    pass
+
+    def assertPending(self, page):
+        if page.publisher_is_draft:
+            # draft
+            self.assertFalse(page.is_published('en'))
+            self.assertTrue(bool(page.publisher_public_id))
+            self.assertTrue(page.get_title_obj('en').published)
+            self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_PENDING)
+            self.assertPending(page.publisher_public)
+        else:
+            # public
+            self.assertFalse(page.is_published('en'))
+            self.assertTrue(bool(page.publisher_public_id))
+            self.assertFalse(page.get_title_obj('en').published)
+
+    def assertPublished(self, page):
+        if page.publisher_is_draft:
+            # draft
+            self.assertTrue(page.is_published('en'))
+            self.assertTrue(page.get_title_obj('en').published)
+            self.assertTrue(bool(page.publisher_public_id))
+            self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
+            self.assertPublished(page.publisher_public)
+        else:
+            # public
+            self.assertTrue(page.is_published('en'))
+            self.assertTrue(page.get_title_obj('en').published)
+            self.assertTrue(bool(page.publisher_public_id))
+
+    def assertUnpublished(self, page):
+        if page.publisher_is_draft:
+            # draft
+            self.assertFalse(page.is_published('en'))
+            self.assertTrue(bool(page.publisher_public_id))
+            self.assertFalse(page.get_title_obj('en').published)
+            self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
+            self.assertUnpublished(page.publisher_public)
+        else:
+            # public
+            self.assertFalse(page.is_published('en'))
+            self.assertTrue(bool(page.publisher_public_id))
+            self.assertFalse(page.get_title_obj('en').published)
+
+    def assertNeverPublished(self, page):
+        self.assertTrue(page.publisher_is_draft)
+        self.assertFalse(page.is_published('en'))
+        self.assertIsNone(page.publisher_public)
+        self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
 
-class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
+class TransactionCMSTestCase(CMSTestCase, testcases.TransactionTestCase):
     pass

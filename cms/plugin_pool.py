@@ -13,7 +13,7 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register
 from cms.utils.compat.dj import is_installed
@@ -25,7 +25,16 @@ class PluginPool(object):
     def __init__(self):
         self.plugins = {}
         self.discovered = False
-        self.patched = False
+
+    def _clear_cached(self):
+        if 'registered_plugins' in self.__dict__:
+            del self.__dict__['registered_plugins']
+
+        if 'plugins_with_extra_menu' in self.__dict__:
+            del self.__dict__['plugins_with_extra_menu']
+
+        if 'plugins_with_extra_placeholder_menu' in self.__dict__:
+            del self.__dict__['plugins_with_extra_placeholder_menu']
 
     def discover_plugins(self):
         if self.discovered:
@@ -41,7 +50,7 @@ class PluginPool(object):
     def clear(self):
         self.discovered = False
         self.plugins = {}
-        self.patched = False
+        self._clear_cached()
 
     def validate_templates(self, plugin=None):
         """
@@ -143,28 +152,12 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
-    def set_plugin_meta(self):
-        """
-        Patches a plugin model by forcing a specifc db_table whether the
-        'new style' table name exists or not. The same goes for all the
-        ManyToMany attributes.
-        This method must be run whenever a plugin model is accessed
-        directly.
-
-        The model is modified in place; a 'patched' attribute is added
-        to the model to check whether it's already been modified.
-        """
-        if self.patched:
-            return
-        self.patched = True
-
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
-        self.set_plugin_meta()
         plugins = sorted(self.plugins.values(), key=attrgetter('name'))
-        template = page and page.get_template() or None
+        template = page.get_template() if page else None
 
         allowed_plugins = get_placeholder_conf(
             setting_key,
@@ -192,7 +185,8 @@ class PluginPool(object):
 
         if placeholder:
             # Filters out any plugin that requires a parent or has set parent classes
-            plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
+            plugins = (plugin for plugin in plugins
+                       if not plugin.requires_parent_plugin(placeholder, page))
         return sorted(plugins, key=attrgetter('module'))
 
     def get_text_enabled_plugins(self, placeholder, page):
@@ -206,7 +200,6 @@ class PluginPool(object):
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
-        self.set_plugin_meta()
         return self.plugins[name]
 
     def get_patterns(self):
@@ -218,7 +211,7 @@ class PluginPool(object):
 
         try:
             url_patterns = []
-            for plugin in self.get_all_plugins():
+            for plugin in self.registered_plugins:
                 p = plugin()
                 slug = slugify(force_text(normalize_name(p.__class__.__name__)))
                 url_patterns += [
@@ -232,7 +225,6 @@ class PluginPool(object):
 
     def get_system_plugins(self):
         self.discover_plugins()
-        self.set_plugin_meta()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
 
     @cached_property

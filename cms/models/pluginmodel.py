@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import reversion_register
 from cms.utils.urlutils import admin_reverse
 

@@ -7,7 +7,7 @@ from cms import api
 from cms.cms_plugins import AliasPlugin
 from cms.models import Placeholder, AliasPluginModel
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import TransactionCMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.urlutils import admin_reverse
 
@@ -15,7 +15,7 @@ from sekizai.data import UniqueSequence
 from sekizai.helpers import get_varname
 
 
-class AliasTestCase(CMSTestCase):
+class AliasTestCase(TransactionCMSTestCase):
 
     def _get_example_obj(self):
         obj = Example1.objects.create(

@@ -21,8 +21,8 @@ from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
 from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
-from cms.utils import get_cms_setting
 from cms.utils import get_language_from_request
+from cms.utils.conf import get_cms_setting
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
@@ -191,7 +191,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def get_require_parent(cls, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page and page.get_template() or None
+        template = page.get_template() if page else None
 
         # config overrides..
         require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
@@ -424,7 +424,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         """
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page and page.get_template() or None
+        template = page.get_template() if page else None
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
@@ -443,7 +443,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # Useful in cases like djangocms-text-ckeditor
         # where only text only plugins are allowed.
         from cms.plugin_pool import plugin_pool
-        return plugin_pool.get_all_plugins()
+        return plugin_pool.registered_plugins
 
     @classmethod
     def get_child_classes(cls, slot, page, instance=None):
@@ -484,7 +484,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def get_parent_classes(cls, slot, page, instance=None):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page and page.get_template() or None
+        template = page.get_template() if page else None
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})

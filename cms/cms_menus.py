@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
-import functools
-
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
+from cms.models import EmptyTitle
+from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.permissions import get_view_restrictions
+from cms.utils.page import get_node_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
-from cms.utils.page_resolver import get_page_queryset
-from cms.utils.moderator import get_title_queryset
 
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
 
-def get_visible_page_objects(request, pages, site):
+def get_visible_nodes(request, nodes, site):
     """
      This code is basically a many-pages-at-once version of
      cms.utils.page_permissions.user_can_view_page
@@ -36,26 +35,21 @@ def get_visible_page_objects(request, pages, site):
         return []
 
     if user_can_view_all_pages(user, site):
-        return pages
+        return nodes
 
-    restricted_pages = get_view_restrictions(pages)
+    restricted_pages = get_view_restrictions(nodes)
 
     if not restricted_pages:
         # If there's no restrictions, let the user see all pages
         # only if he can see unrestricted, otherwise return no pages.
-        return pages if can_see_unrestricted else []
+        return nodes if can_see_unrestricted else []
 
     user_id = user.pk
     user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list('pk', flat=True)))
     is_auth_user = user.is_authenticated()
 
-    def user_can_see_page(page):
-        if page.publisher_is_draft:
-            page_id = page.pk
-        else:
-            page_id = page.publisher_public_id
-
-        page_permissions = restricted_pages.get(page_id, [])
+    def user_can_see_node(node):
+        page_permissions = restricted_pages.get(node.page_id, [])
 
         if not page_permissions:
             # Page has no view restrictions, fallback to the project's
@@ -69,28 +63,18 @@ def get_visible_page_objects(request, pages, site):
             if perm.user_id == user_id or perm.group_id in user_groups:
                 return True
         return False
-    return [page for page in pages if user_can_see_page(page)]
+    return [node for node in nodes if user_can_see_node(node)]
 
 
-def get_visible_pages(request, pages, site=None):
-    """Returns the IDs of all visible pages"""
-
-    if site is None:
-        site = Site.objects.get_current(request)
-
-    pages = get_visible_page_objects(request, pages, site)
-    return [page.pk for page in pages]
-
-
-def page_to_node(renderer, page, home, language):
+def get_menu_node_for_page(renderer, page, language):
     """
     Transform a CMS page into a navigation node.
 
     :param renderer: MenuRenderer instance bound to the request
     :param page: the page you wish to transform
-    :param home: a reference to the "home" page (the page with path="0001")
     :param language: The current language used to render the menu
     """
+    node = page.get_node_object(renderer.site)
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
     attr = {
@@ -100,10 +84,19 @@ def page_to_node(renderer, page, home, language):
         'reverse_id': page.reverse_id,
     }
 
-    parent_id = page.parent_id
+    if node.parent_id and page.publisher_is_draft:
+        parent_page = node.parent.page
+        hide_parent = (parent_page.is_home and not parent_page.in_navigation)
+    elif node.parent_id and not page.publisher_is_draft:
+        parent_page = node.parent.get_public_page()
+        hide_parent = (parent_page.is_home and not parent_page.in_navigation)
+    else:
+        parent_page = None
+        hide_parent = False
 
-    # Should we cut the Node from its parents?
-    if page.parent_id == home.pk and not home.in_navigation:
+    if parent_page and not hide_parent:
+        parent_id = parent_page.pk
+    else:
         parent_id = None
 
     if page.limit_visibility_in_menu is constants.VISIBILITY_ALL:
@@ -183,69 +176,71 @@ class CMSNavigationNode(NavigationNode):
 class CMSMenu(Menu):
 
     def get_nodes(self, request):
+        from cms.models import Title
+
         site = self.renderer.site
         lang = self.renderer.language
-        page_queryset = get_page_queryset(request)
-
-        filters = {
-            'site': site,
-        }
-
-        if hide_untranslated(lang, site.pk):
-            filters['title_set__language'] = lang
-
-            if not self.renderer.draft_mode_active:
-                filters['title_set__published'] = True
-
-        if not self.renderer.draft_mode_active:
-            page_queryset = page_queryset.published()
-
-        pages = page_queryset.filter(**filters).order_by("path")
-        ids = {}
-        nodes = []
-        home = None
-        actual_pages = []
-
-        # cache view perms
-        visible_pages = frozenset(get_visible_pages(request, pages, site))
-        for page in pages:
-            # Pages are ordered by path, therefore the first page is the root
-            # of the page tree (a.k.a "home")
-            if page.pk not in visible_pages:
-                # Don't include pages the user doesn't have access to
-                continue
-
-            if not home:
-                home = page
-
-            ids[page.id] = page
-            actual_pages.append(page)
-            page.title_cache = {}
-
-        langs = [lang]
-        if not hide_untranslated(lang):
-            langs.extend(get_fallback_languages(lang))
-
-        titles = get_title_queryset(request).filter(page__in=ids, language__in=langs)
-
-        for title in titles.iterator():  # add the title and slugs and some meta data
-            page = ids[title.page_id]
-            page.title_cache[title.language] = title
-
-        renderer = self.renderer
-
-        _page_to_node = functools.partial(
-            page_to_node,
-            renderer=renderer,
-            home=home,
-            language=lang,
+        nodes = get_node_queryset(
+            site,
+            published=not self.renderer.draft_mode_active,
         )
 
-        for page in actual_pages:
-            if page.title_cache:
-                node = _page_to_node(page=page)
-                nodes.append(node)
-        return nodes
+        if hide_untranslated(lang, site.pk):
+            nodes = nodes.filter(page__title_set__language=lang)
+            languages = [lang]
+        else:
+            fallbacks = get_fallback_languages(lang, site_id=site.pk)
+            languages = [lang] + (fallbacks or [])
+
+        if self.renderer.draft_mode_active:
+            nodes = nodes.select_related('page', 'parent__page')
+        else:
+            nodes = nodes.select_related(
+                'page__publisher_public',
+                'parent__page__publisher_public',
+            )
+        nodes = nodes.distinct()
+        nodes = get_visible_nodes(request, nodes, site)
+
+        if self.renderer.draft_mode_active:
+            pages = [node.get_page() for node in nodes]
+        else:
+            pages = [node.get_public_page() for node in nodes]
+
+        if not pages:
+            return []
+
+        lookup = Prefetch(
+            'title_set',
+            to_attr='filtered_translations',
+            queryset=Title.objects.filter(language__in=languages)
+        )
+
+        if DJANGO_1_9:
+            # This function was made public in django 1.10
+            # and as a result its signature changed
+            prefetch_related_objects(pages, [lookup])
+        else:
+            prefetch_related_objects(pages, lookup)
+
+        # Build the blank title instances only once
+        blank_title_cache = {language: EmptyTitle(language=language) for language in languages}
+
+        def _page_to_node(page):
+            page.title_cache = {trans.language: trans for trans in page.filtered_translations}
+
+            for language in languages:
+                # EmptyTitle is used to prevent the cms from trying
+                # to find a translation in the database
+                page.title_cache.setdefault(language, blank_title_cache[language])
+
+            menu_node = get_menu_node_for_page(
+                renderer=self.renderer,
+                page=page,
+                language=lang,
+            )
+            return menu_node
+        return [_page_to_node(page=page) for page in pages]
 
 
 menu_pool.register_menu(CMSMenu)

@@ -1,4 +1,4 @@
-{% load i18n cms_admin cms_tags %}
+{% load i18n cms_admin cms_tags admin_urls %}
 {% if rows %}
     <table>
         <thead><tr>
@@ -27,7 +27,7 @@
                             {% if permission.page_id == page.id %}
                                 {% trans "(current)" %}
                             {% else %}
-                                {% if row.can_change %}<a href="{% cms_admin_url 'cms_page_change' permission.page_id %}">{{ permission.page }}</a>
+                                {% if row.can_change %}<a href="{% url opts|admin_urlname:'change' permission.page_id %}">{{ permission.page }}</a>
                                 {% else %}{{ permission.page }}
                                 {% endif %}
                             {% endif %}

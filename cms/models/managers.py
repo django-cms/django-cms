@@ -5,10 +5,13 @@ import operator
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
+
+from treebeard.mp_tree import MP_NodeManager
 
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
-from cms.models.query import PageQuerySet
+from cms.models.query import PageQuerySet, PageNodeQuerySet
 from cms.publisher import PublisherManager
 from cms.utils.i18n import get_fallback_languages
 
@@ -23,12 +26,6 @@ class PageManager(PublisherManager):
         """
         return PageQuerySet(self.model)
 
-    def drafts(self):
-        return super(PageManager, self).drafts()
-
-    def public(self):
-        return super(PageManager, self).public()
-
     # !IMPORTANT: following methods always return access to draft instances,
     # take care on what you do one them. use Page.objects.public() for accessing
     # the published page versions
@@ -36,17 +33,14 @@ class PageManager(PublisherManager):
     # Just some of the queryset methods are implemented here, access queryset
     # for more getting more supporting methods.
 
-    # TODO: check which from following methods are really required to be on
-    # manager, maybe some of them can be just accessible over queryset...?
-
     def on_site(self, site=None):
         return self.get_queryset().on_site(site)
 
-    def published(self, site=None):
-        return self.get_queryset().published(site=site)
+    def published(self):
+        return self.get_queryset().published()
 
     def get_home(self, site=None):
-        return self.get_queryset().get_home(site)
+        return self.get_queryset().drafts().get_home(site)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
@@ -66,7 +60,7 @@ class PageManager(PublisherManager):
 
         # find 'searchable' plugins and build query
         qp = Q()
-        plugins = plugin_pool.get_all_plugins()
+        plugins = plugin_pool.registered_plugins
         for plugin in plugins:
             cmsplugin = plugin.model
             if not (
@@ -90,6 +84,29 @@ class PageManager(PublisherManager):
         qs = qs.filter(qt | qp)
 
         return qs.distinct()
+
+
+class PageNodeManager(MP_NodeManager):
+
+    def get_queryset(self):
+        """Sets the custom queryset as the default."""
+        return PageNodeQuerySet(self.model).order_by('path')
+
+    def get_for_site(self, site):
+        return self.filter(site=site)
+
+    def published(self, site):
+        now = timezone.now()
+        queryset = (
+            self.get_for_site(site)
+            .filter(
+                Q(page__publication_date__lte=now) | Q(page__publication_date__isnull=True),
+                Q(page__publication_end_date__gt=now) | Q(page__publication_end_date__isnull=True),
+            )
+            .filter(page__title_set__published=True)
+            .exclude(page__title_set__publisher_state=4)
+        )
+        return queryset
 
 
 class TitleManager(PublisherManager):
@@ -117,12 +134,8 @@ class TitleManager(PublisherManager):
                 raise
         return None
 
-    # created new public method to meet test case requirement and to get a list of titles for published pages
     def public(self):
-        return self.get_queryset().filter(publisher_is_draft=False, published=True)
-
-    def drafts(self):
-        return self.get_queryset().filter(publisher_is_draft=True)
+        return super(TitleManager, self).public().filter(published=True)
 
     def set_or_create(self, request, page, form, language):
         """
@@ -332,7 +345,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         # in which he can be
         qs = self.filter(
             page__id__in=page_id_allow_list,
-            page__depth__gte=user_level,
+            page__nodes__depth__gte=user_level,
         )
         qs = qs.exclude(user=user).exclude(group__user=user)
         return qs
@@ -346,20 +359,26 @@ class PagePermissionManager(BasicPagePermissionManager):
         list merge return of this function with Global permissions.
         """
         # permissions should be managed on the draft page only
-        page = page.get_draft_object()
+
         from cms.models import (ACCESS_DESCENDANTS, ACCESS_CHILDREN,
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE)
 
-        if page.depth is None or page.path is None or page.numchild is None:
-            raise ValueError("Cannot use unsaved page for permission lookup, missing MPTT attributes.")
+        page = page.get_draft_object()
+        node = page.node
+        paths = node.get_ancestor_paths()
 
-        paths = [
-            page.path[0:pos]
-            for pos in range(0, len(page.path), page.steplen)[1:]
-        ]
-        parents = Q(page__path__in=paths) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
-        direct_parents = Q(page__pk=page.parent_id) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
-        page_qs = Q(page=page) & (Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) |
+        # Ancestors
+        query = (
+            Q(page__nodes__path__in=paths)
+            & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
+        )
+
+        if node.parent_id:
+            # Direct parent
+            query |= (
+                Q(page=node.parent_page)
+                & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
+            )
+        query |= Q(page=page) & (Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) |
                                   Q(grant_on=ACCESS_PAGE))
-        query = (parents | direct_parents | page_qs)
-        return self.filter(query).order_by('page__depth')
+        return self.filter(query).order_by('page__nodes__depth')

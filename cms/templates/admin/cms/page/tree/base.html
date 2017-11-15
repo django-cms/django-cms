@@ -5,7 +5,7 @@
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}{{ block.super }} change-list cms-pagetree-wrapper{% endblock %}
 {% block coltype %}flex{% endblock %}
-{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+{% block date_hierarchy %}{% endblock %}
 {% block pagination %}{% endblock %}
 
 {% block extrahead %}
@@ -36,18 +36,18 @@
 {% block content %}
     {% spaceless %}
     <div id="content-main">
-        <div class="cms-pagetree-root module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+        <div class="cms-pagetree-root module{% if tree.is_filtered %} filtered{% endif %}" id="changelist">
             <div class="cms-pagetree cms-pagetree-header">
                 <div class="cms-pagetree-header-cell cms-pagetree-header-cell-fluid">
                     <div class="cms-pagetree-header-row cms-pagetree-search-container">
                         <div class="cms-pagetree-header-cell">
                             <div class="cms-pagetree-header-title">
                                 <h1>
-                                    {% trans "Page Tree" %} <span>({{ cl.current_site.name }})</span>
+                                    {% trans "Page Tree" %} <span>({{ tree.site.name }})</span>
                                 </h1>
                             </div>
 
-                            {% if cl.is_filtered or request.GET.q %}
+                            {% if tree.is_filtered or request.GET.q %}
                                 {# INFO: show reset button when filtering is active #}
                                 <a href="{% url opts|admin_urlname:'changelist' %}" class="cms-pagetree-header-cell cms-pagetree-header-search-reset">{% trans "Reset filter"|lower %}</a>
                             {% endif %}
@@ -57,20 +57,18 @@
                             <form method="get" class="cms-pagetree-header-search js-cms-pagetree-header-search">
                                 <label for="field-searchbar" class="cms-hidden">{% trans "Search" %}</label>
                                 <div class="cms-pagetree-header-filter">
-                                    <input type="text" size="40" name="q" id="field-searchbar" value="{{ request.GET.q }}" placeholder="{% trans "Search" %}">
-                                    {% if cl.has_filters %}
-                                        <div class="cms-pagetree-header-filter-trigger js-cms-pagetree-header-filter-trigger">
-                                            <a href="#"><span class="cms-icon cms-icon-arrow"></span></a>
-                                        </div>
-                                        <div class="cms-pagetree-header-filter-container js-cms-pagetree-header-filter-container">
-                                            {% for spec in cl.filter_specs %}
-                                                {% clean_admin_list_filter cl spec %}
-                                            {% endfor %}
-                                            <a href="#" class="cms-pagetree-header-search-close js-cms-pagetree-header-search-close">
-                                                <span class="cms-icon cms-icon-close"></span>
-                                            </a>
-                                        </div>
-                                    {% endif %}
+                                    <input type="text" size="40" name="q" id="field-searchbar" value="{{ tree.query }}" placeholder="{% trans "Search" %}">
+                                    <div class="cms-pagetree-header-filter-trigger js-cms-pagetree-header-filter-trigger">
+                                        <a href="#"><span class="cms-icon cms-icon-arrow"></span></a>
+                                    </div>
+                                    <div class="cms-pagetree-header-filter-container js-cms-pagetree-header-filter-container">
+                                        {% for field in changelist_form.visible_fields %}
+                                            {% render_filter_field request field %}
+                                        {% endfor %}
+                                        <a href="#" class="cms-pagetree-header-search-close js-cms-pagetree-header-search-close">
+                                            <span class="cms-icon cms-icon-close"></span>
+                                        </a>
+                                    </div>
                                 </div>
                                 <button type="submit" class="cms-pagetree-header-search-btn">
                                     <span class="cms-icon cms-icon-search"></span>
@@ -83,7 +81,18 @@
                 <div class="cms-pagetree-header-cell cms-pagetree-header-body">
                     {# INFO: hidden search field with dynamic content #}
                     <div class="js-cms-pagetree-header-search-copy cms-hidden">
-                        {% search_form cl %}
+                        <div id="toolbar">
+                            <form id="changelist-search" method="get">
+                                <div><!-- DIV needed for valid HTML -->
+                                    <label for="searchbar"><img src="{% static "admin/img/search.svg" %}" alt="Search" /></label>
+                                    <input type="text" size="40" name="{{ search_var }}" value="{{ tree.query }}" id="searchbar" autofocus />
+                                    <input type="submit" value="{% trans 'Search' %}" />
+                                    {% for pair in changelist_form.get_filter_items %}
+                                        {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endif %}
+                                    {% endfor %}
+                                </div>
+                            </form>
+                        </div>
                     </div>
                     <div class="cms-clear-mobile"></div>
 
@@ -97,8 +106,8 @@
                                 <li>
                                     <span class="label">{% trans "Sites" %}</span>
                                 </li>
-                                {% for site in cl.sites %}
-                                    <li{% if site.pk == cl.current_site.pk %} class="active"{% endif %}>
+                                {% for site in tree.sites %}
+                                    <li{% if site.pk == tree.site.pk %} class="active"{% endif %}>
                                         <a href="#{{ site.pk }}" class="js-cms-pagetree-site-trigger" data-id="{{ site.pk }}">{{ site.name }}</a>
                                     </li>
                                 {% endfor %}
@@ -106,7 +115,7 @@
                                     <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
                                     <li>
                                         <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
-                                            {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
+                                            {% blocktrans with opts.verbose_name_plural|escape as name %}
                                                 Restore deleted {{ name }}
                                             {% endblocktrans %}
                                         </a>
@@ -116,8 +125,8 @@
                         </div>
                         {# INFO: hidden site form when using the dropdown site switcher #}
                         <form method="post" class="js-cms-pagetree-site-form cms-hidden">
-                            <select name="site__exact">
-                                {% for site in cl.sites %}
+                            <select name="site">
+                                {% for site in tree.sites %}
                                     <option value="{{ site.pk }}">{{ site.name }}</option>
                                 {% endfor %}
                             </select>
@@ -128,7 +137,7 @@
                     {# INFO: "new page" button #}
                     {% if has_add_permission %}
                         <a href="{% url opts|admin_urlname:'add' %}" class="cms-pagetree-header-create cms-btn cms-btn-toolbar cms-btn-action">
-                            {% blocktrans with cl.opts.verbose_name|title as name %}
+                            {% blocktrans with opts.verbose_name|title as name %}
                                 New {{ name }}
                             {% endblocktrans %}
                         </a>
@@ -138,7 +147,7 @@
 
             <div class="clear"></div>
 
-            <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+            <form id="changelist-form" action="" method="post" novalidate>{% csrf_token %}
                 <div class="cms-pagetree cms-pagetree-section">
                     <h2>{% trans "Main Navigation" %}</h2>
                     <div class="cms-pagetree-section-nav">
@@ -164,11 +173,11 @@
                 </div>
 
                 {# INFO: javascript is loaded from cms.pagetree.js #}
-                {% if cl.items %}
+                {% if tree.has_items %}
                     <div class="cms-pagetree cms-pagetree-container">
                         <div class="cms-pagetree-jstree js-cms-pagetree" data-json='{
                             "urls": {
-                                "tree": "{% url 'admin:get_tree' %}",
+                                "tree": "{% url opts|admin_urlname:'get_tree' %}",
                                 "move": "./{id}/move-page/",
                                 "copy": "./{id}/copy-page/",
                                 "copyPermission": "./{id}/dialog/copy/",
@@ -178,8 +187,8 @@
                             "static": "{{ STATIC_URL }}",
                             "permission": {{ CMS_PERMISSION|bool }},
                             "debug": {{ DEBUG|bool }},
-                            "filtered": {% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %},
-                            "site": {{ cl.current_site.pk }},
+                            "filtered": {% if tree.is_filtered %}true{% else %}false{% endif %},
+                            "site": {{ tree.site.pk }},
                             "hasAddRootPermission": {{ has_add_permission|yesno:"true,false" }},
                             "lang": {
                                 "code": "{{ preview_language|lower }}",
@@ -205,7 +214,7 @@
                                 "title": "{{ _('View')|escapejs }}",
                                 "key": "preview"
                             }, {% for lang in site_languages %}{
-                                "title": "<a href=\"{% url 'admin:cms_page_changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
+                                "title": "<a href=\"{% url opts|admin_urlname:'changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
                                 "key": "{{ lang }}"
                             }, {% endfor %} {
                                 "title": "{{ _('Menu')|escapejs }}",
@@ -216,9 +225,9 @@
                             }]
                         }' data-settings-url="{% cms_admin_url "cms_usersettings_session_store" %}">
                             <ul>
-                                {% if cl.is_filtered or request.GET.q %}
+                                {% if tree.is_filtered %}
                                     {# INFO: load html data source when filtering #}
-                                    {% show_admin_menu_for_pages cl.items %}
+                                    {% show_admin_menu_for_pages tree.items depth=0 %}
                                 {% endif %}
                             </ul>
                         </div>
@@ -228,10 +237,10 @@
                     {# INFO: show add a page button when there are no items #}
                     <div class="cms-pagetree cms-pagetree-empty">
                         {% url opts|admin_urlname:'add' as add_url %}
-                        {% blocktrans %}
-                            <em>There is no page around yet.</em>
+                        {% blocktrans with object=opts.verbose_name|lower %}
+                            <em>There is no {{ object }} around yet.</em>
                             <br>
-                            <a href="{{ add_url }}" class="addlink">Add page</a> now.
+                            <a href="{{ add_url }}" class="addlink">Add {{ object }}</a> now.
                         {% endblocktrans %}
                     </div>
                 {% endif %}

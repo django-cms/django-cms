@@ -13,7 +13,7 @@ from django.utils.lru_cache import lru_cache
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import (Page, PagePermission, GlobalPagePermission)
+from cms.models import (PageNode, PagePermission, GlobalPagePermission)
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
@@ -137,12 +137,13 @@ def get_user_permission_level(user, site):
             PagePermission
             .objects
             .get_with_change_permissions(user, site)
-            .order_by('page__path')
+            .select_related('page')
+            .order_by('page__nodes__path')
         )[0]
     except IndexError:
         # user isn't assigned to any node
         raise NoPermissionsException
-    return permission.page.depth
+    return permission.page.node.depth
 
 
 def cached_func(func):
@@ -177,19 +178,27 @@ def get_global_actions_for_user(user, site):
 @cached_func
 def get_page_actions_for_user(user, site):
     actions = defaultdict(set)
+    nodes = PageNode.objects.get_for_site(site)
+
+    root_nodes = (node for node in nodes if node.is_root())
+
+    for node in root_nodes:
+        node._set_hierarchy(nodes)
+
+    nodes_by_page_id = dict((node.page_id, node) for node in nodes)
     page_permissions = (
         PagePermission
         .objects
-        .get_with_site(user, site_id=site.pk)
-        .order_by('page__path')
-        .select_related('page')
+        .with_user(user)
+        .filter(page__in=nodes_by_page_id)
     )
 
     for permission in page_permissions.iterator():
-        page_ids = frozenset(permission.get_page_ids())
+        node = nodes_by_page_id[permission.page_id]
+        node_ids = frozenset(permission.get_page_ids(node))
 
         for action in permission.get_configured_actions():
-            actions[action].update(page_ids)
+            actions[action].update(node_ids)
     return actions
 
 
@@ -263,7 +272,7 @@ def get_subordinate_users(user, site):
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__depth__gte=user_level))
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__nodes__depth__gte=user_level))
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
@@ -302,46 +311,14 @@ def get_subordinate_groups(user, site):
     page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
 
     return Group.objects.distinct().filter(
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__depth__gte=user_level))
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__nodes__depth__gte=user_level))
         | (Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True))
     )
 
 
-def load_ancestors(pages):
+def get_view_restrictions(nodes):
     """
-    Loads the ancestors, children and descendants cache for a set of pages.
-    :param pages: A queryset of pages to examine
-    :return: The list of pages, including ancestors
-    """
-    pages_by_id = dict((page.pk, page) for page in pages)
-    pages_list = list(pages)
-    # Ensure that all parent pages are present so that inheritance will work
-    # For most use cases, this should not actually do any work
-    missing = list(pages)
-    while missing:
-        page = missing.pop()
-        page.ancestors_descending = []
-        page._cached_descendants = []
-        if page.parent_id and page.parent_id not in pages_by_id:
-            pages_list.append(page.parent)
-            pages_by_id[page.parent_id] = page.parent
-            missing.append(page.parent)
-    pages_list.sort(key=lambda page: page.path)
-    for page in pages_list:
-        if page.parent_id:
-            parent = pages_by_id[page.parent_id]
-            page.ancestors_descending = parent.ancestors_descending + [parent]
-            for ancestor in page.ancestors_descending:
-                ancestor._cached_descendants.append(page)
-        else:
-            page.ancestors_descending = []
-        page.ancestors_ascending = list(reversed(page.ancestors_descending))
-    return pages_list
-
-
-def get_view_restrictions(pages):
-    """
-    Load all view restrictions for the pages
+    Loads all view restrictions for the given nodes
     """
     restricted_pages = defaultdict(list)
 
@@ -349,30 +326,23 @@ def get_view_restrictions(pages):
         # Permissions are off. There's no concept of page restrictions.
         return restricted_pages
 
-    if not pages:
-        return restricted_pages
+    root_nodes = (node for node in nodes if node.is_root())
 
-    is_public_pages = not pages[0].publisher_is_draft
+    for node in root_nodes:
+        node._set_hierarchy(nodes)
 
-    if is_public_pages:
-        # Always use draft pages!!!
-        draft_ids = (page.publisher_public_id for page in pages)
-        pages = Page.objects.filter(pk__in=draft_ids).select_related('parent')
-
-    pages_list = load_ancestors(pages)
-    pages_by_id = dict((page.pk, page) for page in pages_list)
+    nodes_by_page_id = dict((node.page_id, node) for node in nodes)
 
     page_permissions = PagePermission.objects.filter(
-        page__in=pages_by_id,
+        page__in=nodes_by_page_id,
         can_view=True,
     )
 
     for perm in page_permissions:
-        # set internal fk cache to our page with loaded ancestors and descendants
-        perm._page_cache = pages_by_id[perm.page_id]
+        node = nodes_by_page_id[perm.page_id]
 
-        for page_id in perm.get_page_ids():
-            restricted_pages[page_id].append(perm)
+        for node_id in perm.get_page_ids(node):
+            restricted_pages[node_id].append(perm)
     return restricted_pages
 
 

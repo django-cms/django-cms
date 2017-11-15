@@ -16,7 +16,7 @@ from django.utils.six.moves.urllib.parse import urlparse
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.page_resolver import get_page_from_request
+from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
 

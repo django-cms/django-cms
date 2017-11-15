@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.constants import PUBLISHER_STATE_PENDING
-from cms.utils.admin import render_admin_rows
 
 from django import template
 from django.conf import settings
+from django.contrib.admin.views.main import ERROR_FLAG
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -18,22 +20,23 @@ CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
 @register.simple_tag(takes_context=True)
-def show_admin_menu_for_pages(context, pages):
+def show_admin_menu_for_pages(context, descendants, depth=1):
+    admin = context['admin']
     request = context['request']
 
-    if 'cl' in context:
-        filtered = context['cl'].is_filtered or context['cl'].query
+    if 'tree' in context:
+        filtered = context['tree']['is_filtered']
     else:
         filtered = False
 
-    content = render_admin_rows(
+    rows = admin.get_tree_rows(
         request,
-        pages=pages,
-        site=context['cms_current_site'],
-        filtered=filtered,
+        nodes=descendants,
         language=context['preview_language'],
+        depth=depth,
+        follow_descendants=not bool(filtered),
     )
-    return mark_safe(content)
+    return mark_safe(''.join(rows))
 
 
 class TreePublishRow(Tag):
@@ -44,7 +47,9 @@ class TreePublishRow(Tag):
     )
 
     def render_tag(self, context, page, language):
-        if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
+        page_pending_publication = page.get_publisher_state(language) == PUBLISHER_STATE_PENDING
+
+        if page.is_published(language) and not page_pending_publication:
             if page.is_dirty(language):
                 cls = "cms-pagetree-node-state cms-pagetree-node-state-dirty dirty"
                 text = _("unpublished changes")
@@ -55,10 +60,7 @@ class TreePublishRow(Tag):
             page_languages = page.get_languages()
 
             if language in page_languages:
-                public_pending = page.publisher_public_id and page.publisher_public.get_publisher_state(
-                        language) == PUBLISHER_STATE_PENDING
-                if public_pending or page.get_publisher_state(
-                        language) == PUBLISHER_STATE_PENDING:
+                if page_pending_publication:
                     cls = "cms-pagetree-node-state cms-pagetree-node-state-unpublished-parent unpublishedparent"
                     text = _("unpublished parent")
                 else:
@@ -77,15 +79,14 @@ register.tag(TreePublishRow)
 
 @register.filter
 def is_published(page, language):
-    if page.is_published(language) and page.publisher_public_id and page.publisher_public.is_published(language):
+    if page.is_published(language):
         return True
-    else:
-        page_languages = page.get_languages()
 
-        if language in page_languages and page.publisher_public_id and page.publisher_public.get_publisher_state(
-                language) == PUBLISHER_STATE_PENDING:
-            return True
-        return False
+    page_languages = page.get_languages()
+
+    if language in page_languages and page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
+        return True
+    return False
 
 
 @register.filter
@@ -94,51 +95,42 @@ def is_dirty(page, language):
 
 
 @register.filter
-def all_ancestors_are_published(page, language):
+def nodes_are_published(nodes, language):
     """
     Returns False if any of the ancestors of page (and language) are
     unpublished, otherwise True.
     """
-    page = page.parent
-    while page:
-        if not page.is_published(language):
-            return False
-        page = page.parent
-    return True
+    return all(node.page.is_published(language) for node in nodes)
 
 
-class CleanAdminListFilter(InclusionTag):
-    """
-    used in admin to display only these users that have actually edited a page
-    and not everybody
-    """
-    name = 'clean_admin_list_filter'
-    template = 'admin/cms/page/tree/filter.html'
+@register.inclusion_tag('admin/cms/page/tree/filter.html')
+def render_filter_field(request, field):
+    params = request.GET.copy()
 
-    options = Options(
-        Argument('cl'),
-        Argument('spec'),
-    )
+    if ERROR_FLAG in params:
+        del params['ERROR_FLAG']
 
-    def get_context(self, context, cl, spec):
-        choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
-        query_string = None
-        unique_choices = []
-        for choice in choices:
-            if choice['query_string'] != query_string:
-                unique_choices.append(choice)
-                query_string = choice['query_string']
-        return {'title': spec.title, 'choices': unique_choices}
+    lookup_value = params.pop(field.html_name, [''])[-1]
 
+    def choices():
+        for value, label in field.field.choices:
+            queries = params.copy()
 
-register.tag(CleanAdminListFilter)
+            if value:
+                queries[field.html_name] = value
+            yield {
+                'query_string': '?%s' % queries.urlencode(),
+                'selected': lookup_value == value,
+                'display': label,
+            }
+    return {'field': field, 'choices': choices()}
 
 
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     return mark_safe(
-        u'<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
+        '<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
 
 
 @register.filter
@@ -192,7 +184,8 @@ class PageSubmitRow(InclusionTag):
             'show_save': True,
             'language': language,
             'language_is_filled': language in filled_languages,
-            'object_id': context.get('object_id', None)
+            'object_id': context.get('object_id', None),
+            'opts': opts,
         }
         return context
 

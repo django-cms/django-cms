@@ -421,8 +421,12 @@ class ApphooksTestCase(CMSTestCase):
         self.reload_urls()
         self.apphook_clear()
 
-        page2 = create_page("page2", "nav_playground.html",
-                            "en", created_by=self.superuser, published=True, parent=de_title.page.parent,
+        page2 = create_page("page2",
+                            "nav_playground.html",
+                            language="en",
+                            created_by=self.superuser,
+                            published=True,
+                            parent=de_title.page.node.parent_page,
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
         create_title("de", "de_title", page2, slug="slug")
@@ -806,7 +810,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.parent,
+                            parent=titles[0].page.node.parent_page,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_title('de', 'de_title', page2, slug='slug')
         page2.publish('de')
@@ -847,7 +851,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.get_draft_object().parent,
+                            parent=titles[0].page.get_draft_object().node.parent_page,
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_title('de', 'de_title', page2, slug='slug')

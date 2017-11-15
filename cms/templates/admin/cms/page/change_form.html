@@ -1,5 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_urls admin_static admin_modify cms_admin cms_static %}
+{% load i18n admin_urls admin_static admin_modify admin_urls cms_admin cms_static %}
 
 {% block title %}{% if add %}{% trans 'Add a page' %}{% else %}{% trans "Change a page" %}{% endif %}{% endblock %}
 
@@ -30,7 +30,7 @@
     {% if not popup %}
         <ul class="object-tools hide-in-modal">
             <li>
-                {% url 'admin:cms_page_preview_page' page.id language as admin_url %}
+                {% url opts|admin_urlname:'preview_page' page.id language as admin_url %}
                 <a href="{{ admin_url }}" target="_parent">{% trans "View on site" %}</a>
             </li>
         </ul>
@@ -42,10 +42,9 @@
 
 {% block object-tools %}{% endblock %}
 
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.target %}&amp;target={{ request.GET.target }}{% endif %}{%if request.GET.position %}&amp;position={{ request.GET.position }}{% endif %}{% if request.GET.copy_target %}&amp;copy_target={{ request.GET.copy_target }}{% endif %}{% if request.GET.add_page_type %}&amp;add_page_type={{ request.GET.add_page_type }}{% endif %}" method="post" id="page_form">
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.parent_node %}&amp;parent_node={{ request.GET.parent_node }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="page_form">
 {% csrf_token %}
 {% block form_top %}{% endblock %}
-{{ adminForm.fields.parent }}
 
 <div style="display: none;"><input type="hidden" name="language" value="{{language}}" id="id_language"/></div>
 

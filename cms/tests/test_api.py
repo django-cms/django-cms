@@ -11,7 +11,6 @@ from djangocms_text_ckeditor.models import Text
 from menus.menu_pool import menu_pool
 
 from cms.api import (
-    generate_valid_slug,
     create_page,
     _verify_plugin_type,
     assign_user_to_page,
@@ -41,38 +40,6 @@ class PythonAPITests(CMSTestCase):
             'template': 'nav_playground.html',
             'language': 'en'
         }
-
-    def test_generate_valid_slug(self):
-        title = "Hello Title"
-        expected_slug = "hello-title"
-        # empty db, it should just slugify
-        slug = generate_valid_slug(title, None, 'en')
-        self.assertEqual(slug, expected_slug)
-
-    def test_generage_valid_slug_check_existing(self):
-        title = "Hello Title"
-        create_page(title, 'nav_playground.html', 'en')
-        # second time with same title, it should append -1
-        expected_slug = "hello-title-1"
-        slug = generate_valid_slug(title, None, 'en')
-        self.assertEqual(slug, expected_slug)
-
-    def test_generage_valid_slug_check_parent(self):
-        title = "Hello Title"
-        page = create_page(title, 'nav_playground.html', 'en')
-        # second time with same title, it should append -1
-        expected_slug = "hello-title"
-        slug = generate_valid_slug(title, page, 'en')
-        self.assertEqual(slug, expected_slug)
-
-    def test_generage_valid_slug_check_parent_existing(self):
-        title = "Hello Title"
-        page = create_page(title, 'nav_playground.html', 'en')
-        create_page(title, 'nav_playground.html', 'en', parent=page)
-        # second time with same title, it should append -1
-        expected_slug = "hello-title-1"
-        slug = generate_valid_slug(title, page, 'en')
-        self.assertEqual(slug, expected_slug)
 
     def test_invalid_apphook_type(self):
         self.assertRaises(TypeError, create_page, apphook=1,

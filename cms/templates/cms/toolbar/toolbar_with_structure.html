@@ -57,7 +57,7 @@
     {# start: structure #}
     <div class="cms-structure">
         <div class="cms-structure-content" data-touch-action="pan-y">
-        {% if cms_toolbar.structure_mode_active or cms_toolbar.uses_legacy_structure_mode %}
+        {% if cms_renderer.load_structure %}
             {% for placeholder in cms_renderer.get_rendered_editable_placeholders %}
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
                 {% include cms_toolbar.templates.dragbar_template with placeholder=placeholder %}

@@ -5,7 +5,6 @@ import warnings
 from django.conf.urls import url
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (
@@ -36,7 +35,8 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.signals import pre_placeholder_operation, post_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
-from cms.utils import copy_plugins, get_cms_setting
+from cms.utils import copy_plugins, get_current_site
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_code
 from cms.utils.plugins import has_reached_plugin_limit, reorder_plugins
 from cms.utils.urlutils import admin_reverse
@@ -161,7 +161,7 @@ class PlaceholderAdminMixin(object):
         # has a special meaning on the CMS.
         # It allows users to see another language while maintaining
         # the same url. This complicates language detection.
-        site = get_current_site(request)
+        site = get_current_site()
         parsed_url = urlparse(request.GET['cms_path'])
         queries = dict(parse_qsl(parsed_url.query))
         language = queries.get('language')

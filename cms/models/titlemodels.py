@@ -65,18 +65,13 @@ class Title(models.Model):
         )
         return display
 
-    def update_path(self):
-        # Build path from parent page's path and slug
-        slug = u'%s' % self.slug
-        if not self.has_url_overwrite:
-            self.path = u'%s' % slug
-            if self.page.parent_id:
-                parent_page = self.page.parent_id
+    def get_path_for_base(self, base_path=''):
+        old_base, sep, slug = self.path.rpartition('/')
+        return '%s/%s' % (base_path, slug) if base_path else slug
 
-                parent_title = Title.objects.get_title(parent_page, language=self.language, language_fallback=True)
-                if parent_title:
-                    self.path = u'%s/%s' % (parent_title.path, slug)
-
+    @property
+    def has_path_override(self):
+        return self.has_url_overwrite or bool(self.redirect)
 
     @property
     def overwrite_url(self):
@@ -128,6 +123,22 @@ class Title(models.Model):
             # instead we need to check if the url overwrite flag is set.
             return True
         return False
+
+    def _url_properties_changed(self):
+        assert self.publisher_is_draft
+        assert self.publisher_public_id
+
+        new_values = (
+            self.path,
+            self.slug,
+            self.published,
+        )
+        old_values = (
+            self.publisher_public.path,
+            self.publisher_public.slug,
+            self.publisher_public.published,
+        )
+        return old_values != new_values
 
 
 class EmptyTitle(object):

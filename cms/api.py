@@ -32,9 +32,10 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.utils import copy_plugins
+from cms.utils import copy_plugins, get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
+from cms.utils.page import get_available_slug
 from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
@@ -42,26 +43,6 @@ from menus.menu_pool import menu_pool
 #===============================================================================
 # Helpers/Internals
 #===============================================================================
-
-def generate_valid_slug(source, parent, language):
-    """
-    Generate a valid slug for a page from source for the given language.
-    Parent is passed so we can make sure the slug is unique for this level in
-    the page tree.
-    """
-    if parent:
-        qs = Title.objects.filter(language=language, page__parent=parent)
-    else:
-        qs = Title.objects.filter(language=language, page__parent__isnull=True)
-    used = list(qs.values_list('slug', flat=True))
-    baseslug = slugify(source)
-    slug = baseslug
-    i = 1
-    if used:
-        while slug in used:
-            slug = '%s-%s' % (baseslug, i)
-            i += 1
-    return slug
 
 
 def _verify_apphook(apphook, namespace):
@@ -106,7 +87,6 @@ def _verify_plugin_type(plugin_type):
     """
     if (hasattr(plugin_type, '__module__') and
             issubclass(plugin_type, CMSPluginBase)):
-        plugin_pool.set_plugin_meta()
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -151,21 +131,16 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate site
     if not site:
-        site = Site.objects.get_current()
+        site = get_current_site()
     else:
         assert isinstance(site, Site)
 
     # validate language:
     assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
 
-    # set default slug:
-    if not slug:
-        slug = generate_valid_slug(title, parent, language)
-
     # validate parent
     if parent:
         assert isinstance(parent, Page)
-        parent = Page.objects.get(pk=parent.pk)
 
     # validate publication date
     if publication_date:
@@ -186,13 +161,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    if parent:
-        if position in ('last-child', 'first-child'):
-            parent_id = parent.pk
-        else:
-            parent_id = parent.parent_id
-    else:
-        parent_id = None
+    target_node = parent.node if parent else None
+
     # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook, apphook_namespace)
@@ -210,10 +180,9 @@ def create_page(title, template, language, menu_title=None, slug=None,
         if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
-    page = Page(
+    page = Page.objects.create(
         created_by=created_by,
         changed_by=created_by,
-        parent_id=parent_id,
         publication_date=publication_date,
         publication_end_date=publication_end_date,
         in_navigation=in_navigation,
@@ -228,12 +197,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-
-    # This saves the page
-    page = page.add_root(instance=page)
-
-    if parent:
-        page = page.move(target=parent, pos=position)
+    page.attach_site(site=site, target=target_node, position=position)
+    page.rescan_placeholders()
 
     create_title(
         language=language,
@@ -249,20 +214,17 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if published:
         page.publish(language)
 
+    if parent and position in ('last-child', 'first-child'):
+        parent._clear_node_cache(site)
+
     del _thread_locals.user
-
-    page = page.reload()
-
-    # Avoid an extra query when accessing the site
-    # for the newly created page.
-    page._site_cache = site
     return page
 
 
 @transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
-                 redirect=None, meta_description=None,
-                 parent=None, overwrite_url=None, with_revision=None):
+                 redirect=None, meta_description=None, parent=None,
+                 overwrite_url=None, with_revision=None, page_title=None, path=None):
     """
     Create a title.
 
@@ -281,22 +243,26 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     # set default slug:
     if not slug:
-        slug = generate_valid_slug(title, parent, language)
+        base = page.get_path_for_slug(slugify(title), language)
+        slug = get_available_slug(page.site, base, language)
+
+    if overwrite_url:
+        path = overwrite_url
+    elif path is None:
+        path = page.get_path_for_slug(slug, language)
 
     title = Title.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
+        page_title=page_title,
         slug=slug,
+        path=path,
         redirect=redirect,
         meta_description=meta_description,
-        page=page
+        page=page,
+        has_url_overwrite=bool(overwrite_url),
     )
-
-    if overwrite_url:
-        title.has_url_overwrite = True
-        title.path = overwrite_url
-        title.save()
     return title
 
 
@@ -449,7 +415,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         page_permission = GlobalPagePermission(
             user=user, can_recover_page=can_recover_page, **data)
         page_permission.save()
-        page_permission.sites.add(Site.objects.get_current())
+        page_permission.sites.add(get_current_site())
     return page_permission
 
 

@@ -24,7 +24,7 @@ import time
 
 from django.utils.timezone import now
 
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_header_name, get_timezone_name
 
 

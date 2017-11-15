@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
 

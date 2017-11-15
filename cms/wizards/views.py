@@ -13,6 +13,7 @@ from django.utils.translation import get_language_from_request
 from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
+from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_1_10
 
 from .wizard_pool import wizard_pool
@@ -40,6 +41,7 @@ class WizardCreateView(SessionWizardView):
 
         if not user.is_active or not user.is_staff:
             raise PermissionDenied
+        self.site = get_current_site()
         return super(WizardCreateView, self).dispatch(*args, **kwargs)
 
     def get_current_step(self):
@@ -96,8 +98,14 @@ class WizardCreateView(SessionWizardView):
                 kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
             else:
                 kwargs['wizard_page'] = None
+
             kwargs['wizard_language'] = self.request.GET.get(
                 'language', get_language_from_request(self.request))
+
+        if kwargs['wizard_page']:
+            kwargs['wizard_page_node'] = kwargs['wizard_page'].get_node_object(self.site)
+        else:
+            kwargs['wizard_page_node'] = None
         return kwargs
 
     def get_form_initial(self, step):

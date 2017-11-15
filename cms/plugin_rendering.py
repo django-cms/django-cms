@@ -25,22 +25,6 @@ from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_con
 from cms.utils.plugins import get_plugin_restrictions
 
 
-def _get_page_ancestors(page):
-    """
-    Returns a generator which yields the ancestors for page.
-    """
-    if not page.parent_id:
-        raise StopIteration
-
-    # This is done to fetch one parent at a time vs using the tree
-    # to get all descendants.
-    # The parents have already been loaded by the placeholder pre-loading.
-    yield page.parent
-
-    for ancestor in _get_page_ancestors(page.parent):
-        yield ancestor
-
-
 def _unpack_plugins(parent_plugin):
     found_plugins = []
 
@@ -86,6 +70,7 @@ class RenderedPlaceholder(object):
 
 class BaseRenderer(object):
 
+    load_structure = False
     placeholder_edit_template = ''
 
     def __init__(self, request):
@@ -366,13 +351,14 @@ class ContentRenderer(BaseRenderer):
                 nodelist=None,
             )
 
+        parent_page = current_page.get_parent()
         should_inherit = (
             inherit
-            and not content and current_page.parent_id
+            and not content and parent_page
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.
-            and current_page.parent_id in placeholder_cache
+            and parent_page.pk in placeholder_cache
             # don't display inherited plugins in edit mode, so that the user doesn't
             # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
             # there for possible enhancements
@@ -386,7 +372,7 @@ class ContentRenderer(BaseRenderer):
                 slot,
                 context,
                 inherit=True,
-                page=current_page.parent,
+                page=parent_page,
                 nodelist=None,
                 editable=False,
             )
@@ -550,6 +536,7 @@ class ContentRenderer(BaseRenderer):
                 is_fallback=inherit,
             )
 
+        parent_page = page.get_parent()
         # Inherit only placeholders that have no plugins
         # or are not cached.
         placeholders_to_inherit = [
@@ -557,9 +544,9 @@ class ContentRenderer(BaseRenderer):
             if not getattr(pl, '_plugins_cache', None) and pl.slot in slots_w_inheritance
         ]
 
-        if placeholders_to_inherit and page.parent_id:
+        if parent_page and placeholders_to_inherit:
             self._preload_placeholders_for_page(
-                page=page.parent,
+                page=parent_page,
                 slots=placeholders_to_inherit,
                 inherit=True,
             )
@@ -578,6 +565,7 @@ class ContentRenderer(BaseRenderer):
 
 class StructureRenderer(BaseRenderer):
 
+    load_structure = True
     placeholder_edit_template = (
         """
         <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
@@ -666,6 +654,7 @@ class StructureRenderer(BaseRenderer):
 
 class LegacyRenderer(ContentRenderer):
 
+    load_structure = True
     placeholder_edit_template = (
         """
         {content}
