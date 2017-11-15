@@ -828,7 +828,30 @@ class PageTest(PageTestBase):
         self.assertEqual(page, mock_page)
 
     @override_settings(CMS_PERMISSION=False)
-    def test_existing_overwrite_url(self):
+    def test_set_overwrite_url(self):
+        superuser = self.get_superuser()
+        cms_page = create_page('page', 'nav_playground.html', 'en', published=True)
+        expected = (
+            '<input id="id_overwrite_url" maxlength="255" '
+            'value="new-url" name="overwrite_url" type="text" />'
+        )
+        changelist = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+
+        with self.login_user_context(superuser):
+            page_data = {
+                'overwrite_url': '/new-url/',
+                'template': cms_page.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, changelist)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+            self.assertContains(response, expected, html=True)
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_set_existing_overwrite_url(self):
         superuser = self.get_superuser()
 
         create_page('home', 'nav_playground.html', 'en', published=True)
