@@ -49,6 +49,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='page',
+            name='is_page_type',
+            field=models.BooleanField(default=False),
+        ),
         migrations.CreateModel(
             name='PageType',
             fields=[
