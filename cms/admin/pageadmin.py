@@ -321,9 +321,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         site = self.get_site(request)
         paste_enabled = request.GET.get('has_copy') or request.GET.get('has_cut')
-
         context = {
             'page': page,
+            'node': page.get_node_object(site),
             'opts': self.opts,
             'site': site,
             'is_shared_page': page.site_is_secondary(site),
