@@ -551,6 +551,67 @@ class PageTest(PageTestBase):
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
 
+    def test_copy_page_to_explicit_position(self):
+        """
+        User should be able to copy a single page and paste it
+        in a specific location on another page tree.
+        """
+        superuser = self.get_superuser()
+        parent = create_page("parent", "nav_playground.html", "en", published=True)
+        child_0001 = create_page("child-0001", "nav_playground.html", "en", published=True, parent=parent)
+        child_0002 = create_page("child-0002", "nav_playground.html", "en", published=True, parent=parent)
+        child_0004 = create_page("child-0004", "nav_playground.html", "en", published=True, parent=parent)
+        child_0003 = create_page("child-0003", "nav_playground.html", "en", published=True)
+
+        with self.login_user_context(superuser):
+            child_0003 = self.copy_page(child_0003, parent, position=2)
+
+        tree = (
+            (parent, '0001'),
+            (child_0001, '00010001'),
+            (child_0002, '00010002'),
+            (child_0003, '00010003'),
+            (child_0004, '00010004'),
+        )
+
+        for page, path in tree:
+            self.assertEqual(self.reload(page.node).path, path)
+
+    def test_copy_page_tree_to_explicit_position(self):
+        """
+        User should be able to copy a page with descendants and paste it
+        in a specific location on another page tree.
+        """
+        superuser = self.get_superuser()
+        parent = create_page("parent", "nav_playground.html", "en", published=True)
+        child_0001 = create_page("child-0001", "nav_playground.html", "en", published=True, parent=parent)
+        child_0002 = create_page("child-0002", "nav_playground.html", "en", published=True, parent=parent)
+        child_0004 = create_page("child-0004", "nav_playground.html", "en", published=True, parent=parent)
+        child_0003 = create_page("child-0003", "nav_playground.html", "en", published=True)
+        create_page("child-00030001", "nav_playground.html", "en", published=True, parent=child_0003)
+        create_page("child-00030002", "nav_playground.html", "en", published=True, parent=child_0003)
+        create_page("child-00030003", "nav_playground.html", "en", published=True, parent=child_0003)
+
+        with self.login_user_context(superuser):
+            child_0003 = self.copy_page(child_0003, parent, position=2)
+            child_00030001 = child_0003.node.get_children()[0].page
+            child_00030002 = child_0003.node.get_children()[1].page
+            child_00030003 = child_0003.node.get_children()[2].page
+
+        tree = (
+            (parent, '0001'),
+            (child_0001, '00010001'),
+            (child_0002, '00010002'),
+            (child_0003, '00010003'),
+            (child_00030001, '000100030001'),
+            (child_00030002, '000100030002'),
+            (child_00030003, '000100030003'),
+            (child_0004, '00010004'),
+        )
+
+        for page, path in tree:
+            self.assertEqual(self.reload(page.node).path, path)
+
     def test_copy_self_page(self):
         """
         Test that a page can be copied via the admin

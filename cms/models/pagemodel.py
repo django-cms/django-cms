@@ -711,7 +711,14 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
         # Otherwise, if the page is copied and pasted on itself, it will duplicate.
         descendants = list(node.get_descendants().prefetch_related('page__title_set'))
         new_root_page = self.copy(target_site, parent_node=parent_node)
-        nodes_by_id = {node.pk: new_root_page.get_node_object(target_site)}
+        new_root_node = new_root_page.get_node_object(target_site)
+
+        if target_node and position in ('left', 'last-child'):
+            # target node is a sibling
+            new_root_node.move(target_node, position)
+            new_root_node.refresh_from_db(fields=('path', 'depth'))
+
+        nodes_by_id = {node.pk: new_root_node}
 
         for node in descendants:
             parent = nodes_by_id[node.parent_id]
