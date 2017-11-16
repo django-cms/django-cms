@@ -352,6 +352,43 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 response = self.client.get(url)
                 self.assertNotContains(response, content, status_code=200)
 
+    def test_create_page_with_existing_slug(self):
+        superuser = self.get_superuser()
+        data = {
+            'title': 'page',
+            'slug': 'page',
+            'page_type': None,
+        }
+        create_page(
+            'page',
+            'nav_playground.html',
+            language='en',
+            published=True,
+            slug='page'
+        )
+
+        # slug -> page-1
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+            wizard_page_node=None,
+        )
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.save().title_set.filter(slug='page-2'))
+
+        # slug -> page-2
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+            wizard_page_node=None,
+        )
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.save().title_set.filter(slug='page-3'))
+
 
 # This entire test class can be removed in 3.5.0
 class TestWizardSettings(CMSTestCase):
