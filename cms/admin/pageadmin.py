@@ -452,14 +452,17 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         page = self.get_object(request, object_id=page_id)
 
-        if not self.has_change_permission(request, obj=page):
-            raise PermissionDenied
-
         if page is None:
             raise self._get_404_exception(page_id)
 
+        site = self.get_site(request)
+        user = request.user
         target_id = request.GET.get('target', False) or request.POST.get('target', False)
         callback = request.GET.get('callback', False) or request.POST.get('callback', False)
+        can_view_page = page_permissions.user_can_view_page(user, page, site)
+
+        if not can_view_page:
+            raise PermissionDenied
 
         if target_id:
             try:
@@ -467,8 +470,10 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             except Page.DoesNotExist:
                 raise Http404
 
-            if not page_permissions.user_can_add_subpage(request.user, target=target):
+            if not page_permissions.user_can_add_subpage(user, target, site):
                 raise PermissionDenied
+        elif not page_permissions.user_can_add_page(user, site):
+            raise PermissionDenied
 
         context = {
             'dialog_id': 'dialog-copy',
@@ -901,7 +906,18 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         target = form.cleaned_data['target']
 
-        if target and not target.has_add_permission(user):
+        # User can only copy pages he can see
+        can_copy_page = page_permissions.user_can_view_page(user, page, site)
+
+        if can_copy_page and target:
+            # User can only copy a page into another one if he has permission
+            # to add a page under the target page.
+            can_copy_page = page_permissions.user_can_add_subpage(user, target, site)
+        elif can_copy_page:
+            # User can only copy / paste a page if he has permission to add a page
+            can_copy_page = page_permissions.user_can_add_page(user, site)
+
+        if not can_copy_page:
             message = force_text(_("Error! You don't have permissions to copy this page."))
             return jsonify_request(HttpResponseForbidden(message))
 
