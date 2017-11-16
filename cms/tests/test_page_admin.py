@@ -2380,6 +2380,32 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertFalse(self._translation_exists(title='permissions-de-2'))
 
+    def test_user_can_copy_page(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+
+        self.add_permission(staff_user, 'add_page')
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(
+            staff_user,
+            can_add=True,
+            can_change=True,
+        )
+
+        count = Page.objects.drafts().count()
+
+        with self.login_user_context(staff_user):
+            endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+
+        with self.login_user_context(staff_user):
+            self.copy_page(page, page, position=1)
+        self.assertEqual(count + 1, 3)
+
     # Plugin related tests
 
     def test_user_can_add_plugin(self):
