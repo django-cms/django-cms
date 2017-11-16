@@ -72,7 +72,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
-    site = Site.objects._get_site_by_id(pk=site_id)
+    site = Site.objects._get_site_by_id(site_id)
     try:
         if 'pk' in page_lookup:
             page = Page.objects.all().get(**page_lookup)
