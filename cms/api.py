@@ -247,7 +247,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         slug = get_available_slug(page.site, base, language)
 
     if overwrite_url:
-        path = overwrite_url
+        path = overwrite_url.strip('/')
     elif path is None:
         path = page.get_path_for_slug(slug, language)
 
