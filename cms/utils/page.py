@@ -13,8 +13,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
 
 
-APPEND_TO_SLUG = "-copy"
-COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d+)*)?$')
+SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
 
 def get_page_template_from_request(request):
@@ -191,7 +190,7 @@ def get_all_pages_from_path(site, path, language):
     return pages.filter(title_set__language=language)
 
 
-def get_available_slug(site, path, language):
+def get_available_slug(site, path, language, suffix='copy'):
     """
     Generates slug for path.
     If path is used, appends the value of APPEND_TO_SLUG to the end.
@@ -200,16 +199,15 @@ def get_available_slug(site, path, language):
     pages = get_all_pages_from_path(site, path, language)
 
     if pages.exists():
-        # first is -copy, then -copy-2, -copy-3, ....
-        match = COPY_SLUG_REGEX.match(slug)
+        match = SUFFIX_REGEX.match(slug)
+
         if match:
-            try:
-                next_id = int(match.groups()[0]) + 1
-                slug = "-".join(slug.split('-')[:-1]) + "-%d" % next_id
-            except TypeError:
-                slug += "-2"
+            _next = int(match.groups()[-1]) + 1
+            slug = SUFFIX_REGEX.sub('\g<1>-{}'.format(_next), slug)
+        elif suffix:
+            slug += suffix + '-2'
         else:
-            slug += APPEND_TO_SLUG
+            slug += '-2'
         path = '%s/%s' % (base, slug) if base else slug
-        return get_available_slug(site, path, language)
+        return get_available_slug(site, path, language, suffix=suffix)
     return slug

@@ -110,7 +110,7 @@ class CreateCMSPageForm(AddPageForm):
             base = ''
             path = slug
 
-        data['slug'] = get_available_slug(self._site, path, self._language)
+        data['slug'] = get_available_slug(self._site, path, self._language, suffix=None)
         data['path'] = '%s/%s' % (base, data['slug']) if base else data['slug']
 
         if not data['slug']:
