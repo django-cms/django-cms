@@ -1242,12 +1242,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         site = get_current_site()
         active_site = self.get_site(request)
+        is_shared_page = page.site_is_secondary(site)
         can_see_page = page_permissions.user_can_view_page(request.user, page, active_site)
 
-        if can_see_page and not self.has_change_permission(request, obj=page):
+        if can_see_page:
+            can_change_page = self.has_change_permission(request, obj=page)
+        else:
+            can_change_page = False
+
+        if can_see_page and not can_change_page:
             # User can see the page but has no permission to edit it,
             # as a result, only let them see it if is published.
-            can_see_page = page.is_published(language)
+            # Unless the page is a shared page.
+            can_see_page = is_shared_page or page.is_published(language)
 
         if not can_see_page:
             message = ugettext('You don\'t have permissions to see page "%(title)s"')
