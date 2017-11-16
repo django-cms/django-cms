@@ -604,7 +604,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['redirect'].widget.language = self._language
             self.fields['redirect'].initial = self.title_obj.redirect
 
-        if 'overwrite_url' in self.fields:
+        if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
             self.fields['overwrite_url'].initial = self.title_obj.path
 
     def get_navigation_extenders(self):

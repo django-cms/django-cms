@@ -934,6 +934,38 @@ class PageTest(PageTestBase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
+    @override_settings(CMS_PERMISSION=False)
+    def test_remove_overwrite_url(self):
+        superuser = self.get_superuser()
+        cms_page = create_page(
+            'page',
+            'nav_playground.html',
+            language='en',
+            published=True,
+            overwrite_url='/new-url/',
+        )
+        expected = (
+            '<input id="id_overwrite_url" maxlength="255" '
+            'name="overwrite_url" type="text" />'
+        )
+        changelist = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+
+        # control test
+        self.assertTrue(cms_page.title_set.filter(path='new-url').exists())
+
+        with self.login_user_context(superuser):
+            page_data = {
+                'overwrite_url': '',
+                'template': cms_page.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, changelist)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+            self.assertContains(response, expected, html=True)
+
     def test_advanced_settings_form(self):
         superuser = self.get_superuser()
         page = create_page('Page 1', 'nav_playground.html', 'en')
