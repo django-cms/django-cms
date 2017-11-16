@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django import template
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from django.db.models import Model
@@ -71,7 +72,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
-    page_lookup.update({'site': site_id})
+    site = Site.objects._get_site_by_id(pk=site_id)
     try:
         if 'pk' in page_lookup:
             page = Page.objects.all().get(**page_lookup)
@@ -86,11 +87,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 else:
                     return page
         else:
-            site = get_current_site()
             pages = get_page_queryset(site, draft=use_draft(request))
             return pages.get(**page_lookup)
     except Page.DoesNotExist:
-        site = get_current_site()
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
                  "The URL of the request was: http://%(host)s%(path)s") \
