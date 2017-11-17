@@ -551,6 +551,36 @@ class PageTest(PageTestBase):
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
 
+    def test_copy_page_with_plugins(self):
+        """
+        Copying a page with plugins should copy all plugins for each translation
+        on the page into the respective translation in the new page.
+        """
+        languages = ('en', 'de', 'fr', 'pt-br')
+        cms_page = create_page("page_a_en", "nav_playground.html", "en")
+        create_title('de', 'page_a_de', cms_page)
+        create_title('fr', 'page_a_fr', cms_page)
+        create_title('pt-br', 'page_a_pt-br', cms_page)
+        placeholder = cms_page.placeholders.get(slot='body')
+
+        for language in languages:
+            add_plugin(
+                placeholder,
+                plugin_type='LinkPlugin',
+                language=language,
+                name='Link {}'.format(language),
+                external_link='https://www.django-cms.org',
+            )
+
+        with self.login_user_context(self.get_superuser()):
+            new_page = self.copy_page(cms_page, cms_page, position=1)
+            new_placeholder = new_page.placeholders.get(slot='body')
+
+        for language in languages:
+            self.assertTrue(new_placeholder.get_plugins(language).exists())
+            plugin = new_placeholder.get_plugins(language)[0].get_bound_plugin()
+            self.assertEqual(plugin.name, 'Link {}'.format(language))
+
     def test_copy_page_to_explicit_position(self):
         """
         User should be able to copy a single page and paste it
