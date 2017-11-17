@@ -89,6 +89,10 @@ class BaseRenderer(object):
         return self.request.current_page
 
     @cached_property
+    def current_site(self):
+        return Site.objects.get_current(self.request)
+
+    @cached_property
     def toolbar(self):
         return get_toolbar_from_request(self.request)
 
@@ -100,11 +104,6 @@ class BaseRenderer(object):
     def plugin_pool(self):
         import cms.plugin_pool
         return cms.plugin_pool.plugin_pool
-
-    @cached_property
-    def site_id(self):
-        site = Site.objects.get_current(self.request)
-        return site.pk
 
     def get_placeholder_plugin_menu(self, placeholder, page=None):
         registered_plugins = self.plugin_pool.registered_plugins
@@ -274,7 +273,7 @@ class ContentRenderer(BaseRenderer):
             set_placeholder_cache(
                 placeholder,
                 lang=language,
-                site_id=self.site_id,
+                site_id=self.current_site.pk,
                 content=content,
                 request=self.request,
             )
@@ -282,7 +281,7 @@ class ContentRenderer(BaseRenderer):
         rendered_placeholder = RenderedPlaceholder(
             placeholder=placeholder,
             language=language,
-            site_id=self.site_id,
+            site_id=self.current_site.pk,
             cached=use_cache,
             editable=editable,
             has_content=bool(placeholder_content),
@@ -335,6 +334,10 @@ class ContentRenderer(BaseRenderer):
             # Instead of loading plugins for this one placeholder
             # try and load them for all placeholders on the page.
             self._preload_placeholders_for_page(current_page)
+
+        if current_page.site_is_secondary(self.current_site):
+            # shared pages can't be edited but can be previewed
+            editable = False
 
         try:
             placeholder = placeholder_cache[current_page.pk][slot]
@@ -403,6 +406,11 @@ class ContentRenderer(BaseRenderer):
             editable = False
             use_cache = True
 
+        if editable and self.current_page:
+            # if the static placeholder is being rendered from a shared page,
+            # don't allow the user to edit it.
+            editable = not self.current_page.site_is_secondary(self.current_site)
+
         # I really don't like these impromptu flags...
         placeholder.is_static = True
 
@@ -470,7 +478,8 @@ class ContentRenderer(BaseRenderer):
         """
         # Placeholders can be rendered multiple times under different sites
         # it's important to have a per-site "cache".
-        site_cache = self._placeholders_content_cache.setdefault(self.site_id, {})
+        site_id = self.current_site.pk
+        site_cache = self._placeholders_content_cache.setdefault(site_id, {})
         # Placeholders can be rendered multiple times under different languages
         # it's important to have a per-language "cache".
         language_cache = site_cache.setdefault(language, {})
@@ -479,7 +488,7 @@ class ContentRenderer(BaseRenderer):
             cached_value = get_placeholder_cache(
                 placeholder,
                 lang=language,
-                site_id=self.site_id,
+                site_id=site_id,
                 request=self.request,
             )
 
@@ -600,7 +609,7 @@ class StructureRenderer(BaseRenderer):
         rendered_placeholder = RenderedPlaceholder(
             placeholder=placeholder,
             language=language,
-            site_id=self.site_id,
+            site_id=self.current_site.pk,
             cached=False,
             editable=True,
         )
