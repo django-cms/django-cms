@@ -190,10 +190,10 @@ def get_all_pages_from_path(site, path, language):
     return pages.filter(title_set__language=language)
 
 
-def get_available_slug(site, path, language, suffix='copy'):
+def get_available_slug(site, path, language, suffix='copy', modified=False):
     """
     Generates slug for path.
-    If path is used, appends the value of APPEND_TO_SLUG to the end.
+    If path is used, appends the value of suffix to the end.
     """
     base, _, slug = path.rpartition('/')
     pages = get_all_pages_from_path(site, path, language)
@@ -201,7 +201,7 @@ def get_available_slug(site, path, language, suffix='copy'):
     if pages.exists():
         match = SUFFIX_REGEX.match(slug)
 
-        if match:
+        if match and modified:
             _next = int(match.groups()[-1]) + 1
             slug = SUFFIX_REGEX.sub('\g<1>-{}'.format(_next), slug)
         elif suffix:
@@ -209,5 +209,5 @@ def get_available_slug(site, path, language, suffix='copy'):
         else:
             slug += '-2'
         path = '%s/%s' % (base, slug) if base else slug
-        return get_available_slug(site, path, language, suffix=suffix)
+        return get_available_slug(site, path, language, suffix, modified=True)
     return slug
