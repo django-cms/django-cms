@@ -123,7 +123,7 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id,
         # Assume user passed in a pk directly.
         site_id = getattr(site, 'pk', site)
     else:
-        site_id = renderer.site_id
+        site_id = renderer.current_site.pk
 
     page = _get_page_by_untyped_arg(reverse_id, request, site_id)
 

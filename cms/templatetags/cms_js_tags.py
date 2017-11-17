@@ -46,7 +46,7 @@ def render_cms_structure_js(context, renderer, obj):
         }
 
         if static_placeholder.site_bound:
-            kwargs['site'] = renderer.site_id
+            kwargs['site'] = renderer.current_site.pk
         else:
             kwargs['site_id__isnull'] = True
 

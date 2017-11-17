@@ -628,16 +628,14 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
             title.published = False
             title.publisher_public = None
 
-            language = title.language
-
             if parent_node:
-                base = parent_page.get_path(language)
+                base = parent_page.get_path(title.language)
                 path = u'%s/%s' % (base, title.slug)
             else:
                 base = ''
                 path = title.slug
 
-            slug = get_available_slug(site, path, language)
+            slug = get_available_slug(site, path, title.language)
 
             title.slug = slug
             title.path = '%s/%s' % (base, slug) if base else slug
