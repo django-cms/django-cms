@@ -21,6 +21,31 @@ def get_descendants(root):
             yield child
 
 
+def unpublish_never_published_pages(apps, schema_editor):
+    """
+    Prior to 3.5, pages would be marked as "pending"
+    when users tried to publish a page with an unpublished parent.
+    This is no longer allowed, as a result any page that's set as
+    published but does not have a public version is marked as unpublished.
+    """
+    Page = apps.get_model('cms', 'Page')
+    draft_pages = Page.objects.filter(publisher_is_draft=True)
+    never_published_pages = Page.objects.filter(
+        title_set__published=True,
+        publisher_is_draft=True,
+        publisher_public__isnull=True,
+    )
+
+    for page in never_published_pages.distinct():
+        page.title_set.update(
+            published=False,
+            publisher_state=1,
+        )
+        draft_pages.filter(pk=page.pk).update(
+            publication_date=None,
+            publication_end_date=None,
+        )
+
 def migrate_to_page_nodes(apps, schema_editor):
     Page = apps.get_model('cms', 'Page')
     PageNode = apps.get_model('cms', 'PageNode')
@@ -65,6 +90,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(unpublish_never_published_pages),
         migrations.CreateModel(
             name='PageNode',
             fields=[
