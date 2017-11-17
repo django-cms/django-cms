@@ -389,6 +389,31 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-3'))
 
+        # Now explicitly request the page-2 slug
+        data['slug'] = 'page-2'
+
+        # slug -> page-2-2
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+            wizard_page_node=None,
+        )
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.save().title_set.filter(slug='page-2-2'))
+
+        # slug -> page-2-3
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+            wizard_page_node=None,
+        )
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.save().title_set.filter(slug='page-2-3'))
+
 
 # This entire test class can be removed in 3.5.0
 class TestWizardSettings(CMSTestCase):
