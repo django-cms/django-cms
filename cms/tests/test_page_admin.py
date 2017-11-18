@@ -581,6 +581,32 @@ class PageTest(PageTestBase):
             plugin = new_placeholder.get_plugins(language)[0].get_bound_plugin()
             self.assertEqual(plugin.name, 'Link {}'.format(language))
 
+    def test_copy_page_to_root(self):
+        """
+        When a page is copied and its slug matches that of another page,
+        add "-copy-2" at the end.
+        """
+        data = {
+            'position': 2,
+            'copy_permissions': 'on',
+            'copy_moderation': 'on',
+        }
+        superuser = self.get_superuser()
+        cms_page = create_page("page_a", "nav_playground.html", "en", published=True)
+
+        with self.login_user_context(superuser):
+            endpoint = self.get_admin_url(Page, 'copy_page', cms_page.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        new_slug = cms_page.get_path('en') + '-copy-2'
+        new_path = cms_page.get_slug('en') + '-copy-2'
+
+        self.assertEqual(
+            Title.objects.filter(slug=new_slug, path=new_path).count(),
+            1,
+        )
+
     def test_copy_page_to_explicit_position(self):
         """
         User should be able to copy a single page and paste it
