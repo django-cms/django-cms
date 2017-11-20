@@ -57,6 +57,7 @@ def get_page_choices_for_site(site, language):
                 indent = "&nbsp;&nbsp;" * (node.depth - 1)
                 label = mark_safe("%s%s" % (indent, escape(title)))
                 yield (node.page.pk, label)
+                break
 
 
 def update_site_and_page_choices(language=None):

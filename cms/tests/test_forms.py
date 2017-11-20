@@ -7,7 +7,7 @@ from cms.admin import forms
 from cms.admin.forms import (PagePermissionInlineAdminForm,
                              ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
                              PageUserGroupForm)
-from cms.api import create_page, assign_user_to_page
+from cms.api import create_page, create_title, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
@@ -17,6 +17,8 @@ from cms.forms.widgets import ApplicationConfigSelect
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
 )
+from cms.utils import get_current_site
+from cms.utils.i18n import force_language
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -39,6 +41,33 @@ class FormsTestCase(CMSTestCase):
     def test_get_page_choices(self):
         result = get_page_choices()
         self.assertEqual(result, [('', '----')])
+
+    def test_get_page_choices_with_multiple_translations(self):
+        site = get_current_site()
+        pages = [
+            create_page("0001", "nav_playground.html", "en"),
+            create_page("0002", "nav_playground.html", "en"),
+            create_page("0003", "nav_playground.html", "en"),
+            create_page("0004", "nav_playground.html", "en"),
+        ]
+        languages = ['de', 'fr']
+
+        for page in pages:
+            for language in languages:
+                title = page.get_title('en')
+                create_title(language, title, page=page)
+
+        for language in ['en'] + languages:
+            expected = [
+                ('', '----'),
+                (site.name, [
+                    (page.pk, page.get_title(language, fallback=False))
+                    for page in pages
+                ])
+            ]
+
+            with force_language(language):
+                self.assertSequenceEqual(get_page_choices(), expected)
 
     def test_get_site_choices_without_moderator(self):
         result = get_site_choices()
