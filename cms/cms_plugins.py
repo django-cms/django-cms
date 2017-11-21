@@ -48,7 +48,15 @@ class AliasPlugin(CMSPluginBase):
         if not request or instance.is_recursive():
             return context
 
-        if instance.plugin_id:
+        source = (instance.plugin or instance.alias_placeholder)
+
+        if source and source.page:
+            # this is bad but showing unpublished content is worse
+            can_see_content = source.page.is_published(instance.language)
+        else:
+            can_see_content = True
+
+        if can_see_content and instance.plugin:
             plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
             plugins = [instance.plugin] + list(plugins)
             plugins = downcast_plugins(plugins, request=request)
@@ -57,7 +65,7 @@ class AliasPlugin(CMSPluginBase):
             plugins = build_plugin_tree(plugins)
             context['plugins'] = plugins
 
-        if instance.alias_placeholder_id:
+        if can_see_content and instance.alias_placeholder:
             toolbar = get_toolbar_from_request(request)
             renderer = toolbar.content_renderer
             content = renderer.render_placeholder(
