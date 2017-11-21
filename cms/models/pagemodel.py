@@ -843,7 +843,7 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
         return True
 
     def is_published(self, language, force_reload=False):
-        title_obj = self.get_title_obj(language, False, force_reload=force_reload)
+        title_obj = self.get_title_obj(language, fallback=False, force_reload=force_reload)
         return title_obj.published and title_obj.publisher_state != PUBLISHER_STATE_PENDING
 
     def is_reachable(self):

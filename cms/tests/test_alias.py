@@ -71,6 +71,91 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info">', html=True)
 
+    def test_alias_ref_plugin_on_unpublished_page(self):
+        superuser = self.get_superuser()
+        source_page = api.create_page(
+            "Alias plugin",
+            "col_two.html",
+            "en",
+            published=False,
+        )
+        source_plugin = api.add_plugin(
+            source_page.placeholders.get(slot="col_left"),
+            'LinkPlugin',
+            language='en',
+            name='A Link',
+            external_link='https://www.django-cms.org',
+        )
+        target_page = api.create_page(
+            "Alias plugin",
+            "col_two.html",
+            "en",
+            published=False,
+        )
+        api.add_plugin(
+            target_page.placeholders.get(slot="col_left"),
+            'AliasPlugin',
+            language='en',
+            plugin=source_plugin,
+        )
+
+        with self.login_user_context(superuser):
+            # Source page is unpublished. Alias plugin should not render anything.
+            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+        source_page.publish('en')
+
+        with self.login_user_context(superuser):
+            # Source page is published. Alias plugin should render normally.
+            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+    def test_alias_ref_placeholder_on_unpublished_page(self):
+        superuser = self.get_superuser()
+        source_page = api.create_page(
+            "Alias plugin",
+            "col_two.html",
+            "en",
+            published=False,
+        )
+        source_placeholder = source_page.placeholders.get(slot="col_left")
+        api.add_plugin(
+            source_placeholder,
+            'LinkPlugin',
+            language='en',
+            name='A Link',
+            external_link='https://www.django-cms.org',
+        )
+        target_page = api.create_page(
+            "Alias plugin",
+            "col_two.html",
+            "en",
+            published=False,
+        )
+        api.add_plugin(
+            target_page.placeholders.get(slot="col_left"),
+            'AliasPlugin',
+            language='en',
+            alias_placeholder=source_placeholder,
+        )
+
+        with self.login_user_context(superuser):
+            # Source page is unpublished. Alias plugin should not render anything.
+            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+        source_page.publish('en')
+
+        with self.login_user_context(superuser):
+            # Source page is published. Alias plugin should render normally.
+            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
     def test_alias_placeholder_is_not_editable(self):
         """
         When a placeholder is aliased, it shouldn't render as editable
