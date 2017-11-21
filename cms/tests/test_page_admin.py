@@ -614,13 +614,18 @@ class PageTest(PageTestBase):
         """
         superuser = self.get_superuser()
         parent = create_page("parent", "nav_playground.html", "en", published=True)
-        child_0001 = create_page("child-0001", "nav_playground.html", "en", published=True, parent=parent)
         child_0002 = create_page("child-0002", "nav_playground.html", "en", published=True, parent=parent)
-        child_0004 = create_page("child-0004", "nav_playground.html", "en", published=True, parent=parent)
-        child_0003 = create_page("child-0003", "nav_playground.html", "en", published=True)
+        child_0003 = create_page("child-0003", "nav_playground.html", "en", published=True, parent=parent)
+        child_0005 = create_page("child-0005", "nav_playground.html", "en", published=True, parent=parent)
+        child_0004 = create_page("child-0004", "nav_playground.html", "en", published=True)
 
         with self.login_user_context(superuser):
-            child_0003 = self.copy_page(child_0003, parent, position=2)
+            # Copy the 0005 page and insert it as first child of parent
+            child_0001 = self.copy_page(child_0005, parent, position=0)
+
+        with self.login_user_context(superuser):
+            # Copy the 0004 page and insert it as fourth child of parent
+            child_0004 = self.copy_page(child_0004, parent, position=3)
 
         tree = (
             (parent, '0001'),
@@ -628,6 +633,7 @@ class PageTest(PageTestBase):
             (child_0002, '00010002'),
             (child_0003, '00010003'),
             (child_0004, '00010004'),
+            (child_0005, '00010005'),
         )
 
         for page, path in tree:
@@ -640,29 +646,44 @@ class PageTest(PageTestBase):
         """
         superuser = self.get_superuser()
         parent = create_page("parent", "nav_playground.html", "en", published=True)
-        child_0001 = create_page("child-0001", "nav_playground.html", "en", published=True, parent=parent)
         child_0002 = create_page("child-0002", "nav_playground.html", "en", published=True, parent=parent)
-        child_0004 = create_page("child-0004", "nav_playground.html", "en", published=True, parent=parent)
-        child_0003 = create_page("child-0003", "nav_playground.html", "en", published=True)
-        create_page("child-00030001", "nav_playground.html", "en", published=True, parent=child_0003)
-        create_page("child-00030002", "nav_playground.html", "en", published=True, parent=child_0003)
-        create_page("child-00030003", "nav_playground.html", "en", published=True, parent=child_0003)
+        child_0003 = create_page("child-0003", "nav_playground.html", "en", published=True, parent=parent)
+        child_0005 = create_page("child-0005", "nav_playground.html", "en", published=True, parent=parent)
+        create_page("child-00050001", "nav_playground.html", "en", published=True, parent=child_0005)
+        create_page("child-00050002", "nav_playground.html", "en", published=True, parent=child_0005)
+        create_page("child-00050003", "nav_playground.html", "en", published=True, parent=child_0005)
+        child_0004 = create_page("child-0004", "nav_playground.html", "en", published=True)
+        create_page("child-00040001", "nav_playground.html", "en", published=True, parent=child_0004)
+        create_page("child-00040002", "nav_playground.html", "en", published=True, parent=child_0004)
+        create_page("child-00040003", "nav_playground.html", "en", published=True, parent=child_0004)
 
         with self.login_user_context(superuser):
-            child_0003 = self.copy_page(child_0003, parent, position=2)
-            child_00030001 = child_0003.node.get_children()[0].page
-            child_00030002 = child_0003.node.get_children()[1].page
-            child_00030003 = child_0003.node.get_children()[2].page
+            # Copy the 0005 page and insert it as first child of parent
+            child_0001 = self.copy_page(child_0005, parent, position=0)
+            child_00010001 = child_0001.node.get_children()[0].page
+            child_00010002 = child_0001.node.get_children()[1].page
+            child_00010003 = child_0001.node.get_children()[2].page
+
+        with self.login_user_context(superuser):
+            # Copy the 0004 page and insert it as fourth child of parent
+            child_0004 = self.copy_page(child_0004, parent, position=3)
+            child_00040001 = child_0004.node.get_children()[0].page
+            child_00040002 = child_0004.node.get_children()[1].page
+            child_00040003 = child_0004.node.get_children()[2].page
 
         tree = (
             (parent, '0001'),
             (child_0001, '00010001'),
+            (child_00010001, '000100010001'),
+            (child_00010002, '000100010002'),
+            (child_00010003, '000100010003'),
             (child_0002, '00010002'),
             (child_0003, '00010003'),
-            (child_00030001, '000100030001'),
-            (child_00030002, '000100030002'),
-            (child_00030003, '000100030003'),
             (child_0004, '00010004'),
+            (child_00040001, '000100040001'),
+            (child_00040002, '000100040002'),
+            (child_00040003, '000100040003'),
+            (child_0005, '00010005'),
         )
 
         for page, path in tree:

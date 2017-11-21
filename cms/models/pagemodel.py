@@ -711,6 +711,12 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
         new_root_page = self.copy(target_site, parent_node=parent_node)
         new_root_node = new_root_page.get_node_object(target_site)
 
+        if target_node and position in ('first-child'):
+            # target node is a parent and user has requested to
+            # insert the new page as its first child
+            new_root_node.move(target_node, position)
+            new_root_node.refresh_from_db(fields=('path', 'depth'))
+
         if target_node and position in ('left', 'last-child'):
             # target node is a sibling
             new_root_node.move(target_node, position)

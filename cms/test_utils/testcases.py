@@ -357,7 +357,7 @@ class BaseCMSTestCase(object):
             Page.objects.all(),
             pk=response_data['id'],
         )
-        self.assertObjectExist(page.title_set.filter(language=language), slug=new_page_slug)
+        self.assertObjectExist(copied_page.title_set.filter(language=language), slug=new_page_slug)
         page._clear_node_cache(page.site)
         target_page._clear_node_cache(target_page.site)
         return copied_page
