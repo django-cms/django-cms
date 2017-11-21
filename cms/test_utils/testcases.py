@@ -336,12 +336,16 @@ class BaseCMSTestCase(object):
             return
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
-    def copy_page(self, page, target_page, position=0):
+    def copy_page(self, page, target_page, position=0, target_site=None):
         from cms.utils.page import get_available_slug
+
+        if target_site is None:
+            target_site = target_page.site
 
         data = {
             'position': position,
             'target': target_page.pk,
+            'source_site': page.site.pk,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -349,8 +353,10 @@ class BaseCMSTestCase(object):
         parent_translation = target_page.title_set.all()[0]
         language = source_translation.language
         copied_page_path = source_translation.get_path_for_base(parent_translation.path)
-        new_page_slug = get_available_slug(page.site, copied_page_path, language)
-        response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
+        new_page_slug = get_available_slug(target_site, copied_page_path, language)
+
+        with self.settings(SITE_ID=target_site.pk):
+            response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content.decode('utf8'))
         copied_page = self.assertObjectExist(
@@ -359,7 +365,7 @@ class BaseCMSTestCase(object):
         )
         self.assertObjectExist(copied_page.title_set.filter(language=language), slug=new_page_slug)
         page._clear_node_cache(page.site)
-        target_page._clear_node_cache(target_page.site)
+        target_page._clear_node_cache(target_site)
         return copied_page
 
     def create_homepage(self, *args, **kwargs):

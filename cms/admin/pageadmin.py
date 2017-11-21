@@ -157,6 +157,18 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             translation = None
         return (page, translation)
 
+    def get_page_from_id(self, page_id):
+        page_id = self.model._meta.pk.to_python(page_id)
+
+        try:
+            page = self.model.objects.get(
+                pk=page_id,
+                publisher_is_draft=True,
+            )
+        except self.model.DoesNotExist:
+            page = None
+        return page
+
     def get_site(self, request):
         site_id = request.session.get('cms_admin_site')
 
@@ -450,16 +462,27 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not get_cms_setting('PERMISSION'):
             return HttpResponse('')
 
-        page = self.get_object(request, object_id=page_id)
+        page = self.get_page_from_id(page_id)
 
         if page is None:
             raise self._get_404_exception(page_id)
 
+        if request.method == 'GET':
+            data = request.GET
+        else:
+            data = request.POST
+
+        target_id = data.get('target')
+
+        try:
+            source_site_id = data['source_site']
+            source_site = Site.objects.get(pk=source_site_id)
+        except (KeyError, ObjectDoesNotExist):
+            return HttpResponseBadRequest('source_site is required')
+
         site = self.get_site(request)
         user = request.user
-        target_id = request.GET.get('target', False) or request.POST.get('target', False)
-        callback = request.GET.get('callback', False) or request.POST.get('callback', False)
-        can_view_page = page_permissions.user_can_view_page(user, page, site)
+        can_view_page = page_permissions.user_can_view_page(user, page, source_site)
 
         if not can_view_page:
             raise PermissionDenied
@@ -478,7 +501,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         context = {
             'dialog_id': 'dialog-copy',
             'form': CopyPermissionForm(),  # class needs to be instantiated
-            'callback': callback,
             'opts': self.opts,
         }
         return render(request, "admin/cms/page/tree/copy_premissions.html", context)
@@ -891,7 +913,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         Copy the page and all its plugins and descendants to the requested
         target, at the given position
         """
-        page = self.get_object(request, object_id=page_id)
+        page = self.get_page_from_id(page_id)
 
         if page is None:
             return jsonify_request(HttpResponseBadRequest("error"))
@@ -904,9 +926,10 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return jsonify_request(HttpResponseBadRequest("error"))
 
         target = form.cleaned_data['target']
+        source_site = form.cleaned_data['source_site']
 
         # User can only copy pages he can see
-        can_copy_page = page_permissions.user_can_view_page(user, page, site)
+        can_copy_page = page_permissions.user_can_view_page(user, page, source_site)
 
         if can_copy_page and target:
             # User can only copy a page into another one if he has permission

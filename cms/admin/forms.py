@@ -788,30 +788,51 @@ class PageTreeForm(forms.Form):
             return target_page.get_node_object(site)
         return
 
-    def get_tree_options(self, page, site=None):
-        site = site or page.site
-        node = page.get_node_object(site)
+    def get_tree_options(self):
         position = self.cleaned_data['position']
-        parent_node = self.get_parent_node(site)
-
-        if parent_node and position == 0:
-            return (parent_node, 'first-child')
+        parent_node = self.get_parent_node(self._site)
 
         if parent_node:
-            siblings = parent_node.get_children().filter(site=site)
-        else:
-            siblings = PageNode.get_root_nodes().filter(site=site)
+            return self._get_tree_options_for_parent(parent_node, position)
+        return self._get_tree_options_for_root(position)
+
+    def _get_tree_options_for_root(self, position):
+        siblings = PageNode.get_root_nodes().filter(site=self._site)
 
         try:
             target_node = siblings[position]
         except IndexError:
             # The position requested is not occupied.
-            # If there's a parent, add the node to be its first child,
-            # otherwise add it as the last root node.
-            target_node = parent_node if parent_node else siblings.reverse()[0]
-            target_node_position = 'last-child' if parent_node else 'right'
+            # Add the node as the last root node,
+            # relative to the current site.
+            return (siblings.reverse()[0], 'right')
+        return (target_node, 'left')
+
+    def _get_tree_options_for_parent(self, parent_node, position):
+        if position == 0:
+            return (parent_node, 'first-child')
+
+        siblings = parent_node.get_children().filter(site=self._site)
+
+        try:
+            target_node = siblings[position]
+        except IndexError:
+            # The position requested is not occupied.
+            # Add the node to be the parent's first child
+            return (parent_node, 'last-child')
+        return (target_node, 'left')
+
+
+class MovePageForm(PageTreeForm):
+
+    def get_tree_options(self):
+        options = super(MovePageForm, self).get_tree_options()
+        target_node, target_node_position = options
+
+        if target_node_position != 'left':
             return (target_node, target_node_position)
 
+        node = self.page.get_node_object(self._site)
         node_is_first = node.path < target_node.path
 
         if node_is_first and node.is_sibling_of(target_node):
@@ -830,26 +851,35 @@ class PageTreeForm(forms.Form):
             target_node_position = 'left'
         return (target_node, target_node_position)
 
-
-class MovePageForm(PageTreeForm):
-
     def move_page(self):
-        self.page.move_page(*self.get_tree_options(self.page, self._site))
+        self.page.move_page(*self.get_tree_options())
 
 
 class CopyPageForm(PageTreeForm):
+    source_site = forms.ModelChoiceField(queryset=Site.objects.all(), required=True)
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
     def copy_page(self):
-        target, position = self.get_tree_options(self.page, self._site)
+        source_site = self.cleaned_data['source_site']
+        target, position = self.get_tree_options()
         copy_permissions = self.cleaned_data.get('copy_permissions', False)
         new_page = self.page.copy_with_descendants(
-            self._site,
+            source_site,
             target_node=target,
             position=position,
             copy_permissions=copy_permissions,
+            target_site=self._site,
         )
         return new_page
+
+    def _get_tree_options_for_root(self, position):
+        try:
+            return super(CopyPageForm, self)._get_tree_options_for_root(position)
+        except IndexError:
+            # The user is copying a page to a site with no pages
+            # Add the node as the last root node.
+            siblings = PageNode.get_root_nodes().reverse()
+            return (siblings[0], 'right')
 
 
 class ChangeListForm(forms.Form):

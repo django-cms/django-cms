@@ -609,6 +609,7 @@ class PageTest(PageTestBase):
         """
         data = {
             'position': 2,
+            'source_site': 1,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -627,6 +628,93 @@ class PageTest(PageTestBase):
             Title.objects.filter(slug=new_slug, path=new_path).count(),
             1,
         )
+
+    def test_copy_page_to_different_site(self):
+        superuser = self.get_superuser()
+        site_2 = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
+        site_1_root = create_page("site 1 root", "nav_playground.html", "de", published=True)
+        site_2_parent = create_page("parent", "nav_playground.html", "de", published=True, site=site_2)
+        child_0002 = create_page(
+            "child-0002",
+            template="nav_playground.html",
+            language="de",
+            published=True,
+            parent=site_2_parent,
+            site=site_2,
+        )
+        child_0003 = create_page(
+            "child-0003",
+            template="nav_playground.html",
+            language="de",
+            published=True,
+            parent=site_2_parent,
+            site=site_2,
+        )
+        child_0005 = create_page(
+            "child-0005",
+            template="nav_playground.html",
+            language="de",
+            published=True,
+            parent=site_2_parent,
+            site=site_2,
+        )
+
+        with self.login_user_context(superuser):
+            # Copy the root page from site 1 and insert it as first child
+            # of the site 2 parent.
+            child_0001 = self.copy_page(site_1_root, site_2_parent, position=0)
+
+        with self.login_user_context(superuser):
+            # Copy the root page from site 1 and insert it as fourth child
+            # of the site 2 parent.
+            child_0004 = self.copy_page(site_1_root, site_2_parent, position=3)
+
+        tree = (
+            (site_2_parent, '0002'),
+            (child_0001, '00020001'),
+            (child_0002, '00020002'),
+            (child_0003, '00020003'),
+            (child_0004, '00020004'),
+            (child_0005, '00020005'),
+        )
+
+        for page, path in tree:
+            self.assertEqual(self.reload(page.node).path, path)
+
+    def test_copy_page_to_different_site_with_no_pages(self):
+        data = {
+            'position': 0,
+            'source_site': 1,
+            'copy_permissions': 'on',
+            'copy_moderation': 'on',
+        }
+        superuser = self.get_superuser()
+        site_2 = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
+        site_1_root = create_page("site 1 root", "nav_playground.html", "en", published=True)
+
+        with self.settings(SITE_ID=2):
+            with self.login_user_context(superuser):
+                # Simulate the copy-dialog
+                endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
+                endpoint += '?source_site=%s' % site_1_root.site_id
+                response = self.client.get(endpoint)
+                self.assertEqual(response.status_code, 200)
+
+                # Copy the root page from site 1 and insert it as the first root page
+                # on site 2.
+                endpoint = self.get_admin_url(Page, 'copy_page', site_1_root.pk)
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 200)
+
+        site_2_root = self.assertObjectExist(Page.objects.all(), site=site_2)
+
+        tree = (
+            (site_1_root, '0001'),
+            (site_2_root, '0002'),
+        )
+
+        for page, path in tree:
+            self.assertEqual(self.reload(page.node).path, path)
 
     def test_copy_page_to_explicit_position(self):
         """
@@ -2497,6 +2585,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
+            endpoint += '?source_site=%s' % page.site_id
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
