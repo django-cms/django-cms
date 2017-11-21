@@ -11,6 +11,7 @@
 * Fixed a bug where focusing inputs in modal would require 2 clicks in some browsers
 * Changed the language chooser to always show all configured languages to staff members
   and public-only languages to anon users.
+* Introduced logic to copy pages to different sites from the admin.
 
 
 === 3.4.5 (2017-10-12) ===
