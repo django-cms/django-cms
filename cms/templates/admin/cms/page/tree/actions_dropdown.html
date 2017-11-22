@@ -10,14 +10,20 @@
                 data-apphook="{{ page.application_urls|default_if_none:"" }}"
             {% endif %}
         >
-                <a{% if not has_copy_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %} href="#" title="{% filter escapejs %}{% trans "Copy" %}{% endfilter %}">
-                    <span class="cms-icon cms-icon-copy"></span>
-                    <span>{% filter escapejs %}{% trans "Copy" %}{% endfilter %}<span>
-                </a>
-            </li>
-        <li{% if has_move_page_permission %} class="js-cms-tree-item-cut"{% endif %}>
+            <a{% if not has_copy_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %} href="#" title="{% filter escapejs %}{% trans "Copy" %}{% endfilter %}">
+                <span class="cms-icon cms-icon-copy"></span>
+                <span>{% filter escapejs %}{% trans "Copy" %}{% endfilter %}<span>
+            </a>
+        </li>
+        <li
+            {% if has_move_page_permission %}
+                class="js-cms-tree-item-cut"
+                data-id="{{ page.pk }}"
+                data-node-id="{{ node.pk }}"
+            {% endif %}
+        >
             <a{% if not has_move_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %}
-                href="#" title="{% filter escapejs %}{% trans "Cut" %}{% endfilter %}">
+                href="#"                 title="{% filter escapejs %}{% trans "Cut" %}{% endfilter %}">
                 <span class="cms-icon cms-icon-scissors"></span>
                 <span>{% filter escapejs %}{% trans "Cut" %}{% endfilter %}<span>
             </a>
