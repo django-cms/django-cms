@@ -43,8 +43,22 @@ var PageTree = new Class({
         this._setupUI();
         this._events();
 
+        Helpers.csrf(this.options.csrf);
+
         // cancel if pagetree is not available
-        if (!$.isEmptyObject(opts)) {
+        if ($.isEmptyObject(opts) || opts.empty) {
+            this._getClipboard();
+            // attach events to paste
+            var that = this;
+
+            this.ui.container.on(this.click, this.options.pasteSelector, function(e) {
+                e.preventDefault();
+                if ($(this).hasClass('cms-pagetree-dropdown-item-disabled')) {
+                    return;
+                }
+                that._paste(e);
+            });
+        } else {
             this._setup();
         }
     },
@@ -81,9 +95,6 @@ var PageTree = new Class({
             openNodes: []
         };
         var data = false;
-
-        // make sure that ajax request send the csrf token
-        Helpers.csrf(this.options.csrf);
 
         // setup column headings
         // eslint-disable-next-line no-shadow
@@ -411,7 +422,18 @@ var PageTree = new Class({
         this._setAjaxPost('.js-cms-tree-item-set-home a');
 
         this._setupPageView();
-        that._setupStickyHeader();
+        this._setupStickyHeader();
+
+        this.ui.tree.on('ready.jstree', () => this._getClipboard());
+    },
+
+    _getClipboard: function _getClipboard() {
+        this.clipboard = CMS.settings.pageClipboard || this.clipboard;
+
+        if (this.clipboard.type && this.clipboard.origin) {
+            this._enablePaste();
+            this._updatePasteHelpersState();
+        }
     },
 
     /**
@@ -438,12 +460,18 @@ var PageTree = new Class({
             this.clipboard.type = null;
             this.clipboard.id = null;
             this.clipboard.origin = null;
+            this.clipboard.source_site = null;
             this._disablePaste();
         } else {
-            this.clipboard.origin = obj.element;
+            this.clipboard.origin = obj.element.data().id; // this._getNodeId(obj.element);
             this.clipboard.type = obj.type;
             this.clipboard.id = jsTreeId;
+            this.clipboard.source_site = this.options.site;
             this._updatePasteHelpersState();
+        }
+        if (this.clipboard.type === 'copy' || !this.clipboard.type) {
+            CMS.settings.pageClipboard = this.clipboard;
+            Helpers.setSettings(CMS.settings);
         }
     },
 
@@ -458,21 +486,43 @@ var PageTree = new Class({
         // hide helpers after we picked one
         this._disablePaste();
 
-        var copyFromId = this._getNodeId(this.clipboard.origin);
+        var copyFromId = this._getNodeId(
+            $(`.js-cms-pagetree-options[data-id="${this.clipboard.origin}"]`).closest('.jstree-grid-cell')
+        );
         var copyToId = this._getNodeId($(event.currentTarget));
 
-        if (this.clipboard.type === 'cut') {
-            this.ui.tree.jstree('cut', copyFromId);
+        if (this.clipboard.source_site === this.options.site) {
+            if (this.clipboard.type === 'cut') {
+                this.ui.tree.jstree('cut', copyFromId);
+            } else {
+                this.ui.tree.jstree('copy', copyFromId);
+            }
+
+            this.clipboard.isPasting = true;
+            this.ui.tree.jstree('paste', copyToId, 'last');
         } else {
-            this.ui.tree.jstree('copy', copyFromId);
+            const dummyId = this.ui.tree.jstree('create_node', copyToId, 'Loading', 'last');
+
+            if (this.ui.tree.length) {
+                this.ui.tree.jstree('cut', dummyId);
+                this.clipboard.isPasting = true;
+                this.ui.tree.jstree('paste', copyToId, 'last');
+            } else {
+                if (this.clipboard.type === 'copy') {
+                    this._copyNode();
+                }
+                if (this.clipboard.type === 'cut') {
+                    this._moveNode();
+                }
+            }
         }
 
-        this.clipboard.isPasting = true;
-        this.ui.tree.jstree('paste', copyToId, 'last');
         this.clipboard.id = null;
         this.clipboard.type = null;
         this.clipboard.origin = null;
         this.clipboard.isPasting = false;
+        CMS.settings.pageClipboard = this.clipboard;
+        Helpers.setSettings(CMS.settings);
     },
 
     /**
@@ -557,15 +607,24 @@ var PageTree = new Class({
     _moveNode: function _moveNode(obj) {
         var that = this;
 
-        obj.site = that.options.site;
+        if (!obj.id && this.clipboard.type === 'cut' && this.clipboard.origin) {
+            obj.id = this.clipboard.origin;
+            obj.source_site = this.clipboard.source_site;
+        } else {
+            obj.site = that.options.site;
+        }
 
         return $.ajax({
             method: 'post',
             url: that.options.urls.move.replace('{id}', obj.id),
             data: obj
         })
-            .done(function() {
-                that._showSuccess(obj.id);
+            .done(function(r) {
+                if (r.status && r.status === 400) { // eslint-disable-line
+                    that.showError(r.content);
+                } else {
+                    that._showSuccess(obj.id);
+                }
             })
             .fail(function(error) {
                 that.showError(error.statusText);
@@ -581,14 +640,23 @@ var PageTree = new Class({
      */
     _copyNode: function _copyNode(obj) {
         var that = this;
-        var node = that._getNodePosition(obj);
+        var node = { position: 0 };
+
+        if (obj) {
+            node = that._getNodePosition(obj);
+        }
+
         var data = {
-            site: this.options.site,
-            // we need to refer to the original item here, as the copied
-            // node will have no data attributes stored at it (not a clone)
-            id: obj.original.data.id,
+            // obj.original.data.id is for drag copy
+            id: this.clipboard.origin || obj.original.data.id,
             position: node.position
         };
+
+        if (this.clipboard.source_site) {
+            data.source_site = this.clipboard.source_site;
+        } else {
+            data.source_site = this.options.site;
+        }
 
         // if there is no target provided, the node lands in root
         if (node.target) {
@@ -963,7 +1031,11 @@ var PageTree = new Class({
         }
 
         // hide cut element and it's descendants' paste helpers if it is visible
-        if (this.clipboard.type === 'cut' && this.clipboard.origin) {
+        if (
+            this.clipboard.type === 'cut' &&
+            this.clipboard.origin &&
+            this.options.site === this.clipboard.source_site
+        ) {
             var descendantIds = this._getDescendantsIds(this.clipboard.id);
             var nodes = [this.clipboard.id];
 
@@ -1079,6 +1151,7 @@ $(function() {
     // otherwise initialization will be incorrect when you
     // go first to pages and then to normal page
     window.CMS.config = {
+        isPageTree: true,
         settings: {
             toolbar: 'expanded'
         },

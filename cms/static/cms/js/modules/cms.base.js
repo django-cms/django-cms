@@ -311,7 +311,10 @@ export const Helpers = {
 
         // edit_off is a random flag that should be available on the page, but sometimes can
         // be not set when settings are carried over from pagetree
-        if (!settings || !settings.edit_off || !currentVersionMatches(settings)) {
+        if (
+            (!settings || !settings.edit_off || !currentVersionMatches(settings)) &&
+            !(settings && settings.pageClipboard && CMS.config.isPageTree)
+        ) {
             settings = this.setSettings(window.CMS.config.settings);
         }
 
