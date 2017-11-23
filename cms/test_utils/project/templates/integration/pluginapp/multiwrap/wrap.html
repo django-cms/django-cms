@@ -1,0 +1,7 @@
+{% load cms_tags %}
+<div class="inner-wrap" style="padding: 40px;">
+    inner-wrap
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</div>
