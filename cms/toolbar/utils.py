@@ -107,6 +107,7 @@ def get_plugin_tree_as_json(request, plugins):
                 'cms_toolbar': toolbar,
             }
             tree_structure.append(template.render(context))
+    tree_data.reverse()
     return json.dumps({'html': '\n'.join(tree_structure), 'plugins': tree_data})
 
 
