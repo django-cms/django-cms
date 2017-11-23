@@ -48,6 +48,7 @@ if __name__ == '__main__':
         'cms.test_utils.project.placeholderapp',
         'cms.test_utils.project.pluginapp.plugins.link',
         'cms.test_utils.project.pluginapp.plugins.multicolumn',
+        'cms.test_utils.project.pluginapp.plugins.multiwrap',
         'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
         'cms.test_utils.project.pluginapp.plugins.extra_context',

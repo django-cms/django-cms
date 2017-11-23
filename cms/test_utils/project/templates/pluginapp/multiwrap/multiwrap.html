@@ -1,0 +1,4 @@
+{% load cms_tags %}
+{% for plugin in instance.child_plugin_instances %}
+  	{% render_plugin plugin %}
+{% endfor %}
