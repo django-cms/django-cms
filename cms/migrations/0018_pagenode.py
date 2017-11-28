@@ -29,8 +29,9 @@ def unpublish_never_published_pages(apps, schema_editor):
     published but does not have a public version is marked as unpublished.
     """
     Page = apps.get_model('cms', 'Page')
-    draft_pages = Page.objects.filter(publisher_is_draft=True)
-    never_published_pages = Page.objects.filter(
+    db_alias = schema_editor.connection.alias
+    draft_pages = Page.objects.using(db_alias).filter(publisher_is_draft=True)
+    never_published_pages = Page.objects.using(db_alias).filter(
         title_set__published=True,
         publisher_is_draft=True,
         publisher_public__isnull=True,
