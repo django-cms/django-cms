@@ -8,6 +8,7 @@
   users with change permissions, unless the ``preview`` GET parameter is used.
 * Fixed "Expand all / Collapse all" not reflecting real state of the placeholder tree
 * Fixed a bug where Aliased plugins would render even if their host page was unpublished.
+* Fixed a bug where focusing inputs in modal would require 2 clicks in some browsers
 
 
 === 3.4.5 (2017-10-12) ===

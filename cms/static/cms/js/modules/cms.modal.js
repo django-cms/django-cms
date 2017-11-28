@@ -943,9 +943,12 @@ class Modal {
                 return;
             }
 
-            body.attr('tabindex', '0');
+            // tabindex is required for keyboard navigation
+            // body.attr('tabindex', '0');
             iframe.on('focus', function() {
-                body.focus();
+                if (this.contentWindow) {
+                    this.contentWindow.focus();
+                }
             });
 
             Modal._setupCtrlEnterSave(document);
@@ -1093,6 +1096,21 @@ class Modal {
                 if (contents.find('.object-tools').length) {
                     contents.find('#content').css('padding-top', 38); // eslint-disable-line
                 }
+
+                // this is required for IE11. we assume that when the modal is opened the user is going to interact
+                // with it. if we don't focus the body directly the next time the user clicks on a field inside
+                // the iframe the focus will be stolen by body thus requiring two clicks. this immediately focuses the
+                // iframe body on load except if something is already focused there
+                // (django tries to focus first field by default)
+                setTimeout(() => {
+                    if (!iframe[0] || !iframe[0].contentDocument || !iframe[0].contentDocument.documentElement) {
+                        return;
+                    }
+                    if ($(iframe[0].contentDocument.documentElement).find(':focus').length) {
+                        return;
+                    }
+                    iframe.trigger('focus');
+                }, 0); // eslint-disable-line
             }
 
             that._attachContentPreservingHandlers(iframe);
