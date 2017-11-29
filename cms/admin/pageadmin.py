@@ -192,12 +192,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
             pat(r'^get-tree/$', self.get_tree),
         ]
-
-        if plugin_pool.registered_plugins:
-            url_patterns += plugin_pool.get_patterns()
-
-        url_patterns += super(BasePageAdmin, self).get_urls()
-        return url_patterns
+        return url_patterns + super(BasePageAdmin, self).get_urls()
 
     def _send_pre_page_operation(self, request, operation, **kwargs):
         token = str(uuid.uuid4())
@@ -1575,6 +1570,9 @@ class PageAdmin(BasePageAdmin):
             pat(r'^([0-9]+)/set-home/$', self.set_home),
             pat(r'^published-pages/$', self.get_published_pagelist),
         ]
+
+        if plugin_pool.registered_plugins:
+            url_patterns += plugin_pool.get_patterns()
         return url_patterns + super(PageAdmin, self).get_urls()
 
     @require_POST
