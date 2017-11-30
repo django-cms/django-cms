@@ -13,9 +13,9 @@ from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
-from cms.api import create_page
+from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import Page, PageNode, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
@@ -289,7 +289,80 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # test the cms menu class
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
-        self.assertEqual(len(nodes), len(self.get_all_pages()))
+        pages = self.get_all_pages().order_by('publisher_public__nodes__path')
+        self.assertEqual(len(nodes), len(pages))
+        self.assertSequenceEqual(
+            [node.get_absolute_url() for node in nodes],
+            [page.get_absolute_url() for page in pages],
+        )
+
+    def test_cms_menu_public_with_multiple_languages(self):
+        for node in PageNode.objects.all():
+            create_title(
+                language='de',
+                title=node.page.get_title('en'),
+                page=node.page,
+                slug='{}-de'.format(node.page.get_slug('en'))
+            )
+
+        pages = self.get_all_pages().order_by('publisher_public__nodes__path')
+
+        # Fallbacks on
+        request = self.get_request(language='de')
+        renderer = menu_pool.get_renderer(request)
+        menu = renderer.get_menu('CMSMenu')
+        nodes = menu.get_nodes(request)
+        self.assertEqual(len(nodes), len(pages))
+
+        with force_language('de'):
+            # Current language is "de" but urls should still point
+            # to "en" because of fallbacks.
+            self.assertSequenceEqual(
+                [node.get_absolute_url() for node in nodes],
+                [page.get_absolute_url('en', fallback=False) for page in pages],
+            )
+
+        # Fallbacks off
+        request = self.get_request(language='de')
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        lang_settings[1][1]['hide_untranslated'] = True
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            renderer = menu_pool.get_renderer(request)
+            menu = renderer.get_menu('CMSMenu')
+            nodes = menu.get_nodes(request)
+            self.assertEqual(len(nodes), 0)
+
+        for node in PageNode.objects.all():
+            node.page.publish('de')
+
+        # Fallbacks on
+        # This time however, the "de" translations are published.
+        request = self.get_request(language='de')
+        renderer = menu_pool.get_renderer(request)
+        menu = renderer.get_menu('CMSMenu')
+        nodes = menu.get_nodes(request)
+        self.assertEqual(len(nodes), len(pages))
+
+        with force_language('de'):
+            self.assertSequenceEqual(
+                [node.get_absolute_url() for node in nodes],
+                [page.get_absolute_url('de', fallback=False) for page in pages],
+            )
+
+        # Fallbacks off
+        request = self.get_request(language='de')
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            renderer = menu_pool.get_renderer(request)
+            menu = renderer.get_menu('CMSMenu')
+            nodes = menu.get_nodes(request)
+
+            with force_language('de'):
+                self.assertSequenceEqual(
+                    [node.get_absolute_url() for node in nodes],
+                    [page.get_absolute_url('de', fallback=False) for page in pages],
+                )
 
     def test_show_menu(self):
         root = self.get_page(1)

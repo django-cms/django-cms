@@ -6,6 +6,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
+from cms.utils import i18n
 from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
@@ -117,7 +118,7 @@ def get_menu_node_for_page(renderer, page, language):
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
-    if language in page.title_cache and page.application_urls:
+    if page.title_cache.get(language) and page.application_urls:
         # it means it is an apphook
         app = apphook_pool.get_apphook(page.application_urls)
 
@@ -136,7 +137,7 @@ def get_menu_node_for_page(renderer, page, language):
     if exts:
         attr['navigation_extenders'] = exts
 
-    translation = page.get_title_obj(language)
+    translation = page.get_title_obj(language, fallback=True)
 
     # Do we have a redirectURL?
     attr['redirect_url'] = translation.redirect  # save redirect URL if any
@@ -149,7 +150,8 @@ def get_menu_node_for_page(renderer, page, language):
         parent_id=parent_id,
         attr=attr,
         visible=page.in_navigation,
-        path=translation.path or translation.slug
+        path=translation.path or translation.slug,
+        language=(translation.language if translation.language != language else None),
     )
     return ret_node
 
@@ -158,6 +160,8 @@ class CMSNavigationNode(NavigationNode):
 
     def __init__(self, *args, **kwargs):
         self.path = kwargs.pop('path')
+        # language is only used when we're dealing with a fallback
+        self.language = kwargs.pop('language', None)
         super(CMSNavigationNode, self).__init__(*args, **kwargs)
 
     def is_selected(self, request):
@@ -167,10 +171,16 @@ class CMSNavigationNode(NavigationNode):
             return False
         return page_id == self.id
 
-    def get_absolute_url(self):
+    def _get_absolute_url(self):
         if self.attr['is_home']:
             return reverse('pages-root')
         return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+
+    def get_absolute_url(self):
+        if self.language:
+            with i18n.force_language(self.language):
+                return self._get_absolute_url()
+        return self._get_absolute_url()
 
 
 class CMSMenu(Menu):
@@ -186,7 +196,10 @@ class CMSMenu(Menu):
         )
 
         if hide_untranslated(lang, site.pk):
-            nodes = nodes.filter(page__title_set__language=lang)
+            if self.renderer.draft_mode_active:
+                nodes = nodes.filter(page__title_set__language=lang)
+            else:
+                nodes = nodes.filter(page__publisher_public__title_set__language=lang)
             languages = [lang]
         else:
             fallbacks = get_fallback_languages(lang, site_id=site.pk)
@@ -210,10 +223,15 @@ class CMSMenu(Menu):
         if not pages:
             return []
 
+        titles = Title.objects.filter(
+            language__in=languages,
+            publisher_is_draft=bool(self.renderer.draft_mode_active),
+        )
+
         lookup = Prefetch(
             'title_set',
             to_attr='filtered_translations',
-            queryset=Title.objects.filter(language__in=languages)
+            queryset=titles,
         )
 
         if DJANGO_1_9:
@@ -233,13 +251,7 @@ class CMSMenu(Menu):
                 # EmptyTitle is used to prevent the cms from trying
                 # to find a translation in the database
                 page.title_cache.setdefault(language, blank_title_cache[language])
-
-            menu_node = get_menu_node_for_page(
-                renderer=self.renderer,
-                page=page,
-                language=lang,
-            )
-            return menu_node
+            return get_menu_node_for_page(self.renderer, page, language=lang)
         return [_page_to_node(page=page) for page in pages]
 
 
