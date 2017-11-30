@@ -582,8 +582,8 @@ var Plugin = new Class({
             source_language: sourceLanguage,
             target_plugin_id: options.parent || '',
             target_placeholder_id: options.target || CMS.config.clipboard.id,
-            target_language: options.page_language || sourceLanguage,
-            csrfmiddlewaretoken: CMS.config.csrf
+            csrfmiddlewaretoken: CMS.config.csrf,
+            target_language: CMS.config.request.language
         };
         var request = {
             type: 'POST',
@@ -635,8 +635,9 @@ var Plugin = new Class({
             placeholder_id: CMS.config.clipboard.id,
             plugin_id: this.options.plugin_id,
             plugin_parent: '',
-            plugin_language: this.options.page_language,
+            plugin_language: CMS.config.request.language,
             plugin_order: [this.options.plugin_id],
+            target_language: CMS.config.request.language,
             csrfmiddlewaretoken: CMS.config.csrf
         };
 
@@ -747,7 +748,16 @@ var Plugin = new Class({
             plugin_id: options.plugin_id,
             plugin_parent: plugin_parent || '',
             // this is a hack: when moving to different languages use the global language
-            plugin_language: options.page_language,
+            plugin_language: (() => {
+                if (options.move_a_copy) {
+                    return CMS.config.request.language;
+                }
+                if (options.plugin_language) {
+                    return options.plugin_language;
+                }
+                return CMS.config.request.language;
+            })(),
+            target_language: CMS.config.request.language,
             plugin_order: plugin_order,
             csrfmiddlewaretoken: CMS.config.csrf,
             move_a_copy: options.move_a_copy

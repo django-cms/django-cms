@@ -73,6 +73,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -449,6 +452,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins_complex_markup.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -497,6 +503,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -598,6 +607,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -668,6 +680,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 clipboard: {
                     id: 'clipboardId'
                 },
@@ -725,7 +740,7 @@ describe('CMS.Plugin', function() {
                 source_language: [''],
                 target_plugin_id: [''],
                 target_placeholder_id: ['clipboardId'],
-                target_language: [''],
+                target_language: ['en'],
                 csrfmiddlewaretoken: ['CSRF_TOKEN']
             });
         });
@@ -819,6 +834,7 @@ describe('CMS.Plugin', function() {
             });
 
             plugin.options.plugin_language = 'es';
+            CMS.config.request.language = 'es';
             plugin.copyPlugin();
         });
 
@@ -840,7 +856,7 @@ describe('CMS.Plugin', function() {
                 CMS.API.locked = false;
             });
 
-            plugin.options.page_language = 'es';
+            CMS.config.request.language = 'es';
             plugin.copyPlugin(undefined, 'de');
         });
     });
@@ -851,6 +867,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 clipboard: {
                     id: 'clipboardId'
                 },
@@ -874,7 +893,6 @@ describe('CMS.Plugin', function() {
                     plugin_id: 1,
                     plugin_type: 'TextPlugin',
                     placeholder_id: 1,
-                    page_language: 'en',
                     urls: {
                         add_plugin: '/en/admin/cms/page/add-plugin/',
                         edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
@@ -906,6 +924,7 @@ describe('CMS.Plugin', function() {
                     plugin_language: 'en',
                     plugin_parent: '',
                     plugin_order: [1],
+                    target_language: 'en',
                     csrfmiddlewaretoken: 'CSRF_TOKEN'
                 },
                 success: jasmine.any(Function),
@@ -1009,6 +1028,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html', 'clipboard.html', true);
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 clipboard: {
                     id: 'clipboardId'
                 },
@@ -1058,7 +1080,6 @@ describe('CMS.Plugin', function() {
                             plugin_id: 2,
                             plugin_type: 'RandomPlugin',
                             placeholder_id: 2,
-                            page_language: 'en',
                             urls: {
                                 add_plugin: '/en/admin/cms/page/add-plugin/',
                                 edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
@@ -1144,7 +1165,6 @@ describe('CMS.Plugin', function() {
                     copy_plugin: '/en/admin/cms/page/copy-plugins/',
                     delete_plugin: '/en/admin/cms/page/delete-plugin/2/'
                 },
-                page_language: 'en',
                 target: 2,
                 parent: 2,
                 move_a_copy: true
@@ -1158,6 +1178,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 clipboard: {
                     id: 'clipboardId'
                 },
@@ -1207,7 +1230,6 @@ describe('CMS.Plugin', function() {
                     plugin_id: 1,
                     plugin_type: 'TextPlugin',
                     placeholder_id: 1,
-                    page_language: 'en',
                     urls: {
                         add_plugin: '/en/admin/cms/page/add-plugin/',
                         edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
@@ -1237,6 +1259,7 @@ describe('CMS.Plugin', function() {
                 plugin_parent: [''],
                 'plugin_order[]': ['3', '2', '1'],
                 plugin_language: ['en'],
+                target_language: ['en'],
                 csrfmiddlewaretoken: ['CSRF_TOKEN']
             });
             CMS.API.locked = false;
@@ -1283,6 +1306,7 @@ describe('CMS.Plugin', function() {
                 plugin_id: 1,
                 plugin_parent: '',
                 plugin_language: 'en',
+                target_language: 'en',
                 plugin_order: [3, 2, 1],
                 csrfmiddlewaretoken: 'CSRF_TOKEN'
             });
@@ -1393,6 +1417,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1448,6 +1475,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1495,6 +1525,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1533,6 +1566,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1580,6 +1616,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1663,6 +1702,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1875,6 +1917,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -1968,6 +2013,9 @@ describe('CMS.Plugin', function() {
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
+                request: {
+                    language: 'en'
+                },
                 lang: {}
             };
             CMS.settings = {
@@ -2050,6 +2098,9 @@ describe('CMS.Plugin', function() {
             $(function() {
                 CMS.config = {
                     csrf: 'CSRF_TOKEN',
+                    request: {
+                        language: 'en'
+                    },
                     lang: {}
                 };
                 CMS.settings = {
@@ -2220,6 +2271,9 @@ describe('CMS.Plugin', function() {
             $(function() {
                 CMS.config = {
                     csrf: 'CSRF_TOKEN',
+                    request: {
+                        language: 'en'
+                    },
                     lang: {}
                 };
                 CMS.settings = {
@@ -2309,6 +2363,9 @@ describe('CMS.Plugin', function() {
             $(function() {
                 CMS.config = {
                     csrf: 'CSRF_TOKEN',
+                    request: {
+                        language: 'en'
+                    },
                     lang: {}
                 };
                 CMS.settings = {
