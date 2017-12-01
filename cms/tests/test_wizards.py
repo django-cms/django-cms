@@ -10,8 +10,8 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 
 from cms.api import create_page, publish_page
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.cms_wizards import CMSPageWizard
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
@@ -99,12 +99,6 @@ class WizardTestMixin(object):
 
 
 class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
-
-    def test_str(self):
-        self.assertEqual(str(self.page_wizard), self.page_wizard.title)
-
-    def test_repr(self):
-        self.assertEqual(self.page_wizard.__repr__(), 'Wizard: "Page"')
 
     def test_user_has_add_permission(self):
         # Test does not have permission
@@ -206,6 +200,13 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
+
+    def test_str(self):
+        page_wizard = [
+            entry for entry in wizard_pool.get_entries()
+            if isinstance(entry, CMSPageWizard)
+        ][0]
+        self.assertEqual(str(page_wizard), page_wizard.title)
 
     def test_repr(self):
         page_wizard = [
