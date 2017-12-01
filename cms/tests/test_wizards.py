@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 
 from cms.api import create_page, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.cms_wizards import CMSPageWizard
 from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
@@ -205,6 +206,15 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
+
+    def test_repr(self):
+        page_wizard = [
+            entry for entry in wizard_pool.get_entries()
+            if isinstance(entry, CMSPageWizard)
+        ][0]
+        self.assertIn("cms.cms_wizards.CMSPageWizard", repr(page_wizard))
+        self.assertIn("id={}".format(page_wizard.id), repr(page_wizard))
+        self.assertIn(hex(id(page_wizard)), repr(page_wizard))
 
     def test_wizard_first_page_published(self):
         superuser = self.get_superuser()

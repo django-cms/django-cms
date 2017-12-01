@@ -94,10 +94,16 @@ class Wizard(WizardBase):
         return ""
 
     def __str__(self):
-        return self.title
+        return force_text(self.title)
 
     def __repr__(self):
-        return 'Wizard: "{0}"'.format(force_text(self.title))
+        display = '<{module}.{class_name} id={id} object at {location}>'.format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.id,
+            location=hex(id(self)),
+        )
+        return display
 
     def user_has_add_permission(self, user, **kwargs):
         """
