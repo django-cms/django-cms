@@ -201,7 +201,8 @@ var PageTree = new Class({
                     return that._hasPermission(nodes[0], 'move') && !that.options.filtered;
                 },
                 large_drop_target: true,
-                copy: true
+                copy: true,
+                touch: 'selected'
             },
             // https://github.com/deitch/jstree-grid
             grid: {
