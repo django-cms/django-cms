@@ -446,7 +446,7 @@ describe('cms.base.js', function() {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: '{"serverSetting":true}'
+                    responseText: '{"serverSetting":true,"version":"same"}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-settings-url-with-empty-response').andReturn({
@@ -588,7 +588,7 @@ describe('cms.base.js', function() {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: '{"serverSetting":true,"edit_off":1}'
+                    responseText: '{"serverSetting":true,"version":"same","edit_off":1}'
                 });
 
                 jasmine.Ajax.stubRequest('/my-broken-settings-url').andReturn({
@@ -606,20 +606,52 @@ describe('cms.base.js', function() {
                     pending('Localstorage is not supported, skipping');
                 }
 
-                localStorage.setItem('cms_cookie', JSON.stringify({ presetSetting: true, edit_off: 1 }));
+                localStorage.setItem(
+                    'cms_cookie',
+                    JSON.stringify({ version: 'same', presetSetting: true, edit_off: 1 })
+                );
                 CMS.settings = {};
                 CMS.config = {
-                    settings: {}
+                    settings: {
+                        version: 'same'
+                    }
                 };
                 CMS.API.Toolbar = {
                     showLoader: jasmine.createSpy(),
                     hideLoader: jasmine.createSpy()
                 };
 
-                expect(CMS.API.Helpers.getSettings()).toEqual({ presetSetting: true, edit_off: 1 });
+                expect(CMS.API.Helpers.getSettings()).toEqual({ presetSetting: true, version: 'same', edit_off: 1 });
 
                 expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
                 expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+            });
+
+            it('should get settings from config if there is a version mismatch', function() {
+                if (!_isLocalStorageSupported) {
+                    pending('Localstorage is not supported, skipping');
+                }
+
+                localStorage.setItem(
+                    'cms_cookie',
+                    JSON.stringify({ version: 'old', presetSetting: true, edit_off: 1 })
+                );
+                CMS.settings = {};
+                CMS.config = {
+                    settings: {
+                        version: 'new',
+                        other_stuff: true
+                    }
+                };
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
+                expect(CMS.API.Helpers.getSettings()).toEqual({ version: 'new', other_stuff: true });
+
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
             });
 
             it('should get settings from localStorage and cms.config if required settings are not there', function() {
@@ -672,6 +704,9 @@ describe('cms.base.js', function() {
             it('makes a synchronous request to the session url if localStorage is not available', function() {
                 CMS.API.Helpers._isStorageSupported = false;
                 CMS.config = {
+                    settings: {
+                        version: 'same'
+                    },
                     urls: {
                         settings: '/my-settings-url'
                     }
@@ -681,7 +716,7 @@ describe('cms.base.js', function() {
                     hideLoader: jasmine.createSpy()
                 };
 
-                expect(CMS.API.Helpers.getSettings()).toEqual({ serverSetting: true, edit_off: 1 });
+                expect(CMS.API.Helpers.getSettings()).toEqual({ version: 'same', serverSetting: true, edit_off: 1 });
 
                 expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
                 expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
