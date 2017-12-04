@@ -24,7 +24,6 @@ var PageTree = new Class({
     options: {
         pasteSelector: '.js-cms-tree-item-paste'
     },
-    // TODO add mechanics to set the home page
     initialize: function initialize(options) {
         // options are loaded from the pagetree html node
         var opts = $('.js-cms-pagetree').data('json');
@@ -780,11 +779,19 @@ var PageTree = new Class({
                 return;
             }
 
+            try {
+                window.top.CMS.API.Toolbar.showLoader();
+            } catch (err) {}
+
             $.ajax({
                 method: 'post',
                 url: $(this).attr('href')
             })
                 .done(function() {
+                    try {
+                        window.top.CMS.API.Toolbar.hideLoader();
+                    } catch (err) {}
+
                     if (window.self === window.top) {
                         // simply reload the page
                         that._reloadHelper();

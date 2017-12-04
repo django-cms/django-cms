@@ -41,6 +41,20 @@ export const uid = (function() {
 })();
 
 /**
+ * Checks if the current version of the CMS matches provided one
+ *
+ * @param {Object} settings
+ * @param {String} settings.version CMS version
+ * @returns {Boolean}
+ */
+export const currentVersionMatches = ({ version }) => {
+    if (!CMS.config || !CMS.config.settings || !CMS.config.settings.version) {
+        return true; // sadly this has to be here since PageTree doesn't actually have proper CMS.config
+    }
+    return version === CMS.config.settings.version;
+};
+
+/**
  * Provides various helpers that are mixed in all CMS classes.
  *
  * @class Helpers
@@ -317,7 +331,7 @@ export const Helpers = {
 
         // edit_off is a random flag that should be available on the page, but sometimes can
         // be not set when settings are carried over from pagetree
-        if (!settings || !settings.edit_off) {
+        if (!settings || !settings.edit_off || !currentVersionMatches(settings)) {
             settings = this.setSettings(window.CMS.config.settings);
         }
 
