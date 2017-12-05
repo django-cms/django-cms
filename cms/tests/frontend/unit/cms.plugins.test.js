@@ -169,7 +169,6 @@ describe('CMS.Plugin', function() {
                 placeholder_id: 1,
                 plugin_type: 'TextPlugin',
                 plugin_id: 1,
-                plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
@@ -190,7 +189,6 @@ describe('CMS.Plugin', function() {
                 placeholder_id: 1,
                 plugin_type: 'RandomPlugin',
                 plugin_id: 2,
-                plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
@@ -211,7 +209,6 @@ describe('CMS.Plugin', function() {
                 placeholder_id: 1,
                 plugin_type: '',
                 plugin_id: null,
-                plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
@@ -232,7 +229,6 @@ describe('CMS.Plugin', function() {
                 placeholder_id: null,
                 plugin_type: '',
                 plugin_id: null,
-                plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
@@ -557,7 +553,7 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('/en/admin/cms/page/add-plugin?');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('placeholder_id=1');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_type=TextPlugin');
-            expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_language=');
+            expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_language=en');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_parent=12');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('cms_path=');
         });
@@ -576,7 +572,7 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open).toHaveBeenCalledWith({
                 url:
                     '/en/admin/cms/page/add-plugin/' +
-                        '?placeholder_id=1&plugin_type=TextPlugin&cms_path=%2Fcontext.html&plugin_language=',
+                        '?placeholder_id=1&plugin_type=TextPlugin&cms_path=%2Fcontext.html&plugin_language=en',
                 title: 'Text plugin'
             });
         });
@@ -737,7 +733,7 @@ describe('CMS.Plugin', function() {
             expect(request.data()).toEqual({
                 source_placeholder_id: ['1'],
                 source_plugin_id: ['1'],
-                source_language: [''],
+                source_language: ['en'],
                 target_plugin_id: [''],
                 target_placeholder_id: ['clipboardId'],
                 target_language: ['en'],
@@ -833,7 +829,6 @@ describe('CMS.Plugin', function() {
                 CMS.API.locked = false;
             });
 
-            plugin.options.plugin_language = 'es';
             CMS.config.request.language = 'es';
             plugin.copyPlugin();
         });
@@ -921,7 +916,6 @@ describe('CMS.Plugin', function() {
                 data: {
                     placeholder_id: 'clipboardId',
                     plugin_id: 1,
-                    plugin_language: 'en',
                     plugin_parent: '',
                     plugin_order: [1],
                     target_language: 'en',
@@ -1153,7 +1147,6 @@ describe('CMS.Plugin', function() {
                 placeholder_id: 2,
                 plugin_type: 'RandomPlugin',
                 plugin_id: 2,
-                plugin_language: '',
                 plugin_parent: null,
                 plugin_order: null,
                 plugin_restriction: jasmine.arrayContaining([]),
@@ -1258,7 +1251,6 @@ describe('CMS.Plugin', function() {
                 plugin_id: ['1'],
                 plugin_parent: [''],
                 'plugin_order[]': ['3', '2', '1'],
-                plugin_language: ['en'],
                 target_language: ['en'],
                 csrfmiddlewaretoken: ['CSRF_TOKEN']
             });
@@ -1305,7 +1297,6 @@ describe('CMS.Plugin', function() {
                 placeholder_id: 1,
                 plugin_id: 1,
                 plugin_parent: '',
-                plugin_language: 'en',
                 target_language: 'en',
                 plugin_order: [3, 2, 1],
                 csrfmiddlewaretoken: 'CSRF_TOKEN'
