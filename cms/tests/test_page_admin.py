@@ -1274,15 +1274,15 @@ class PageTest(PageTestBase):
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
+                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data) # first
                 self.assertEqual(response.status_code, 200)
-                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
+                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
                 endpoint = self.get_move_plugin_uri(plugin_2)
                 response = self.client.post(endpoint, data) # second
                 self.assertEqual(response.status_code, 200)
-                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_3.pk, 'plugin_parent': ''}
+                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_3.pk, 'plugin_parent': ''}
                 endpoint = self.get_move_plugin_uri(plugin_3)
                 response = self.client.post(endpoint, data) # third
                 self.assertEqual(response.status_code, 400)
@@ -1302,11 +1302,11 @@ class PageTest(PageTestBase):
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
+                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data) # first
                 self.assertEqual(response.status_code, 200)
-                data = {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
+                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data) # second
                 self.assertEqual(response.status_code, 400)
@@ -2639,6 +2639,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
             'plugin_parent': '',
         }
@@ -2669,6 +2670,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
             'plugin_parent': '',
         }
@@ -4142,6 +4144,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
             'plugin_parent': '',
         }
@@ -4176,6 +4179,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
             'plugin_parent': '',
         }

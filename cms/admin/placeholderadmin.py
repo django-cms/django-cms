@@ -613,13 +613,11 @@ class PlaceholderAdminMixin(object):
 
         # The rest are optional
         parent_id = get_int(request.POST.get('plugin_parent', ""), None)
-        language = request.POST.get('plugin_language', None) or plugin.language
+        target_language = request.POST['target_language']
         move_a_copy = request.POST.get('move_a_copy')
         move_a_copy = (move_a_copy and move_a_copy != "0" and
                        move_a_copy.lower() != "false")
         move_to_clipboard = placeholder == request.toolbar.clipboard
-
-        source_language = plugin.language
         source_placeholder = plugin.placeholder
 
         order = request.POST.getlist("plugin_order[]")
@@ -628,7 +626,7 @@ class PlaceholderAdminMixin(object):
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,
-                                         plugin.language, template=template)
+                                         target_language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
 
@@ -639,7 +637,7 @@ class PlaceholderAdminMixin(object):
         ordered_plugin_ids = [int(pk) for pk in order if pk not in exclude_from_order_check]
         plugins_in_tree_count = (
             placeholder
-            .get_plugins(language)
+            .get_plugins(target_language)
             .filter(parent=parent_id, pk__in=ordered_plugin_ids)
             .count()
         )
@@ -660,7 +658,7 @@ class PlaceholderAdminMixin(object):
                 return HttpResponseBadRequest(force_text(
                     _('parent must be in the same placeholder')))
 
-            if move_a_plugin and target_parent.language != language:
+            if move_a_plugin and target_parent.language != target_language:
                 return HttpResponseBadRequest(force_text(
                     _('parent must be in the same language as '
                       'plugin_language')))
@@ -676,7 +674,7 @@ class PlaceholderAdminMixin(object):
             new_plugins = self._paste_placeholder(
                 request,
                 plugin=plugin,
-                target_language=language,
+                target_language=target_language,
                 target_placeholder=placeholder,
                 tree_order=order,
             )
@@ -686,7 +684,7 @@ class PlaceholderAdminMixin(object):
                 request,
                 plugin=plugin,
                 target_parent=target_parent,
-                target_language=language,
+                target_language=target_language,
                 target_placeholder=placeholder,
                 tree_order=order,
             )
@@ -694,7 +692,7 @@ class PlaceholderAdminMixin(object):
             new_plugin = self._cut_plugin(
                 request,
                 plugin=plugin,
-                target_language=language,
+                target_language=target_language,
                 target_placeholder=placeholder,
             )
             new_plugins = [new_plugin]
@@ -704,7 +702,7 @@ class PlaceholderAdminMixin(object):
                 request,
                 plugin=plugin,
                 target_parent=target_parent,
-                target_language=language,
+                target_language=target_language,
                 target_placeholder=placeholder,
                 tree_order=order,
             )
@@ -714,12 +712,12 @@ class PlaceholderAdminMixin(object):
             new_plugins = [root] + list(root.get_descendants().order_by('path'))
 
         # Mark the target placeholder as dirty
-        placeholder.mark_as_dirty(language)
+        placeholder.mark_as_dirty(target_language)
 
         if placeholder != source_placeholder:
             # Plugin is being moved or copied into a separate placeholder
             # Mark source placeholder as dirty
-            source_placeholder.mark_as_dirty(source_language)
+            source_placeholder.mark_as_dirty(plugin.language)
         data = get_plugin_tree_as_json(request, new_plugins)
         return HttpResponse(data, content_type='application/json')
 

@@ -21,7 +21,6 @@ from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
 from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
-from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 
 
@@ -289,7 +288,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         data = get_plugin_toolbar_info(
             obj,
-            request_language=get_language_from_request(request),
             children=child_classes,
             parents=parent_classes,
         )

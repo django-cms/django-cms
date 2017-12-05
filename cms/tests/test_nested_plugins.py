@@ -929,7 +929,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 post_data = {
                     'placeholder_id': page_one_ph_three.id,
                     'plugin_id': text_plugin_two.id,
-                    'plugin_language': 'en',
+                    'target_language': 'en',
                     'plugin_parent': '',
 
                 }

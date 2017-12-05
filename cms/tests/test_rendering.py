@@ -705,18 +705,12 @@ class RenderingTestCase(CMSTestCase):
         conf = {placeholder.slot: {'name': 'Content-with-dash'}}
 
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            content = renderer.get_placeholder_toolbar_js(
-                placeholder,
-                language='en',
-                page=page,
-            )
+            content = renderer.get_placeholder_toolbar_js(placeholder, page)
 
         expected_bits = [
             '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
             '"name": "Content-with-dash"',
             '"placeholder_id": "{}"'.format(placeholder.pk),
-            '"plugin_language": "en"',
-            '"page_language": "en"',
         ]
 
         for bit in expected_bits:
@@ -727,18 +721,12 @@ class RenderingTestCase(CMSTestCase):
         request = self.get_request(language='en', page=page)
         renderer = self.get_content_renderer(request)
         placeholder = page.placeholders.get(slot='empty')
-        content = renderer.get_placeholder_toolbar_js(
-            placeholder,
-            language='en',
-            page=page,
-        )
+        content = renderer.get_placeholder_toolbar_js(placeholder, page)
 
         expected_bits = [
             '"addPluginHelpTitle": "Add plugin to placeholder \\"Empty\\""',
             '"name": "Empty"',
             '"placeholder_id": "{}"'.format(placeholder.pk),
-            '"plugin_language": "en"',
-            '"page_language": "en"',
         ]
 
         for bit in expected_bits:

@@ -128,7 +128,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
                 'plugin_id': sourceplugin.pk,
                 'placeholder_id': static_placeholder_target.draft.id,
                 'plugin_parent': '',
-                'plugin_language': 'en',
+                'target_language': 'en',
             }
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
@@ -155,6 +155,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             'plugin_id': plugin.pk,
             'placeholder_id': static_placeholder_target.draft.pk,
             'move_a_copy': 'true',
+            'target_language': 'en',
             'plugin_order[]': ['__COPY__'],
         }
 

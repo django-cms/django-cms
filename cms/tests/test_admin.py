@@ -561,7 +561,7 @@ class AdminTests(AdminTestsBase):
                 'plugin_id': sub_col.pk,
                 'placeholder_id': source.id,
                 'plugin_parent': col2.pk,
-                'plugin_language': 'de'
+                'target_language': 'de'
             }
             endpoint = self.get_move_plugin_uri(sub_col)
             response = self.client.post(endpoint, data)
@@ -621,7 +621,7 @@ class AdminTests(AdminTestsBase):
                 data = {
                     'plugin_type': 'TextPlugin',
                     'placeholder_id': body.pk,
-                    'plugin_language': 'en',
+                    'target_language': 'en',
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
@@ -644,7 +644,7 @@ class AdminTests(AdminTestsBase):
                 data = {
                     'plugin_type': 'TextPlugin',
                     'placeholder_id': body.pk,
-                    'plugin_language': 'en',
+                    'target_language': 'en',
                     'plugin_parent': '',
                 }
                 response = self.client.post(url, data)

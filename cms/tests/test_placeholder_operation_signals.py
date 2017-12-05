@@ -215,6 +215,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
         }
 
@@ -250,6 +251,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
         }
 
@@ -290,6 +292,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': user_settings.clipboard_id,
         }
 
@@ -326,6 +329,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': user_settings.clipboard_id,
         }
 
@@ -367,6 +371,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             'plugin_id': plugin.pk,
             'placeholder_id': self._cms_placeholder.pk,
             'move_a_copy': 'true',
+            'target_language': 'en',
             'plugin_order[]': ['__COPY__'],
         }
 
@@ -402,6 +407,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
         data = {
             'plugin_id': plugin.pk,
             'placeholder_id': self._cms_placeholder.pk,
+            'target_language': 'en',
             'move_a_copy': 'true',
             'plugin_order[]': ['__COPY__'],
         }
@@ -449,6 +455,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
             'plugin_id': placeholder_plugin.pk,
             'placeholder_id': self._cms_placeholder.pk,
             'move_a_copy': 'true',
+            'target_language': 'en',
             'plugin_order[]': ['__COPY__'],
         }
 
@@ -492,6 +499,7 @@ class OperationSignalsTestCase(CMSTestCase, UnittestCompatMixin):
         data = {
             'plugin_id': placeholder_plugin.pk,
             'placeholder_id': self._cms_placeholder.pk,
+            'target_language': 'en',
             'move_a_copy': 'true',
             'plugin_order[]': ['__COPY__'],
         }
