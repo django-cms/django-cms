@@ -44,7 +44,6 @@ var Plugin = new Class({
         placeholder_id: null,
         plugin_type: '',
         plugin_id: null,
-        plugin_language: '',
         plugin_parent: null,
         plugin_order: null,
         plugin_restriction: [],
@@ -491,7 +490,7 @@ var Plugin = new Class({
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
             cms_path: path,
-            plugin_language: this.options.plugin_language
+            plugin_language: CMS.config.request.language
         };
 
         if (parent) {
@@ -573,7 +572,7 @@ var Plugin = new Class({
             options.plugin_id = '';
             options.parent = '';
         } else {
-            sourceLanguage = options.plugin_language;
+            sourceLanguage = CMS.config.request.language;
         }
 
         var data = {
@@ -635,7 +634,6 @@ var Plugin = new Class({
             placeholder_id: CMS.config.clipboard.id,
             plugin_id: this.options.plugin_id,
             plugin_parent: '',
-            plugin_language: CMS.config.request.language,
             plugin_order: [this.options.plugin_id],
             target_language: CMS.config.request.language,
             csrfmiddlewaretoken: CMS.config.csrf
@@ -699,7 +697,6 @@ var Plugin = new Class({
      * @param {String} [opts.placeholder_id]
      * @param {String} [opts.plugin_id]
      * @param {String} [opts.plugin_parent]
-     * @param {String} [opts.plugin_language]
      * @param {Boolean} [opts.move_a_copy]
      * @returns {Boolean|void}
      */
@@ -747,16 +744,6 @@ var Plugin = new Class({
             placeholder_id: placeholder_id,
             plugin_id: options.plugin_id,
             plugin_parent: plugin_parent || '',
-            // this is a hack: when moving to different languages use the global language
-            plugin_language: (() => {
-                if (options.move_a_copy) {
-                    return CMS.config.request.language;
-                }
-                if (options.plugin_language) {
-                    return options.plugin_language;
-                }
-                return CMS.config.request.language;
-            })(),
             target_language: CMS.config.request.language,
             plugin_order: plugin_order,
             csrfmiddlewaretoken: CMS.config.csrf,
