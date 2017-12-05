@@ -117,6 +117,7 @@ casper.test.begin('Edit utils page content', function(test) {
                 'Delete plugin successful'
             );
         })
+        .wait(1000)
         // CHECK CUT UTIL
         // click settings for last content plugin
         .then(function() {
