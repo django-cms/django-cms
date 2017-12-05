@@ -16,7 +16,7 @@ CMS.config = {
     'debug': {% if debug %}true{% else %}false{% endif %},
     'csrf': '{{ csrf_token }}',
     'request': {
-        'language': '{{ request.GET.language|escape|escapejs }}',
+        'language': '{{ cms_toolbar.language }}',
         'model': '{{ cms_toolbar.get_object_model }}',
         'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk }}{% else %}{{ request.current_page.publisher_public_id }}{% endif %}',
         'pk': '{{ cms_toolbar.get_object_pk }}',

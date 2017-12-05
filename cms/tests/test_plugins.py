@@ -176,7 +176,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = self.get_placeholder()
         url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
             'plugin_type': "ArticlePlugin",
-            'plugin_language': settings.LANGUAGES[0][0],
+            'target_language': settings.LANGUAGES[0][0],
             'placeholder_id': placeholder.pk,
         })
         superuser = self.get_superuser()
@@ -327,7 +327,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'placeholder_id': placeholder.id,
             'plugin_id': text_plugin_1.id,
             'plugin_parent': '',
-            'plugin_language': 'en',
+            'target_language': 'en',
             'plugin_order[]': [text_plugin_1.id, text_plugin_2.id, text_plugin_3.id],
         }
 
@@ -366,7 +366,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'placeholder_id': placeholder.id,
             'plugin_id': text_plugin_1.id,
             'plugin_parent': '',
-            'plugin_language': 'en',
+            'target_language': 'en',
             'plugin_order[]': [
                 text_plugin_1.id,
                 text_plugin_2.id,
@@ -748,7 +748,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         ph.save()
         url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
             'plugin_type': "TextPlugin",
-            'plugin_language': settings.LANGUAGES[0][0],
+            'target_language': settings.LANGUAGES[0][0],
             'placeholder': ph.pk,
             'plugin_parent': plugin.pk
 
@@ -945,6 +945,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             post = {
                 'plugin_id': child_plugin.pk,
                 'placeholder_id': page.placeholders.get(slot='right-column').pk,
+                'target_language': 'en',
                 'plugin_parent': '',
             }
 

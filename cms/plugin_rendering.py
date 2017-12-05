@@ -117,15 +117,13 @@ class BaseRenderer(object):
         plugin_menu_template = self.templates.placeholder_plugin_menu_template
         return plugin_menu_template.render({'plugin_menu': plugin_menu})
 
-    def get_placeholder_toolbar_js(self, placeholder, language, page=None):
+    def get_placeholder_toolbar_js(self, placeholder, page=None):
         plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page) # original
 
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
         placeholder_toolbar_js = get_placeholder_toolbar_js(
             placeholder=placeholder,
-            request_language=self.request_language,
-            render_language=language,
             allowed_plugins=allowed_plugins,
         )
         return placeholder_toolbar_js
@@ -141,7 +139,6 @@ class BaseRenderer(object):
             plugin,
             children=child_classes,
             parents=parent_classes,
-            request_language=self.request_language,
         )
         return content
 
@@ -298,20 +295,16 @@ class ContentRenderer(BaseRenderer):
             self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
         if editable:
-            data = self.get_editable_placeholder_context(placeholder, language, page=page)
+            data = self.get_editable_placeholder_context(placeholder, page=page)
             data['content'] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
 
         context.pop()
         return mark_safe(placeholder_content)
 
-    def get_editable_placeholder_context(self, placeholder, language, page=None):
+    def get_editable_placeholder_context(self, placeholder, page=None):
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
-        placeholder_toolbar_js = self.get_placeholder_toolbar_js(
-            placeholder,
-            language=language,
-            page=page,
-        )
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
         plugin_toolbar_js_bits = (self.get_plugin_toolbar_js(plugin, page=page)
                                   for plugin in placeholder_cache['plugins'])
         context = {
@@ -600,12 +593,7 @@ class StructureRenderer(BaseRenderer):
         rendered_plugins = self.render_plugins(placeholder, language=language, page=page)
         plugin_js_output = ''.join(rendered_plugins)
 
-        placeholder_toolbar_js = self.get_placeholder_toolbar_js(
-            placeholder,
-            language=language,
-            page=page,
-        )
-
+        placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
         rendered_placeholder = RenderedPlaceholder(
             placeholder=placeholder,
             language=language,
@@ -675,12 +663,8 @@ class LegacyRenderer(ContentRenderer):
         """
     )
 
-    def get_editable_placeholder_context(self, placeholder, language, page=None):
-        context = super(LegacyRenderer, self).get_editable_placeholder_context(
-            placeholder=placeholder,
-            language=language,
-            page=page,
-        )
+    def get_editable_placeholder_context(self, placeholder, page=None):
+        context = super(LegacyRenderer, self).get_editable_placeholder_context(placeholder, page)
         context['plugin_menu_js'] = self.get_placeholder_plugin_menu(placeholder, page=page)
         return context
 

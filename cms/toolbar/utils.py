@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import json
-import functools
 
 from django.utils.encoding import force_text
 from django.utils.six import text_type
@@ -10,8 +9,7 @@ from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils.i18n import force_language
 
 
-def get_placeholder_toolbar_js(placeholder, request_language,
-                               render_language, allowed_plugins=None):
+def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     label = placeholder.get_label() or ''
     help_text = ugettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -20,9 +18,7 @@ def get_placeholder_toolbar_js(placeholder, request_language,
     data = {
         'type': 'placeholder',
         'name': force_text(label),
-        'page_language': request_language,
         'placeholder_id': text_type(placeholder.pk),
-        'plugin_language': request_language,
         'plugin_restriction': allowed_plugins or [],
         'addPluginHelpTitle': force_text(help_text),
         'urls': {
@@ -33,7 +29,7 @@ def get_placeholder_toolbar_js(placeholder, request_language,
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin, request_language, children=None, parents=None):
+def get_plugin_toolbar_info(plugin, children=None, parents=None):
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = ugettext(
         'Add plugin to %(plugin_name)s'
@@ -42,16 +38,14 @@ def get_plugin_toolbar_info(plugin, request_language, children=None, parents=Non
     data['onClose'] = False
     data['addPluginHelpTitle'] = force_text(help_text)
     data['plugin_order'] = ''
-    data['page_language'] = request_language
     data['plugin_restriction'] = children or []
     data['plugin_parent_restriction'] = parents or []
     return data
 
 
-def get_plugin_toolbar_js(plugin, request_language, children=None, parents=None):
+def get_plugin_toolbar_js(plugin, children=None, parents=None):
     data = get_plugin_toolbar_info(
         plugin,
-        request_language=request_language,
         children=children,
         parents=parents,
     )
@@ -75,10 +69,7 @@ def get_plugin_tree_as_json(request, plugins):
     copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
     plugins = downcast_plugins(plugins, select_placeholder=True)
     plugin_tree = build_plugin_tree(plugins)
-    get_plugin_info = functools.partial(
-        get_plugin_toolbar_info,
-        request_language=toolbar.language,
-    )
+    get_plugin_info = get_plugin_toolbar_info
 
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(

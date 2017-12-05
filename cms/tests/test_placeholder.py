@@ -162,6 +162,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         data = {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
+            'target_language': 'en',
             'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
         }
         endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)

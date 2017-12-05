@@ -95,6 +95,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_1.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                 }
                 endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
@@ -103,6 +104,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_2.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                 }
                 endpoint = self.get_move_plugin_uri(plugin_2, container=Example1)
@@ -111,6 +113,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_3.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                 }
                 endpoint = self.get_move_plugin_uri(plugin_3, container=Example1)
@@ -138,6 +141,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_1.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                     'plugin_order': 1,
                 }
@@ -147,6 +151,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_2.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                     'plugin_order': 1,
                 }
@@ -192,6 +197,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_1.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                 }
                 endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
@@ -200,6 +206,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_2.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                 }
                 endpoint = self.get_move_plugin_uri(plugin_2, container=Example1)
@@ -224,6 +231,7 @@ class AppAdminTest(AppAdminTestCase):
                 data = {
                     'plugin_id': plugin_1.pk,
                     'placeholder_id': target_placeholder.pk,
+                    'target_language': 'en',
                     'plugin_parent': '',
                     'plugin_order': 1,
                 }
@@ -413,6 +421,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         data = {
             'plugin_id': plugin.pk,
+            'target_language': 'en',
             'placeholder_id': target_placeholder.pk,
             'plugin_parent': '',
         }
@@ -441,6 +450,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         data = {
             'plugin_id': plugin.pk,
             'placeholder_id': target_placeholder.pk,
+            'target_language': 'en',
             'plugin_parent': '',
         }
 
@@ -748,7 +758,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
                 'placeholder_id': target_placeholder.pk,
                 'plugin_id': placeholder_plugin.pk,
                 'plugin_parent': '',
-                'plugin_language': 'fr',
+                'target_language': 'fr',
                 'plugin_order[]': '__COPY__',
                 'move_a_copy': True,
             }
@@ -793,7 +803,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
                 'placeholder_id': target_placeholder.pk,
                 'plugin_id': placeholder_plugin.pk,
                 'plugin_parent': '',
-                'plugin_language': 'fr',
+                'target_language': 'fr',
                 'plugin_order[]': '__COPY__',
                 'move_a_copy': True,
             }
@@ -812,7 +822,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
                 'placeholder_id': target_placeholder.pk,
                 'plugin_id': placeholder_plugin.pk,
                 'plugin_parent': '',
-                'plugin_language': 'fr',
+                'target_language': 'fr',
                 'plugin_order[]': '__COPY__',
                 'move_a_copy': True,
             }
