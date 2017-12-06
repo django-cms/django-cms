@@ -4,8 +4,7 @@ from collections import defaultdict
 from django.template import Template
 
 from cms import api
-from cms.cms_plugins import AliasPlugin
-from cms.models import Placeholder, AliasPluginModel
+from cms.models import Placeholder
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import TransactionCMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -27,8 +26,7 @@ class AliasTestCase(TransactionCMSTestCase):
         return obj
 
     def test_add_plugin_alias(self):
-        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                  slug="page1", published=True, in_navigation=True)
+        page_en = api.create_page("PluginOrderPage", "col_two.html", "en")
         ph_en = page_en.placeholders.get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         with self.login_user_context(self.get_superuser()):
@@ -44,11 +42,10 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 400)
         response = self.client.post(admin_reverse('cms_create_alias'), data={'plugin_id': text_plugin_1.pk})
         self.assertEqual(response.status_code, 403)
-        instance = AliasPluginModel.objects.all()[0]
-        admin = AliasPlugin()
-        context = self.get_context()
-        admin.render(context, instance, ph_en)
-        self.assertEqual(context['content'], "I'm the first")
+        page_en.publish('en')
+        response = self.client.get(page_en.get_absolute_url() + '?edit')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "I'm the first", html=False)
 
     def test_alias_recursion(self):
         page_en = api.create_page(
@@ -70,6 +67,31 @@ class AliasTestCase(TransactionCMSTestCase):
             response = self.client.get(page_en.get_absolute_url() + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info">', html=True)
+
+    def test_alias_recursion_across_pages(self):
+        superuser = self.get_superuser()
+        page_1 = api.create_page("page-1", "col_two.html", "en", published=True)
+        page_1_pl = page_1.placeholders.get(slot="col_left")
+        source_plugin = api.add_plugin(page_1_pl, 'StylePlugin', 'en', tag_type='div', class_name='info')
+        # this creates a recursive alias on the same page
+        alias_plugin = api.add_plugin(page_1_pl, 'AliasPlugin', 'en', plugin=source_plugin, target=source_plugin)
+
+        self.assertTrue(alias_plugin.is_recursive())
+
+        with self.login_user_context(superuser):
+            response = self.client.get(page_1.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<div class="info">', html=False)
+
+        page_2 = api.create_page("page-2", "col_two.html", "en")
+        page_2_pl = page_2.placeholders.get(slot="col_left")
+        # This points to a plugin with a recursive alias
+        api.add_plugin(page_2_pl, 'AliasPlugin', 'en', plugin=source_plugin)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(page_2.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<div class="info">', html=False)
 
     def test_alias_ref_plugin_on_unpublished_page(self):
         superuser = self.get_superuser()
