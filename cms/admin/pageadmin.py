@@ -859,7 +859,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     @transaction.atomic
     def copy_language(self, request, page_id):
         page = self.get_object(request, object_id=page_id)
-        placeholders = page.get_placeholders()
         source_language = request.POST.get('source_language')
         target_language = request.POST.get('target_language')
 
@@ -872,7 +871,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not target_language or not target_language in get_language_list(site_id=page.site_id):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
-        for placeholder in placeholders:
+        for placeholder in page.get_placeholders():
             plugins = list(
                 placeholder.get_plugins(language=source_language).order_by('path'))
             if not placeholder.has_add_plugins_permission(request.user, plugins):
