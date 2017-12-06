@@ -4,12 +4,10 @@ from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
-from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.urlutils import admin_reverse
 from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 
@@ -38,43 +36,6 @@ class AliasPlugin(CMSPluginBase):
     def get_render_queryset(cls):
         queryset = super(AliasPlugin, cls).get_render_queryset()
         return queryset.select_related('plugin', 'alias_placeholder')
-
-    def render(self, context, instance, placeholder):
-        from cms.utils.plugins import downcast_plugins, build_plugin_tree
-
-        context = super(AliasPlugin, self).render(context, instance, placeholder)
-        request = context.get('request')
-
-        if not request or instance.is_recursive():
-            return context
-
-        source = (instance.plugin or instance.alias_placeholder)
-
-        if source and source.page:
-            # this is bad but showing unpublished content is worse
-            can_see_content = source.page.is_published(instance.language)
-        else:
-            can_see_content = True
-
-        if can_see_content and instance.plugin:
-            plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
-            plugins = [instance.plugin] + list(plugins)
-            plugins = downcast_plugins(plugins, request=request)
-            plugins = list(plugins)
-            plugins[0].parent_id = None
-            plugins = build_plugin_tree(plugins)
-            context['plugins'] = plugins
-
-        if can_see_content and instance.alias_placeholder:
-            toolbar = get_toolbar_from_request(request)
-            renderer = toolbar.content_renderer
-            content = renderer.render_placeholder(
-                placeholder=instance.alias_placeholder,
-                context=context,
-                editable=False,
-            )
-            context['content'] = mark_safe(content)
-        return context
 
     @classmethod
     def get_extra_plugin_menu_items(cls, request, plugin):
