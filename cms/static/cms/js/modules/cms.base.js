@@ -166,7 +166,7 @@ export const Helpers = {
             data &&
             data.plugin_id &&
             window.CMS._instances.some(function(plugin) {
-                return Number(plugin.options.plugin_id) === Number(data.plugin_id);
+                return Number(plugin.options.plugin_id) === Number(data.plugin_id) && plugin.options.type === 'plugin';
             });
         var addedPlugin = !editedPlugin && data && data.plugin_id;
 
