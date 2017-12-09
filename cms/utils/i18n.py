@@ -33,6 +33,30 @@ def get_languages(site_id=None):
     return result
 
 
+def get_site_language_from_request(request, current_page=None):
+    from cms.utils import get_current_site
+
+    language = request.GET.get('language', None)
+
+    if current_page:
+        site_id = current_page.site_id
+    else:
+        site_id = get_current_site().pk
+
+    if is_valid_site_language(language, site_id=site_id):
+        return language
+
+    language = getattr(request, 'LANGUAGE_CODE', None)
+
+    if is_valid_site_language(language, site_id=site_id):
+        return language
+
+    if current_page and current_page.get_languages():
+        # in last resort, get the first language available in the page
+        return current_page.get_languages()[0]
+    return get_default_language_for_site(site_id=site_id)
+
+
 def get_language_code(language_code, site_id=None):
     """
     Returns language code while making sure it's in LANGUAGES
@@ -119,7 +143,6 @@ def get_default_language(language_code=None, site_id=None):
 
     Returns: language_code
     """
-
     if not language_code:
         language_code = get_language_code(settings.LANGUAGE_CODE)
 
@@ -136,6 +159,10 @@ def get_default_language(language_code=None, site_id=None):
         return settings.LANGUAGE_CODE
 
     return language_code
+
+
+def get_default_language_for_site(site_id):
+    return get_language_list(site_id)[0]
 
 
 def get_fallback_languages(language, site_id=None):
@@ -178,3 +205,7 @@ def is_language_prefix_patterns_used():
     """
     return any(isinstance(url_pattern, LocaleRegexURLResolver)
                for url_pattern in get_resolver(None).url_patterns)
+
+
+def is_valid_site_language(language, site_id):
+    return language in get_language_list(site_id)
