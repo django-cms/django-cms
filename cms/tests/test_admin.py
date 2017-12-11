@@ -974,8 +974,7 @@ class AdminFormsTests(AdminTestsBase):
         page_data['site'] = '1000'
 
         with self.login_user_context(admin_user):
-            de_path = path + u"?language=de"
-            response = self.client.post(de_path, page_data)
+            response = self.client.post(path, page_data)
             # Assert user is not redirected because there was a form error
             self.assertEqual(response.status_code, 200)
 

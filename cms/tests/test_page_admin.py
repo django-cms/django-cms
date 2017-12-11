@@ -182,6 +182,27 @@ class PageTest(PageTestBase):
             title = Title.objects.drafts().get(slug=page_data['slug'])
             title = Title.objects.public().get(slug=page_data['slug'])
 
+    def test_create_page_with_unconfigured_language(self):
+        """
+        Test that a page can be created via the admin
+        with the request language pointing to a language
+        not configured for the current site
+        """
+        page_data = self.get_new_page_data()
+        superuser = self.get_superuser()
+        Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+        with self.login_user_context(superuser):
+            self.assertEqual(Title.objects.all().count(), 0)
+            self.assertEqual(Page.objects.all().count(), 0)
+            # crate home and auto publish
+            with self.settings(SITE_ID=2):
+                # url uses "en" as the request language
+                # but the site is configured to use "de" and "fr"
+                response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+                self.assertRedirects(response, URL_CMS_PAGE)
+                self.assertEqual(Page.objects.all().count(), 2)
+                self.assertEqual(Title.objects.filter(language='de').count(), 2)
+
     def test_create_tree_admin(self):
         """
         Test that a tree can be created via the admin

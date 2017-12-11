@@ -65,7 +65,12 @@ from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
 from cms.utils import page_permissions
-from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object
+from cms.utils.i18n import (
+    get_language_list,
+    get_language_tuple,
+    get_language_object,
+    get_site_language_from_request,
+)
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -262,7 +267,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
         form._user = request.user
         form._site = self.get_site(request)
-        form._language = get_language_from_request(request, obj)
+        form._language = get_site_language_from_request(request, obj)
         return form
 
     def duplicate(self, request, object_id):
@@ -294,7 +299,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         # always returns a valid language
-        language = get_language_from_request(request, current_page=page)
+        language = get_site_language_from_request(request, current_page=page)
         language_obj = get_language_object(language, site_id=page.site_id)
 
         if not page.has_translation(language):
@@ -370,7 +375,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         if extra_context is None:
             extra_context = {}
-        language = get_language_from_request(request)
+        language = get_site_language_from_request(request)
         extra_context.update({
             'language': language,
         })
@@ -405,7 +410,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             _has_advanced_settings_perm = self.has_change_advanced_settings_permission(request, obj=obj)
             extra_context['can_change_advanced_settings'] = _has_advanced_settings_perm
 
-        tab_language = get_language_from_request(request)
+        tab_language = get_site_language_from_request(request)
         extra_context.update(self.get_unihandecode_context(tab_language))
 
         response = super(BasePageAdmin, self).change_view(
@@ -501,7 +506,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if context is None:
             context = {}
 
-        language = get_language_from_request(request, obj)
+        language = get_site_language_from_request(request, obj)
         languages = self._get_site_languages(request, obj)
         context.update({
             'language': language,
@@ -1330,7 +1335,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         rows = self.get_tree_rows(
             request,
             nodes=nodes,
-            language=get_language_from_request(request),
+            language=get_site_language_from_request(request),
             depth=(node.depth + 1 if node else 1),
             follow_descendants=True,
         )
