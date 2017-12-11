@@ -8,7 +8,6 @@ from cms.utils.urlutils import admin_reverse
 from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 
@@ -32,32 +31,6 @@ class AliasPlugin(CMSPluginBase):
     model = AliasPluginModel
     render_template = "cms/plugins/alias.html"
     system = True
-
-    def render(self, context, instance, placeholder):
-        from cms.utils.plugins import downcast_plugins, build_plugin_tree
-
-        context = super(AliasPlugin, self).render(context, instance, placeholder)
-        cms_content_renderer = context.get('cms_content_renderer')
-
-        if not cms_content_renderer or instance.is_recursive():
-            return context
-
-        if instance.plugin_id:
-            plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
-            plugins = [instance.plugin] + list(plugins)
-            plugins = downcast_plugins(plugins, request=cms_content_renderer.request)
-            plugins = list(plugins)
-            plugins[0].parent_id = None
-            plugins = build_plugin_tree(plugins)
-            context['plugins'] = plugins
-        if instance.alias_placeholder_id:
-            content = cms_content_renderer.render_placeholder(
-                placeholder=instance.alias_placeholder,
-                context=context,
-                editable=False,
-            )
-            context['content'] = mark_safe(content)
-        return context
 
     def get_extra_global_plugin_menu_items(self, request, plugin):
         return [
