@@ -246,3 +246,16 @@ spelling_lang = 'en_GB'
 spelling_word_list_filename = 'spelling_wordlist'
 
 spelling_ignore_pypi_package_names = True
+
+latex_elements = {
+    'preamble': r'''\usepackage{CJKutf8}''',
+}
+
+from sphinx.util.texescape import tex_replacements
+tex_replacements.append(('✕', r'\(\times\)'))
+tex_replacements.append(('日', r'\begin{CJK}{UTF8}{min}日\end{CJK}'))
+tex_replacements.append(('本', r'\begin{CJK}{UTF8}{min}本\end{CJK}'))
+tex_replacements.append(('語', r'\begin{CJK}{UTF8}{min}語\end{CJK}'))
+
+
+

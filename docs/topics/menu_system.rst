@@ -153,36 +153,38 @@ Many of the methods below pass this list of nodes to the ones it calls, and retu
 
 Don't forget that show_menu recurses - so it will do *all* of the below for *each level* in the menu.
 
-* ``{% show_menu %}`` - the template tag in the template
-    * :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()`
-        * :py:meth:`menus.menu_pool.MenuPool.get_nodes()`
-            * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's ``cms_menus.py``, and registers:
-                * Menu classes, placing them in the ``self.menus`` dict
-                * Modifier classes, placing them in the self.modifiers list
-            * :py:meth:`menus.menu_pool.MenuPool._build_nodes()`
-                * checks the cache to see if it should return cached nodes
-                * loops over the Menus in self.menus (note: by default the only generator is :py:class:`cms.menu.CMSMenu`); for each:
-                    * call its :py:meth:`menus.base.Menu.get_nodes()` - the menu generator
-                    * :py:func:`menus.menu_pool._build_nodes_inner_for_one_menu()`
-                    * adds all nodes into a big list
-            * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()`
-                * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
-                * loops over each node, comparing its URL with the request.path_info, and marks the best match as ``selected``
-                * loops over the Modifiers in ``self.modifiers`` calling each one's :py:meth:`~menus.base.Modifier.modify()` with ``post_cut=False``. The default Modifiers are:
-                    * :py:class:`cms.menu.NavExtender`
-                    * :py:class:`cms.menu.SoftRootCutter` removes all nodes below the appropriate soft root
-                    * :py:class:`menus.modifiers.Marker` loops over all nodes; finds selected, marks its ancestors, siblings and children
-                    * :py:class:`menus.modifiers.AuthVisibility` removes nodes that require authorisation to see
-                    * :py:class:`menus.modifiers.Level` loops over all nodes; for each one that is a root node (``level == 0``) passes it to:
-                        * :py:meth:`~menus.modifiers.Level.mark_levels()` recurses over a node's descendants marking their levels
-        * we're now back in :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()` again
-        * if we have been provided a root_id, get rid of any nodes other than its descendants
-        * :py:meth:`menus.templatetags.menu_tags.cut_levels()` removes nodes from the menu according to the arguments provided by the template tag
-        * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()` with ``post_cut = True`` loops over all the Modifiers again
-            * :py:class:`cms.menu.NavExtender`
-            * :py:class:`cms.menu.SoftRootCutter`
-            * :py:class:`menus.modifiers.Marker`
-            * :py:class:`menus.modifiers.AuthVisibility`
-            * :py:class:`menus.modifiers.Level`:
-                * :py:meth:`menus.modifiers.Level.mark_levels()`
-        * return the nodes to the context in the variable ``children``
+.. |_| unicode:: 0xA0 0xA0 0xA0
+		    
+| |_| ``{% show_menu %}`` - the template tag in the template
+| |_| |_| :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()`
+| |_| |_| |_| :py:meth:`menus.menu_pool.MenuPool.get_nodes()`
+| |_| |_| |_| |_| :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's ``cms_menus.py``, and registers:
+| |_| |_| |_| |_| |_| Menu classes, placing them in the ``self.menus`` dict
+| |_| |_| |_| |_| |_| Modifier classes, placing them in the self.modifiers list
+| |_| |_| |_| |_| :py:meth:`menus.menu_pool.MenuPool._build_nodes()`
+| |_| |_| |_| |_| |_| checks the cache to see if it should return cached nodes
+| |_| |_| |_| |_| |_| loops over the Menus in self.menus (note: by default the only generator is :py:class:`cms.menu.CMSMenu`); for each:
+| |_| |_| |_| |_| |_| |_| call its :py:meth:`menus.base.Menu.get_nodes()` - the menu generator
+| |_| |_| |_| |_| |_| |_| :py:func:`menus.menu_pool._build_nodes_inner_for_one_menu()`
+| |_| |_| |_| |_| |_| |_| adds all nodes into a big list
+| |_| |_| |_| |_| :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()`
+| |_| |_| |_| |_| |_| :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
+| |_| |_| |_| |_| |_| loops over each node, comparing its URL with the request.path_info, and marks the best match as ``selected``
+| |_| |_| |_| |_| |_| loops over the Modifiers in ``self.modifiers`` calling each one's :py:meth:`~menus.base.Modifier.modify()` with ``post_cut=False``. The default Modifiers are:
+| |_| |_| |_| |_| |_| |_| :py:class:`cms.menu.NavExtender`
+| |_| |_| |_| |_| |_| |_| :py:class:`cms.menu.SoftRootCutter` removes all nodes below the appropriate soft root
+| |_| |_| |_| |_| |_| |_| :py:class:`menus.modifiers.Marker` loops over all nodes; finds selected, marks its ancestors, siblings and children
+| |_| |_| |_| |_| |_| |_| :py:class:`menus.modifiers.AuthVisibility` removes nodes that require authorisation to see
+| |_| |_| |_| |_| |_| |_| :py:class:`menus.modifiers.Level` loops over all nodes; for each one that is a root node (``level == 0``) passes it to:
+| |_| |_| |_| |_| |_| |_| |_| :py:meth:`~menus.modifiers.Level.mark_levels()` recurses over a node's descendants marking their levels
+| |_| |_| |_| we're now back in :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()` again
+| |_| |_| |_| if we have been provided a root_id, get rid of any nodes other than its descendants
+| |_| |_| |_| :py:meth:`menus.templatetags.menu_tags.cut_levels()` removes nodes from the menu according to the arguments provided by the template tag
+| |_| |_| |_| :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()` with ``post_cut = True`` loops over all the Modifiers again
+| |_| |_| |_| |_| :py:class:`cms.menu.NavExtender`
+| |_| |_| |_| |_| :py:class:`cms.menu.SoftRootCutter`
+| |_| |_| |_| |_| :py:class:`menus.modifiers.Marker`
+| |_| |_| |_| |_| :py:class:`menus.modifiers.AuthVisibility`
+| |_| |_| |_| |_| :py:class:`menus.modifiers.Level`:
+| |_| |_| |_| |_| |_| :py:meth:`menus.modifiers.Level.mark_levels()`
+| |_| |_| |_| return the nodes to the context in the variable ``children``
