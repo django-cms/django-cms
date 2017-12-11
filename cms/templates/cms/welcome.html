@@ -12,6 +12,7 @@
 </head>
 <body class="cms-welcome-bg">
     {% cms_toolbar %}
+    {% language request.toolbar.toolbar_language %}
     <div class="cms-reset cms-welcome">
         <header class="cms-welcome-header">
             <h1 class="cms-welcome-heading">
@@ -74,8 +75,10 @@
             {% endif %}
         </footer>
     </div>
+    {% endlanguage %}
     {% render_block "js" %}
 
+    {% language request.toolbar.toolbar_language %}
     <script>
         {% if user.is_authenticated %}
             CMS.$(function () {
@@ -102,5 +105,6 @@
             {% endif %}
         {% endif %}
     </script>
+    {% endlanguage %}
 </body>
 </html>

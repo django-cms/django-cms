@@ -13,7 +13,7 @@ casper.test.setUp(function(done) {
 });
 
 casper.test.tearDown(function(done) {
-    casper.start().then(cms.removePage()).then(cms.logout()).run(done);
+    casper.start().then(cms.logout()).run(done);
 });
 
 casper.test.begin('Add First Page with wizard', function(test) {
@@ -60,6 +60,71 @@ casper.test.begin('Add First Page with wizard', function(test) {
             );
 
             test.assertExists('.cms-btn-switch-save', 'The new page has been published');
+        }).then(cms.removePage())
+        .run(function() {
+            test.done();
+        });
+});
+
+casper.test.begin('Welcome page uses correct language', function(test) {
+    casper
+        .start(globals.editUrl)
+        .waitForSelector('.cms-ready')
+        .waitUntilVisible('.cms-modal', function() {
+            test.assertVisible('.cms-modal', 'The wizard pop up is opened');
+            test.assertSelectorHasText(
+                '.cms-modal-title-prefix',
+                'Welcome to django CMS',
+                'Modal has correct language'
+            );
+        })
+        .run(function() {
+            test.done();
+        });
+});
+
+casper.test.begin('Welcome page uses correct language 2', function(test) {
+    casper
+        .start(globals.editUrl.replace(/en/, 'de'))
+        .waitForSelector('.cms-ready')
+        .waitUntilVisible('.cms-modal', function() {
+            test.assertVisible('.cms-modal', 'The wizard pop up is opened');
+            test.assertSelectorHasText(
+                '.cms-modal-title-prefix',
+                'Welcome to django CMS',
+                'Modal has correct language'
+            );
+        })
+        .run(function() {
+            test.done();
+        });
+});
+
+casper.test.begin('Welcome page uses correct language 3', function(test) {
+    casper
+        .start(globals.baseUrl + 'admin/cms/usersettings')
+        .waitForSelector('#content-main', function() {
+            test.assertExists('#id_language', 'language button exists');
+
+            // selects German language
+            this.fill(
+                '#usersettings_form',
+                {
+                    language: 'de'
+                },
+                true
+            );
+        })
+        .wait(2000)
+        .thenOpen(globals.editUrl.replace(/en/, 'de'))
+        .waitForSelector('.cms-ready')
+        .waitUntilVisible('.cms-modal', function() {
+            test.assertVisible('.cms-modal', 'The wizard pop up is opened');
+            test.assertSelectorHasText(
+                '.cms-modal-title-prefix',
+                'Willkommen im django CMS',
+                'Modal has correct language'
+            );
         })
         .run(function() {
             test.done();
