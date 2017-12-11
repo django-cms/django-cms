@@ -118,11 +118,6 @@ var Sideframe = new Class({
         var url = opts.url;
         var animate = opts.animate;
 
-        // setup internals
-        var language = ['language', CMS.config.request.language];
-        var page_id = ['page_id', CMS.config.request.page_id];
-        var params = [];
-
         // We have to rebind events every time we open a sideframe
         // because the event handlers contain references to the instance
         // and since we reuse the same markup we need to update
@@ -138,18 +133,7 @@ var Sideframe = new Class({
             CMS.API.Toolbar.showLoader();
         }
 
-        // we need to modify the url appropriately to pass
-        // language and page to the params
-        if (url.indexOf(CMS.config.request.tree) >= 0) {
-            if (CMS.config.request.language) {
-                params.push(language);
-            }
-            if (CMS.config.request.page_id) {
-                params.push(page_id);
-            }
-        }
-
-        url = Helpers.makeURL(url, params);
+        url = Helpers.makeURL(url);
 
         // load the iframe
         this._content(url);
@@ -259,7 +243,9 @@ var Sideframe = new Class({
             });
 
             // adding django hacks
-            contents.find('.viewsitelink').attr('target', '_top');
+            contents.find('.viewsitelink').attr('target', '_top').on('click', () => {
+                that.close();
+            });
 
             // update history
             that._addToHistory(this.contentWindow.location.href);
