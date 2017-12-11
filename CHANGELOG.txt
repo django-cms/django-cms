@@ -1,6 +1,9 @@
 === 3.4.6 (unreleased) ===
+
 * Changed the way drag and drop works in the page tree. The page has to be
-  selected first before moving
+  selected first before moving.
+* Fixed a bug where the cms alias plugin leaks context into the rendered aliased plugins.
+
 
 === 3.4.5 (2017-10-12) ===
 
