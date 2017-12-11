@@ -145,52 +145,6 @@ describe('CMS.Sideframe', function() {
             expect(sideframe.ui.frame).toHaveClass('cms-loader');
         });
 
-        it('correctly modifies the url based on request params', function() {
-            spyOn(CMS.API.Helpers, 'makeURL').and.returnValue(url);
-            CMS.config.request.tree = 'non-existent-url-part';
-
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
-
-            CMS.config.request.language = 'ru';
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
-
-            CMS.config.request.language = false;
-            CMS.config.request.page_id = 'page_id';
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
-
-            CMS.config.request.language = 'de';
-            CMS.config.request.page_id = 'page_id_another';
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
-
-            CMS.config.request.tree = 'sideframe_iframe.html';
-
-            CMS.config.request.language = false;
-            CMS.config.request.page_id = false;
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, []]);
-
-            CMS.config.request.language = 'ru';
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, [['language', 'ru']]]);
-
-            CMS.config.request.language = false;
-            CMS.config.request.page_id = 'page_id';
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([url, [['page_id', 'page_id']]]);
-
-            CMS.config.request.language = 'de';
-            CMS.config.request.page_id = 'page_id_another';
-            sideframe.open({ url: url });
-            expect(CMS.API.Helpers.makeURL.calls.mostRecent().args).toEqual([
-                url,
-                [['language', 'de'], ['page_id', 'page_id_another']]
-            ]);
-        });
-
         it('animates the sideframe to correct width', function() {
             spyOn($.fn, 'animate');
             sideframe.ui.body = $('<div></div>', {

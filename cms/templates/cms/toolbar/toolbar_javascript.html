@@ -21,7 +21,6 @@ CMS.config = {
         'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk }}{% else %}{{ request.current_page.publisher_public_id }}{% endif %}',
         'pk': '{{ cms_toolbar.get_object_pk }}',
         'url': '{% language cms_toolbar.language %}{% cms_admin_url "cms_page_resolve" %}{% endlanguage %}',
-        'tree': '{% language cms_toolbar.language %}{% cms_admin_url "cms_page_changelist" %}{% endlanguage %}',
         'toolbar': '{% language cms_toolbar.language %}{% cms_admin_url "cms_usersettings_get_toolbar" %}{% endlanguage %}'
     },
     'lang': {
