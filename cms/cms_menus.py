@@ -9,7 +9,12 @@ from cms.models import EmptyTitle
 from cms.utils import i18n
 from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_fallback_languages, hide_untranslated
+from cms.utils.i18n import (
+    get_default_language_for_site,
+    get_fallback_languages,
+    hide_untranslated,
+    is_valid_site_language,
+)
 from cms.utils.permissions import get_view_restrictions
 from cms.utils.page import get_node_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
@@ -67,7 +72,7 @@ def get_visible_nodes(request, nodes, site):
     return [node for node in nodes if user_can_see_node(node)]
 
 
-def get_menu_node_for_page(renderer, page, language):
+def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     """
     Transform a CMS page into a navigation node.
 
@@ -75,6 +80,9 @@ def get_menu_node_for_page(renderer, page, language):
     :param page: the page you wish to transform
     :param language: The current language used to render the menu
     """
+    if fallbacks is None:
+        fallbacks = []
+
     node = page.get_node_object(renderer.site)
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
@@ -137,23 +145,27 @@ def get_menu_node_for_page(renderer, page, language):
     if exts:
         attr['navigation_extenders'] = exts
 
-    translation = page.get_title_obj(language, fallback=True)
+    for lang in [language] + fallbacks:
+        translation = page.title_cache[lang]
 
-    # Do we have a redirectURL?
-    attr['redirect_url'] = translation.redirect  # save redirect URL if any
+        if translation:
+            # Do we have a redirectURL?
+            attr['redirect_url'] = translation.redirect  # save redirect URL if any
 
-    # Now finally, build the NavigationNode object and return it.
-    ret_node = CMSNavigationNode(
-        translation.menu_title or translation.title,
-        url='',
-        id=page.pk,
-        parent_id=parent_id,
-        attr=attr,
-        visible=page.in_navigation,
-        path=translation.path or translation.slug,
-        language=(translation.language if translation.language != language else None),
-    )
-    return ret_node
+            # Now finally, build the NavigationNode object and return it.
+            ret_node = CMSNavigationNode(
+                title=translation.menu_title or translation.title,
+                url='',
+                id=page.pk,
+                parent_id=parent_id,
+                attr=attr,
+                visible=page.in_navigation,
+                path=translation.path or translation.slug,
+                language=(translation.language if translation.language != language else None),
+            )
+            return ret_node
+    else:
+        raise RuntimeError('Unable to render cms menu. There is a language misconfiguration.')
 
 
 class CMSNavigationNode(NavigationNode):
@@ -189,21 +201,37 @@ class CMSMenu(Menu):
         from cms.models import Title
 
         site = self.renderer.site
-        lang = self.renderer.language
+        lang = self.renderer.request_language
         nodes = get_node_queryset(
             site,
             published=not self.renderer.draft_mode_active,
         )
 
-        if hide_untranslated(lang, site.pk):
+        if is_valid_site_language(lang, site_id=site.pk):
+            _valid_language = True
+            _hide_untranslated = hide_untranslated(lang, site.pk)
+        else:
+            _valid_language = False
+            _hide_untranslated = False
+
+        if _valid_language:
+            fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
+            languages = [lang] + [_lang for _lang in fallbacks if _lang != lang]
+        else:
+            # The request language is not configured for the current site.
+            # Fallback to the default language configured for the current site.
+            languages = [get_default_language_for_site(site.pk)]
+            fallbacks = languages
+
+        if _valid_language and (_hide_untranslated or not fallbacks):
+            # The language is correctly configured for the site.
+            # But the user has opted out of displaying untranslated pages
+            # OR has not configured any fallbacks.
             if self.renderer.draft_mode_active:
                 nodes = nodes.filter(page__title_set__language=lang)
             else:
                 nodes = nodes.filter(page__publisher_public__title_set__language=lang)
             languages = [lang]
-        else:
-            fallbacks = get_fallback_languages(lang, site_id=site.pk)
-            languages = [lang] + (fallbacks or [])
 
         if self.renderer.draft_mode_active:
             nodes = nodes.select_related('page', 'parent__page')
@@ -244,14 +272,17 @@ class CMSMenu(Menu):
         # Build the blank title instances only once
         blank_title_cache = {language: EmptyTitle(language=language) for language in languages}
 
-        def _page_to_node(page):
-            page.title_cache = {trans.language: trans for trans in page.filtered_translations}
+        if lang not in blank_title_cache:
+            blank_title_cache[lang] = EmptyTitle(language=lang)
 
-            for language in languages:
-                # EmptyTitle is used to prevent the cms from trying
-                # to find a translation in the database
-                page.title_cache.setdefault(language, blank_title_cache[language])
-            return get_menu_node_for_page(self.renderer, page, language=lang)
+        def _page_to_node(page):
+            # EmptyTitle is used to prevent the cms from trying
+            # to find a translation in the database
+            page.title_cache = blank_title_cache.copy()
+
+            for trans in page.filtered_translations:
+                page.title_cache[trans.language] = trans
+            return get_menu_node_for_page(self.renderer, page, language=lang, fallbacks=fallbacks)
         return [_page_to_node(page=page) for page in pages]
 
 

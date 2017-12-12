@@ -944,6 +944,6 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
 
         output = tag.get_context(fake_context, 'fr')
         url = output['content']
-        self.assertEqual(url, '/fr/child_page/child_child_page/extra_1/')
+        self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
 
         self.apphook_clear()

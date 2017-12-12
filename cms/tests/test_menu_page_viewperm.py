@@ -264,9 +264,12 @@ class ViewPermissionTests(CMSTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'COOKIES': {},
+            'META': {},
             'POST': {},
             'GET': {},
             'path': path,
+            'path_info': path,
             'session': {},
         }
         return type('Request', (object,), attrs)

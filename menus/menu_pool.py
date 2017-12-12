@@ -9,9 +9,8 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import NoReverseMatch
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import get_language_from_request, ugettext_lazy as _
 
-from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load
 from cms.utils.moderator import use_draft
@@ -104,7 +103,7 @@ class MenuRenderer(object):
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.language = get_language_from_request(request)
+        self.request_language = get_language_from_request(request, check_path=True)
         self.site = Site.objects.get_current(request)
         self.draft_mode_active = use_draft(request)
 
@@ -113,7 +112,7 @@ class MenuRenderer(object):
 
         prefix = getattr(settings, 'CMS_CACHE_PREFIX', 'menu_cache_')
 
-        key = '%smenu_nodes_%s_%s' % (prefix, self.language, site_id)
+        key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, site_id)
 
         if self.request.user.is_authenticated():
             key += '_%s_user' % self.request.user.pk
@@ -133,7 +132,7 @@ class MenuRenderer(object):
             cache_key = self._get_cache_key(site_id=site_id)
             db_cache_key_lookup = CacheKey.objects.filter(
                 key=cache_key,
-                language=self.language,
+                language=self.request_language,
                 site=site_id,
             )
             # Cache the lookup to avoid a query on every call to a menu tag
@@ -209,7 +208,7 @@ class MenuRenderer(object):
             # the database. It's still cheaper than recomputing every time!
             # This way we can selectively invalidate per-site and per-language,
             # since the cache is shared but the keys aren't
-            CacheKey.objects.create(key=key, language=self.language, site=site_id)
+            CacheKey.objects.create(key=key, language=self.request_language, site=site_id)
         return final_nodes
 
     def _mark_selected(self, nodes):

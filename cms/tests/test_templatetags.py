@@ -249,7 +249,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             context = self.get_context(page_3.get_absolute_url())
             context['request'].current_page = page_3.publisher_public
             res = self.render_template_obj(tpl, context.__dict__, context['request'])
-            self.assertEqual(res, "/de/page-3/")
+            self.assertEqual(res, "/en/page-3/")
         lang_settings[1][1]['hide_untranslated'] = True
 
         with self.settings(CMS_LANGUAGES=lang_settings):
