@@ -9,6 +9,7 @@ import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
 import URI from 'urijs';
 import DiffDOM from 'diff-dom';
+import PreventParentScroll from 'prevent-parent-scroll';
 import { find, findIndex, once, remove, uniqWith, compact, isEqual } from 'lodash';
 import ls from 'local-storage';
 
@@ -100,6 +101,8 @@ class StructureBoard {
             toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
             toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
         };
+
+        this._preventScroll = new PreventParentScroll(this.ui.content[0]);
     }
 
     /**
@@ -703,6 +706,7 @@ class StructureBoard {
             this._makeFullWidth();
         }
 
+        this._preventScroll.start();
         this.ui.window.trigger('resize');
     }
 
@@ -756,6 +760,7 @@ class StructureBoard {
     _hideBoard() {
         // hide elements
         this.ui.container.hide();
+        this._preventScroll.stop();
 
         // this is sometimes required for user-side scripts to
         // render dynamic elements on the page correctly.

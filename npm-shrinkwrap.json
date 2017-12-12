@@ -812,9 +812,9 @@
       "dev": true
     },
     "bluebird": {
-      "version": "3.5.0",
+      "version": "3.5.1",
       "from": "bluebird@>=3.3.4 <4.0.0",
-      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.5.0.tgz",
+      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.5.1.tgz",
       "dev": true
     },
     "bn.js": {
@@ -1555,7 +1555,7 @@
     },
     "djangocms-casper-helpers": {
       "version": "3.0.0",
-      "from": "djangocms-casper-helpers@3.0.0",
+      "from": "djangocms-casper-helpers@>=3.0.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/djangocms-casper-helpers/-/djangocms-casper-helpers-3.0.0.tgz",
       "dev": true,
       "dependencies": {
@@ -5996,6 +5996,11 @@
       "from": "pretty-hrtime@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/pretty-hrtime/-/pretty-hrtime-1.0.3.tgz",
       "dev": true
+    },
+    "prevent-parent-scroll": {
+      "version": "0.0.6",
+      "from": "prevent-parent-scroll@latest",
+      "resolved": "https://registry.npmjs.org/prevent-parent-scroll/-/prevent-parent-scroll-0.0.6.tgz"
     },
     "private": {
       "version": "0.1.7",
