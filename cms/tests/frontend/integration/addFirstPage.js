@@ -126,6 +126,20 @@ casper.test.begin('Welcome page uses correct language 3', function(test) {
                 'Modal has correct language'
             );
         })
+        .thenOpen(globals.baseUrl + 'admin/cms/usersettings')
+        .waitForSelector('#content-main', function() {
+            test.assertExists('#id_language', 'language button exists');
+
+            // selects english language back
+            this.fill(
+                '#usersettings_form',
+                {
+                    language: 'en'
+                },
+                true
+            );
+        })
+        .wait(2000)
         .run(function() {
             test.done();
         });
