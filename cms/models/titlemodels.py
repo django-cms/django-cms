@@ -32,7 +32,7 @@ class Title(models.Model):
                                   help_text=_("overwrite the title in the menu"))
     meta_description = models.TextField(_("description"), max_length=155, blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
-    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False, allow_unicode=True)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
