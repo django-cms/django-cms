@@ -64,11 +64,41 @@ casper.test.begin('Plugins can be copied from same page in a different language'
         .waitUntilVisible('.cms-submenu-dropdown', function() {
             this.click('.cms-submenu-dropdown [data-rel="copy-lang"]');
         })
-        .waitForResource(/copy-plugins/)
         .then(cms.waitUntilContentIsRefreshed())
         .waitForSelector('.cms-toolbar-expanded', function() {
             test.assertElementCount('.cms-plugin', 1, 'Plugin was copied from english page');
             test.assertSelectorHasText('.cms-plugin', 'Test text', 'Plugin was copied from english page');
+        })
+        // need to test that immediately after pasting from different language drag n drop works
+        // (target language change #6162)
+        .then(function() {
+            var placeholder = this.getElementBounds('.cms-dragarea:nth-child(2) .cms-draggables');
+
+            this.evaluate(function() {
+                // changing delay here because casper doesn't understand
+                // that we want to wait 100 ms after "picking up" the plugin
+                // for sortable to work
+                CMS.API.StructureBoard.ui.sortables.nestedSortable('option', 'delay', 0);
+            });
+
+            this.mouse.down('.cms-dragarea:first-child > .cms-draggables > .cms-draggable');
+            this.mouse.move(placeholder.left + placeholder.width / 2, placeholder.top + placeholder.height * 0.2);
+        })
+        .then(function() {
+            this.mouse.up('.cms-dragarea:nth-child(2) .cms-draggables');
+            test.assertElementCount(
+                '.cms-dragarea:nth-child(2) > .cms-draggables > .cms-draggable',
+                1,
+                'Plugin moved to another placeholder'
+            );
+        })
+        .then(cms.waitUntilContentIsRefreshed())
+        .then(function() {
+            test.assertElementCount(
+                '.cms-dragarea:nth-child(2) > .cms-draggables > .cms-draggable',
+                1,
+                'Plugin moved to another placeholder'
+            );
         })
         .run(function() {
             test.done();
