@@ -332,8 +332,9 @@ class TestLanguageFallbacks(CMSTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         response = self.client.get('/en/')
-        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
+        response = self.client.get('/fr/')
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(
         CMS_LANGUAGES={

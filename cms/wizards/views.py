@@ -8,13 +8,13 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import NoReverseMatch
 from django.template.response import SimpleTemplateResponse
-from django.utils.translation import get_language_from_request
 
 from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
 from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_1_10
+from cms.utils.i18n import get_site_language_from_request
 
 from .wizard_pool import wizard_pool
 from .forms import (
@@ -98,9 +98,7 @@ class WizardCreateView(SessionWizardView):
                 kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
             else:
                 kwargs['wizard_page'] = None
-
-            kwargs['wizard_language'] = self.request.GET.get(
-                'language', get_language_from_request(self.request))
+            kwargs['wizard_language'] = get_site_language_from_request(self.request)
 
         if kwargs['wizard_page']:
             kwargs['wizard_page_node'] = kwargs['wizard_page'].get_node_object(self.site)

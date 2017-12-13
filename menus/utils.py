@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-from cms.models.titlemodels import Title
-from cms.utils import get_language_from_request
-from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch, reverse, resolve
+
+from cms.utils import get_current_site, get_language_from_request
+from cms.utils.i18n import (
+    force_language,
+    get_default_language_for_site,
+    get_fallback_languages,
+    hide_untranslated,
+    is_valid_site_language,
+)
 
 
 def mark_descendants(nodes):
@@ -91,17 +97,43 @@ class DefaultLanguageChanger(object):
 
     def get_page_path(self, lang):
         page = getattr(self.request, 'current_page', None)
-        if page:
-            with force_language(lang):
-                try:
-                    return page.get_absolute_url(language=lang, fallback=False)
-                except (Title.DoesNotExist, NoReverseMatch):
-                    if hide_untranslated(lang) and settings.USE_I18N:
-                        return '/%s/' % lang
-                    else:
-                        return page.get_absolute_url(language=lang, fallback=True)
-        else:
+
+        if not page:
             return '/%s/' % lang if settings.USE_I18N else '/'
+
+        page_languages = page.get_languages()
+
+        if lang in page_languages:
+            return page.get_absolute_url(lang, fallback=False)
+
+        site = get_current_site()
+
+        if is_valid_site_language(lang, site_id=site.pk):
+            _valid_language = True
+            _hide_untranslated = hide_untranslated(lang, site.pk)
+        else:
+            _valid_language = False
+            _hide_untranslated = False
+
+        if _hide_untranslated and settings.USE_I18N:
+            return '/%s/' % lang
+
+        default_language = get_default_language_for_site(site.pk)
+
+        if not _valid_language and default_language in page_languages:
+            # The request language is not configured for the current site.
+            # Fallback to the default language configured for the current site.
+            return page.get_absolute_url(default_language, fallback=False)
+
+        if _valid_language:
+            fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
+            fallbacks = [_lang for _lang in fallbacks if _lang in page_languages]
+        else:
+            fallbacks = []
+
+        if fallbacks:
+            return page.get_absolute_url(fallbacks[0], fallback=False)
+        return '/%s/' % lang if settings.USE_I18N else '/'
 
     def __call__(self, lang):
         page_language = get_language_from_request(self.request)

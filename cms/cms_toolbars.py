@@ -15,7 +15,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, force_language, get_language_dict, get_default_language
+from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
 from cms.utils.permissions import get_user_sites_queryset
 from cms.utils.page_permissions import (
     user_can_change_page,
@@ -81,12 +81,10 @@ class PlaceholderToolbar(CMSToolbar):
             page_pk = ''
             disabled = True
 
-        lang = get_language_from_request(self.request, current_page=self.page) or get_default_language()
-
         url = '{url}?page={page}&language={lang}&edit'.format(
             url=reverse("cms_wizard_create"),
             page=page_pk,
-            lang=lang,
+            lang=self.toolbar.site_language,
         )
         self.toolbar.add_modal_button(title, url,
                                       side=self.toolbar.RIGHT,
@@ -733,7 +731,7 @@ class PageToolbar(CMSToolbar):
                     on_success=refresh,
                 )
 
-            if not self.page.is_page_type:
+            if self.current_lang and not self.page.is_page_type:
                 # revert to live
                 current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
                 revert_action = admin_reverse('cms_page_revert_to_live', args=(self.page.pk, self.current_lang))

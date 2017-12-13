@@ -5,6 +5,7 @@ import operator
 import warnings
 
 from cms import __version__
+from cms.api import get_page_draft
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models import UserSettings, Placeholder
@@ -15,7 +16,7 @@ from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import force_language
+from cms.utils.i18n import get_site_language_from_request, force_language
 
 from classytags.utils import flatten_context
 
@@ -33,6 +34,29 @@ class BaseToolbar(ToolbarAPIMixin):
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+
+    @property
+    def language(self):
+        # Backwards compatibility
+        warnings.warn(
+            "toolbar.language has been deprecated "
+            "and will be removed in django CMS 3.6",
+            PendingDeprecationWarning
+        )
+        return self.request_language
+
+    @cached_property
+    def site_language(self):
+        cms_page = get_page_draft(self.request.current_page)
+        return get_site_language_from_request(self.request, cms_page)
+
+    @cached_property
+    def request_language(self):
+        if settings.USE_I18N:
+            language = get_language_from_request(self.request)
+        else:
+            language = settings.LANGUAGE_CODE
+        return language
 
     def get_content_renderer(self):
         if self.uses_legacy_structure_mode:
@@ -108,7 +132,6 @@ class CMSToolbar(BaseToolbar):
         self.is_staff = None
         self.show_toolbar = None
         self.clipboard = None
-        self.language = None
         self.toolbar_language = None
         self.show_toolbar = True
         self.init_toolbar(request, request_path=request_path)
@@ -119,7 +142,7 @@ class CMSToolbar(BaseToolbar):
         # request cannot be cached.
         self._cache_disabled = self.edit_mode_active or self.show_toolbar
 
-        with force_language(self.language):
+        with force_language(self.request_language):
             try:
                 decorator = resolve(self.request_path).func
                 try:
@@ -166,13 +189,9 @@ class CMSToolbar(BaseToolbar):
 
         if self.request.session.get('cms_toolbar_disabled', False):
             self.show_toolbar = False
-        if settings.USE_I18N:
-            self.language = get_language_from_request(request)
-        else:
-            self.language = settings.LANGUAGE_CODE
 
         # We need to store the current language in case the user's preferred language is different.
-        self.toolbar_language = self.language
+        self.toolbar_language = self.request_language
 
         if self.is_staff:
             user_settings = self.user_settings
@@ -180,7 +199,7 @@ class CMSToolbar(BaseToolbar):
                     not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
                 self.toolbar_language = user_settings.language
             else:
-                user_settings.language = self.language
+                user_settings.language = self.request_language
                 user_settings.save()
             self.clipboard = user_settings.clipboard
 
@@ -225,7 +244,7 @@ class CMSToolbar(BaseToolbar):
                 placeholder = Placeholder.objects.create(slot="clipboard")
                 user_settings = UserSettings.objects.create(
                     clipboard=placeholder,
-                    language=self.language,
+                    language=self.request_language,
                     user=self.request.user,
                 )
         return user_settings
@@ -315,7 +334,7 @@ class CMSToolbar(BaseToolbar):
 
     def get_object_public_url(self):
         if self.obj:
-            with force_language(self.language):
+            with force_language(self.request_language):
                 try:
                     return self.obj.get_public_url()
                 except:
@@ -324,7 +343,7 @@ class CMSToolbar(BaseToolbar):
 
     def get_object_draft_url(self):
         if self.obj:
-            with force_language(self.language):
+            with force_language(self.request_language):
                 try:
                     return self.obj.get_draft_url()
                 except:
