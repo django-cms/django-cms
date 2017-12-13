@@ -920,10 +920,15 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
 
         if self.publisher_public_id:
             public_page = Page.objects.get(pk=self.publisher_public_id)
+            public_languages = public_page.get_languages()
         else:
             public_page = Page(created_by=self.created_by)
+            public_languages = [language]
 
         self._copy_attributes(public_page, clean=False)
+
+        if language not in public_languages:
+            public_languages.append(language)
 
         # TODO: Get rid of the current user thread hack
         public_page.changed_by = get_current_user_name()
@@ -931,7 +936,7 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
         public_page.publication_date = self.publication_date or now()
         public_page.publisher_public = self
         public_page.publisher_is_draft = False
-        public_page.languages = self.languages
+        public_page.languages = ','.join(public_languages)
         public_page.save()
 
         # Copy the page translation (title) matching language

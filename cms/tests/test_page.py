@@ -458,6 +458,28 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertPublished(delta.reload())
         self.assertPublished(theta.reload())
 
+    def test_publish_page_regression_6188(self):
+        # ref: https://github.com/divio/django-cms/issues/6188
+        page = create_page("en-page", "nav_playground.html", "en", published=False)
+        create_title('de', 'de-page', page)
+        create_title('fr', 'fr-page', page)
+
+        # Publishing the en language should set "en" as the only language
+        # on the public version of the page.
+        page.publish("en")
+
+        self.assertListEqual(sorted(page.publisher_public.get_languages()), ['en'])
+
+        page.publish("de")
+
+        # Now there should be "en" and "de" on the public page
+        self.assertSequenceEqual(sorted(page.publisher_public.get_languages()), ['de', 'en'])
+
+        page.publish("fr")
+
+        # Now there should be "en", "de" and "fr" on the public page
+        self.assertSequenceEqual(sorted(page.publisher_public.get_languages()), ['de', 'en', 'fr'])
+
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
         child = create_page("Child", constants.TEMPLATE_INHERITANCE_MAGIC,

@@ -330,9 +330,11 @@ class PublishingTests(TestCase):
 
     def test_publish_single(self):
         name = self._testMethodName
-        page = self.create_page(name, published=False)
         drafts = Page.objects.drafts()
         public = Page.objects.public()
+        page = self.create_page(name, published=False)
+        create_title('de', 'de-page', page)
+        create_title('fr', 'fr-page', page)
 
         self.assertNeverPublished(page)
         self.assertObjectExist(drafts, title_set__title=name)
@@ -344,17 +346,34 @@ class PublishingTests(TestCase):
         self.assertPublished(page.reload())
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(public, title_set__title=name)
-        self.assertObjectExist(public.published("en"), title_set__title=name)
+        self.assertFalse(public.published("de").exists())
+        self.assertFalse(public.published("fr").exists())
+        self.assertSequenceEqual(page.publisher_public.get_languages(), ['en'])
 
     def test_publish_admin(self):
-        page = self.create_page("test_admin", published=False)
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
+        name = 'test_admin'
+        drafts = Page.objects.drafts()
+        public = Page.objects.public()
+        page = self.create_page(name, published=False)
+        create_title('de', 'de-page', page)
+        create_title('fr', 'fr-page', page)
+
+        self.assertNeverPublished(page)
+        self.assertObjectExist(drafts, title_set__title=name)
+        self.assertObjectDoesNotExist(public, title_set__title=name)
+        self.assertObjectDoesNotExist(public.published("en"), title_set__title=name)
+
+        with self.login_user_context(self.get_superuser()):
             response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
-        page = Page.objects.get(pk=page.pk)
 
-        self.assertEqual(page.get_publisher_state('en'), 0)
+        page = page.reload()
+        self.assertPublished(page)
+        self.assertObjectExist(drafts, title_set__title=name)
+        self.assertObjectExist(public, title_set__title=name)
+        self.assertFalse(public.published("de").exists())
+        self.assertFalse(public.published("fr").exists())
+        self.assertSequenceEqual(page.publisher_public.get_languages(), ['en'])
 
     def test_publish_wrong_lang(self):
         page = self.create_page("test_admin", published=False)
