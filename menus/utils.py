@@ -101,7 +101,7 @@ class DefaultLanguageChanger(object):
         if not page:
             return '/%s/' % lang if settings.USE_I18N else '/'
 
-        page_languages = page.get_languages()
+        page_languages = page.get_published_languages()
 
         if lang in page_languages:
             return page.get_absolute_url(lang, fallback=False)
