@@ -291,6 +291,10 @@ var Plugin = new Class({
             data.parent = that._getId(dragitem.parent().closest('.cms-draggable'));
             data.move_a_copy = true;
 
+            // expand the plugin we paste to
+            CMS.settings.states.push(data.parent);
+            Helpers.setSettings(CMS.settings);
+
             that.movePlugin(data);
         });
 
@@ -882,167 +886,6 @@ var Plugin = new Class({
         // TODO: see above
         // return this;
     },
-
-    /**
-     * Moves the plugin according to the place it should have in content mode.
-     *
-     * @method _setPosition
-     * @private
-     * @param {String} id
-     * @param {jQuery} plugin the `.cms-plugin` element
-     * @param {jQuery} dragitem the `.cms-draggable` of the plugin
-     * @returns {Boolean} requires reload?
-     */
-    // eslint-disable-next-line max-params
-    // _setPosition: function (id, plugin, dragitem, previousParentPluginId) {
-    //     // after we insert the plugin onto its new place, we need to figure out where to position it
-    //     var prevItem = dragitem.prev('.cms-draggable');
-    //     var nextItem = dragitem.next('.cms-draggable');
-    //     var parent = dragitem.parent().closest('.cms-draggable');
-    //     var child = $('.cms-plugin-' + this._getId(parent));
-    //     var placeholder = dragitem.closest('.cms-dragarea');
-    //     var pluginId = this._getId(dragitem);
-    //
-    //     // determine if there are other plugins within the same level, this makes the move easier
-    //     // in case "editMode" plugin DOM exists, proceed
-    //     if (plugin.length) {
-    //         this._removeOldParentsData({
-    //             plugin: plugin,
-    //             pluginId: pluginId,
-    //             previousParentPluginId: previousParentPluginId
-    //         });
-    //
-    //         // there is a dragitem in a tree right before the new place
-    //         if (prevItem.length) {
-    //             var previousItemId = this._getId(prevItem);
-    //             var previousPlugin = $('.cms-plugin-' + previousItemId + ':last');
-    //
-    //             if (previousPlugin.length) {
-    //                 plugin.insertAfter(previousPlugin);
-    //                 // meaning there are parent plugins with no DOM
-    //                 this._addNewParentsData({
-    //                     sibling: previousPlugin,
-    //                     siblingId: previousItemId,
-    //                     plugin: plugin
-    //                 });
-    //                 return false;
-    //             }
-    //         } else if (nextItem.length) {
-    //             var nextItemId = this._getId(nextItem);
-    //             var nextPlugin = $('.cms-plugin-' + nextItemId + ':first');
-    //
-    //             if (nextPlugin.length) {
-    //                 plugin.insertBefore(nextPlugin);
-    //                 // meaning there are parent plugins with no DOM
-    //                 this._addNewParentsData({
-    //                     sibling: nextPlugin,
-    //                     siblingId: nextItemId,
-    //                     plugin: plugin
-    //                 });
-    //                 return false;
-    //             }
-    //         } else if (parent.length && child.length) {
-    //             // if we can't find a plugin on the same level, we need to travel higher
-    //             // for this we need to find the deepest child
-    //
-    //             // TODO this is _just_ an assumtion because in reality we do not know where
-    //             // the children would be positioned in case the plugin contains multiple divs
-    //             // so instead of putting them into one of the tree paths we should just reload
-    //             while (child.children().length) {
-    //                 child = child.children();
-    //             }
-    //             child.append(plugin);
-    //             return false;
-    //         } else if (!parent.length && placeholder.length) {
-    //             // we also need to cover the case if we move the plugin to an empty placeholder
-    //             plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
-    //             return false;
-    //         }
-    //     }
-    //
-    //     // if we did not found any match, require reload
-    //     return true;
-    // },
-
-    /**
-     * If a plugin is moved to the the plugin that has no DOM representation
-     * we need to add the data about this plugin to the freshly moved node.
-     * Adds the appropriate classes and pushes data into "cms". The parent data
-     * is taken from the sibling provided. If the sibling doesn't contain multiple plugins - noop.
-     *
-     * @method _addNewParentsData
-     * @private
-     * @param {Object} options options
-     * @param {jQuery} options.sibling element
-     * @param {String|Number} options.siblingId
-     * @param {jQuery} options.plugin the plugin that has been just moved
-     */
-    // _addNewParentsData: function _addNewParentsData(options) {
-    //     if (Plugin._isContainingMultiplePlugins(options.sibling)) {
-    //         // add more data to it and classes
-    //         // there could be one or more parents
-    //         var plugin = options.plugin;
-    //         var siblingPluginData = options.sibling.data('cms').slice(0); // clones so we don't mutate data
-    //         var ownIndex = siblingPluginData.findIndex(function (pluginData) {
-    //             return pluginData.plugin_id === options.siblingId;
-    //         });
-    //         var siblingPluginParentsData = siblingPluginData.slice(ownIndex + 1);
-    //
-    //         siblingPluginParentsData.forEach(function (pluginData) {
-    //             plugin.each(function () {
-    //                 $(this)
-    //                     .addClass('cms-plugin-' + pluginData.plugin_id)
-    //                     .data('cms').push(pluginData);
-    //             });
-    //         });
-    //     }
-    // },
-
-    /**
-     * If we move a plugin out of a plugin that had a parent with no own DOM
-     * then the parent's data has to be removed from this plugin. If the plugin
-     * does not contain multiple plugins - noop.
-     *
-     * @method _removeOldParentsData
-     * @private
-     * @param {Object} options
-     * @param {jQuery} options.plugin element
-     * @param {String|Number} options.pluginId
-     * @param {String|Number} options.previousParentPluginId
-     */
-    // _removeOldParentsData: function _removeOldParentsData(options) {
-    //     var plugin = options.plugin;
-    //     var pluginId = options.pluginId;
-    //     var previousParentPluginId = options.previousParentPluginId;
-    //
-    //     if (Plugin._isContainingMultiplePlugins(plugin)) {
-    //         var currentPluginData = plugin.data('cms').slice(0); // clone array
-    //         // if plugin contains multiple parents then it _has to_ have a previous parent
-    //         var parentIndex = currentPluginData.findIndex(function (pluginData) {
-    //             return pluginData.plugin_id === previousParentPluginId;
-    //         });
-    //         var ownIndex = currentPluginData.findIndex(function (pluginData) {
-    //             return pluginData.plugin_id === pluginId;
-    //         });
-    //
-    //         var newPluginData = currentPluginData.slice(pluginId, parentIndex + 1);
-    //         var parentPluginData = currentPluginData.slice(0, ownIndex)
-    //             .concat(currentPluginData.slice(parentIndex));
-    //
-    //         plugin.each(function () {
-    //             $(this).data('cms', newPluginData);
-    //         });
-    //
-    //         parentPluginData.forEach(function (pluginData) {
-    //             plugin.removeClass('cms-plugin-' + pluginData.plugin_id);
-    //         });
-    //
-    //         // if it was a last plugin in the parent we could create a dummy in place
-    //         // so things can still be moved to it
-    //         // however, if we don't do anything, next plugin moving into it will just
-    //         // trigger a reload, so "not now"
-    //     }
-    // },
 
     /**
      * Called after plugin is added through ajax.
@@ -1929,7 +1772,6 @@ var Plugin = new Class({
     }
 });
 
-// TODO: It would be nicer to have them under a nested object like Plugin.events = {} IMHO
 Plugin.click = 'click.cms.plugin';
 Plugin.pointerUp = 'pointerup.cms.plugin';
 Plugin.pointerDown = 'pointerdown.cms.plugin';
@@ -1953,7 +1795,6 @@ Plugin.touchEnd = 'touchend.cms.plugin';
 Plugin._updateRegistry = function _updateRegistry(plugins) {
     plugins.forEach(pluginData => {
         const pluginContainer = `cms-plugin-${pluginData.plugin_id}`;
-        // TODO this can be slone on huge number of plugins
         const pluginIndex = findIndex(CMS._plugins, ([pluginStr]) => pluginStr === pluginContainer);
 
         if (pluginIndex === -1) {
