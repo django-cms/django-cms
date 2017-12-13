@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
+from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
@@ -28,7 +29,6 @@ from cms.test_utils.testcases import (
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import installed_apps
-from cms.utils.i18n import force_language
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 

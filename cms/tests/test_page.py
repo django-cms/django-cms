@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.timezone import now as tz_now
+from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.api import create_page, add_plugin, create_title, publish_page
@@ -22,7 +23,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import force_language
 from cms.utils.page import (
     get_available_slug,
     get_current_site,

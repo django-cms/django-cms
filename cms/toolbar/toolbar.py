@@ -16,7 +16,7 @@ from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_site_language_from_request, force_language
+from cms.utils.i18n import get_site_language_from_request
 
 from classytags.utils import flatten_context
 
@@ -25,6 +25,7 @@ from django.core.urlresolvers import resolve, Resolver404
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
+from django.utils.translation import override as force_language
 
 
 class BaseToolbar(ToolbarAPIMixin):

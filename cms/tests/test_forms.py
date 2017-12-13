@@ -2,6 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (PagePermissionInlineAdminForm,
@@ -18,7 +19,6 @@ from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
 )
 from cms.utils import get_current_site
-from cms.utils.i18n import force_language
 
 
 class Mock_PageSelectFormField(PageSelectFormField):

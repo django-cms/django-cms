@@ -11,6 +11,7 @@ from django.core.urlresolvers import clear_url_caches, reverse, resolve, NoRever
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.timezone import now
+from django.utils.translation import override as force_language
 
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
@@ -24,7 +25,6 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger

@@ -2,11 +2,11 @@
 from django.core.urlresolvers import reverse
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
+from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
-from cms.utils import i18n
 from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
@@ -190,7 +190,7 @@ class CMSNavigationNode(NavigationNode):
 
     def get_absolute_url(self):
         if self.language:
-            with i18n.force_language(self.language):
+            with force_language(self.language):
                 return self._get_absolute_url()
         return self._get_absolute_url()
 
