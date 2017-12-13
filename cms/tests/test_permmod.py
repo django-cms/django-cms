@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils.translation import override as force_language
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
@@ -26,7 +27,6 @@ from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, CMSTestCase)
 from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
-from cms.utils.i18n import force_language
 from cms.utils.page import get_page_from_path
 from cms.utils.page_permissions import user_can_publish_page, user_can_view_page
 

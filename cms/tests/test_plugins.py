@@ -17,6 +17,7 @@ from django.forms.widgets import Media
 from django.test.testcases import TestCase
 from django.utils import timezone
 from django.utils.encoding import force_text
+from django.utils.translation import override as force_language
 
 from cms import api
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
@@ -43,7 +44,6 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.i18n import force_language
 from cms.utils.plugins import get_plugins
 from django.utils.http import urlencode
 

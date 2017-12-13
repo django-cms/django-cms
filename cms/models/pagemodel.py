@@ -12,7 +12,11 @@ from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import (
+    get_language,
+    override as force_language,
+    ugettext_lazy as _,
+)
 
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
@@ -23,6 +27,7 @@ from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.helpers import reversion_register
+from cms.utils.i18n import get_current_language
 
 from menus.menu_pool import menu_pool
 
@@ -347,8 +352,9 @@ class Page(six.with_metaclass(PageMetaClass, models.Model)):
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
-            language = get_language()
-        with i18n.force_language(language):
+            language = get_current_language()
+
+        with force_language(language):
             if self.is_home:
                 return reverse('pages-root')
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)

@@ -3,10 +3,9 @@ import json
 
 from django.utils.encoding import force_text
 from django.utils.six import text_type
-from django.utils.translation import ugettext
+from django.utils.translation import override as force_language, ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.utils.i18n import force_language
 
 
 def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):

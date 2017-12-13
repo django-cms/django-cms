@@ -5,7 +5,7 @@ from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import override as force_language, ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
@@ -15,7 +15,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
+from cms.utils.i18n import get_language_tuple, get_language_dict
 from cms.utils.permissions import get_user_sites_queryset
 from cms.utils.page_permissions import (
     user_can_change_page,

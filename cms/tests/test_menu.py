@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
-from django.utils.translation import activate
+from django.utils.translation import activate, override as force_language
 from cms.apphook_pool import apphook_pool
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
@@ -27,7 +27,6 @@ from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import force_language
 
 
 class BaseMenuTest(CMSTestCase):

@@ -16,7 +16,7 @@ from django.utils.encoding import smart_text, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.six import string_types
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import get_language, override as force_language, ugettext_lazy as _
 
 from classytags.arguments import (Argument, MultiValueArgument,
                                   MultiKeywordArgument)
@@ -33,7 +33,6 @@ from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request, get_site_id
 from cms.utils.compat.dj import get_middleware
-from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name

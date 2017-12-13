@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from django.utils.translation import override as force_language
 
 from cms.api import create_page, add_plugin, create_title
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
@@ -15,7 +16,6 @@ from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 
 
