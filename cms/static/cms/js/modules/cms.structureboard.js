@@ -896,6 +896,7 @@ class StructureBoard {
                     // check if we copy/paste a plugin or not
                     if (originalPluginContainer.hasClass('cms-clipboard-containers')) {
                         originalPluginContainer.html(plugin.eq(0).clone(true, true));
+                        Plugin._updateClipboard();
                         plugin.trigger('cms-paste-plugin-update', [eventData]);
                     } else {
                         plugin.trigger('cms-plugins-update', [eventData]);

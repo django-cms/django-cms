@@ -447,6 +447,7 @@ class Modal {
             duration = opts.duration;
         }
 
+        this.trigger('cms.modal.close');
         this.ui.frame.empty();
         this.ui.modalBody.removeClass('cms-loader');
         this.ui.modal.removeClass('cms-modal-open');

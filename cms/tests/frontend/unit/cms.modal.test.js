@@ -1095,7 +1095,8 @@ describe('CMS.Modal', function() {
 
         it('triggers cms.modal.closed', function() {
             modal._hide({ duration: 10000000 });
-            expect(modal.trigger).not.toHaveBeenCalled();
+            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.close');
+            expect(modal.trigger).not.toHaveBeenCalledWith('cms.modal.closed');
             jasmine.clock().tick(modal.options.duration);
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.closed');
         });

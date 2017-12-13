@@ -76,8 +76,9 @@ var Clipboard = new Class({
                 // cannot be cached
                 $('.cms-add-plugin-placeholder').remove();
             })
-            .on('cms.modal.closed cms.modal.load', function() {
+            .on('cms.modal.close cms.modal.load', function() {
                 that.ui.pluginsList.prependTo(that.ui.clipboard);
+                Plugin._updateClipboard();
             })
             .ui.modal.on('cms.modal.load', function() {
                 that.ui.pluginsList.prependTo(that.ui.clipboard);
