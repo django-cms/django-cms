@@ -1198,14 +1198,7 @@ class StructureBoard {
             StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
         });
 
-        // FIXME When moving - update this from CMS.states instead
-        // When pasting - keep this
-        const topLevel = $(`.cms-draggable-${data.plugins[0].plugin_id} > .cms-dragitem`);
-
-        // istanbul ignore else
-        if (!topLevel.hasClass('cms-dragitem-expanded')) {
-            topLevel.find('> .cms-dragitem-text').trigger('click');
-        }
+        StructureBoard._initializeDragItemsStates();
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
@@ -1431,61 +1424,6 @@ class StructureBoard {
         StructureBoard.actualizeEmptyPlaceholders();
     }
 
-    // this method currently isn't used, but in order to
-    // fix some of the edge cases we might have to use it again
-    // istanbul ignore next
-    _getPluginIdsFromMarkup(markup) {
-        const element = $(markup);
-        const pluginId = this.getId(element);
-        const pluginChildren = element.find('.cms-draggable');
-        let pluginIds = [pluginId];
-
-        if (pluginChildren.length) {
-            pluginIds = pluginIds.concat(pluginChildren.toArray().map(el => this.getId($(el)).trim()));
-        }
-
-        return pluginIds;
-    }
-
-    /*
-      // usage:
-      const pluginIdsToInit = this._getPluginIdsFromMarkup(newPluginStructure);
-
-      ... find the ones that aren't initialized
-
-      const pluginDataToInit = this._getPluginDataFromText(
-      $(new DOMParser().parseFromString(response, 'text/html').documentElement)
-         .find('script[data-cms]')
-         .filter((i, el) => $(el).text().match(new RegExp(`cms-plugin-${data.plugin_id}`)))
-         .text(),
-          pluginIdsToAdd
-      );
-    */
-    // istanbul ignore next
-    _getPluginDataFromText(text, pluginIds) {
-        return compact(
-            pluginIds.map(pluginId => {
-                // oh boy there should be an easier way
-                const regex = new RegExp(`CMS._plugins.push\\((\\["cms\-plugin\-${pluginId}",[\\s\\S]*?\\])\\);`, 'g');
-                const matches = regex.exec(text);
-                let settings;
-
-                if (matches) {
-                    try {
-                        settings = JSON.parse(matches[1]);
-                    } catch (e) {
-                        // don't really see those happening
-                        settings = false;
-                    }
-                } else {
-                    settings = false;
-                }
-
-                return settings;
-            })
-        );
-    }
-
     /**
      * Similar to CMS.Plugin populates globally required
      * variables, that only need querying once, e.g. placeholders.
@@ -1593,7 +1531,7 @@ class StructureBoard {
  * @private
  */
 // istanbul ignore next
-StructureBoard._initializeDragItemsStates = once(function _initializeDragItemsStates() {
+StructureBoard._initializeDragItemsStates = function _initializeDragItemsStates() {
     // removing duplicate entries
     var states = CMS.settings.states || [];
     var sortedArr = states.sort();
@@ -1616,7 +1554,7 @@ StructureBoard._initializeDragItemsStates = once(function _initializeDragItemsSt
             el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
         }
     });
-});
+};
 
 // shorthand for jQuery(document).ready();
 $(StructureBoard._initializeGlobalHandlers);
