@@ -921,15 +921,22 @@ class MenuTests(BaseMenuTest):
         language on the current site.
         """
         # Refs - https://github.com/divio/django-cms/issues/6179
-        de_site = Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
-        defaults = {
-            'site': de_site,
+        site_2 = Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+        de_defaults = {
+            'site': site_2,
             'template': 'nav_playground.html',
             'language': 'de',
         }
-        create_page('DE-P1', published=True, in_navigation=True, **defaults)
-        create_page('DE-P2', published=True, in_navigation=True, **defaults)
-        create_page('DE-P3', published=True, in_navigation=True, **defaults)
+        fr_defaults = {
+            'site': site_2,
+            'template': 'nav_playground.html',
+            'language': 'fr',
+        }
+        create_page('DE-P1', published=True, in_navigation=True, **de_defaults)
+        create_page('DE-P2', published=True, in_navigation=True, **de_defaults)
+        create_page('DE-P3', published=True, in_navigation=True, **de_defaults)
+        create_page('FR-P1', published=True, in_navigation=True, **fr_defaults)
+        create_page('FR-P2', published=True, in_navigation=True, **fr_defaults)
 
         with self.settings(SITE_ID=2):
             request = self.get_request('/en/')
@@ -938,13 +945,19 @@ class MenuTests(BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
-            self.assertEqual(len(nodes), 3)
+            self.assertEqual(len(nodes), 5)
             self.assertEqual(nodes[0].title, 'DE-P1')
             self.assertEqual(nodes[0].get_absolute_url(), '/de/de-p1/')
             self.assertEqual(nodes[1].title, 'DE-P2')
             self.assertEqual(nodes[1].get_absolute_url(), '/de/de-p2/')
             self.assertEqual(nodes[2].title, 'DE-P3')
             self.assertEqual(nodes[2].get_absolute_url(), '/de/de-p3/')
+            self.assertEqual(nodes[3].title, 'FR-P1')
+            self.assertEqual(nodes[3].get_absolute_url(), '/fr/fr-p1/')
+            self.assertEqual(nodes[4].title, 'FR-P2')
+            self.assertEqual(nodes[4].get_absolute_url(), '/fr/fr-p2/')
+
+        menu_pool.clear(site_id=2)
 
         with self.settings(SITE_ID=2):
             request = self.get_request('/en/de-p2/')
@@ -953,15 +966,106 @@ class MenuTests(BaseMenuTest):
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
-            self.assertEqual(len(nodes), 3)
+            self.assertEqual(len(nodes), 5)
             self.assertEqual(nodes[0].title, 'DE-P1')
             self.assertEqual(nodes[0].get_absolute_url(), '/de/de-p1/')
             self.assertEqual(nodes[1].title, 'DE-P2')
             self.assertEqual(nodes[1].get_absolute_url(), '/de/de-p2/')
             self.assertEqual(nodes[2].title, 'DE-P3')
             self.assertEqual(nodes[2].get_absolute_url(), '/de/de-p3/')
+            self.assertEqual(nodes[3].title, 'FR-P1')
+            self.assertEqual(nodes[3].get_absolute_url(), '/fr/fr-p1/')
+            self.assertEqual(nodes[4].title, 'FR-P2')
+            self.assertEqual(nodes[4].get_absolute_url(), '/fr/fr-p2/')
+
+    def test_render_menu_with_invalid_language_and_page(self):
+        """
+        This tests an edge-case where the user requests a
+        language not configure for the current site
+        while having pages on the current site with unconfigured
+        translations.
+        """
+        # Refs - https://github.com/divio/django-cms/issues/6179
+        site_2 = Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
+        de_defaults = {
+            'site': site_2,
+            'template': 'nav_playground.html',
+            'language': 'de',
+            'in_navigation': True,
+        }
+        nl_defaults = {
+            'site': site_2,
+            'template': 'nav_playground.html',
+            'in_navigation': True,
+        }
+        create_page('DE-P1', published=True, **de_defaults)
+        create_page('DE-P2', published=True, **de_defaults)
+        create_page('DE-P3', published=True, **de_defaults)
+
+        # The nl language is not configured for the current site
+        # as a result, we have to create the pages manually.
+        nl_page_1 = Page.objects.create(**nl_defaults)
+        nl_page_1.attach_site(site=site_2, target=None)
+        nl_page_1.title_set.create(
+            language='nl',
+            title='NL-P1',
+            slug='nl-p1',
+        )
+        nl_page_1.publish('nl')
+
+        nl_page_2 = Page.objects.create(**nl_defaults)
+        nl_page_2.attach_site(site=site_2, target=None)
+        nl_page_2.title_set.create(
+            language='nl',
+            title='NL-P2',
+            slug='nl-p2',
+        )
+        nl_page_2.publish('nl')
+        create_title('fr', 'FR-P2', nl_page_2)
+        nl_page_2.publish('fr')
+
+        with self.settings(SITE_ID=2):
+            request = self.get_request('/en/')
+            context = Context()
+            context['request'] = request
+            tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+            tpl.render(context)
+            nodes = context['children']
+            self.assertEqual(len(nodes), 4)
+            self.assertEqual(nodes[0].title, 'DE-P1')
+            self.assertEqual(nodes[0].get_absolute_url(), '/de/de-p1/')
+            self.assertEqual(nodes[1].title, 'DE-P2')
+            self.assertEqual(nodes[1].get_absolute_url(), '/de/de-p2/')
+            self.assertEqual(nodes[2].title, 'DE-P3')
+            self.assertEqual(nodes[2].get_absolute_url(), '/de/de-p3/')
+            self.assertEqual(nodes[3].title, 'FR-P2')
+            self.assertEqual(nodes[3].get_absolute_url(), '/fr/fr-p2/')
+
+        menu_pool.clear(site_id=2)
+
+        with self.settings(SITE_ID=2):
+            request = self.get_request('/en/de-p2/')
+            context = Context()
+            context['request'] = request
+            tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+            tpl.render(context)
+            nodes = context['children']
+            self.assertEqual(len(nodes), 4)
+            self.assertEqual(nodes[0].title, 'DE-P1')
+            self.assertEqual(nodes[0].get_absolute_url(), '/de/de-p1/')
+            self.assertEqual(nodes[1].title, 'DE-P2')
+            self.assertEqual(nodes[1].get_absolute_url(), '/de/de-p2/')
+            self.assertEqual(nodes[2].title, 'DE-P3')
+            self.assertEqual(nodes[2].get_absolute_url(), '/de/de-p3/')
+            self.assertEqual(nodes[3].title, 'FR-P2')
+            self.assertEqual(nodes[3].get_absolute_url(), '/fr/fr-p2/')
 
     def test_render_menu_with_invalid_language_and_no_fallbacks(self):
+        """
+        The requested language is valid but there's no page
+        with it and the user has disabled all fallbacks.
+        The cms should render only nodes for the requested language.
+        """
         defaults = {
             'template': 'nav_playground.html',
             'language': 'de',
@@ -982,6 +1086,8 @@ class MenuTests(BaseMenuTest):
             tpl.render(context)
             nodes = context['children']
             self.assertEqual(len(nodes), 0)
+
+        menu_pool.clear(site_id=1)
 
         with self.settings(CMS_LANGUAGES=lang_settings):
             request = self.get_request('/en/de-p2/')

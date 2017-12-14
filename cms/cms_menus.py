@@ -10,8 +10,8 @@ from cms.models import EmptyTitle
 from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_default_language_for_site,
     get_fallback_languages,
+    get_public_languages,
     hide_untranslated,
     is_valid_site_language,
 )
@@ -215,27 +215,24 @@ class CMSMenu(Menu):
             _hide_untranslated = False
 
         if _valid_language:
-            fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
+            # The request language has been explicitly configured
+            # for the current site.
+            if _hide_untranslated:
+                fallbacks = []
+            else:
+                fallbacks = get_fallback_languages(lang, site_id=site.pk)
             languages = [lang] + [_lang for _lang in fallbacks if _lang != lang]
         else:
             # The request language is not configured for the current site.
-            # Fallback to the default language configured for the current site.
-            languages = [get_default_language_for_site(site.pk)]
+            # Fallback to all configured public languages for the current site.
+            languages = get_public_languages(site.pk)
             fallbacks = languages
 
-        if _valid_language and (_hide_untranslated or not fallbacks):
-            # The language is correctly configured for the site.
-            # But the user has opted out of displaying untranslated pages
-            # OR has not configured any fallbacks.
-            if self.renderer.draft_mode_active:
-                nodes = nodes.filter(page__title_set__language=lang)
-            else:
-                nodes = nodes.filter(page__publisher_public__title_set__language=lang)
-            languages = [lang]
-
         if self.renderer.draft_mode_active:
+            nodes = nodes.filter(page__title_set__language__in=languages)
             nodes = nodes.select_related('page', 'parent__page')
         else:
+            nodes = nodes.filter(page__publisher_public__title_set__language__in=languages)
             nodes = nodes.select_related(
                 'page__publisher_public',
                 'parent__page__publisher_public',
