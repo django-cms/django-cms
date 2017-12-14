@@ -997,6 +997,30 @@ describe('cms.base.js', function() {
                 CMS.API.Helpers.addEventListener('my-event', fn);
                 expect(CMS.API.Helpers.dispatchEvent('my-event') instanceof $.Event).toEqual(true);
             });
+
+            it('can has namespaces', function() {
+                CMS._eventRoot = $('#cms-top');
+                var fn = jasmine.createSpy();
+
+                CMS.API.Helpers.addEventListener('my-event.namespace', fn);
+                CMS.API.Helpers.dispatchEvent('my-event', {
+                    payload: 'djangoCMS'
+                });
+                expect(fn).toHaveBeenCalledWith(jasmine.any(Object), {
+                    payload: 'djangoCMS'
+                });
+            });
+
+            it('can has namespaces the other way', function() {
+                CMS._eventRoot = $('#cms-top');
+                var fn = jasmine.createSpy();
+
+                CMS.API.Helpers.addEventListener('my-event', fn);
+                CMS.API.Helpers.dispatchEvent('my-event.namespace', {
+                    payload: 'djangoCMS'
+                });
+                expect(fn).not.toHaveBeenCalled();
+            });
         });
 
         describe('.preventTouchScrolling()', function() {

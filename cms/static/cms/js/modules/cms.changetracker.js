@@ -4,7 +4,6 @@
 
 import $ from 'jquery';
 import Class from 'classjs';
-import SimpleMap from './simplemap';
 
 /**
  * Tracks the changes done inside the modal form.
@@ -21,7 +20,7 @@ var ChangeTracker = new Class({
         var that = this;
 
         that.state = {
-            fields: new SimpleMap(),
+            fields: new Map(),
             formChanged: false
         };
 
