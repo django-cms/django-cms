@@ -148,11 +148,11 @@ describe('CMS.Clipboard', function() {
 
         it('sets up events to clear "add plugin" placeholder', function() {
             $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
-            clipboard.modal.trigger('cms.modal.loaded');
+            CMS.API.Helpers.dispatchEvent('modal-loaded', { instance: clipboard.modal });
             expect($('.cms-add-plugin-placeholder')).not.toExist();
 
             $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
-            clipboard.modal.trigger('cms.modal.closed');
+            CMS.API.Helpers.dispatchEvent('modal-closed', { instance: clipboard.modal });
             expect($('.cms-add-plugin-placeholder')).not.toExist();
         });
 
@@ -168,21 +168,21 @@ describe('CMS.Clipboard', function() {
             expect(clipboard.ui.clipboard).not.toContainElement(clipboard.ui.pluginList);
 
             // modal is closed
-            clipboard.modal.trigger('cms.modal.closed');
+            CMS.API.Helpers.dispatchEvent('modal-closed', { instance: clipboard.modal });
             expect(clipboard.ui.clipboard).toContainElement(clipboard.ui.pluginsList);
 
             clipboard.ui.triggers.trigger('click');
             expect(clipboard.ui.clipboard).not.toContainElement(clipboard.ui.pluginList);
 
             // this modal instance is being opened again
-            clipboard.modal.trigger('cms.modal.load');
+            CMS.API.Helpers.dispatchEvent('modal-load', { instance: clipboard.modal });
             expect(clipboard.ui.clipboard).toContainElement(clipboard.ui.pluginsList);
 
             clipboard.ui.triggers.trigger('click');
             expect(clipboard.ui.clipboard).not.toContainElement(clipboard.ui.pluginList);
 
             // new modal instance overtook and is opening
-            clipboard.modal.ui.modal.trigger('cms.modal.load');
+            CMS.API.Helpers.dispatchEvent('modal-load', { instance: clipboard.modal });
             expect(clipboard.ui.clipboard).toContainElement(clipboard.ui.pluginsList);
 
             // manually cleaning up, otherwise PhantomJS fails

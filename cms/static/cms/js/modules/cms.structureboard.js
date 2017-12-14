@@ -479,8 +479,8 @@ class StructureBoard {
                 var bodyRegex = /<body([\S\s]*?)>([\S\s]*)<\/body>/gi;
                 var headRegex = /<head[\S\s]*?>([\S\s]*)<\/head>/gi;
                 var matches = bodyRegex.exec(contentMarkup);
-                // TODO handle case when there's no body or something else
-                // TODO handle case when there's no html tag
+                // we don't handle cases where body or html doesn't exist, cause it's highly unlikely
+                // and will result in way more troubles for cms than this
                 var bodyAttrs = matches[1];
                 var body = $(matches[2]);
                 var head = $(headRegex.exec(contentMarkup)[1]);

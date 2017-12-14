@@ -6,7 +6,6 @@ import Modal from './cms.modal';
 import $ from 'jquery';
 import { Helpers } from './cms.base';
 import Plugin from './cms.plugins';
-import Class from 'classjs';
 import ls from 'local-storage';
 var storageKey = 'cms-clipboard';
 
@@ -21,19 +20,14 @@ var MIN_HEIGHT = 117;
  * @namespace CMS
  * @uses CMS.API.Helpers
  */
-var Clipboard = new Class({
-    implement: [Helpers],
-
-    initialize: function() {
+class Clipboard {
+    constructor() {
         this._setupUI();
-
-        // states
-        this.click = 'click.cms.clipboard';
 
         // setup events
         this._events();
         this.currentClipboardData = {};
-    },
+    }
 
     /**
      * Caches all the jQuery element queries.
@@ -41,7 +35,7 @@ var Clipboard = new Class({
      * @method _setupUI
      * @private
      */
-    _setupUI: function _setupUI() {
+    _setupUI() {
         var clipboard = $('.cms-clipboard');
 
         this.ui = {
@@ -51,7 +45,7 @@ var Clipboard = new Class({
             pluginsList: clipboard.find('.cms-clipboard-containers'),
             document: $(document)
         };
-    },
+    }
 
     /**
      * Sets up event handlers for clipboard ui.
@@ -59,7 +53,7 @@ var Clipboard = new Class({
      * @method _events
      * @private
      */
-    _events: function() {
+    _events() {
         var that = this;
 
         that.modal = new Modal({
@@ -71,18 +65,30 @@ var Clipboard = new Class({
             closeOnEsc: false
         });
 
-        that.modal
-            .on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
-                // cannot be cached
-                $('.cms-add-plugin-placeholder').remove();
-            })
-            .on('cms.modal.close cms.modal.load', function() {
-                that.ui.pluginsList.prependTo(that.ui.clipboard);
+        Helpers.removeEventListener(
+            'modal-loaded.clipboard modal-closed.clipboard modal-close.clipboard modal-load.clipboard'
+        );
+
+        Helpers.addEventListener('modal-loaded.clipboard modal-closed.clipboard', (e, { instance }) => {
+            if (instance === this.modal) {
+                Plugin._removeAddPluginPlaceholder();
+            }
+        });
+
+        Helpers.addEventListener('modal-close.clipboard', (e, { instance }) => {
+            if (instance === this.modal) {
+                this.ui.pluginsList.prependTo(that.ui.clipboard);
                 Plugin._updateClipboard();
-            })
-            .ui.modal.on('cms.modal.load', function() {
-                that.ui.pluginsList.prependTo(that.ui.clipboard);
-            });
+            }
+        });
+        Helpers.addEventListener('modal-load.clipboard', (e, { instance }) => {
+            if (instance === this.modal) {
+                this.ui.pluginsList.prependTo(that.ui.clipboard);
+            } else {
+                this.ui.pluginsList.prependTo(that.ui.clipboard);
+                Plugin._updateClipboard();
+            }
+        });
 
         try {
             ls.off(storageKey);
@@ -90,12 +96,12 @@ var Clipboard = new Class({
         ls.on(storageKey, value => this._handleExternalUpdate(value));
 
         this._toolbarEvents();
-    },
+    }
 
     _toolbarEvents() {
         var that = this;
 
-        that.ui.triggers.off(that.click).on(that.click, function(e) {
+        that.ui.triggers.off(Clipboard.click).on(Clipboard.click, function(e) {
             e.preventDefault();
             e.stopPropagation();
             if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -112,7 +118,7 @@ var Clipboard = new Class({
         });
 
         // add remove event
-        that.ui.triggerRemove.off(that.click).on(that.click, function(e) {
+        that.ui.triggerRemove.off(Clipboard.click).on(Clipboard.click, function(e) {
             e.preventDefault();
             e.stopPropagation();
             if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -120,7 +126,7 @@ var Clipboard = new Class({
             }
             that.clear();
         });
-    },
+    }
 
     /**
      * _handleExternalUpdate
@@ -128,13 +134,14 @@ var Clipboard = new Class({
      * @private
      * @param {String} value event new value
      */
-    _handleExternalUpdate: function _handleExternalUpdate(value) {
+    _handleExternalUpdate(value) {
         var that = this;
         var clipboardData = JSON.parse(value);
 
         if (
             clipboardData.timestamp < that.currentClipboardData.timestamp ||
-            that.currentClipboardData.data && that.currentClipboardData.data.plugin_id === clipboardData.data.plugin_id
+            (that.currentClipboardData.data &&
+                that.currentClipboardData.data.plugin_id === clipboardData.data.plugin_id)
         ) {
             that.currentClipboardData = clipboardData;
             return;
@@ -155,16 +162,16 @@ var Clipboard = new Class({
         CMS._instances.push(new Plugin(`cms-plugin-${clipboardData.data.plugin_id}`, clipboardData.data));
 
         that.currentClipboardData = clipboardData;
-    },
+    }
 
     /**
      * @method _isClipboardModalOpen
      * @private
      * @returns {Boolean}
      */
-    _isClipboardModalOpen: function _isClipboardModalOpen() {
+    _isClipboardModalOpen() {
         return !!this.modal.ui.modalBody.find('.cms-clipboard-containers').length;
-    },
+    }
 
     /**
      * Cleans up DOM state when clipboard is cleared
@@ -172,7 +179,7 @@ var Clipboard = new Class({
      * @method _cleanupDOM
      * @private
      */
-    _cleanupDOM: function _cleanupDOM() {
+    _cleanupDOM() {
         var that = this;
         var pasteItems = $('.cms-submenu-item [data-rel=paste]')
             .attr('tabindex', '-1')
@@ -189,25 +196,25 @@ var Clipboard = new Class({
 
         that._disableTriggers();
         that.ui.document.trigger('click.cms.toolbar');
-    },
+    }
 
     /**
      * @method _enableTriggers
      * @private
      */
-    _enableTriggers: function _enableTriggers() {
+    _enableTriggers() {
         this.ui.triggers.parent().removeClass('cms-toolbar-item-navigation-disabled');
         this.ui.triggerRemove.parent().removeClass('cms-toolbar-item-navigation-disabled');
-    },
+    }
 
     /**
      * @method _disableTriggers
      * @private
      */
-    _disableTriggers: function _disableTriggers() {
+    _disableTriggers() {
         this.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
         this.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
-    },
+    }
 
     /**
      * Clears the clipboard by quering the server.
@@ -217,7 +224,7 @@ var Clipboard = new Class({
      * @method clear
      * @param {Function} [callback]
      */
-    clear: function(callback) {
+    clear(callback) {
         var that = this;
         // post needs to be a string, it will be converted using JSON.parse
         var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
@@ -238,7 +245,7 @@ var Clipboard = new Class({
                 }
             }
         });
-    },
+    }
 
     /**
      * populate
@@ -247,7 +254,7 @@ var Clipboard = new Class({
      * @param {String} html markup of the clipboard draggable
      * @param {Object} pluginData data of the plugin in the clipboard
      */
-    populate: function(html, pluginData) {
+    populate(html, pluginData) {
         this.currentClipboardData = {
             data: pluginData,
             timestamp: Date.now(),
@@ -256,6 +263,8 @@ var Clipboard = new Class({
 
         ls.set(storageKey, JSON.stringify(this.currentClipboardData));
     }
-});
+}
+
+Clipboard.click = 'click.cms.clipboard';
 
 export default Clipboard;

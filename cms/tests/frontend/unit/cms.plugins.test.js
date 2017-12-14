@@ -511,6 +511,7 @@ describe('CMS.Plugin', function() {
             jasmine.Ajax.install();
 
             $(function() {
+                spyOn(CMS.API.Helpers, 'addEventListener');
                 plugin = new CMS.Plugin('cms-plugin-1', {
                     type: 'plugin',
                     plugin_id: 1,
@@ -579,10 +580,13 @@ describe('CMS.Plugin', function() {
 
         it('adds event to remove any existing "add plugin" placeholders', function() {
             plugin.addPlugin('TextPlugin', 'Text plugin');
-            expect(FakeModal.prototype.on).toHaveBeenCalledWith('cms.modal.closed', jasmine.any(Function));
+            expect(CMS.API.Helpers.addEventListener).toHaveBeenCalledWith(
+                'modal-closed.add-plugin',
+                jasmine.any(Function)
+            );
 
             $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
-            FakeModal.prototype.on.calls.argsFor(0)[1]();
+            CMS.API.Helpers.addEventListener.calls.argsFor(0)[1]({}, { instance: plugin.modal });
             expect($('.cms-add-plugin-placeholder')).not.toExist();
         });
     });
@@ -598,7 +602,7 @@ describe('CMS.Plugin', function() {
 
         beforeEach(function(done) {
             Plugin.__Rewire__('Modal', FakeModal);
-            FakeModal.prototype.on = jasmine.createSpy();
+            spyOn(CMS.API.Helpers, 'addEventListener');
             FakeModal.prototype.open = jasmine.createSpy();
             fixture.load('plugins.html');
             CMS.config = {
@@ -657,15 +661,13 @@ describe('CMS.Plugin', function() {
         it('adds events to remove the "add plugin" placeholder', function() {
             plugin.editPlugin('/edit-plugin-url', 'Random Plugin', ['breadcrumb']);
 
-            expect(FakeModal.prototype.on).toHaveBeenCalledWith('cms.modal.loaded', jasmine.any(Function));
-            expect(FakeModal.prototype.on).toHaveBeenCalledWith('cms.modal.closed', jasmine.any(Function));
+            expect(CMS.API.Helpers.addEventListener).toHaveBeenCalledWith(
+                'modal-closed.edit-plugin modal-loaded.edit-plugin',
+                jasmine.any(Function)
+            );
 
             $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
-            FakeModal.prototype.on.calls.argsFor(0)[1]();
-            expect($('.cms-add-plugin-placeholder')).not.toExist();
-
-            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
-            FakeModal.prototype.on.calls.argsFor(1)[1]();
+            CMS.API.Helpers.addEventListener.calls.argsFor(0)[1]({}, { instance: plugin.modal });
             expect($('.cms-add-plugin-placeholder')).not.toExist();
         });
     });
@@ -1400,12 +1402,12 @@ describe('CMS.Plugin', function() {
                 modalConstructor(...args);
             }
         }
+        FakeModal.prototype.open = jasmine.createSpy();
 
         beforeEach(function(done) {
             Plugin.__Rewire__('Modal', FakeModal);
-            FakeModal.prototype.on = jasmine.createSpy();
-            FakeModal.prototype.open = jasmine.createSpy();
             fixture.load('plugins.html');
+            spyOn(CMS.API.Helpers, 'addEventListener').and.callThrough();
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
                 request: {
@@ -1451,10 +1453,13 @@ describe('CMS.Plugin', function() {
 
         it('adds events to remove any existing "add plugin" placeholders', function() {
             plugin.deletePlugin();
-            expect(FakeModal.prototype.on).toHaveBeenCalledWith('cms.modal.loaded', jasmine.any(Function));
+            expect(CMS.API.Helpers.addEventListener).toHaveBeenCalledWith(
+                'modal-loaded.delete-plugin',
+                jasmine.any(Function)
+            );
 
             $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
-            FakeModal.prototype.on.calls.argsFor(0)[1]();
+            CMS.API.Helpers.addEventListener.calls.argsFor(0)[1]({}, { instance: plugin.modal });
             expect($('.cms-add-plugin-placeholder')).not.toExist();
         });
     });

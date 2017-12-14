@@ -418,7 +418,7 @@ export const Helpers = {
      * @returns {jQuery}
      */
     addEventListener: function addEventListener(eventName, fn) {
-        return CMS._eventRoot.on(_ns(eventName), fn);
+        return CMS._eventRoot && CMS._eventRoot.on(_ns(eventName), fn);
     },
 
     /**
@@ -430,7 +430,7 @@ export const Helpers = {
      * @returns {jQuery}
      */
     removeEventListener: function removeEventListener(eventName, fn) {
-        return CMS._eventRoot.off(_ns(eventName), fn);
+        return CMS._eventRoot && CMS._eventRoot.off(_ns(eventName), fn);
     },
 
     /**

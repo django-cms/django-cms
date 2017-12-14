@@ -3,6 +3,8 @@
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var Modal = require('../../../static/cms/js/modules/cms.modal').default;
 var $ = require('jquery');
+var Helpers = Modal.__GetDependency__('Helpers');
+var KEYS = Modal.__GetDependency__('KEYS');
 
 window.CMS = window.CMS || CMS;
 CMS.Modal = Modal;
@@ -11,6 +13,7 @@ describe('CMS.Modal', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
     beforeEach(function() {
+        CMS._eventRoot = $('#cms-top');
         CMS.ChangeTracker = function() {
             return {
                 isFormChanged: function() {
@@ -144,14 +147,23 @@ describe('CMS.Modal', function() {
             expect(CMS.API.Tooltip.hide).toHaveBeenCalled();
         });
 
-        it('triggers load events on instance and the DOM node', function() {
-            spyOn(modal, 'trigger');
-            var spyEvent = spyOnEvent(modal.ui.modal, 'cms.modal.load');
+        it('triggers load events via helpers', function() {
+            jasmine.clock().install();
+            spyOn(Helpers, 'dispatchEvent');
             modal.open({ html: '<div></div>' });
 
-            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.load');
-            expect(spyEvent).toHaveBeenTriggered();
-            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.loaded');
+            expect(Helpers.dispatchEvent).toHaveBeenCalledWith(
+                'modal-load',
+                jasmine.objectContaining({ instance: modal })
+            );
+
+            jasmine.clock().tick(modal.options.duration);
+
+            expect(Helpers.dispatchEvent).toHaveBeenCalledWith(
+                'modal-loaded',
+                jasmine.objectContaining({ instance: modal })
+            );
+            jasmine.clock().uninstall();
         });
 
         it('applies correct state to modal controls 1', function() {
@@ -364,8 +376,8 @@ describe('CMS.Modal', function() {
             modal.open({ html: '<div></div>' });
 
             CMS._eventRoot = $('#cms-top');
-            CMS.API.Helpers.addEventListener('modal-maximized', function(e, data) {
-                CMS.API.Helpers.removeEventListener('modal-maximized');
+            Helpers.addEventListener('modal-maximized', function(e, data) {
+                Helpers.removeEventListener('modal-maximized');
                 expect(data.instance).toEqual(modal);
                 done();
             });
@@ -398,8 +410,8 @@ describe('CMS.Modal', function() {
             modal.open({ html: '<div></div>' });
 
             CMS._eventRoot = $('#cms-top');
-            CMS.API.Helpers.addEventListener('modal-restored', function(e, data) {
-                CMS.API.Helpers.removeEventListener('modal-restored');
+            Helpers.addEventListener('modal-restored', function(e, data) {
+                Helpers.removeEventListener('modal-restored');
                 expect(true).toEqual(true);
                 expect(data.instance).toEqual(modal);
                 done();
@@ -436,7 +448,8 @@ describe('CMS.Modal', function() {
         });
 
         it('returns false if modal-close event is prevented', function() {
-            CMS.API.Helpers.addEventListener('modal-close', function(e, opts) {
+            CMS._eventRoot = $('#cms-top');
+            Helpers.addEventListener('modal-close', function(e, opts) {
                 e.preventDefault();
                 expect(opts.instance).toEqual(modal);
             });
@@ -445,13 +458,13 @@ describe('CMS.Modal', function() {
             modal.open({ html: '<div></div>' });
             expect(modal.close()).toEqual(false);
             expect(modal._hide).not.toHaveBeenCalled();
-            CMS.API.Helpers.removeEventListener('modal-close');
+            Helpers.removeEventListener('modal-close');
         });
 
         it('removes content preserving handlers', function() {
             var removeEventListener = jasmine.createSpy();
 
-            spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+            spyOn(Helpers, '_getWindow').and.returnValue({
                 removeEventListener: removeEventListener
             });
 
@@ -480,7 +493,7 @@ describe('CMS.Modal', function() {
         it('reloads the browser if onClose is provided', function(done) {
             modal = new CMS.Modal({ onClose: '/this-url' });
             modal.open({ html: '<div></div>' });
-            spyOn(CMS.API.Helpers, 'reloadBrowser').and.callFake(function(url, timeout, ajax) {
+            spyOn(Helpers, 'reloadBrowser').and.callFake(function(url, timeout, ajax) {
                 expect(url).toEqual('/this-url');
                 expect(timeout).toEqual(false);
                 expect(ajax).toEqual(true);
@@ -878,7 +891,6 @@ describe('CMS.Modal', function() {
                 });
                 spyOn(modal, 'maximize');
                 spyOn(modal, 'close');
-                spyOn(modal, 'trigger');
                 done();
             });
         });
@@ -955,10 +967,14 @@ describe('CMS.Modal', function() {
             modal._show({});
         });
 
-        it('triggers cms.modal.shown', function(done) {
+        it('triggers cms-modal-shown', function(done) {
+            spyOn(Helpers, 'dispatchEvent');
             modal.ui.modal.one('cmsTransitionEnd', function() {
                 setTimeout(function() {
-                    expect(modal.trigger).toHaveBeenCalledWith('cms.modal.shown');
+                    expect(Helpers.dispatchEvent).toHaveBeenCalledWith(
+                        'modal-shown',
+                        jasmine.objectContaining({ instance: modal })
+                    );
                     done();
                 }, 0);
             });
@@ -973,13 +989,13 @@ describe('CMS.Modal', function() {
 
             modal._show({});
 
-            var wrongEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
+            var wrongEvent = new $.Event('keydown.cms.close', { keyCode: KEYS.SPACE });
             modal.ui.body.trigger(wrongEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
             expect(modal.options.onClose).toEqual('stuff');
 
-            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: KEYS.ESC });
             modal.ui.body.trigger(correctEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).toHaveBeenCalled();
@@ -995,13 +1011,13 @@ describe('CMS.Modal', function() {
 
             modal._show({});
 
-            var wrongEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
+            var wrongEvent = new $.Event('keydown.cms.close', { keyCode: KEYS.SPACE });
             modal.ui.body.trigger(wrongEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
             expect(modal.options.onClose).toEqual('stuff');
 
-            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: KEYS.ESC });
             modal.ui.body.trigger(correctEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
@@ -1017,7 +1033,7 @@ describe('CMS.Modal', function() {
 
             modal._show({});
 
-            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: KEYS.ESC });
             modal.ui.body.trigger(correctEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).toHaveBeenCalled();
@@ -1033,7 +1049,7 @@ describe('CMS.Modal', function() {
 
             modal._show({});
 
-            var correctEvent = new $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            var correctEvent = new $.Event('keydown.cms.close', { keyCode: KEYS.ESC });
             modal.ui.body.trigger(correctEvent);
             expect(spy).not.toHaveBeenCalled();
             expect(modal.close).not.toHaveBeenCalled();
@@ -1066,10 +1082,8 @@ describe('CMS.Modal', function() {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
-                spyOn(modal, 'maximize');
                 spyOn(modal, 'minimize');
-                spyOn(modal, 'close');
-                spyOn(modal, 'trigger');
+                spyOn(modal, 'maximize');
                 done();
             });
         });
@@ -1093,12 +1107,18 @@ describe('CMS.Modal', function() {
             expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
         });
 
-        it('triggers cms.modal.closed', function() {
+        it('triggers cms-modal-closed', function() {
+            spyOn(Helpers, 'dispatchEvent');
             modal._hide({ duration: 10000000 });
-            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.close');
-            expect(modal.trigger).not.toHaveBeenCalledWith('cms.modal.closed');
+            expect(Helpers.dispatchEvent).not.toHaveBeenCalledWith(
+                'modal-closed',
+                jasmine.objectContaining({ instance: modal })
+            );
             jasmine.clock().tick(modal.options.duration);
-            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.closed');
+            expect(Helpers.dispatchEvent).toHaveBeenCalledWith(
+                'modal-closed',
+                jasmine.objectContaining({ instance: modal })
+            );
         });
 
         it('hides tooblar loader', function() {
@@ -1133,16 +1153,6 @@ describe('CMS.Modal', function() {
             expect(modal.ui.body).not.toHandle('keydown.cms.close');
             modal.ui.body.trigger('keydown.cms.close');
             expect(spy).not.toHaveBeenCalled();
-        });
-
-        it('triggers modal-closed event', function(done) {
-            CMS.API.Helpers.addEventListener('modal-closed', function(e, opts) {
-                expect(opts.instance).toEqual(modal);
-                CMS.API.Helpers.removeEventListener('modal-closed');
-                done();
-            });
-            modal._hide();
-            jasmine.clock().tick(modal.options.duration);
         });
     });
 
@@ -1810,12 +1820,12 @@ describe('CMS.Modal', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger(new $.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: false, keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: false, keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger(new $.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: true, keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: true, keyCode: KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(1);
         });
 
@@ -1823,12 +1833,12 @@ describe('CMS.Modal', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger(new $.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: false, keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: false, keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger(new $.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { ctrlKey: true, keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { ctrlKey: true, keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
         });
 
@@ -1836,22 +1846,22 @@ describe('CMS.Modal', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(1);
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(2);
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).toHaveBeenCalledTimes(3);
         });
 
@@ -1859,22 +1869,22 @@ describe('CMS.Modal', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
         });
 
@@ -1882,22 +1892,22 @@ describe('CMS.Modal', function() {
             spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
             CMS.Modal._setupCtrlEnterSave(document);
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_LEFT }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_RIGHT }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
 
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
-            doc.trigger(new $.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keydown', { keyCode: KEYS.ENTER }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.CMD_FIREFOX }));
+            doc.trigger(new $.Event('keyup', { keyCode: KEYS.ENTER }));
             expect(spy).not.toHaveBeenCalled();
         });
     });
@@ -1920,7 +1930,7 @@ describe('CMS.Modal', function() {
             $(function() {
                 modal = new CMS.Modal();
                 modal.ui.modal.show();
-                spyOn(CMS.API.Helpers, 'reloadBrowser');
+                spyOn(Helpers, 'reloadBrowser');
                 spyOn(modal, '_setBreadcrumb');
                 spyOn(modal, '_setButtons');
                 spyOn(CMS.Modal, '_setupCtrlEnterSave');
@@ -2060,7 +2070,7 @@ describe('CMS.Modal', function() {
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
-                    expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
+                    expect(Helpers.reloadBrowser).not.toHaveBeenCalled();
                     done();
                 });
             });
@@ -2070,7 +2080,7 @@ describe('CMS.Modal', function() {
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
-                    expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
+                    expect(Helpers.reloadBrowser).not.toHaveBeenCalled();
                     done();
                 });
             });
@@ -2081,7 +2091,7 @@ describe('CMS.Modal', function() {
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
-                    expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
+                    expect(Helpers.reloadBrowser).toHaveBeenCalledWith();
                     done();
                 });
             });
@@ -2212,7 +2222,7 @@ describe('CMS.Modal', function() {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(jasmine.any(String), false, true);
+                expect(Helpers.reloadBrowser).toHaveBeenCalledWith(jasmine.any(String), false, true);
                 done();
             });
         });
@@ -2224,7 +2234,7 @@ describe('CMS.Modal', function() {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/custom-on-close', false, true);
+                expect(Helpers.reloadBrowser).toHaveBeenCalledWith('/custom-on-close', false, true);
                 done();
             });
         });
@@ -2310,8 +2320,8 @@ describe('CMS.Modal', function() {
                     }
                 });
 
-                body.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.SPACE }));
-                body.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ESC }));
+                body.trigger(new $.Event('keydown', { keyCode: KEYS.SPACE }));
+                body.trigger(new $.Event('keydown', { keyCode: KEYS.ESC }));
             });
         });
 
@@ -2330,7 +2340,7 @@ describe('CMS.Modal', function() {
                     done();
                 });
 
-                body.trigger(new $.Event('keydown', { keyCode: CMS.KEYS.ESC }));
+                body.trigger(new $.Event('keydown', { keyCode: KEYS.ESC }));
             });
         });
 
@@ -2394,7 +2404,7 @@ describe('CMS.Modal', function() {
             $(function() {
                 modal = new CMS.Modal();
                 modal.ui.modal.show();
-                spyOn(CMS.API.Helpers, 'reloadBrowser');
+                spyOn(Helpers, 'reloadBrowser');
                 spyOn(modal, '_setBreadcrumb');
                 spyOn(modal, '_setButtons');
                 spyOn(CMS.Modal, '_setupCtrlEnterSave');
@@ -2416,7 +2426,7 @@ describe('CMS.Modal', function() {
 
         it('adds the evnet listener to the window', function() {
             var addEventListener = jasmine.createSpy();
-            spyOn(CMS.API.Helpers, '_getWindow').and.returnValue({
+            spyOn(Helpers, '_getWindow').and.returnValue({
                 addEventListener: addEventListener
             });
 
@@ -2459,12 +2469,12 @@ describe('CMS.Modal', function() {
 
         describe('_confirmDirtyEscCancel', function() {
             beforeEach(function() {
-                spyOn(CMS.API.Helpers, 'secureConfirm');
+                spyOn(Helpers, 'secureConfirm');
             });
 
             it('returns true if there is no tracker', function() {
                 expect(modal._confirmDirtyEscCancel()).toEqual(true);
-                expect(CMS.API.Helpers.secureConfirm).not.toHaveBeenCalled();
+                expect(Helpers.secureConfirm).not.toHaveBeenCalled();
             });
 
             it('returns true if there is a tracker but form did not change', function() {
@@ -2475,11 +2485,11 @@ describe('CMS.Modal', function() {
                 };
 
                 expect(modal._confirmDirtyEscCancel()).toEqual(true);
-                expect(CMS.API.Helpers.secureConfirm).not.toHaveBeenCalled();
+                expect(Helpers.secureConfirm).not.toHaveBeenCalled();
             });
 
             it('returns result of the confirmation if there is a tracker and form changed', function() {
-                CMS.API.Helpers.secureConfirm.and.returnValue(true);
+                Helpers.secureConfirm.and.returnValue(true);
 
                 modal.tracker = {
                     isFormChanged: function() {
@@ -2488,15 +2498,15 @@ describe('CMS.Modal', function() {
                 };
 
                 expect(modal._confirmDirtyEscCancel()).toEqual(true);
-                expect(CMS.API.Helpers.secureConfirm).toHaveBeenCalledTimes(1);
-                expect(CMS.API.Helpers.secureConfirm).toHaveBeenCalledWith(
+                expect(Helpers.secureConfirm).toHaveBeenCalledTimes(1);
+                expect(Helpers.secureConfirm).toHaveBeenCalledWith(
                     'Smth changed!\n\nSmth changed and you are pressing ESC'
                 );
 
-                CMS.API.Helpers.secureConfirm.and.returnValue(false);
+                Helpers.secureConfirm.and.returnValue(false);
 
                 expect(modal._confirmDirtyEscCancel()).toEqual(false);
-                expect(CMS.API.Helpers.secureConfirm).toHaveBeenCalledTimes(2);
+                expect(Helpers.secureConfirm).toHaveBeenCalledTimes(2);
             });
         });
     });

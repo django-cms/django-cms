@@ -28,8 +28,6 @@ class Modal {
 
         // elements
         this._setupUI();
-        // event emitter
-        this._setupEventEmitter();
 
         // states and events
         this.click = 'click.cms.modal';
@@ -45,34 +43,6 @@ class Modal {
         this.saved = false;
 
         this._beforeUnloadHandler = this._beforeUnloadHandler.bind(this);
-    }
-
-    /**
-     * Setup event pubsub mechanism for the instance.
-     *
-     * @private
-     * @method _setupEventEmitter
-     */
-    _setupEventEmitter() {
-        var that = this;
-        var bus = $({});
-
-        /**
-         * @function proxy
-         * @param {String} name of the method
-         * @returns {Function}
-         */
-        function proxy(name) {
-            return function() {
-                bus[name].apply(bus, arguments);
-                return that;
-            };
-        }
-
-        this.trigger = proxy('trigger');
-        this.one = proxy('one');
-        this.on = proxy('on');
-        this.off = proxy('off');
     }
 
     /**
@@ -187,11 +157,11 @@ class Modal {
         // that instance reference every time.
         this._events();
 
-        this.trigger('cms.modal.load');
-        // trigger the event also on the dom element,
-        // because if we load another modal while one is already open
-        // the older instance won't receive any updates
-        this.ui.modal.trigger('cms.modal.load');
+        Helpers.dispatchEvent('modal-load', { instance: this });
+        // // trigger the event also on the dom element,
+        // // because if we load another modal while one is already open
+        // // the older instance won't receive any updates
+        // this.ui.modal.trigger('cms.modal.load');
 
         // common elements state
         this.ui.resize.toggle(this.options.resizable);
@@ -235,7 +205,7 @@ class Modal {
             });
         }
 
-        this.trigger('cms.modal.loaded');
+        Helpers.dispatchEvent('modal-loaded', { instance: this });
 
         var currentContext = keyboard.getContext();
 
@@ -343,7 +313,6 @@ class Modal {
         var that = this;
         var width = opts.width;
         var height = opts.height;
-        // TODO make use of transitionDuration, currently capped at 0.2s
         var speed = opts.duration;
         var top = opts.top;
         var left = opts.left;
@@ -358,7 +327,6 @@ class Modal {
             height: height,
             top: top,
             left: left,
-            // TODO animate translateX if possible instead of margin
             'margin-left': -(width / 2),
             'margin-top': -(height / 2)
         });
@@ -382,7 +350,7 @@ class Modal {
 
                 // changed locked status to allow other modals again
                 CMS.API.locked = false;
-                that.trigger('cms.modal.shown');
+                Helpers.dispatchEvent('modal-shown', { instance: that });
             })
             .emulateTransitionEnd(speed);
 
@@ -447,7 +415,6 @@ class Modal {
             duration = opts.duration;
         }
 
-        this.trigger('cms.modal.close');
         this.ui.frame.empty();
         this.ui.modalBody.removeClass('cms-loader');
         this.ui.modal.removeClass('cms-modal-open');
@@ -465,9 +432,6 @@ class Modal {
             if (that.maximized) {
                 that.maximize();
             }
-            // TODO remove two different event systems,
-            // just use Helpers.dispatchEvent with instance parameter
-            that.trigger('cms.modal.closed');
             CMS.API.Toolbar.hideLoader();
             Helpers.dispatchEvent('modal-closed', { instance: that });
         }, this.options.duration);
@@ -1053,7 +1017,7 @@ class Modal {
                             );
                         }
                         // hello ckeditor
-                        CMS.API.Helpers.removeEventListener('modal-close.text-plugin');
+                        Helpers.removeEventListener('modal-close.text-plugin');
                         that.close();
                     }, 150); // eslint-disable-line
                     // FIXME must be more than 100ms

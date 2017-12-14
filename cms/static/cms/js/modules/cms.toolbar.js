@@ -7,6 +7,7 @@ import Class from 'classjs';
 import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
+import Plugin from './cms.plugins';
 import DiffDOM from 'diff-dom';
 import { filter, debounce, throttle, uniq } from 'lodash';
 import Nprogress from 'nprogress';
@@ -632,8 +633,8 @@ var Toolbar = new Class({
 
         switch (target) {
             case 'modal':
-                // TODO move into a static method on StructureBoard
-                $('.cms-add-plugin-placeholder').remove();
+                Plugin._removeAddPluginPlaceholder();
+
                 var modal = new Modal({
                     onClose: el.data('on-close')
                 });

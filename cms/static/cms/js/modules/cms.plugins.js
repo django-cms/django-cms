@@ -510,8 +510,15 @@ var Plugin = new Class({
             url: url,
             title: name
         });
-        modal.on('cms.modal.closed', function removePlaceholder() {
-            $('.cms-add-plugin-placeholder').remove();
+
+        this.modal = modal;
+
+        Helpers.removeEventListener('modal-closed.add-plugin');
+        Helpers.addEventListener('modal-closed.add-plugin', (e, { instance }) => {
+            if (instance !== modal) {
+                return;
+            }
+            Plugin._removeAddPluginPlaceholder();
         });
     },
 
@@ -531,11 +538,14 @@ var Plugin = new Class({
             redirectOnClose: this.options.redirectOnClose || false
         });
 
-        modal.on('cms.modal.loaded', function removePlaceholder() {
-            $('.cms-add-plugin-placeholder').remove();
-        });
-        modal.on('cms.modal.closed', function removePlaceholder() {
-            $('.cms-add-plugin-placeholder').remove();
+        this.modal = modal;
+
+        Helpers.removeEventListener('modal-closed.edit-plugin modal-loaded.edit-plugin');
+        Helpers.addEventListener('modal-closed.edit-plugin modal-loaded.edit-plugin', (e, { instance }) => {
+            if (instance === modal) {
+                // cannot be cached
+                Plugin._removeAddPluginPlaceholder();
+            }
         });
         modal.open({
             url: url,
@@ -829,8 +839,13 @@ var Plugin = new Class({
             redirectOnClose: this.options.redirectOnClose || false
         });
 
-        modal.on('cms.modal.loaded', function removePlaceholder() {
-            $('.cms-add-plugin-placeholder').remove();
+        this.modal = modal;
+
+        Helpers.removeEventListener('modal-loaded.delete-plugin');
+        Helpers.addEventListener('modal-loaded.delete-plugin', (e, { instance }) => {
+            if (instance === modal) {
+                Plugin._removeAddPluginPlaceholder();
+            }
         });
         modal.open({
             url: url,
@@ -1019,8 +1034,7 @@ var Plugin = new Class({
             var isPlaceholder = !dragItem.length;
             var childrenList;
 
-            // make sure also the modal is available to this instance
-            this.modal = modal = new Modal({
+            modal = new Modal({
                 minWidth: 400,
                 minHeight: 400
             });
@@ -1031,19 +1045,31 @@ var Plugin = new Class({
                 childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
             }
 
-            modal.on('cms.modal.loaded', $.proxy(that._setupKeyboardTraversing, that));
-            modal.on('cms.modal.loaded', function addPlaceholder() {
+            Helpers.addEventListener('modal-loaded', (e, { instance }) => {
+                if (instance !== modal) {
+                    return;
+                }
+
+                that._setupKeyboardTraversing();
                 if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
                     that._toggleCollapsable(dragItem);
                 }
-                $('.cms-add-plugin-placeholder').remove();
+                Plugin._removeAddPluginPlaceholder();
                 placeholder.appendTo(childrenList);
                 that._scrollToElement(placeholder);
             });
-            modal.on('cms.modal.closed', function removePlaceholder() {
-                $('.cms-add-plugin-placeholder').remove();
+
+            Helpers.addEventListener('modal-closed', (e, { instance }) => {
+                if (instance !== modal) {
+                    return;
+                }
+                Plugin._removeAddPluginPlaceholder();
             });
-            modal.on('cms.modal.shown', function() {
+
+            Helpers.addEventListener('modal-shown', (e, { instance }) => {
+                if (modal !== instance) {
+                    return;
+                }
                 var dropdown = $('.cms-modal-markup .cms-plugin-picker');
 
                 if (!isTouching) {
@@ -2165,6 +2191,11 @@ Plugin._updateUsageCount = function _updateUsageCount(pluginType) {
     if (Helpers._isStorageSupported) {
         localStorage.setItem('cms-plugin-usage', JSON.stringify(pluginUsageMap));
     }
+};
+
+Plugin._removeAddPluginPlaceholder = function removeAddPluginPlaceholder() {
+    // this can't be cached since they are created and destroyed all over the place
+    $('.cms-add-plugin-placeholder').remove();
 };
 
 // shorthand for jQuery(document).ready();
