@@ -5,6 +5,7 @@
 import $ from 'jquery';
 import URL from 'urijs';
 import { once, debounce, throttle } from 'lodash';
+import { showLoader, hideLoader } from './loader';
 
 var _CMS = {
     API: {}
@@ -193,7 +194,7 @@ export const Helpers = {
 
         forms.submit(function() {
             // show loader
-            CMS.API.Toolbar.showLoader();
+            showLoader();
             // we cannot use disabled as the name action will be ignored
             $('input[type="submit"]')
                 .on('click', function(e) {
@@ -231,22 +232,14 @@ export const Helpers = {
         // merge settings
         var settings = JSON.stringify($.extend({}, window.CMS.config.settings, newSettings));
 
-        // istanbul ignore else
-        if (CMS.API.Toolbar) {
-            CMS.API.Toolbar.showLoader();
-        }
-
         // use local storage or session
         if (this._isStorageSupported) {
             // save within local storage
             localStorage.setItem('cms_cookie', settings);
-            // istanbul ignore else
-            if (CMS.API.Toolbar) {
-                CMS.API.Toolbar.hideLoader();
-            }
         } else {
             // save within session
             CMS.API.locked = true;
+            showLoader();
 
             $.ajax({
                 async: false,
@@ -260,10 +253,7 @@ export const Helpers = {
                     CMS.API.locked = false;
                     // determine if logged in or not
                     settings = data ? JSON.parse(data) : window.CMS.config.settings;
-                    // istanbul ignore else
-                    if (CMS.API.Toolbar) {
-                        CMS.API.Toolbar.hideLoader();
-                    }
+                    hideLoader();
                 },
                 error: function(jqXHR) {
                     CMS.API.Messages.open({
@@ -291,20 +281,13 @@ export const Helpers = {
     getSettings: function() {
         var settings;
 
-        // istanbul ignore else
-        if (CMS.API.Toolbar) {
-            CMS.API.Toolbar.showLoader();
-        }
 
         // use local storage or session
         if (this._isStorageSupported) {
             // get from local storage
             settings = JSON.parse(localStorage.getItem('cms_cookie') || 'null');
-            // istanbul ignore else
-            if (CMS.API.Toolbar) {
-                CMS.API.Toolbar.hideLoader();
-            }
         } else {
+            showLoader();
             CMS.API.locked = true;
             // get from session
             $.ajax({
@@ -315,10 +298,7 @@ export const Helpers = {
                     CMS.API.locked = false;
                     // determine if logged in or not
                     settings = data ? JSON.parse(data) : window.CMS.config.settings;
-                    // istanbul ignore else
-                    if (CMS.API.Toolbar) {
-                        CMS.API.Toolbar.hideLoader();
-                    }
+                    hideLoader();
                 },
                 error: function(jqXHR) {
                     CMS.API.Messages.open({

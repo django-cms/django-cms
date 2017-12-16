@@ -4,6 +4,8 @@ import CMS, { Helpers, KEYS, uid } from '../../../static/cms/js/modules/cms.base
 var jQuery = require('jquery');
 var $ = jQuery;
 var Class = require('classjs');
+var showLoader;
+var hideLoader;
 
 CMS.API.Helpers = Helpers;
 CMS.KEYS = KEYS;
@@ -26,6 +28,18 @@ describe('cms.base.js', function() {
             return false;
         }
     })();
+
+    beforeEach(() => {
+        showLoader = jasmine.createSpy();
+        hideLoader = jasmine.createSpy();
+        CMS.__Rewire__('showLoader', showLoader);
+        CMS.__Rewire__('hideLoader', hideLoader);
+    });
+
+    afterEach(() => {
+        CMS.__ResetDependency__('showLoader');
+        CMS.__ResetDependency__('hideLoader');
+    });
 
     it('creates CMS namespace', function() {
         expect(CMS).toBeDefined();
@@ -395,7 +409,6 @@ describe('cms.base.js', function() {
             });
 
             it('should prevent forms from being submitted when one form is submitted', function() {
-                CMS.API.Toolbar = CMS.API.Toolbar || { showLoader: jasmine.createSpy('spy') };
                 var submitCallback = jasmine.createSpy().and.returnValue(false);
 
                 CMS.API.Helpers.preventSubmit();
@@ -416,7 +429,7 @@ describe('cms.base.js', function() {
 
                 expect('click').toHaveBeenPreventedOn(input1);
                 expect('click').toHaveBeenPreventedOn(input2);
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
+                expect(showLoader).toHaveBeenCalled();
                 expect(submitCallback).toHaveBeenCalled();
             });
         });
@@ -487,15 +500,9 @@ describe('cms.base.js', function() {
                 CMS.config = {
                     settings: {}
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ mySetting: true });
                 expect(localStorage.getItem('cms_cookie')).toEqual('{"mySetting":true}');
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
 
                 CMS.config.settings = { mySetting: false };
                 expect(CMS.API.Helpers.setSettings({ anotherSetting: true })).toEqual({
@@ -503,15 +510,11 @@ describe('cms.base.js', function() {
                     anotherSetting: true
                 });
                 expect(localStorage.getItem('cms_cookie')).toEqual('{"mySetting":false,"anotherSetting":true}');
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
 
                 expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({
                     mySetting: true
                 });
                 expect(localStorage.getItem('cms_cookie')).toEqual('{"mySetting":true}');
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(3);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(3);
             });
 
             it('makes a synchronous request to the session url if localStorage is not available', function() {
@@ -521,15 +524,10 @@ describe('cms.base.js', function() {
                         settings: '/my-settings-url'
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
-
                 expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ serverSetting: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+                expect(showLoader.calls.count()).toEqual(1);
+                expect(hideLoader.calls.count()).toEqual(1);
             });
 
             it('uses default settings if response is empty', function() {
@@ -542,15 +540,11 @@ describe('cms.base.js', function() {
                         settings: '/my-settings-url-with-empty-response'
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ defaultSetting: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+                expect(showLoader.calls.count()).toEqual(1);
+                expect(hideLoader.calls.count()).toEqual(1);
             });
 
             it('makes a synchronous request which can fail', function() {
@@ -563,15 +557,11 @@ describe('cms.base.js', function() {
                 CMS.API.Messages = {
                     open: jasmine.createSpy()
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ mySetting: true });
 
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
-                expect(CMS.API.Toolbar.hideLoader).not.toHaveBeenCalled();
+                expect(showLoader).toHaveBeenCalled();
+                expect(hideLoader).not.toHaveBeenCalled();
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({
                     message: 'Fail | 500 error',
                     error: true
@@ -624,15 +614,11 @@ describe('cms.base.js', function() {
                         version: 'same'
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ presetSetting: true, version: 'same', edit_off: 1 });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+                expect(showLoader.calls.count()).toEqual(0);
+                expect(hideLoader.calls.count()).toEqual(0);
             });
 
             it('should get settings from config if there is a version mismatch', function() {
@@ -651,15 +637,11 @@ describe('cms.base.js', function() {
                         other_stuff: true
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ version: 'new', other_stuff: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
+                expect(showLoader.calls.count()).toEqual(0);
+                expect(hideLoader.calls.count()).toEqual(0);
             });
 
             it('should get settings from localStorage and cms.config if required settings are not there', function() {
@@ -674,15 +656,11 @@ describe('cms.base.js', function() {
                         fromConfig: true
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ fromConfig: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
+                expect(showLoader.calls.count()).toEqual(0);
+                expect(hideLoader.calls.count()).toEqual(0);
             });
 
             it('should first set settings from CMS.config is there are no settings in localstorage', function() {
@@ -696,16 +674,12 @@ describe('cms.base.js', function() {
                         configSetting: true
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
                 spyOn(CMS.API.Helpers, 'setSettings').and.callThrough();
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ configSetting: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
+                expect(showLoader.calls.count()).toEqual(0);
+                expect(hideLoader.calls.count()).toEqual(0);
                 expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
             });
 
@@ -719,15 +693,11 @@ describe('cms.base.js', function() {
                         settings: '/my-settings-url'
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ version: 'same', serverSetting: true, edit_off: 1 });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+                expect(showLoader.calls.count()).toEqual(1);
+                expect(hideLoader.calls.count()).toEqual(1);
             });
 
             it('uses default settings if response is empty', function() {
@@ -740,15 +710,11 @@ describe('cms.base.js', function() {
                         settings: '/my-settings-url-with-empty-response'
                     }
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ defaultSetting: true });
 
-                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
-                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
+                expect(showLoader.calls.count()).toEqual(2);
+                expect(hideLoader.calls.count()).toEqual(2);
             });
 
             it('makes a synchronous request which can fail', function() {
@@ -762,15 +728,11 @@ describe('cms.base.js', function() {
                 CMS.API.Messages = {
                     open: jasmine.createSpy()
                 };
-                CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy()
-                };
 
                 expect(CMS.API.Helpers.getSettings()).toEqual({ test: false });
 
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
-                expect(CMS.API.Toolbar.hideLoader).not.toHaveBeenCalled();
+                expect(showLoader).toHaveBeenCalled();
+                expect(hideLoader).not.toHaveBeenCalled();
                 expect(CMS.API.Messages.open).toHaveBeenCalledWith({
                     message: 'Fail | 500 error',
                     error: true

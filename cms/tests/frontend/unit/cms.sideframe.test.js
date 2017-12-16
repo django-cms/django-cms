@@ -4,13 +4,24 @@
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var Sideframe = require('../../../static/cms/js/modules/cms.sideframe').default;
 var $ = require('jquery');
+var showLoader;
+var hideLoader;
 
 window.CMS = window.CMS || CMS;
 CMS.Sideframe = Sideframe;
 
 describe('CMS.Sideframe', function() {
-    beforeEach(function() {
+    beforeEach(() => {
         CMS.API.Helpers._isStorageSupported = true;
+        showLoader = jasmine.createSpy();
+        hideLoader = jasmine.createSpy();
+        Sideframe.__Rewire__('showLoader', showLoader);
+        Sideframe.__Rewire__('hideLoader', hideLoader);
+    });
+
+    afterEach(() => {
+        Sideframe.__ResetDependency__('showLoader');
+        Sideframe.__ResetDependency__('hideLoader');
     });
 
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -92,9 +103,7 @@ describe('CMS.Sideframe', function() {
             };
             spyOn(CMS.API.Helpers, 'reloadBrowser');
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 sideframe = new CMS.Sideframe();
@@ -134,9 +143,9 @@ describe('CMS.Sideframe', function() {
         });
 
         it('shows the toolbar loader', function() {
-            expect(CMS.API.Toolbar.showLoader).not.toHaveBeenCalled();
+            expect(showLoader).not.toHaveBeenCalled();
             sideframe.open({ url: url });
-            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
+            expect(showLoader).toHaveBeenCalled();
         });
 
         it('shows the loader on the sideframe', function() {
@@ -159,11 +168,6 @@ describe('CMS.Sideframe', function() {
                 },
                 300
             );
-        });
-
-        it('hides the toolbar loader', function() {
-            sideframe.open({ url: url });
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
         });
 
         it('adds "close by escape" handler', function(done) {
@@ -231,6 +235,16 @@ describe('CMS.Sideframe', function() {
             });
         });
 
+        it('hides loader', function(done) {
+            sideframe.open({ url: url });
+            expect(sideframe.ui.frame).toContainElement('iframe');
+
+            sideframe.ui.frame.find('iframe').on('load', function() {
+                expect(hideLoader).toHaveBeenCalled();
+                done();
+            });
+        });
+
         it('adds specific classes on the iframe body if debug mode is on', function(done) {
             CMS.config.debug = true;
             sideframe.open({ url: url });
@@ -294,9 +308,7 @@ describe('CMS.Sideframe', function() {
             // we do not really care, and things fail in IE
             spyOn(CMS.Sideframe.prototype, '_content');
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 sideframe = new CMS.Sideframe();
@@ -397,9 +409,7 @@ describe('CMS.Sideframe', function() {
             // we do not really care, and things fail in IE
             spyOn(CMS.Sideframe.prototype, '_content');
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 sideframe = new CMS.Sideframe();
@@ -499,9 +509,7 @@ describe('CMS.Sideframe', function() {
             };
             spyOn(CMS.API.Helpers, 'reloadBrowser');
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';

@@ -11,6 +11,7 @@ import { toPairs, isNaN, debounce, findIndex, find, every, uniqWith, once, diffe
 
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
+import { showLoader, hideLoader } from './loader';
 import { filter as fuzzyFilter } from 'fuzzaldrin';
 
 var clipboardDraggable;
@@ -612,7 +613,7 @@ var Plugin = new Class({
                     CMS.API.StructureBoard.invalidateState('COPY', response);
                 }
                 CMS.API.locked = false;
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
             },
             error: function(jqXHR) {
                 CMS.API.locked = false;
@@ -664,7 +665,7 @@ var Plugin = new Class({
                     message: CMS.config.lang.success
                 });
                 CMS.API.StructureBoard.invalidateState('CUT', $.extend({}, data, response));
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
             },
             error: function(jqXHR) {
                 CMS.API.locked = false;
@@ -675,7 +676,7 @@ var Plugin = new Class({
                     message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                     error: true
                 });
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
             }
         });
     },
@@ -764,7 +765,7 @@ var Plugin = new Class({
             move_a_copy: options.move_a_copy
         };
 
-        CMS.API.Toolbar.showLoader();
+        showLoader();
 
         $.ajax({
             type: 'POST',
@@ -778,7 +779,7 @@ var Plugin = new Class({
 
                 // enable actions again
                 CMS.API.locked = false;
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
             },
             error: function(jqXHR) {
                 CMS.API.locked = false;
@@ -789,7 +790,7 @@ var Plugin = new Class({
                     message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                     error: true
                 });
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
             }
         });
     },
@@ -866,7 +867,6 @@ var Plugin = new Class({
         const mustCleanup = options.mustCleanup || false;
 
         // close the plugin modal if it was open
-        // TODO: shouldn't the modal be destroyed as well at this point?
         if (this.modal) {
             this.modal.close();
             // unsubscribe to all the modal events
@@ -880,10 +880,6 @@ var Plugin = new Class({
         // remove event bound to global elements like document or window
         $document.off(`.${this.uid}`);
         $window.off(`.${this.uid}`);
-
-        // TODO: It would be better to return something at this point
-        // but we don't do it anywhere so let's keep it void for now
-        // return this;
     },
 
     /**
@@ -897,9 +893,6 @@ var Plugin = new Class({
         // notice that $.remove will remove also all the ui specific events
         // previously attached to them
         Object.keys(this.ui).forEach(el => this.ui[el].remove());
-
-        // TODO: see above
-        // return this;
     },
 
     /**
@@ -1172,7 +1165,6 @@ var Plugin = new Class({
     /**
      * Returns a specific plugin namespaced event postfixing the plugin uid to it
      * in order to properly manage it via jQuery $.on and $.off
-     * TODO: move this in cms.base.js
      *
      * @method _getNamepacedEvent
      * @private
@@ -1316,7 +1308,7 @@ var Plugin = new Class({
         }
 
         // show loader and make sure scroll doesn't jump
-        CMS.API.Toolbar.showLoader();
+        showLoader();
 
         var items = '.cms-submenu-edit, .cms-submenu-item a';
         var el = $(e.target).closest(items);
@@ -1353,7 +1345,7 @@ var Plugin = new Class({
                 break;
             case 'copy':
                 if (el.parent().hasClass('cms-submenu-item-disabled')) {
-                    CMS.API.Toolbar.hideLoader();
+                    hideLoader();
                 } else {
                     that.copyPlugin();
                 }
@@ -1362,7 +1354,7 @@ var Plugin = new Class({
                 that.cutPlugin();
                 break;
             case 'paste':
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
                 if (!el.parent().hasClass('cms-submenu-item-disabled')) {
                     that.pastePlugin();
                 }
@@ -1375,14 +1367,14 @@ var Plugin = new Class({
                 );
                 break;
             case 'highlight':
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
                 // eslint-disable-next-line no-magic-numbers
                 window.location.hash = `cms-plugin-${this.options.plugin_id}`;
                 Plugin._highlightPluginContent(this.options.plugin_id, { seeThrough: true });
                 e.stopImmediatePropagation();
                 break;
             default:
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
                 CMS.API.Toolbar._delegate(el);
         }
     },
@@ -1829,7 +1821,6 @@ Plugin._updateRegistry = function _updateRegistry(plugins) {
         } else {
             Plugin.aliasPluginDuplicatesMap[pluginData.plugin_id] = false;
             CMS._plugins[pluginIndex] = [pluginContainer, pluginData];
-            // TODO make sure that instances doesn't have generics
             CMS._instances[pluginIndex] = new Plugin(pluginContainer, pluginData);
         }
     });
@@ -1995,7 +1986,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     });
 
     $window.on('blur.cms', () => {
-        // TODO should be called differently tbh
         $document.data('expandmode', false);
     });
 };

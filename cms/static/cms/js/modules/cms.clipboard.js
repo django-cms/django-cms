@@ -10,7 +10,7 @@ import ls from 'local-storage';
 var storageKey = 'cms-clipboard';
 
 var MIN_WIDTH = 400;
-// FIXME kind of a magic number for 1 item in clipboard
+// magic number for 1 item in clipboard
 var MIN_HEIGHT = 117;
 
 /**

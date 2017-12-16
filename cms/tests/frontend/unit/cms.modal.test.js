@@ -5,6 +5,8 @@ var Modal = require('../../../static/cms/js/modules/cms.modal').default;
 var $ = require('jquery');
 var Helpers = Modal.__GetDependency__('Helpers');
 var KEYS = Modal.__GetDependency__('KEYS');
+var showLoader;
+var hideLoader;
 
 window.CMS = window.CMS || CMS;
 CMS.Modal = Modal;
@@ -12,7 +14,11 @@ CMS.Modal = Modal;
 describe('CMS.Modal', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    beforeEach(function() {
+    beforeEach(() => {
+        showLoader = jasmine.createSpy();
+        hideLoader = jasmine.createSpy();
+        Modal.__Rewire__('showLoader', showLoader);
+        Modal.__Rewire__('hideLoader', hideLoader);
         CMS._eventRoot = $('#cms-top');
         CMS.ChangeTracker = function() {
             return {
@@ -21,6 +27,11 @@ describe('CMS.Modal', function() {
                 }
             };
         };
+    });
+
+    afterEach(() => {
+        Modal.__ResetDependency__('showLoader');
+        Modal.__ResetDependency__('hideLoader');
     });
 
     it('creates a Modal class', function() {
@@ -103,9 +114,7 @@ describe('CMS.Modal', function() {
                 open: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal();
@@ -258,9 +267,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal();
@@ -331,9 +338,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal();
@@ -430,9 +435,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -511,9 +514,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -633,9 +634,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -881,9 +880,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1073,9 +1070,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 jasmine.clock().install();
@@ -1124,7 +1119,7 @@ describe('CMS.Modal', function() {
         it('hides tooblar loader', function() {
             modal._hide({ duration: 10000000 });
             jasmine.clock().tick(modal.options.duration);
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
+            expect(hideLoader).toHaveBeenCalled();
         });
 
         it('resets minimize state', function() {
@@ -1164,9 +1159,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1264,9 +1257,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1313,9 +1304,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1460,9 +1449,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1514,9 +1501,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1585,9 +1570,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1749,9 +1732,7 @@ describe('CMS.Modal', function() {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal({
@@ -1923,9 +1904,7 @@ describe('CMS.Modal', function() {
                 open: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             $(function() {
                 modal = new CMS.Modal();
@@ -2018,11 +1997,11 @@ describe('CMS.Modal', function() {
             modal._loadIframe({
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
             });
-            expect(CMS.API.Toolbar.hideLoader).not.toHaveBeenCalled();
-            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+            expect(hideLoader).not.toHaveBeenCalled();
+            expect(showLoader).toHaveBeenCalledTimes(1);
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+                expect(hideLoader).toHaveBeenCalledTimes(1);
+                expect(showLoader).toHaveBeenCalledTimes(1);
                 done();
             });
         });
@@ -2103,7 +2082,7 @@ describe('CMS.Modal', function() {
                     url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
                 });
                 modal.ui.modal.find('iframe').on('load', function() {
-                    expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(2);
+                    expect(showLoader).toHaveBeenCalledTimes(2);
                     expect(modal.ui.modalBody).toHaveClass('cms-loader');
                     done();
                 });
@@ -2246,7 +2225,7 @@ describe('CMS.Modal', function() {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(2);
+                expect(showLoader).toHaveBeenCalledTimes(2);
                 expect(modal.ui.modalBody).toHaveClass('cms-loader');
                 done();
             });
@@ -2391,9 +2370,7 @@ describe('CMS.Modal', function() {
                 open: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                open: jasmine.createSpy(),
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
+                open: jasmine.createSpy()
             };
             CMS.config = {
                 lang: {
