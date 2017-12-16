@@ -9,26 +9,13 @@ import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
 import DiffDOM from 'diff-dom';
-import { filter, debounce, throttle, uniq } from 'lodash';
-import Nprogress from 'nprogress';
-
+import { filter, throttle, uniq } from 'lodash';
+import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';
 
 var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
 var dd;
-
-Nprogress.configure({
-    showSpinner: false,
-    parent: '#cms-top',
-    trickleSpeed: 200,
-    minimum: 0.3,
-    template: `
-        <div class="cms-loading-bar" role="bar">
-            <div class="cms-loading-peg"></div>
-        </div>
-    `
-});
 
 export const getPlaceholderIds = pluginRegistry =>
     uniq(filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id));
@@ -108,25 +95,13 @@ var Toolbar = new Class({
             this._events();
         }
 
-        // FIXME the general initialization is handled within the toolbar
-        // rather than a separate cms.setup or similar. Yet other components
-        // are loaded after the toolbar so it can create a clash where
-        // CMS.API is not ready. This is a workaround until a proper fix
-        // will be released in 3.x
-        setTimeout(() => this._initialStates(), 0);
+        this._initialStates();
 
         // set a state to determine if we need to reinitialize this._events();
         this.ui.toolbar.data('ready', true);
 
         dd = new DiffDOM({
             preDiffApply(info) {
-                // if ($('.cms-toolbar-item-cms-mode-switcher').is(info.node)) {
-                //     return true;
-                // }
-                // if ($('.cms-toolbar-item-cms-mode-switcher a').is(info.node)) {
-                //     return true;
-                // }
-
                 if (
                     (info.diff.action === 'removeAttribute' || info.diff.action === 'modifyAttribute') &&
                     info.diff.name === 'style' &&
@@ -394,7 +369,7 @@ var Toolbar = new Class({
 
             btn.find('.cms-btn-publish').off(`${that.click}.publish`).on(`${that.click}.publish`, function(e) {
                 e.preventDefault();
-                that.showLoader();
+                showLoader();
                 // send post request to prevent xss attacks
                 $.ajax({
                     type: 'post',
@@ -409,10 +384,10 @@ var Toolbar = new Class({
                         ]);
 
                         Helpers.reloadBrowser(url);
-                        that.hideLoader();
+                        hideLoader();
                     },
                     error: function(jqXHR) {
-                        that.hideLoader();
+                        hideLoader();
                         CMS.API.Messages.open({
                             message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
@@ -557,8 +532,7 @@ var Toolbar = new Class({
             return false;
         }
 
-        // set loader
-        this.showLoader();
+        showLoader();
 
         return $.ajax({
             type: method,
@@ -570,7 +544,7 @@ var Toolbar = new Class({
 
                 if (callback) {
                     callback(that, response);
-                    that.hideLoader();
+                    hideLoader();
                 } else if (onSuccess) {
                     if (onSuccess === 'FOLLOW_REDIRECT') {
                         Helpers.reloadBrowser(response.url);
@@ -593,26 +567,14 @@ var Toolbar = new Class({
     },
 
     /**
-     * Shows the loader spinner on the trigger knob for the toolbar.
-     *
-     * @method showLoader
+     * Public api for `./loader.js`
      */
-    showLoader: debounce(function showLoader() {
-        // due to this being animated loader we don't want things that show and hide loader
-        // in one frame to actually show it, for example when setSettings is called in a browser
-        // that supports localStorage. (it happens every time you click on a plugin for example)
-        // we want to debounce the call and cancel it if it's in the same frame
-        Nprogress.start();
-    }, 0),
+    showLoader: function () {
+        showLoader();
+    },
 
-    /**
-     * Hides the loader spinner on the trigger knob for the toolbar.
-     *
-     * @method hideLoader
-     */
-    hideLoader: function hideLoader() {
-        this.showLoader.cancel();
-        Nprogress.done();
+    hideLoader: function () {
+        hideLoader();
     },
 
     /**

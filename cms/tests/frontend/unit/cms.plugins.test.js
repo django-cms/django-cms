@@ -18,6 +18,8 @@ CMS.Modal = Modal;
 CMS.Messages = Messages;
 CMS.Clipboard = Clipboard;
 CMS.API.Clipboard = new CMS.Clipboard();
+var showLoader;
+var hideLoader;
 
 describe('CMS.Plugin', function() {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -40,6 +42,10 @@ describe('CMS.Plugin', function() {
     });
 
     beforeEach(function(done) {
+        showLoader = jasmine.createSpy();
+        hideLoader = jasmine.createSpy();
+        Plugin.__Rewire__('showLoader', showLoader);
+        Plugin.__Rewire__('hideLoader', hideLoader);
         $(function() {
             CMS.settings = {
                 dragbars: [],
@@ -62,6 +68,8 @@ describe('CMS.Plugin', function() {
         $(document).off('dblclick.cms.plugin pointerover.cms.plugin pointerout.cms.plugin');
         Plugin.__ResetDependency__('isStructureReady');
         Plugin.__ResetDependency__('isContentReady');
+        Plugin.__ResetDependency__('showLoader');
+        Plugin.__ResetDependency__('hideLoader');
     });
 
     describe('instance', function() {
@@ -1039,11 +1047,6 @@ describe('CMS.Plugin', function() {
                 dragbars: [],
                 states: []
             };
-            CMS.API.Toolbar = {
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy()
-            };
-
             $(function() {
                 CMS.Plugin._initializeGlobalHandlers();
                 CMS.API.StructureBoard = {
@@ -1215,8 +1218,6 @@ describe('CMS.Plugin', function() {
                         revert: $('.cms-toolbar-revert'),
                         window: $(window)
                     },
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy(),
                     onPublishAvailable: jasmine.createSpy()
                 };
 
@@ -1308,21 +1309,21 @@ describe('CMS.Plugin', function() {
         it('shows and hides the loader if success', function(done) {
             spyOn($, 'ajax').and.callFake(function(ajax) {
                 ajax.success({});
-                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                expect(hideLoader).toHaveBeenCalledTimes(1);
                 done();
             });
             plugin.movePlugin();
-            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+            expect(showLoader).toHaveBeenCalledTimes(1);
         });
 
         it('shows and hides the loader if error', function(done) {
             spyOn($, 'ajax').and.callFake(function(ajax) {
                 ajax.error({});
-                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                expect(hideLoader).toHaveBeenCalledTimes(1);
                 done();
             });
             plugin.movePlugin();
-            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+            expect(showLoader).toHaveBeenCalledTimes(1);
         });
 
         it('does not show success animation', function() {
@@ -1723,8 +1724,6 @@ describe('CMS.Plugin', function() {
                     }
                 });
                 CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy(),
                     _delegate: jasmine.createSpy(),
                     openAjax: jasmine.createSpy(),
                     onPublishAvailable: jasmine.createSpy()
@@ -1769,8 +1768,8 @@ describe('CMS.Plugin', function() {
             var link = nav.find('a');
             plugin._setupActions(nav);
             link.trigger(Plugin.click);
-            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+            expect(showLoader).toHaveBeenCalledTimes(1);
+            expect(hideLoader).toHaveBeenCalledTimes(1);
             expect(CMS.API.Toolbar._delegate).toHaveBeenCalledTimes(1);
             expect(CMS.API.Toolbar._delegate).toHaveBeenCalledWith(link);
         });
@@ -1848,12 +1847,12 @@ describe('CMS.Plugin', function() {
             plugin._setupActions(nav);
             link.trigger(Plugin.click);
             expect(plugin.copyPlugin).not.toHaveBeenCalled();
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+            expect(hideLoader).toHaveBeenCalledTimes(1);
 
             link.parent().removeClass('cms-submenu-item-disabled');
             link.trigger(Plugin.click);
             expect(plugin.copyPlugin).toHaveBeenCalledTimes(1);
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+            expect(hideLoader).toHaveBeenCalledTimes(1);
         });
 
         it('delegates to cutPlugin', function() {
@@ -1876,12 +1875,12 @@ describe('CMS.Plugin', function() {
             plugin._setupActions(nav);
             link.trigger(Plugin.click);
             expect(plugin.pastePlugin).not.toHaveBeenCalled();
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+            expect(hideLoader).toHaveBeenCalledTimes(1);
 
             link.parent().removeClass('cms-submenu-item-disabled');
             link.trigger(Plugin.click);
             expect(plugin.pastePlugin).toHaveBeenCalledTimes(1);
-            expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(2);
+            expect(hideLoader).toHaveBeenCalledTimes(2);
         });
 
         it('delegates to deletePlugin', function() {
@@ -1938,8 +1937,6 @@ describe('CMS.Plugin', function() {
                     }
                 });
                 CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy(),
                     _delegate: jasmine.createSpy(),
                     openAjax: jasmine.createSpy(),
                     onPublishAvailable: jasmine.createSpy()
@@ -2038,8 +2035,6 @@ describe('CMS.Plugin', function() {
                 items = picker.find('.cms-submenu-item');
                 titles = picker.find('.cms-submenu-item-title');
                 CMS.API.Toolbar = {
-                    showLoader: jasmine.createSpy(),
-                    hideLoader: jasmine.createSpy(),
                     _delegate: jasmine.createSpy(),
                     openAjax: jasmine.createSpy()
                 };

@@ -6,31 +6,35 @@ var $ = require('jquery');
 import Toolbar from '../../../static/cms/js/modules/cms.toolbar';
 import Modal from '../../../static/cms/js/modules/cms.modal';
 
+CMS.API = CMS.API || {};
+CMS.API.Helpers = Toolbar.__GetDependency__('Helpers');
+CMS.KEYS = Toolbar.__GetDependency__('KEYS');
+
 window.CMS = window.CMS || CMS;
 CMS.Toolbar = Toolbar;
 CMS.Modal = Modal;
 CMS.Sideframe = Sideframe;
 CMS.Messages = Messages;
+var showLoader;
+var hideLoader;
 
 class Navigation {}
-
-const Nprogress = {
-    configure: jasmine.createSpy(),
-    start: jasmine.createSpy(),
-    done: jasmine.createSpy()
-};
 
 describe('CMS.Toolbar', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
     beforeEach(() => {
-        Toolbar.__Rewire__('Nprogress', Nprogress);
+        showLoader = jasmine.createSpy();
+        hideLoader = jasmine.createSpy();
+        Toolbar.__Rewire__('showLoader', showLoader);
+        Toolbar.__Rewire__('hideLoader', hideLoader);
         Toolbar.__Rewire__('Navigation', Navigation);
     });
 
     afterEach(() => {
-        Toolbar.__ResetDependency__('Nprogress');
         Toolbar.__ResetDependency__('Navigation');
+        Toolbar.__ResetDependency__('showLoader');
+        Toolbar.__ResetDependency__('hideLoader');
     });
 
     it('creates a Toolbar class', function () {
@@ -96,15 +100,11 @@ describe('CMS.Toolbar', function () {
             CMS.Toolbar.prototype._initialStates.calls.reset();
             CMS.settings = { sideframe: {}, version: 'fake' };
             CMS.config = { settings: { version: 'fake' }, auth: true };
-            jasmine.clock().install();
-            toolbar = new CMS.Toolbar();
             toolbar.ui.document.on('cms-ready', function () {
                 // expect this to happen
-                jasmine.clock().uninstall();
                 done();
             });
-            expect(CMS.Toolbar.prototype._initialStates).not.toHaveBeenCalled();
-            jasmine.clock().tick(200);
+            toolbar = new CMS.Toolbar();
             expect(CMS.Toolbar.prototype._initialStates).toHaveBeenCalled();
             expect(toolbar.ui.body).toHaveClass('cms-ready');
         });
@@ -130,8 +130,6 @@ describe('CMS.Toolbar', function () {
             $(function () {
                 spyOn(CMS.Toolbar.prototype, '_initialStates');
                 toolbar = new CMS.Toolbar();
-                spyOn(toolbar, 'showLoader');
-                spyOn(toolbar, 'hideLoader');
                 spyOn(toolbar, 'setSettings').and.callFake(function (input) {
                     return $.extend(true, CMS.settings, input);
                 });
@@ -160,7 +158,7 @@ describe('CMS.Toolbar', function () {
 
         it('shows the loader before making the request', function () {
             expect(toolbar.openAjax({ url: '/url' })).toEqual(jasmine.any(Object));
-            expect(toolbar.showLoader).toHaveBeenCalled();
+            expect(showLoader).toHaveBeenCalled();
         });
 
         it('uses custom callback after request succeeds and hides the loader', function () {
@@ -182,7 +180,7 @@ describe('CMS.Toolbar', function () {
 
             expect(callback).toHaveBeenCalled();
             expect(callback).toHaveBeenCalledWith(toolbar, 'response');
-            expect(toolbar.hideLoader).toHaveBeenCalled();
+            expect(hideLoader).toHaveBeenCalled();
         });
 
         it('does not hide the loader if no callback provided', function () {
@@ -202,8 +200,8 @@ describe('CMS.Toolbar', function () {
                 onSuccess: '/another-url'
             });
 
-            expect(toolbar.showLoader).toHaveBeenCalled();
-            expect(toolbar.hideLoader).not.toHaveBeenCalled();
+            expect(showLoader).toHaveBeenCalled();
+            expect(hideLoader).not.toHaveBeenCalled();
         });
 
         it('uses custom onSuccess url from request success', function () {

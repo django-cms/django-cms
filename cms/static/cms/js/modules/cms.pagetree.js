@@ -807,7 +807,7 @@ var PageTree = new Class({
                         // to be the data about the page and not the model
                         var parent = window.parent ? window.parent : window;
                         var data = {
-                            // FIXME shouldn't be hardcoded
+                            // this shouldn't be hardcoded, but there is no way around it
                             model: 'cms.page',
                             pk: parent.CMS.config.request.page_id
                         };

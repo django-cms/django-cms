@@ -5,6 +5,7 @@
 import $ from 'jquery';
 import Class from 'classjs';
 import { Helpers, KEYS } from './cms.base';
+import { showLoader, hideLoader } from './loader';
 
 /**
  * The sideframe is triggered via API calls from the backend either
@@ -128,10 +129,7 @@ var Sideframe = new Class({
         this.ui.dimmer.show();
         this.ui.frame.addClass('cms-loader');
 
-        // istanbul ignore else: always show loader
-        if (CMS.API && CMS.API.Toolbar) {
-            CMS.API.Toolbar.showLoader();
-        }
+        showLoader();
 
         url = Helpers.makeURL(url);
 
@@ -249,6 +247,7 @@ var Sideframe = new Class({
 
             // update history
             that._addToHistory(this.contentWindow.location.href);
+            hideLoader();
         });
 
         let iframeUrl = url;
@@ -303,12 +302,6 @@ var Sideframe = new Class({
             );
         } else {
             this.ui.sideframe.css('width', width);
-        }
-
-        // istanbul ignore else: always trigger API handlers
-        if (CMS.API && CMS.API.Toolbar) {
-            // FIXME: initialization needs to be done after our libs are loaded
-            CMS.API.Toolbar.hideLoader();
         }
 
         // add esc close event

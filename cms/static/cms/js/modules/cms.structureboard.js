@@ -21,6 +21,7 @@ import measureScrollbar from './scrollbar';
 import preloadImagesFromMarkup from './preload-images';
 
 import { Helpers, KEYS } from './cms.base';
+import { showLoader, hideLoader } from './loader';
 
 let dd;
 const DOMParser = window.DOMParser; // needed only for testing
@@ -380,12 +381,12 @@ class StructureBoard {
             return Promise.resolve();
         }
 
-        CMS.API.Toolbar.showLoader();
+        showLoader();
         return that
             ._requestMode('structure')
             .done(function(contentMarkup) {
                 that._requeststructure = null;
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
 
                 CMS.settings.states = Helpers.getSettings().states;
 
@@ -406,9 +407,6 @@ class StructureBoard {
                 $('.cms-structure-content').html(structure.html());
                 triggerWindowResize();
 
-                // FIXME we don't handle the case when there are more plugins in structure
-                // than in content, which is quite tricky
-
                 StructureBoard._initializeGlobalHandlers();
                 StructureBoard.actualizeEmptyPlaceholders();
                 CMS._instances.forEach(function(instance) {
@@ -427,8 +425,6 @@ class StructureBoard {
                 that._drag();
                 StructureBoard._initializeDragItemsStates();
 
-                // TODO handle the case when there is a mismatch in number of plugins/placeholders
-                // TODO might be edge cases when page doesn't exist anymore (moved/removed)
                 that._loadedStructure = true;
             })
             .fail(function() {
@@ -469,12 +465,12 @@ class StructureBoard {
             return Promise.resolve();
         }
 
-        CMS.API.Toolbar.showLoader();
+        showLoader();
         return that
             ._requestMode('content')
             .done(function(contentMarkup) {
                 that._requestcontent = null;
-                CMS.API.Toolbar.hideLoader();
+                hideLoader();
                 var htmlRegex = /<html([\S\s]*?)>[\S\s]*<\/html>/gi;
                 var bodyRegex = /<body([\S\s]*?)>([\S\s]*)<\/body>/gi;
                 var headRegex = /<head[\S\s]*?>([\S\s]*)<\/head>/gi;
@@ -696,7 +692,7 @@ class StructureBoard {
         this.ui.html.removeClass('cms-structure-mode-content').addClass('cms-structure-mode-structure');
 
         this.ui.container.show();
-        CMS.API.Toolbar.hideLoader();
+        hideLoader();
 
         if (!init) {
             this._makeCondensed();

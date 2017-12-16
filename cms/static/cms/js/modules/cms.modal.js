@@ -10,6 +10,7 @@ import './jquery.transition';
 import './jquery.trap';
 
 import { Helpers, KEYS } from './cms.base';
+import { showLoader, hideLoader } from './loader';
 
 var previousKeyboardContext;
 var previouslyFocusedElement;
@@ -432,7 +433,7 @@ class Modal {
             if (that.maximized) {
                 that.maximize();
             }
-            CMS.API.Toolbar.hideLoader();
+            hideLoader();
             Helpers.dispatchEvent('modal-closed', { instance: that });
         }, this.options.duration);
 
@@ -857,8 +858,7 @@ class Modal {
         opts.title = opts.title || '';
         opts.breadcrumbs = opts.breadcrumbs || '';
 
-        // show loader
-        CMS.API.Toolbar.showLoader();
+        showLoader();
 
         // set classes
         this.ui.modal.removeClass('cms-modal-markup');
@@ -965,12 +965,12 @@ class Modal {
 
             // hide loaders
             that.ui.modalBody.removeClass('cms-loader');
-            CMS.API.Toolbar.hideLoader();
+            hideLoader();
 
             // determine if we should close the modal or reload
             if (messages.length && that.enforceReload) {
                 that.ui.modalBody.addClass('cms-loader');
-                CMS.API.Toolbar.showLoader();
+                showLoader();
                 Helpers.reloadBrowser();
             }
             if (messages.length && that.enforceClose) {
@@ -998,7 +998,7 @@ class Modal {
             if (that.saved && saveSuccess && !contents.find('.delete-confirmation').length) {
                 that.ui.modalBody.addClass('cms-loader');
                 if (that.options.onClose) {
-                    CMS.API.Toolbar.showLoader();
+                    showLoader();
                     Helpers.reloadBrowser(
                         that.options.onClose ? that.options.onClose : window.location.href,
                         false,
@@ -1019,8 +1019,8 @@ class Modal {
                         // hello ckeditor
                         Helpers.removeEventListener('modal-close.text-plugin');
                         that.close();
+                    // must be more than 100ms
                     }, 150); // eslint-disable-line
-                    // FIXME must be more than 100ms
                 }
             } else {
                 iframe.show();

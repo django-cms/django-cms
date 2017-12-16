@@ -4,6 +4,8 @@ import Plugin from '../../../static/cms/js/modules/cms.plugins';
 var CMS = require('../../../static/cms/js/modules/cms.base').default;
 var $ = require('jquery');
 var keyboard = require('../../../static/cms/js/modules/keyboard').default;
+var showLoader;
+var hideLoader;
 
 window.CMS = window.CMS || CMS;
 CMS.StructureBoard = StructureBoard;
@@ -47,6 +49,10 @@ describe('CMS.StructureBoard', function() {
         CMS.API.Clipboard = {
             populate: jasmine.createSpy()
         };
+        showLoader = jasmine.createSpy();
+        hideLoader = jasmine.createSpy();
+        StructureBoard.__Rewire__('showLoader', showLoader);
+        StructureBoard.__Rewire__('hideLoader', hideLoader);
     });
 
     afterEach(() => {
@@ -58,6 +64,8 @@ describe('CMS.StructureBoard', function() {
         FakePlugin.prototype._collapsables.calls.reset();
         FakePlugin.prototype._setPluginContentEvents.calls.reset();
         FakePlugin.prototype._setPluginStructureEvents.calls.reset();
+        StructureBoard.__ResetDependency__('showLoader');
+        StructureBoard.__ResetDependency__('hideLoader');
     });
 
     it('creates a StructureBoard class', function() {
@@ -214,8 +222,6 @@ describe('CMS.StructureBoard', function() {
                 mode: 'edit'
             };
             CMS.API.Toolbar = {
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
                 _refreshMarkup: jasmine.createSpy()
             };
             CMS.config = {
@@ -1476,10 +1482,6 @@ describe('CMS.StructureBoard', function() {
 
         beforeEach(done => {
             fixture.load('plugins.html');
-            CMS.API.Toolbar = {
-                hideLoader: jasmine.createSpy(),
-                showLoader: jasmine.createSpy()
-            };
             board = new CMS.StructureBoard();
             StructureBoard.__Rewire__('Plugin', FakePlugin);
             spyOn(StructureBoard, 'actualizePluginCollapseStatus');
@@ -2144,8 +2146,6 @@ describe('CMS.StructureBoard', function() {
         beforeEach(() => {
             requestSucceeded = jasmine.createSpy();
             CMS.API.Toolbar = {
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
                 _refreshMarkup: jasmine.createSpy()
             };
             board = new StructureBoard();
@@ -2222,8 +2222,8 @@ describe('CMS.StructureBoard', function() {
             expect(board._loadedContent).not.toBeDefined();
             pluginConstructor.calls.reset();
             board._loadContent().then(() => {
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
-                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
+                expect(showLoader).toHaveBeenCalled();
+                expect(hideLoader).toHaveBeenCalled();
                 expect(CMS.API.Toolbar._refreshMarkup).toHaveBeenCalled();
                 expect($('html').attr('attr0')).toEqual('a');
                 expect($('html').attr('attr1')).toEqual('b');
@@ -2250,8 +2250,6 @@ describe('CMS.StructureBoard', function() {
         beforeEach(() => {
             requestSucceeded = jasmine.createSpy();
             CMS.API.Toolbar = {
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
                 _refreshMarkup: jasmine.createSpy()
             };
             board = new StructureBoard();
@@ -2327,8 +2325,8 @@ describe('CMS.StructureBoard', function() {
             expect(board._loadedStructure).not.toBeDefined();
             pluginConstructor.calls.reset();
             board._loadStructure().then(() => {
-                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
-                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
+                expect(showLoader).toHaveBeenCalled();
+                expect(hideLoader).toHaveBeenCalled();
                 expect(CMS.API.Toolbar._refreshMarkup).toHaveBeenCalled();
 
                 expect(FakePlugin.prototype._setPlaceholder).toHaveBeenCalledTimes(1);
@@ -2456,8 +2454,6 @@ describe('CMS.StructureBoard', function() {
                 open: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                showLoader: jasmine.createSpy(),
-                hideLoader: jasmine.createSpy(),
                 _refreshMarkup: jasmine.createSpy()
             };
         });
