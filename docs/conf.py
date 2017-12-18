@@ -254,10 +254,7 @@ latex_elements = {
 
 # Adding missing Unicode chars 
 from sphinx.util.texescape import tex_replacements
-tex_replacements.append(('✕', r'\(\times\)'))
-tex_replacements.append(('日', r'\begin{CJK}{UTF8}{min}日\end{CJK}'))
-tex_replacements.append(('本', r'\begin{CJK}{UTF8}{min}本\end{CJK}'))
-tex_replacements.append(('語', r'\begin{CJK}{UTF8}{min}語\end{CJK}'))
-
-
-
+tex_replacements.append((u'✕', u'\\(\\times\\)'))
+tex_replacements.append((u'日', u'\\begin{CJK}{UTF8}{min}日\\end{CJK}'))
+tex_replacements.append((u'本', u'\\begin{CJK}{UTF8}{min}本\\end{CJK}'))
+tex_replacements.append((u'語', u'\\begin{CJK}{UTF8}{min}語\\end{CJK}'))
