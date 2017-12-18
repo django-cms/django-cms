@@ -34,6 +34,9 @@ FakePlugin._updateClipboard = jasmine.createSpy().and.callFake(() => {
     originalPlugin._updateClipboard();
 });
 FakePlugin.aliasPluginDuplicatesMap = {};
+FakePlugin._refreshPlugins = jasmine.createSpy().and.callFake(() => {
+    originalPlugin._refreshPlugins();
+});
 FakePlugin.prototype._setupUI = jasmine.createSpy();
 FakePlugin.prototype._ensureData = jasmine.createSpy();
 FakePlugin.prototype._setGeneric = jasmine.createSpy();
@@ -64,6 +67,7 @@ describe('CMS.StructureBoard', function() {
         FakePlugin.prototype._collapsables.calls.reset();
         FakePlugin.prototype._setPluginContentEvents.calls.reset();
         FakePlugin.prototype._setPluginStructureEvents.calls.reset();
+        FakePlugin._refreshPlugins.calls.reset();
         StructureBoard.__ResetDependency__('showLoader');
         StructureBoard.__ResetDependency__('hideLoader');
     });
@@ -2171,9 +2175,11 @@ describe('CMS.StructureBoard', function() {
                 }
             });
             StructureBoard.__Rewire__('Plugin', FakePlugin);
+            Plugin.__Rewire__('Plugin', FakePlugin);
         });
         afterEach(() => {
             StructureBoard.__ResetDependency__('Plugin');
+            Plugin.__ResetDependency__('Plugin', FakePlugin);
         });
 
         it('resolves immediately when content mode is already loaded', done => {

@@ -10,7 +10,7 @@ import Clipboard from './cms.clipboard';
 import URI from 'urijs';
 import DiffDOM from 'diff-dom';
 import PreventParentScroll from 'prevent-parent-scroll';
-import { find, findIndex, once, remove, uniqWith, compact, isEqual } from 'lodash';
+import { find, findIndex, once, remove, compact, isEqual } from 'lodash';
 import ls from 'local-storage';
 
 import './jquery.ui.custom';
@@ -409,12 +409,12 @@ class StructureBoard {
 
                 StructureBoard._initializeGlobalHandlers();
                 StructureBoard.actualizeEmptyPlaceholders();
-                CMS._instances.forEach(function(instance) {
+                CMS._instances.forEach(instance => {
                     if (instance.options.type === 'placeholder') {
                         instance._setPlaceholder();
                     }
                 });
-                CMS._instances.forEach(function(instance) {
+                CMS._instances.forEach(instance => {
                     if (instance.options.type === 'plugin') {
                         instance._setPluginStructureEvents();
                         instance._collapsables();
@@ -517,53 +517,12 @@ class StructureBoard {
                 CMS.API.Toolbar._refreshMarkup(newToolbar);
                 $(window).trigger('resize');
 
-                // TODO find better way to reset
-                Plugin.aliasPluginDuplicatesMap = {};
-                Plugin.staticPlaceholderDuplicatesMap = {};
-                CMS._plugins = uniqWith(CMS._plugins, isEqual);
-
-                CMS._instances.forEach(function(instance) {
-                    if (instance.options.type === 'placeholder') {
-                        instance._setupUI(`cms-placeholder-${instance.options.placeholder_id}`);
-                        instance._ensureData();
-                        instance.ui.container.data('cms', instance.options);
-                    }
-                });
-                CMS._instances.forEach(function(instance) {
-                    if (instance.options.type === 'plugin') {
-                        instance._setupUI(`cms-plugin-${instance.options.plugin_id}`);
-                        instance._ensureData();
-                        instance.ui.container.data('cms').push(instance.options);
-                        instance._setPluginContentEvents();
-                    }
-                });
-
-                CMS._plugins.forEach(([type, opts]) => {
-                    if (opts.type !== 'placeholder' && opts.type !== 'plugin') {
-                        const instance = find(
-                            CMS._instances,
-                            i => i.options.type === opts.type && Number(i.options.plugin_id) === Number(opts.plugin_id)
-                        );
-
-                        if (instance) {
-                            // update
-                            instance._setupUI(type);
-                            instance._ensureData();
-                            instance.ui.container.data('cms').push(instance.options);
-                            instance._setGeneric();
-                        } else {
-                            // create
-                            CMS._instances.push(new Plugin(type, opts));
-                        }
-                    }
-                });
+                Plugin._refreshPlugins();
 
                 const scripts = $('script');
 
                 // istanbul ignore next
                 scripts.on('load', function() {
-                    // make sure this works correctly
-                    // FIXME do it after every script is loaded
                     window.dispatchEvent(new Event('load'));
                     window.dispatchEvent(new Event('DOMContentLoaded'));
                 });
@@ -572,13 +531,11 @@ class StructureBoard {
 
                 if (unhandledPlugins.length) {
                     CMS.API.Messages.open({
-                        message: 'The page was changed in the meantime, reloading...'
+                        message: CMS.config.lang.unhandledPageChange
                     });
                     Helpers.reloadBrowser();
                 }
 
-                // TODO handle the case when there is a mismatch in number of plugins/placeholders
-                // TODO might be edge cases when page doesn't exist anymore (moved/removed) by another user
                 that._loadedContent = true;
             })
             .fail(function() {
@@ -992,10 +949,13 @@ class StructureBoard {
         });
     }
 
-    // TODO deal with already loaded states as well
-    //
-    //
-    // Currently is only called when something changed on the page, but shouldn't make that assumption
+    /**
+     * @method invalidateState
+     * @param {String} action - action to handle
+     * @param {Object} data - data required to handle the object
+     * @param {Object} opts
+     * @param {Boolean} [opts.propagate=true] - should we propagate the change to other tabs or not
+     */
     // eslint-disable-next-line complexity
     invalidateState(action, data, { propagate = true } = {}) {
         // eslint-disable-next-line default-case
@@ -1058,8 +1018,6 @@ class StructureBoard {
 
         if (currentMode === 'structure') {
             this._requestcontent = null;
-
-            // TODO update it in two secs (maybe debounce);
 
             if (this._loadedContent && action !== 'COPY') {
                 this.updateContent();
@@ -1274,12 +1232,11 @@ class StructureBoard {
         if (!this._loadedStructure) {
             this._requeststructure = null;
         }
-        var fixedContentMarkup = contentMarkup; // .replace(/<noscript[\s\S]*?<\/noscript>/, '');
+        var fixedContentMarkup = contentMarkup;
         var newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
 
-        // check generics!
         var toolbar = $('#cms-top, [data-cms]').detach();
         var newToolbar = $(newDoc).find('.cms-toolbar').clone();
 
@@ -1295,7 +1252,6 @@ class StructureBoard {
             );
         }
 
-        // TODO handle the case when there is a plugin count mismatch but not generics mismatch
         var headDiff = dd.diff(document.head, newDoc.head);
 
         StructureBoard._replaceBodyWithHTML(newDoc.body.innerHTML);
@@ -1305,32 +1261,11 @@ class StructureBoard {
 
         $('.cms-structure-content').scrollTop(structureScrollTop);
 
-        // TODO find better way to reset
-        Plugin.aliasPluginDuplicatesMap = {};
-        Plugin.staticPlaceholderDuplicatesMap = {};
-        CMS._instances.forEach(function(instance) {
-            if (instance.options.type === 'placeholder') {
-                instance._setupUI(`cms-placeholder-${instance.options.placeholder_id}`);
-                instance._ensureData();
-                instance.ui.container.data('cms', instance.options);
-                instance._setPlaceholder();
-            }
-        });
-        CMS._instances.forEach(function(instance) {
-            if (instance.options.type === 'plugin') {
-                instance._setupUI(`cms-plugin-${instance.options.plugin_id}`);
-                instance._ensureData();
-                instance.ui.container.data('cms').push(instance.options);
-                instance._setPluginContentEvents();
-                // TODO generics
-            }
-        });
+        Plugin._refreshPlugins();
 
         Helpers._getWindow().dispatchEvent(new Event('load'));
         $(Helpers._getWindow()).trigger('cms-content-refresh');
 
-        // TODO handle the case when there is a mismatch in number of plugins/placeholders
-        // TODO might be edge cases when page doesn't exist anymore (moved/removed)
         this._loadedContent = true;
     }
 
