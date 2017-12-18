@@ -247,10 +247,12 @@ spelling_word_list_filename = 'spelling_wordlist'
 
 spelling_ignore_pypi_package_names = True
 
+# Latex package needed to write japanese characters
 latex_elements = {
     'preamble': r'''\usepackage{CJKutf8}''',
 }
 
+# Adding missing Unicode chars 
 from sphinx.util.texescape import tex_replacements
 tex_replacements.append(('✕', r'\(\times\)'))
 tex_replacements.append(('日', r'\begin{CJK}{UTF8}{min}日\end{CJK}'))
