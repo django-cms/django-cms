@@ -7,7 +7,7 @@ import $ from 'jquery';
 import '../polyfills/array.prototype.findindex';
 import nextUntil from './nextuntil';
 
-import { toPairs, isNaN, debounce, findIndex, find, every, uniqWith, once, difference } from 'lodash';
+import { toPairs, isNaN, debounce, findIndex, find, every, uniqWith, once, difference, isEqual } from 'lodash';
 
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
@@ -300,7 +300,6 @@ var Plugin = new Class({
         });
 
         setTimeout(() => {
-            // TODO delegate to the doc
             this.ui.dragitem
                 .on('mouseenter', e => {
                     e.stopPropagation();
@@ -737,7 +736,7 @@ var Plugin = new Class({
             plugin_order = plugin_order.map(function(pluginId) {
                 var id = pluginId;
 
-                // TODO correct way would be to check if it's actually a
+                // correct way would be to check if it's actually a
                 // pasted plugin and only then replace the id with copy token
                 // otherwise if we would copy from the same placeholder we would get
                 // two copy tokens instead of original and a copy.
@@ -1928,7 +1927,6 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
             e.preventDefault();
             if (++clickCounter === 1) {
                 timer = setTimeout(function() {
-                    // FIXME this shouldn't happen if the default was prevented already
                     var anchor = $(e.target).closest('a');
 
                     clickCounter = 0;
@@ -2186,6 +2184,50 @@ Plugin._updateUsageCount = function _updateUsageCount(pluginType) {
 Plugin._removeAddPluginPlaceholder = function removeAddPluginPlaceholder() {
     // this can't be cached since they are created and destroyed all over the place
     $('.cms-add-plugin-placeholder').remove();
+};
+
+Plugin._refreshPlugins = function refreshPlugins() {
+    Plugin.aliasPluginDuplicatesMap = {};
+    Plugin.staticPlaceholderDuplicatesMap = {};
+    CMS._plugins = uniqWith(CMS._plugins, isEqual);
+
+    CMS._instances.forEach(instance => {
+        if (instance.options.type === 'placeholder') {
+            instance._setupUI(`cms-placeholder-${instance.options.placeholder_id}`);
+            instance._ensureData();
+            instance.ui.container.data('cms', instance.options);
+            instance._setPlaceholder();
+        }
+    });
+
+    CMS._instances.forEach(instance => {
+        if (instance.options.type === 'plugin') {
+            instance._setupUI(`cms-plugin-${instance.options.plugin_id}`);
+            instance._ensureData();
+            instance.ui.container.data('cms').push(instance.options);
+            instance._setPluginContentEvents();
+        }
+    });
+
+    CMS._plugins.forEach(([type, opts]) => {
+        if (opts.type !== 'placeholder' && opts.type !== 'plugin') {
+            const instance = find(
+                CMS._instances,
+                i => i.options.type === opts.type && Number(i.options.plugin_id) === Number(opts.plugin_id)
+            );
+
+            if (instance) {
+                // update
+                instance._setupUI(type);
+                instance._ensureData();
+                instance.ui.container.data('cms').push(instance.options);
+                instance._setGeneric();
+            } else {
+                // create
+                CMS._instances.push(new Plugin(type, opts));
+            }
+        }
+    });
 };
 
 // shorthand for jQuery(document).ready();
