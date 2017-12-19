@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
-from classytags.arguments import IntegerArgument, Argument, StringArgument
-from classytags.core import Options
-from classytags.helpers import InclusionTag
-from cms.utils.i18n import force_language, get_language_objects
 from django import template
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import get_language, ugettext
+
+from classytags.arguments import IntegerArgument, Argument, StringArgument
+from classytags.core import Options
+from classytags.helpers import InclusionTag
+
+from cms.utils.i18n import (
+    force_language,
+    get_language_list,
+    get_language_object,
+    get_public_languages,
+)
+
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -382,11 +390,20 @@ class LanguageChooser(InclusionTag):
         marker = MARKERS[i18n_mode]
         current_lang = get_language()
         site = Site.objects.get_current()
-        languages = []
-        for lang in get_language_objects(site.pk):
-            if lang.get('public', True):
-                languages.append((lang['code'], marker(lang['name'], lang['code'])))
-        context['languages'] = languages
+        request = context['request']
+
+        if request.user.is_staff:
+            languages = get_language_list(site_id=site.pk)
+        else:
+            languages = get_public_languages(site_id=site.pk)
+
+        languages_info = []
+
+        for language in languages:
+            obj = get_language_object(language, site_id=site.pk)
+            languages_info.append((obj['code'], marker(obj['name'], obj['code'])))
+
+        context['languages'] = languages_info
         context['current_language'] = current_lang
         context['template'] = template
         return context
