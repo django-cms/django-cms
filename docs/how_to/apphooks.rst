@@ -22,10 +22,6 @@ The basics of apphook creation
 
 To create an apphook, create a ``cms_apps.py`` file in your application.
 
-.. note:: Up to version 3.1 this module was named ``cms_app.py`` - please
-          update your existing modules to the new naming convention.
-          Support for the old name will be removed in version 3.4.
-
 The file needs to contain a :class:`CMSApp <cms.app_base.CMSApp>` sub-class. For example::
 
     from cms.app_base import CMSApp

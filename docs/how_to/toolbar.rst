@@ -77,10 +77,6 @@ A simple example, registering a class that does nothing::
             pass
 
 
-.. note:: Up to version 3.1 the module was named ``cms_toolbar.py``. Please
-          update your existing modules to the new naming convention.
-          Support for the old name will be removed in version 3.4.
-
 .. warning::
 
     As the toolbar passed to ``post_template_populate`` has been already populated with items from
