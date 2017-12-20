@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import json
 
 from django.core.cache import cache
 from django.contrib import admin
@@ -18,7 +19,7 @@ from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
-from cms.models.pagemodel import Page, PageNode
+from cms.models.pagemodel import Page, PageNode, PageType
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
@@ -188,20 +189,40 @@ class PageTest(PageTestBase):
         with the request language pointing to a language
         not configured for the current site
         """
-        page_data = self.get_new_page_data()
+        from django.test import Client
+        from django.contrib.auth import get_user_model
+
+        client = Client()
         superuser = self.get_superuser()
         Site.objects.create(id=2, name='example-2.com', domain='example-2.com')
-        with self.login_user_context(superuser):
-            self.assertEqual(Title.objects.all().count(), 0)
-            self.assertEqual(Page.objects.all().count(), 0)
-            # crate home and auto publish
-            with self.settings(SITE_ID=2):
-                # url uses "en" as the request language
-                # but the site is configured to use "de" and "fr"
-                response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-                self.assertRedirects(response, URL_CMS_PAGE)
-                self.assertEqual(Page.objects.all().count(), 2)
-                self.assertEqual(Title.objects.filter(language='de').count(), 2)
+        client.login(
+            username=getattr(superuser, get_user_model().USERNAME_FIELD),
+            password=getattr(superuser, get_user_model().USERNAME_FIELD),
+        )
+        self.assertEqual(Title.objects.all().count(), 0)
+        self.assertEqual(Page.objects.all().count(), 0)
+        # create home and auto publish
+        with self.settings(SITE_ID=2):
+            # url uses "en" as the request language
+            # but the site is configured to use "de" and "fr"
+            response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
+            self.assertRedirects(response, URL_CMS_PAGE)
+            self.assertEqual(Page.objects.filter(site=2).count(), 2)
+            self.assertEqual(Title.objects.filter(language='de').count(), 2)
+
+        # The user is on site #1 but switches sites using the site switcher
+        # on the page changelist.
+        client.post(self.get_admin_url(Page, 'changelist'), {'site': 2})
+
+        # url uses "en" as the request language
+        # but the site is configured to use "de" and "fr"
+        response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
+        self.assertRedirects(response, URL_CMS_PAGE)
+        self.assertEqual(Page.objects.filter(site=2).count(), 3)
+        self.assertEqual(Title.objects.filter(language='de').count(), 3)
+
+        Site.objects.clear_cache()
+        client.logout()
 
     def test_create_tree_admin(self):
         """
@@ -629,6 +650,84 @@ class PageTest(PageTestBase):
             1,
         )
 
+    def test_copy_page_to_root_with_pagetypes(self):
+        """
+        When a page is copied, the cms should not count page types
+        when calculating where the sibling node of the new page.
+        """
+        data = {
+            'position': 4,
+            'source_site': 1,
+            'copy_permissions': 'on',
+            'copy_moderation': 'on',
+        }
+        superuser = self.get_superuser()
+        page_1 = create_page("page_a", "nav_playground.html", "en", published=True)
+        page_2 = create_page("page_b", "nav_playground.html", "en", published=True)
+
+        with self.login_user_context(superuser):
+            # Creates a page type whose nodes will be in the middle
+            # of other page nodes.
+            self.client.post(
+                self.get_admin_url(PageType, 'add'),
+                data={'source': page_1.pk, 'title': 'type1', 'slug': 'type1', '_save': 1},
+            )
+            self.client.post(
+                self.get_admin_url(PageType, 'add'),
+                data={'source': page_1.pk, 'title': 'type2', 'slug': 'type2', '_save': 1},
+            )
+            page_type_0 = self.assertObjectExist(
+                Page.objects.all(),
+                is_page_type=True,
+                nodes__parent__isnull=True,
+                publisher_is_draft=True,
+            )
+            page_type_1 = self.assertObjectExist(
+                Page.objects.all(),
+                is_page_type=True,
+                title_set__slug='type1',
+                publisher_is_draft=True,
+            )
+            page_type_2 = self.assertObjectExist(
+                Page.objects.all(),
+                is_page_type=True,
+                title_set__slug='type2',
+                publisher_is_draft=True,
+            )
+
+            # Add some normal pages on top of the page type nodes
+            page_3 = create_page("page_c", "nav_playground.html", "en", published=True)
+            page_4 = create_page("page_d", "nav_playground.html", "en", published=True)
+
+            # Copy a page and insert it at the bottom of all pages
+            endpoint = self.get_admin_url(Page, 'copy_page', page_1.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        new_slug = page_1.get_path('en') + '-copy-2'
+        new_path = page_1.get_slug('en') + '-copy-2'
+
+        page_5_title = self.assertObjectExist(
+            Title.objects.all(),
+            slug=new_slug,
+            path=new_path,
+        )
+        page_5 = page_5_title.page
+
+        tree = (
+            (page_1, '0001'),
+            (page_2, '0002'),
+            (page_type_0, '0003'),
+            (page_type_1, '00030001'),
+            (page_type_2, '00030002'),
+            (page_3, '0004'),
+            (page_4, '0005'),
+            (page_5, '0006'),
+        )
+
+        for page, path in tree:
+            self.assertEqual(self.reload(page.node).path, path)
+
     def test_copy_page_to_different_site(self):
         superuser = self.get_superuser()
         site_2 = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
@@ -679,7 +778,44 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            node = self.reload(page.node)
+            self.assertEqual(node.path, path)
+            self.assertEqual(node.site_id, 2)
+
+    def test_copy_page_to_different_site_fails_with_untranslated_page(self):
+        data = {
+            'position': 0,
+            'source_site': 1,
+            'copy_permissions': 'on',
+            'copy_moderation': 'on',
+        }
+        superuser = self.get_superuser()
+        site_2 = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
+        site_1_root = create_page("site 1 root", "nav_playground.html", "en", published=True)
+        expected_response = {
+            "status": 400,
+            "content": "Error! The page you're pasting is not translated in "
+                       "any of the languages configured by the target site.",
+        }
+
+        with self.settings(SITE_ID=2):
+            with self.login_user_context(superuser):
+                # Simulate the copy-dialog
+                endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
+                endpoint += '?source_site=%s' % site_1_root.site_id
+                response = self.client.get(endpoint)
+                self.assertEqual(response.status_code, 200)
+
+                # Copy the root page from site 1 and insert it as the first root page
+                # on site 2.
+                endpoint = self.get_admin_url(Page, 'copy_page', site_1_root.pk)
+                response = self.client.post(endpoint, data)
+                self.assertEqual(response.status_code, 200)
+                self.assertObjectDoesNotExist(Page.objects.all(), site=site_2)
+                self.assertEqual(
+                    json.loads(response.content.decode('utf8')),
+                    expected_response,
+                )
 
     def test_copy_page_to_different_site_with_no_pages(self):
         data = {
@@ -690,7 +826,7 @@ class PageTest(PageTestBase):
         }
         superuser = self.get_superuser()
         site_2 = Site.objects.create(id=2, domain='example-2.com', name='example-2.com')
-        site_1_root = create_page("site 1 root", "nav_playground.html", "en", published=True)
+        site_1_root = create_page("site 1 root", "nav_playground.html", "de", published=True)
 
         with self.settings(SITE_ID=2):
             with self.login_user_context(superuser):
