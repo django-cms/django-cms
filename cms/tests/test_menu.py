@@ -686,6 +686,49 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             for lang in context['languages']:
                 self.assertEqual(*lang)
 
+    def test_language_chooser_all_for_staff(self):
+        """
+        Language chooser should show all configured languages
+        on the current site if the user is staff.
+        """
+        superuser = self.get_superuser()
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        # DE is marked as public False
+        lang_settings[1][1]['public'] = False
+        # FR is marked as public False
+        lang_settings[1][2]['public'] = False
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            with self.login_user_context(superuser):
+                context = self.get_context(path=self.get_page(3).get_absolute_url())
+                Template("{% load menu_tags %}{% language_chooser %}").render(context)
+                self.assertEqual(len(context['languages']), 5)
+                self.assertSequenceEqual(
+                    sorted(lang[0] for lang in context['languages']),
+                    ['de', 'en', 'es-mx', 'fr', 'pt-br']
+                )
+
+    def test_language_chooser_public_for_anon(self):
+        """
+        Language chooser should only show public configured languages
+        on the current site if the user is anon.
+        """
+        # PT-BR is already set to public False
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        # DE is marked as public False
+        lang_settings[1][1]['public'] = False
+        # FR is marked as public False
+        lang_settings[1][2]['public'] = False
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            context = self.get_context(path=self.get_page(3).get_absolute_url())
+            Template("{% load menu_tags %}{% language_chooser %}").render(context)
+            self.assertEqual(len(context['languages']), 2)
+            self.assertSequenceEqual(
+                sorted(lang[0] for lang in context['languages']),
+                ['en', 'es-mx']
+            )
+
     def test_page_language_url(self):
         path = self.get_page(3).get_absolute_url()
         context = self.get_context(path=path)

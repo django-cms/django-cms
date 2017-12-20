@@ -9,6 +9,8 @@
 * Fixed "Expand all / Collapse all" not reflecting real state of the placeholder tree
 * Fixed a bug where Aliased plugins would render even if their host page was unpublished.
 * Fixed a bug where focusing inputs in modal would require 2 clicks in some browsers
+* Changed the language chooser to always show all configured languages to staff members
+  and public-only languages to anon users.
 
 
 === 3.4.5 (2017-10-12) ===
