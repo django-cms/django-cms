@@ -779,7 +779,13 @@ class PageTreeForm(forms.Form):
         self.page = kwargs.pop('page')
         self._site = kwargs.pop('site', Site.objects.get_current())
         super(PageTreeForm, self).__init__(*args, **kwargs)
-        self.fields['target'].queryset = Page.objects.drafts().filter(nodes__site=self._site)
+        self.fields['target'].queryset = Page.objects.drafts().filter(
+            nodes__site=self._site,
+            is_page_type=self.page.is_page_type,
+        )
+
+    def get_root_nodes(self):
+        return PageNode.get_root_nodes().filter(page__is_page_type=self.page.is_page_type)
 
     def get_parent_node(self, site):
         target_page = self.cleaned_data.get('target')
@@ -797,7 +803,7 @@ class PageTreeForm(forms.Form):
         return self._get_tree_options_for_root(position)
 
     def _get_tree_options_for_root(self, position):
-        siblings = PageNode.get_root_nodes().filter(site=self._site)
+        siblings = self.get_root_nodes().filter(site=self._site)
 
         try:
             target_node = siblings[position]
@@ -878,7 +884,7 @@ class CopyPageForm(PageTreeForm):
         except IndexError:
             # The user is copying a page to a site with no pages
             # Add the node as the last root node.
-            siblings = PageNode.get_root_nodes().reverse()
+            siblings = self.get_root_nodes().reverse()
             return (siblings[0], 'right')
 
 

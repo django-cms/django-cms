@@ -279,7 +279,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
         form._user = request.user
         form._site = self.get_site(request)
-        form._language = get_site_language_from_request(request, obj)
+        form._language = get_site_language_from_request(request, site_id=form._site.pk)
         return form
 
     def duplicate(self, request, object_id):
@@ -311,8 +311,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         # always returns a valid language
-        language = get_site_language_from_request(request, current_page=page)
-        language_obj = get_language_object(language, site_id=page.site_id)
+        site = self.get_site(request)
+        language = get_site_language_from_request(request, site_id=site.pk)
+        language_obj = get_language_object(language, site_id=site.pk)
 
         if not page.has_translation(language):
             # Can't edit advanced settings for a page translation (title)
@@ -387,7 +388,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         if extra_context is None:
             extra_context = {}
-        language = get_site_language_from_request(request)
+        site = self.get_site(request)
+        language = get_site_language_from_request(request, site_id=site.pk)
         extra_context.update({
             'language': language,
         })
@@ -422,7 +424,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             _has_advanced_settings_perm = self.has_change_advanced_settings_permission(request, obj=obj)
             extra_context['can_change_advanced_settings'] = _has_advanced_settings_perm
 
-        tab_language = get_site_language_from_request(request)
+        site = self.get_site(request)
+        tab_language = get_site_language_from_request(request, site_id=site.pk)
         extra_context.update(self.get_unihandecode_context(tab_language))
 
         response = super(BasePageAdmin, self).change_view(
@@ -528,7 +531,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if context is None:
             context = {}
 
-        language = get_site_language_from_request(request, obj)
+        site = self.get_site(request)
+        language = get_site_language_from_request(request, site_id=site.pk)
         languages = self._get_site_languages(request, obj)
         context.update({
             'language': language,
@@ -943,6 +947,14 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             message = force_text(_("Error! You don't have permissions to copy this page."))
             return jsonify_request(HttpResponseForbidden(message))
 
+        page_languages = page.get_languages()
+        site_languages = get_language_list(site_id=site.pk)
+
+        if not any(lang in  page_languages for lang in site_languages):
+            message = force_text(_("Error! The page you're pasting is not "
+                                   "translated in any of the languages configured by the target site."))
+            return jsonify_request(HttpResponseBadRequest(message))
+
         new_page = form.copy_page()
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
 
@@ -1355,10 +1367,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 | Q(parent__in=open_nodes)
             )
 
+        site = self.get_site(request)
         rows = self.get_tree_rows(
             request,
             nodes=nodes,
-            language=get_site_language_from_request(request),
+            language=get_site_language_from_request(request, site_id=site.pk),
             depth=(node.depth + 1 if node else 1),
             follow_descendants=True,
         )

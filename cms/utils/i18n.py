@@ -33,14 +33,12 @@ def get_languages(site_id=None):
     return result
 
 
-def get_site_language_from_request(request, current_page=None):
+def get_site_language_from_request(request, site_id=None):
     from cms.utils import get_current_site
 
     language = request.GET.get('language', None)
 
-    if current_page:
-        site_id = current_page.site_id
-    else:
+    if site_id is None:
         site_id = get_current_site().pk
 
     if is_valid_site_language(language, site_id=site_id):
@@ -50,10 +48,6 @@ def get_site_language_from_request(request, current_page=None):
 
     if is_valid_site_language(language, site_id=site_id):
         return language
-
-    if current_page and current_page.get_languages():
-        # in last resort, get the first language available in the page
-        return current_page.get_languages()[0]
     return get_default_language_for_site(site_id=site_id)
 
 
