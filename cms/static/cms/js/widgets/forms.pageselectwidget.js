@@ -13,7 +13,6 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.page
 require.ensure(
     [],
     function(require) {
-        var CMS = window.CMS || {};
         var $ = require('jquery');
         var Class = require('classjs');
 
@@ -24,7 +23,7 @@ require.ensure(
          * @class PageSelectWidget
          * @namespace CMS
          */
-        CMS.PageSelectWidget = new Class({
+        var PageSelectWidget = new Class({
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 // load functionality
@@ -78,10 +77,13 @@ require.ensure(
             }
         });
 
+        window.CMS = window.CMS || {};
+        window.CMS.PageSelectWidget = PageSelectWidget;
+
         // init
         $(function() {
-            CMS.Widgets._pageSelectWidgets.forEach(function(widget) {
-                new CMS.PageSelectWidget(widget);
+            window.CMS.Widgets._pageSelectWidgets.forEach(function(widget) {
+                new PageSelectWidget(widget);
             });
         });
     },
