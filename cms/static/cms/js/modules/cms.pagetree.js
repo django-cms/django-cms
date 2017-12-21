@@ -727,8 +727,12 @@ var PageTree = new Class({
             url: that.options.urls.copy.replace('{id}', data.id),
             data: data
         })
-            .done(function() {
-                that._reloadHelper();
+            .done(function(r) {
+                if (r.status && r.status === 400) { // eslint-disable-line
+                    that.showError(r.content);
+                } else {
+                    that._reloadHelper();
+                }
             })
             .fail(function(error) {
                 that.showError(error.statusText);
