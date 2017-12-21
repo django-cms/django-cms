@@ -11,7 +11,6 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.page
 // PAGE SMART LINK WIDGET
 // cms/forms/widgets.py used for redirects in admin/cms/page/advanced-settings
 require.ensure([], function (require) {
-    var CMS = window.CMS || {};
     var $ = require('jquery');
     var Class = require('classjs');
 
@@ -24,7 +23,7 @@ require.ensure([], function (require) {
      * @class PageSmartLinkWidget
      * @namespace CMS
      */
-    CMS.PageSmartLinkWidget = new Class({
+    var PageSmartLinkWidget = new Class({
 
         initialize: function initialize(options) {
             this.options = $.extend(true, {}, this.options, options);
@@ -92,9 +91,12 @@ require.ensure([], function (require) {
         }
     });
 
+    window.CMS = window.CMS || {};
+    window.CMS.PageSmartLinkWidget = PageSmartLinkWidget;
+
     $(function () {
-        CMS.Widgets._pageSmartLinkWidgets.forEach(function (widget) {
-            new CMS.PageSmartLinkWidget(widget);
+        window.CMS.Widgets._pageSmartLinkWidgets.forEach(function (widget) {
+            new PageSmartLinkWidget(widget);
         });
     });
 }, 'admin.widget');
