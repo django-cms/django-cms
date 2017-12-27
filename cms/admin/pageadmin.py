@@ -653,7 +653,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     def change_template(self, request, object_id):
         page = get_object_or_404(self.model, pk=object_id)
 
-        if not self.has_change_permission(request, obj=page):
+        if not self.has_change_advanced_settings_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to change the template")))
 
         to_template = request.POST.get("template", None)
