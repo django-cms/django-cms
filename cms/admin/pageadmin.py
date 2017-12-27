@@ -765,6 +765,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(object_id)
 
+        if not self.has_change_advanced_settings_permission(request, obj=page):
+            raise PermissionDenied('No permissions to change the template')
+
         to_template = request.POST.get("template", None)
 
         if to_template not in dict(get_cms_setting('TEMPLATES')):

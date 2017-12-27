@@ -646,23 +646,24 @@ class PageToolbar(CMSToolbar):
             else:
                 advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
             advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
-            advanced_disabled = not edit_mode or not self.page.has_advanced_settings_permission(self.request.user)
+            can_change_advanced = self.page.has_advanced_settings_permission(self.request.user)
+            advanced_disabled = not edit_mode or not can_change_advanced
             current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
 
             # templates menu
             if edit_mode:
-                templates_menu = current_page_menu.get_or_create_menu(
-                    'templates',
-                    _('Templates'),
-                    disabled=not can_change,
-                )
-
                 if self.page.is_page_type:
                     action = admin_reverse('cms_pagetype_change_template', args=(self.page.pk,))
                 else:
                     action = admin_reverse('cms_page_change_template', args=(self.page.pk,))
 
-                if can_change:
+                if can_change_advanced:
+                    templates_menu = current_page_menu.get_or_create_menu(
+                        'templates',
+                        _('Templates'),
+                        disabled=not can_change,
+                    )
+
                     for path, name in get_cms_setting('TEMPLATES'):
                         active = self.page.template == path
                         if path == TEMPLATE_INHERITANCE_MAGIC:

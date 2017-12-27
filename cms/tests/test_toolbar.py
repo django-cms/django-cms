@@ -172,6 +172,12 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
 @override_settings(CMS_PERMISSION=False)
 class ToolbarTests(ToolbarTestBase):
 
+    def get_page_item(self, toolbar):
+        items = toolbar.get_left_items() + toolbar.get_right_items()
+        page_item = [item for item in items if force_text(item.name) == 'Page']
+        self.assertEqual(len(page_item), 1)
+        return page_item[0]
+
     def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         toolbar = CMSToolbar(request)
@@ -221,10 +227,36 @@ class ToolbarTests(ToolbarTestBase):
     @override_settings(CMS_PERMISSION=True)
     def test_template_change_permission(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
-        request = self.get_page_request(page, self.get_nonstaff())
+
+        # Staff user with change page permissions only
+        staff_user = self.get_staff_user_with_no_permissions()
+        self.add_permission(staff_user, 'change_page')
+        global_permission = self.add_global_permission(staff_user, can_change=True, can_delete=True)
+
+        # User should not see "Templates" option because he only has
+        # "change" permission.
+        request = self.get_page_request(page, staff_user, edit=True)
         toolbar = CMSToolbar(request)
-        items = toolbar.get_left_items() + toolbar.get_right_items()
-        self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
+        page_item = self.get_page_item(toolbar)
+        template_item = [item for item in page_item.items
+                         if force_text(getattr(item, 'name', '')) == 'Templates']
+        self.assertEqual(len(template_item), 0)
+
+        # Give the user change advanced settings permission
+        global_permission.can_change_advanced_settings = True
+        global_permission.save()
+
+        # Reload user to avoid stale caches
+        staff_user = self.reload(staff_user)
+
+        # User should see "Templates" option because
+        # he has "change advanced settings" permission
+        request = self.get_page_request(page, staff_user, edit=True)
+        toolbar = CMSToolbar(request)
+        page_item = self.get_page_item(toolbar)
+        template_item = [item for item in page_item.items
+                         if force_text(getattr(item, 'name', '')) == 'Templates']
+        self.assertEqual(len(template_item), 1)
 
     def test_markup(self):
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)

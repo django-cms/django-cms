@@ -2086,6 +2086,49 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertTrue(self._translation_exists())
 
+    def test_user_can_change_template(self):
+        """
+        User can change a page's template if he
+        has change permissions on the Page model and both
+        global change and change advanced settings permissions.
+        """
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        endpoint = self.get_admin_url(Page, 'change_template', page.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=True)
+
+        with self.login_user_context(staff_user):
+            data = {'template': 'simple.html'}
+            response = self.client.post(endpoint, data)
+            self.assertContains(response, 'The template was successfully changed')
+            page.refresh_from_db(fields=['template'])
+            # clear the template cache
+            page.__dict__.pop('_template_cache', None)
+            self.assertEqual(page.get_template(), 'simple.html')
+
+    def test_user_cant_change_template(self):
+        """
+        User can't change a page's template if he
+        does not have change permissions on the Page model,
+        global change permissions and/or global change advanced settings
+        permissions.
+        """
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_no_permissions()
+        endpoint = self.get_admin_url(Page, 'change_template', page.pk)
+
+        self.add_permission(staff_user, 'change_page')
+        self.add_global_permission(staff_user, can_change=True)
+
+        with self.login_user_context(staff_user):
+            data = {'template': 'simple.html'}
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            page.refresh_from_db(fields=['template'])
+            self.assertEqual(page.get_template(), 'nav_playground.html')
+
     def test_user_can_revert_non_empty_page_to_live(self):
         """
         User can revert a page to live with plugins if he has change permissions
