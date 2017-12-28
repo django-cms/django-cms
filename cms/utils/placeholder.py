@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import operator
 import warnings
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -201,7 +202,7 @@ def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blo
                 nodes += _scan_placeholders(_get_nodelist(template), node_class, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
-            nodes += _extend_nodelist(node, node_class)
+            nodes += _get_placeholder_nodes_from_extend(node, node_class)
         # in block nodes we have to scan for super blocks
         elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == 'block.super':
@@ -277,7 +278,39 @@ def get_static_placeholders(template, context):
     return placeholders_with_code
 
 
-def _extend_nodelist(extend_node, node_class):
+def _get_block_nodes(extend_node):
+    # we don't support variable extensions
+    if is_variable_extend_node(extend_node):
+        return []
+
+    parent = extend_node.get_parent(get_context())
+    parent_nodelist = _get_nodelist(parent)
+    parent_nodes = parent_nodelist.get_nodes_by_type(BlockNode)
+    parent_extend_nodes = parent_nodelist.get_nodes_by_type(ExtendsNode)
+
+    if parent_extend_nodes:
+        # Start at the top
+        # Scan the extends node from the parent (if any)
+        nodes = _get_block_nodes(parent_extend_nodes[0])
+    else:
+        nodes = OrderedDict()
+
+    # Continue with the parent template nodes
+    for node in parent_nodes:
+        nodes[node.name] = node
+
+    # Move on to the current template nodes
+    current_nodes = _get_nodelist(extend_node).get_nodes_by_type(BlockNode)
+
+    for node in current_nodes:
+        if node.name in nodes:
+            # set this node as the super node (for {{ block.super }})
+            node.super = nodes[node.name]
+        nodes[node.name] = node
+    return nodes
+
+
+def _get_placeholder_nodes_from_extend(extend_node, node_class):
     """
     Returns a list of placeholders found in the parent template(s) of this
     ExtendsNode
@@ -285,17 +318,20 @@ def _extend_nodelist(extend_node, node_class):
     # we don't support variable extensions
     if is_variable_extend_node(extend_node):
         return []
-        # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
-    blocks = dict(extend_node.blocks)
-    _extend_blocks(extend_node, blocks)
+
+    # This is a dictionary mapping all BlockNode instances found
+    # in the template that contains the {% extends %} tag
+    block_nodes = _get_block_nodes(extend_node)
+    block_names = list(block_nodes.keys())
+
     placeholders = []
 
-    for block in blocks.values():
-        placeholders += _scan_placeholders(_get_nodelist(block), node_class, block, blocks.keys())
+    for block in block_nodes.values():
+        placeholders.extend(_scan_placeholders(_get_nodelist(block), node_class, block, block_names))
 
     # Scan topmost template for placeholder outside of blocks
     parent_template = _find_topmost_template(extend_node)
-    placeholders += _scan_placeholders(_get_nodelist(parent_template), node_class, None, blocks.keys())
+    placeholders += _scan_placeholders(_get_nodelist(parent_template), node_class, None, block_names)
     return placeholders
 
 
@@ -306,29 +342,3 @@ def _find_topmost_template(extend_node):
         return _find_topmost_template(node)
         # No ExtendsNode
     return extend_node.get_parent(get_context())
-
-
-def _extend_blocks(extend_node, blocks):
-    """
-    Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
-    """
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return
-    parent = extend_node.get_parent(get_context())
-    # Search for new blocks
-    for node in _get_nodelist(parent).get_nodes_by_type(BlockNode):
-        if not node.name in blocks:
-            blocks[node.name] = node
-        else:
-            # set this node as the super node (for {{ block.super }})
-            block = blocks[node.name]
-            seen_supers = []
-            while hasattr(block.super, 'nodelist') and block.super not in seen_supers:
-                seen_supers.append(block.super)
-                block = block.super
-            block.super = node
-        # search for further ExtendsNodes
-    for node in _get_nodelist(parent).get_nodes_by_type(ExtendsNode):
-        _extend_blocks(node, blocks)
-        break
