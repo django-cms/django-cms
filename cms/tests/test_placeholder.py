@@ -403,6 +403,10 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
             self.assertEqual(force_text(placeholder_3.get_label()), 'No_Name')
 
+    def test_placeholders_from_blocks_order(self):
+        placeholders = _get_placeholder_slots('placeholder_tests/test_with_block.html')
+        self.assertEqual(placeholders, ['one', 'two', 'three', 'four'])
+
     def test_placeholder_scanning_nested_super(self):
         placeholders = _get_placeholder_slots('placeholder_tests/nested_super_level1.html')
         self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
