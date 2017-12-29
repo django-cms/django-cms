@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import autodiscover_modules, import_string
+
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
-from cms.utils.django_load import load, iterload_objects
-from django.core.exceptions import ImproperlyConfigured
 
 
 class ToolbarPool(object):
@@ -19,12 +20,13 @@ class ToolbarPool(object):
             #import all the modules
         toolbars = get_cms_setting('TOOLBARS')
         if toolbars:
-            for cls in iterload_objects(toolbars):
+            for path in toolbars:
+                cls = import_string(path)
                 self.force_register = True
                 self.register(cls)
                 self.force_register = False
         else:
-            load('cms_toolbars')
+            autodiscover_modules('cms_toolbars')
         self._discovered = True
 
     def clear(self):

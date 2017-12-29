@@ -26,7 +26,6 @@ from cms.models.metaclasses import PageMetaClass
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
-from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_current_language
 
 from menus.menu_pool import menu_pool
@@ -1840,20 +1839,3 @@ class PageNode(MP_Node):
 
         for child in children:
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
-
-
-def _reversion():
-    exclude_fields = [
-        'publisher_is_draft',
-        'publisher_public',
-        'publisher_state',
-    ]
-
-    reversion_register(
-        Page,
-        follow=["title_set", "placeholders", "pagepermission_set"],
-        exclude_fields=exclude_fields
-    )
-
-
-_reversion()

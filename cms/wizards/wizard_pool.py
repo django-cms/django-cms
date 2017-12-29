@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import ugettext as _
-
-from cms.utils.django_load import load
 
 from .wizard_base import Wizard
 
@@ -32,7 +30,7 @@ class WizardPool(object):
 
     def _discover(self):
         if not self._discovered:
-            load('cms_wizards')
+            autodiscover_modules('cms_wizards')
             self._discovered = True
 
     def _clear(self):

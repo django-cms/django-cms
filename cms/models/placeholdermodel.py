@@ -25,7 +25,6 @@ from cms.constants import (
 from cms.utils import get_language_from_request
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
-from cms.utils.helpers import reversion_register
 
 
 @python_2_unicode_compatible
@@ -586,6 +585,3 @@ class Placeholder(models.Model):
             root_plugin=root_plugin,
         )
         return new_plugins
-
-
-reversion_register(Placeholder)

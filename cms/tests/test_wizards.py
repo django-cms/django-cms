@@ -424,23 +424,3 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2-3'))
-
-
-# This entire test class can be removed in 3.5.0
-class TestWizardSettings(CMSTestCase):
-    def test_old_wizard_setting(self):
-        value = 'obscure-named-placeholder'
-        with override_settings(CMS_WIZARD_CONTENT_PLACEHOLDER=value):
-            self.assertEqual(get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER'), value)
-
-    def test_new_wizard_setting(self):
-        value = 'obscure-named-placeholder'
-        with override_settings(CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER=value):
-            self.assertEqual(get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER'), value)
-
-    def test_new_wizard_setting_are_preferred(self):
-        old_value = 'obscure-named-placeholder-old'
-        new_value = 'obscure-named-placeholder-new'
-        with override_settings(CMS_WIZARD_CONTENT_PLACEHOLDER=old_value,
-                               CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER=new_value):
-            self.assertEqual(get_cms_setting('PAGE_WIZARD_CONTENT_PLACEHOLDER'), new_value)

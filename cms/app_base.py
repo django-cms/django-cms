@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-import warnings
 
 
 class CMSApp(object):
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
-    _urls = None
+    _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``
     _menus = []
     #: name of the apphook (required)
@@ -32,22 +31,6 @@ class CMSApp(object):
                     )
                 )
             cls.app_config.cmsapp = cls
-        # mapping the legacy urls attribute to private attribute
-        # and exposing the new API
-        if hasattr(cls, 'urls'):
-            if not isinstance(cls.urls, property):
-                cls._urls = cls.urls
-                cls.urls = cls.legacy_urls
-        else:
-            cls.urls = cls.legacy_urls
-        # mapping the legacy menus attribute to private attribute
-        # and exposing the new API
-        if hasattr(cls, 'menus'):
-            if not isinstance(cls.menus, property):
-                cls._menus = cls.menus
-                cls.menus = cls.legacy_menus
-        else:
-            cls.menus = cls.legacy_menus
         return super(CMSApp, cls).__new__(cls)
 
     def get_configs(self):
@@ -68,14 +51,6 @@ class CMSApp(object):
         (usually the model admin add view)
         """
         raise NotImplemented('Configurable AppHooks must implement this method')
-
-    @property
-    def legacy_menus(self):
-        return self._menus
-
-    @legacy_menus.setter
-    def menus(self, value):
-        self._menus = value
 
     def get_menus(self, page=None, language=None, **kwargs):
         """
@@ -102,17 +77,6 @@ class CMSApp(object):
         :return: list of menu classes
         """
         return self._menus
-
-    @property
-    def legacy_urls(self):
-        warnings.warn('Accessing CMSApp.urls directly is deprecated, '
-                      'and it will be removed in version 3.5; CMSApp.get_urls method',
-                      DeprecationWarning)
-        return self._urls
-
-    @legacy_urls.setter
-    def urls(self, value):
-        self._urls = value
 
     def get_urls(self, page=None, language=None, **kwargs):
         """

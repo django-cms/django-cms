@@ -12,7 +12,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
-from cms.utils.helpers import reversion_register
 
 
 # Cannot use contrib.auth.get_user_model() at compile time.
@@ -282,6 +281,3 @@ class PageUserGroup(Group):
         app_label = 'cms'
         if (1, 10) <= django.VERSION < (2, 0):
             manager_inheritance_from_future = True
-
-
-reversion_register(PagePermission)

@@ -29,7 +29,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
-from cms.utils.helpers import reversion_register
 from cms.utils.urlutils import admin_reverse
 
 from treebeard.mp_tree import MP_Node
@@ -607,9 +606,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def get_copy_url(self):
         return self.placeholder.get_copy_url()
-
-
-reversion_register(CMSPlugin)
 
 
 def get_plugin_media_path(instance, filename):
