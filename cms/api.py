@@ -166,10 +166,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
 
     if reverse_id:
-        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).exists():
+        if Page.objects.drafts().filter(reverse_id=reverse_id, node__site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
-    page = Page.objects.create(
+    page = Page(
         created_by=created_by,
         changed_by=created_by,
         publication_date=publication_date,
@@ -181,12 +181,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
         template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
-        site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-    page.attach_site(site=site, target=target_node, position=position)
+    page.set_tree_node(site=site, target=target_node, position=position)
+    page.save()
     page.rescan_placeholders()
 
     create_title(
@@ -204,7 +204,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page.publish(language)
 
     if parent and position in ('last-child', 'first-child'):
-        parent._clear_node_cache(site)
+        parent._clear_node_cache()
 
     del _thread_locals.user
     return page
@@ -225,12 +225,12 @@ def create_title(language, title, page, menu_title=None, slug=None,
     assert isinstance(page, Page)
 
     # validate language:
-    assert language in get_language_list(page.site_id)
+    assert language in get_language_list(page.node.site_id)
 
     # set default slug:
     if not slug:
         base = page.get_path_for_slug(slugify(title), language)
-        slug = get_available_slug(page.site, base, language)
+        slug = get_available_slug(page.node.site, base, language)
 
     if overwrite_url:
         path = overwrite_url.strip('/')
@@ -429,10 +429,12 @@ def publish_pages(include_unpublished=False, language=None, site=None):
     Create published public version of selected drafts.
     """
     qs = Page.objects.drafts()
+
     if not include_unpublished:
         qs = qs.filter(title_set__published=True).distinct()
+
     if site:
-        qs = qs.filter(site=site)
+        qs = qs.filter(node__site=site)
 
     output_language = None
     for i, page in enumerate(qs):
@@ -465,7 +467,7 @@ def get_page_draft(page):
         if page.publisher_is_draft:
             return page
         else:
-            return page.publisher_draft
+            return page.publisher_public
     else:
         return None
 

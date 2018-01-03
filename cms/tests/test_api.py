@@ -225,7 +225,7 @@ class PythonAPITests(CMSTestCase):
         self.add_permission(user, 'publish_page')
 
         gpp = GlobalPagePermission.objects.create(user=user, can_change=True, can_publish=True)
-        gpp.sites.add(page.site)
+        gpp.sites.add(page.node.site)
         publish_page(page, user, 'en')
         # Reload the page to get updates.
         page = page.reload()

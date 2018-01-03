@@ -220,14 +220,14 @@ def _get_app_patterns(site):
     # we don't have a request here so get_page_queryset() can't be used,
     # so use public() queryset.
     # This can be done because url patterns are used just in frontend
-    title_qs = Title.objects.public().filter(page__publisher_public__nodes__site=site)
+    title_qs = Title.objects.public().filter(page__node__site=site)
 
     hooked_applications = OrderedDict()
 
     # Loop over all titles with an application hooked to them
     titles = (title_qs.exclude(page__application_urls=None)
               .exclude(page__application_urls='')
-              .order_by('-page__publisher_public__nodes__path').select_related())
+              .order_by('-page__node__path').select_related())
     # TODO: Need to be fixed for django-treebeard when forward ported to 3.1
     for title in titles:
         path = title.path

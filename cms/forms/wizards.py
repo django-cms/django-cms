@@ -44,7 +44,6 @@ class SlugWidget(forms.widgets.TextInput):
 
 class CreateCMSPageForm(AddPageForm):
     page = None
-    page_node = None
     sub_page_form = False
 
     # Field overrides
@@ -104,7 +103,7 @@ class CreateCMSPageForm(AddPageForm):
         parent_node = data.get('parent_node')
 
         if parent_node:
-            base = parent_node.page.get_path(self._language)
+            base = parent_node.item.get_path(self._language)
             path = u'%s/%s' % (base, slug) if base else slug
         else:
             base = ''
@@ -121,26 +120,26 @@ class CreateCMSPageForm(AddPageForm):
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people from possible form-hacking.
-        if self.page_node and self.sub_page_form:
+        if self.page and self.sub_page_form:
             # User is adding a page which will be a direct
             # child of the current page.
-            parent_node = self.page_node
-        elif self.page_node and self.page_node.parent:
+            parent_page = self.page
+        elif self.page and self.page.parent_page:
             # User is adding a page which will be a right
             # sibling to the current page.
-            parent_node = self.page_node.parent
+            parent_page = self.page.parent_page
         else:
-            parent_node = None
+            parent_page = None
 
-        if parent_node:
-            has_perm = user_can_add_subpage(self.user, target=parent_node.page)
+        if parent_page:
+            has_perm = user_can_add_subpage(self.user, target=parent_page)
         else:
             has_perm = user_can_add_page(self.user)
 
         if not has_perm:
             message = ugettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
-        return parent_node
+        return parent_page.node if parent_page else None
 
     def clean_slug(self):
         # Don't let the PageAddForm validate this

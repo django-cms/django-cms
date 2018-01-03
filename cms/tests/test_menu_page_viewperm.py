@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, PageNode
+from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -247,8 +247,7 @@ class ViewPermissionTests(CMSTestCase):
             query[get_user_model().USERNAME_FIELD+'__iexact'] = username
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
-        all_nodes = PageNode.objects.filter(page__in=all_pages)
-        visible_page_ids = [node.page_id for node in get_visible_nodes(request, all_nodes, self.site)]
+        visible_page_ids = [page.pk for page in get_visible_nodes(request, all_pages, self.site)]
         public_page_ids = Page.objects.drafts().filter(title_set__title__in=expected_granted_pages).values_list('id',
                                                                                                                 flat=True)
         self.assertEqual(len(visible_page_ids), len(expected_granted_pages))
@@ -293,9 +292,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         """
         all_pages = self._setup_tree_pages()
         request = self.get_request()
-        all_nodes = PageNode.objects.filter(page__in=all_pages)
-        visible_nodes = get_visible_nodes(request, all_nodes, self.site)
-        self.assertEqual(len(all_pages), len(visible_nodes))
+        visible_pages = get_visible_nodes(request, all_pages, self.site)
+        self.assertEqual(len(all_pages), len(visible_pages))
         menu_renderer = menu_pool.get_renderer(request)
         nodes = menu_renderer.get_nodes()
         self.assertEqual(len(nodes), len(all_pages))

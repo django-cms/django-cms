@@ -328,10 +328,6 @@ class ContentRenderer(BaseRenderer):
             # try and load them for all placeholders on the page.
             self._preload_placeholders_for_page(current_page)
 
-        if current_page.site_is_secondary(self.current_site):
-            # shared pages can't be edited but can be previewed
-            editable = False
-
         try:
             placeholder = placeholder_cache[current_page.pk][slot]
         except KeyError:
@@ -346,8 +342,7 @@ class ContentRenderer(BaseRenderer):
                 use_cache=True,
                 nodelist=None,
             )
-
-        parent_page = current_page.get_parent()
+        parent_page = current_page.parent_page
         should_inherit = (
             inherit
             and not content and parent_page
@@ -398,11 +393,6 @@ class ContentRenderer(BaseRenderer):
             placeholder = static_placeholder.public
             editable = False
             use_cache = True
-
-        if editable and self.current_page:
-            # if the static placeholder is being rendered from a shared page,
-            # don't allow the user to edit it.
-            editable = not self.current_page.site_is_secondary(self.current_site)
 
         # I really don't like these impromptu flags...
         placeholder.is_static = True
@@ -539,7 +529,7 @@ class ContentRenderer(BaseRenderer):
                 is_fallback=inherit,
             )
 
-        parent_page = page.get_parent()
+        parent_page = page.parent_page
         # Inherit only placeholders that have no plugins
         # or are not cached.
         placeholders_to_inherit = [

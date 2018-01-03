@@ -55,7 +55,7 @@ from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
-    EmptyTitle, Page, PageNode, PageType,
+    EmptyTitle, Page, PageType,
     Title, CMSPlugin, PagePermission,
     GlobalPagePermission, StaticPlaceholder,
 )
@@ -81,7 +81,7 @@ require_POST = method_decorator(require_POST)
 PUBLISH_COMMENT = "Publish"
 
 
-class PageNodeAdmin(admin.ModelAdmin):
+class TreeNodeAdmin(admin.ModelAdmin):
     list_filter = ['site']
     list_display = ['id', 'path', 'page', 'numchild', 'depth', 'parent_display', 'site']
     readonly_fields = ['parent', 'page']
@@ -101,6 +101,7 @@ class PageNodeAdmin(admin.ModelAdmin):
 
 class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     form = AddPageForm
+    ordering = ('node__path',)
     search_fields = ('=id', 'title_set__slug', 'title_set__title', 'reverse_id')
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
@@ -116,8 +117,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     changelist_form = ChangeListForm
     duplicate_form = DuplicatePageForm
 
-    node_admin = PageNodeAdmin
-
     inlines = PERMISSION_ADMIN_INLINES
 
     def get_admin_url(self, action, *args):
@@ -130,20 +129,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     def get_queryset(self, request):
         site = self.get_site(request)
-        queryset  = super(BasePageAdmin, self).get_queryset(request)
-        return queryset.filter(nodes__site=site)
-
-    def get_nodes_queryset(self, request):
-        site = self.get_site(request)
-        nodes = PageNode.objects.get_for_site(site)
-        nodes = nodes.prefetch_related(
-            Prefetch(
-                'page__title_set',
-                to_attr='filtered_translations',
-                queryset=Title.objects.filter(language__in=get_language_list(site.pk))
-            ),
-        )
-        return nodes
+        queryset = super(BasePageAdmin, self).get_queryset(request)
+        queryset = queryset.filter(node__site=site, publisher_is_draft=True)
+        return queryset.select_related('node')
 
     def get_object_with_translation(self, language, *args, **kwargs):
         page = self.get_object(*args, **kwargs)
@@ -336,10 +324,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         paste_enabled = request.GET.get('has_copy') or request.GET.get('has_cut')
         context = {
             'page': page,
-            'node': page.get_node_object(site),
+            'node': page.node,
             'opts': self.opts,
             'site': site,
-            'is_shared_page': page.site_is_secondary(site),
             'page_is_restricted': page.has_view_restrictions(site),
             'paste_enabled': paste_enabled,
             'has_add_permission': page_permissions.user_can_add_subpage(request.user, target=page),
@@ -522,7 +509,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     def _get_site_languages(self, request, obj=None):
         if obj:
-            site_id = obj.site_id
+            site_id = obj.node.site_id
         else:
             site_id = self.get_site(request).pk
         return get_language_tuple(site_id)
@@ -572,16 +559,16 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if parent_node_id:
             try:
-                parent_node = PageNode.objects.get(pk=parent_node_id)
-            except Page.DoesNotExist:
+                parent_item = self.get_queryset(request).get(node=parent_node_id)
+            except self.model.DoesNotExist:
                 return False
         else:
-            parent_node = None
+            parent_item = None
 
-        if parent_node:
+        if parent_item:
             has_perm = page_permissions.user_can_add_subpage(
                 request.user,
-                target=parent_node.page,
+                target=parent_item,
                 site=site,
             )
         else:
@@ -678,6 +665,14 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return True
         return super(BasePageAdmin, self).lookup_allowed(key, *args, **kwargs)
 
+    def get_sites_for_user(self, user):
+        sites = Site.objects.order_by('name')
+
+        if not get_cms_setting('PERMISSION') or user.is_superuser:
+            return sites
+        _has_perm = page_permissions.user_can_change_at_least_one_page
+        return [site for site in sites if _has_perm(user, site)]
+
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG
 
@@ -697,17 +692,15 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not language:
             language = get_language()
 
-        node_admin = self.node_admin(model=PageNode, admin_site=self.admin_site)
-
         query = request.GET.get('q', '')
-        nodes = self.get_nodes_queryset(request)
-        nodes, use_distinct = node_admin.get_search_results(request, nodes, query)
+        pages = self.get_queryset(request)
+        pages, use_distinct = self.get_search_results(request, pages, query)
 
         changelist_form = self.changelist_form(request.GET)
 
         try:
             changelist_form.full_clean()
-            nodes = changelist_form.run_filters(nodes)
+            pages = changelist_form.run_filters(pages)
         except (ValueError, ValidationError):
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -722,11 +715,18 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
 
         if changelist_form.is_filtered():
-            nodes = nodes.distinct() if use_distinct else nodes
+            pages = pages.prefetch_related(
+                Prefetch(
+                    'title_set',
+                    to_attr='filtered_translations',
+                    queryset=Title.objects.filter(language__in=get_language_list(site.pk))
+                ),
+            )
+            pages = pages.distinct() if use_distinct else pages
             # Evaluates the queryset
-            has_items = len(nodes) >= 1
+            has_items = len(pages) >= 1
         else:
-            has_items = nodes.exists()
+            has_items = pages.exists()
 
         context = self.admin_site.each_context(request)
         context.update({
@@ -741,13 +741,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'module_name': force_text(self.model._meta.verbose_name_plural),
             'admin': self,
-            #'preserved_filters': self.get_preserved_filters(request),
             'tree': {
                 'site': site,
-                'sites': permissions.get_user_sites_queryset(request.user),
+                'sites': self.get_sites_for_user(request.user),
                 'query': query,
                 'is_filtered': changelist_form.is_filtered(),
-                'items': nodes,
+                'items': pages,
                 'has_items': has_items,
             },
         })
@@ -902,7 +901,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(page_id)
 
-        if not target_language or not target_language in get_language_list(site_id=page.site_id):
+        if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
         for placeholder in page.get_placeholders():
@@ -1150,7 +1149,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not has_translation:
             raise Http404('No translation matches requested language.')
 
-        language_name = get_language_object(language, site_id=page.site_id)['name']
+        language_name = get_language_object(language, site_id=page.node.site_id)['name']
 
         try:
             page.unpublish(language)
@@ -1182,7 +1181,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         else:
             language = get_language_from_request(request)
 
-        site = self.get_site(request)
         page, translation = self.get_object_with_translation(
             request=request,
             object_id=object_id,
@@ -1252,7 +1250,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             page.remove_language(language)
 
             if page.node.is_branch:
-                page.mark_descendants_pending(language, site=site)
+                page.mark_descendants_pending(language)
 
             self._send_post_page_operation(
                 request,
@@ -1295,7 +1293,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         site = get_current_site()
         active_site = self.get_site(request)
-        is_shared_page = page.site_is_secondary(site)
         can_see_page = page_permissions.user_can_view_page(request.user, page, active_site)
 
         if can_see_page:
@@ -1306,8 +1303,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if can_see_page and not can_change_page:
             # User can see the page but has no permission to edit it,
             # as a result, only let them see it if is published.
-            # Unless the page is a shared page.
-            can_see_page = is_shared_page or page.is_published(language)
+            can_see_page = page.is_published(language)
 
         if not can_see_page:
             message = ugettext('You don\'t have permissions to see page "%(title)s"')
@@ -1319,7 +1315,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         attrs += "&language=" + language
         url = page.get_absolute_url(language) + attrs
 
-        if site != active_site and not page.nodes.filter(site=site).exists():
+        if site != active_site and page.node.site_id != site.pk:
             # The user has selected a site using the site selector menu
             # and the page is not available on the current site's tree.
             # Redirect to the page url in the selected site
@@ -1352,35 +1348,41 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         Used for lazy loading pages in cms.pagetree.js
         """
-        nodes = self.get_nodes_queryset(request)
+        site = self.get_site(request)
+        pages = self.get_queryset(request)
         node_id = request.GET.get('nodeId')
         open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
 
         if node_id:
-            node = get_object_or_404(nodes, pk=int(node_id))
-            nodes = nodes.get_descendants(node).filter(Q(pk__in=open_nodes)|Q(parent__in=open_nodes))
+            page = get_object_or_404(pages, node_id=int(node_id))
+            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes)|Q(node__parent__in=open_nodes))
         else:
-            node = None
-            nodes = nodes.filter(
+            page = None
+            pages = pages.filter(
                 # get all root nodes
-                Q(depth=1)
+                Q(node__depth=1)
                 # or children which were previously open
-                | Q(depth=2, pk__in=open_nodes)
+                | Q(node__depth=2, node__in=open_nodes)
                 # or children of the open descendants
-                | Q(parent__in=open_nodes)
+                | Q(node__parent__in=open_nodes)
             )
-
-        site = self.get_site(request)
+        pages = pages.prefetch_related(
+            Prefetch(
+                'title_set',
+                to_attr='filtered_translations',
+                queryset=Title.objects.filter(language__in=get_language_list(site.pk))
+            ),
+        )
         rows = self.get_tree_rows(
             request,
-            nodes=nodes,
+            pages=pages,
             language=get_site_language_from_request(request, site_id=site.pk),
-            depth=(node.depth + 1 if node else 1),
+            depth=(page.node.depth + 1 if page else 1),
             follow_descendants=True,
         )
         return HttpResponse(u''.join(rows))
 
-    def get_tree_rows(self, request, nodes, language, depth=1,
+    def get_tree_rows(self, request, pages, language, depth=1,
                       follow_descendants=True):
         """
         Used for rendering the page tree, inserts into context everything what
@@ -1394,8 +1396,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         languages = get_language_list(site.pk)
         user_can_add = page_permissions.user_can_add_subpage
 
-        def render_page_row(node):
-            page = node.page
+        def render_page_row(page):
             page.title_cache = {trans.language: trans for trans in page.filtered_translations}
 
             for _language in languages:
@@ -1415,14 +1416,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 'admin': self,
                 'opts': self.opts,
                 'site': site,
-                'node': node,
                 'page': page,
-                'ancestors': node.get_cached_ancestors(),
-                'descendants': node.get_cached_descendants(),
+                'node': page.node,
+                'ancestors': [node.item for node in page.node.get_cached_ancestors()],
+                'descendants': [node.item for node in page.node.get_cached_descendants()],
                 'request': request,
                 'lang': language,
                 'metadata': metadata,
-                'is_shared_page': page.site_is_secondary(site),
                 'page_languages': page.get_languages(),
                 'preview_language': language,
                 'follow_descendants': follow_descendants,
@@ -1437,18 +1437,25 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return template.render(context)
 
         if follow_descendants:
-            root_nodes = (node for node in nodes if node.depth == depth)
+            root_pages = (page for page in pages if page.node.depth == depth)
         else:
             # When the tree is filtered, it's displayed as a flat structure
-            root_nodes = nodes
+            root_pages = pages
 
         if depth == 1:
-            for node in root_nodes:
-                node._set_hierarchy(nodes)
-                yield render_page_row(node)
+            nodes = []
+
+            for page in pages:
+                page.node.__dict__['item'] = page
+                nodes.append(page.node)
+
+            for page in root_pages:
+                page.node._set_hierarchy(nodes)
+                yield render_page_row(page)
         else:
-            for node in root_nodes:
-                yield render_page_row(node)
+            for page in root_pages:
+                page.node.__dict__['item'] = page
+                yield render_page_row(page)
 
     def resolve(self, request):
         if not request.user.is_staff:
@@ -1599,10 +1606,6 @@ class PageAdmin(BasePageAdmin):
         queryset  = super(PageAdmin, self).get_queryset(request)
         return queryset.exclude(is_page_type=True)
 
-    def get_nodes_queryset(self, request):
-        nodes = super(PageAdmin, self).get_nodes_queryset(request)
-        return nodes.exclude(page__is_page_type=True)
-
     def get_urls(self):
         """Get the admin urls
         """
@@ -1637,24 +1640,12 @@ class PageAdmin(BasePageAdmin):
         # Check if one of the affected pages either from the old homepage
         # or the homepage had an apphook attached
         if old_home_tree:
-            apphooks_affected = (
-                self
-                .model
-                .objects
-                .filter(pk__in=old_home_tree, publisher_is_draft=False)
-                .has_apphooks()
-            )
+            apphooks_affected = old_home_tree.filter(publisher_is_draft=False).has_apphooks()
         else:
             apphooks_affected = False
 
         if not apphooks_affected:
-            apphooks_affected = (
-                self
-                .model
-                .objects
-                .filter(pk__in=new_home_tree, publisher_is_draft=False)
-                .has_apphooks()
-            )
+            apphooks_affected = new_home_tree.filter(publisher_is_draft=False).has_apphooks()
 
         if apphooks_affected:
             # One or more pages affected by this operation was attached to an apphook.
@@ -1700,10 +1691,6 @@ class PageTypeAdmin(BasePageAdmin):
     def get_queryset(self, request):
         queryset  = super(PageTypeAdmin, self).get_queryset(request)
         return queryset.exclude(is_page_type=False)
-
-    def get_nodes_queryset(self, request):
-        nodes = super(PageTypeAdmin, self).get_nodes_queryset(request)
-        return nodes.exclude(page__is_page_type=False)
 
 
 admin.site.register(Page, PageAdmin)

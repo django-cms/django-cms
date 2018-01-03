@@ -74,7 +74,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     site = Site.objects._get_site_by_id(site_id)
     try:
         if 'pk' in page_lookup:
-            page = Page.objects.all().get(**page_lookup)
+            page = Page.objects.select_related('node').get(**page_lookup)
             if request and use_draft(request):
                 if page.publisher_is_draft:
                     return page
@@ -87,7 +87,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                     return page
         else:
             pages = get_page_queryset(site, draft=use_draft(request))
-            return pages.get(**page_lookup)
+            return pages.select_related('node').get(**page_lookup)
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
@@ -135,6 +135,9 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id,
         if settings.DEBUG:
             raise
         return ''
+    else:
+        # save a query. cache the page.
+        placeholder.page = page
 
     content = renderer.render_placeholder(
         placeholder=placeholder,

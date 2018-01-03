@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
+from cms.models.pagemodel import TreeNode
 from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -22,7 +23,7 @@ from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             get_default_language_for_site,
                             is_language_prefix_patterns_used)
-from cms.utils.page import get_node_queryset, get_page_from_request
+from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
 
 
@@ -62,9 +63,9 @@ def details(request, slug):
     site = get_current_site()
     page = get_page_from_request(request, use_path=slug)
     toolbar = get_toolbar_from_request(request)
-    page_nodes = get_node_queryset(site)
+    tree_nodes = TreeNode.objects.get_for_site(site)
 
-    if not page and not slug and not page_nodes.exists():
+    if not page and not slug and not tree_nodes.exists():
         # render the welcome page if the requested path is root "/"
         # and there's no pages
         return _render_welcome_page(request)

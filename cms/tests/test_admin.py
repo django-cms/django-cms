@@ -112,8 +112,6 @@ class AdminTestCase(AdminTestsBase):
         page_data = {
             'title': PAGE2,
             'slug': page2.get_slug(),
-            'language': 'en',
-            'site': page.site.pk,
             'template': page2.template,
             'application_urls': 'SampleApp',
             'application_namespace': 'space1',
@@ -218,8 +216,6 @@ class AdminTestCase(AdminTestsBase):
             url = admin_reverse('cms_page_dates', args=(draft.pk,))
             with self.login_user_context(admin_user):
                 response = self.client.post(url, {
-                    'language': 'en',
-                    'site': draft.site.pk,
                     'publication_date_0': new_date.date(),
                     'publication_date_1': new_date.strftime("%H:%M:%S"),
                     'publication_end_date_0': new_end_date.date(),
@@ -247,7 +243,6 @@ class AdminTestCase(AdminTestsBase):
             with self.login_user_context(admin_user):
                 response = self.client.post(url, {
                     'language': 'en',
-                    'site': draft.site.pk,
                     'publication_date_0': new_date.date(),
                     'publication_date_1': new_date.strftime("%H:%M:%S"),
                     'publication_end_date_0': new_end_date.date(),
@@ -315,10 +310,10 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin_user):
             response = self.client.get(self.get_admin_url(Page, 'changelist'))
             cms_page_nodes = response.context_data['tree']['items']
-            self.assertEqual(cms_page_nodes[0].page, first_level_page)
-            self.assertEqual(cms_page_nodes[1].page, second_level_page_top)
-            self.assertEqual(cms_page_nodes[2].page, third_level_page)
-            self.assertEqual(cms_page_nodes[3].page, second_level_page_bottom)
+            self.assertEqual(cms_page_nodes[0], first_level_page)
+            self.assertEqual(cms_page_nodes[1], second_level_page_top)
+            self.assertEqual(cms_page_nodes[2], third_level_page)
+            self.assertEqual(cms_page_nodes[3], second_level_page_bottom)
 
     def test_changelist_get_results(self):
         admin_user = self.get_superuser()
@@ -953,11 +948,9 @@ class AdminFormsTests(AdminTestsBase):
 
     def test_advanced_settings_endpoint_fails_gracefully(self):
         admin_user = self.get_superuser()
-        site = Site.objects.get_current()
         page = create_page('Page 1', 'nav_playground.html', 'en')
         page_data = {
             'language': 'en',
-            'site': site.pk,
             'template': 'col_two.html',
         }
         path = admin_reverse('cms_page_advanced', args=(page.pk,))
@@ -971,7 +964,6 @@ class AdminFormsTests(AdminTestsBase):
 
         # So test that the form short circuits if there's errors.
         page_data['application_urls'] = 'TestApp'
-        page_data['site'] = '1000'
 
         with self.login_user_context(admin_user):
             response = self.client.post(path, page_data)
@@ -981,7 +973,6 @@ class AdminFormsTests(AdminTestsBase):
             page = page.reload()
             # Make sure no change was made
             self.assertEqual(page.application_urls, None)
-            self.assertEqual(page.site.pk, site.pk)
 
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")

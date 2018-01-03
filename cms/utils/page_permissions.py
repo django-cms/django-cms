@@ -28,9 +28,13 @@ PAGE_VIEW_CODENAME = get_model_permission_codename(Page, 'view')
 _django_permissions_by_action = {
     'add_page': [PAGE_ADD_CODENAME, PAGE_CHANGE_CODENAME],
     'change_page': [PAGE_CHANGE_CODENAME],
-    'delete_page': [PAGE_DELETE_CODENAME],
-    'delete_page_translation': [PAGE_DELETE_CODENAME],
-    'publish_page': [PAGE_PUBLISH_CODENAME],
+    'change_page_advanced_settings': [PAGE_CHANGE_CODENAME],
+    'change_page_permissions': [PAGE_CHANGE_CODENAME],
+    'delete_page': [PAGE_CHANGE_CODENAME, PAGE_DELETE_CODENAME],
+    'delete_page_translation': [PAGE_CHANGE_CODENAME, PAGE_DELETE_CODENAME],
+    'move_page': [PAGE_CHANGE_CODENAME],
+    'publish_page': [PAGE_CHANGE_CODENAME, PAGE_PUBLISH_CODENAME],
+    'revert_page_to_live': [PAGE_CHANGE_CODENAME]
 }
 
 
@@ -70,7 +74,7 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
     return page_ids
 
 
-def auth_permission_required(action, manual=False):
+def auth_permission_required(action):
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
         def wrapper(user, *args, **kwargs):
@@ -86,7 +90,7 @@ def auth_permission_required(action, manual=False):
 
             permissions_enabled = get_cms_setting('PERMISSION')
 
-            if manual or (not user.is_superuser and permissions_enabled):
+            if not user.is_superuser and permissions_enabled:
                 return func(user, *args, **kwargs)
             return True
         return wrapper
@@ -140,19 +144,8 @@ def user_can_add_subpage(user, target, site=None):
 
 
 @cached_func
-@auth_permission_required('change_page', manual=True)
+@auth_permission_required('change_page')
 def user_can_change_page(user, page, site=None):
-    if site is None:
-        site = get_current_site()
-
-    can_change = not page.site_is_secondary(site)
-
-    if can_change and user.is_superuser:
-        return True
-
-    if not can_change or not get_cms_setting('PERMISSION'):
-        return can_change
-
     can_change = has_generic_permission(
         page=page,
         user=user,
@@ -163,7 +156,6 @@ def user_can_change_page(user, page, site=None):
 
 
 @cached_func
-@change_permission_required
 @auth_permission_required('delete_page')
 def user_can_delete_page(user, page, site=None):
     has_perm = has_generic_permission(
@@ -190,16 +182,8 @@ def user_can_delete_page(user, page, site=None):
 
 
 @cached_func
-@auth_permission_required('delete_page_translation', manual=True)
+@auth_permission_required('delete_page_translation')
 def user_can_delete_page_translation(user, page, language, site=None):
-    can_change = user_can_change_page(user, page, site=site)
-
-    if can_change and user.is_superuser:
-        return True
-
-    if not can_change or not get_cms_setting('PERMISSION'):
-        return can_change
-
     has_perm = has_generic_permission(
         page=page,
         user=user,
@@ -223,14 +207,10 @@ def user_can_delete_page_translation(user, page, language, site=None):
 
 
 @cached_func
+@auth_permission_required('change_page')
 def user_can_revert_page_to_live(user, page, language, site=None):
-    can_change = user_can_change_page(user, page, site=site)
-
-    if can_change and user.is_superuser:
-        return True
-
-    if not can_change or not get_cms_setting('PERMISSION'):
-        return can_change
+    if not user_can_change_page(user, page, site=site):
+        return False
 
     placeholders = (
         _get_draft_placeholders(page)
@@ -245,7 +225,6 @@ def user_can_revert_page_to_live(user, page, language, site=None):
 
 
 @cached_func
-@change_permission_required
 @auth_permission_required('publish_page')
 def user_can_publish_page(user, page, site=None):
     has_perm = has_generic_permission(
@@ -258,8 +237,7 @@ def user_can_publish_page(user, page, site=None):
 
 
 @cached_func
-@change_permission_required
-@skip_if_permissions_disabled
+@auth_permission_required('change_page_advanced_settings')
 def user_can_change_page_advanced_settings(user, page, site=None):
     has_perm = has_generic_permission(
         page=page,
@@ -271,8 +249,7 @@ def user_can_change_page_advanced_settings(user, page, site=None):
 
 
 @cached_func
-@change_permission_required
-@skip_if_permissions_disabled
+@auth_permission_required('change_page_permissions')
 def user_can_change_page_permissions(user, page, site=None):
     has_perm = has_generic_permission(
         page=page,
@@ -284,8 +261,7 @@ def user_can_change_page_permissions(user, page, site=None):
 
 
 @cached_func
-@change_permission_required
-@skip_if_permissions_disabled
+@auth_permission_required('move_page')
 def user_can_move_page(user, page, site=None):
     has_perm = has_generic_permission(
         page=page,

@@ -199,25 +199,27 @@ class ApphooksTestCase(CMSTestCase):
             "home", "nav_playground.html", "de", created_by=superuser, published=True, site=site2
         )
 
-        page_1 = create_page(
+        page_a_1 = create_page(
             "apphooked-page", "nav_playground.html", "en", created_by=superuser, published=True, parent=home_site_1,
             apphook=NS_APP_NAME, apphook_namespace="instance"
         )
-        page_2_1 = create_page(
-            "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_2,
-            site=site1
+        page_a_2 = create_page(
+            "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_1,
         )
-        page_2_2 = create_page(
+        page_b_1 = create_page(
             "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_2,
             site=site2
         )
-        form = AdvancedSettingsForm(instance=page_1)
+        form = AdvancedSettingsForm(instance=page_a_1)
+        form._site = site1
         self.assertFalse(form._check_unique_namespace_instance("instance"))
 
-        form = AdvancedSettingsForm(instance=page_2_1)
+        form = AdvancedSettingsForm(instance=page_a_2)
+        form._site = site1
         self.assertTrue(form._check_unique_namespace_instance("instance"))
 
-        form = AdvancedSettingsForm(instance=page_2_2)
+        form = AdvancedSettingsForm(instance=page_b_1)
+        form._site = site2
         self.assertFalse(form._check_unique_namespace_instance("instance"))
 
         self.apphook_clear()
@@ -426,7 +428,7 @@ class ApphooksTestCase(CMSTestCase):
                             language="en",
                             created_by=self.superuser,
                             published=True,
-                            parent=de_title.page.node.parent_page,
+                            parent=de_title.page.get_parent_page(),
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
         create_title("de", "de_title", page2, slug="slug")
@@ -810,7 +812,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.node.parent_page,
+                            parent=titles[0].page.get_parent_page(),
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_title('de', 'de_title', page2, slug='slug')
         page2.publish('de')
@@ -852,7 +854,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.get_draft_object().node.parent_page,
+                            parent=titles[0].page.get_parent_page(),
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_title('de', 'de_title', page2, slug='slug')

@@ -14,11 +14,10 @@ from cms.extensions import PageExtension
 from cms.models import Page, PageType
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 from cms.test_utils.project.extensionapp.models import MultiTablePageExtension, MultiTableTitleExtension
-from cms.test_utils.testcases import CMSTestCase as TestCase
-from cms.tests.test_admin import AdminTestsBase
+from cms.test_utils.testcases import CMSTestCase
 
 
-class ExtensionsTestCase(TestCase):
+class ExtensionsTestCase(CMSTestCase):
     def test_register_extension(self):
         initial_extension_count = len(extension_pool.page_extensions)
         # --- None extension registering -----------------------------
@@ -119,7 +118,7 @@ class ExtensionsTestCase(TestCase):
         # asserting original extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_title_extensions()), 2)
-        copied_page = page.copy_with_descendants(page.site, target_node=None, position='last-child')
+        copied_page = page.copy_with_descendants(target_node=None, position='last-child')
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
@@ -128,8 +127,7 @@ class ExtensionsTestCase(TestCase):
         # testing extension content
         old_page_extensions = [page_extension, subpage_extension]
         old_title_extension = [title_extension, subtitle_extension]
-        for index, new_node in enumerate([copied_page.node] + list(copied_page.node.get_descendants())):
-            new_page = new_node.page
+        for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
                              old_page_extensions[index].extra)
             self.assertEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].extra_title,
@@ -181,7 +179,7 @@ class ExtensionsTestCase(TestCase):
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_title_extensions()), 2)
 
-        copied_page = page.copy_with_descendants(page.site, target_node=None, position='last-child')
+        copied_page = page.copy_with_descendants(target_node=None, position='last-child')
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
@@ -190,8 +188,7 @@ class ExtensionsTestCase(TestCase):
         # testing extension content
         old_page_extensions = [page_extension, subpage_extension]
         old_title_extension = [title_extension, subtitle_extension]
-        for index, node in enumerate([copied_page.node] + list(copied_page.node.get_descendants())):
-            new_page = node.page
+        for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             copied_page_extension = extension_pool.get_page_extensions(new_page)[0]
             copied_title_extension = extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0]
             self.assertEqual(copied_page_extension.extension_parent_field,
@@ -322,11 +319,13 @@ class ExtensionsTestCase(TestCase):
         title_extension.delete()
         self.assertFalse(MultiTableTitleExtension.objects.filter(pk=title_extension.pk).exists())
 
-class ExtensionAdminTestCase(AdminTestsBase):
+class ExtensionAdminTestCase(CMSTestCase):
+
     def setUp(self):
         User = get_user_model()
 
-        self.admin, self.normal_guy = self._get_guys()
+        self.admin = self.get_superuser()
+        self.normal_guy = self.get_staff_user_with_std_permissions()
 
         if get_user_model().USERNAME_FIELD == 'email':
             self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'test2@test.com')

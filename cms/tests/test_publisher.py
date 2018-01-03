@@ -11,7 +11,7 @@ from django.utils.translation import override as force_language
 from cms.api import create_page, add_plugin, create_title
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.management.commands.subcommands.publisher_publish import PublishCommand
-from cms.models import CMSPlugin, Page, PageNode, Title
+from cms.models import CMSPlugin, Page, TreeNode, Title
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
@@ -339,15 +339,15 @@ class PublishingTests(TestCase):
         self.assertNeverPublished(page)
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectDoesNotExist(public, title_set__title=name)
-        self.assertObjectDoesNotExist(public.published("en"), title_set__title=name)
+        self.assertObjectDoesNotExist(public.published(language="en"), title_set__title=name)
 
         page.publish("en")
 
         self.assertPublished(page.reload())
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(public, title_set__title=name)
-        self.assertFalse(public.published("de").exists())
-        self.assertFalse(public.published("fr").exists())
+        self.assertFalse(public.published(language="de").exists())
+        self.assertFalse(public.published(language="fr").exists())
         self.assertSequenceEqual(page.publisher_public.get_languages(), ['en'])
 
     def test_publish_admin(self):
@@ -361,7 +361,7 @@ class PublishingTests(TestCase):
         self.assertNeverPublished(page)
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectDoesNotExist(public, title_set__title=name)
-        self.assertObjectDoesNotExist(public.published("en"), title_set__title=name)
+        self.assertObjectDoesNotExist(public.published(language="en"), title_set__title=name)
 
         with self.login_user_context(self.get_superuser()):
             response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
@@ -371,8 +371,8 @@ class PublishingTests(TestCase):
         self.assertPublished(page)
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(public, title_set__title=name)
-        self.assertFalse(public.published("de").exists())
-        self.assertFalse(public.published("fr").exists())
+        self.assertFalse(public.published(language="de").exists())
+        self.assertFalse(public.published(language="fr").exists())
         self.assertSequenceEqual(page.publisher_public.get_languages(), ['en'])
 
     def test_publish_wrong_lang(self):
@@ -406,11 +406,11 @@ class PublishingTests(TestCase):
 
         self.assertObjectExist(drafts, title_set__title='parent')
         self.assertObjectDoesNotExist(public, title_set__title='parent')
-        self.assertObjectDoesNotExist(public.published('en'), title_set__title='parent')
+        self.assertObjectDoesNotExist(public.published(language='en'), title_set__title='parent')
 
         self.assertObjectExist(drafts, title_set__title='child')
         self.assertObjectExist(public, title_set__title='child')
-        self.assertObjectDoesNotExist(public.published('en'), title_set__title='child')
+        self.assertObjectDoesNotExist(public.published(language='en'), title_set__title='child')
 
         parent.reload().publish("en")
 
@@ -420,7 +420,7 @@ class PublishingTests(TestCase):
             self.assertPublished(page)
             self.assertObjectExist(drafts, title_set__title=name)
             self.assertObjectExist(public, title_set__title=name)
-            self.assertObjectExist(public.published('en'), title_set__title=name)
+            self.assertObjectExist(public.published(language='en'), title_set__title=name)
 
     def test_simple_publisher(self):
         """
@@ -442,7 +442,7 @@ class PublishingTests(TestCase):
         self.assertTrue(pageA.publisher_public_id)
         self.assertTrue(pageB.publisher_public_id)
         self.assertTrue(not pageC.publisher_public_id)
-        self.assertEqual(len(Page.objects.public().published("en")), 2)
+        self.assertEqual(len(Page.objects.public().published(language="en")), 2)
 
         # Let's publish C now.
         pageC.publish("en")
@@ -451,7 +451,7 @@ class PublishingTests(TestCase):
         self.assertTrue(pageA.publisher_public_id)
         self.assertTrue(pageB.publisher_public_id)
         self.assertTrue(pageC.publisher_public_id)
-        self.assertEqual(len(Page.objects.public().published("en")), 3)
+        self.assertEqual(len(Page.objects.public().published(language="en")), 3)
 
     def test_i18n_publishing(self):
         page = self.create_page('parent', published=True)
@@ -467,7 +467,7 @@ class PublishingTests(TestCase):
         name = self._testMethodName
         page = self.create_page(name, published=True)
         drafts = Page.objects.drafts()
-        published = Page.objects.public().published("en")
+        published = Page.objects.public().published(language="en")
         self.assertObjectExist(drafts, title_set__title=name)
         self.assertObjectExist(published, title_set__title=name)
 
@@ -604,7 +604,7 @@ class PublishingTests(TestCase):
         child.reload()
         drafts = Page.objects.drafts()
         public = Page.objects.public()
-        self.assertEqual(public.published("en").count(), 3)
+        self.assertEqual(public.published(language="en").count(), 3)
         self.assertEqual(page.node.get_descendant_count(), 2)
         base = reverse('pages-root')
 
@@ -615,7 +615,7 @@ class PublishingTests(TestCase):
         for title in ('Page', 'Child', 'Grandchild'):
             self.assertObjectExist(drafts, title_set__title=title)
             self.assertObjectExist(public, title_set__title=title)
-            self.assertObjectExist(public.published("en"), title_set__title=title)
+            self.assertObjectExist(public.published(language="en"), title_set__title=title)
             item = drafts.get(title_set__title=title)
             self.assertTrue(item.publisher_public_id)
             self.assertEqual(item.get_publisher_state('en'), PUBLISHER_STATE_DEFAULT)
@@ -630,7 +630,7 @@ class PublishingTests(TestCase):
         for title in ('Page', 'Child', 'Grandchild'):
             self.assertObjectExist(drafts, title_set__title=title)
             self.assertObjectExist(public, title_set__title=title)
-            self.assertObjectDoesNotExist(public.published("en"), title_set__title=title)
+            self.assertObjectDoesNotExist(public.published(language="en"), title_set__title=title)
             item = drafts.get(title_set__title=title)
             if title == 'Page':
                 self.assertFalse(item.is_published("en"))
@@ -854,9 +854,9 @@ class PublishingTests(TestCase):
         item2 = item2.reload()
 
         self.assertEqual(Page.objects.filter(publisher_is_draft=False).count(), 5)
-        self.assertEqual(PageNode.objects.count(), 5)
+        self.assertEqual(TreeNode.objects.count(), 5)
 
-        child_nodes = list(PageNode.objects.filter(parent__isnull=False))
+        child_nodes = list(TreeNode.objects.filter(parent__isnull=False))
 
         for idx, node in enumerate(child_nodes):
             self.assertEqual(node.path[0:4], node.parent.path[0:4])
@@ -868,9 +868,9 @@ class PublishingTests(TestCase):
         item2.publish('en')
 
         self.assertEqual(Page.objects.filter(publisher_is_draft=False).count(), 5)
-        self.assertEqual(PageNode.objects.count(), 5)
+        self.assertEqual(TreeNode.objects.count(), 5)
 
-        child_nodes = list(PageNode.objects.filter(parent__isnull=False))
+        child_nodes = list(TreeNode.objects.filter(parent__isnull=False))
 
         for idx, node in enumerate(child_nodes):
             self.assertEqual(node.path[0:4], node.parent.path[0:4])

@@ -719,6 +719,7 @@ class ViewPermissionBaseTests(CMSTestCase):
 
     def setUp(self):
         self.page = create_page('testpage', 'nav_playground.html', 'en')
+        self.site = get_current_site()
 
     def get_request(self, user=None):
         attrs = {
@@ -757,15 +758,15 @@ class BasicViewPermissionTests(ViewPermissionBaseTests):
         with self.assertNumQueries(0):
             self.assertViewAllowed(self.page)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site),
-                         [self.page.node])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
     def test_unauth_non_access(self):
         request = self.get_request()
         with self.assertNumQueries(0):
             self.assertViewNotAllowed(self.page)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site),
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
                          [])
 
     @override_settings(CMS_PUBLIC_FOR="all")
@@ -776,8 +777,8 @@ class BasicViewPermissionTests(ViewPermissionBaseTests):
         with self.assertNumQueries(0):
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site),
-                         [self.page.node])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
     def test_staff_public_staff(self):
         user = self.get_staff_user_with_no_permissions()
@@ -786,8 +787,8 @@ class BasicViewPermissionTests(ViewPermissionBaseTests):
         with self.assertNumQueries(0):
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site),
-                         [self.page.node])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
     def test_staff_basic_auth(self):
         user = self.get_staff_user_with_no_permissions()
@@ -796,8 +797,8 @@ class BasicViewPermissionTests(ViewPermissionBaseTests):
         with self.assertNumQueries(0):
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site),
-                         [self.page.node])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
     @override_settings(CMS_PUBLIC_FOR="all")
     def test_normal_basic_auth(self):
@@ -807,7 +808,7 @@ class BasicViewPermissionTests(ViewPermissionBaseTests):
         with self.assertNumQueries(0):
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site), [self.page.node])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [self.page])
 
 
 @override_settings(
@@ -830,7 +831,7 @@ class UnrestrictedViewPermissionTests(ViewPermissionBaseTests):
             """
             self.assertViewNotAllowed(self.page)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site), [])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [])
 
     def test_global_access(self):
         user = self.get_standard_user()
@@ -846,7 +847,7 @@ class UnrestrictedViewPermissionTests(ViewPermissionBaseTests):
             """
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site), [self.page.node])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [self.page])
 
     def test_normal_denied(self):
         user = self.get_standard_user()
@@ -862,7 +863,7 @@ class UnrestrictedViewPermissionTests(ViewPermissionBaseTests):
             """
             self.assertViewNotAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, [self.page.node], self.page.site), [])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [])
 
 
 @override_settings(
@@ -878,8 +879,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         super(RestrictedViewPermissionTests, self).setUp()
         self.group = Group.objects.create(name='testgroup')
         self.pages = [self.page]
-        self.nodes = [page.node for page in self.pages]
-        self.expected = [self.page.node]
+        self.expected = [self.page]
         PagePermission.objects.create(page=self.page, group=self.group, can_view=True, grant_on=ACCESS_PAGE)
 
     def test_unauthed(self):
@@ -890,7 +890,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
             """
             self.assertViewNotAllowed(self.page)
 
-        self.assertEqual(get_visible_nodes(request, self.nodes, self.page.site), [])
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), [])
 
     def test_page_permissions(self):
         user = self.get_standard_user()
@@ -903,12 +903,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
             PagePermission query (is this page restricted)
             content type lookup (x2)
             GlobalpagePermission query for user
-            PageNode lookup
+            TreeNode lookup
             PagePermission query for this user
             """
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, self.nodes, self.page.site), self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
     def test_page_group_permissions(self):
         user = self.get_standard_user()
@@ -921,12 +921,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
                 PagePermission query (is this page restricted)
                 content type lookup (x2)
                 GlobalpagePermission query for user
-                PageNode lookup
+                TreeNode lookup
                 PagePermission query for user
             """
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, self.nodes, self.page.site), self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
     def test_global_permission(self):
         user = self.get_standard_user()
@@ -943,7 +943,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
             """
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, self.nodes, self.page.site), self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
     def test_basic_perm_denied(self):
         user = self.get_staff_user_with_no_permissions()
@@ -955,12 +955,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
             PagePermission query (is this page restricted)
             content type lookup x2
             GlobalpagePermission query for user
-            PageNode lookup
+            TreeNode lookup
             PagePermission query for this user
             """
             self.assertViewNotAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, self.nodes, self.page.site), [])
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), [])
 
     def test_basic_perm(self):
         user = self.get_standard_user()
@@ -976,7 +976,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
             """
             self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_nodes(request, self.nodes, self.page.site), self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
 
 class PublicViewPermissionTests(RestrictedViewPermissionTests):
@@ -986,7 +986,7 @@ class PublicViewPermissionTests(RestrictedViewPermissionTests):
         super(PublicViewPermissionTests, self).setUp()
         self.page.publish('en')
         self.pages = [self.page.publisher_public]
-        self.expected = [self.page.node]
+        self.expected = [self.page.publisher_public]
 
 
 class GlobalPermissionTests(CMSTestCase):

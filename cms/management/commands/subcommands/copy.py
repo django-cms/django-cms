@@ -8,7 +8,7 @@ from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import Page, PageNode, StaticPlaceholder, EmptyTitle
+from cms.models import Page, StaticPlaceholder, EmptyTitle
 from cms.utils import get_language_list
 from cms.utils.copy_plugins import copy_plugins_to
 
@@ -118,22 +118,24 @@ class CopySiteCommand(SubcommandsCommand):
         from_site = self.get_site(from_site)
         to_site = self.get_site(to_site)
 
-        nodes = (
-            PageNode
+        pages = (
+            Page
             .objects
-            .filter(site=from_site, depth=1)
-            .select_related('page')
+            .drafts()
+            .on_site(from_site)
+            .filter(node__depth=1)
+            .select_related('node')
+            .order_by('node__path')
         )
 
         with transaction.atomic():
-            for node in nodes:
-                new_page = node.page.copy_with_descendants(
-                    from_site,
+            for page in pages:
+                new_page = page.copy_with_descendants(
                     target_node=None,
                     target_site=to_site,
                 )
 
-                if node.page.is_home:
+                if page.is_home:
                     Page.set_homepage(new_page)
         self.stdout.write('Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk))
 

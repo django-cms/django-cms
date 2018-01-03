@@ -31,7 +31,7 @@ def show_admin_menu_for_pages(context, descendants, depth=1):
 
     rows = admin.get_tree_rows(
         request,
-        nodes=descendants,
+        pages=descendants,
         language=context['preview_language'],
         depth=depth,
         follow_descendants=not bool(filtered),
@@ -95,12 +95,12 @@ def is_dirty(page, language):
 
 
 @register.filter
-def nodes_are_published(nodes, language):
+def items_are_published(items, language):
     """
     Returns False if any of the ancestors of page (and language) are
     unpublished, otherwise True.
     """
-    return all(node.page.is_published(language) for node in nodes)
+    return all(item.is_published(language) for item in items)
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')

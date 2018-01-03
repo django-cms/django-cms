@@ -47,9 +47,9 @@ class CMSSitemap(Sitemap):
         # supply a new items() method which doesn't filter out the redirects.
         all_titles = Title.objects.public().filter(
             Q(redirect='') | Q(redirect__isnull=True),
-            page__publisher_public__login_required=False,
-            page__publisher_public__nodes__site=get_current_site(),
-        ).order_by('page__publisher_public__nodes__path')
+            page__login_required=False,
+            page__node__site=get_current_site(),
+        ).order_by('page__node__path')
         return all_titles
 
     def lastmod(self, title):

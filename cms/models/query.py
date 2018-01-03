@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
@@ -16,26 +15,27 @@ class PageQuerySet(PublisherQuerySet):
 
         if site is None:
             site = get_current_site()
-        return self.filter(site=site)
+        return self.filter(node__site=site)
 
-    def published(self, language=None):
+    def published(self, site=None, language=None):
+        now = timezone.now()
         if language:
-            pub = self.filter(
-                Q(publication_date__lte=timezone.now()) | Q(publication_date__isnull=True),
-                Q(publication_end_date__gt=timezone.now()) | Q(publication_end_date__isnull=True),
-                title_set__published=True, title_set__language=language
+            pub = self.on_site(site).filter(
+                Q(publication_date__lte=now) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gt=now) | Q(publication_end_date__isnull=True),
+                title_set__published=True, title_set__language=language,
             )
         else:
-            pub = self.filter(
-                Q(publication_date__lte=timezone.now()) | Q(publication_date__isnull=True),
-                Q(publication_end_date__gt=timezone.now()) | Q(publication_end_date__isnull=True),
-                title_set__published=True
+            pub = self.on_site(site).filter(
+                Q(publication_date__lte=now) | Q(publication_date__isnull=True),
+                Q(publication_end_date__gt=now) | Q(publication_end_date__isnull=True),
+                title_set__published=True,
             )
-        return pub
+        return pub.exclude(title_set__publisher_state=4)
 
     def get_home(self, site=None):
         try:
-            home = self.published().distinct().on_site(site).get(is_home=True)
+            home = self.published(site).distinct().get(is_home=True)
         except self.model.DoesNotExist:
             raise NoHomeFound('No Root page found. Publish at least one page!')
         return home
@@ -59,16 +59,7 @@ class PageNodeQuerySet(MP_NodeQuerySet):
         return self.filter(path__startswith=parent.path, depth__gte=parent.depth)
 
     def delete_fast(self):
-        """
-        Optimized delete method for page nodes.
-        Updates parent numchild to reflect new count.
-        """
-        parents = self.exclude(parent__isnull=True).values_list('parent')
-        (self
-         .model
-         .objects
-         .filter(pk__in=parents)
-         .update(numchild=models.F('numchild') - 1))
+        # calls django's delete instead of the one from treebeard
         super(MP_NodeQuerySet, self).delete()
 
     def root_only(self):

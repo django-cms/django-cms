@@ -5,6 +5,7 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.translation import override as force_language
 
 from cms import constants
+from cms.api import get_page_draft
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
 from cms.utils.compat import DJANGO_1_9
@@ -16,21 +17,21 @@ from cms.utils.i18n import (
     is_valid_site_language,
 )
 from cms.utils.permissions import get_view_restrictions
-from cms.utils.page import get_node_queryset
+from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
 
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
 
-def get_visible_nodes(request, nodes, site):
+def get_visible_nodes(request, pages, site):
     """
      This code is basically a many-pages-at-once version of
      cms.utils.page_permissions.user_can_view_page
      pages contains all published pages
     """
     user = request.user
-
+    _get_page_draft = get_page_draft
     public_for = get_cms_setting('PUBLIC_FOR')
     can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
 
@@ -41,21 +42,24 @@ def get_visible_nodes(request, nodes, site):
         return []
 
     if user_can_view_all_pages(user, site):
-        return nodes
+        return list(pages)
 
-    restricted_pages = get_view_restrictions(nodes)
+    # Permissions are only attached to draft pages
+    draft_pages = [_get_page_draft(page) for page in pages]
+    restricted_pages = get_view_restrictions(draft_pages)
 
     if not restricted_pages:
         # If there's no restrictions, let the user see all pages
         # only if he can see unrestricted, otherwise return no pages.
-        return nodes if can_see_unrestricted else []
+        return list(pages) if can_see_unrestricted else []
 
     user_id = user.pk
     user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list('pk', flat=True)))
     is_auth_user = user.is_authenticated()
 
-    def user_can_see_node(node):
-        page_permissions = restricted_pages.get(node.page_id, [])
+    def user_can_see_page(page):
+        page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
+        page_permissions = restricted_pages.get(page_id, [])
 
         if not page_permissions:
             # Page has no view restrictions, fallback to the project's
@@ -69,7 +73,7 @@ def get_visible_nodes(request, nodes, site):
             if perm.user_id == user_id or perm.group_id in user_groups:
                 return True
         return False
-    return [node for node in nodes if user_can_see_node(node)]
+    return [page for page in pages if user_can_see_page(page)]
 
 
 def get_menu_node_for_page(renderer, page, language, fallbacks=None):
@@ -83,7 +87,6 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     if fallbacks is None:
         fallbacks = []
 
-    node = page.get_node_object(renderer.site)
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
     attr = {
@@ -92,21 +95,6 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         'auth_required': page.login_required,
         'reverse_id': page.reverse_id,
     }
-
-    if node.parent_id and page.publisher_is_draft:
-        parent_page = node.parent.page
-        hide_parent = (parent_page.is_home and not parent_page.in_navigation)
-    elif node.parent_id and not page.publisher_is_draft:
-        parent_page = node.parent.get_public_page()
-        hide_parent = (parent_page.is_home and not parent_page.in_navigation)
-    else:
-        parent_page = None
-        hide_parent = False
-
-    if parent_page and not hide_parent:
-        parent_id = parent_page.pk
-    else:
-        parent_id = None
 
     if page.limit_visibility_in_menu is constants.VISIBILITY_ALL:
         attr['visible_for_authenticated'] = True
@@ -153,11 +141,11 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
             attr['redirect_url'] = translation.redirect  # save redirect URL if any
 
             # Now finally, build the NavigationNode object and return it.
+            # The parent_id is manually set by the menu get_nodes method.
             ret_node = CMSNavigationNode(
                 title=translation.menu_title or translation.title,
                 url='',
                 id=page.pk,
-                parent_id=parent_id,
                 attr=attr,
                 visible=page.in_navigation,
                 path=translation.path or translation.slug,
@@ -202,8 +190,9 @@ class CMSMenu(Menu):
 
         site = self.renderer.site
         lang = self.renderer.request_language
-        nodes = get_node_queryset(
+        pages = get_page_queryset(
             site,
+            draft=self.renderer.draft_mode_active,
             published=not self.renderer.draft_mode_active,
         )
 
@@ -228,29 +217,31 @@ class CMSMenu(Menu):
             languages = get_public_languages(site.pk)
             fallbacks = languages
 
-        if self.renderer.draft_mode_active:
-            nodes = nodes.filter(page__title_set__language__in=languages)
-            nodes = nodes.select_related('page', 'parent__page')
-        else:
-            nodes = nodes.filter(page__publisher_public__title_set__language__in=languages)
-            nodes = nodes.select_related(
-                'page__publisher_public',
-                'parent__page__publisher_public',
-            )
-        nodes = nodes.distinct()
-        nodes = get_visible_nodes(request, nodes, site)
+        pages = (
+            pages
+            .filter(title_set__language__in=languages)
+            .select_related('node')
+            .order_by('node__path')
+            .distinct()
+        )
 
-        if self.renderer.draft_mode_active:
-            pages = [node.get_page() for node in nodes]
-        else:
-            pages = [node.get_public_page() for node in nodes]
+        if not self.renderer.draft_mode_active:
+            # we're dealing with public pages.
+            # prefetch the draft versions.
+            pages = pages.select_related('publisher_public__node')
+        pages = get_visible_nodes(request, pages, site)
 
         if not pages:
             return []
 
+        try:
+            homepage = [page for page in pages if page.is_home][0]
+        except IndexError:
+            homepage = None
+
         titles = Title.objects.filter(
             language__in=languages,
-            publisher_is_draft=bool(self.renderer.draft_mode_active),
+            publisher_is_draft=self.renderer.draft_mode_active,
         )
 
         lookup = Prefetch(
@@ -272,6 +263,9 @@ class CMSMenu(Menu):
         if lang not in blank_title_cache:
             blank_title_cache[lang] = EmptyTitle(language=lang)
 
+        # Maps a node id to its page id
+        node_id_to_page = {}
+
         def _page_to_node(page):
             # EmptyTitle is used to prevent the cms from trying
             # to find a translation in the database
@@ -279,8 +273,37 @@ class CMSMenu(Menu):
 
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
-            return get_menu_node_for_page(self.renderer, page, language=lang, fallbacks=fallbacks)
-        return [_page_to_node(page=page) for page in pages]
+            menu_node =  get_menu_node_for_page(
+                self.renderer,
+                page,
+                language=lang,
+                fallbacks=fallbacks,
+            )
+            return menu_node
+
+        menu_nodes = []
+
+        for page in pages:
+            node = page.node
+            parent_id = node_id_to_page.get(node.parent_id)
+
+            if node.parent_id and not parent_id:
+                # If the parent page is not available (unpublished, etc..)
+                # don't bother creating menu nodes for its descendants.
+                continue
+
+            menu_node = _page_to_node(page)
+            cut_homepage = homepage and not homepage.in_navigation
+
+            if cut_homepage and parent_id == homepage.pk:
+                # When the homepage is hidden from navigation,
+                # we need to cut all its direct children from it.
+                menu_node.parent_id = None
+            else:
+                menu_node.parent_id = parent_id
+            node_id_to_page[node.pk] = page.pk
+            menu_nodes.append(menu_node)
+        return menu_nodes
 
 
 menu_pool.register_menu(CMSMenu)

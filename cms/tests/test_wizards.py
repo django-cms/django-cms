@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from cms.api import create_page, publish_page
 from cms.cms_wizards import CMSPageWizard
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.forms.wizards import CreateCMSPageForm
+from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
@@ -24,6 +24,11 @@ from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
 CreateCMSPageForm = step2_form_factory(
     mixin_cls=WizardStep2BaseForm,
     entry_form_class=CreateCMSPageForm,
+)
+
+CreateCMSSubPageForm = step2_form_factory(
+    mixin_cls=WizardStep2BaseForm,
+    entry_form_class=CreateCMSSubPageForm,
 )
 
 
@@ -229,7 +234,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_page=None,
             wizard_user=superuser,
             wizard_language='en',
-            wizard_page_node=None,
         )
         self.assertTrue(form.is_valid())
         page = form.save()
@@ -240,6 +244,32 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             url = page.get_absolute_url('en')
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+
+    def test_wizard_create_sibling_page(self):
+        superuser = self.get_superuser()
+        parent_page = create_page(
+            title="Parent",
+            template=TEMPLATE_INHERITANCE_MAGIC,
+            language="en",
+        )
+        data = {
+            'title': 'Child',
+            'slug': 'child',
+            'page_type': None,
+        }
+        form = CreateCMSSubPageForm(
+            data=data,
+            wizard_page=parent_page,
+            wizard_user=superuser,
+            wizard_language='en',
+        )
+        self.assertTrue(form.is_valid())
+        child_page = form.save()
+
+        self.assertEqual(child_page.node.depth, 2)
+        self.assertEqual(child_page.parent_page, parent_page)
+        self.assertEqual(child_page.get_title('en'), 'Child')
+        self.assertEqual(child_page.get_path('en'), 'parent/child')
 
     def test_wizard_create_atomic(self):
         # Ref: https://github.com/divio/django-cms/issues/5652
@@ -258,7 +288,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_page=None,
             wizard_user=superuser,
             wizard_language='en',
-            wizard_page_node=None,
         )
 
         self.assertTrue(form.is_valid())
@@ -303,7 +332,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 wizard_page=page,
                 wizard_user=superuser,
                 wizard_language='en',
-                wizard_page_node=page.node,
             )
             self.assertTrue(form.is_valid())
             page = form.save()
@@ -352,7 +380,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 wizard_page=page,
                 wizard_user=superuser,
                 wizard_language='en',
-                wizard_page_node=page.node,
             )
             self.assertTrue(form.is_valid())
             page = form.save()
@@ -384,7 +411,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_page=None,
             wizard_user=superuser,
             wizard_language='en',
-            wizard_page_node=None,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2'))
@@ -395,7 +421,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_page=None,
             wizard_user=superuser,
             wizard_language='en',
-            wizard_page_node=None,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-3'))
@@ -409,7 +434,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_page=None,
             wizard_user=superuser,
             wizard_language='en',
-            wizard_page_node=None,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2-2'))
@@ -420,7 +444,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_page=None,
             wizard_user=superuser,
             wizard_language='en',
-            wizard_page_node=None,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2-3'))

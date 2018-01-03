@@ -19,7 +19,7 @@ from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
-from cms.models.pagemodel import Page, PageNode, PageType
+from cms.models.pagemodel import Page, PageType
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
@@ -207,7 +207,7 @@ class PageTest(PageTestBase):
             # but the site is configured to use "de" and "fr"
             response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertEqual(Page.objects.filter(site=2).count(), 2)
+            self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
             self.assertEqual(Title.objects.filter(language='de').count(), 2)
 
         # The user is on site #1 but switches sites using the site switcher
@@ -218,7 +218,7 @@ class PageTest(PageTestBase):
         # but the site is configured to use "de" and "fr"
         response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
         self.assertRedirects(response, URL_CMS_PAGE)
-        self.assertEqual(Page.objects.filter(site=2).count(), 3)
+        self.assertEqual(Page.objects.filter(node__site=2).count(), 3)
         self.assertEqual(Title.objects.filter(language='de').count(), 3)
 
         Site.objects.clear_cache()
@@ -679,7 +679,7 @@ class PageTest(PageTestBase):
             page_type_0 = self.assertObjectExist(
                 Page.objects.all(),
                 is_page_type=True,
-                nodes__parent__isnull=True,
+                node__parent__isnull=True,
                 publisher_is_draft=True,
             )
             page_type_1 = self.assertObjectExist(
@@ -802,7 +802,7 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.site_id
+                endpoint += '?source_site=%s' % site_1_root.node.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -811,7 +811,7 @@ class PageTest(PageTestBase):
                 endpoint = self.get_admin_url(Page, 'copy_page', site_1_root.pk)
                 response = self.client.post(endpoint, data)
                 self.assertEqual(response.status_code, 200)
-                self.assertObjectDoesNotExist(Page.objects.all(), site=site_2)
+                self.assertObjectDoesNotExist(Page.objects.all(), node__site=site_2)
                 self.assertEqual(
                     json.loads(response.content.decode('utf8')),
                     expected_response,
@@ -832,7 +832,7 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.site_id
+                endpoint += '?source_site=%s' % site_1_root.node.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -842,7 +842,7 @@ class PageTest(PageTestBase):
                 response = self.client.post(endpoint, data)
                 self.assertEqual(response.status_code, 200)
 
-        site_2_root = self.assertObjectExist(Page.objects.all(), site=site_2)
+        site_2_root = self.assertObjectExist(Page.objects.drafts(), node__site=site_2)
 
         tree = (
             (site_1_root, '0001'),
@@ -905,16 +905,18 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             # Copy the 0005 page and insert it as first child of parent
             child_0001 = self.copy_page(child_0005, parent, position=0)
-            child_00010001 = child_0001.node.get_children()[0].page
-            child_00010002 = child_0001.node.get_children()[1].page
-            child_00010003 = child_0001.node.get_children()[2].page
+            child_pages = list(child_0001.get_child_pages())
+            child_00010001 = child_pages[0]
+            child_00010002 = child_pages[1]
+            child_00010003 = child_pages[2]
 
         with self.login_user_context(superuser):
             # Copy the 0004 page and insert it as fourth child of parent
             child_0004 = self.copy_page(child_0004, parent, position=3)
-            child_00040001 = child_0004.node.get_children()[0].page
-            child_00040002 = child_0004.node.get_children()[1].page
-            child_00040003 = child_0004.node.get_children()[2].page
+            child_pages = list(child_0004.get_child_pages())
+            child_00040001 = child_pages[0]
+            child_00040002 = child_pages[1]
+            child_00040003 = child_pages[2]
 
         tree = (
             (parent, '0001'),
@@ -944,19 +946,19 @@ class PageTest(PageTestBase):
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_b, position=1)
         self.assertEqual(Page.objects.drafts().count(), 5)
-        self.assertEqual(page_b.node.get_children().count(), 2)
-        node_d = page_b.node.get_children()[1]
-        node_e = node_d.get_children()[0]
-        self.assertEqual(node_d.path, '000100010002')
-        self.assertEqual(node_e.path, '0001000100020001')
-        node_e.page.delete()
-        node_d.page.delete()
+        self.assertEqual(page_b.get_child_pages().count(), 2)
+        page_d = page_b.get_child_pages()[1]
+        page_e = page_d.get_child_pages()[0]
+        self.assertEqual(page_d.node.path, '000100010002')
+        self.assertEqual(page_e.node.path, '0001000100020001')
+        page_e.delete()
+        page_d.delete()
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c)
-        self.assertEqual(page_c.node.get_children().count(), 1)
-        self.assertEqual(page_b.node.get_children().count(), 1)
-        page_ids = list(page_c.node.get_descendants().values_list('page', flat=True))
-        page_c.node.get_descendants().delete()
+        self.assertEqual(page_c.get_child_pages().count(), 1)
+        self.assertEqual(page_b.get_child_pages().count(), 1)
+        page_ids = list(page_c.get_descendant_pages().values_list('pk', flat=True))
+        page_c.get_descendant_pages().delete()
         Page.objects.filter(pk__in=page_ids).delete()
         self.assertEqual(Page.objects.all().count(), 3)
         page_b = page_b.reload()
@@ -1018,10 +1020,11 @@ class PageTest(PageTestBase):
             self.client.post(URL_CMS_PAGE_ADD, page_data2)
             page_data3 = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data3)
-            home = PageNode.objects.all()[0].page
-            page1 = PageNode.objects.all()[1].page
-            page2 = PageNode.objects.all()[2].page
-            page3 = PageNode.objects.all()[3].page
+            pages = list(Page.objects.drafts().order_by('node__path'))
+            home = pages[0]
+            page1 = pages[1]
+            page2 = pages[2]
+            page3 = pages[3]
 
             # move pages
             response = self.client.post(URL_CMS_PAGE_MOVE % page3.pk, {"target": page2.pk, "position": "0"})
@@ -2764,7 +2767,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
-            endpoint += '?source_site=%s' % page.site_id
+            endpoint += '?source_site=%s' % page.node.site_id
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 

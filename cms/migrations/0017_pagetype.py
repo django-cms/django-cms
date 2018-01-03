@@ -59,10 +59,10 @@ class Migration(migrations.Migration):
             fields=[
             ],
             options={
-                'default_permissions': '',
+                'default_permissions': [],
                 'proxy': True,
             },
             bases=('cms.page',),
         ),
-        migrations.RunPython(migrate_to_page_types),
+        migrations.RunPython(migrate_to_page_types, migrations.RunPython.noop),
     ]

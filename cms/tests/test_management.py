@@ -13,7 +13,7 @@ from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models import Page, PageNode, StaticPlaceholder
+from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
@@ -469,11 +469,11 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         for page in Page.objects.on_site(site_2_pk).drafts():
             page.publish('en')
 
-        nodes_1 = list(PageNode.objects.get_for_site(site_1).select_related('page'))
-        nodes_2 = list(PageNode.objects.get_for_site(site_2).select_related('page'))
-        for index, node in enumerate(nodes_1):
-            self.assertEqual(node.page.get_title('en'), nodes_2[index].page.get_title('en'))
-            self.assertEqual(node.depth, nodes_2[index].depth)
+        pages_1 = list(Page.objects.drafts().on_site(site_1).select_related('node').order_by('node__path'))
+        pages_2 = list(Page.objects.drafts().on_site(site_2).select_related('node').order_by('node__path'))
+        for index, page in enumerate(pages_1):
+            self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
+            self.assertEqual(page.node.depth, pages_2[index].node.depth)
 
         phs_1 = []
         phs_2 = []

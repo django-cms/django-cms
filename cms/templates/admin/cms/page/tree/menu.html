@@ -109,7 +109,7 @@
                                 </li>
                                 {# hide if page is empty #}
                                 {% if lang in page_languages %}
-                                    {% if ancestors|nodes_are_published:lang %}
+                                    {% if ancestors|items_are_published:lang %}
                                         {% if page|is_dirty:lang or not page|is_published:lang %}
                                             <li>
                                                 <a href="{% url opts|admin_urlname:'publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
