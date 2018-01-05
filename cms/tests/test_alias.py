@@ -95,8 +95,8 @@ class AliasTestCase(TransactionCMSTestCase):
 
     def test_alias_content_plugin_display(self):
         '''
-        In edit mode, content must be shown regardless of source_page status.
-        Otherwise, content must be shown only when source_page is published.
+        In edit mode, content is shown regardless of the source page publish status.
+        In published mode, content is shown only if the source page is published.
         '''
         superuser = self.get_superuser()
         source_page = api.create_page(
@@ -151,8 +151,8 @@ class AliasTestCase(TransactionCMSTestCase):
 
     def test_alias_content_placeholder_display(self):
         '''
-        In edit mode, content must be shown regardless of source_page status.
-        Otherwise, content must be shown only when source_page is published.
+        In edit mode, content is shown regardless of the source page publish status.
+        In published mode, content is shown only if the source page is published.
         '''
         superuser = self.get_superuser()
         source_page = api.create_page(
