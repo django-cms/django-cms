@@ -16,7 +16,7 @@ def render_alias_plugin(context, instance):
     renderer = toolbar.content_renderer
     source = (instance.plugin or instance.alias_placeholder)
 
-    if source and source.page:
+    if not(toolbar.edit_mode_active) and source and source.page:
         # this is bad but showing unpublished content is worse
         can_see_content = source.page.is_published(instance.language)
     else:
