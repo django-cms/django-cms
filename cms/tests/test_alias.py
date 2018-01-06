@@ -93,7 +93,11 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info">', html=False)
 
-    def test_alias_ref_plugin_on_unpublished_page(self):
+    def test_alias_content_plugin_display(self):
+        '''
+        In edit mode, content is shown regardless of the source page publish status.
+        In published mode, content is shown only if the source page is published.
+        '''
         superuser = self.get_superuser()
         source_page = api.create_page(
             "Alias plugin",
@@ -122,20 +126,34 @@ class AliasTestCase(TransactionCMSTestCase):
         )
 
         with self.login_user_context(superuser):
-            # Source page is unpublished. Alias plugin should not render anything.
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            # Not published, not edit mode: hide content
+            response = self.client.get(target_page.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
-        source_page.publish('en')
-
-        with self.login_user_context(superuser):
-            # Source page is published. Alias plugin should render normally.
+            # Not published, edit mode: show content
             response = self.client.get(target_page.get_absolute_url() + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
-    def test_alias_ref_placeholder_on_unpublished_page(self):
+        source_page.publish('en')
+
+        with self.login_user_context(superuser):
+            # Published, not edit mode: show content
+            response = self.client.get(target_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+            # Published, edit mode: show content
+            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+    def test_alias_content_placeholder_display(self):
+        '''
+        In edit mode, content is shown regardless of the source page publish status.
+        In published mode, content is shown only if the source page is published.
+        '''
         superuser = self.get_superuser()
         source_page = api.create_page(
             "Alias plugin",
@@ -165,15 +183,25 @@ class AliasTestCase(TransactionCMSTestCase):
         )
 
         with self.login_user_context(superuser):
-            # Source page is unpublished. Alias plugin should not render anything.
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            # Not published, not edit mode: hide content
+            response = self.client.get(target_page.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+            # Not published, edit mode: show content
+            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
         source_page.publish('en')
 
         with self.login_user_context(superuser):
-            # Source page is published. Alias plugin should render normally.
+            # Published, not edit mode: show content
+            response = self.client.get(target_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+
+            # Published, edit mode: show content
             response = self.client.get(target_page.get_absolute_url() + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
