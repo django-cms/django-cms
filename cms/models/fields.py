@@ -24,6 +24,7 @@ class PlaceholderField(models.ForeignKey):
         # We hard-code the `to` argument for ForeignKey.__init__
         # since a PlaceholderField can only be a ForeignKey to a Placeholder
         kwargs['to'] = 'cms.Placeholder'
+        kwargs['on_delete'] = models.CASCADE
         super(PlaceholderField, self).__init__(**kwargs)
 
     def deconstruct(self):
@@ -82,6 +83,7 @@ class PageField(models.ForeignKey):
         # We hard-code the `to` argument for ForeignKey.__init__
         # since a PageField can only be a ForeignKey to a Page
         kwargs['to'] = 'cms.Page'
+        kwargs['on_delete'] = models.CASCADE
         super(PageField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
