@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='usersettings',
             name='user',
-            field=models.OneToOneField(related_name='djangocms_usersettings', editable=False, to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(on_delete=models.CASCADE, related_name='djangocms_usersettings', editable=False, to=settings.AUTH_USER_MODEL),
             preserve_default=True,
         ),
     ]

@@ -36,14 +36,20 @@ class Title(models.Model):
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
-    page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
 
     # Publisher fields
     published = models.BooleanField(_("is published"), blank=True, default=False)
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
-    publisher_public = models.OneToOneField('self', related_name='publisher_draft', null=True, editable=False)
+    publisher_public = models.OneToOneField(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='publisher_draft',
+        null=True,
+        editable=False,
+    )
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
 
     objects = TitleManager()

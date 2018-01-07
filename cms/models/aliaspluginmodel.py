@@ -8,9 +8,26 @@ from cms.models import CMSPlugin, Placeholder
 
 @python_2_unicode_compatible
 class AliasPluginModel(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='cms_aliasplugin', parent_link=True)
-    plugin = models.ForeignKey(CMSPlugin, editable=False, related_name="alias_reference", null=True)
-    alias_placeholder = models.ForeignKey(Placeholder, editable=False, related_name="alias_placeholder", null=True)
+    cmsplugin_ptr = models.OneToOneField(
+        CMSPlugin,
+        on_delete=models.CASCADE,
+        related_name='cms_aliasplugin',
+        parent_link=True,
+    )
+    plugin = models.ForeignKey(
+        CMSPlugin,
+        on_delete=models.CASCADE,
+        editable=False,
+        related_name='alias_reference',
+        null=True,
+    )
+    alias_placeholder = models.ForeignKey(
+        Placeholder,
+        on_delete=models.CASCADE,
+        editable=False,
+        related_name='alias_placeholder',
+        null=True,
+    )
 
     class Meta:
         app_label = 'cms'

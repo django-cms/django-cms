@@ -7,7 +7,13 @@ from cms.models import Page, Title
 
 
 class BaseExtension(models.Model):
-    public_extension = models.OneToOneField('self', null=True, editable=False, related_name='draft_extension')
+    public_extension = models.OneToOneField(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        editable=False,
+        related_name='draft_extension',
+    )
     extended_object = None
 
     class Meta:
@@ -105,7 +111,7 @@ class BaseExtension(models.Model):
 
 
 class PageExtension(BaseExtension):
-    extended_object = models.OneToOneField(Page, editable=False)
+    extended_object = models.OneToOneField(Page, on_delete=models.CASCADE, editable=False)
 
     class Meta:
         abstract = True
@@ -125,7 +131,7 @@ class PageExtension(BaseExtension):
 
 
 class TitleExtension(BaseExtension):
-    extended_object = models.OneToOneField(Title, editable=False)
+    extended_object = models.OneToOneField(Title, on_delete=models.CASCADE, editable=False)
 
     class Meta:
         abstract = True
