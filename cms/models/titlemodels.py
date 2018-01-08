@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
-from cms.utils.helpers import reversion_register
 
 
 @python_2_unicode_compatible
@@ -177,15 +176,3 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
-
-
-def _reversion():
-    exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
-
-    reversion_register(
-        Title,
-        exclude_fields=exclude_fields
-    )
-
-
-_reversion()

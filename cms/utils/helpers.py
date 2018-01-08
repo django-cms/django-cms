@@ -4,8 +4,6 @@ import re
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import force_text
 
-from .compat.dj import is_installed
-
 
 def find_placeholder_relation(obj):
     return 'page'
@@ -84,32 +82,3 @@ def get_timezone_name():
     # Hence this paranoid conversion to create a valid cache key.
     tz_name = force_text(get_current_timezone_name(), errors='ignore')
     return tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
-
-
-def reversion_register(model_class, fields=None, follow=(), format="json", exclude_fields=None):
-    """CMS interface to reversion api - helper function. Registers model for
-    reversion only if reversion is available.
-
-    Auto excludes publisher fields.
-    """
-
-    #FIXME: Remove this when integrating djangocms-reversion
-    # reversion's merely recommended, not required
-    if not is_installed('reversion'):
-        return
-
-    if fields and exclude_fields:
-        raise ValueError("Just one of fields, exclude_fields arguments can be passed.")
-
-    opts = model_class._meta
-    local_fields = opts.local_fields + opts.local_many_to_many
-
-    if fields is None:
-        fields = [field.name for field in local_fields]
-
-    exclude_fields = exclude_fields or []
-
-    fields = filter(lambda name: not name in exclude_fields, fields)
-
-    from cms.utils import reversion_hacks
-    reversion_hacks.register_draft_only(model_class, fields, follow, format)

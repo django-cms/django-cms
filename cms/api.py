@@ -7,7 +7,6 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
-import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -73,13 +72,6 @@ def _verify_apphook(apphook, namespace):
     return apphook_name
 
 
-def _raise_revision_warning():
-    warnings.warn('Revision support has been removed from the core.'
-                  'As a result the with_revision parameter is no longer '
-                  'supported and will be removed in version 3.5',
-                  UserWarning)
-
-
 def _verify_plugin_type(plugin_type):
     """
     Verifies the given plugin_type is valid and returns a tuple of
@@ -115,15 +107,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=None):
+                xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    if with_revision in (True, False):
-        _raise_revision_warning()
-
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
         assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
@@ -224,7 +213,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 @transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None, parent=None,
-                 overwrite_url=None, with_revision=None, page_title=None, path=None):
+                 overwrite_url=None, page_title=None, path=None):
     """
     Create a title.
 
@@ -237,9 +226,6 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     # validate language:
     assert language in get_language_list(page.site_id)
-
-    if with_revision in (True, False):
-        _raise_revision_warning()
 
     # set default slug:
     if not slug:

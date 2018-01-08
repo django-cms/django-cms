@@ -9,6 +9,7 @@ from classytags.utils import flatten_context
 from django.contrib.sites.models import Site
 from django.template import Context
 from django.utils.functional import cached_property
+from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
@@ -19,7 +20,6 @@ from cms.toolbar.utils import (
 )
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.django_load import iterload_objects
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.plugins import get_plugin_restrictions
@@ -444,7 +444,8 @@ class ContentRenderer(BaseRenderer):
 
         content = template.render(context)
 
-        for processor in iterload_objects(get_cms_setting('PLUGIN_PROCESSORS')):
+        for path in get_cms_setting('PLUGIN_PROCESSORS'):
+            processor = import_string(path)
             content = processor(instance, placeholder, content, context)
 
         if editable:
@@ -684,7 +685,8 @@ class PluginContext(Context):
         if not processors:
             processors = []
 
-        for processor in iterload_objects(get_cms_setting('PLUGIN_CONTEXT_PROCESSORS')):
+        for path in get_cms_setting('PLUGIN_CONTEXT_PROCESSORS'):
+            processor = import_string(path)
             self.update(processor(instance, placeholder, self))
         for processor in processors:
             self.update(processor(instance, placeholder, self))

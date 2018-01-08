@@ -13,7 +13,6 @@ from cms.models import AliasPluginModel
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.dj import is_installed
-from cms.utils.conf import DEPRECATED_CMS_SETTINGS
 
 
 SUCCESS = 1
@@ -255,23 +254,6 @@ def check_context_processors(output):
         for processor in required_processors:
             if processor not in processors:
                 section.error("%s context processor must be in TEMPLATES option context_processors" % processor)
-
-@define_check
-def check_deprecated_settings(output):
-    with output.section("Deprecated settings") as section:
-        found = False
-        for deprecated, new_setting in DEPRECATED_CMS_SETTINGS.items():
-            if not hasattr(settings, deprecated):
-                continue
-            if new_setting:
-                message = "Deprecated setting %s found. This setting has been replaced by %s" % new_setting
-                section.warn(message)
-            else:
-                message = "Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated
-                section.warn(message)
-            found = True
-        if not found:
-            section.skip("No deprecated settings found")
 
 
 @define_check

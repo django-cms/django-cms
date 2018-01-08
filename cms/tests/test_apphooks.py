@@ -838,7 +838,8 @@ class ApphooksTestCase(CMSTestCase):
         cache.clear()
 
         request = self.get_request('/')
-        nodes = menu_pool.get_nodes(request)
+        renderer = menu_pool.get_renderer(request)
+        nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
         self.assertFalse('/en/child_page/page2/' in nodes_urls)
@@ -857,7 +858,8 @@ class ApphooksTestCase(CMSTestCase):
         create_title('de', 'de_title', page2, slug='slug')
         page2.publish('de')
         request = self.get_request('/page2/')
-        nodes = menu_pool.get_nodes(request)
+        renderer = menu_pool.get_renderer(request)
+        nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
         self.assertTrue(reverse('sample2-root') in nodes_urls)

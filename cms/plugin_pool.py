@@ -8,15 +8,13 @@ from django.template.defaultfilters import slugify
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
+from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.utils.conf import get_cms_setting
-from cms.utils.django_load import load
-from cms.utils.helpers import reversion_register
-from cms.utils.compat.dj import is_installed
 from cms.utils.helpers import normalize_name
 
 
@@ -44,7 +42,7 @@ class PluginPool(object):
         if get_cms_setting("PAGE_CACHE"):
             invalidate_cms_page_cache()
 
-        load('cms_plugins')
+        autodiscover_modules('cms_plugins')
         self.discovered = True
 
     def clear(self):
@@ -130,13 +128,6 @@ class PluginPool(object):
 
         signals.pre_save.connect(pre_save_plugins, sender=plugin.model,
                                  dispatch_uid='cms_pre_save_plugin_%s' % plugin_name)
-
-        if is_installed('reversion'):
-            from cms.utils.reversion_hacks import RegistrationError
-            try:
-                reversion_register(plugin.model)
-            except RegistrationError:
-                pass
         return plugin
 
     def unregister_plugin(self, plugin):

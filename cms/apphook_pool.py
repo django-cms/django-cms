@@ -2,12 +2,12 @@
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import autodiscover_modules, import_string
 from django.utils.translation import ugettext as _
 
 from cms.app_base import CMSApp
 from cms.exceptions import AppAlreadyRegistered
 from cms.utils.conf import get_cms_setting
-from cms.utils.django_load import load, iterload_objects
 
 
 class ApphookPool(object):
@@ -52,14 +52,15 @@ class ApphookPool(object):
         self.apphooks = get_cms_setting('APPHOOKS')
 
         if self.apphooks:
-            for cls in iterload_objects(self.apphooks):
+            for path in self.apphooks:
+                cls = import_string(path)
                 try:
                     self.register(cls, discovering_apps=True)
                 except AppAlreadyRegistered:
                     pass
 
         else:
-            load('cms_apps')
+            autodiscover_modules('cms_apps')
 
         self.discovered = True
 
