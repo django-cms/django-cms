@@ -109,9 +109,6 @@ class Page(models.Model):
     )
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
-    # If the draft is loaded from a reversion version save the revision id here.
-    revision_id = models.PositiveIntegerField(default=0, editable=False)
-
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
@@ -190,14 +187,13 @@ class Page(models.Model):
     def parent_page(self):
         return self.get_parent_page()
 
-    @classmethod
-    def set_homepage(cls, page, user=None):
+    def set_as_homepage(self, user=None):
         """
         Sets the given page as the homepage.
         Updates the title paths for all affected pages.
         Returns the old home page (if any).
         """
-        assert page.publisher_is_draft
+        assert self.publisher_is_draft
 
         if user:
             changed_by = get_clean_username(user)
@@ -207,12 +203,12 @@ class Page(models.Model):
         changed_date = now()
 
         try:
-            old_home = cls.objects.get(
+            old_home = self.__class__.objects.get(
                 is_home=True,
-                node__site=page.node.site_id,
+                node__site=self.node.site_id,
                 publisher_is_draft=True,
             )
-        except cls.DoesNotExist:
+        except self.__class__.DoesNotExist:
             old_home_tree = []
         else:
             old_home.update(
@@ -223,13 +219,13 @@ class Page(models.Model):
             )
             old_home_tree = old_home._set_title_root_path()
 
-        page.update(
+        self.update(
             draft_only=False,
             is_home=True,
             changed_by=changed_by,
             changed_date=changed_date,
         )
-        new_home_tree = page._remove_title_root_path()
+        new_home_tree = self._remove_title_root_path()
         return (new_home_tree, old_home_tree)
 
     def _update_title_path(self, language):

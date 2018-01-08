@@ -10,7 +10,7 @@ from django.template import Variable
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page
-from cms.models import Page, PagePermission, UserSettings, Placeholder
+from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -207,7 +207,7 @@ class ViewTests(CMSTestCase):
         create_title("fr", "french home", page)
         publish_page(page, user, "fr")
 
-        Page.set_homepage(page)
+        page.set_as_homepage()
 
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')

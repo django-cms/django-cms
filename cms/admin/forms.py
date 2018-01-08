@@ -292,7 +292,7 @@ class AddPageForm(BasePageForm):
         if is_first and not new_page.is_page_type:
             # its the first page. publish it right away
             new_page.publish(translation.language)
-            Page.set_homepage(new_page, user=self._user)
+            new_page.set_as_homepage(self._user)
         return new_page
 
 

@@ -1627,7 +1627,7 @@ class PageAdmin(BasePageAdmin):
         page = self.get_object(request, object_id=object_id)
 
         if not self.has_change_permission(request, page):
-            raise PermissionDenied("You do not have permission to set 'home'")
+            raise PermissionDenied("You do not have permission to set 'home'.")
 
         if page is None:
             raise self._get_404_exception(object_id)
@@ -1635,7 +1635,7 @@ class PageAdmin(BasePageAdmin):
         if not page.is_potential_home():
             return HttpResponseBadRequest(force_text(_("The page is not eligible to be home.")))
 
-        new_home_tree, old_home_tree = Page.set_homepage(page, user=request.user)
+        new_home_tree, old_home_tree = page.set_as_homepage(request.user)
 
         # Check if one of the affected pages either from the old homepage
         # or the homepage had an apphook attached

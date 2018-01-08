@@ -62,7 +62,7 @@ DEFAULTS = {
     'PAGE_CACHE': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
-    'CACHE_PREFIX': 'cms-{}-'.format(__version__),
+    'CACHE_PREFIX': 'cms_{}_'.format(__version__),
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
