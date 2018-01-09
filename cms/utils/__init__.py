@@ -25,7 +25,7 @@ def get_language_from_request(request, current_page=None):
         language = request.POST.get('language', None)
     if hasattr(request, 'GET') and not language:
         language = request.GET.get('language', None)
-    site_id = current_page.site_id if current_page else None
+    site_id = current_page.node.site_id if current_page else None
     if language:
         language = get_language_code(language)
         if not language in get_language_list(site_id):

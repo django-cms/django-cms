@@ -5,7 +5,6 @@ import operator
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
-from django.utils import timezone
 
 from treebeard.mp_tree import MP_NodeManager
 
@@ -36,8 +35,8 @@ class PageManager(PublisherManager):
     def on_site(self, site=None):
         return self.get_queryset().on_site(site)
 
-    def published(self):
-        return self.get_queryset().published()
+    def published(self, site=None):
+        return self.get_queryset().published(site)
 
     def get_home(self, site=None):
         return self.get_queryset().drafts().get_home(site)
@@ -54,7 +53,7 @@ class PageManager(PublisherManager):
 
         if current_site_only:
             site = Site.objects.get_current()
-            qs = qs.filter(site=site)
+            qs = qs.on_site(site)
 
         qt = Q(title_set__title__icontains=q)
 
@@ -94,19 +93,6 @@ class PageNodeManager(MP_NodeManager):
 
     def get_for_site(self, site):
         return self.filter(site=site)
-
-    def published(self, site):
-        now = timezone.now()
-        queryset = (
-            self.get_for_site(site)
-            .filter(
-                Q(page__publication_date__lte=now) | Q(page__publication_date__isnull=True),
-                Q(page__publication_end_date__gt=now) | Q(page__publication_end_date__isnull=True),
-            )
-            .filter(page__title_set__published=True)
-            .exclude(page__title_set__publisher_state=4)
-        )
-        return queryset
 
 
 class TitleManager(PublisherManager):
@@ -263,14 +249,14 @@ class PagePermissionManager(BasicPagePermissionManager):
         Provide a single point of entry for deciding whether any given global
         permission exists.
         """
-        query = {perm: True, 'page__site': site_id}
+        query = {perm: True, 'page__node__site': site_id}
         return self.with_user(user).filter(**query)
 
     def get_with_site(self, user, site_id):
-        return self.with_user(user).filter(page__site=site_id)
+        return self.with_user(user).filter(page__node__site=site_id)
 
     def user_has_permissions(self, user, site_id, perms):
-        queryset = self.with_user(user).filter(page__site=site_id)
+        queryset = self.with_user(user).filter(page__node__site=site_id)
         queries = [Q(**{perm: True}) for perm in perms]
         return queryset.filter(functools.reduce(operator.or_, queries)).exists()
 
@@ -345,7 +331,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         # in which he can be
         qs = self.filter(
             page__id__in=page_id_allow_list,
-            page__nodes__depth__gte=user_level,
+            page__node__depth__gte=user_level,
         )
         qs = qs.exclude(user=user).exclude(group__user=user)
         return qs
@@ -364,21 +350,20 @@ class PagePermissionManager(BasicPagePermissionManager):
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE)
 
         page = page.get_draft_object()
-        node = page.node
-        paths = node.get_ancestor_paths()
+        paths = page.node.get_ancestor_paths()
 
         # Ancestors
         query = (
-            Q(page__nodes__path__in=paths)
+            Q(page__node__path__in=paths)
             & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
         )
 
-        if node.parent_id:
+        if page.parent_page:
             # Direct parent
             query |= (
-                Q(page=node.parent_page)
+                Q(page=page.parent_page)
                 & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
             )
         query |= Q(page=page) & (Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) |
                                   Q(grant_on=ACCESS_PAGE))
-        return self.filter(query).order_by('page__nodes__depth')
+        return self.filter(query).order_by('page__node__depth')

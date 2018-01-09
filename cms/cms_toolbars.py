@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.db.models import Q
 from django.utils.translation import override as force_language, ugettext_lazy as _
@@ -16,7 +17,6 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_dict
-from cms.utils.permissions import get_user_sites_queryset
 from cms.utils.page_permissions import (
     user_can_change_page,
     user_can_delete_page,
@@ -60,11 +60,6 @@ class PlaceholderToolbar(CMSToolbar):
     def populate(self):
         self.page = get_page_draft(self.request.current_page)
 
-        if self.page:
-            self.page_node = self.page.get_node_object(self.current_site)
-        else:
-            self.page_node = None
-
     def post_template_populate(self):
         super(PlaceholderToolbar, self).post_template_populate()
         self.add_wizard_button()
@@ -73,10 +68,10 @@ class PlaceholderToolbar(CMSToolbar):
         from cms.wizards.wizard_pool import entry_choices
         title = _("Create")
 
-        if self.page_node:
+        if self.page:
             user = self.request.user
             page_pk  = self.page.pk
-            disabled = len(list(entry_choices(user, self.page, self.page_node))) == 0
+            disabled = len(list(entry_choices(user, self.page))) == 0
         else:
             page_pk = ''
             disabled = True
@@ -118,7 +113,7 @@ class BasicToolbar(CMSToolbar):
             self.add_users_button(self._admin_menu)
 
             # sites menu
-            sites_queryset = get_user_sites_queryset(self.request.user)
+            sites_queryset = Site.objects.order_by('name')
 
             if len(sites_queryset) > 1:
                 sites_menu = self._admin_menu.get_or_create_menu('sites', _('Sites'))
@@ -341,7 +336,7 @@ class PageToolbar(CMSToolbar):
 
     def get_on_delete_redirect_url(self):
         language = self.current_lang
-        parent_page = self.page_node.parent_page
+        parent_page = self.page.parent_page if self.page else None
 
         # if the current page has a parent in the request's current language redirect to it
         if parent_page and language in parent_page.get_languages():
@@ -356,12 +351,6 @@ class PageToolbar(CMSToolbar):
 
     def populate(self):
         self.page = get_page_draft(self.request.current_page)
-
-        if self.page:
-            self.page_node = self.page.get_node_object(self.current_site)
-        else:
-            self.page_node = None
-
         self.title = self.get_title()
         self.permissions_activated = get_cms_setting('PERMISSION')
         self.change_admin_menu()
@@ -572,18 +561,18 @@ class PageToolbar(CMSToolbar):
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
             new_page_params = {'edit': 1}
-            new_sub_page_params = {'edit': 1, 'parent_node': self.page_node.pk}
+            new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
 
             can_add_root_page = page_permissions.user_can_add_page(
                 user=self.request.user,
                 site=self.current_site,
             )
 
-            if self.page_node.parent:
-                new_page_params['parent_node'] = self.page_node.parent.pk
+            if self.page.parent_page:
+                new_page_params['parent_node'] = self.page.parent_page.node_id
                 can_add_sibling_page = page_permissions.user_can_add_subpage(
                     user=self.request.user,
-                    target=self.page_node.parent.page,
+                    target=self.page.parent_page,
                 )
             else:
                 can_add_sibling_page = can_add_root_page

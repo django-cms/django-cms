@@ -78,7 +78,7 @@ class ExtensionToolbar(CMSToolbar):
         if language:
             titles = page.get_title_obj(language),
         else:
-            titles = page.title_set.filter(language__in=get_language_list(page.site_id))
+            titles = page.title_set.filter(language__in=get_language_list(page.node.site_id))
         # Titles
         for title in titles:
             try:

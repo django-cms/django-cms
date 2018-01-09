@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from cms.cache.choices import (
     clean_site_choices_cache, clean_page_choices_cache,
     _site_cache_key, _page_cache_key)
-from cms.models import Page, PageNode, Title
+from cms.models import Page, Title
 from cms.utils import i18n
 
 
@@ -18,7 +18,7 @@ def get_sites():
     sites = (
         Site
         .objects
-        .filter(djangocms_page_nodes__isnull=False)
+        .filter(djangocms_nodes__isnull=False)
         .order_by('name')
         .distinct()
     )
@@ -33,19 +33,18 @@ def get_page_choices_for_site(site, language):
         to_attr='filtered_translations',
         queryset=Title.objects.filter(language__in=languages).only('pk', 'page', 'language', 'title')
     )
-    page_lookup = Prefetch(
-        'page',
-        queryset=Page.objects.only('pk').prefetch_related(translation_lookup)
-    )
-    nodes = (
-        PageNode
+    pages = (
+        Page
         .objects
-        .get_for_site(site)
-        .prefetch_related(page_lookup)
+        .drafts()
+        .on_site(site)
+        .select_related('node')
+        .prefetch_related(translation_lookup)
+        .order_by('node__path')
+        .only('pk', 'node')
     )
 
-    for node in nodes:
-        page = node.page
+    for page in pages:
         translations = page.filtered_translations
         titles_by_language = {trans.language: trans.title for trans in translations}
 
@@ -54,9 +53,9 @@ def get_page_choices_for_site(site, language):
             # to find a translation in the database
             if language in titles_by_language:
                 title = titles_by_language[language]
-                indent = "&nbsp;&nbsp;" * (node.depth - 1)
+                indent = "&nbsp;&nbsp;" * (page.node.depth - 1)
                 label = mark_safe("%s%s" % (indent, escape(title)))
-                yield (node.page.pk, label)
+                yield (page.pk, label)
                 break
 
 

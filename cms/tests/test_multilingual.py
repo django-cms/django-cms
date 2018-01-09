@@ -62,7 +62,7 @@ class MultilingualTestCase(CMSTestCase):
         title = page.get_title_obj()
 
         # A title is set?
-        self.assertNotEqual(title, None)
+        self.assertTrue(bool(title))
 
         # Publish and unpublish the page
         page.publish(TESTLANG)

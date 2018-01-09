@@ -315,7 +315,7 @@ class PagesTestCase(TransactionCMSTestCase):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_b = create_page("page_b", "nav_playground.html", "en")
         page = page_a.publisher_public
-        self.assertRaises(PublicIsUnmodifiable, page.copy_with_descendants, page.site, page_b, 'last-child')
+        self.assertRaises(PublicIsUnmodifiable, page.copy_with_descendants, page_b, 'last-child')
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.revert_to_live, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')

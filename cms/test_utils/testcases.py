@@ -340,12 +340,12 @@ class BaseCMSTestCase(object):
         from cms.utils.page import get_available_slug
 
         if target_site is None:
-            target_site = target_page.site
+            target_site = target_page.node.site
 
         data = {
             'position': position,
             'target': target_page.pk,
-            'source_site': page.site.pk,
+            'source_site': page.node.site_id,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -364,8 +364,8 @@ class BaseCMSTestCase(object):
             pk=response_data['id'],
         )
         self.assertObjectExist(copied_page.title_set.filter(language=language), slug=new_page_slug)
-        page._clear_node_cache(page.site)
-        target_page._clear_node_cache(target_site)
+        page._clear_node_cache()
+        target_page._clear_node_cache()
         return copied_page
 
     def create_homepage(self, *args, **kwargs):

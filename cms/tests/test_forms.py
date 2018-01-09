@@ -42,6 +42,27 @@ class FormsTestCase(CMSTestCase):
         result = get_page_choices()
         self.assertEqual(result, [('', '----')])
 
+    def test_page_choices_draft_only(self):
+        """
+        The page choices should always use draft ids
+        """
+        site = get_current_site()
+        pages = [
+            create_page("0001", "nav_playground.html", "en", published=True),
+            create_page("0002", "nav_playground.html", "en", published=True),
+            create_page("0003", "nav_playground.html", "en", published=True),
+            create_page("0004", "nav_playground.html", "en", published=True),
+        ]
+
+        expected = [
+            ('', '----'),
+            (site.name, [
+                (page.pk, page.get_title('en', fallback=False))
+                for page in pages
+            ])
+        ]
+        self.assertSequenceEqual(get_page_choices('en'), expected)
+
     def test_get_page_choices_with_multiple_translations(self):
         site = get_current_site()
         pages = [

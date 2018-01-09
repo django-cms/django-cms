@@ -19,8 +19,8 @@ from cms.extensions import extension_pool
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
 from cms.forms.validators import validate_relative_url, validate_url_uniqueness
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (CMSPlugin, Page, PageNode, PageType, PagePermission, PageUser, PageUserGroup, Title,
-                        Placeholder, GlobalPagePermission)
+from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
+                        Placeholder, GlobalPagePermission, TreeNode)
 from cms.models.permissionmodels import User
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
@@ -152,7 +152,7 @@ class AddPageForm(BasePageForm):
         required=False,
     )
     parent_node = forms.ModelChoiceField(
-        queryset=PageNode.objects.all(),
+        queryset=TreeNode.objects.all(),
         required=False,
         widget=forms.HiddenInput(),
     )
@@ -169,16 +169,12 @@ class AddPageForm(BasePageForm):
         if not source_field or source_field.widget.is_hidden:
             return
 
-        root_node = PageType.get_root_node(site=self._site)
+        root_page = PageType.get_root_page(site=self._site)
 
-        if root_node:
+        if root_page:
             # Set the choicefield's choices to the various page_types
-            descendants = root_node.get_descendants()
-            titles = Title.objects.filter(
-                page__is_page_type=True,
-                page__nodes__in=descendants,
-                language=self._language,
-            )
+            descendants = root_page.get_descendant_pages().filter(is_page_type=True)
+            titles = Title.objects.filter(page__in=descendants, language=self._language)
             choices = [('', '---------')]
             choices.extend((title.page_id, title.title) for title in titles)
             source_field.choices = choices
@@ -200,7 +196,7 @@ class AddPageForm(BasePageForm):
 
         if parent_node:
             slug = data['slug']
-            parent_path = parent_node.page.get_path(self._language)
+            parent_path = parent_node.item.get_path(self._language)
             path = u'%s/%s' % (parent_path, slug) if parent_path else slug
         else:
             path = data['slug']
@@ -224,15 +220,6 @@ class AddPageForm(BasePageForm):
         if parent_node and parent_node.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_node
-
-    def create_page_node(self, page, parent=None):
-        new_node = PageNode(page=page, site=page.site)
-
-        if parent:
-            parent.add_child(instance=new_node)
-        else:
-            PageNode.add_root(instance=new_node)
-        return new_node
 
     def create_translation(self, page):
         data = self.cleaned_data
@@ -275,16 +262,14 @@ class AddPageForm(BasePageForm):
 
         if source:
             new_page = self.from_source(source, parent=parent)
-            new_node = new_page.get_node_object(self._site)
 
             for lang in source.get_languages():
                 source._copy_contents(new_page, lang)
         else:
             new_page = super(AddPageForm, self).save(commit=False)
             new_page.template = self.get_template()
-            new_page.site = self._site
+            new_page.set_tree_node(self._site, target=parent, position='last-child')
             new_page.save()
-            new_node = self.create_page_node(new_page, parent=parent)
 
         translation = self.create_translation(new_page)
 
@@ -296,10 +281,10 @@ class AddPageForm(BasePageForm):
             )
 
         is_first = not (
-            PageNode
+            TreeNode
             .objects
             .get_for_site(self._site)
-            .exclude(pk=new_node.pk)
+            .exclude(pk=new_page.node_id)
             .exists()
         )
         new_page.rescan_placeholders()
@@ -326,18 +311,16 @@ class AddPageTypeForm(AddPageForm):
         Creates the root node used to store all page types
         for the current site if it doesn't exist.
         """
-        root_node = PageType.get_root_node(site=self._site)
+        root_page = PageType.get_root_page(site=self._site)
 
-        if root_node:
-            root_page = root_node.page
-        else:
-            root_page = Page.objects.create(
+        if not root_page:
+            root_page = Page(
                 publisher_is_draft=True,
-                site=self._site,
                 in_navigation=False,
                 is_page_type=True,
             )
-            root_node = root_page.attach_site(self._site)
+            root_page.set_tree_node(self._site)
+            root_page.save()
 
         if not root_page.has_translation(self._language):
             api.create_title(
@@ -347,12 +330,12 @@ class AddPageTypeForm(AddPageForm):
                 slug=PAGE_TYPES_ID,
                 path=PAGE_TYPES_ID,
             )
-        return root_node
+        return root_page.node
 
     def clean_parent_node(self):
         parent_node = super(AddPageTypeForm, self).clean_parent_node()
 
-        if parent_node and not parent_node.page.is_page_type:
+        if parent_node and not parent_node.item.is_page_type:
             raise ValidationError("Parent has to be a page type.")
 
         if not parent_node:
@@ -437,11 +420,9 @@ class ChangePageForm(BasePageForm):
             # as a result, slug might not always be there.
             return data
 
-        node = page.get_node_object(site=self._site)
-
-        if node.parent:
+        if page.parent_page:
             slug = data['slug']
-            parent_path = node.parent.page.get_path(self._language)
+            parent_path = page.parent_page.get_path(self._language)
             path = u'%s/%s' % (parent_path, slug) if parent_path else slug
         else:
             path = data['slug']
@@ -483,7 +464,7 @@ class ChangePageForm(BasePageForm):
         if update_count == 0:
             api.create_title(language=self._language, page=cms_page, **translation_data)
         else:
-            cms_page._update_title_path_recursive(self._language, self._site)
+            cms_page._update_title_path_recursive(self._language)
         return cms_page
 
 
@@ -611,9 +592,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         return menu_pool.get_menus_by_attribute("cms_enabled", True)
 
     def _check_unique_namespace_instance(self, namespace):
-        return Page.objects.filter(
-            publisher_is_draft=True,
-            site_id=self.instance.site_id,
+        return Page.objects.drafts().on_site(self._site).filter(
             application_namespace=namespace
         ).exclude(pk=self.instance.pk).exists()
 
@@ -628,7 +607,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         # so we know it exists.
         language_name = get_language_object(
             self._language,
-            site_id=self.instance.site_id,
+            site_id=self._site.pk,
         )['name']
 
         if not self.title_obj.slug:
@@ -640,11 +619,10 @@ class AdvancedSettingsForm(forms.ModelForm):
             raise ValidationError(message % {'language': language_name})
 
         if 'reverse_id' in self.fields:
-            id = cleaned_data['reverse_id']
-            site_id = self.instance.site_id
-            if id:
-                if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(
-                        pk=self.instance.pk).exists():
+            reverse_id = cleaned_data['reverse_id']
+            if reverse_id:
+                lookup = Page.objects.drafts().on_site(self._site).filter(reverse_id=reverse_id)
+                if lookup.exclude(pk=self.instance.pk).exists():
                     self._errors['reverse_id'] = self.error_class(
                         [_('A page with this reverse URL id exists already.')])
         apphook = cleaned_data.get('application_urls', None)
@@ -780,23 +758,19 @@ class PageTreeForm(forms.Form):
         self._site = kwargs.pop('site', Site.objects.get_current())
         super(PageTreeForm, self).__init__(*args, **kwargs)
         self.fields['target'].queryset = Page.objects.drafts().filter(
-            nodes__site=self._site,
+            node__site=self._site,
             is_page_type=self.page.is_page_type,
         )
 
     def get_root_nodes(self):
-        return PageNode.get_root_nodes().filter(page__is_page_type=self.page.is_page_type)
-
-    def get_parent_node(self, site):
-        target_page = self.cleaned_data.get('target')
-
-        if target_page:
-            return target_page.get_node_object(site)
-        return
+        # TODO: this needs to avoid using the pages accessor directly
+        nodes = TreeNode.get_root_nodes()
+        return nodes.exclude(cms_pages__is_page_type=not(self.page.is_page_type))
 
     def get_tree_options(self):
         position = self.cleaned_data['position']
-        parent_node = self.get_parent_node(self._site)
+        target_page = self.cleaned_data.get('target')
+        parent_node = target_page.node if target_page else None
 
         if parent_node:
             return self._get_tree_options_for_parent(parent_node, position)
@@ -838,7 +812,7 @@ class MovePageForm(PageTreeForm):
         if target_node_position != 'left':
             return (target_node, target_node_position)
 
-        node = self.page.get_node_object(self._site)
+        node = self.page.node
         node_is_first = node.path < target_node.path
 
         if node_is_first and node.is_sibling_of(target_node):
@@ -866,11 +840,9 @@ class CopyPageForm(PageTreeForm):
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
     def copy_page(self):
-        source_site = self.cleaned_data['source_site']
         target, position = self.get_tree_options()
         copy_permissions = self.cleaned_data.get('copy_permissions', False)
         new_page = self.page.copy_with_descendants(
-            source_site,
             target_node=target,
             position=position,
             copy_permissions=copy_permissions,
@@ -922,7 +894,7 @@ class ChangeListForm(forms.Form):
 
     def run_filters(self, queryset):
         for field, value in self.get_filter_items():
-            query = {'page__{}__exact'.format(field): value}
+            query = {'{}__exact'.format(field): value}
             queryset = queryset.filter(**query)
         return queryset
 

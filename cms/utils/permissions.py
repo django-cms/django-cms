@@ -6,14 +6,13 @@ from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
-from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils.decorators import available_attrs
 from django.utils.lru_cache import lru_cache
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import (PageNode, PagePermission, GlobalPagePermission)
+from cms.models import (Page, PagePermission, GlobalPagePermission)
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
@@ -138,7 +137,7 @@ def get_user_permission_level(user, site):
             .objects
             .get_with_change_permissions(user, site)
             .select_related('page')
-            .order_by('page__nodes__path')
+            .order_by('page__node__path')
         )[0]
     except IndexError:
         # user isn't assigned to any node
@@ -178,27 +177,37 @@ def get_global_actions_for_user(user, site):
 @cached_func
 def get_page_actions_for_user(user, site):
     actions = defaultdict(set)
-    nodes = PageNode.objects.get_for_site(site)
+    pages = (
+        Page
+        .objects
+        .drafts()
+        .on_site(site)
+        .select_related('node')
+        .order_by('node__path')
+    )
+    nodes = [page.node for page in pages]
+    pages_by_id = {}
 
-    root_nodes = (node for node in nodes if node.is_root())
+    for page in pages:
+        if page.node.is_root():
+            page.node._set_hierarchy(nodes)
+        page.node.__dict__['item'] = page
+        pages_by_id[page.pk] = page
 
-    for node in root_nodes:
-        node._set_hierarchy(nodes)
-
-    nodes_by_page_id = dict((node.page_id, node) for node in nodes)
     page_permissions = (
         PagePermission
         .objects
         .with_user(user)
-        .filter(page__in=nodes_by_page_id)
+        .filter(page__in=pages_by_id)
     )
 
-    for permission in page_permissions.iterator():
-        node = nodes_by_page_id[permission.page_id]
-        node_ids = frozenset(permission.get_page_ids(node))
+    for perm in page_permissions.iterator():
+        # set internal fk cache to our page with loaded ancestors and descendants
+        perm._page_cache = pages_by_id[perm.page_id]
+        page_ids = frozenset(perm.get_page_ids())
 
-        for action in permission.get_configured_actions():
-            actions[action].update(node_ids)
+        for action in perm.get_configured_actions():
+            actions[action].update(page_ids)
     return actions
 
 
@@ -212,9 +221,9 @@ def has_global_permission(user, site, action, use_cache=True):
 
 def has_page_permission(user, page, action, use_cache=True):
     if use_cache:
-        actions = get_page_actions_for_user(user, page.site)
+        actions = get_page_actions_for_user(user, page.node.site)
     else:
-        actions = get_page_actions_for_user.without_cache(user, page.site)
+        actions = get_page_actions_for_user.without_cache(user, page.node.site)
     return page.pk in actions[action]
 
 
@@ -272,7 +281,7 @@ def get_subordinate_users(user, site):
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__nodes__depth__gte=user_level))
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
@@ -311,14 +320,14 @@ def get_subordinate_groups(user, site):
     page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
 
     return Group.objects.distinct().filter(
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__nodes__depth__gte=user_level))
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
         | (Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True))
     )
 
 
-def get_view_restrictions(nodes):
+def get_view_restrictions(pages):
     """
-    Loads all view restrictions for the given nodes
+    Load all view restrictions for the pages
     """
     restricted_pages = defaultdict(list)
 
@@ -326,59 +335,30 @@ def get_view_restrictions(nodes):
         # Permissions are off. There's no concept of page restrictions.
         return restricted_pages
 
-    root_nodes = (node for node in nodes if node.is_root())
+    if not pages:
+        return restricted_pages
 
-    for node in root_nodes:
-        node._set_hierarchy(nodes)
+    nodes = [page.node for page in pages]
+    pages_by_id = {}
 
-    nodes_by_page_id = dict((node.page_id, node) for node in nodes)
+    for page in pages:
+        if page.node.is_root():
+            page.node._set_hierarchy(nodes)
+        page.node.__dict__['item'] = page
+        pages_by_id[page.pk] = page
 
     page_permissions = PagePermission.objects.filter(
-        page__in=nodes_by_page_id,
+        page__in=pages_by_id,
         can_view=True,
     )
 
     for perm in page_permissions:
-        node = nodes_by_page_id[perm.page_id]
+        # set internal fk cache to our page with loaded ancestors and descendants
+        perm._page_cache = pages_by_id[perm.page_id]
 
-        for node_id in perm.get_page_ids(node):
-            restricted_pages[node_id].append(perm)
+        for page_id in perm.get_page_ids():
+            restricted_pages[page_id].append(perm)
     return restricted_pages
-
-
-def get_user_sites_queryset(user):
-    """
-    Returns queryset of all sites available for given user.
-
-    1.  For superuser always returns all sites.
-    2.  For global user returns all sites he haves in global page permissions
-        together with any sites he is assigned to over an page.
-    3.  For standard user returns just sites he is assigned to over pages.
-    """
-    qs = Site.objects.all()
-
-    if not get_cms_setting('PERMISSION') or user.is_superuser:
-        return qs
-
-    global_ids = GlobalPagePermission.objects.with_user(user).filter(
-        Q(can_add=True) | Q(can_change=True)
-    ).values_list('id', flat=True)
-
-    query = Q()
-    if global_ids:
-        query = Q(globalpagepermission__id__in=global_ids)
-        # haves some global permissions assigned
-        if not qs.filter(query).exists():
-            # haves global permissions, but none of sites is specified,
-            # so he haves access to all sites
-            return qs
-    # add some pages if he has permission to add / change them
-    query |= (
-        Q(Q(djangocms_pages__pagepermission__user=user) |
-          Q(djangocms_pages__pagepermission__group__user=user)) &
-        Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True))
-    )
-    return qs.filter(query).distinct()
 
 
 def has_plugin_permission(user, plugin_type, permission_type):

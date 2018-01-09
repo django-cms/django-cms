@@ -17,7 +17,7 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, PageNode, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
@@ -290,7 +290,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # test the cms menu class
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
-        pages = self.get_all_pages().order_by('publisher_public__nodes__path')
+        pages = self.get_all_pages().order_by('node__path')
         self.assertEqual(len(nodes), len(pages))
         self.assertSequenceEqual(
             [node.get_absolute_url() for node in nodes],
@@ -298,15 +298,15 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         )
 
     def test_cms_menu_public_with_multiple_languages(self):
-        for node in PageNode.objects.all():
+        for page in Page.objects.drafts():
             create_title(
                 language='de',
-                title=node.page.get_title('en'),
-                page=node.page,
-                slug='{}-de'.format(node.page.get_slug('en'))
+                title=page.get_title('en'),
+                page=page,
+                slug='{}-de'.format(page.get_slug('en'))
             )
 
-        pages = self.get_all_pages().order_by('publisher_public__nodes__path')
+        pages = self.get_all_pages().order_by('node__path')
 
         # Fallbacks on
         request = self.get_request(path='/de/', language='de')
@@ -334,8 +334,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             nodes = menu.get_nodes(request)
             self.assertEqual(len(nodes), 0)
 
-        for node in PageNode.objects.all():
-            node.page.publish('de')
+        for page in Page.objects.drafts().order_by('node__path'):
+            page.publish('de')
 
         # Fallbacks on
         # This time however, the "de" translations are published.
@@ -554,9 +554,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
-        level_2_public_pages = Page.objects.public().filter(
-            publisher_public__in=Page.objects.filter(nodes__depth=2, site=site)
-        )
+        level_2_public_pages = Page.objects.public().filter(node__depth=2, node__site=site)
         self.assertEqual(len(nodes), level_2_public_pages.count())
         for node in nodes:
             self.assertEqual(len(node.children), 0)
@@ -804,13 +802,12 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         When we render P6, there should be a menu entry for P7 and P8 if the
         tag parameters are "1 XXX XXX XXX"
         """
-        site = get_current_site()
         page6 = self.get_page(6)
         context = self.get_context(page6.get_absolute_url(), page=page6)
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
-        number_of_p6_children = page6.get_child_pages(site).filter(in_navigation=True).count()
+        number_of_p6_children = page6.get_child_pages().filter(in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p6_children)
 
         page7 = self.get_page(7)
@@ -823,7 +820,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 2 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
-        number_of_p7_children = page7.get_child_pages(site).filter(in_navigation=True).count()
+        number_of_p7_children = page7.get_child_pages().filter(in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p7_children)
 
     def test_show_breadcrumb_invisible(self):
@@ -1037,7 +1034,6 @@ class MenuTests(BaseMenuTest):
             'in_navigation': True,
         }
         nl_defaults = {
-            'site': site_2,
             'template': 'nav_playground.html',
             'in_navigation': True,
         }
@@ -1047,8 +1043,9 @@ class MenuTests(BaseMenuTest):
 
         # The nl language is not configured for the current site
         # as a result, we have to create the pages manually.
-        nl_page_1 = Page.objects.create(**nl_defaults)
-        nl_page_1.attach_site(site=site_2, target=None)
+        nl_page_1 = Page(**nl_defaults)
+        nl_page_1.set_tree_node(site=site_2, target=None)
+        nl_page_1.save()
         nl_page_1.title_set.create(
             language='nl',
             title='NL-P1',
@@ -1056,8 +1053,9 @@ class MenuTests(BaseMenuTest):
         )
         nl_page_1.publish('nl')
 
-        nl_page_2 = Page.objects.create(**nl_defaults)
-        nl_page_2.attach_site(site=site_2, target=None)
+        nl_page_2 = Page(**nl_defaults)
+        nl_page_2.set_tree_node(site=site_2, target=None)
+        nl_page_2.save()
         nl_page_2.title_set.create(
             language='nl',
             title='NL-P2',
@@ -1171,6 +1169,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
 
     def tearDown(self):
         Page.objects.all().delete()
+        menu_pool.clear(all=True)
 
     def get_page(self, name):
         return Page.objects.public().get(title_set__slug=name)
@@ -1565,7 +1564,6 @@ class ViewPermissionMenuTests(CMSTestCase):
     def setUp(self):
         self.page = create_page('page', 'nav_playground.html', 'en')
         self.pages = [self.page]
-        self.nodes = [self.page.node]
         self.user = self.get_standard_user()
         self.site = get_current_site()
 
@@ -1590,9 +1588,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             GlobalPagePermission query
             PagePermission count query
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
     @override_settings(CMS_PUBLIC_FOR='all')
     def test_public_for_all(self):
@@ -1606,9 +1603,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             GlobalPagePermission query
             PagePermission query for affected pages
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
     @override_settings(CMS_PUBLIC_FOR='all')
     def test_unauthed(self):
@@ -1618,9 +1614,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             The query is:
             PagePermission query for affected pages
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
     def test_authed_basic_perm(self):
         self.user.user_permissions.add(Permission.objects.get(codename='view_page'))
@@ -1632,9 +1627,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             User permissions
             Content type
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
     def test_authed_no_access(self):
         request = self.get_request(self.user)
@@ -1647,14 +1641,14 @@ class ViewPermissionMenuTests(CMSTestCase):
             User permissions
             Content type
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, [])
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, [])
 
     def test_unauthed_no_access(self):
         request = self.get_request()
 
         with self.assertNumQueries(0):
-            nodes = get_visible_nodes(request, self.nodes, self.site)
+            nodes = get_visible_nodes(request, self.pages, self.site)
             self.assertEqual(nodes, [])
 
     def test_page_permissions(self):
@@ -1669,9 +1663,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             Content type
             GlobalpagePermission query for user
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
     def test_page_permissions_view_groups(self):
         group = Group.objects.create(name='testgroup')
@@ -1688,9 +1681,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             GlobalpagePermission query for user
             Group query via PagePermission
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
     def test_global_permission(self):
         GlobalPagePermission.objects.create(can_view=True, user=self.user)
@@ -1705,9 +1697,8 @@ class ViewPermissionMenuTests(CMSTestCase):
             Content type
             GlobalpagePermission query for user
             """
-            nodes = get_visible_nodes(request, self.nodes, self.site)
-            self.assertEqual(nodes, self.nodes)
-            self.assertEqual([node.page for node in nodes], self.pages)
+            pages = get_visible_nodes(request, self.pages, self.site)
+            self.assertEqual(pages, self.pages)
 
 
 @override_settings(
@@ -1733,8 +1724,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         c3 = create_page('c3', l, 'en', parent=b2, **kw)
         c4 = create_page('c4', l, 'en', parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
-        self.nodes = [page.node for page in self.pages]
-        self.site = a.site
+        self.site = get_current_site()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
         self.other = self._create_user("other", is_staff=False, is_superuser=False)
@@ -1752,38 +1742,34 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         self.request = type('Request', (object,), attrs)
 
     def test_draft_list_access(self):
-        nodes = get_visible_nodes(self.request, self.nodes, self.site)
-        page_ids = [node.page_id for node in nodes]
-        pages = (
-            Page
-            .objects
-            .filter(id__in=page_ids)
-            .values_list('title_set__title', flat=True)
-        )
-        pages = sorted(pages)
-        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
-
-    def test_draft_qs_access(self):
-        nodes = get_visible_nodes(self.request, self.nodes, self.site)
-        page_ids = [node.page_id for node in nodes]
+        pages = get_visible_nodes(self.request, self.pages, self.site)
         pages = (
             Page
             .objects
             .drafts()
-            .filter(id__in=page_ids)
+            .filter(pk__in=(page.pk for page in pages))
             .values_list('title_set__title', flat=True)
         )
-        pages = sorted(pages)
-        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+        self.assertSequenceEqual(sorted(pages), ['a', 'b1', 'c1', 'c2'])
+
+    def test_draft_qs_access(self):
+        pages = get_visible_nodes(self.request, Page.objects.drafts(), self.site)
+        pages = (
+            Page
+            .objects
+            .drafts()
+            .filter(pk__in=(page.pk for page in pages))
+            .values_list('title_set__title', flat=True)
+        )
+        self.assertSequenceEqual(sorted(pages), ['a', 'b1', 'c1', 'c2'])
 
     def test_public_qs_access(self):
-        nodes = get_visible_nodes(self.request, self.nodes, self.site)
-        result = [node.page.publisher_public_id for node in nodes]
+        pages = get_visible_nodes(self.request, Page.objects.public(), self.site)
         pages = (
             Page
             .objects
             .public()
-            .filter(id__in=result)
+            .filter(id__in=(page.pk for page in pages))
             .values_list('title_set__title', flat=True)
         )
         pages = sorted(pages)

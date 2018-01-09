@@ -102,11 +102,6 @@ class WizardCreateView(SessionWizardView):
                 self.request,
                 site_id=self.site.pk,
             )
-
-        if kwargs['wizard_page']:
-            kwargs['wizard_page_node'] = kwargs['wizard_page'].get_node_object(self.site)
-        else:
-            kwargs['wizard_page_node'] = None
         return kwargs
 
     def get_form_initial(self, step):

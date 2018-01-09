@@ -8,7 +8,6 @@ from django.template.response import TemplateResponse
 from cms import __version__
 from cms.cache.page import set_page_cache
 from cms.models import Page
-from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_template_from_request
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
@@ -18,21 +17,11 @@ def render_page(request, page, current_language, slug):
     """
     Renders a page
     """
-    site = get_current_site()
-
-    if page.publisher_is_draft:
-        draft_page = page
-    else:
-        draft_page = page.get_draft_object()
-        # at this stage we already know which node is being rendered
-        # save a query by passing this information to the draft page
-        draft_page._nodes_cache = page._nodes_cache.copy()
-
     context = {}
     context['lang'] = current_language
     context['current_page'] = page
-    context['has_change_permissions'] = user_can_change_page(request.user, draft_page)
-    context['has_view_permissions'] = user_can_view_page(request.user, draft_page, site)
+    context['has_change_permissions'] = user_can_change_page(request.user, page)
+    context['has_view_permissions'] = user_can_view_page(request.user, page)
 
     if not context['has_view_permissions']:
         return _handle_no_page(request)

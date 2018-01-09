@@ -234,20 +234,22 @@ class PagePermission(AbstractPagePermission):
                         "by its creator.")
             raise ValidationError(message)
 
-    def get_page_ids(self, node):
+    def get_page_ids(self):
         if self.grant_on & MASK_PAGE:
             yield self.page_id
 
         if self.grant_on & MASK_CHILDREN:
-            children = node.get_children().values_list('page', flat=True)
+            children = self.page.get_child_pages().values_list('pk', flat=True)
 
             for child in children:
                 yield child
         elif self.grant_on & MASK_DESCENDANTS:
+            node = self.page.node
+
             if node._has_cached_hierarchy():
-                descendants = (node.page_id for node in node.get_cached_descendants())
+                descendants = (node.item.pk for node in node.get_cached_descendants())
             else:
-                descendants = node.get_descendants().values_list('page', flat=True).iterator()
+                descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 
             for descendant in descendants:
                 yield descendant

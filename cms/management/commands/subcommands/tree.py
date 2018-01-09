@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from collections import OrderedDict
 
-from cms.models import PageNode, CMSPlugin
+from cms.models import CMSPlugin, TreeNode
 
 from .base import SubcommandsCommand
 
@@ -15,7 +15,7 @@ def get_descendants(root):
     """
     # Note this is done because get_descendants() can't be trusted
     # as the tree can be corrupt.
-    children = PageNode.objects.filter(parent=root).order_by('path')
+    children = TreeNode.objects.filter(parent=root).order_by('path')
 
     for child in children.iterator():
         yield child
@@ -33,9 +33,9 @@ class FixTreeCommand(SubcommandsCommand):
         Repairs the tree
         """
         self.stdout.write('fixing page tree')
-        PageNode.fix_tree()
+        TreeNode.fix_tree()
 
-        root_nodes = PageNode.objects.filter(parent__isnull=True)
+        root_nodes = TreeNode.objects.filter(parent__isnull=True)
 
         last = None
 
@@ -61,7 +61,7 @@ class FixTreeCommand(SubcommandsCommand):
         self.stdout.write('all done')
 
     def _update_descendants_tree(self, root):
-        nodes = PageNode.objects.all()
+        nodes = TreeNode.objects.all()
         descendants_by_parent = OrderedDict()
 
         for descendant in get_descendants(root):
