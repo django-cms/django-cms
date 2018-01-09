@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+import warnings
 from collections import OrderedDict
 from logging import getLogger
 from os.path import join
@@ -181,7 +182,48 @@ class Page(models.Model):
 
     @property
     def parent(self):
+        warnings.warn(
+            'Pages no longer have a "parent" field. '
+            'To get the parent object of any given page, use the "parent_page" attribute. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
         return self.parent_page
+
+    @property
+    def parent_id(self):
+        warnings.warn(
+            'Pages no longer have a "parent_id" attribute. '
+            'To get the parent id of any given page, '
+            'call "pk" on the "parent_page" attribute. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
+        if self.parent_page:
+            return self.parent_page.pk
+        return None
+
+    @property
+    def site(self):
+        warnings.warn(
+            'Pages no longer have a "site" field. '
+            'To get the site object of any given page, '
+            'call "site" on the page "node" object. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
+        return self.node.site
+
+    @property
+    def site_id(self):
+        warnings.warn(
+            'Pages no longer have a "site_id" attribute. '
+            'To get the site id of any given page, '
+            'call "site_id" on the page "node" object. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
+        return self.node.site_id
 
     @cached_property
     def parent_page(self):
