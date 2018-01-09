@@ -572,8 +572,7 @@ class AdminTests(AdminTestsBase):
             self.assertRaises(Http404, self.admin_class.preview_page, request, 404, "en")
         page = self.get_page()
         page.publish("en")
-
-        Page.set_homepage(page)
+        page.set_as_homepage()
 
         new_site = Site.objects.create(id=2, domain='django-cms.org', name='django-cms')
         new_page = create_page("testpage", "nav_playground.html", "fr", site=new_site, published=True)
@@ -1014,8 +1013,7 @@ class AdminFormsTests(AdminTestsBase):
         cache.clear()
 
         homepage = create_page('Test', 'static.html', 'en', published=True)
-
-        Page.set_homepage(homepage)
+        homepage.set_as_homepage()
 
         for placeholder in Placeholder.objects.all():
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')

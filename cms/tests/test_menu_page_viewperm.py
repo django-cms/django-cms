@@ -71,7 +71,7 @@ class ViewPermissionTests(CMSTestCase):
             'in_navigation': True,
         }
         homepage = create_page("page_a", **stdkwargs)
-        Page.set_homepage(homepage)
+        homepage.set_as_homepage()
 
         page_b = create_page("page_b", **stdkwargs)
         page_c = create_page("page_c", **stdkwargs)
@@ -568,7 +568,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             'in_navigation': True,
         }
         homepage = create_page("page_1", **stdkwargs)
-        Page.set_homepage(homepage)
+        homepage.set_as_homepage()
         page_2 = create_page("page_2", parent=homepage, **stdkwargs)
         page_3 = create_page("page_3", parent=page_2, **stdkwargs)
         page_4 = create_page("page_4", parent=page_3, **stdkwargs)

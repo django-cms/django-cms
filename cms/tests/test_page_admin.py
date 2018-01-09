@@ -287,7 +287,7 @@ class PageTest(PageTestBase):
         page = create_page("page", 'nav_playground.html', "en")
         sub_page = create_page("subpage", 'nav_playground.html', "en", parent=page)
         child_page = create_page("child-page", 'nav_playground.html', "en", parent=root)
-        Page.set_homepage(root)
+        root.set_as_homepage()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             # slug collision between two child pages of the same node
@@ -1052,7 +1052,7 @@ class PageTest(PageTestBase):
             page1.publish('en')
 
             # Promote page1 to be the new homepage
-            Page.set_homepage(page1)
+            page1.set_as_homepage()
             self.assertEqual(page1.get_path(), '')
             self.assertEqual(page1.publisher_public.reload().get_path(), '')
             # check that page2 and page3 url have changed

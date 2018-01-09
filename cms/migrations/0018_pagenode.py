@@ -53,7 +53,7 @@ def migrate_to_page_nodes(apps, schema_editor):
     TreeNode = apps.get_model('cms', 'TreeNode')
     db_alias = schema_editor.connection.alias
 
-    public_pages = Page.objects.filter(publisher_is_draft=False)
+    public_pages = Page.objects.using(db_alias).filter(publisher_is_draft=False)
     root_draft_pages = Page.objects.using(db_alias).filter(
         publisher_is_draft=True,
         parent__isnull=True,
@@ -128,6 +128,12 @@ class Migration(migrations.Migration):
             unique_together=set([('node', 'publisher_is_draft')]),
         ),
         migrations.RunPython(migrate_to_page_nodes),
+        migrations.AlterModelOptions(
+            name='page',
+            options={'verbose_name': 'page', 'verbose_name_plural': 'pages', 'permissions': (
+            ('view_page', 'Can view page'), ('publish_page', 'Can publish page'),
+            ('edit_static_placeholder', 'Can edit static placeholders'))},
+        ),
         migrations.AlterField(
             model_name='page',
             name='node',
@@ -141,6 +147,10 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='page',
             name='parent',
+        ),
+        migrations.RemoveField(
+            model_name='page',
+            name='revision_id',
         ),
         migrations.RemoveField(
             model_name='page',

@@ -370,7 +370,7 @@ class BaseCMSTestCase(object):
 
     def create_homepage(self, *args, **kwargs):
         homepage = create_page(*args, **kwargs)
-        Page.set_homepage(homepage)
+        homepage.set_as_homepage()
         return homepage.reload()
 
     def move_page(self, page, target_page, position="first-child"):

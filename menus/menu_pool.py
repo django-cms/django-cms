@@ -2,7 +2,6 @@
 from functools import partial
 from logging import getLogger
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -109,7 +108,7 @@ class MenuRenderer(object):
 
     @property
     def cache_key(self):
-        prefix = getattr(settings, 'CMS_CACHE_PREFIX', 'menu_cache_')
+        prefix = get_cms_setting('CACHE_PREFIX')
 
         key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, self.site.pk)
 

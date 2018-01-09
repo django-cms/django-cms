@@ -136,7 +136,7 @@ class TestNoI18N(CMSTestCase):
                 published=True,
                 redirect='/foobar/',
             )
-            Page.set_homepage(homepage)
+            homepage.set_as_homepage()
             response = self.client.get('/', follow=False)
             self.assertTrue(response['Location'].endswith("/foobar/"))
 
