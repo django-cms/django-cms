@@ -8,7 +8,8 @@ module.exports = {
     },
     globals: {
         CMS: true,
-        Promise: true
+        Promise: true,
+        __CMS_VERSION__: true
     },
     root: true,
     ecmaFeatures: {

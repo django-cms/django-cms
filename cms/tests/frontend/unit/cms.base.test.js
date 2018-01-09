@@ -586,7 +586,7 @@ describe('cms.base.js', function() {
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
                     status: 200,
                     contentType: 'text/plain',
-                    responseText: '{"serverSetting":true,"version":"same","edit_off":1}'
+                    responseText: `{"serverSetting":true,"version":"${__CMS_VERSION__}","edit_off":1}`
                 });
 
                 jasmine.Ajax.stubRequest('/my-broken-settings-url').andReturn({
@@ -606,16 +606,20 @@ describe('cms.base.js', function() {
 
                 localStorage.setItem(
                     'cms_cookie',
-                    JSON.stringify({ version: 'same', presetSetting: true, edit_off: 1 })
+                    JSON.stringify({ version: __CMS_VERSION__, presetSetting: true, edit_off: 1 })
                 );
                 CMS.settings = {};
                 CMS.config = {
                     settings: {
-                        version: 'same'
+                        version: __CMS_VERSION__
                     }
                 };
 
-                expect(CMS.API.Helpers.getSettings()).toEqual({ presetSetting: true, version: 'same', edit_off: 1 });
+                expect(CMS.API.Helpers.getSettings()).toEqual({
+                    presetSetting: true,
+                    version: __CMS_VERSION__,
+                    edit_off: 1
+                });
 
                 expect(showLoader.calls.count()).toEqual(0);
                 expect(hideLoader.calls.count()).toEqual(0);
@@ -687,14 +691,18 @@ describe('cms.base.js', function() {
                 CMS.API.Helpers._isStorageSupported = false;
                 CMS.config = {
                     settings: {
-                        version: 'same'
+                        version: __CMS_VERSION__
                     },
                     urls: {
                         settings: '/my-settings-url'
                     }
                 };
 
-                expect(CMS.API.Helpers.getSettings()).toEqual({ version: 'same', serverSetting: true, edit_off: 1 });
+                expect(CMS.API.Helpers.getSettings()).toEqual({
+                    version: __CMS_VERSION__,
+                    serverSetting: true,
+                    edit_off: 1
+                });
 
                 expect(showLoader.calls.count()).toEqual(1);
                 expect(hideLoader.calls.count()).toEqual(1);

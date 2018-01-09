@@ -38,16 +38,17 @@ if (argv && argv.tests) {
     console.log('Running tests for ' + files.join(', '));
 }
 
+var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
+    .match(/__version__ = '(.*?)'/)[1];
+
 webpackConfig.plugins = [
     new webpack.DefinePlugin({
         __DEV__: 'false',
         __TEST__: 'true',
+        __CMS_VERSION__: JSON.stringify(CMS_VERSION),
         files: JSON.stringify(files)
     })
 ];
-
-var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' })
-    .match(/__version__ = '(.*?)'/)[1];
 
 module.exports = function (config) {
     var useSauceLabs = function () {
