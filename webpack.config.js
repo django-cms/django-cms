@@ -108,13 +108,15 @@ module.exports = function(opts) {
         baseConfig.plugins = baseConfig.plugins.concat([
             new webpack.NoEmitOnErrorsPlugin(),
             new webpack.DefinePlugin({
-                __DEV__: 'true'
+                __DEV__: 'true',
+                __CMS_VERSION__: JSON.stringify(CMS_VERSION)
             })
         ]);
     } else {
         baseConfig.plugins = baseConfig.plugins.concat([
             new webpack.DefinePlugin({
-                __DEV__: 'false'
+                __DEV__: 'false',
+                __CMS_VERSION__: JSON.stringify(CMS_VERSION)
             }),
             new webpack.optimize.ModuleConcatenationPlugin(),
             new webpack.optimize.UglifyJsPlugin({

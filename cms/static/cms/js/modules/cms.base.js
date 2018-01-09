@@ -49,10 +49,7 @@ export const uid = (function() {
  * @returns {Boolean}
  */
 export const currentVersionMatches = ({ version }) => {
-    if (!CMS.config || !CMS.config.settings || !CMS.config.settings.version) {
-        return true; // sadly this has to be here since PageTree doesn't actually have proper CMS.config
-    }
-    return version === CMS.config.settings.version;
+    return version === __CMS_VERSION__;
 };
 
 /**
@@ -312,8 +309,7 @@ export const Helpers = {
         // edit_off is a random flag that should be available on the page, but sometimes can
         // be not set when settings are carried over from pagetree
         if (
-            (!settings || !settings.edit_off || !currentVersionMatches(settings)) &&
-            !(settings && settings.pageClipboard && CMS.config.isPageTree)
+            (!settings || !currentVersionMatches(settings))
         ) {
             settings = this.setSettings(window.CMS.config.settings);
         }
