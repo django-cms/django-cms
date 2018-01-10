@@ -390,6 +390,21 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 response = self.client.get(url)
                 self.assertNotContains(response, content, status_code=200)
 
+    def test_create_page_with_empty_fields(self):
+        superuser = self.get_superuser()
+        data = {
+            'title': '',
+            'slug': '',
+            'page_type': None,
+        }
+        form = CreateCMSPageForm(
+            data=data,
+            wizard_page=None,
+            wizard_user=superuser,
+            wizard_language='en',
+        )
+        self.assertFalse(form.is_valid())
+
     def test_create_page_with_existing_slug(self):
         superuser = self.get_superuser()
         data = {
