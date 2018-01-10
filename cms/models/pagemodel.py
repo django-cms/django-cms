@@ -1024,6 +1024,13 @@ class Page(models.Model):
         )
         return pages
 
+    def get_root(self):
+        node = self.node
+        return self.__class__.objects.get(
+            node__path=node.path[0:node.steplen],
+            publisher_is_draft=self.publisher_is_draft,
+        )
+
     def get_parent_page(self):
         if not self.node.parent_id:
             return None
