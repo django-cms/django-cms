@@ -98,6 +98,10 @@ class CreateCMSPageForm(AddPageForm):
         :return:
         """
         data = self.cleaned_data
+
+        if self._errors:
+            return data
+
         slug = data.get('slug') or slugify(data['title'])
 
         parent_node = data.get('parent_node')

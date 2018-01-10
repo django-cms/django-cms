@@ -287,7 +287,7 @@ class PageTest(PageTestBase):
         page = create_page("page", 'nav_playground.html', "en")
         sub_page = create_page("subpage", 'nav_playground.html', "en", parent=page)
         child_page = create_page("child-page", 'nav_playground.html', "en", parent=root)
-        Page.set_homepage(root)
+        root.set_as_homepage()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             # slug collision between two child pages of the same node
@@ -571,6 +571,24 @@ class PageTest(PageTestBase):
             # page's changed_date is within the time range taken by this test
             self.assertLessEqual(before_change, save_time)
             self.assertLessEqual(save_time, after_change)
+
+    def test_delete_page_confirmation(self):
+        superuser = self.get_superuser()
+        page_a = create_page("page_a", "nav_playground.html", "en", published=True)
+        create_page("page_a_a", "nav_playground.html", "en", parent=page_a, published=True)
+        page_a_b = create_page("page_a_b", "nav_playground.html", "en", parent=page_a, published=True)
+        create_page("page_a_b_a", "nav_playground.html", "en", parent=page_a_b, published=True)
+        endpoint = self.get_admin_url(Page, 'delete', page_a.pk)
+
+        page_tree = [page_a] + list(page_a.get_descendant_pages())
+        row_markup = '<a href="%s">%s</a>'
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+            for page in page_tree:
+                edit_url = self.get_admin_url(Page, 'change', page.pk)
+                page_markup = row_markup % (edit_url, page.get_title('en'))
+                self.assertContains(response, page_markup, html=True)
 
     def test_copy_page(self):
         """
@@ -1052,7 +1070,7 @@ class PageTest(PageTestBase):
             page1.publish('en')
 
             # Promote page1 to be the new homepage
-            Page.set_homepage(page1)
+            page1.set_as_homepage()
             self.assertEqual(page1.get_path(), '')
             self.assertEqual(page1.publisher_public.reload().get_path(), '')
             # check that page2 and page3 url have changed

@@ -486,8 +486,8 @@ class Placeholder(models.Model):
         return min_ttl
 
     def clear_cache(self, language, site_id=None):
-        if not site_id:
-            site_id = getattr(self.page, 'site_id', None)
+        if not site_id and self.page:
+            site_id = self.page.node.site_id
         clear_placeholder_cache(self, language, get_site_id(site_id))
 
     def mark_as_dirty(self, language, clear_cache=True):

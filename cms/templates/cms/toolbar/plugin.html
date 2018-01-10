@@ -13,7 +13,11 @@ CMS._plugins.push(['cms-plugin-{% if generic %}{{ generic.app_label }}-{{ generi
     plugin_type: '{{ instance.plugin_type }}',
     plugin_id: '{{ instance.pk|unlocalize }}',
     plugin_language: '{{ instance.language|default:"" }}',
-    plugin_parent: '{{ instance.parent_id|unlocalize }}',
+    {% if instance.node_id %}
+        plugin_parent: '{{ instance.parent_page.pk|unlocalize }}',
+    {% else %}
+        plugin_parent: '{{ instance.parent_id|unlocalize }}',
+    {% endif %}
     plugin_order: '{{ instance.plugin_order }}',{% language request.toolbar.toolbar_language %}
     plugin_restriction: [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
     plugin_parent_restriction: [{% for cls in allowed_parent_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],

@@ -1157,7 +1157,8 @@ $(function() {
     window.CMS.config = {
         isPageTree: true,
         settings: {
-            toolbar: 'expanded'
+            toolbar: 'expanded',
+            version: __CMS_VERSION__
         },
         urls: {
             settings: $('.js-cms-pagetree').data('settings-url')

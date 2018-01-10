@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
-from cms.models import Page, Title, EmptyTitle
+from cms.models import Title, EmptyTitle
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.utils.conf import get_cms_setting
@@ -201,7 +201,7 @@ class MultilingualTestCase(CMSTestCase):
             page3.publish('en')
             page4.publish('de')
 
-            Page.set_homepage(page)
+            page.set_as_homepage()
 
             # The "en" language is set to public -> False.
             # Because the request is to the root (homepage),
@@ -291,8 +291,7 @@ class MultilingualTestCase(CMSTestCase):
         """
         from cms.views import details
         p1 = create_page("page", "nav_playground.html", "en", published=True)
-
-        Page.set_homepage(p1)
+        p1.set_as_homepage()
 
         # There's no "de" translation.
         # Fallbacks are configured.

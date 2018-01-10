@@ -737,7 +737,7 @@ class PublishingTests(TestCase):
         self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'another-page/child/')
         home = self.reload(home)
         home.unpublish('en')
-        Page.set_homepage(other.reload())
+        other.reload().set_as_homepage()
 
         home = self.reload(home)
         other = self.reload(other)
@@ -759,7 +759,7 @@ class PublishingTests(TestCase):
         self.assertEqual(child.get_public_object().get_absolute_url(), root + 'page/child/')
 
         home.publish('en')
-        Page.set_homepage(home)
+        home.set_as_homepage()
         home = self.reload(home)
         other = self.reload(other)
         child = self.reload(child)

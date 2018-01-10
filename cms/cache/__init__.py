@@ -2,7 +2,7 @@
 import re
 from cms.utils.conf import get_cms_setting
 
-CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
+CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + '_PAGE_CACHE_VERSION'
 
 
 def _get_cache_version():

@@ -467,7 +467,7 @@ class ToolbarTests(ToolbarTestBase):
         user = self._create_user('toolbar', True, True)
         username = getattr(user, user.USERNAME_FIELD)
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        Page.set_homepage(page)
+        page.set_as_homepage()
         login_url = reverse('cms_login')
         endpoint = '{}?next=https://notyourdomain.com'.format(login_url)
         response = self.client.post(endpoint, {'username': username, 'password': username})

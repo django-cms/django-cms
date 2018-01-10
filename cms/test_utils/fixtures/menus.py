@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.api import create_page
-from cms.models import Page
 
 
 class MenusFixture(object):
@@ -23,7 +22,7 @@ class MenusFixture(object):
         }
         with self.settings(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
-            Page.set_homepage(p1)
+            p1.set_as_homepage()
             p4 = create_page('P4', published=True, in_navigation=True, **defaults)
             p6 = create_page('P6', published=True, in_navigation=False, **defaults)
             p2 = create_page('P2', published=True, in_navigation=True, parent=p1, **defaults)
@@ -56,7 +55,7 @@ class ExtendedMenusFixture(object):
         }
         with self.settings(CMS_MODERATOR=False, CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
-            Page.set_homepage(p1)
+            p1.set_as_homepage()
             p4 = create_page('P4', published=True, in_navigation=True, **defaults)
             p6 = create_page('P6', published=True, in_navigation=False, **defaults)
             p2 = create_page('P2', published=True, in_navigation=True, parent=p1, **defaults)
@@ -89,7 +88,7 @@ class SubMenusFixture(object):
         }
         with self.settings(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
-            Page.set_homepage(p1)
+            p1.set_as_homepage()
             p4 = create_page('P4', published=True, in_navigation=True, **defaults)
             p6 = create_page('P6', published=True, in_navigation=True, **defaults)
             p2 = create_page('P2', published=True, in_navigation=True, parent=p1, **defaults)
@@ -123,7 +122,7 @@ class SoftrootFixture(object):
         }
         with self.settings(CMS_PERMISSION=False):
             top = create_page('top', **defaults)
-            Page.set_homepage(top)
+            top.set_as_homepage()
             root = create_page('root', parent=top, **defaults)
             aaa = create_page('aaa', parent=root, **defaults)
             _111 = create_page('111', parent=aaa, **defaults)

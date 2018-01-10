@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+import warnings
 from collections import OrderedDict
 from logging import getLogger
 from os.path import join
@@ -109,9 +110,6 @@ class Page(models.Model):
     )
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
-    # If the draft is loaded from a reversion version save the revision id here.
-    revision_id = models.PositiveIntegerField(default=0, editable=False)
-
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
@@ -184,20 +182,60 @@ class Page(models.Model):
 
     @property
     def parent(self):
+        warnings.warn(
+            'Pages no longer have a "parent" field. '
+            'To get the parent object of any given page, use the "parent_page" attribute. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
         return self.parent_page
+
+    @property
+    def parent_id(self):
+        warnings.warn(
+            'Pages no longer have a "parent_id" attribute. '
+            'To get the parent id of any given page, '
+            'call "pk" on the "parent_page" attribute. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
+        if self.parent_page:
+            return self.parent_page.pk
+        return None
+
+    @property
+    def site(self):
+        warnings.warn(
+            'Pages no longer have a "site" field. '
+            'To get the site object of any given page, '
+            'call "site" on the page "node" object. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
+        return self.node.site
+
+    @property
+    def site_id(self):
+        warnings.warn(
+            'Pages no longer have a "site_id" attribute. '
+            'To get the site id of any given page, '
+            'call "site_id" on the page "node" object. '
+            'This backwards compatible shim will be removed in version 3.6',
+            UserWarning,
+        )
+        return self.node.site_id
 
     @cached_property
     def parent_page(self):
         return self.get_parent_page()
 
-    @classmethod
-    def set_homepage(cls, page, user=None):
+    def set_as_homepage(self, user=None):
         """
         Sets the given page as the homepage.
         Updates the title paths for all affected pages.
         Returns the old home page (if any).
         """
-        assert page.publisher_is_draft
+        assert self.publisher_is_draft
 
         if user:
             changed_by = get_clean_username(user)
@@ -207,12 +245,12 @@ class Page(models.Model):
         changed_date = now()
 
         try:
-            old_home = cls.objects.get(
+            old_home = self.__class__.objects.get(
                 is_home=True,
-                node__site=page.node.site_id,
+                node__site=self.node.site_id,
                 publisher_is_draft=True,
             )
-        except cls.DoesNotExist:
+        except self.__class__.DoesNotExist:
             old_home_tree = []
         else:
             old_home.update(
@@ -223,13 +261,13 @@ class Page(models.Model):
             )
             old_home_tree = old_home._set_title_root_path()
 
-        page.update(
+        self.update(
             draft_only=False,
             is_home=True,
             changed_by=changed_by,
             changed_date=changed_date,
         )
-        new_home_tree = page._remove_title_root_path()
+        new_home_tree = self._remove_title_root_path()
         return (new_home_tree, old_home_tree)
 
     def _update_title_path(self, language):

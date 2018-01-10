@@ -49,7 +49,7 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def site_language(self):
         cms_page = get_page_draft(self.request.current_page)
-        site_id = getattr(cms_page, 'site_id', None)
+        site_id = cms_page.node.site_id if cms_page else None
         return get_site_language_from_request(self.request, site_id)
 
     @cached_property
