@@ -563,6 +563,17 @@ class PageToolbar(CMSToolbar):
             new_page_params = {'edit': 1}
             new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
 
+            if self.page.is_page_type:
+                add_page_url = admin_reverse('cms_pagetype_add')
+                advanced_url = admin_reverse('cms_pagetype_advanced', args=(self.page.pk,))
+                page_settings_url = admin_reverse('cms_pagetype_change', args=(self.page.pk,))
+                duplicate_page_url = admin_reverse('cms_pagetype_duplicate', args=[self.page.pk])
+            else:
+                add_page_url = admin_reverse('cms_page_add')
+                advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
+                page_settings_url = admin_reverse('cms_page_change', args=(self.page.pk,))
+                duplicate_page_url = admin_reverse('cms_page_duplicate', args=[self.page.pk])
+
             can_add_root_page = page_permissions.user_can_add_page(
                 user=self.request.user,
                 site=self.current_site,
@@ -587,7 +598,6 @@ class PageToolbar(CMSToolbar):
                 PAGE_MENU_ADD_IDENTIFIER,
                 _('Create Page'),
             )
-            app_page_url = admin_reverse('cms_page_add')
 
             add_page_menu_modal_items = (
                 (_('New Page'), new_page_params, can_add_sibling_page),
@@ -598,14 +608,10 @@ class PageToolbar(CMSToolbar):
                 params.update(language=self.toolbar.language)
                 add_page_menu.add_modal_item(
                     title,
-                    url=add_url_parameters(app_page_url, params),
+                    url=add_url_parameters(add_page_url, params),
                     disabled=not has_perm,
                 )
 
-            if self.page.is_page_type:
-                duplicate_page_url = admin_reverse('cms_pagetype_duplicate', args=[self.page.pk])
-            else:
-                duplicate_page_url = admin_reverse('cms_page_duplicate', args=[self.page.pk])
             add_page_menu.add_modal_item(
                 _('Duplicate this Page'),
                 url=add_url_parameters(duplicate_page_url, {'language': self.toolbar.language}),
@@ -620,20 +626,12 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
 
             # page settings
-            if self.page.is_page_type:
-                page_settings_url = admin_reverse('cms_pagetype_change', args=(self.page.pk,))
-            else:
-                page_settings_url = admin_reverse('cms_page_change', args=(self.page.pk,))
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.language)
             settings_disabled = not edit_mode or not can_change
             current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=settings_disabled,
                                              on_close=refresh)
 
             # advanced settings
-            if self.page.is_page_type:
-                advanced_url = admin_reverse('cms_pagetype_advanced', args=(self.page.pk,))
-            else:
-                advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
             advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
             can_change_advanced = self.page.has_advanced_settings_permission(self.request.user)
             advanced_disabled = not edit_mode or not can_change_advanced
