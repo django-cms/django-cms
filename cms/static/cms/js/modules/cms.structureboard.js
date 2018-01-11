@@ -1480,8 +1480,8 @@ StructureBoard._initializeDragItemsStates = function _initializeDragItemsStates(
     $.each(CMS.settings.states, function(index, id) {
         var el = $('.cms-draggable-' + id);
 
-        // only add this class to elements which have a draggable area
-        if (el.find('.cms-draggables').length) {
+        // only add this class to elements which have immediate children
+        if (el.find('> .cms-collapsable-container > .cms-draggable').length) {
             el.find('> .cms-collapsable-container').removeClass('cms-hidden');
             el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
         }
