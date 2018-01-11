@@ -83,6 +83,34 @@ Backward-incompatible changes
   ``parent_page`` attribute, which relies on the node tree.
 * Never-published pages can no longer have a 'pending' publishing state. A data migration,
   ``cms/migrations/0018_pagenode.py``, removes this.
+* Using ``self.request.path`` or ``self.request.path_info`` in a ``CMSToolbar`` subclass method is
+  no longer reliable and is discouraged. Instead, use ``self.toolbar.request_path``.
+
+
+*********************
+How to upgrade to 3.5
+*********************
+
+We assume you are upgrading from django CMS 3.4.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.
 
 
 ****************************
