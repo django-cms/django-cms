@@ -363,7 +363,7 @@ class AddPageTypeForm(AddPageForm):
             # User has created a page-type via "Add page"
             # instead of from another page.
             new_page.update(
-                draft_only=False,
+                draft_only=True,
                 is_page_type=True,
                 in_navigation=False,
             )
