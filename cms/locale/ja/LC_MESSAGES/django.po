@@ -7,13 +7,16 @@
 # Daigo Sakamoto <superdaigo@gmail.com>, 2011
 # Jonas Obrist <me@ojii.ch>, 2011
 # Jonas Obrist <ojiidotch@gmail.com>, 2012,2015
+# Paulo Alvarado <paulo.alvarado@divio.ch>, 2017
+# tenomoto <takeshi@enomosphere.net>, 2017
+# tenomoto <takeshi@enomosphere.net>, 2017
 # Yasushi Masuda <whosaysni@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-23 14:01-0500\n"
-"PO-Revision-Date: 2017-01-09 17:49+0000\n"
+"POT-Creation-Date: 2018-01-11 16:30+0000\n"
+"PO-Revision-Date: 2018-01-11 16:38+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Japanese (http://www.transifex.com/divio/django-cms/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -22,1429 +25,1052 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin/forms.py:79
+msgid "All"
+msgstr "すべて"
+
 msgid "Copy permissions"
 msgstr "権限をコピー"
 
-#: admin/forms.py:86 admin/forms.py:188 admin/forms.py:231 cms_toolbars.py:221
-#: models/settingmodels.py:11
-msgid "Language"
-msgstr "言語"
-
-#: admin/forms.py:87 admin/forms.py:189 admin/forms.py:232
-msgid "The current language of the content fields."
-msgstr "現在のコンテンツの言語です。"
-
-#: admin/forms.py:88 forms/wizards.py:56
-msgid "Page type"
-msgstr "ページタイプ"
-
-#: admin/forms.py:89 forms/wizards.py:49
 msgid "Title"
 msgstr "タイトル"
 
-#: admin/forms.py:90
 msgid "The default title"
 msgstr "デフォルトタイトル"
 
-#: admin/forms.py:91 forms/wizards.py:52
 msgid "Slug"
 msgstr "スラグ"
 
-#: admin/forms.py:92
 msgid "The part of the title that is used in the URL"
 msgstr "URLに使うタイトルの一部"
 
-#: admin/forms.py:93
 msgid "Menu Title"
 msgstr "メニュータイトル"
 
-#: admin/forms.py:94
 msgid "Overwrite what is displayed in the menu"
 msgstr "メニューに表示されているテキストを上書きします"
 
-#: admin/forms.py:95
 msgid "Page Title"
 msgstr "ページタイトル"
 
-#: admin/forms.py:96
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "ブラウザのタイトルやブックマークに表示されているタイトルを上書きします"
 
-#: admin/forms.py:98
 msgid "Description meta tag"
 msgstr "メタタグの記述"
 
-#: admin/forms.py:100
 msgid "A description of the page used by search engines."
 msgstr "検索エンジンが利用する記述。"
 
-#: admin/forms.py:153
-msgid "Another page with this slug already exists"
-msgstr "このスラグを使っているページが存在します"
-
-#: admin/forms.py:183
 msgid "Slug must not be empty."
 msgstr "スラグは空ではいけません。"
 
-#: admin/forms.py:211
+msgid "Page type"
+msgstr "ページタイプ"
+
+msgid "Page Types"
+msgstr "ページタイプ"
+
 msgid "Application"
 msgstr "アプリケーション"
 
-#: admin/forms.py:213
 msgid "Hook application to this page."
 msgstr "アプリケーションをこのページに関連付けます。"
 
-#: admin/forms.py:214
 msgid "Overwrite URL"
 msgstr "上書きURL"
 
-#: admin/forms.py:215
 msgid "Keep this field empty if standard path should be used."
 msgstr "標準のパスを使う場合は、このフィールドを空のままにしてください。"
 
-#: admin/forms.py:219
 msgid "X Frame Options"
 msgstr ""
 
-#: admin/forms.py:220
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "このページを別のページやウェブサイトに埋め込むか否か"
 
-#: admin/forms.py:225
 msgid "Redirect"
 msgstr "リダイレクト"
 
-#: admin/forms.py:226
 msgid "Redirects to this URL."
 msgstr "このURLにリダイレクトします。"
 
-#: admin/forms.py:227
 msgid "Start typing..."
-msgstr ""
+msgstr "入力を始めます..."
 
-#: admin/forms.py:236
 msgid "Application configurations"
-msgstr ""
+msgstr "アプリケーション設定"
 
-#: admin/forms.py:242
 msgid "Language independent options"
-msgstr ""
+msgstr "言語に依存しないオプション"
 
-#: admin/forms.py:341
-#, python-format
-msgid ""
-"Please create the %(language)s page translation before editing its advanced "
-"settings."
-msgstr ""
-
-#: admin/forms.py:349
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "%(language)s スラグを設定してから高度な設定を編集してください。"
 
-#: admin/forms.py:360
 msgid "A page with this reverse URL id exists already."
 msgstr "この逆引きURLを持っているページが存在します。"
 
-#: admin/forms.py:377
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "この設定を使用しているアプリケーションインスタンスが既に存在します。"
 
-#: admin/forms.py:385 admin/forms.py:396
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "この名前のアプリケーションインスタンスが既に存在します。"
 
-#: admin/forms.py:466 admin/forms.py:538 migrations/0001_initial.py:75
-#: migrations/0001_initial.py:138 models/permissionmodels.py:58
-#: test_utils/project/customuserapp/models.py:60
+msgid "Yes"
+msgstr "はい"
+
+msgid "No"
+msgstr "いいえ"
+
 msgid "user"
 msgstr "ユーザ"
 
-#: admin/forms.py:543
 msgid "can_view"
 msgstr "can_view"
 
-#: admin/forms.py:585 admin/forms.py:591 admin/forms.py:595
-#: templates/admin/cms/page/change_form.html:11
-#: templates/admin/cms/usersettings/change_form.html:33
-#: templatetags/cms_tags.py:585
 msgid "Add"
 msgstr "追加"
 
-#: admin/forms.py:586 admin/forms.py:592 admin/forms.py:596
 msgid "Change"
 msgstr "変更"
 
-#: admin/forms.py:587 admin/forms.py:593 admin/forms.py:597
-#: templates/admin/cms/extensions/change_form.html:8
-#: templates/admin/cms/page/plugin/submit_line.html:5
-#: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/actions_dropdown.html:33
-#: templates/admin/cms/page/tree/actions_dropdown.html:38
-#: templates/admin/cms/page/tree/menu.html:225
-#: templates/admin/cms/page/tree/menu.html:227
-#: templates/cms/toolbar/dragitem.html:40
 msgid "Delete"
 msgstr "削除"
 
-#: admin/forms.py:615 models/permissionmodels.py:85
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "作成されたページの変更権限がないのでユーザはページを作成できません。編集権限が必要です。"
 
-#: admin/forms.py:620 models/permissionmodels.py:90
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "ページの変更権限がないのでユーザはページを削除できません。編集権限が必要です。"
 
-#: admin/forms.py:625
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "ページの変更権限がないのでユーザはページの権限を設定できません。編集権限が必要です。"
 
-#: admin/forms.py:630
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "ユーザはページの変更権限なしにページの権限を削除できません。編集権限が必要です。"
 
-#: admin/forms.py:637
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "ユーザは作成された権限を変更する権限なしにページの権限を作成できません。編集権限が必要です。"
 
-#: admin/forms.py:642
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "権限を変更する権限がないのでユーザはページの権限を削除できません。編集権限が必要です。"
 
-#: admin/forms.py:761
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "不正なプラグインタイプ '%s'"
 
-#: admin/forms.py:778 admin/pageadmin.py:826 admin/placeholderadmin.py:413
 msgid "Language must be set to a supported language!"
 msgstr "「言語」に、サポートする言語をセットしてください！"
 
-#: admin/forms.py:784
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "親プラグインの言語は言語と同じでなければなりません。"
 
-#: admin/forms.py:789
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "親プラグインのプレースホルダはプレースホルダと同じでなくてはなりません。"
 
-#: admin/pageadmin.py:292
 #, python-format
 msgid ""
 "Please create the %(language)s page translation before editing it's advanced"
 " settings."
-msgstr ""
+msgstr "%(language)s ページの翻訳を作成してから高度な設定を編集してください。"
 
-#: admin/pageadmin.py:301 templates/admin/cms/page/submit_row.html:10
 msgid "Advanced Settings"
 msgstr "詳細設定"
 
-#: admin/pageadmin.py:324 cms_toolbars.py:583
 msgid "Publishing dates"
-msgstr ""
+msgstr "公開する日時"
 
-#: admin/pageadmin.py:331
 msgid "Change Permissions"
 msgstr "権限の変更"
 
-#: admin/pageadmin.py:358
-msgid "Add Page Type"
-msgstr "ページタイプ追加"
-
-#: admin/pageadmin.py:362
-msgid "Add Page Copy"
-msgstr "ページコピー追加"
-
-#: admin/pageadmin.py:366 cms_wizards.py:44
-#: templates/admin/cms/page/tree/menu.html:181
-#: templates/admin/cms/page/tree/menu.html:188
-msgid "New sub page"
-msgstr ""
-
-#: admin/pageadmin.py:371 cms_wizards.py:36
-msgid "New page"
-msgstr "新しいページ"
-
-#: admin/pageadmin.py:657
-msgid "You do not have permission to change the template"
-msgstr "テンプレートを変更する権限がありません。"
-
-#: admin/pageadmin.py:662
-msgid "Template not valid"
-msgstr "テンプレートが正しくありません。"
-
-#: admin/pageadmin.py:666
-msgid "The template was successfully changed"
-msgstr "テンプレートを変更しました。"
-
-#: admin/pageadmin.py:748
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
-msgstr "エラー！このページを移動する権限がありません。ページを再読み込みしてください。"
-
-#: admin/pageadmin.py:832 admin/placeholderadmin.py:505
-#: admin/placeholderadmin.py:569
-msgid "You do not have permission to copy these plugins."
-msgstr "プラグインをコピーする権限がありません。"
-
-#: admin/pageadmin.py:924
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr ""
-
-#: admin/pageadmin.py:947
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr ""
-
-#: admin/pageadmin.py:974
-msgid "You do not have permission to publish this page"
-msgstr "このページを公開する権限がありません。"
-
-#: admin/pageadmin.py:1022 admin/pageadmin.py:1034
-msgid "Page not published! A parent page is not published yet."
-msgstr ""
-
-#: admin/pageadmin.py:1024
-msgid "The content was successfully published."
-msgstr "コンテンツの公開に成功しました。"
-
-#: admin/pageadmin.py:1036
-msgid "There was a problem publishing your content"
-msgstr "この内容を公開する際問題が起きました。"
-
-#: admin/pageadmin.py:1075
-msgid "You do not have permission to unpublish this page"
-msgstr "このページを非公開にする権限がありません。"
-
-#: admin/pageadmin.py:1078
-msgid "This page was never published"
-msgstr ""
-
-#: admin/pageadmin.py:1082
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr ""
-
-#: admin/pageadmin.py:1124
-msgid "You do not have permission to change this page"
-msgstr "このページを変更する権限がありません"
-
-#: admin/pageadmin.py:1128
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "プライマリキーが %(key)r であるようなオブジェクト %(name)s がありません。"
-
-#: admin/pageadmin.py:1134
-msgid "There only exists one translation for this page"
-msgstr "このページは一つの翻訳しかありません。"
-
-#: admin/pageadmin.py:1171
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "%(language)s 版のタイトルとプラグインを削除しました。"
-
-#: admin/pageadmin.py:1199 admin/placeholderadmin.py:1209
-#: admin/placeholderadmin.py:1279
-msgid "Are you sure?"
-msgstr "続けてもよろしいですか？"
-
-#: admin/pageadmin.py:1227
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
-
-#: admin/pageadmin.py:1253
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "このページの in_navigation ステータスを変更する権限がありません"
-
-#: admin/pageadmin.py:1297
-msgid "Page Types"
-msgstr "ページタイプ"
-
-#: admin/pageadmin.py:1376
-msgid "You do not have permission to edit this page"
-msgstr "このページを変更する権限がありません。"
-
-#: admin/permissionadmin.py:106
-msgid "View restriction"
-msgstr "表示制限"
-
-#: admin/permissionadmin.py:107
-msgid "View restrictions"
-msgstr "表示制限"
-
-#: admin/placeholderadmin.py:113
-#, python-format
-msgid "Field %s not found"
-msgstr "フィールド%sが見つかりません。"
-
-#: admin/placeholderadmin.py:120
-msgid "You do not have permission to edit this item"
-msgstr "これを編集する権限がありません。"
-
-#: admin/placeholderadmin.py:337
-msgid "You do not have permission to add a plugin"
-msgstr "プラグインを追加する権限がありません。"
-
-#: admin/placeholderadmin.py:526
-#| msgid "You do not have permission to clear this placeholder"
-msgid "You do not have permission to copy this placeholder."
-msgstr ""
-
-#: admin/placeholderadmin.py:631
-msgid "Plugin not found"
-msgstr "プラグインが見つかりません。"
-
-#: admin/placeholderadmin.py:639
-msgid "You do not have permission to edit this plugin"
-msgstr "このプラグインを編集する権限がありません"
-
-#: admin/placeholderadmin.py:735
-msgid "order parameter references plugins in different trees"
-msgstr ""
-
-#: admin/placeholderadmin.py:747
-msgid "parent must be in the same placeholder"
-msgstr ""
-
-#: admin/placeholderadmin.py:751
-msgid "parent must be in the same language as plugin_language"
-msgstr ""
-
-#: admin/placeholderadmin.py:878
-#| msgid "You have no permission to move this plugin"
-msgid "You have no permission to paste this plugin"
-msgstr ""
-
-#: admin/placeholderadmin.py:938
-#| msgid "You have no permission to move this plugin"
-msgid "You have no permission to paste this placeholder"
-msgstr ""
-
-#: admin/placeholderadmin.py:992
-msgid "You have no permission to move this plugin"
-msgstr "このプラグインを移動する権限がありません。"
-
-#: admin/placeholderadmin.py:1087
-#| msgid "You have no permission to move this plugin"
-msgid "You have no permission to cut this plugin"
-msgstr ""
-
-#: admin/placeholderadmin.py:1150 admin/placeholderadmin.py:1159
-msgid "You do not have permission to delete this plugin"
-msgstr "このプラグインを削除する権限がありません。"
-
-#: admin/placeholderadmin.py:1178
-#, python-format
-msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s プラグイン \"%(obj)s\" を無事削除しました。"
-
-#: admin/placeholderadmin.py:1207 admin/placeholderadmin.py:1277
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s を削除できません。"
 
-#: admin/placeholderadmin.py:1231 admin/placeholderadmin.py:1244
+msgid "Are you sure?"
+msgstr "続けてもよろしいですか？"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "プライマリキーが %(key)r であるようなオブジェクト %(name)s がありません。"
+
+msgid "Database error"
+msgstr "データベースエラー"
+
+msgid "Template not valid"
+msgstr "テンプレートが正しくありません。"
+
+msgid "The template was successfully changed"
+msgstr "テンプレートを変更しました。"
+
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "エラー！このページを移動する権限がありません。ページを再読み込みしてください。"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "プラグインをコピーする権限がありません。"
+
+#| msgid "You do not have permission to clear this placeholder"
+msgid "Error! You don't have permissions to copy this page."
+msgstr ""
+
+msgid ""
+"Error! The page you're pasting is not translated in any of the languages "
+"configured by the target site."
+msgstr ""
+
+#| msgid "You do not have permission to edit this page"
+msgid "You do not have permission to revert this page."
+msgstr "このページを元に戻す権限がありません。"
+
+#, python-format
+msgid "\"%s\" was reverted to the live version."
+msgstr "%s をライブバージョンに戻しました。"
+
+msgid "You do not have permission to publish this page"
+msgstr "このページを公開する権限がありません。"
+
+msgid "Page not published! A parent page is not published yet."
+msgstr "ページは公開されませんでした。親ページがまだ公開されていません。"
+
+msgid "The content was successfully published."
+msgstr "コンテンツの公開に成功しました。"
+
+msgid "There was a problem publishing your content"
+msgstr "この内容を公開する際問題が起きました。"
+
+msgid "You do not have permission to unpublish this page"
+msgstr "このページを非公開にする権限がありません。"
+
+msgid "This page was never published"
+msgstr "このページは公開されたことがありません。"
+
+#, python-format
+msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+msgstr "%(language)s ページ \"%(page)s\" を無事非公開にしました。"
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
+msgstr ""
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "%(language)s 版のタイトルとプラグインを削除しました。"
+
+#, python-format
+#| msgid "You do not have permission to change pages."
+msgid "You don't have permissions to see page \"%(title)s\""
+msgstr "ページ \"%(title)s\" を閲覧する権限がありません。"
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "このページの in_navigation ステータスを変更する権限がありません"
+
+msgid "You do not have permission to edit this page"
+msgstr "このページを変更する権限がありません。"
+
+msgid "Add Page Copy"
+msgstr "ページコピー追加"
+
+msgid "New sub page"
+msgstr "新しいサブページ"
+
+msgid "New page"
+msgstr "新しいページ"
+
+msgid "The page is not eligible to be home."
+msgstr ""
+
+msgid "View restriction"
+msgstr "表示制限"
+
+msgid "View restrictions"
+msgstr "表示制限"
+
+#, python-format
+msgid "Field %s not found"
+msgstr "フィールド%sが見つかりません。"
+
+msgid "You do not have permission to edit this item"
+msgstr "これを編集する権限がありません。"
+
+msgid "You do not have permission to add a plugin"
+msgstr "プラグインを追加する権限がありません。"
+
+#| msgid "You do not have permission to clear this placeholder"
+msgid "You do not have permission to copy this placeholder."
+msgstr "このプレースホルダをコピーする権限がありません。"
+
+msgid "Plugin not found"
+msgstr "プラグインが見つかりません。"
+
+msgid "You do not have permission to edit this plugin"
+msgstr "このプラグインを編集する権限がありません"
+
+msgid "order parameter references plugins in different trees"
+msgstr "パラメタ参照プラグインを異なるツリーに並べます"
+
+msgid "parent must be in the same placeholder"
+msgstr "親は同じプレースホルダに存在しなくてはなりません"
+
+msgid "parent must be in the same language as plugin_language"
+msgstr "親は plugin_language と同じ言語でなくてはなりません。"
+
+#| msgid "You have no permission to move this plugin"
+msgid "You have no permission to paste this plugin"
+msgstr "このプラグインをペーストする権限がありません。"
+
+#| msgid "You have no permission to move this plugin"
+msgid "You have no permission to paste this placeholder"
+msgstr "このプレースホルダをペーストする権限がありません。"
+
+msgid "You have no permission to move this plugin"
+msgstr "このプラグインを移動する権限がありません。"
+
+#| msgid "You have no permission to move this plugin"
+msgid "You have no permission to cut this plugin"
+msgstr "このプラグインをカットする権限がありません。"
+
+msgid "You do not have permission to delete this plugin"
+msgstr "このプラグインを削除する権限がありません。"
+
+#, python-format
+msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s プラグイン \"%(obj)s\" を無事削除しました。"
+
 msgid "You do not have permission to clear this placeholder"
 msgstr "このプレースホルダをクリアする権限がありません。"
 
-#: admin/placeholderadmin.py:1256
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "プレースホルダ \"%(obj)s\" を無事クリアしました。"
 
-#: admin/placeholderadmin.py:1283
 msgid "placeholder"
 msgstr "プレースホルダ"
 
-#: admin/useradmin.py:122 models/permissionmodels.py:206
 msgid "Page permissions"
 msgstr "ページ権限"
 
-#: admin/useradmin.py:123
 msgid "User & Group permissions"
 msgstr "ユーザとグループ権限"
 
-#: admin/useradmin.py:124
 msgid "Page permissions management"
 msgstr "ページ権限管理"
 
-#: apphook_pool.py:97
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "登録されたapphook \"%r\" が見つかりません。"
 
-#: apps.py:9 templates/cms/toolbar/items/logo.html:2
-#: templates/cms/welcome.html:6 templates/cms/welcome.html.py:22
-#: templates/cms/welcome.html:58
 msgid "django CMS"
 msgstr "django CMS"
 
-#: cms_plugins.py:16
 msgid "Placeholder"
 msgstr "プレースホルダ"
 
-#: cms_plugins.py:30
 msgid "Alias"
 msgstr "エリアス"
 
-#: cms_plugins.py:65 cms_plugins.py:74
 msgid "Create Alias"
 msgstr "エリアスを作る。"
 
-#: cms_plugins.py:117
 #, python-format
 msgid ""
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-msgstr ""
+msgstr "これはエイリアス参照です。内容の編集ができるページは <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> だけです。"
 
-#: cms_toolbars.py:97
-msgid "Structure"
-msgstr "ストラクチャ"
-
-#: cms_toolbars.py:98 forms/wizards.py:58
-msgid "Content"
-msgstr "コンテンツ"
-
-#: cms_toolbars.py:102 templates/cms/wizards/create.html:5
-#: templates/cms/wizards/create.html:22 templates/cms/wizards/start.html:5
 msgid "Create"
-msgstr ""
+msgstr "作成"
 
-#: cms_toolbars.py:153 templates/admin/cms/page/tree/base.html:98
 msgid "Sites"
 msgstr "サイト"
 
-#: cms_toolbars.py:154
 msgid "Admin Sites"
 msgstr "管理サイト"
 
-#: cms_toolbars.py:161
 msgid "Administration"
 msgstr "管理"
 
-#: cms_toolbars.py:165
 msgid "User settings"
 msgstr "ユーザー設定"
 
-#: cms_toolbars.py:173
 msgid "Clipboard..."
-msgstr ""
+msgstr "クリップボード"
 
-#: cms_toolbars.py:176
 msgid "Clear clipboard"
-msgstr ""
+msgstr "クリップボードをクリアする"
 
-#: cms_toolbars.py:182
 msgid "Disable toolbar"
 msgstr "ツールバー非表示"
 
-#: cms_toolbars.py:196
+msgid "Shortcuts..."
+msgstr ""
+
 msgid "Users"
 msgstr "ユーザー"
 
-#: cms_toolbars.py:215 tests/test_toolbar.py:857 tests/test_toolbar.py:872
-#: tests/test_toolbar.py:905
 #, python-format
 msgid "Logout %s"
 msgstr "ログアウト %s"
 
-#: cms_toolbars.py:215
 msgid "Logout"
 msgstr "ログアウト"
 
-#: cms_toolbars.py:367
+msgid "Language"
+msgstr "言語"
+
+msgid "Structure"
+msgstr "ストラクチャ"
+
+msgid "Content"
+msgstr "コンテンツ"
+
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "ページの変更を公開"
 
-#: cms_toolbars.py:369
 msgid "Publish page now"
 msgstr "今すぐ公開"
 
-#: cms_toolbars.py:411 cms_toolbars.py:541
 msgid "Page settings"
 msgstr "ページ設定"
 
-#: cms_toolbars.py:430
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
-msgstr ""
+msgstr "翻訳を追加"
 
-#: cms_toolbars.py:437
 #| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
-msgstr ""
+msgstr "翻訳を削除"
 
-#: cms_toolbars.py:445
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "全てのプラグインをコピー"
 
-#: cms_toolbars.py:446
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "%s から"
 
-#: cms_toolbars.py:447
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "%s から全てのプラグインをコピーしてもよいですか？"
 
-#: cms_toolbars.py:473
 msgid "Pages"
 msgstr "ページ"
 
-#: cms_toolbars.py:488 templates/admin/cms/page/permissions.html:5
-#: tests/test_wizards.py:62 tests/test_wizards.py:85
 msgid "Page"
 msgstr "ページ"
 
-#: cms_toolbars.py:513
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "ページ作成"
 
-#: cms_toolbars.py:518
 msgid "New Page"
 msgstr "新しいページ"
 
-#: cms_toolbars.py:519
 msgid "New Sub Page"
 msgstr "新しいサブページ"
 
-#: cms_toolbars.py:520
 msgid "Duplicate this Page"
 msgstr "ページ複本"
 
-#: cms_toolbars.py:536
 msgid "Edit this Page"
 msgstr "このページを編集"
 
-#: cms_toolbars.py:548 templates/admin/cms/page/tree/actions_dropdown.html:43
-#: templates/admin/cms/page/tree/actions_dropdown.html:48
-#: templates/admin/cms/page/tree/menu.html:231
-#: templates/admin/cms/page/tree/menu.html:233
 msgid "Advanced settings"
 msgstr "詳細設定"
 
-#: cms_toolbars.py:552
 msgid "Templates"
 msgstr "テンプレート"
 
-#: cms_toolbars.py:564
 msgid "Save as Page Type"
-msgstr ""
+msgstr "ページタイプとして保存"
 
-#: cms_toolbars.py:579 templates/admin/cms/page/tree/actions_dropdown.html:54
-#: templates/admin/cms/page/tree/actions_dropdown.html:59
-#: templates/admin/cms/page/tree/menu.html:240
 msgid "Permissions"
 msgstr "権限"
 
-#: cms_toolbars.py:589
 msgid "Hide in navigation"
 msgstr "ナビゲーションに表示しない"
 
-#: cms_toolbars.py:589
 msgid "Display in navigation"
 msgstr "ナビゲーションに表示する"
 
-#: cms_toolbars.py:596
 msgid "Unpublish page"
 msgstr "ページを非公開にする"
 
-#: cms_toolbars.py:599
 msgid "Publish page"
 msgstr "ページを公開する"
 
-#: cms_toolbars.py:613
 msgid "Are you sure you want to revert to live?"
 msgstr "このページをライブに戻してよいですか？"
 
-#: cms_toolbars.py:617
 msgid "Revert to live"
 msgstr "ライブに戻す"
 
-#: cms_toolbars.py:632
 msgid "Delete page"
 msgstr "ページを削除する"
 
-#: cms_wizards.py:40
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "現在のページの隣に新しいページを作成する。"
 
-#: cms_wizards.py:48
 msgid "Create a page below the current page."
 msgstr "現在のページの下に新しいページを作成する。"
 
-#: forms/fields.py:31
 msgid "Select a valid site"
 msgstr "有効なサイトを選択してください"
 
-#: forms/fields.py:32
 msgid "Select a valid page"
 msgstr "有効なページを選択してください"
 
-#: forms/widgets.py:266
+#, python-format
+#| msgid ""
+#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
+#| msgid_plural ""
+#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
+msgid ""
+"Page %(conflict_page)s has the same url '%(url)s' as current page "
+"\"%(instance)s\"."
+msgstr ""
+
+#, python-format
+#| msgid ""
+#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
+#| msgid_plural ""
+#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
+msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
+msgstr ""
+
 msgid "Add Another"
 msgstr "もう一つ追加"
 
-#: forms/wizards.py:50
+msgid ""
+"Optional. If supplied, will be automatically added within a new text plugin."
+msgstr "省略可能。入力されれば、テキストプラグイン内に自動的に追加。"
+
 msgid "Provide a title for the new page."
 msgstr "新しいページのタイトルを設定する。"
 
-#: forms/wizards.py:53
 msgid "Leave empty for automatic slug, or override as required."
+msgstr "空欄のままで自動スラグを使うか必要に応じて上書きする。"
+
+#| msgid "You do not have permission to add a plugin"
+msgid "You don't have the permissions required to add a page."
 msgstr ""
 
-#: forms/wizards.py:59
-msgid ""
-"Optional. If supplied, will be automatically added within a new text plugin."
-msgstr ""
-
-#: forms/wizards.py:143 migrations/0001_initial.py:137 models/pagemodel.py:123
-#: models/permissionmodels.py:200 models/titlemodels.py:41
-#: test_utils/project/sampleapp/ns_urls.py:8
-msgid "page"
-msgstr "ページ"
-
-#: forms/wizards.py:181
-msgid "User does not have permission to add page."
-msgstr ""
-
-#: migrations/0001_initial.py:29 migrations/0001_initial.py:63
-#: migrations/0001_initial.py:86 migrations/0001_initial.py:126
 msgid "ID"
 msgstr "ID"
 
-#: migrations/0001_initial.py:30 models/pluginmodel.py:186
 msgid "position"
 msgstr "位置"
 
-#: migrations/0001_initial.py:31 models/pluginmodel.py:187
-#: models/titlemodels.py:29
 msgid "language"
 msgstr "言語"
 
-#: migrations/0001_initial.py:32 models/pluginmodel.py:188
 msgid "plugin_name"
-msgstr ""
+msgstr "プラグイン名"
 
-#: migrations/0001_initial.py:33 models/pluginmodel.py:189
-#: models/titlemodels.py:42
 msgid "creation date"
 msgstr "作成日"
 
-#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
-#: models/permissionmodels.py:62
 msgid "can edit"
 msgstr "編集可能"
 
-#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
-#: models/permissionmodels.py:63
 msgid "can add"
 msgstr "追加可能"
 
-#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
-#: models/permissionmodels.py:64
 msgid "can delete"
 msgstr "削除可能"
 
-#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
-#: models/permissionmodels.py:65
 msgid "can change advanced settings"
 msgstr "詳細設定を変更可能"
 
-#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
-#: models/permissionmodels.py:66
 msgid "can publish"
 msgstr "公開可能"
 
-#: migrations/0001_initial.py:69 migrations/0001_initial.py:132
-#: models/permissionmodels.py:67
 msgid "can change permissions"
 msgstr "権限変更可能"
 
-#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
-#: models/permissionmodels.py:68
 msgid "can move"
 msgstr "移動可能"
 
-#: migrations/0001_initial.py:71 migrations/0001_initial.py:134
-#: models/permissionmodels.py:69
 msgid "view restricted"
 msgstr "表示制限する"
 
-#: migrations/0001_initial.py:72 models/permissionmodels.py:173
 msgid "can recover pages"
 msgstr "ページ復元可能"
 
-#: migrations/0001_initial.py:73 migrations/0001_initial.py:136
-#: models/permissionmodels.py:59
 msgid "group"
 msgstr "グループ"
 
-#: migrations/0001_initial.py:74 models/permissionmodels.py:181
 msgid "sites"
 msgstr "サイト"
 
-#: migrations/0001_initial.py:87 models/pagemodel.py:56
 msgid "created by"
 msgstr "作成者"
 
-#: migrations/0001_initial.py:88 models/pagemodel.py:59
 msgid "changed by"
 msgstr "変更者"
 
-#: migrations/0001_initial.py:91 models/pagemodel.py:65
-#: templates/admin/cms/page/tree/actions_dropdown.html:66
 msgid "publication date"
 msgstr "公開日時"
 
-#: migrations/0001_initial.py:92 models/pagemodel.py:67
-#: templates/admin/cms/page/tree/actions_dropdown.html:69
 msgid "publication end date"
 msgstr "公開終了日次"
 
-#: migrations/0001_initial.py:93 models/pagemodel.py:74
 msgid "in navigation"
 msgstr "メニューに表示"
 
-#: migrations/0001_initial.py:94 models/pagemodel.py:75
 msgid "soft root"
 msgstr "ソフトルート"
 
-#: migrations/0001_initial.py:95 models/pagemodel.py:77
 msgid "id"
 msgstr "ID"
 
-#: migrations/0001_initial.py:96 models/pagemodel.py:79
 msgid "attached menu"
 msgstr "アタッチメニュー"
 
-#: migrations/0001_initial.py:97 models/pagemodel.py:80
-#: templates/admin/cms/page/tree/actions_dropdown.html:83
 msgid "template"
 msgstr "テンプレート"
 
-#: migrations/0001_initial.py:98 models/pagemodel.py:86
 msgid "login required"
 msgstr "ログインが必要"
 
-#: migrations/0001_initial.py:99 models/pagemodel.py:87
 msgid "menu visibility"
 msgstr "メニューの可視性"
 
-#: migrations/0001_initial.py:101 models/pagemodel.py:91
 msgid "application"
 msgstr "アプリケーション"
 
-#: migrations/0001_initial.py:102 models/pagemodel.py:92
 msgid "application instance name"
-msgstr ""
+msgstr "アプリケーションインスタンス名"
 
-#: migrations/0001_initial.py:113 models/pagemodel.py:83
-#: templates/admin/cms/page/tree/actions_dropdown.html:89
 msgid "site"
 msgstr "サイト"
 
-#: migrations/0001_initial.py:135 models/permissionmodels.py:199
-#: templates/admin/cms/page/permissions.html:15
 msgid "Grant on"
 msgstr "権限を付与"
 
-#: models/pagemodel.py:37
+msgid "page"
+msgstr "ページ"
+
 msgid "for logged in users only"
 msgstr "ログインユーザー用"
 
-#: models/pagemodel.py:38
 msgid "for anonymous users only"
 msgstr "匿名ユーザー用"
 
-#: models/pagemodel.py:47
 msgid "Inherit from parent page"
-msgstr ""
+msgstr "親ページから継承"
 
-#: models/pagemodel.py:48
 msgid "Deny"
 msgstr "否定"
 
-#: models/pagemodel.py:49
 msgid "Only this website"
 msgstr "このウェブサイトのみ"
 
-#: models/pagemodel.py:50
 msgid "Allow"
 msgstr "肯定"
 
-#: models/pagemodel.py:66
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "ページをライブにする日時です。ライブにするページのステータスは「公開」にせねばなりません。"
 
-#: models/pagemodel.py:68
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "ページの有効期限です。無期限にする場合は空のままにしておいてください。"
 
-#: models/pagemodel.py:76
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "ソフトルートを指定すると、上の階層がナビゲーションに表示されなくなります。"
 
-#: models/pagemodel.py:78
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
-msgstr ""
+msgstr "page_url テンプレートタグでこのページをリンクする時に使う、一意な識別子です。"
 
-#: models/pagemodel.py:81
 msgid "The template used to render the content."
 msgstr "コンテンツのレンダリングに使うテンプレートです。"
 
-#: models/pagemodel.py:83
-msgid "The site the page is accessible at."
-msgstr "このページにアクセスできるサイトです。"
-
-#: models/pagemodel.py:89
 msgid "limit when this page is visible in the menu"
 msgstr "このページをメニューに表示するタイミングを制限します"
 
-#: models/pagemodel.py:124
 msgid "pages"
 msgstr "ページ"
 
-#: models/pagemodel.py:1115 templates/admin/cms/page/tree/legend.html:33
 msgid "Empty"
 msgstr "空"
 
-#: models/pagemodel.py:1233
 msgid "default"
 msgstr "デフォルト"
 
-#: models/permissionmodels.py:45
 msgid "Current page"
 msgstr "現在のページ"
 
-#: models/permissionmodels.py:46
 msgid "Page children (immediate)"
 msgstr "このページの（直接の）子ページ"
 
-#: models/permissionmodels.py:47
 msgid "Page and children (immediate)"
 msgstr "このページと（直接の）子ページ"
 
-#: models/permissionmodels.py:48
 msgid "Page descendants"
 msgstr "このページの配下のページ全て"
 
-#: models/permissionmodels.py:49
 msgid "Page and descendants"
 msgstr "このページと配下のページ全て"
 
-#: models/permissionmodels.py:67
 msgid "on page level"
 msgstr "ページレベルの権限です"
 
-#: models/permissionmodels.py:69
 msgid "frontend view restriction"
 msgstr "フロントエンドで表示制限します"
 
-#: models/permissionmodels.py:79
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "ユーザかグループを選択してください。"
 
-#: models/permissionmodels.py:95
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "ユーザはページを変更する権限なしにページを公開できません。編集権限が必要です。"
 
-#: models/permissionmodels.py:100
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "ユーザはページを変更する権限なしに高度な設定を変更できません。編集権限が必要です。"
 
-#: models/permissionmodels.py:105
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "ユーザはページを変更する権限なしにページ権限を変更できません。編集権限が必要です。"
 
-#: models/permissionmodels.py:110
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "ユーザはページの変更権限なしにページを移動できません。編集権限が必要です。"
 
-#: models/permissionmodels.py:175
 msgid "can recover any deleted page"
 msgstr "削除されたページを復元できます"
 
-#: models/permissionmodels.py:180
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "何も選択しなければ、該当ユーザは全てのサイトでの権限を獲得します。"
 
-#: models/permissionmodels.py:187
 msgid "Page global permission"
 msgstr "ページグロバール権限"
 
-#: models/permissionmodels.py:188
 msgid "Pages global permissions"
 msgstr "ページグロバール権限"
 
-#: models/permissionmodels.py:205
 msgid "Page permission"
 msgstr "ページ権限"
 
-#: models/permissionmodels.py:220
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "ページ追加権限を付与する場合、子ページやその配下へのアクセス権限も付与してください。さもないと、作成者が追加したページを編集できなくなります。"
 
-#: models/permissionmodels.py:256
 msgid "User (page)"
 msgstr "ユーザ (ページ)"
 
-#: models/permissionmodels.py:257
 msgid "Users (page)"
 msgstr "ユーザ (ページ)"
 
-#: models/permissionmodels.py:267
 msgid "User group (page)"
 msgstr "ユーザ グループ(ページ)"
 
-#: models/permissionmodels.py:268
 msgid "User groups (page)"
 msgstr "ユーザ グループ(ページ)"
 
-#: models/placeholdermodel.py:38
 msgid "slot"
 msgstr "スロット"
 
-#: models/placeholdermodel.py:39
 msgid "width"
 msgstr "幅"
 
-#: models/pluginmodel.py:214
 msgid "<Empty>"
 msgstr "<空>"
 
-#: models/settingmodels.py:12
 msgid "The language for the admin interface and toolbar"
 msgstr "管理インタフェースとツールバーの言語"
 
-#: models/settingmodels.py:16
 msgid "user setting"
 msgstr "ユーザー設定"
 
-#: models/settingmodels.py:17
 msgid "user settings"
 msgstr "ユーザー設定"
 
-#: models/static_placeholder.py:28
 msgid "by template"
 msgstr "テンプレートから"
 
-#: models/static_placeholder.py:29
 msgid "by code"
 msgstr "コードから"
 
-#: models/static_placeholder.py:32 models/static_placeholder.py:57
 msgid "static placeholder name"
-msgstr ""
+msgstr "固定プレースホルダ名"
 
-#: models/static_placeholder.py:33
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr ""
+msgstr "この固定プレースホルダを識別できるような名前です。ユーザには表示されません。"
 
-#: models/static_placeholder.py:35
 msgid "placeholder code"
-msgstr ""
+msgstr "プレースホルダコード"
 
-#: models/static_placeholder.py:36
 msgid "To render the static placeholder in templates."
-msgstr ""
+msgstr "テンプレートで固定プレースホルダを展開します。"
 
-#: models/static_placeholder.py:37
 msgid "placeholder content"
-msgstr ""
+msgstr "プレースホルダの内容"
 
-#: models/static_placeholder.py:41
 msgid "creation_method"
-msgstr ""
+msgstr "作成メソッド"
 
-#: models/static_placeholder.py:47
 msgid "static placeholder"
-msgstr ""
+msgstr "固定プレースホルダ"
 
-#: models/static_placeholder.py:48
 msgid "static placeholders"
-msgstr ""
+msgstr "固定プレースホルダ"
 
-#: models/static_placeholder.py:68
 msgid "A static placeholder with the same site and code already exists"
-msgstr ""
+msgstr "同じサイトとコードの固定プレースホルダが既に存在します。"
 
-#: models/titlemodels.py:30 models/titlemodels.py:31 models/titlemodels.py:33
 msgid "title"
 msgstr "タイトル"
 
-#: models/titlemodels.py:32
 msgid "overwrite the title (html title tag)"
 msgstr "タイトル (HTMLのtitleタグの中身) を書き換えます"
 
-#: models/titlemodels.py:34
 msgid "overwrite the title in the menu"
 msgstr "メニューのタイトルを書き替える"
 
-#: models/titlemodels.py:35
 msgid "description"
 msgstr "説明"
 
-#: models/titlemodels.py:36
 msgid "The text displayed in search engines."
 msgstr "検索エンジンに表示するテキストです。"
 
-#: models/titlemodels.py:37
 msgid "slug"
 msgstr "スラグ"
 
-#: models/titlemodels.py:38
 msgid "Path"
 msgstr "パス"
 
-#: models/titlemodels.py:39
 msgid "has url overwrite"
-msgstr ""
+msgstr "urlの上書きがある"
 
-#: models/titlemodels.py:40
 msgid "redirect"
 msgstr "リダイレクト"
 
-#: models/titlemodels.py:45
 msgid "is published"
 msgstr "公開"
 
-#: plugin_base.py:78
 msgid "Advanced options"
 msgstr "詳細設定"
 
-#: plugin_base.py:95
 msgid "Generic"
 msgstr "ジェネリック"
 
-#: plugin_base.py:319
 #, python-format
 #| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s プラグイン \"%(obj)s\" を無事変更しました。"
 
-#: plugin_base.py:374
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "このプラグインにこれ以上設定する項目はありません。保存を押してください。"
 
-#: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:98
-#: templates/admin/cms/page/plugin/submit_line.html:3
-#: templates/admin/cms/page/submit_row.html:4
-#: templates/admin/cms/page/tree/copy_premissions.html:10
-#: templates/admin/cms/usersettings/change_form.html:41
 msgid "Save"
 msgstr "保存"
 
-#: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
 msgstr "<a href=\"%(login_url)s\">ここ</a> から管理ページにログインしてください。"
 
-#: templates/admin/cms/mail/base.txt:8
 #, python-format
 msgid "Login url: %(login_url)s"
 msgstr "ログインURL: %(login_url)s"
 
-#: templates/admin/cms/mail/page_user_change.html:7
-#: templates/admin/cms/mail/page_user_change.txt:5
 msgid "Username:"
 msgstr "ユーザ名"
 
-#: templates/admin/cms/mail/page_user_change.html:11
-#: templates/admin/cms/mail/page_user_change.txt:6
 msgid "Password:"
 msgstr "パスワード"
 
-#: templates/admin/cms/page/change_form.html:4
-#: templates/admin/cms/page/close_frame.html:4
+#| msgid "Add Page"
+msgid "Add a page"
+msgstr ""
+
 msgid "Change a page"
 msgstr "ページを変更"
 
-#: templates/admin/cms/page/change_form.html:8
-#: templates/admin/cms/page/tree/base.html:23
-#: templates/admin/cms/page/tree/legend.html:57
-#: templates/admin/cms/page/tree/menu.html:24
-#: templates/admin/cms/usersettings/change_form.html:30
 msgid "Home"
 msgstr "ホーム"
 
-#: templates/admin/cms/page/change_form.html:34
-#: templates/admin/cms/page/tree/menu.html:62
-#: templates/admin/cms/page/tree/menu.html:64
 msgid "View on site"
 msgstr "サイトで確認"
 
-#: templates/admin/cms/page/change_form.html:68
-#: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "以下のエラーを修正してください。"
 
-#: templates/admin/cms/page/change_form.html:86
 msgid "All permissions"
 msgstr "全パーミッション"
 
-#: templates/admin/cms/page/change_form.html:87
-#: templates/admin/cms/page/tree/base.html:192
 msgid "Loading..."
 msgstr "読込中..."
 
-#: templates/admin/cms/page/change_form.html:99
-#: templates/admin/cms/page/plugin/submit_line.html:9
-#: templates/admin/cms/page/submit_row.html:16
 msgid "Save and continue editing"
 msgstr "保存して編集を続ける"
 
-#: templates/admin/cms/page/permissions.html:6
 msgid "User"
 msgstr "ユーザ"
 
-#: templates/admin/cms/page/permissions.html:7
 msgid "Group"
 msgstr "グループ"
 
-#: templates/admin/cms/page/permissions.html:8
 msgid "Can edit"
 msgstr "編集可能"
 
-#: templates/admin/cms/page/permissions.html:9
 msgid "Can add"
 msgstr "追加可能"
 
-#: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
 msgstr "削除可能"
 
-#: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
 msgstr "公開可能"
 
-#: templates/admin/cms/page/permissions.html:12
 msgid "Can change permissions"
 msgstr "権限変更可能"
 
-#: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
 msgstr "移動可能"
 
-#: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
 msgstr "閲覧可能"
 
-#: templates/admin/cms/page/permissions.html:23
-#: templates/admin/cms/page/permissions.html:24
 msgid "(global)"
 msgstr "(全ページ)"
 
-#: templates/admin/cms/page/permissions.html:28
 msgid "(current)"
 msgstr "(現在のページ)"
 
-#: templates/admin/cms/page/permissions.html:45
-msgid "All"
-msgstr "すべて"
-
-#: templates/admin/cms/page/permissions.html:54
 msgid "Page doesn't inherit any permissions."
 msgstr "このページの継承している権限はありません。"
 
-#: templates/admin/cms/page/plugin/error_form.html:4
 msgid "Edit model"
-msgstr ""
+msgstr "モデルを編集"
 
-#: templates/admin/cms/page/plugin/submit_line.html:7
-#: templates/admin/cms/page/submit_row.html:14
 msgid "Save as new"
 msgstr "新規保存"
 
-#: templates/admin/cms/page/plugin/submit_line.html:8
-#: templates/admin/cms/page/submit_row.html:15
 msgid "Save and add another"
 msgstr "保存してもう一つ追加"
 
-#: templates/admin/cms/page/submit_row.html:9
 msgid "Basic Settings"
 msgstr "基本設定"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:11
-#: templates/admin/cms/page/tree/actions_dropdown.html:13
-#: templates/admin/cms/page/tree/menu.html:207
-#: templates/admin/cms/page/tree/menu.html:209
-#: templates/cms/toolbar/dragitem.html:33
 msgid "Copy"
 msgstr "コピー"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:18
-#: templates/admin/cms/page/tree/actions_dropdown.html:20
-#: templates/admin/cms/page/tree/menu.html:213
-#: templates/admin/cms/page/tree/menu.html:215
-#: templates/cms/toolbar/dragitem.html:32
 msgid "Cut"
 msgstr "カット"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:28
-#: templates/admin/cms/page/tree/base.html:156
-#: templates/admin/cms/page/tree/menu.html:221
-#: templates/cms/toolbar/dragbar.html:15
-#: templates/cms/toolbar/dragitem.html:35
 msgid "Paste"
+msgstr "ペースト"
+
+#| msgid "Save as new"
+msgid "Set as home"
 msgstr ""
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:71
-#: templates/admin/cms/page/tree/actions_dropdown.html:72
 msgid "is restricted"
-msgstr ""
+msgstr "制限あり"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:71
-#: templates/admin/cms/page/tree/actions_dropdown.html:74
-msgid "Yes"
-msgstr ""
-
-#: templates/admin/cms/page/tree/actions_dropdown.html:71
-#: templates/admin/cms/page/tree/actions_dropdown.html:76
-msgid "No"
-msgstr ""
-
-#: templates/admin/cms/page/tree/actions_dropdown.html:80
 msgid "last change by"
-msgstr ""
+msgstr "最終変更者"
 
-#: templates/admin/cms/page/tree/actions_dropdown.html:86
 msgid "meta"
-msgstr ""
+msgstr "メタ"
 
-#: templates/admin/cms/page/tree/base.html:5
 msgid "List of pages"
 msgstr "ページの一覧"
 
-#: templates/admin/cms/page/tree/base.html:28
-#: templates/admin/cms/page/tree/base.html:58
-#: templates/admin/cms/page/tree/base.html:60
 msgid "Search"
 msgstr "検索"
 
-#: templates/admin/cms/page/tree/base.html:46
 #| msgid "Page Title"
 msgid "Page Tree"
-msgstr ""
+msgstr "ページ木"
 
-#: templates/admin/cms/page/tree/base.html:52
 msgid "Reset filter"
-msgstr ""
+msgstr "フィルタをリセット"
 
-#: templates/admin/cms/page/tree/base.html:109
 #, python-format
 msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr ""
+msgstr "\n削除された %(name)s を復元"
 
-#: templates/admin/cms/page/tree/base.html:131
 #, python-format
 msgid ""
 "\n"
 "                                New %(name)s\n"
 "                            "
-msgstr ""
+msgstr "\n新しい %(name)s"
 
-#: templates/admin/cms/page/tree/base.html:143
 #| msgid "in navigation"
 msgid "Main Navigation"
-msgstr ""
+msgstr "主ナビゲーション"
 
-#: templates/admin/cms/page/tree/base.html:148
-#: templates/admin/cms/page/tree/menu.html:198
 #| msgid "Actions"
 msgid "Options"
-msgstr ""
+msgstr "オプション"
 
-#: templates/admin/cms/page/tree/base.html:186
 msgid "Successfully moved"
 msgstr "移動しました"
 
-#: templates/admin/cms/page/tree/base.html:187
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "木の内部の変更には再読み込みが必要です。"
 
-#: templates/admin/cms/page/tree/base.html:188
 msgid "Error:"
-msgstr ""
+msgstr "エラー: "
 
-#: templates/admin/cms/page/tree/base.html:189
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
-msgstr ""
+msgstr "このページはアプリケーションを伴わないのでコピーできません。apphookを操作するにはページの高度な設定を確認してください。"
 
-#: templates/admin/cms/page/tree/base.html:190
 msgid "Are you sure you want to § this page?"
-msgstr ""
+msgstr "このページを § して良いですか。"
 
-#: templates/admin/cms/page/tree/base.html:191
 msgid "Reload"
-msgstr ""
+msgstr "再読み込み"
 
-#: templates/admin/cms/page/tree/base.html:193
 #| msgid "New Page"
 msgid "New node"
-msgstr ""
+msgstr "新しいノード"
 
-#: templates/admin/cms/page/tree/base.html:194
 msgid "nodes"
-msgstr ""
+msgstr "ノード"
 
-#: templates/admin/cms/page/tree/base.html:205
 msgid "View"
-msgstr ""
+msgstr "ビュー"
 
-#: templates/admin/cms/page/tree/base.html:211
 msgid "Menu"
 msgstr "メニュー"
 
-#: templates/admin/cms/page/tree/base.html:231
 #, python-format
 #| msgid ""
 #| "                  JavaScript seems to be disabled so please\n"
@@ -1452,376 +1078,299 @@ msgstr "メニュー"
 #| "              "
 msgid ""
 "\n"
-"                            <em>There is no page around yet.</em>\n"
+"                            <em>There is no %(object)s around yet.</em>\n"
 "                            <br>\n"
-"                            <a href=\"%(add_url)s\" class=\"addlink\">Add page</a> now.\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
 
-#: templates/admin/cms/page/tree/copy_premissions.html:4
 msgid "Copy options"
 msgstr "コピーオプション"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Choose copy options"
 msgstr "コピーオプションを選んでください"
 
-#: templates/admin/cms/page/tree/copy_premissions.html:11
-#: templates/cms/toolbar/toolbar.html:47 templates/cms/toolbar/toolbar.html:80
 msgid "Close"
 msgstr "閉じる"
 
-#: templates/admin/cms/page/tree/legend.html:7
 msgid "Legend"
 msgstr ""
 
-#: templates/admin/cms/page/tree/legend.html:15
 #| msgid "published"
 msgid "Published"
-msgstr ""
+msgstr "公開済"
 
-#: templates/admin/cms/page/tree/legend.html:21
 #| msgid "Change"
 msgid "Changed"
-msgstr ""
+msgstr "変更済"
 
-#: templates/admin/cms/page/tree/legend.html:27
 #| msgid "unpublished"
 msgid "Unpublished"
-msgstr ""
+msgstr "非公開済"
 
-#: templates/admin/cms/page/tree/legend.html:39
 #| msgid "in menu"
 msgid "In menu"
-msgstr ""
+msgstr "メニューの中"
 
-#: templates/admin/cms/page/tree/legend.html:45
 #| msgid "not in menu"
 msgid "Not in menu"
-msgstr ""
+msgstr "メニューになし"
 
-#: templates/admin/cms/page/tree/legend.html:51
 #| msgid "New page"
 msgid "View page"
-msgstr ""
+msgstr "ページを閲覧"
 
-#: templates/admin/cms/page/tree/legend.html:63
-#: templates/admin/cms/page/tree/menu.html:34
 #| msgid "softroot"
 msgid "Softroot"
-msgstr ""
+msgstr "ソフトルート"
 
-#: templates/admin/cms/page/tree/legend.html:69
 msgid "Apphook"
-msgstr ""
+msgstr "アプリケーションフック"
 
-#: templates/admin/cms/page/tree/menu.html:46
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "アプリケーション: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu.html:88
 #, python-format
 #| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
-msgstr ""
+msgstr "%(language)s でこのページを見る"
 
-#: templates/admin/cms/page/tree/menu.html:89
 msgid "Preview"
 msgstr "プレビュー"
 
-#: templates/admin/cms/page/tree/menu.html:99
 msgid "Publish"
 msgstr "公開する"
 
-#: templates/admin/cms/page/tree/menu.html:107
 msgid "Unpublish"
 msgstr "非公開にする"
 
-#: templates/admin/cms/page/tree/menu.html:116
 msgid "Configure"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu.html:141
 msgid "in menu"
-msgstr ""
+msgstr "メニューにあり"
 
-#: templates/admin/cms/page/tree/menu.html:146
 msgid "not in menu"
-msgstr ""
+msgstr "メニューになし"
 
-#: templates/admin/cms/page/tree/menu.html:162
-#: templates/admin/cms/page/tree/menu.html:173
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "ページ設定 (SHIFTクリックして高度な設定)"
 
-#: templates/cms/toolbar/clipboard.html:6
 msgid "Clipboard"
 msgstr "クリップボード"
 
-#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:20
-#: templates/cms/toolbar/toolbar_javascript.html:87
 msgid "Add plugin"
 msgstr "プラグインを追加する"
 
-#: templates/cms/toolbar/dragbar.html:11
 msgid "Copy all"
 msgstr "全てコピー"
 
-#: templates/cms/toolbar/dragbar.html:13
 msgid "Copy from"
 msgstr "コピーの起源"
 
-#: templates/cms/toolbar/dragbar.html:16
 msgid "Empty all"
 msgstr "全て空にする"
 
-#: templates/cms/toolbar/dragbar.html:21
-#: templates/cms/toolbar/dragitem.html:46
 msgid "Filter plugins..."
-msgstr ""
+msgstr "プラグインをフィルタ..."
 
-#: templates/cms/toolbar/dragbar.html:28
 msgid "This is a static placeholder"
-msgstr ""
+msgstr "これは固定プレースホルダです"
 
-#: templates/cms/toolbar/dragbar.html:30
 msgid "Expand all"
-msgstr ""
+msgstr "全てを展開"
 
-#: templates/cms/toolbar/dragbar.html:31
 msgid "Collapse all"
 msgstr "すべて折り畳む"
 
-#: templates/cms/toolbar/dragitem.html:13 templatetags/cms_tags.py:576
-#: templatetags/cms_tags.py:579
 msgid "Edit"
 msgstr "編集"
 
-#: templates/cms/toolbar/dragitem.html:18
 msgid "You cannot add plugins to this plugin."
 msgstr "このプラグインにはプラグインを追加できません。"
 
-#: templates/cms/toolbar/dragitem.html:26
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "このプラグインは親の外に移動したり編集したりできません"
 
-#: templates/cms/toolbar/dragitem.html:36
 msgid "Clipboard is empty."
 msgstr "クリップボードは空です。"
 
-#: templates/cms/toolbar/dragitem.html:37
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "このプラグインはこの種のプラグインを入れ子プラグインとすることはできません。"
 
-#: templates/cms/toolbar/dragitem.html:38
 msgid "This plugin cannot have nested plugins."
+msgstr "このプラグインは入れ子プラグインを持つことはできません。"
+
+msgid "Highlight"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem_menu.html:5
 msgid "Available plugins"
 msgstr "利用可能なプラグイン"
 
-#: templates/cms/toolbar/items/live_draft.html:6
+#| msgid "Structure"
+msgid "Toggle structure"
+msgstr ""
+
 #| msgid "View published"
-msgid "View published page"
+msgid "View published"
 msgstr ""
 
-#: templates/cms/toolbar/items/live_draft.html:11
-#| msgid "Edit this Page"
-msgid "Edit page"
-msgstr ""
-
-#: templates/cms/toolbar/items/login.html:16
 msgid "Login"
 msgstr "ログイン"
 
-#: templates/cms/toolbar/plugin.html:22
 msgid "Add plugin to"
 msgstr "にプラグインを追加する"
 
-#: templates/cms/toolbar/toolbar.html:12
-msgid "Double-click to edit"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:13
-msgid "Tap to edit"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:28
 msgid "More"
-msgstr ""
+msgstr "詳しく"
 
-#: templates/cms/toolbar/toolbar.html:42
-msgid "Toggle toolbar"
-msgstr "ツールバーの表示・非表示"
-
-#: templates/cms/toolbar/toolbar.html:60
-msgid "Click to go back"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:61
-msgid "Click to go forward"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:78
-msgid "Minimize"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:79
-msgid "Maximize"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:101
-msgid "Drop a plugin here"
-msgstr "ここにプラグインをドロップ"
-
-#: templates/cms/toolbar/toolbar.html:115
-msgid "This page has no preview!"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:116
-msgid "It is being redirected to:"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar_javascript.html:25
 #, python-format
 #| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
-msgstr ""
+msgstr "Django CMS %(cms_version)s, Django %(django_version)s と Python %(python_version)s を使った開発バージョン"
 
-#: templates/cms/toolbar/toolbar_javascript.html:26
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: templates/cms/toolbar/toolbar_javascript.html:27
 msgid "The following error occured:"
-msgstr ""
+msgstr "次のエラーが発生:"
 
-#: templates/cms/toolbar/toolbar_javascript.html:28
 #| msgid "Action successfull... reloading."
-msgid "Action successful... reloading."
+msgid "Action successful."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:29
 msgid "Are you sure you want to delete this plugin?"
 msgstr "本当にこのプラグインを削除しますか？"
 
-#: templates/cms/toolbar/toolbar_javascript.html:30
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "本当にこのページを公開しますか。"
 
-#: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "Plugin will be added here"
 msgstr "プラグインはこちらに追加されます"
 
-#: templates/cms/toolbar/toolbar_javascript.html:32
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
+msgstr "保存していない変更があります。"
+
+#| msgid "Loading..."
+msgid "Loading"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:33
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "本当に変更を中止しても構いませんか。"
 
-#: templates/cms/toolbar/toolbar_javascript.html:34
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
+msgstr "フォームを読み込みできませんでした。サーバが正しく動作しているか確認してください。"
+
+#| msgid "Notify user"
+msgid "Most used"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Shortcuts"
+msgstr "ショートカット"
+
+msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "このヘルプダイアログを表示する"
 
-#: templates/cms/toolbar/toolbar_javascript.html:46
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "閉じる/キャンセル"
 
-#: templates/cms/toolbar/toolbar_javascript.html:50
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "構成モードを切り替える"
 
-#: templates/cms/toolbar/toolbar_javascript.html:54
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "構成モードを切り替え hovered-over プラグインをハイライトする"
 
-#: templates/cms/toolbar/toolbar_javascript.html:58
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "「作成」ダイアログを開く"
 
-#: templates/cms/toolbar/toolbar_javascript.html:62
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "ツールバーにフォーカスする"
 
-#: templates/cms/toolbar/toolbar_javascript.html:71
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "プレースホルダにフォーカスする"
 
-#: templates/cms/toolbar/toolbar_javascript.html:75
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "次/前の要素に移動する"
 
-#: templates/cms/toolbar/toolbar_javascript.html:79
 #| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "プレースホルダのプラグインにフォーカス"
 
-#: templates/cms/toolbar/toolbar_javascript.html:83
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "プラグインを編集"
 
-#: templates/cms/toolbar/toolbar_javascript.html:91
 #| msgid "not in menu"
 msgid "Open actions menu"
-msgstr ""
+msgstr "アクションメニューを開く"
 
-#: templates/cms/toolbar/toolbar_javascript.html:95
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "開く/閉じる"
 
-#: templates/cms/toolbar/toolbar_javascript.html:119
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>ログインできません。</strong> パスワードなどが正しいかチェックして、やり直してください。"
 
-#: templates/cms/toolbar/toolbar_javascript.html:120
 msgid "This page has unpublished changes."
 msgstr "このページには未公開の変更点があります。"
 
-#: templates/cms/welcome.html:19
-msgid "Installation successful!"
-msgstr ""
+msgid "Double-click to edit"
+msgstr "ダブルクリックして編集"
 
-#: templates/cms/welcome.html:30
+msgid "Tap to edit"
+msgstr "タップして編集"
+
+msgid "Click to go back"
+msgstr "クリックして戻る"
+
+msgid "Click to go forward"
+msgstr "クリックして進む"
+
+msgid "Minimize"
+msgstr "最小化"
+
+msgid "Maximize"
+msgstr "最大化"
+
+msgid "Drop a plugin here"
+msgstr "ここにプラグインをドロップ"
+
+msgid "This page has no preview!"
+msgstr "このページはプレビューがありません。"
+
+msgid "It is being redirected to:"
+msgstr "リダイレクト中"
+
+msgid "Installation successful!"
+msgstr "インストール成功。"
+
 msgid "Add your first page"
 msgstr "始めてのページを追加しましょう"
 
-#: templates/cms/welcome.html:32
 msgid "Please log in"
 msgstr "ログインして下さい"
 
-#: templates/cms/welcome.html:36
 #, python-format
 msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr ""
+msgstr "\ndjango CMS バージョン <strong>%(cms_version)s</strong> へようこそ。"
 
-#: templates/cms/welcome.html:43
 #, python-format
 msgid ""
 "\n"
@@ -1829,345 +1378,314 @@ msgid ""
 "                    "
 msgstr ""
 
-#: templates/cms/welcome.html:47
 #, python-format
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr ""
+msgstr "\nJavaScriptがオフになっているので、\n<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">手動でページを追加</a> "
 
-#: templates/cms/welcome.html:56
 msgid "Installation Notes"
-msgstr ""
+msgstr "インストールのメモ"
 
-#: templates/cms/welcome.html:59
 msgid "Support"
-msgstr ""
+msgstr "サポート"
 
-#: templates/cms/welcome.html:60
 msgid "Documentation"
-msgstr ""
+msgstr "ドキュメント"
 
-#: templates/cms/welcome.html:62
+#| msgid ""
+#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
+#| "              you linked the <code>static/cms</code> folder to r\n"
+#| "              static files.</p>\n"
+#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
+#| "              <code>DEBUG = True</code> in your django settings e and\n"
+#| "              haven't added any pages yet.\n"
+#| "          </p>\n"
+#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
-"                <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
-"                    <code>DEBUG = True</code> in your django settings file and\n"
-"                    haven't added any pages yet.\n"
-"                </p>\n"
 "            "
 msgstr ""
 
-#: templates/cms/welcome.html:84
-msgid "Welcome to django CMS"
-msgstr "django CMSによこそう"
+#| msgid ""
+#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
+#| "              you linked the <code>static/cms</code> folder to r\n"
+#| "              static files.</p>\n"
+#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
+#| "              <code>DEBUG = True</code> in your django settings e and\n"
+#| "              haven't added any pages yet.\n"
+#| "          </p>\n"
+#| "      "
+msgid ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
+"                        <code>DEBUG = True</code> in your django settings file and\n"
+"                        haven't added any pages yet.\n"
+"                    </p>\n"
+"                "
+msgstr ""
 
-#: templates/cms/wizards/create.html:25
+msgid "Welcome to django CMS"
+msgstr "django CMSにようこそ"
+
 msgid "Back"
 msgstr "戻る"
 
-#: templates/cms/wizards/start.html:15
 msgid "Please choose an option from below to proceed to the next step."
 msgstr "次のステップに進むため以下のオプションから1つ選んでください。"
 
-#: templates/cms/wizards/start.html:30
 msgid "Next"
 msgstr "次"
 
-#: templatetags/cms_admin.py:52
 msgid "unpublished changes"
 msgstr "変更を公開しない"
 
-#: templatetags/cms_admin.py:55
 msgid "published"
 msgstr "公開"
 
-#: templatetags/cms_admin.py:65
 msgid "unpublished parent"
-msgstr ""
+msgstr "非公開の親"
 
-#: templatetags/cms_admin.py:68
 msgid "unpublished"
-msgstr ""
+msgstr "非公開"
 
-#: templatetags/cms_admin.py:71
 msgid "no content"
-msgstr ""
+msgstr "内容なし"
 
-#: templatetags/cms_tags.py:92
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr "%(domain)s 上にページがありません"
 
-#: templatetags/cms_tags.py:93
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr "テンプレートタグは、引数 `%(page_lookup)s` に該当するページを見つけられませんでした。\nリクエストのURLは http://%(host)s%(path)s です"
 
-#: test_utils/project/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:4
 msgid "Two columns"
-msgstr ""
+msgstr "2コラム"
 
-#: test_utils/project/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates/__init__.py:5
-#: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:5
 msgid "Three columns"
-msgstr ""
+msgstr "3コラム"
 
-#: test_utils/project/customuserapp/models.py:39
 msgid "username"
-msgstr ""
+msgstr "ユーザ名"
 
-#: test_utils/project/customuserapp/models.py:40
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "必須。300文字以下の英数字及び記号（@/./+/-/_）"
 
-#: test_utils/project/customuserapp/models.py:43
 msgid "Enter a valid username."
-msgstr ""
+msgstr "有効なユーザ名を入力してください。"
 
-#: test_utils/project/customuserapp/models.py:45
 msgid "email address"
 msgstr "メール"
 
-#: test_utils/project/customuserapp/models.py:46
 msgid "staff status"
-msgstr ""
+msgstr "スタッフの地位"
 
-#: test_utils/project/customuserapp/models.py:47
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "ユーザがこの管理者サイトにユーザがログインできるか示す"
 
-#: test_utils/project/customuserapp/models.py:49
 msgid "active"
 msgstr "アクティブ"
 
-#: test_utils/project/customuserapp/models.py:50
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr ""
+msgstr "ユーザかアクティブと扱われるべきか示す。これの選択を外してアカウントさくじを回避する"
 
-#: test_utils/project/customuserapp/models.py:61
 msgid "users"
 msgstr "ユーザ"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:39
 msgid "Title Extension"
-msgstr ""
+msgstr "タイトル機能拡張"
 
-#: test_utils/project/extensionapp/cms_toolbars.py:70
 msgid "Page Extension"
-msgstr ""
+msgstr "ページ機能拡張"
 
-#: test_utils/project/objectpermissionsapp/models.py:46
 msgid "object ID"
-msgstr ""
+msgstr "オプジェクトiD"
 
-#: test_utils/project/placeholderapp/cms_apps.py:7
 msgid "Example1 App"
-msgstr ""
+msgstr "例1アプリケーション"
 
-#: test_utils/project/placeholderapp/cms_apps.py:14
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "多言語例1アプリケーション"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:26
 msgid "Example1"
-msgstr ""
+msgstr "例1"
 
-#: test_utils/project/placeholderapp/cms_toolbars.py:27
 msgid "Examples"
-msgstr ""
+msgstr "例"
 
-#: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
 msgstr "追加コンテンツ"
 
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:16
-#: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:35
 msgid "Articles"
 msgstr "記事"
 
-#: test_utils/project/sampleapp/cms_apps.py:8
 msgid "Sample App"
 msgstr "サンプルアプリ"
 
-#: test_utils/project/sampleapp/cms_apps.py:17
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "拡大した権限を使うアプリケーションの見本"
 
-#: test_utils/project/sampleapp/cms_apps.py:28
 msgid "Sample App 2"
 msgstr "サンプルアプリ2"
 
-#: test_utils/project/sampleapp/cms_apps.py:36
+#| msgid "Sample App 2"
+msgid "Sample App 3"
+msgstr ""
+
 msgid "Namespaced App"
 msgstr "ネームスペースつきアプリ"
 
-#: test_utils/project/sampleapp/cms_apps.py:48
 msgid "Parent app"
-msgstr ""
+msgstr "親アプリケーション"
 
-#: test_utils/project/sampleapp/cms_apps.py:55
 msgid "Child app"
-msgstr ""
+msgstr "子アプリケーション"
 
-#: test_utils/project/sampleapp/cms_apps.py:62
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "変数URLメニーアプリケーション"
 
-#: test_utils/project/sampleapp/cms_menus.py:17
 msgid "sample root page"
 msgstr "サンプルルートページ"
 
-#: test_utils/project/sampleapp/cms_menus.py:18
 msgid "sample settings page"
 msgstr "サンプル設定ページ"
 
-#: test_utils/project/sampleapp/cms_menus.py:19
 msgid "sample account page"
 msgstr "サンプルアカウントページ"
 
-#: test_utils/project/sampleapp/cms_menus.py:20
 msgid "sample my profile page"
 msgstr "サンプルマイプロファイルページ"
 
-#: test_utils/project/sampleapp/cms_menus.py:33
 msgid "Static Menu"
 msgstr "固定メニュー"
 
-#: test_utils/project/sampleapp/cms_menus.py:51
 msgid "Static Menu2"
 msgstr "固定メニュー2"
 
-#: test_utils/project/sampleapp/cms_menus.py:56
 msgid "Static Menu3"
 msgstr ""
 
-#: test_utils/project/sampleapp/cms_menus.py:61
 #| msgid "Static Menu"
 msgid "Static Menu4"
-msgstr ""
+msgstr "固定メニュー4"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:22
-#: test_utils/project/sampleapp/views.py:30
 msgid "Category"
 msgstr "カテゴリー"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:23
 msgid "Categories"
 msgstr "カテゴリー"
 
-#: test_utils/project/sampleapp/cms_toolbars.py:24
 msgid "Add Category"
 msgstr "カテゴリーを追加"
 
-#: test_utils/project/sampleapp/urls.py:14
 msgid "^account/$"
 msgstr "^account/$"
 
-#: test_utils/project/sampleapp/views.py:32
 msgid "Change Category"
 msgstr "カテゴリーを変更"
 
-#: test_utils/project/templates/registration/logged_out.html:7
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "本日は貴重なお時間をこのサイトにお使いいただきありがうとございます。"
 
-#: tests/test_templates.py:52 utils/conf.py:157
 msgid "Inherit the template of the nearest ancestor"
-msgstr ""
+msgstr "最も近い祖先のテンプレートを継承"
 
-#: tests/test_wizards.py:74
 msgid "UserSettings"
-msgstr ""
+msgstr "ユーザ設定"
 
-#: toolbar/utils.py:14
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "プースホルダ #%(placeholder_label)s\" にプラグインを追加"
 
-#: toolbar/utils.py:36
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
-#: utils/mail.py:37
 msgid "CMS - your user account was created."
 msgstr "CMS - アカウントが作成されました。"
 
-#: utils/mail.py:39
 msgid "CMS - your user account was changed."
 msgstr "CMS - アカウントが変更されました。"
 
-#: utils/page_resolver.py:145
-msgid "Invalid URL, use /my/url format."
-msgstr "無効なURLです。 /my/url のように入力してください。"
-
-#: utils/page_resolver.py:173
-#, python-format
-msgid ""
-"Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
-msgid_plural ""
-"Pages %(pages)s have the same url '%(url)s' as current page "
-"\"%(instance)s\"."
-msgstr[0] "ページ %(pages)s が、現在のページ \"%(instance)s と同じ URL '%(url)s' になっています。"
-
-#: utils/plugins.py:245
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "このプレースホルダには、プラグインが上限 (%s) まで入っています。"
 
-#: utils/plugins.py:257
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr "このプレースホルダには、プラグイン %(plugin_name)s が上限 (%(limit)s) まで入っています。"
 
-#: utils/request_ip_resolvers.py:24
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "指定された CMS_REQUEST_IP_RESOLVERモジュール: \"{0}\" が見つかりません。"
 
-#: utils/request_ip_resolvers.py:28
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
-msgstr ""
+msgstr "指定された\"CMS_REQUEST_IP_RESOLVER\" 関数 \"{0}\"がモジュールに見つかりません\"{1}\"。"
 
-#: wizards/wizard_base.py:91
 #, python-format
 msgid "Create a new %s instance."
 msgstr "新しい%sインスタンスを作成する。"
 
-#: wizards/wizard_pool.py:79
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "モデル \"%s\" についてウィーザードか゜既に登録されています。"
+
+#~ msgid "The current language of the content fields."
+#~ msgstr "The current language of the content fields."
+
+#~ msgid "Another page with this slug already exists"
+#~ msgstr "Another page with this slug already exists"
+
+#~ msgid "Add Page Type"
+#~ msgstr "Add Page Type"
+
+#~ msgid "You do not have permission to change the template"
+#~ msgstr "You do not have permission to change the template"
+
+#~ msgid "You do not have permission to change this page"
+#~ msgstr "You do not have permission to change this page"
+
+#~ msgid "There only exists one translation for this page"
+#~ msgstr "There only exists one translation for this page"
+
+#~ msgid "User does not have permission to add page."
+#~ msgstr "User does not have permission to add page."
+
+#~ msgid "The site the page is accessible at."
+#~ msgstr "The site the page is accessible at."
+
+#~ msgid "Edit page"
+#~ msgstr "Edit this Page"
+
+#~ msgid "Toggle toolbar"
+#~ msgstr "Toggle toolbar"
+
+#~ msgid "Invalid URL, use /my/url format."
+#~ msgstr "Invalid URL, use /my/url format."
 
 #~ msgid "Add page permission also requires edit page permission."
 #~ msgstr "Add page permission also requires edit page permission."
 
 #~ msgid "Recover (any) pages"
 #~ msgstr "Recover (any) pages"
-
-#~ msgid "Notify user"
-#~ msgstr "Notify user"
 
 #~ msgid ""
 #~ "Send email notification to user about username or password change. Requires "
@@ -2221,9 +1739,6 @@ msgstr ""
 
 #~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 #~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
-
-#~ msgid "Database error"
-#~ msgstr "Database error"
 
 #~ msgid "Page reverted but slug stays the same because of url collisions."
 #~ msgstr "Page reverted but slug stays the same because of url collisions."
@@ -2281,9 +1796,6 @@ msgstr ""
 
 #~ msgid "Plugins were moved"
 #~ msgstr "Plugins were moved"
-
-#~ msgid "Add Page"
-#~ msgstr "Add Page"
 
 #~ msgid "Path Overflow from: '%s'"
 #~ msgstr "Path Overflow from: '%s'"

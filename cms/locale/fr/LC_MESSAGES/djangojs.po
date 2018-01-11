@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-23 14:02-0500\n"
-"PO-Revision-Date: 2016-08-09 11:43+0000\n"
+"POT-Creation-Date: 2018-01-11 16:31+0000\n"
+"PO-Revision-Date: 2018-01-11 16:38+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -21,19 +21,5 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: static/cms/js/dist/3.4.2/bundle.admin.changeform.min.js:1
-#: static/cms/js/modules/cms.changeform.js:72
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Êtes-vous sûr·e de vouloir changer d'onglet sans enregistrer la page ?"
-
-#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
-msgid "show"
-msgstr "afficher"
-
-#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
-msgid "hide"
-msgstr "masquer"
-
-#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
-msgid "toggle"
-msgstr "inverser"
