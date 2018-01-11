@@ -72,18 +72,16 @@ Previously deprecated functionality has been removed:
 Backward-incompatible changes
 =============================
 
-* The home page is no longer automatically the root page in the tree (since there is no longer
-a page tree). Instead, the home page is managed via a page setting.
-* Pages no longer the source of the navigation tree. Previously, ordered pages could be obtained
-  via ``Page.object.order_by('path')``; the equivalent is now
-  ``Page.object.order_by('node__path')``.
-* Pages are no longer ordered by path. For pages according to tree ordering, use
-  ``order_by==node__path`` in filters.
-* Pages no longer have a ``site`` field page. Whereas previously you could use ``filter(site=id)``,
+* The home page is no longer automatically the root page in the tree (since there is no longer a
+  page tree). Instead, the home page is set manually in the page list admin.
+* Previously, ordered pages could be obtained via ``Page.object.order_by('path')``; the equivalent
+  is now ``Page.object.order_by('node__path')``.
+* Pages are no longer ordered by path. For ordering, use ``order_by('node__path')``.
+* Pages no longer have a ``site`` field. Whereas previously you could use ``filter(site=id)``,
   now use ``filter(node__site==id)``.
 * Pages no longer have a ``parent`` field. Instead a ``parent`` property now returns the new
   ``parent_page`` attribute, which relies on the node tree.
-* Pages can no longer have a 'pending' publishing state. A data migration,
+* Never-published pages can no longer have a 'pending' publishing state. A data migration,
   ``cms/migrations/0018_pagenode.py``, removes this.
 
 
