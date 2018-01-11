@@ -425,6 +425,7 @@
 
         .cms-draggable {
             margin-left: $structure-draggable-inner-padding !important;
+            margin-left: 15px;
             .cms-dragitem {
                 background-image: none;
                 &:hover {
@@ -474,6 +475,11 @@
         }
         .cms-draggables .cms-draggables {
             padding-left: 15px;
+        }
+        .cms-draggable-disabled {
+            .cms-draggable {
+                margin-left: 15px !important;
+            }
         }
 
         .cms-dragitem {
