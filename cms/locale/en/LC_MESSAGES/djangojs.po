@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-23 14:02-0500\n"
+"POT-Creation-Date: 2018-01-11 16:31+0000\n"
 "PO-Revision-Date: 2015-10-31 12:28+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -19,19 +19,5 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/cms/js/dist/3.4.2/bundle.admin.changeform.min.js:1
-#: static/cms/js/modules/cms.changeform.js:72
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Are you sure you want to change tabs without saving the page first?"
-
-#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
-msgid "show"
-msgstr ""
-
-#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
-msgid "hide"
-msgstr ""
-
-#: static/cms/js/dist/3.4.2/bundle.admin.widget.min.js:3
-msgid "toggle"
-msgstr ""
