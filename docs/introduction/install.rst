@@ -1,3 +1,5 @@
+.. _install-django-cms-tutorial:
+
 #####################
 Installing django CMS
 #####################
