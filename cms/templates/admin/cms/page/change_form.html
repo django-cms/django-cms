@@ -27,7 +27,7 @@
 
 {% block content_title %}
     {% if title %}<h1>{{ title }}</h1>{% endif %}
-    {% if not popup %}
+    {% if not popup and not add %}
         <ul class="object-tools hide-in-modal">
             <li>
                 {% url opts|admin_urlname:'preview_page' page.id language as admin_url %}
