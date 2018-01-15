@@ -70,7 +70,7 @@ class StructureBoard {
         }
         this._setupModeSwitcher();
         this._events();
-        StructureBoard.actualizeEmptyPlaceholders();
+        StructureBoard.actualizePlaceholders();
 
         setTimeout(() => this.highlightPluginFromUrl(), 0);
         this._listenToExternalUpdates();
@@ -408,7 +408,7 @@ class StructureBoard {
                 triggerWindowResize();
 
                 StructureBoard._initializeGlobalHandlers();
-                StructureBoard.actualizeEmptyPlaceholders();
+                StructureBoard.actualizePlaceholders();
                 CMS._instances.forEach(instance => {
                     if (instance.options.type === 'placeholder') {
                         instance._setPlaceholder();
@@ -775,7 +775,7 @@ class StructureBoard {
 
                     that.dragging = true;
                     // show empty
-                    StructureBoard.actualizeEmptyPlaceholders();
+                    StructureBoard.actualizePlaceholders();
                     // ensure all menus are closed
                     Plugin._hideSettingsMenu();
                     // keep in mind that caching cms-draggables query only works
@@ -864,7 +864,7 @@ class StructureBoard {
                         }
                     });
 
-                    StructureBoard.actualizeEmptyPlaceholders();
+                    StructureBoard.actualizePlaceholders();
                 },
                 // eslint-disable-next-line complexity
                 isAllowed: function(placeholder, placeholderParent, originalItem) {
@@ -934,7 +934,7 @@ class StructureBoard {
                     return that.state;
                 }
             })
-            .on('cms-structure-update', StructureBoard.actualizeEmptyPlaceholders);
+            .on('cms-structure-update', StructureBoard.actualizePlaceholders);
     }
 
     _dragRefresh() {
@@ -1147,7 +1147,7 @@ class StructureBoard {
             }
         }
 
-        StructureBoard.actualizeEmptyPlaceholders();
+        StructureBoard.actualizePlaceholders();
         Plugin._updateRegistry(data.plugins);
         data.plugins.forEach(pluginData => {
             StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
@@ -1277,7 +1277,7 @@ class StructureBoard {
             $(`.cms-dragarea-${data.placeholder_id} > .cms-draggables`).append(data.structure.html);
         }
 
-        StructureBoard.actualizeEmptyPlaceholders();
+        StructureBoard.actualizePlaceholders();
         Plugin._updateRegistry(data.structure.plugins);
         data.structure.plugins.forEach(pluginData => {
             StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
@@ -1321,7 +1321,7 @@ class StructureBoard {
         draggable.remove();
 
         StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
-        StructureBoard.actualizeEmptyPlaceholders();
+        StructureBoard.actualizePlaceholders();
         deletedPluginIds.forEach(function(pluginId) {
             remove(CMS._plugins, settings => settings[0] === `cms-plugin-${pluginId}`);
             remove(
@@ -1353,7 +1353,7 @@ class StructureBoard {
             $(`.cms-draggable-${id}`).remove();
         });
 
-        StructureBoard.actualizeEmptyPlaceholders();
+        StructureBoard.actualizePlaceholders();
     }
 
     /**
@@ -1369,10 +1369,13 @@ class StructureBoard {
     }
 
     /**
-     * @function actualizeEmptyPlaceholders
+     * Checks if placeholders are empty and enables/disables certain actions on them, hides or shows the
+     * "empty placeholder" placeholder and adapts the location of "Plugin will be added here" placeholder
+     *
+     * @function actualizePlaceholders
      * @private
      */
-    static actualizeEmptyPlaceholders() {
+    static actualizePlaceholders() {
         placeholders.each(function() {
             var placeholder = $(this);
             var copyAll = placeholder.find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
@@ -1390,6 +1393,12 @@ class StructureBoard {
                 copyAll.find('> a').attr('aria-disabled', 'true');
             }
         });
+
+        const addPluginPlaceholder = $('.cms-dragarea .cms-add-plugin-placeholder');
+
+        if (addPluginPlaceholder.length && !addPluginPlaceholder.is(':last')) {
+            addPluginPlaceholder.appendTo(addPluginPlaceholder.parent());
+        }
     }
 
     /**

@@ -883,7 +883,7 @@ describe('CMS.StructureBoard', function() {
             expect(board.ui.sortables).toHandle('cms-structure-update');
             // cheating here a bit
             expect(CMS.$._data(board.ui.sortables[0]).events['cms-structure-update'][0].handler.name).toEqual(
-                'actualizeEmptyPlaceholders'
+                'actualizePlaceholders'
             );
         });
 
@@ -1489,7 +1489,7 @@ describe('CMS.StructureBoard', function() {
             board = new CMS.StructureBoard();
             StructureBoard.__Rewire__('Plugin', FakePlugin);
             spyOn(StructureBoard, 'actualizePluginCollapseStatus');
-            spyOn(StructureBoard, 'actualizeEmptyPlaceholders');
+            spyOn(StructureBoard, 'actualizePlaceholders');
             spyOn(StructureBoard, 'actualizePluginsCollapsibleStatus');
             spyOn(Plugin, '_updateClipboard');
             spyOn(board, '_drag');
@@ -1735,7 +1735,7 @@ describe('CMS.StructureBoard', function() {
 
                 expect($('.cms-draggable-1')).not.toExist();
                 expect($('.new-draggable')).toExist();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(1);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
@@ -1759,7 +1759,7 @@ describe('CMS.StructureBoard', function() {
                 expect($('.cms-draggable-1')).toExist();
                 expect($('.cms-draggable-2')).not.toExist();
                 expect($('.new-draggable')).toExist();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(1);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
@@ -1778,7 +1778,7 @@ describe('CMS.StructureBoard', function() {
                 expect($('.cms-draggable-1')).toExist();
                 expect($('.cms-draggable-2')).toExist();
                 expect($('.new-draggable')).toExist();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(1);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
@@ -1809,7 +1809,7 @@ describe('CMS.StructureBoard', function() {
 
                 expect($('.cms-draggable-2')).toHaveClass('new');
                 expect($('.new-draggable')).toExist();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.structure.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(2);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(2);
@@ -1836,7 +1836,7 @@ describe('CMS.StructureBoard', function() {
 
                 expect($('.cms-draggable-2')).not.toHaveClass('new');
                 expect($('.cms-dragarea-2 > .cms-draggables > .new-draggable')).toBeInDOM();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.structure.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(1);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(3);
@@ -1863,7 +1863,7 @@ describe('CMS.StructureBoard', function() {
 
                 expect($('.cms-draggable-2')).not.toExist();
                 expect($('.new-draggable')).toBeInDOM();
-                expect(StructureBoard.actualizeEmptyPlaceholders).not.toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).not.toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.structure.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(1);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(3);
@@ -1888,7 +1888,7 @@ describe('CMS.StructureBoard', function() {
 
                 expect($('.cms-draggable-2')).not.toExist();
                 expect($('.new-draggable')).toBeInDOM();
-                expect(StructureBoard.actualizeEmptyPlaceholders).not.toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).not.toHaveBeenCalled();
                 expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.structure.plugins);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(1);
                 expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(3);
@@ -1954,7 +1954,7 @@ describe('CMS.StructureBoard', function() {
                 expect($('.cms-draggable-1')).not.toBeInDOM();
                 expect($('.cms-draggable-2')).not.toBeInDOM();
                 expect(StructureBoard.actualizePluginsCollapsibleStatus).not.toHaveBeenCalled();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(CMS._plugins).toEqual([['cms-plugin-3']]);
                 expect(CMS._instances).toEqual([{ options: { plugin_id: 3 } }]);
             });
@@ -2266,7 +2266,7 @@ describe('CMS.StructureBoard', function() {
             };
 
             spyOn(StructureBoard, '_initializeGlobalHandlers');
-            spyOn(StructureBoard, 'actualizeEmptyPlaceholders');
+            spyOn(StructureBoard, 'actualizePlaceholders');
             spyOn(StructureBoard, '_initializeDragItemsStates');
             spyOn(board, '_drag');
 
@@ -2343,7 +2343,7 @@ describe('CMS.StructureBoard', function() {
 
                 expect(StructureBoard._initializeDragItemsStates).toHaveBeenCalled();
                 expect(StructureBoard._initializeGlobalHandlers).toHaveBeenCalled();
-                expect(StructureBoard.actualizeEmptyPlaceholders).toHaveBeenCalled();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
                 expect(board._loadedStructure).toBe(true);
                 done();
             });
