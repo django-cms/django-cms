@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import resolve, Resolver404
+from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -75,5 +75,6 @@ def _render_welcome_page(request):
         'cms_version': __version__,
         'cms_edit_on': get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'),
         'django_debug': settings.DEBUG,
+        'next_url': reverse('pages-root'),
     }
     return TemplateResponse(request, "cms/welcome.html", context)
