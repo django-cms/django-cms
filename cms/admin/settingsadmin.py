@@ -96,7 +96,7 @@ class SettingsAdmin(ModelAdmin):
         request = copy.copy(request)
         request.GET = data
         request.current_page = current_page
-        request.toolbar = CMSToolbar(request, request_path=origin_url.path)
+        request.toolbar = CMSToolbar(request, request_path=origin_url.path, _async=True)
         request.toolbar.set_object(attached_obj or current_page)
         return HttpResponse(request.toolbar.render())
 
