@@ -229,12 +229,7 @@ class PageToolbar(CMSToolbar):
         request = self.request
         toolbar = self.toolbar
 
-        if request.method == 'GET':
-            is_api_call = 'placeholders[]' in request.GET and request.is_ajax()
-        else:
-            is_api_call = False
-
-        if is_api_call:
+        if toolbar._async and 'placeholders[]' in request.GET:
             # AJAX request to reload page structure
             placeholder_ids = request.GET.getlist("placeholders[]")
             self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)

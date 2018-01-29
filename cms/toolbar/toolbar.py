@@ -119,8 +119,9 @@ class CMSToolbar(BaseToolbar):
     The default CMS Toolbar
     """
 
-    def __init__(self, request, request_path=None):
+    def __init__(self, request, request_path=None, _async=False):
         super(CMSToolbar, self).__init__()
+        self._async = _async
         self.right_items = []
         self.left_items = []
         self.last_left_items = []

@@ -194,7 +194,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
             pat(r'^([0-9]+)/([a-z\-]+)/revert-to-live/$', self.revert_to_live),
-            url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
             pat(r'^get-tree/$', self.get_tree),
         ]
         return url_patterns + super(BasePageAdmin, self).get_urls()
@@ -1663,6 +1662,7 @@ class PageAdmin(BasePageAdmin):
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
             pat(r'^published-pages/$', self.get_published_pagelist),
+            url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         ]
 
         if plugin_pool.registered_plugins:
