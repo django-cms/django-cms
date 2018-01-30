@@ -119,16 +119,7 @@ On the Divio Cloud
 ==================
 
 The Divio Cloud offers an easy way to set up django CMS projects. In the `Divio Cloud Control Panel
-<https://control.divio.com>`_, create a new django CMS project.
-
-Once it has been created, configure its *Addons*. You will need to specify the versions of two
-addons:
-
-* django CMS: select version ``3.5.0.1`` or newer from the *Beta* channel of Aldryn django CMS
-* django CMS Snippet: select ``2.0.0rc1`` or newer from the *Alpha* channel of django CMS Snippet
-  (earlier versions are not compatible)
-
-Then you can **Deploy** the project.
+<https://control.divio.com>`_, create a new django CMS project and **Deploy** it.
 
 
 Using the django CMS Installer
