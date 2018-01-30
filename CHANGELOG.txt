@@ -7,6 +7,8 @@
   change a page's template.
 * Added ``on_delete`` to ``ForeignKey`` and ``OneToOneField`` to silence Django
   deprecation warnings.
+* Fixed a bug where the sitemap would ignore the ``public`` setting of the site languages
+  and thus display hidden languages.
 
 
 === 3.4.5 (2017-10-12) ===
