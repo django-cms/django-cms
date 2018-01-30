@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import copy
+
+from cms.api import create_page, create_title
 from cms.models import Title, Page
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
-from cms.api import create_page, create_title
+from cms.utils.conf import get_cms_setting
 
 
 class SitemapTestCase(CMSTestCase):
@@ -144,3 +147,21 @@ class SitemapTestCase(CMSTestCase):
             else:
                 url = 'http://example.com/%s/%s' % (title.language, title.path)
             self.assertFalse(url in locations)
+
+    def test_sitemap_uses_public_languages_only(self):
+        """
+        Pages on the sitemap should only show public languages.
+        """
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        # sanity check
+        assert lang_settings[1][1]['code'] == 'de'
+        # set german as private
+        lang_settings[1][1]['public'] = False
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            for item in CMSSitemap().get_urls():
+                url = 'http://example.com/en/'
+
+                if item['item'].path:
+                    url += item['item'].path + '/'
+                self.assertEqual(item['location'], url)
