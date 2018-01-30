@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.utils import translation
 
 from cms.models import Title
+from cms.utils.i18n import get_public_languages
 
 
 def from_iterable(iterables):
@@ -45,9 +46,11 @@ class CMSSitemap(Sitemap):
         # If, for some reason, you require redirecting pages (Titles) to be
         # included, simply create a new class inheriting from this one, and
         # supply a new items() method which doesn't filter out the redirects.
-        #
+        site = Site.objects.get_current()
+        languages = get_public_languages(site_id=site.pk)
         all_titles = Title.objects.public().filter(
             Q(redirect='') | Q(redirect__isnull=True),
+            language__in=languages,
             page__login_required=False,
             page__site=Site.objects.get_current(),
         ).order_by('page__path')
