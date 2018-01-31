@@ -130,6 +130,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate parent
     if parent:
         assert isinstance(parent, Page)
+        assert parent.publisher_is_draft
 
     # validate publication date
     if publication_date:

@@ -14,6 +14,7 @@
 * Introduced logic to copy pages to different sites from the admin.
 * Removed "View on Site" button when adding a page
 * Welcome page no longer uses multilingual URLs when not required.
+* Prevent users from passing a public page as parent in ``create_page`` api function
 
 
 === 3.4.5 (2017-10-12) ===

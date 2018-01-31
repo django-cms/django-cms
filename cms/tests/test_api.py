@@ -231,3 +231,10 @@ class PythonAPITests(CMSTestCase):
         page = page.reload()
         self.assertTrue(page.is_published('en'))
         self.assertEqual(page.changed_by, user.get_username())
+
+    def test_create_page_assert_parent_is_draft(self):
+        page_attrs = self._get_default_create_page_arguments()
+        page_attrs['published'] = True
+        parent_page = create_page(**page_attrs)
+        parent_page_public = parent_page.get_public_object()
+        self.assertRaises(AssertionError, create_page, parent=parent_page_public, **page_attrs)
