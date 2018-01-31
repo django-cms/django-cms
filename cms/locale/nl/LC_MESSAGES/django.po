@@ -18,7 +18,7 @@
 # leonderijke <inactive+leonderijke@transifex.com>, 2012
 # Maarten Draijer <maarten@madra.nl>, 2013
 # Maarten Draijer <maarten@madra.nl>, 2013
-# René Mulder <rene@ytec.nl>, 2014-2015
+# René Mulder <inactive+rene_ytec@transifex.com>, 2014-2015
 # Steven Vande Ryse <vande.ryse.steven@gmail.com>, 2012
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2013-2014,2016
 # kurdy <transifex.net@kurdyenviolien.nl>, 2013

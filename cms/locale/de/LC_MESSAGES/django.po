@@ -23,7 +23,7 @@
 # o.zander <oliver.zander@gmail.com>, 2014
 # Patrick Lauber <patrick.lauber@divio.ch>, 2012-2015
 # Peter Bittner <django@bittner.it>, 2015
-# Peter Wischer <peter.wischer@lwl.org>, 2017
+# Peter Wischer <peter.wischer@lwl.org>, 2017-2018
 # Roland <rka@beautyparlour.at>, 2013
 # Roland <rka@beautyparlour.at>, 2013
 # SachaMPS <sacha@mllrsohn.com>, 2015
@@ -36,8 +36,8 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"PO-Revision-Date: 2018-01-12 07:32+0000\n"
+"Last-Translator: Peter Wischer <peter.wischer@lwl.org>\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -246,12 +246,12 @@ msgstr "Sie haben keine Berechtigung, dieses Plugin zu kopieren."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Fehler! Sie haben nicht die Berechtigungen um diese Seite zu kopieren."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "Fehler! Die Seite, welche Sie versuchen einzufügen ist in keine der Sprachen übersetzt, die in der Zielseite konfiguriert sind."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -312,7 +312,7 @@ msgid "New page"
 msgstr "Neue Seite"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Die Seite ist nicht berechtigt die Startseite zu sein."
 
 msgid "View restriction"
 msgstr "Ansichts-Beschränkung"
@@ -437,7 +437,7 @@ msgid "Disable toolbar"
 msgstr "Toolbar abschalten"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Tastenkürzel..."
 
 msgid "Users"
 msgstr "Benutzer"
@@ -564,7 +564,7 @@ msgstr "Wählen Sie eine gültige Seite"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle Seite \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -572,7 +572,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle Seite."
 
 msgid "Add Another"
 msgstr "Weitere hinzufügen"
@@ -589,7 +589,7 @@ msgstr "Leer lassen um automatisch zu generieren, oder manuell überschreiben."
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Sie haben nicht die notwendigen Rechte um eine Seite hinzuzufügen."
 
 msgid "ID"
 msgstr "ID"
@@ -1013,7 +1013,7 @@ msgstr "Einfügen"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Als Startseite setzen"
 
 msgid "is restricted"
 msgstr "Ist eingeschränkt"
@@ -1103,7 +1103,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n<em>Es gibt derzeit kein %(object)s.</em>\n<br>\n<a href=\"%(add_url)s\" class=\"addlink\">%(object)s jetzt hinzufügen.</a>"
 
 msgid "Copy options"
 msgstr "Kopier-Optionen"
@@ -1225,14 +1225,14 @@ msgid "This plugin cannot have nested plugins."
 msgstr "Dieses Plugin erlaubt keine weiteren Plugins innerhalb sich selbst."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Highlight"
 
 msgid "Available plugins"
 msgstr "Verfügbare Plugins"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "Struktur umschalten"
 
 #| msgid "View published"
 msgid "View published"
@@ -1262,7 +1262,7 @@ msgstr "Der folgende Fehler ist aufgetreten:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "Aktion erfolgreich."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Sind Sie sicher, dass Sie dieses Plugin löschen wollen?"
@@ -1279,7 +1279,7 @@ msgstr "Es gibt ungespeicherte Änderungen."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Lädt"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1292,13 +1292,13 @@ msgstr "Das Formular konnte nicht geladen werden. Bitte überprüfen, dass der S
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Meist genutzt"
 
 msgid "Shortcuts"
 msgstr "Tastenkombinationen"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "Die Seite wurde in der Zwischenzeit verändert, lade neu..."
 
 msgid "Bring up this help dialog"
 msgstr "Diesen Hilfedialog anzeigen"
@@ -1431,7 +1431,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n<p class=\"cms-welcome-notes\">Wenn Sie das django CMS Logo oben nicht sehen, stellen Sie sicher das der Ordner <code>static/cms</code> in Ihre statischen Dateien verlinkt ist.</p>"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1449,7 +1449,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n<p class=\"cms-welcome-notes\">Sie sehen diese Meldung weil Sie <code>DEBUG = True</code> in Ihrer django Einstellungsdatei eingetragen haben und noch keine Seite existiert.</p>"
 
 msgid "Welcome to django CMS"
 msgstr "Willkommen im django CMS"
