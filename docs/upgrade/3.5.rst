@@ -63,6 +63,8 @@ Previously deprecated functionality has been removed:
 * The ``cms.utils.django_load.py`` module has been removed (in favour of standard Django helpers)
 * Support for Django Reversion has been removed.
 * The ``urls`` and ``menus`` attributes are no longer supported on ``CMSApp`` (apphook) classes.
+  All apphook subclasses now need a ``get_urls()`` method. In addition, if your apphook has a
+  ``menus`` attribute, that will need to be replaced by a ``get_menus()`` method.
 * ``Page.revision_id`` has been removed
 * Deprecated content creation wizard settings have been removed.
 
