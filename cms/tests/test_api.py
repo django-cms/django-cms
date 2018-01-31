@@ -236,5 +236,5 @@ class PythonAPITests(CMSTestCase):
         page_attrs = self._get_default_create_page_arguments()
         page_attrs['published'] = True
         parent_page = create_page(**page_attrs)
-        parent_page = parent_page.get_public_object()
-        self.assertRaises(AssertionError, create_page, parent=parent_page, **page_attrs)
+        parent_page_public = parent_page.get_public_object()
+        self.assertRaises(AssertionError, create_page, parent=parent_page_public, **page_attrs)
