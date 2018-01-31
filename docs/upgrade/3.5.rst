@@ -44,7 +44,6 @@ Bug Fixes
 
 This release fixes:
 
-* a bug in which Placeholder ordering could be incorrect
 * a Page template settings permission issue (failed to check for "Change advanced settings
   permission")
 * a bug allowing Pages to be pasted without the correct translations for the target site
@@ -53,7 +52,6 @@ This release fixes:
 * a bug where focusing inputs in modal would require two clicks in some browsers
 * minor issues with initialisation of interface widgets.
 * minor clipboard bugs
-* numerous minor issues with rendering/interaction of the structureboard
 
 
 Removal of deprecated functionality
@@ -111,6 +109,29 @@ Run::
     python manage.py migrate
 
 to apply the new migrations.
+
+
+***********************************
+Create a new django CMS 3.5 project
+***********************************
+
+On the Divio Cloud
+==================
+
+The Divio Cloud offers an easy way to set up django CMS projects. In the `Divio Cloud Control Panel
+<https://control.divio.com>`_, create a new django CMS project and **Deploy** it.
+
+
+Using the django CMS Installer
+==============================
+
+See our :ref:`installation guide in the tutorial <install-django-cms-tutorial>`. However, make
+sure that you:
+
+* have installed the latest version of django CMS Installer (at least version ``0.9.8``)
+* specify the version to install as ``develop``: ``djangocms --cms-version=develop mysite``
+
+The user name and password will both be ``admin``.
 
 
 ****************************
