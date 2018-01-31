@@ -6,7 +6,7 @@
 # Translators:
 # Chris Wesseling <chris.wesseling@xs4all.nl>, 2011
 # Jacques de Hooge <>, 2012
-# René Mulder <rene@ytec.nl>, 2014
+# René Mulder <inactive+rene_ytec@transifex.com>, 2014
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2016
 msgid ""
 msgstr ""
