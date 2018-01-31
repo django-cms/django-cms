@@ -1,4 +1,4 @@
-=== 3.5.0 (unreleased) ===
+=== 3.5.0 (2018-01-31) ===
 
 * Fixed a bug which prevented users from seeing the welcome screen when debug is
   turned off.
