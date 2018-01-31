@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
+import sys
 
 from django.core.cache import cache
+from django.core.urlresolvers import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.forms.models import model_to_dict
@@ -17,6 +19,7 @@ from django.utils.translation import override as force_language
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
+from cms.appresolver import clear_app_resolvers
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models.pagemodel import Page, PageType
@@ -27,6 +30,7 @@ from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_MOVE,
     URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
 )
+from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import installed_apps
@@ -1392,6 +1396,114 @@ class PageTest(PageTestBase):
                 ).count(),
                 2,
             )
+
+    @override_settings(CMS_APPHOOKS=[
+        'cms.test_utils.project.sampleapp.cms_apps.SampleApp',
+        'cms.test_utils.project.sampleapp.cms_apps.SampleAppWithConfig',
+    ])
+    def test_advanced_settings_form_apphook_config(self):
+        clear_app_resolvers()
+        clear_url_caches()
+
+        if 'cms.test_utils.project.sampleapp.cms_apps' in sys.modules:
+            del sys.modules['cms.test_utils.project.sampleapp.cms_apps']
+
+        self.apphook_clear()
+
+        superuser = self.get_superuser()
+        app_config = SampleAppConfig.objects.create(namespace='sample')
+        cms_page = create_page('app', 'nav_playground.html', 'en', published=True)
+        cms_pages = Page.objects.filter(pk__in=[cms_page.pk, cms_page.publisher_public_id])
+        redirect_to = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+        page_data = {
+            "redirect": "",
+            "language": "en",
+            "reverse_id": "",
+            "navigation_extenders": "",
+            "site": "1",
+            "xframe_options": "0",
+            "application_urls": "SampleAppWithConfig",
+            "application_configs": app_config.pk,
+            "application_namespace": "sampleapp",
+            "overwrite_url": "",
+            "template": "INHERIT",
+        }
+
+        with self.login_user_context(superuser):
+            # set the apphook config
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='SampleAppWithConfig',
+                    application_namespace=app_config.namespace,
+                ).count(),
+                2
+            )
+
+        with self.login_user_context(superuser):
+            # change from apphook with config to normal apphook
+            page_data['application_urls'] = 'SampleApp'
+            page_data['application_namespace'] = 'sampleapp'
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='SampleApp',
+                    application_namespace='sampleapp',
+                ).count(),
+                2
+            )
+
+        with self.login_user_context(superuser):
+            # set the apphook config again
+            page_data['application_urls'] = 'SampleAppWithConfig'
+            page_data['application_namespace'] = 'sampleapp'
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='SampleAppWithConfig',
+                    application_namespace=app_config.namespace,
+                ).count(),
+                2
+            )
+
+        with self.login_user_context(superuser):
+            # change the apphook config to an invalid value
+            expected_error = '<ul class="errorlist"><li>Invalid application config value</li></ul>'
+            page_data['application_configs'] = '2'
+            response = self.client.post(endpoint, page_data)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, expected_error)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='SampleAppWithConfig',
+                    application_namespace=app_config.namespace,
+                ).count(),
+                2
+            )
+
+        with self.login_user_context(superuser):
+            # remove the apphook
+            page_data['application_urls'] = ''
+            page_data['application_namespace'] = ''
+            response = self.client.post(endpoint, page_data)
+            self.assertRedirects(response, redirect_to)
+            self.assertEqual(
+                cms_pages.filter(
+                    application_urls='',
+                    application_namespace=None,
+                ).count(),
+                2,
+            )
+        clear_app_resolvers()
+        clear_url_caches()
+
+        if 'cms.test_utils.project.sampleapp.cms_apps' in sys.modules:
+            del sys.modules['cms.test_utils.project.sampleapp.cms_apps']
+        self.apphook_clear()
 
     def test_form_url_page_change(self):
         superuser = self.get_superuser()

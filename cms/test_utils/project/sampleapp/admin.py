@@ -1,6 +1,7 @@
-from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from django.contrib import admin
-from cms.test_utils.project.sampleapp.models import Picture, Category
+
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.test_utils.project.sampleapp.models import Picture, Category, SampleAppConfig
 
 
 class PictureInline(admin.StackedInline):
@@ -11,3 +12,4 @@ class CategoryAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     inlines = [PictureInline]
 
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(SampleAppConfig)

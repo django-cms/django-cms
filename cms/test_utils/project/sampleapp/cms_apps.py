@@ -1,9 +1,14 @@
+from django.conf.urls import url
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.utils.translation import ugettext_lazy as _
+
 from cms.app_base import CMSApp
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu3, StaticMenu4
 from cms.apphook_pool import apphook_pool
-from django.conf.urls import url
-from django.http import HttpResponse
-from django.utils.translation import ugettext_lazy as _
+
+from .models import SampleAppConfig
 
 
 class SampleApp(CMSApp):
@@ -15,6 +20,26 @@ class SampleApp(CMSApp):
 
     def get_urls(self, page=None, language=None, **kwargs):
         return ["cms.test_utils.project.sampleapp.urls"]
+
+
+class SampleAppWithConfig(CMSApp):
+    name = _("Sample App with config")
+    app_config = SampleAppConfig
+
+    def get_urls(self, page=None, language=None, **kwargs):
+        return ["cms.test_utils.project.sampleapp.urls_sample_config"]
+
+    def get_configs(self):
+        return self.app_config.objects.all()
+
+    def get_config(self, namespace):
+        try:
+            return self.app_config.objects.get(namespace=namespace)
+        except ObjectDoesNotExist:
+            return None
+
+    def get_config_add_url(self):
+        return reverse('admin:%s_%s_add' % (self.app_config._meta.app_label, self.app_config._meta.model_name))
 
 
 class SampleAppWithExcludedPermissions(CMSApp):
