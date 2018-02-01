@@ -187,6 +187,7 @@ class Page(models.Model):
             'To get the parent object of any given page, use the "parent_page" attribute. '
             'This backwards compatible shim will be removed in version 3.6',
             UserWarning,
+            stacklevel=2,
         )
         return self.parent_page
 
@@ -198,6 +199,7 @@ class Page(models.Model):
             'call "pk" on the "parent_page" attribute. '
             'This backwards compatible shim will be removed in version 3.6',
             UserWarning,
+            stacklevel=2,
         )
         if self.parent_page:
             return self.parent_page.pk
@@ -211,6 +213,7 @@ class Page(models.Model):
             'call "site" on the page "node" object. '
             'This backwards compatible shim will be removed in version 3.6',
             UserWarning,
+            stacklevel=2,
         )
         return self.node.site
 
@@ -222,6 +225,7 @@ class Page(models.Model):
             'call "site_id" on the page "node" object. '
             'This backwards compatible shim will be removed in version 3.6',
             UserWarning,
+            stacklevel=2,
         )
         return self.node.site_id
 
