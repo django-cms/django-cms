@@ -60,6 +60,8 @@ then your ``MyApphook`` class should include::
 If you fail to this, then any templates in the application that invoke URLs using the form ``{% url 'myapp:index' %}``
 or views that call (for example) ``reverse('myapp:index')`` will throw a ``NoReverseMatch`` error.
 
+If you had already assigned a page to your aplication prior to including ``app_name``, you'll need to edit its *Advanced settings* and specify your  ``app_name`` as *Application instance name* to avoid the same ``NoReverseMatch`` error (this is filled automatically in new pages).
+
 *Unless* the class that defines the apphook specifies an ``app_name``, it can be attached only to one page at a time.
 Attempting to apply it a second time will cause an error. See :ref:`multi_apphook` for more on having multiple apphook
 instances.
