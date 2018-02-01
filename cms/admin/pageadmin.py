@@ -8,7 +8,6 @@ import uuid
 
 import django
 from django.contrib.admin.helpers import AdminForm
-from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
@@ -19,7 +18,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist,
                                     PermissionDenied, ValidationError)
 from django.db import router, transaction
-from django.db.models import Q
 from django.http import (
     HttpResponseRedirect,
     HttpResponse,
@@ -63,6 +61,7 @@ from cms.utils.admin import jsonify_request, render_admin_rows
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import current_site
 from cms.utils.urlutils import add_url_parameters, admin_reverse
+from menus.menu_pool import menu_pool
 
 require_POST = method_decorator(require_POST)
 
@@ -1421,32 +1420,32 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     def get_published_pagelist(self, *args, **kwargs):
         """
-         This view is used by the PageSmartLinkWidget as the user type to feed the autocomplete drop-down.
+        This view is used by the PageSmartLinkWidget as the user type to feed the autocomplete drop-down.
         """
         request = args[0]
+        if not request.is_ajax():
+            return HttpResponseForbidden()
+        query_term = request.GET.get('q','').strip('/').lower()
 
-        if request.is_ajax():
-            query_term = request.GET.get('q','').strip('/')
+        # override request language if set
+        language_code = request.GET.get('language_code')
+        if language_code:
+            request.LANGUAGE_CODE = language_code
 
-            language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
-            matching_published_pages = self.model.objects.published().public().filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
-            ).distinct()
+        # add menu items from the menu pool
+        results = []
+        for node in menu_pool.get_nodes(request):
+            path = getattr(node, 'path', '').lower()  # only CMSNavigationNode has a `path` attribute
+            if query_term in path.lower() or query_term in node.title.lower():
+                results.append({
+                    'path': path,
+                    'title': node.get_menu_title(),
+                    'redirect_url': node.get_absolute_url(),
+                })
+                if len(results) > 15:
+                    break  # limit the list of choices to 16
 
-            results = []
-            for page in matching_published_pages:
-                results.append(
-                    {
-                        'path': page.get_path(language=language_code),
-                        'title': page.get_title(language=language_code),
-                        'redirect_url': page.get_absolute_url(language=language_code)
-                    }
-                )
-            return HttpResponse(json.dumps(results), content_type='application/json')
-        return HttpResponseForbidden()
+        return HttpResponse(json.dumps(results), content_type='application/json')
 
 
 admin.site.register(Page, PageAdmin)
