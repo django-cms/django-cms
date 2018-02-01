@@ -504,8 +504,11 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     # This is really a 'fake' field which does not correspond to any Page attribute
     # But creates a stub field to be populate by js
-    application_configs = forms.ChoiceField(label=_('Application configurations'),
-                                            choices=(), required=False, widget=ApplicationConfigSelect)
+    application_configs = forms.CharField(
+        label=_('Application configurations'),
+        required=False,
+        widget=ApplicationConfigSelect,
+    )
     fieldsets = (
         (None, {
             'fields': ('overwrite_url', 'redirect'),
@@ -558,27 +561,20 @@ class AdvancedSettingsForm(forms.ModelForm):
             if app_configs:
                 self.fields['application_configs'].widget = ApplicationConfigSelect(
                     attrs={'id': 'application_configs'},
-                    app_configs=app_configs)
+                    app_configs=app_configs,
+                )
 
                 if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
-                    self.fields['application_configs'].choices = [(config.pk, force_text(config)) for config in app_configs[page_data['application_urls']].get_configs()]
+                    configs = app_configs[page_data['application_urls']].get_configs()
+                    self.fields['application_configs'].widget.choices = [(config.pk, force_text(config)) for config in configs]
 
-                    apphook = page_data.get('application_urls', False)
                     try:
-                        config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
+                        config = configs.get(namespace=self.initial['application_namespace'])
                         self.fields['application_configs'].initial = config.pk
                     except ObjectDoesNotExist:
                         # Provided apphook configuration doesn't exist (anymore),
                         # just skip it
                         # The user will choose another value anyway
-                        pass
-                else:
-                    # If app_config apphook is not selected, drop any value
-                    # for application_configs to avoid the field data from
-                    # being validated by the field itself
-                    try:
-                        del self.data['application_configs']
-                    except KeyError:
                         pass
 
         if 'redirect' in self.fields:
@@ -587,6 +583,13 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
             self.fields['overwrite_url'].initial = self.title_obj.path
+
+    def get_apphooks(self):
+        for hook in apphook_pool.get_apphooks():
+            yield (hook[0], apphook_pool.get_apphook(hook[0]))
+
+    def get_apphooks_with_config(self):
+        return {key: app for key, app in self.get_apphooks() if app.app_config}
 
     def get_navigation_extenders(self):
         return menu_pool.get_menus_by_attribute("cms_enabled", True)
@@ -631,12 +634,29 @@ class AdvancedSettingsForm(forms.ModelForm):
         instance_namespace = cleaned_data.get('application_namespace', None)
         application_config = cleaned_data.get('application_configs', None)
         if apphook:
+            apphooks_with_config = self.get_apphooks_with_config()
+
             # application_config wins over application_namespace
-            if application_config:
+            if apphook in apphooks_with_config and application_config:
                 # the value of the application config namespace is saved in
                 # the 'usual' namespace field to be backward compatible
                 # with existing apphooks
-                config = apphook_pool.get_apphook(apphook).get_configs().get(pk=int(application_config))
+                try:
+                    appconfig_pk = forms.IntegerField(required=True).to_python(application_config)
+                except ValidationError:
+                    self._errors['application_configs'] = ErrorList([
+                        _('Invalid application config value')
+                    ])
+                    return self.cleaned_data
+
+                try:
+                    config = apphooks_with_config[apphook].get_configs().get(pk=appconfig_pk)
+                except ObjectDoesNotExist:
+                    self._errors['application_configs'] = ErrorList([
+                        _('Invalid application config value')
+                    ])
+                    return self.cleaned_data
+
                 if self._check_unique_namespace_instance(config.namespace):
                     # Looks like there's already one with the default instance
                     # namespace defined.

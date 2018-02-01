@@ -24,3 +24,11 @@ class Category(MP_Node):
 class Picture(models.Model):
     image = models.ImageField(upload_to="pictures")
     category = models.ForeignKey(Category)
+
+
+class SampleAppConfig(models.Model):
+    namespace = models.CharField(
+        default=None,
+        max_length=100,
+        unique=True,
+    )
