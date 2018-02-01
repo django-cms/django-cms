@@ -9,6 +9,7 @@
   deprecation warnings.
 * Fixed a bug where the sitemap would ignore the ``public`` setting of the site languages
   and thus display hidden languages.
+* Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
 
 
 === 3.4.5 (2017-10-12) ===
