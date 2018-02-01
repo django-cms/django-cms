@@ -1420,12 +1420,17 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     def get_published_pagelist(self, *args, **kwargs):
         """
-         This view is used by the PageSmartLinkWidget as the user type to feed the autocomplete drop-down.
+        This view is used by the PageSmartLinkWidget as the user type to feed the autocomplete drop-down.
         """
         request = args[0]
         if not request.is_ajax():
             return HttpResponseForbidden()
         query_term = request.GET.get('q','').strip('/').lower()
+
+        # override request language if set
+        language_code = request.GET.get('language_code')
+        if language_code:
+            request.LANGUAGE_CODE = language_code
 
         # add menu items from the menu pool
         results = []
@@ -1434,7 +1439,7 @@ class PageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             if query_term in path.lower() or query_term in node.title.lower():
                 results.append({
                     'path': path,
-                    'title': node.title,
+                    'title': node.get_menu_title(),
                     'redirect_url': node.get_absolute_url(),
                 })
                 if len(results) > 15:
