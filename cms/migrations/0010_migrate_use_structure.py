@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cms', '0009_merge'),
-        ('contenttypes', '__latest__'),
+        ('contenttypes', '0001_initial'),
     ]
 
     operations = [
