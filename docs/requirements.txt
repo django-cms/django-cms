@@ -2,7 +2,8 @@
 MarkupSafe==0.23
 Pygments==2.0.2
 sphinx
-sphinxcontrib-spelling
+# temporarily disabled because of an issue on RTD. see also conf.py
+#sphinxcontrib-spelling
 pyenchant
 sphinx-autobuild
 sphinx_rtd_theme
