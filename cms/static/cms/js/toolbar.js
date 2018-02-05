@@ -24,7 +24,11 @@ import StructureBoard from './modules/cms.structureboard';
 import Toolbar from './modules/cms.toolbar';
 import Tooltip from './modules/cms.tooltip';
 
-// CMS by this time is a global that has `_plugins` property
+// CMS by this time should be a global that has `_plugins` property
+const CMS = window.CMS || {};
+
+CMS._plugins = CMS._plugins || [];
+
 CMS.Messages = Messages;
 CMS.ChangeTracker = ChangeTracker;
 CMS.Modal = Modal;
