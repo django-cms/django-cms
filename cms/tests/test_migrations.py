@@ -18,7 +18,7 @@ class MigrationTestCase(TestCase):
         }
 
         if DJANGO_1_9:
-            # this option was deprecated on Django 1.10
+            # this option was deprecated in Django 1.10
             options['exit_code'] = True
             # this option was introduced in Django 1.10
             del options['check_changes']
