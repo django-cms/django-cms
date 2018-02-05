@@ -1,7 +1,9 @@
 === 3.5.1 (unreleased) ===
 
-* Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration 
+* Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration
   with multiple page types per site.
+* Fixed a bug which prevented toolbar js from working correctly when rendered
+  before toolbar.
 
 
 === 3.5.0 (2018-01-31) ===
