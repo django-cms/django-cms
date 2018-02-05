@@ -1,3 +1,7 @@
+=== 3.5.1 (unreleased) ===
+
+* Fixed a MultipleObjectsReturned exception raised on the page types migration with multiple page types per site.
+
 === 3.5.0 (2018-01-31) ===
 
 * Fixed a bug which prevented users from seeing the welcome screen when debug is

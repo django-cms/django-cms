@@ -15,7 +15,11 @@ def migrate_to_page_types(apps, schema_editor):
     Page = apps.get_model('cms', 'Page')
     db_alias = schema_editor.connection.alias
 
-    for page_types_root in Page.objects.using(db_alias).filter(publisher_is_draft=True, reverse_id='page_types'):
+    page_types = Page.objects.using(db_alias).filter(
+        reverse_id='page_types',
+        publisher_is_draft=True,
+    )
+    for page_types_root in page_types:
         update_descendants(page_types_root, is_page_type=True)
 
         # Remove reverse id from draft page
