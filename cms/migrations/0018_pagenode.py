@@ -167,7 +167,7 @@ class Migration(migrations.Migration):
         ),
     ]
 
-if (1, 10) <= django.VERSION < (2, 0):
+if django.VERSION >= (1, 10):
     Migration.operations.append(
         migrations.AlterModelManagers(
             name='pageusergroup',

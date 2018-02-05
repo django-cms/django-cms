@@ -14,13 +14,14 @@ class MigrationTestCase(TestCase):
             'interactive': False,
             'dry_run': True,
             'stdout': output,
+            'check_changes': True,
         }
 
         if DJANGO_1_9:
-            # this was deprecated on Django 1.10
+            # this option was deprecated on Django 1.10
             options['exit_code'] = True
-        else:
-            options['check_changes'] = True
+            # this option was introduced in Django 1.10
+            del options['check_changes']
 
         try:
             call_command('makemigrations', **options)
