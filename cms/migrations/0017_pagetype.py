@@ -15,31 +15,28 @@ def migrate_to_page_types(apps, schema_editor):
     Page = apps.get_model('cms', 'Page')
     db_alias = schema_editor.connection.alias
 
-    try:
-        page_types_root = Page.objects.using(db_alias).get(
-            publisher_is_draft=True,
-            reverse_id='page_types',
-        )
-    except Page.DoesNotExist:
-        return
+    page_types = Page.objects.using(db_alias).filter(
+        reverse_id='page_types',
+        publisher_is_draft=True,
+    )
+    for page_types_root in page_types:
+        update_descendants(page_types_root, is_page_type=True)
 
-    update_descendants(page_types_root, is_page_type=True)
+        # Remove reverse id from draft page
+        page_types_root.reverse_id = ''
+        page_types_root.is_page_type = True
+        page_types_root.save(update_fields=['reverse_id', 'is_page_type'])
+        page_types_root_public = page_types_root.publisher_public
 
-    # Remove reverse id from draft page
-    page_types_root.reverse_id = ''
-    page_types_root.is_page_type = True
-    page_types_root.save(update_fields=['reverse_id', 'is_page_type'])
-    page_types_root_public = page_types_root.publisher_public
+        if page_types_root_public:
+            # very strange case.. technically page-types should never be published.
+            # but nothing actually prevents it, so update public pages (if any).
+            update_descendants(page_types_root_public, is_page_type=True)
 
-    if page_types_root_public:
-        # very strange case.. technically page-types should never be published.
-        # but nothing actually prevents it, so update public pages (if any).
-        update_descendants(page_types_root_public, is_page_type=True)
-
-        # Remove reverse id from public page
-        page_types_root_public.reverse_id = ''
-        page_types_root_public.is_page_type = True
-        page_types_root_public.save(update_fields=['reverse_id', 'is_page_type'])
+            # Remove reverse id from public page
+            page_types_root_public.reverse_id = ''
+            page_types_root_public.is_page_type = True
+            page_types_root_public.save(update_fields=['reverse_id', 'is_page_type'])
 
 
 class Migration(migrations.Migration):
