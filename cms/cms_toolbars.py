@@ -308,7 +308,7 @@ class PageToolbar(CMSToolbar):
                 page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
 
     def in_apphook(self):
-        with force_language(self.toolbar.language):
+        with force_language(self.toolbar.request_language):
             try:
                 resolver = resolve(self.toolbar.request_path)
             except Resolver404:
@@ -447,7 +447,7 @@ class PageToolbar(CMSToolbar):
         self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
 
     def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
-        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.language)
+        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.request_language)
         self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 
     # Menus
@@ -529,7 +529,7 @@ class PageToolbar(CMSToolbar):
         if not self._changed_admin_menu and can_change_page:
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             url = admin_reverse('cms_page_changelist')  # cms page admin
-            params = {'language': self.toolbar.language}
+            params = {'language': self.toolbar.request_language}
             if self.page:
                 params['page_id'] = self.page.pk
             url = add_url_parameters(url, params)
@@ -600,7 +600,7 @@ class PageToolbar(CMSToolbar):
             )
 
             for title, params, has_perm in add_page_menu_modal_items:
-                params.update(language=self.toolbar.language)
+                params.update(language=self.toolbar.request_language)
                 add_page_menu.add_modal_item(
                     title,
                     url=add_url_parameters(add_page_url, params),
@@ -609,7 +609,7 @@ class PageToolbar(CMSToolbar):
 
             add_page_menu.add_modal_item(
                 _('Duplicate this Page'),
-                url=add_url_parameters(duplicate_page_url, {'language': self.toolbar.language}),
+                url=add_url_parameters(duplicate_page_url, {'language': self.toolbar.request_language}),
                 disabled=not can_add_sibling_page,
             )
 
@@ -621,13 +621,13 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
 
             # page settings
-            page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.language)
+            page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)
             settings_disabled = not edit_mode or not can_change
             current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=settings_disabled,
                                              on_close=refresh)
 
             # advanced settings
-            advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
+            advanced_url = add_url_parameters(advanced_url, language=self.toolbar.request_language)
             can_change_advanced = self.page.has_advanced_settings_permission(self.request.user)
             advanced_disabled = not edit_mode or not can_change_advanced
             current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
@@ -656,7 +656,7 @@ class PageToolbar(CMSToolbar):
             # page type
             if not self.page.is_page_type:
                 page_type_url = admin_reverse('cms_pagetype_add')
-                page_type_url = add_url_parameters(page_type_url, source=self.page.pk, language=self.toolbar.language)
+                page_type_url = add_url_parameters(page_type_url, source=self.page.pk, language=self.toolbar.request_language)
                 page_type_disabled = not edit_mode or not can_add_root_page
                 current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=page_type_disabled)
 

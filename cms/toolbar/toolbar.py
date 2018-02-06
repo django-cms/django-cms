@@ -2,7 +2,6 @@
 from collections import OrderedDict
 import functools
 import operator
-import warnings
 
 from cms import __version__
 from cms.api import get_page_draft
@@ -35,16 +34,6 @@ class BaseToolbar(ToolbarAPIMixin):
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
-
-    @property
-    def language(self):
-        # Backwards compatibility
-        warnings.warn(
-            "toolbar.language has been deprecated "
-            "and will be removed in django CMS 3.6",
-            PendingDeprecationWarning
-        )
-        return self.request_language
 
     @cached_property
     def site_language(self):
@@ -210,16 +199,6 @@ class CMSToolbar(BaseToolbar):
             for key, toolbar in self.toolbars.items():
                 self.toolbars[key].request = self.request
         self.request_path = request_path or request.path
-
-    @property
-    def edit_mode(self):
-        # Backwards compatibility
-        warnings.warn(
-            "toolbar.edit_mode has been deprecated "
-            "and will be removed in django CMS 3.6",
-            PendingDeprecationWarning
-        )
-        return self.edit_mode_active
 
     @cached_property
     def user_settings(self):
