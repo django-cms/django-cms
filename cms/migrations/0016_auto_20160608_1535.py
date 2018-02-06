@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import django
 from django.db import migrations, models
 
 
@@ -22,3 +23,13 @@ class Migration(migrations.Migration):
             field=models.OneToOneField(parent_link=True, related_name='cms_placeholderreference', primary_key=True, serialize=False, to='cms.CMSPlugin', on_delete=models.CASCADE),
         ),
     ]
+
+if django.VERSION >= (1, 10):
+    Migration.operations.append(
+        migrations.AlterModelManagers(
+            name='pageusergroup',
+            managers=[
+                ('objects', django.contrib.auth.models.GroupManager()),
+            ],
+        ),
+    )
