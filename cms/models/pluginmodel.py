@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 import json
-from operator import itemgetter
 import os
 import warnings
 
@@ -15,7 +14,6 @@ from django.utils import six, timezone
 from django.utils.six import text_type
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import filter
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
@@ -113,7 +111,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
     child_plugin_instances = None
-    translatable_content_excluded_fields = []
 
     class Meta:
         app_label = 'cms'
@@ -468,25 +465,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         tags to be able to see his children in WYSIWYG.
         """
         pass
-
-    def get_translatable_content(self):
-        """
-        Returns {field_name: field_contents} for translatable fields, where
-        field_contents > ''
-        """
-        fields = (f for f in self._meta.fields
-                  if isinstance(f, (models.CharField, models.TextField)) and
-                     f.editable and not f.choices and
-                     f.name not in self.translatable_content_excluded_fields)
-        return dict(filter(itemgetter(1),
-                           ((f.name, getattr(self, f.name)) for f in fields)))
-
-    def set_translatable_content(self, fields):
-        for field, value in fields.items():
-            setattr(self, field, value)
-        self.save()
-        return all(getattr(self, field) == value
-                   for field, value in fields.items())
 
     def delete(self, no_mp=False, *args, **kwargs):
         if no_mp:
