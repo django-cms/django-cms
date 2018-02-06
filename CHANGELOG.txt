@@ -1,6 +1,11 @@
+=== 3.6.0 (unreleased) ===
+
+* <new entry here>
+
+
 === 3.5.1 (unreleased) ===
 
-* Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration 
+* Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration
   with multiple page types per site.
 
 
