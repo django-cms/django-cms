@@ -1,6 +1,6 @@
 === 3.6.0 (unreleased) ===
 
-* <new entry here>
+* Removed the ``cms moderator`` command.
 
 
 === 3.5.2 (2018-04-11) ===
