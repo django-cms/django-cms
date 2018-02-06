@@ -903,13 +903,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(1, len(w))
             self.assertIn('test_plugins.py', w[0].filename)
 
-    def test_set_translatable_content(self):
-        a = self.get_plugin_model('TextPlugin')(body="hello")
-        self.assertTrue(a.set_translatable_content({'body': 'world'}))
-        b = self.get_plugin_model('LinkPlugin')(name="hello")
-        self.assertTrue(b.set_translatable_content({'name': 'world'}))
-
-
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
@@ -1111,33 +1104,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             child_classes = plugin.get_child_classes(placeholder.slot, page)
             self.assertIn('ChildPlugin', child_classes)
             self.assertIn('ParentPlugin', child_classes)
-
-
-    def test_plugin_translatable_content_getter_setter(self):
-        """
-        Test that you can add a text plugin
-        """
-        # add a new text plugin
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.drafts().first()
-        created_plugin_id = self._create_text_plugin_on_page(page)
-
-        # now edit the plugin
-        plugin = self._edit_text_plugin(created_plugin_id, "Hello World")
-        self.assertEqual("Hello World", plugin.body)
-
-        # see if the getter works
-        self.assertEqual({'body': "Hello World"}, plugin.get_translatable_content())
-
-        # change the content
-        self.assertEqual(True, plugin.set_translatable_content({'body': "It works!"}))
-
-        # check if it changed
-        self.assertEqual("It works!", plugin.body)
-
-        # double check through the getter
-        self.assertEqual({'body': "It works!"}, plugin.get_translatable_content())
 
     def test_plugin_pool_register_returns_plugin_class(self):
         @plugin_pool.register_plugin
