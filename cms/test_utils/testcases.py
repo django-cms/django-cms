@@ -35,7 +35,6 @@ from cms.models.permissionmodels import (
     PageUser,
 )
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.utils.compat import DJANGO_1_8
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -44,10 +43,7 @@ from cms.utils.urlutils import admin_reverse
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
 URL_CMS_PAGE_CHANGE_BASE = urljoin(URL_CMS_PAGE, "%d/")
-if DJANGO_1_8:
-    URL_CMS_PAGE_CHANGE = URL_CMS_PAGE_CHANGE_BASE
-else:
-    URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
+URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
 URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
 URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
 URL_CMS_PAGE_PERMISSIONS = urljoin(URL_CMS_PAGE, "%d/permissions/")
