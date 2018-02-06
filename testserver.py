@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from cms.utils.compat import DJANGO_1_9
-
 
 def noop_gettext(s):
     return s
@@ -120,7 +118,7 @@ HELPER_SETTINGS = dict(
         'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.placeholderapp',
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'cms.middleware.utils.ApphookReloadMiddleware',
     ],
     TEMPLATE_DIRS=(
@@ -133,12 +131,7 @@ HELPER_SETTINGS = dict(
         ('page.html', 'Standard page'),
         ('simple.html', 'Simple page'),
     ),
-)
-
-if DJANGO_1_9:
-    HELPER_SETTINGS['MIGRATION_MODULES'] = DisableMigrations()
-else:
-    HELPER_SETTINGS['MIGRATION_MODULES'] = {
+    MIGRATION_MODULES={
         'auth': None,
         'admin': None,
         'contenttypes': None,
@@ -147,7 +140,8 @@ else:
         'cms': None,
         'menus': None,
         'djangocms_text_ckeditor': None,
-    }
+    },
+)
 
 
 def _helper_patch(*args, **kwargs):

@@ -33,7 +33,7 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.autodoc']
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/1.10/', 'https://docs.djangoproject.com/en/1.10/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
     'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
