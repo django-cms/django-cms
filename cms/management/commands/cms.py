@@ -8,7 +8,6 @@ import cms
 from .subcommands.base import SubcommandsCommand
 from .subcommands.check import CheckInstallation
 from .subcommands.list import ListCommand
-from .subcommands.moderator import ModeratorCommand
 from .subcommands.publisher_publish import PublishCommand
 from .subcommands.tree import FixTreeCommand
 from .subcommands.uninstall import UninstallCommand
@@ -24,7 +23,6 @@ class Command(SubcommandsCommand):
         ('delete-orphaned-plugins', DeleteOrphanedPluginsCommand),
         ('fix-tree', FixTreeCommand),
         ('list', ListCommand),
-        ('moderator', ModeratorCommand),
         ('publisher-publish', PublishCommand),
         ('uninstall', UninstallCommand),
     ))
