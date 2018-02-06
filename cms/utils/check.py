@@ -11,7 +11,6 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils.conf import get_cms_setting
-from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.dj import is_installed
 
 
@@ -323,18 +322,11 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                if DJANGO_1_8:
-                    section.warn('%s has a many-to-many relation to %s,\n    '
-                                 'but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.related.model),
-                    ))
-                else:
-                    section.warn('%s has a many-to-many relation to %s,\n    '
-                                 'but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.remote_field.model),
-                    ))
+                section.warn('%s has a many-to-many relation to %s,\n    '
+                             'but no "copy_relations" method defined.' % (
+                    c_to_s(extension),
+                    c_to_s(rel.remote_field.model),
+                ))
             for rel in extension._get_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (

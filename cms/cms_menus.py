@@ -8,7 +8,6 @@ from cms import constants
 from cms.api import get_page_draft
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
-from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -249,14 +248,7 @@ class CMSMenu(Menu):
             to_attr='filtered_translations',
             queryset=titles,
         )
-
-        if DJANGO_1_9:
-            # This function was made public in django 1.10
-            # and as a result its signature changed
-            prefetch_related_objects(pages, [lookup])
-        else:
-            prefetch_related_objects(pages, lookup)
-
+        prefetch_related_objects(pages, lookup)
         # Build the blank title instances only once
         blank_title_cache = {language: EmptyTitle(language=language) for language in languages}
 

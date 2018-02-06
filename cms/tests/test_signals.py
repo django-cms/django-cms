@@ -89,10 +89,9 @@ class SignalTests(CMSTestCase):
                     self.assertEqual(env.call_count, 1)
 
 
-overrides = dict()
-overrides['MIDDLEWARE' if getattr(settings, 'MIDDLEWARE', None) else 'MIDDLEWARE_CLASSES'] = [
-    'cms.middleware.utils.ApphookReloadMiddleware'
-] + getattr(settings, 'MIDDLEWARE', getattr(settings, 'MIDDLEWARE_CLASSES', None))
+overrides = {
+    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + getattr(settings, 'MIDDLEWARE')
+}
 @override_settings(**overrides)
 class ApphooksReloadTests(CMSTestCase):
     def test_urls_reloaded(self):

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.utils.compat import DJANGO_1_10
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
@@ -7,7 +6,6 @@ from django.forms.widgets import Select, MultiWidget, TextInput
 from django.utils.encoding import force_text
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
 
 from cms.utils.urlutils import admin_reverse, static_with_version
 from cms.forms.utils import get_site_choices, get_page_choices
@@ -95,33 +93,6 @@ class PageSelectWidget(MultiWidget):
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
 
-    def render(self, name, value, attrs=None, renderer=None):
-        if DJANGO_1_10:
-            # THIS IS A COPY OF django.forms.widgets.MultiWidget.render()
-            # (except for the last line)
-
-            # value is a list of values, each corresponding to a widget
-            # in self.widgets.
-            self._build_widgets()
-
-            if not isinstance(value, list):
-                value = self.decompress(value)
-            output = []
-            final_attrs = self.build_attrs(attrs)
-            id_ = final_attrs.get('id', None)
-            for i, widget in enumerate(self.widgets):
-                try:
-                    widget_value = value[i]
-                except IndexError:
-                    widget_value = None
-                if id_:
-                    final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-                output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-            output.append(self._build_script(name, value, final_attrs))
-            return mark_safe(self.format_output(output))
-        else:
-            return super(PageSelectWidget, self).render(name, value, attrs, renderer)
-
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
 
@@ -175,15 +146,6 @@ class PageSmartLinkWidget(TextInput):
         context = super(PageSmartLinkWidget, self).get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
-
-    def render(self, name, value, attrs=None, renderer=None):
-        if DJANGO_1_10:
-            final_attrs = self.build_attrs(attrs)
-            output = list(self._build_script(name, value, final_attrs))
-            output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
-            return mark_safe(u''.join(output))
-        else:
-            return super(PageSmartLinkWidget, self).render(name, value, attrs, renderer)
 
 
 class UserSelectAdminWidget(Select):
@@ -298,16 +260,3 @@ class ApplicationConfigSelect(Select):
         context = super(ApplicationConfigSelect, self).get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
-
-    def render(self, name, value, attrs=None, renderer=None):
-        if DJANGO_1_10:
-            output = list(super(ApplicationConfigSelect, self).render(name, value, attrs))
-            output.append(self._build_script(name, value, attrs))
-
-            related_url = ''
-            output.append('<a href="%s" class="add-another" id="add_%s" title="%s" onclick="return showAddAnotherPopup(this);">'
-                          % (related_url, name, _('Add Another')))
-            output.append('</a>')
-            return mark_safe(''.join(output))
-        else:
-            return super(ApplicationConfigSelect, self).render(name, value, attrs, renderer)
