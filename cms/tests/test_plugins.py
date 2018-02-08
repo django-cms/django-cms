@@ -134,28 +134,28 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-    def _create_text_plugin_on_page(self, page, slot='col_left'):
-        plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot=slot),
-            plugin_type='TextPlugin',
-            language=settings.LANGUAGES[0][0],
-            body=''
-        )
-        return plugin.pk
 
-    def _edit_text_plugin(self, plugin_id, text):
+    def _create_link_plugin_on_page(self, page, slot='col_left'):
+        add_url = self.get_add_plugin_uri(
+            placeholder=page.placeholders.get(slot=slot),
+            plugin_type='LinkPlugin',
+            language=settings.LANGUAGES[0][0],
+        )
+        data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+        response = self.client.post(add_url, data)
+        self.assertEqual(response.status_code, 200)
+        return CMSPlugin.objects.latest('pk').pk
+
+    def __edit_link_plugin(self, plugin_id, text):
         endpoint = self.get_admin_url(Page, 'edit_plugin', plugin_id)
         endpoint += '?cms_path=/en/'
 
         response = self.client.get(endpoint)
         self.assertEqual(response.status_code, 200)
-        data = {
-            "body": text
-        }
+        data = {'name': text, 'external_link': 'https://www.django-cms.org'}
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
-        txt = Text.objects.get(pk=plugin_id)
-        return txt
+        return CMSPlugin.objects.get(pk=plugin_id).get_bound_plugin()
 
     def test_add_edit_plugin(self):
         """
@@ -165,10 +165,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.drafts().first()
-        created_plugin_id = self._create_text_plugin_on_page(page)
+        created_plugin_id = self._create_link_plugin_on_page(page)
         # now edit the plugin
-        txt = self._edit_text_plugin(created_plugin_id, "Hello World")
-        self.assertEqual("Hello World", txt.body)
+        plugin = self.__edit_link_plugin(created_plugin_id, "Hello World")
+        self.assertEqual("Hello World", plugin.name)
 
     def test_plugin_add_form_integrity(self):
         admin.autodiscover()
@@ -267,14 +267,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = Page.objects.drafts().first()
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
-        created_plugin_id = self._create_text_plugin_on_page(page)
+        created_plugin_id = self._create_link_plugin_on_page(page)
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), False)
-        self._edit_text_plugin(created_plugin_id, "Hello World")
+        self.__edit_link_plugin(created_plugin_id, "Hello World")
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
 
@@ -910,8 +910,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
-        plugin_id = self._create_text_plugin_on_page(page, slot='body')
-        plugin = self._edit_text_plugin(plugin_id, "fnord")
+        plugin_id = self._create_link_plugin_on_page(page, slot='body')
+        plugin = self.__edit_link_plugin(plugin_id, "fnord")
 
         actual_last_modification_time = CMSSitemap().lastmod(title)
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)

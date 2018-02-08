@@ -4,7 +4,7 @@ import copy
 from django.contrib.sites.models import Site
 
 from cms.api import create_page
-from cms.models import Page, Placeholder
+from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -110,10 +110,3 @@ class SiteTestCase(CMSTestCase):
                         page_url = page.get_absolute_url(language='de')
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
-
-    def test_site_delete(self):
-        with self.settings(SITE_ID=self.site2.pk):
-            create_page("page_2a", "nav_playground.html", "de", site=self.site2)
-            self.assertEqual(Placeholder.objects.count(), 2)
-            self.site2.delete()
-            self.assertEqual(Placeholder.objects.count(), 0)
