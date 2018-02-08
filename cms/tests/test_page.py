@@ -632,11 +632,22 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(Text.objects.count(), 1)
         self.assertTrue(Placeholder.objects.count() > 2)
-        page.delete()
-        home.delete()
+
+        superuser = self.get_superuser()
+        home_pl_count = home.get_placeholders().count()
+        page_pl_count = page.get_placeholders().count()
+        expected_pl_count = Placeholder.objects.count() - (home_pl_count + page_pl_count)
+
+        with self.login_user_context(superuser):
+            # Delete page
+            self.client.post(self.get_admin_url(Page, 'delete', page.pk), {'post': 'yes'})
+
+        with self.login_user_context(superuser):
+            # Delete home page
+            self.client.post(self.get_admin_url(Page, 'delete', home.pk), {'post': 'yes'})
         self.assertEqual(CMSPlugin.objects.count(), 0)
         self.assertEqual(Text.objects.count(), 0)
-        self.assertEqual(Placeholder.objects.count(), 0)
+        self.assertEqual(Placeholder.objects.exclude(slot='clipboard').count(), expected_pl_count)
         self.assertEqual(Page.objects.count(), 0)
 
     def test_get_page_from_request_nopage(self):

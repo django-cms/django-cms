@@ -29,6 +29,7 @@ class FixtureTestCase(NavextendersFixture, CMSTestCase):
         original_pages = Page.objects.count()
         original_plugins = CMSPlugin.objects.count()
         Page.objects.all().delete()
+        Placeholder.objects.all().delete()
         output.seek(0)
         with codecs.open(dump[1], 'w', 'utf-8') as dumpfile:
             dumpfile.write(output.read())

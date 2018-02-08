@@ -43,10 +43,10 @@ class SignalTests(CMSTestCase):
                     self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_delete(self):
+        superuser = self.get_superuser()
+
         with apphooks(SampleApp):
-            with signal_tester(urls_need_reloading) as env:
-                self.client.get('/')
-                self.assertEqual(env.call_count, 0)
+            with self.login_user_context(superuser):
                 page = create_page(
                     "apphooked-page",
                     "nav_playground.html",
@@ -55,9 +55,12 @@ class SignalTests(CMSTestCase):
                     apphook="SampleApp",
                     apphook_namespace="test"
                 )
-                page.delete()
-                self.client.get('/')
-                self.assertEqual(env.call_count, 1)
+
+                with signal_tester(urls_need_reloading) as env:
+                    endpoint = self.get_admin_url(Page, 'delete', page.pk)
+                    self.assertEqual(env.call_count, 0)
+                    self.client.post(endpoint, {'post': 'yes'})
+                    self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_change_slug(self):
         superuser = self.get_superuser()
@@ -90,7 +93,7 @@ class SignalTests(CMSTestCase):
 
 
 overrides = {
-    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + getattr(settings, 'MIDDLEWARE')
+    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE
 }
 @override_settings(**overrides)
 class ApphooksReloadTests(CMSTestCase):

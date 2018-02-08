@@ -53,6 +53,7 @@ from cms.admin.forms import (
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
     EmptyTitle, Page, PageType,
@@ -486,6 +487,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             obj=obj,
         )
 
+        cms_pages = [obj]
+
+        if obj.publisher_public:
+            cms_pages.append(obj.publisher_public)
+
+        if obj.node.is_branch:
+            nodes = obj.node.get_descendants()
+            cms_pages.extend(self.model.objects.filter(node__in=nodes))
+
+        for page in cms_pages:
+            page._clear_placeholders()
+            page.get_placeholders().delete()
+
         super(BasePageAdmin, self).delete_model(request, obj)
 
         self._send_post_page_operation(
@@ -494,6 +508,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             token=operation_token,
             obj=obj,
         )
+
+        clear_permission_cache()
+
+        if obj.application_urls:
+            set_restart_trigger()
 
     def get_copy_dialog(self, request, page_id):
         if not get_cms_setting('PERMISSION'):

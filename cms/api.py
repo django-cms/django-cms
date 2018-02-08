@@ -250,6 +250,11 @@ def create_title(language, title, page, menu_title=None, slug=None,
         page=page,
         has_url_overwrite=bool(overwrite_url),
     )
+
+    page_languages = page.get_languages()
+
+    if language not in page_languages:
+        page.update_languages(page_languages + [language])
     return title
 
 

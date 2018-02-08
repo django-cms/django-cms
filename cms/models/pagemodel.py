@@ -489,19 +489,16 @@ class Page(models.Model):
         source_title.save()
         return source_title
 
-    def _clear_placeholders(self, language):
+    def _clear_placeholders(self, language=None):
         from cms.models import CMSPlugin
-        from cms.signals.utils import disable_cms_plugin_signals
 
         placeholders = list(self.get_placeholders())
         placeholder_ids = (placeholder.pk for placeholder in placeholders)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
 
-        with disable_cms_plugin_signals():
-            plugins = CMSPlugin.objects.filter(
-                language=language,
-                placeholder__in=placeholder_ids,
-            )
-            models.query.QuerySet.delete(plugins)
+        if language:
+            plugins = plugins.filter(language=language)
+        models.query.QuerySet.delete(plugins)
         return placeholders
 
     def _copy_contents(self, target, language):
@@ -600,6 +597,7 @@ class Page(models.Model):
             title.save()
 
             new_page.title_cache[title.language] = title
+        new_page.update_languages([trans.language for trans in translations])
 
         # copy the placeholders (and plugins on those placeholders!)
         for placeholder in self.placeholders.iterator():

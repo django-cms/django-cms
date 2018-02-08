@@ -20,6 +20,7 @@ from cms import constants
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
 from cms.appresolver import clear_app_resolvers
+from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models.pagemodel import Page, PageType
@@ -2924,6 +2925,21 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
+
+    def test_permissions_cache_invalidation(self):
+        """
+        Test permission cache clearing on page save
+        """
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_std_permissions()
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        set_permission_cache(staff_user, "change_page", [page.pk])
+
+        with self.login_user_context(self.get_superuser()):
+            data = self._get_page_permissions_data(page=page.pk, user=staff_user.pk)
+            data['_continue'] = '1'
+            self.client.post(endpoint, data)
+        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
 
     def test_user_can_edit_title_fields(self):
         """

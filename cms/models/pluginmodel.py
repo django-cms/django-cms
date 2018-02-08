@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import signals, Model, ManyToManyField
+from django.db.models import Model, ManyToManyField
 from django.db.models.base import ModelBase
 from django.utils import six, timezone
 from django.utils.six import text_type
@@ -331,10 +331,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
         if no_signals:
-            from cms.signals import pre_save_plugins
-
-            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
-            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
             new_plugin._no_reorder = True
         new_plugin.save()
         if plugin_instance:
@@ -353,10 +349,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
-        if no_signals:
-
-            signals.pre_save.connect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
-
         return new_plugin
 
     @classmethod
