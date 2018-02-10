@@ -4,7 +4,10 @@ import json
 import sys
 
 from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
+try:
+    from django.urls import clear_url_caches
+except ImportError:
+    from django.core.urlresolvers import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.forms.models import model_to_dict

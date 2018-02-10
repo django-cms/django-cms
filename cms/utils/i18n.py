@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
+try:
+    from django.urls import get_resolver, LocaleRegexURLResolver
+except ImportError:
+    from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _

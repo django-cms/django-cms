@@ -3,7 +3,10 @@
 from django.conf import settings
 from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.cache import patch_cache_control
 from django.utils.http import is_safe_url, urlquote

@@ -5,7 +5,10 @@ Edit Toolbar middleware
 from django import forms
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import resolve
+try:
+    from django.urls import resolve
+except ImportError:
+    from django.core.urlresolvers import resolve
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request

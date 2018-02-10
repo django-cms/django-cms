@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import override as force_language

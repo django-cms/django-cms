@@ -6,7 +6,11 @@ import os
 import warnings
 
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
+try:
+    from django.urls import NoReverseMatch
+except ImportError:
+    from django.core.urlresolvers import NoReverseMatch
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import signals, Model, ManyToManyField

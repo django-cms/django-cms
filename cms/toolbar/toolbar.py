@@ -21,7 +21,10 @@ from cms.utils.i18n import get_site_language_from_request
 from classytags.utils import flatten_context
 
 from django.conf import settings
-from django.core.urlresolvers import resolve, Resolver404
+try:
+    from django.urls import resolve, Resolver404
+except ImportError:
+    from django.core.urlresolvers import resolve, Resolver404
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from django import template
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse, NoReverseMatch
+try:
+    from django.urls import reverse, NoReverseMatch
+except ImportError:
+    from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import get_language, ugettext

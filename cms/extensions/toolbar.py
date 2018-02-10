@@ -5,7 +5,10 @@ from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
 from cms.utils.page_permissions import user_can_change_page
 
-from django.core.urlresolvers import NoReverseMatch
+try:
+    from django.urls import NoReverseMatch
+except ImportError:
+    from django.core.urlresolvers import NoReverseMatch
 
 
 class ExtensionToolbar(CMSToolbar):
