@@ -5,11 +5,10 @@ from importlib import import_module
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 try:
-    from django.urls import (RegexURLResolver, Resolver404, reverse,
-                                      RegexURLPattern)
+    from django.urls import (URLResolver, Resolver404, reverse, URLPattern)
 except ImportError:
-    from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
-                                      RegexURLPattern)
+    from django.core.urlresolvers import (RegexURLResolver as URLResolver,
+        Resolver404, reverse, RegexURLPattern as URLPattern)
 
 from django.db import OperationalError, ProgrammingError
 from django.utils import six
@@ -60,7 +59,7 @@ def applications_page_check(request, current_page=None, path=None):
     return None
 
 
-class AppRegexURLResolver(RegexURLResolver):
+class AppRegexURLResolver(URLResolver):
     def __init__(self, *args, **kwargs):
         self.page_id = None
         self.url_patterns_dict = {}
@@ -117,14 +116,14 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
         app_pat = app_pat.lstrip('^')
         path = path.lstrip('^')
         regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
-        if isinstance(pattern, RegexURLResolver):
+        if isinstance(pattern, URLResolver):
             # include default_args
             args = pattern.default_kwargs
             if default_args:
                 args.update(default_args)
             if DJANGO_1_8:
                 # this is an 'include', recurse!
-                resolver = RegexURLResolver(regex, 'cms_appresolver',
+                resolver = URLResolver(regex, 'cms_appresolver',
                                             pattern.default_kwargs, pattern.app_name, pattern.namespace)
                 # see lines 243 and 236 of urlresolvers.py to understand the next line
                 resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
@@ -132,14 +131,14 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
                 # see lines 243 and 236 of urlresolvers.py to understand the next line
                 urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
                 # this is an 'include', recurse!
-                resolver = RegexURLResolver(regex, urlconf_module,
+                resolver = URLResolver(regex, urlconf_module,
                                             pattern.default_kwargs, pattern.app_name, pattern.namespace)
         else:
-            # Re-do the RegexURLPattern with the new regular expression
+            # Re-do the URLPattern with the new regular expression
             args = pattern.default_args
             if default_args:
                 args.update(default_args)
-            resolver = RegexURLPattern(regex, pattern.callback,
+            resolver = URLPattern(regex, pattern.callback,
                                        args, pattern.name)
         resolver.page_id = page_id
         newpatterns.append(resolver)
@@ -148,7 +147,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
 
 def _set_permissions(patterns, exclude_permissions):
     for pattern in patterns:
-        if isinstance(pattern, RegexURLResolver):
+        if isinstance(pattern, URLResolver):
             if pattern.namespace in exclude_permissions:
                 continue
             _set_permissions(pattern.url_patterns, exclude_permissions)
