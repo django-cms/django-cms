@@ -1,33 +1,24 @@
 # -*- coding: utf-8 -*-
-from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
-from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
-from django.core.management import call_command
-from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils.translation import override as force_language
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
 from cms.admin.forms import save_permissions
 from cms.cms_menus import get_visible_nodes
-from cms.management.commands.subcommands.moderator import log
 from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          ACCESS_PAGE_AND_DESCENDANTS,
                                          PagePermission,
                                          GlobalPagePermission)
-from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, CMSTestCase)
-from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
-from cms.utils.page import get_page_from_path
 from cms.utils.page_permissions import user_can_publish_page, user_can_view_page
 
 
@@ -662,57 +653,6 @@ class PatricksMoveTest(CMSTestCase):
             self.ph.publisher_public.get_absolute_url(),
             u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
         )
-
-
-class ModeratorSwitchCommandTest(CMSTestCase):
-    def test_switch_moderator_on(self):
-        site = get_current_site()
-        with force_language("en"):
-            pages_root = unquote(reverse("pages-root"))
-        page1 = create_page('page', 'nav_playground.html', 'en', published=True)
-        with disable_logger(log):
-            call_command('cms', 'moderator', 'on')
-        with force_language("en"):
-            path = page1.get_absolute_url()[len(pages_root):].strip('/')
-            page2 = get_page_from_path(site, path)
-        self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
-
-    def test_table_name_patching(self):
-        """
-        This tests the plugin models patching when publishing from the command line
-        """
-        self.get_superuser()
-        create_page("The page!", "nav_playground.html", "en", published=True)
-        draft = Page.objects.drafts()[0]
-        draft.reverse_id = 'a_test'  # we have to change *something*
-        draft.save()
-        add_plugin(draft.placeholders.get(slot=u"body"),
-                   u"TextPlugin", u"en", body="Test content")
-        draft.publish('en')
-        add_plugin(draft.placeholders.get(slot=u"body"),
-                   u"TextPlugin", u"en", body="Test content")
-
-        # Manually undoing table name patching
-        Text._meta.db_table = 'djangocms_text_ckeditor_text'
-        plugin_pool.patched = False
-
-        with disable_logger(log):
-            call_command('cms', 'moderator', 'on')
-        # Sanity check the database (we should have one draft and one public)
-        not_drafts = len(Page.objects.filter(publisher_is_draft=False))
-        drafts = len(Page.objects.filter(publisher_is_draft=True))
-        self.assertEqual(not_drafts, 1)
-        self.assertEqual(drafts, 1)
-
-    def test_switch_moderator_off(self):
-        site = get_current_site()
-        with force_language("en"):
-            pages_root = unquote(reverse("pages-root"))
-            page1 = create_page('page', 'nav_playground.html', 'en', published=True)
-            path = page1.get_absolute_url()[len(pages_root):].strip('/')
-            page2 = get_page_from_path(site, path)
-            self.assertIsNotNone(page2)
-            self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
 
 
 class ViewPermissionBaseTests(CMSTestCase):

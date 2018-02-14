@@ -5,7 +5,6 @@ from django.test.utils import override_settings
 
 from cms.models.permissionmodels import PageUserGroup
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat import DJANGO_1_10
 from cms.utils.urlutils import admin_reverse
 
 
@@ -339,14 +338,10 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
-            # Since Django 1.11 404 results in redirect to the admin home
-            if DJANGO_1_10:
-                self.assertEqual(response.status_code, 404)
-            else:
-                self.assertRedirects(response, redirect_to)
-                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
-                self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
-                self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
+            self.assertRedirects(response, redirect_to)
+            msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+            self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
+            self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
             self.assertFalse(self._group_exists('New test group'))
 
     def test_user_cant_change_others_group(self):
@@ -373,14 +368,10 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
-            # Since Django 1.11 404 results in redirect to the admin home
-            if DJANGO_1_10:
-                self.assertEqual(response.status_code, 404)
-            else:
-                self.assertRedirects(response, redirect_to)
-                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
-                self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
-                self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
+            self.assertRedirects(response, redirect_to)
+            msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+            self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
+            self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
             self.assertFalse(self._group_exists('New test group'))
 
     def test_user_can_delete_subordinate_group(self):
@@ -452,19 +443,10 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
-            # The response is a 404 instead of a 403
-            # because the queryset is limited to objects
-            # that the user has permissions for.
-            # This queryset is used to fetch the object
-            # from the request, resulting in a 404.
-            # Since Django 1.11 404 results in redirect to the admin home
-            if DJANGO_1_10:
-                self.assertEqual(response.status_code, 404)
-            else:
-                self.assertRedirects(response, redirect_to)
-                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
-                self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
-                self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
+            self.assertRedirects(response, redirect_to)
+            msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+            self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
+            self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
             self.assertTrue(self._group_exists())
 
     def test_user_cant_delete_others_group(self):
@@ -489,17 +471,8 @@ class PermissionsOnPageTest(PermissionsOnTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
-            # The response is a 404 instead of a 403
-            # because the queryset is limited to objects
-            # that the user has permissions for.
-            # This queryset is used to fetch the object
-            # from the request, resulting in a 404.
-            # Since Django 1.11 404 results in redirect to the admin home
-            if DJANGO_1_10:
-                self.assertEqual(response.status_code, 404)
-            else:
-                self.assertRedirects(response, redirect_to)
-                msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
-                self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
-                self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
+            self.assertRedirects(response, redirect_to)
+            msgs = CookieStorage(response)._decode(response.cookies['messages'].value)
+            self.assertTrue(msgs[0], PageUserGroup._meta.verbose_name)
+            self.assertTrue(msgs[0], 'ID "%s"' % group.pk)
             self.assertTrue(self._group_exists())

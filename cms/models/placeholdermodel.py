@@ -14,7 +14,6 @@ from django.utils.translation import ugettext_lazy as _, force_text
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
-from cms.utils.compat import DJANGO_1_8
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
 from cms.constants import (
@@ -335,12 +334,8 @@ class Placeholder(models.Model):
         """
         Returns a list of objects attached to this placeholder.
         """
-        if DJANGO_1_8:
-            return [obj for field in self._get_attached_fields()
-                    for obj in getattr(self, field.related.get_accessor_name()).all()]
-        else:
-            return [obj for field in self._get_attached_fields()
-                    for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
+        return [obj for field in self._get_attached_fields()
+                for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
 
     def page_getter(self):
         if not hasattr(self, '_page'):

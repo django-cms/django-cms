@@ -14,6 +14,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms import api
 from cms.apphook_pool import apphook_pool
+from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
@@ -465,6 +466,7 @@ class ChangePageForm(BasePageForm):
             api.create_title(language=self._language, page=cms_page, **translation_data)
         else:
             cms_page._update_title_path_recursive(self._language)
+        cms_page.clear_cache(menu=True)
         return cms_page
 
 
@@ -473,6 +475,11 @@ class PublicationDatesForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ['publication_date', 'publication_end_date']
+
+    def save(self, *args, **kwargs):
+        page = super(PublicationDatesForm, self).save(*args, **kwargs)
+        page.clear_cache(menu=True)
+        return page
 
 
 class AdvancedSettingsForm(forms.ModelForm):
@@ -758,6 +765,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if is_draft_and_has_public and self.has_changed_apphooks():
             self.update_apphooks()
+        page.clear_cache(menu=True)
         return page
 
 
@@ -766,6 +774,12 @@ class PagePermissionForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ['login_required', 'limit_visibility_in_menu']
+
+    def save(self, *args, **kwargs):
+        page = super(PagePermissionForm, self).save(*args, **kwargs)
+        page.clear_cache(menu=True)
+        clear_permission_cache()
+        return page
 
 
 class PageTreeForm(forms.Form):
