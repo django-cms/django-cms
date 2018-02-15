@@ -7,9 +7,12 @@ from django.forms.models import ModelForm
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.translation import force_text
 from django.utils.translation import (
     override as force_language,
-    force_text,
     ugettext as _
 )
 

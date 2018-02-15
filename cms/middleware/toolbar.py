@@ -73,7 +73,11 @@ class ToolbarMiddleware(MiddlewareMixin):
             request.session['cms_toolbar_disabled'] = False
 
         toolbar_enabled = not request.session.get('cms_toolbar_disabled', False)
-        can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous())
+        try:
+            is_anonymous = request.user.is_anonymous() # Django<1.10
+        except TypeError:
+            is_anonymous = request.user.is_anonymous # Django 1.10 - 2.x
+        can_see_toolbar = request.user.is_staff or (anonymous_on and is_anonymous)
         show_toolbar = (toolbar_enabled and can_see_toolbar)
 
         if edit_enabled and show_toolbar and not request.session.get('cms_edit'):

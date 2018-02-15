@@ -78,7 +78,7 @@ def auth_permission_required(action):
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
         def wrapper(user, *args, **kwargs):
-            if not user.is_authenticated():
+            if not user.is_authenticated:
                 return False
 
             permissions = _django_permissions_by_action[action]
@@ -292,7 +292,7 @@ def user_can_view_page(user, page, site=None):
         # Page has no restrictions and project is configured
         # to allow everyone to see unrestricted pages.
         return True
-    elif not user.is_authenticated():
+    elif not user.is_authenticated:
         # Page has restrictions or project is configured
         # to require staff user status to see pages.
         return False
@@ -357,7 +357,7 @@ def user_can_view_all_pages(user, site):
         can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
         return can_see_unrestricted
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.has_perm(PAGE_VIEW_CODENAME):

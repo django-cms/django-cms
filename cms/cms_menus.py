@@ -38,7 +38,11 @@ def get_visible_nodes(request, pages, site):
     public_for = get_cms_setting('PUBLIC_FOR')
     can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
 
-    if not user.is_authenticated() and not can_see_unrestricted:
+    try:
+        is_authenticated = user.is_authenticated() # Django<1.10
+    except TypeError:
+        is_authenticated = user.is_authenticated # Django 1.10 - 2.x
+    if not is_authenticated and not can_see_unrestricted:
         # User is not authenticated and can't see unrestricted pages,
         # no need to check for page restrictions because if there's some,
         # user is anon and if there is not any, user can't see unrestricted.

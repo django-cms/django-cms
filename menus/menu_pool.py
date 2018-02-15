@@ -115,7 +115,11 @@ class MenuRenderer(object):
 
         key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, self.site.pk)
 
-        if self.request.user.is_authenticated():
+        try:
+            is_authenticated = self.request.user.is_authenticated() # Django<1.10
+        except TypeError:
+            is_authenticated = self.request.user.is_authenticated # Django 1.10 - 2.x
+        if is_authenticated:
             key += '_%s_user' % self.request.user.pk
 
         if self.draft_mode_active:

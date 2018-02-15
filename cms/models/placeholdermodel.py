@@ -9,8 +9,11 @@ from django.db import models
 from django.template.defaultfilters import title
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _, force_text
-
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.translation import force_text
+from django.utils.translation import ugettext_lazy as _
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id

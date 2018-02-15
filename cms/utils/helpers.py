@@ -2,7 +2,10 @@
 import re
 
 from django.utils.timezone import get_current_timezone_name
-from django.utils.translation import force_text
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.translation import force_text
 
 
 def find_placeholder_relation(obj):

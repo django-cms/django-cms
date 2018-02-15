@@ -148,6 +148,7 @@ class PluginModelBase(ModelBase):
                     related_name='%(app_label)s_%(class)s',
                     auto_created=True,
                     parent_link=True,
+                    on_delete=models.CASCADE,
                 )
 
         # create a new class (using the super-metaclass)
