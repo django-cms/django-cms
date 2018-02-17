@@ -2076,6 +2076,12 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
         var mr = parseInt(el.css('margin-right'), 10);
         var mt = parseInt(el.css('margin-top'), 10);
         var mb = parseInt(el.css('margin-bottom'), 10);
+        var width = el.outerWidth();
+        var height = el.outerHeight();
+
+        if (width === 0 && height === 0) {
+            return;
+        }
 
         if (isNaN(ml)) {
             ml = 0;
@@ -2092,11 +2098,15 @@ Plugin._highlightPluginContent = function _highlightPluginContent(
 
         positions.push({
             x1: offset.left - ml,
-            x2: offset.left + el.outerWidth() + mr,
+            x2: offset.left + width + mr,
             y1: offset.top - mt,
-            y2: offset.top + el.outerHeight() + mb
+            y2: offset.top + height + mb
         });
     });
+
+    if (positions.length === 0) {
+        return;
+    }
 
     // turns out that offset calculation will be off by toolbar height if
     // position is set to "relative" on html element.
