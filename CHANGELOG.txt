@@ -4,6 +4,8 @@
   with multiple page types per site.
 * Fixed a bug which prevented toolbar js from working correctly when rendered
   before toolbar.
+* Fixed a bug where CMS would incorrectly highlight plugin content when plugin
+  contains invisible elements
 
 
 === 3.5.0 (2018-01-31) ===
