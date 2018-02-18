@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import NoReverseMatch
 from django.template.response import SimpleTemplateResponse
-from django.utils.translation import get_language_from_request
+from cms.utils import get_language_from_request
 
 from formtools.wizard.views import SessionWizardView
 
@@ -89,7 +89,7 @@ class WizardCreateView(SessionWizardView):
         kwargs['wizard_user'] = self.request.user
         if self.is_second_step(step):
             kwargs['wizard_page'] = self.get_origin_page()
-            kwargs['wizard_language'] = self.get_origin_language()
+            kwargs['wizard_language'] = get_language_from_request(self.request)
         else:
             page_pk = self.page_pk or self.request.GET.get('page', None)
             if page_pk and page_pk != 'None':
@@ -105,7 +105,7 @@ class WizardCreateView(SessionWizardView):
         initial = super(WizardCreateView, self).get_form_initial(step)
         if self.is_first_step(step):
             initial['page'] = self.request.GET.get('page')
-            initial['language'] = self.request.GET.get('language')
+            initial['language'] = get_language_from_request(self.request)
         return initial
 
     def get_step_2_form(self, step=None, data=None, files=None):
