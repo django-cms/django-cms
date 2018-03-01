@@ -12,7 +12,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
 
-from sekizai.helpers import get_varname, is_variable_extend_node
+from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils.conf import get_cms_setting
@@ -279,10 +279,6 @@ def get_static_placeholders(template, context):
 
 
 def _get_block_nodes(extend_node):
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return []
-
     parent = extend_node.get_parent(get_context())
     parent_nodelist = _get_nodelist(parent)
     parent_nodes = parent_nodelist.get_nodes_by_type(BlockNode)
@@ -315,10 +311,6 @@ def _get_placeholder_nodes_from_extend(extend_node, node_class):
     Returns a list of placeholders found in the parent template(s) of this
     ExtendsNode
     """
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return []
-
     # This is a dictionary mapping all BlockNode instances found
     # in the template that contains the {% extends %} tag
     block_nodes = _get_block_nodes(extend_node)

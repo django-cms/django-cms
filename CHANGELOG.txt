@@ -6,6 +6,8 @@
   before toolbar.
 * Fixed a bug where CMS would incorrectly highlight plugin content when plugin
   contains invisible elements
+* Fixed a regression where templates which inherit from a template using an ``{% extends %}``
+  tag with a default would raise an exception.
 
 
 === 3.5.0 (2018-01-31) ===

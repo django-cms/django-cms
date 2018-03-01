@@ -65,6 +65,14 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         placeholders = _get_placeholder_slots('placeholder_tests/test_one.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
 
+    def test_placeholder_scanning_variable_extend(self):
+        placeholders = _get_placeholder_slots('placeholder_tests/test_variable_extends.html')
+        self.assertEqual(placeholders, [u'one', u'two', u'three', u'four'])
+
+    def test_placeholder_scanning_inherit_from_variable_extend(self):
+        placeholders = _get_placeholder_slots('placeholder_tests/test_inherit_from_variable_extends.html')
+        self.assertEqual(placeholders, [u'one', u'two', u'three', u'four'])
+
     def test_placeholder_scanning_sekizai_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_one_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
