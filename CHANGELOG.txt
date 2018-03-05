@@ -1,6 +1,6 @@
-=== 3.5.1 (unreleased) ===
+=== 3.5.1 (2018-03-05) ===
 
-* Fixed a bug where editing pages with primary keys greater than 9999 would throw an
+* Fixed a bug where editing pages with primary keys greater than 999 would throw an
   exception.
 * Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration
   with multiple page types per site.
