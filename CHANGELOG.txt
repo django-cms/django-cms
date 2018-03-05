@@ -1,5 +1,7 @@
 === 3.5.1 (unreleased) ===
 
+* Fixed a bug where editing pages with primary keys greater than 9999 would throw an
+  exception.
 * Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration
   with multiple page types per site.
 * Fixed a bug which prevented toolbar js from working correctly when rendered
