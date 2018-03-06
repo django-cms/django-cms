@@ -1,3 +1,8 @@
+=== 3.5.2 (unreleased) ===
+
+* Fixed a bug where shortcuts menu entry would stop working after toolbar reload
+
+
 === 3.5.1 (2018-03-05) ===
 
 * Fixed a bug where editing pages with primary keys greater than 999 would throw an

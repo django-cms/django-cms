@@ -3,9 +3,11 @@
 // #############################################################################
 // Create the first page
 
+var casperjs = require('casper');
 var helpers = require('djangocms-casper-helpers');
 var globals = helpers.settings;
-var cms = helpers();
+var cms = helpers(casperjs);
+var xPath = casperjs.selectXPath;
 var resizeButton;
 
 casper.test.setUp(function(done) {
@@ -213,6 +215,47 @@ casper.test.begin('Manipulate Modal', function(test) {
             test.assert(height !== standardModal - resizeUp, 'Modal reached min size');
             test.assert(height === 400, 'Modal reached 400px');
         })
+        .run(function() {
+            test.done();
+        });
+});
+
+casper.test.begin('Shortcuts modal', function(test) {
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Home' }))
+        .thenOpen(globals.editUrl)
+        .waitForSelector('.cms-toolbar-expanded')
+        .then(function() {
+            // click on "Example.com" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(1) > a');
+        })
+        // opening "Clipboard" menu item
+        .wait(10, function() {
+            this.click(xPath('//a[.//span[text()[contains(.,"Shortcuts")]]]'));
+        })
+        .waitUntilVisible('.cms-modal-open')
+        .then(function() {
+            test.assertSelectorHasText('.cms-modal-title-prefix', 'Shortcuts', 'Shortcuts window was opened');
+        })
+        .then(function() {
+            this.click('.cms-modal-close');
+        })
+        .waitWhileVisible('.cms-modal-open')
+        .then(cms.switchTo('structure'))
+        .then(function() {
+            // click on "Example.com" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(1) > a');
+        })
+        // opening "Clipboard" menu item
+        .wait(10, function() {
+            this.click(xPath('//a[.//span[text()[contains(.,"Shortcuts")]]]'));
+        })
+        .waitUntilVisible('.cms-modal-open')
+        .then(function() {
+            test.assertSelectorHasText('.cms-modal-title-prefix', 'Shortcuts', 'Shortcuts window was opened');
+        })
+        .then(cms.removePage())
         .run(function() {
             test.done();
         });
