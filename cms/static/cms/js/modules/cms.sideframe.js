@@ -263,7 +263,10 @@ var Sideframe = new Class({
             try {
                 const currentUrl = iframe[0].contentWindow.location.href;
 
-                if (currentUrl !== iframeUrl) {
+                // extra case with about:blank is needed to get rid of a race
+                // condition when another page is opened while sideframe url
+                // is still loading and browser last reported url was about:blank
+                if (currentUrl !== iframeUrl && currentUrl !== 'about:blank') {
                     // save url in settings
                     window.CMS.settings.sideframe.url = currentUrl;
                     window.CMS.settings = Helpers.setSettings(window.CMS.settings);

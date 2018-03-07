@@ -1,6 +1,8 @@
 === 3.5.2 (unreleased) ===
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
+* Fixed a race condition in frontend code that could lead to sideframe being
+  opened with blank page
 
 
 === 3.5.1 (2018-03-05) ===
