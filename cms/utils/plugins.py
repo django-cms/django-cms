@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from collections import defaultdict
-from itertools import groupby, starmap
-from operator import attrgetter, itemgetter
+from collections import defaultdict, deque, OrderedDict
+from itertools import starmap
+from operator import itemgetter
 
 from django.utils.encoding import force_text
 from django.utils.lru_cache import lru_cache
@@ -12,7 +12,6 @@ from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
-from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_placeholder_conf
 
@@ -45,24 +44,33 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         return
     placeholders = tuple(placeholders)
     lang = lang or get_language_from_request(request)
-    qs = get_cmsplugin_queryset(request)
-    qs = qs.filter(placeholder__in=placeholders, language=lang)
-    plugins = list(qs.order_by('placeholder', 'path'))
-    # Create default plugins if enabled
+    plugins = list(
+        CMSPlugin
+        .objects
+        .filter(placeholder__in=placeholders, language=lang)
+    )
     if not plugins:
+        # Create default plugins if enabled
         plugins = create_default_plugins(request, placeholders, template, lang)
     plugins = downcast_plugins(plugins, placeholders, request=request)
+
     # split the plugins up by placeholder
-    # Plugins should still be sorted by placeholder
-    plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
-    all_plugins_groups = plugin_groups.copy()
-    for group in plugin_groups:
-        plugin_groups[group] = build_plugin_tree(plugin_groups[group])
+    plugins_by_placeholder = defaultdict(list)
+
+    for plugin in plugins:
+        plugins_by_placeholder[plugin.placeholder_id].append(plugin)
+
     for placeholder in placeholders:
+        all_plugins = plugins_by_placeholder[placeholder.pk]
+
+        if all_plugins:
+            layered_plugins = get_plugins_as_layered_tree(all_plugins)
+        else:
+            layered_plugins = []
         # This is all the plugins.
-        setattr(placeholder, '_all_plugins_cache', all_plugins_groups.get(placeholder.pk, []))
-        # This one is only the root plugins.
-        setattr(placeholder, '_plugins_cache', plugin_groups.get(placeholder.pk, []))
+        setattr(placeholder, '_all_plugins_cache', all_plugins)
+        # This is only the root plugins.
+        setattr(placeholder, '_plugins_cache', layered_plugins)
 
 
 def create_default_plugins(request, placeholders, template, lang):
@@ -106,26 +114,23 @@ def create_default_plugins(request, placeholders, template, lang):
     return sum(starmap(_create_default_plugins, mutable_confs), [])
 
 
-def build_plugin_tree(plugins):
+def get_plugins_as_layered_tree(plugins):
     """
-    Accepts an iterable of plugins and assigns tuples, sorted by position, of
-    children plugins to their respective parents.
-    Returns a sorted list of root plugins.
+    Given an iterable of plugins ordered by position,
+    returns a deque of root plugins with their respective
+    children set in the child_plugin_instances attribute.
     """
-    tree = defaultdict(list)
-    # Backwards compatibility in case a generator was passed
-    plugins = list(plugins)
-    root_depth = min(plugin.depth for plugin in plugins)
-    root_plugins = (plugin for plugin in plugins if plugin.depth == root_depth)
+    delayed = defaultdict(deque)
+    root_plugins = deque()
 
-    for plugin in plugins:
+    for plugin in reversed(plugins):
+        plugin.child_plugin_instances = delayed[plugin.pk]
+
         if plugin.parent_id:
-            tree[plugin.parent_id].append(plugin)
-
-    for plugin in plugins:
-        children = sorted(tree[plugin.pk], key=attrgetter('position'))
-        plugin.child_plugin_instances = children
-    return sorted(root_plugins, key=attrgetter('position'))
+            delayed[plugin.parent_id].appendleft(plugin)
+        else:
+            root_plugins.appendleft(plugin)
+    return root_plugins
 
 
 def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
@@ -163,9 +168,18 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     return (child_classes, parent_classes)
 
 
-def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin=None):
+def copy_plugins_to_placeholder(plugins, placeholder, language=None,
+                                root_plugin=None, start_positions=None):
     plugin_pairs = []
-    plugins_by_id = {}
+    plugins_by_id = OrderedDict()
+    # Keeps track of the next available position per language.
+    positions_by_language = {}
+
+    if start_positions:
+        positions_by_language.update(start_positions)
+
+    if root_plugin:
+        language = root_plugin.language
 
     for source_plugin in get_bound_plugins(plugins):
         parent = plugins_by_id.get(source_plugin.parent_id, root_plugin)
@@ -178,33 +192,51 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             new_plugin.language = language or new_plugin.language
             new_plugin.placeholder = placeholder
             new_plugin.parent = parent
-            new_plugin.numchild = 0
         else:
             new_plugin = plugin_model(
                 language=(language or source_plugin.language),
                 parent=parent,
                 plugin_type=source_plugin.plugin_type,
                 placeholder=placeholder,
-                position=source_plugin.position,
             )
 
-        if parent:
-            new_plugin = parent.add_child(instance=new_plugin)
-        else:
-            new_plugin = CMSPlugin.add_root(instance=new_plugin)
+        try:
+            position = positions_by_language[new_plugin.language]
+        except KeyError:
+            offset = placeholder.get_last_plugin_position(language) or 0
+            # The position is relative to language.
+            position = placeholder.get_next_plugin_position(
+                language=new_plugin.language,
+                parent=new_plugin.parent,
+                insert_order='last',
+            )
+            # Because it is the first time this language is processed,
+            # shift all plugins to the right of the next position.
+            placeholder._shift_plugin_positions(
+                language,
+                start=position,
+                offset=offset,
+            )
+
+        new_plugin.position = position
+        new_plugin.save()
+        positions_by_language[new_plugin.language] = position + 1
 
         if plugin_model != CMSPlugin:
             new_plugin.copy_relations(source_plugin)
             plugin_pairs.append((new_plugin, source_plugin))
-
         plugins_by_id[source_plugin.pk] = new_plugin
 
     # Backwards compatibility
     # This magic is needed for advanced plugins like Text Plugins that can have
     # nested plugins and need to update their content based on the new plugins.
+    # FIXME: The only reason this exists is djangocms-text-ckeditor
     for new_plugin, old_plugin in plugin_pairs:
         new_plugin.post_copy(old_plugin, plugin_pairs)
-    return [pair[0] for pair in plugin_pairs]
+
+    for language in positions_by_language:
+        placeholder._recalculate_plugin_positions(language)
+    return list(plugins_by_id.values())
 
 
 def get_bound_plugins(plugins):
@@ -279,35 +311,6 @@ def downcast_plugins(plugins,
 
         if valid_parent and plugin.pk in plugin_lookup:
             yield plugin_lookup[plugin.pk]
-
-
-def reorder_plugins(placeholder, parent_id, language, order=None):
-    """
-    Reorder the plugins according the order parameter
-
-    :param placeholder: placeholder instance which contains the given plugins
-    :param parent_id: parent of the given plugins
-    :param language: language
-    :param order: optional custom order (given as list of plugin primary keys)
-    """
-    plugins = CMSPlugin.objects.filter(
-        parent=parent_id,
-        placeholder=placeholder,
-        language=language,
-    ).order_by('position')
-
-    if order:
-        # Make sure we're dealing with a list
-        order = list(order)
-        plugins = plugins.filter(pk__in=order)
-
-        for plugin in plugins.iterator():
-            position = order.index(plugin.pk)
-            plugin.update(position=position)
-    else:
-        for position, plugin in enumerate(plugins.iterator()):
-            plugin.update(position=position)
-    return plugins
 
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):

@@ -4,10 +4,8 @@ import json
 import os
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
-from django.db.models import ManyToManyField, Model
+from django.db import connection, connections, models, router
 from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
 from django.utils import six, timezone
@@ -21,7 +19,18 @@ from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
-from treebeard.mp_tree import MP_Node
+
+def _get_descendants_cte():
+    sql = (
+        "WITH RECURSIVE descendants as ("
+            "SELECT {0}.id, {0}.position, {0}.parent_id  "
+                "FROM {0} WHERE {0}.parent_id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.position, {0}.parent_id "
+                "FROM descendants, {0} WHERE {0}.parent_id = descendants.id"
+        ")"
+    )
+    return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
 
 
 class BoundRenderMeta(object):
@@ -92,7 +101,7 @@ class PluginModelBase(ModelBase):
 
 
 @python_2_unicode_compatible
-class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
+class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -106,7 +115,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     '''
     placeholder = models.ForeignKey(Placeholder, on_delete=models.CASCADE, editable=False, null=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, editable=False)
-    position = models.PositiveSmallIntegerField(_("position"), default = 0, editable=False)
+    position = models.SmallIntegerField(_("position"), default=1, editable=False)
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
@@ -115,6 +124,11 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     class Meta:
         app_label = 'cms'
+        ordering = ('position',)
+        indexes = [
+            models.Index(fields=['placeholder', 'language', 'position']),
+        ]
+        unique_together = ('placeholder', 'language', 'position')
 
     class RenderMeta:
         index = 0
@@ -133,6 +147,21 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             location=hex(id(self)),
         )
         return display
+
+    @classmethod
+    def _get_database_connection(cls, action):
+        return {
+            'read': connections[router.db_for_read(cls)],
+            'write': connections[router.db_for_write(cls)]
+        }[action]
+
+    @classmethod
+    def get_database_vendor(cls, action):
+        return cls._get_database_connection(action).vendor
+
+    @classmethod
+    def _get_database_cursor(cls, action):
+        return cls._get_database_connection(action).cursor()
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -195,6 +224,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         plugin_name = self.get_plugin_name()
         data = {
             'type': 'plugin',
+            'position': self.position,
             'placeholder_id': text_type(self.placeholder_id),
             'plugin_name': force_text(plugin_name) or '',
             'plugin_type': self.plugin_type,
@@ -256,38 +286,33 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             return self.reload()
         return
 
-    def save(self, no_signals=False, *args, **kwargs):
-        if not self.depth:
-            if self.parent_id or self.parent:
-                self.parent.add_child(instance=self)
-            else:
-                if not self.position and not self.position == 0:
-                    self.position = CMSPlugin.objects.filter(parent__isnull=True,
-                                                             language=self.language,
-                                                             placeholder_id=self.placeholder_id).count()
-                self.add_root(instance=self)
-            return
-        super(CMSPlugin, self).save(*args, **kwargs)
-
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
 
-    def move(self, target, pos=None):
-        super(CMSPlugin, self).move(target, pos)
-        self = self.reload()
+    def _get_descendants_count(self):
+        cursor = CMSPlugin._get_database_cursor('write')
+        sql = _get_descendants_cte() + '\n'
+        sql += 'SELECT COUNT(*) FROM descendants;'
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk])
+        return cursor.fetchall()[0][0]
 
-        try:
-            new_pos = max(CMSPlugin.objects.filter(parent_id=self.parent_id,
-                                                   placeholder_id=self.placeholder_id,
-                                                   language=self.language).exclude(pk=self.pk).order_by('depth', 'path').values_list('position', flat=True)) + 1
-        except ValueError:
-            # This is the first plugin in the set
-            new_pos = 0
-        return self.update(refresh=True, position=new_pos)
+    def _get_descendants_ids(self):
+        cursor = CMSPlugin._get_database_cursor('write')
+        sql = _get_descendants_cte() + '\n'
+        sql += 'SELECT id FROM descendants;'
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk])
+        return [item[0] for item in cursor.fetchall()]
+
+    def get_children(self):
+        return self.cmsplugin_set.all()
+
+    def get_descendants(self):
+        return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
 
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path',
-                     'numchild', 'pk', 'position']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
             setattr(plugin, attr, getattr(self, attr))
 
     def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
@@ -352,31 +377,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.copy_relations(old_instance)
         return new_plugin
 
-    @classmethod
-    def fix_tree(cls, destructive=False):
-        """
-        Fixes the plugin tree by first calling treebeard fix_tree and the
-        recalculating the correct position property for each plugin.
-        """
-        from cms.utils.plugins import reorder_plugins
-
-        super(CMSPlugin, cls).fix_tree(destructive)
-        for placeholder in Placeholder.objects.all():
-            for language, __ in settings.LANGUAGES:
-                order = CMSPlugin.objects.filter(
-                        placeholder_id=placeholder.pk, language=language,
-                        parent_id__isnull=True
-                    ).order_by('position', 'path').values_list('pk', flat=True)
-                reorder_plugins(placeholder, None, language, order)
-
-                for plugin in CMSPlugin.objects.filter(
-                        placeholder_id=placeholder.pk,
-                        language=language).order_by('depth', 'path'):
-                    order = CMSPlugin.objects.filter(
-                            parent_id=plugin.pk
-                        ).order_by('position', 'path').values_list('pk', flat=True)
-                    reorder_plugins(placeholder, plugin.pk, language, order)
-
     def post_copy(self, old_instance, new_old_ziplist):
         """
         Handle more advanced cases (eg Text Plugins) after the original is
@@ -398,13 +398,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
-
-    def get_position_in_placeholder(self):
-        """
-        1 based position!
-        """
-        return self.position + 1
+        return list(obj for obj in fields if not isinstance(obj.field, models.ManyToManyField))
 
     def get_breadcrumb(self):
         from cms.models import Page
@@ -437,9 +431,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         result = mark_safe(result)
         return result
 
-    def num_children(self):
-        return self.numchild
-
     def notify_on_autoadd(self, request, conf):
         """
         Method called when we auto add this plugin via default_plugins in
@@ -458,12 +449,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         tags to be able to see his children in WYSIWYG.
         """
         pass
-
-    def delete(self, no_mp=False, *args, **kwargs):
-        if no_mp:
-            Model.delete(self, *args, **kwargs)
-        else:
-            super(CMSPlugin, self).delete(*args, **kwargs)
 
     def get_action_urls(self, js_compat=True):
         if js_compat:

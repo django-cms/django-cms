@@ -1289,6 +1289,7 @@ class PluginAddValidationForm(forms.Form):
         queryset=Placeholder.objects.all(),
         required=True,
     )
+    plugin_position = forms.IntegerField(required=True)
     plugin_language = forms.CharField(required=True)
     plugin_parent = forms.ModelChoiceField(
         CMSPlugin.objects.all(),
@@ -1315,6 +1316,7 @@ class PluginAddValidationForm(forms.Form):
             return data
 
         language = data['plugin_language']
+        position = data['plugin_position']
         placeholder = data['placeholder_id']
         parent_plugin = data.get('plugin_parent')
 
@@ -1332,6 +1334,11 @@ class PluginAddValidationForm(forms.Form):
             if parent_plugin.placeholder_id != placeholder.pk:
                 message = ugettext("Parent plugin placeholder must be same as placeholder!")
                 self.add_error('placeholder_id', message)
+                return self.cleaned_data
+
+            if position <= parent_plugin.position:
+                message = ugettext("Plugin position must be greater than %(position)d")
+                self.add_error('placeholder_id', message % {'position': parent_plugin.position})
                 return self.cleaned_data
 
         page = placeholder.page
