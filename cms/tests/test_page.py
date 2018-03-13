@@ -618,13 +618,12 @@ class PagesTestCase(TransactionCMSTestCase):
         page = create_page("page", "nav_playground.html", "en")
         page.rescan_placeholders() # create placeholders
         placeholder = page.placeholders.all()[0]
-        plugin_base = CMSPlugin(
+        plugin_base = CMSPlugin.objects.create(
             plugin_type='TextPlugin',
             placeholder=placeholder,
             position=1,
             language=settings.LANGUAGES[0][0]
         )
-        plugin_base = plugin_base.add_root(instance=plugin_base)
 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
