@@ -7,7 +7,7 @@ import $ from 'jquery';
 import '../polyfills/array.prototype.findindex';
 import nextUntil from './nextuntil';
 
-import { toPairs, isNaN, debounce, findIndex, find, every, uniqWith, once, difference, isEqual } from 'lodash';
+import { toPairs, filter, isNaN, debounce, findIndex, find, every, uniqWith, once, difference, isEqual } from 'lodash';
 
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
@@ -46,7 +46,6 @@ var Plugin = new Class({
         plugin_type: '',
         plugin_id: null,
         plugin_parent: null,
-        plugin_order: null,
         plugin_restriction: [],
         plugin_parent_restriction: [],
         urls: {
@@ -494,7 +493,8 @@ var Plugin = new Class({
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
             cms_path: path,
-            plugin_language: CMS.config.request.language
+            plugin_language: CMS.config.request.language,
+            plugin_position: this._getPluginAddPosition()
         };
 
         if (parent) {
@@ -520,6 +520,27 @@ var Plugin = new Class({
             }
             Plugin._removeAddPluginPlaceholder();
         });
+    },
+
+    _getPluginAddPosition: function() {
+        if (this.options.type === 'placeholder') {
+            return $(`.cms-dragarea-${this.options.placeholder_id} .cms-draggable`).length + 1;
+        }
+
+        // assume plugin now
+        // would prefer to get the information from the tree, but the problem is that the flat data
+        // isn't sorted by position
+        const maybeChildren = this.ui.draggable.find('.cms-draggable');
+
+        if (maybeChildren.length) {
+            const lastChild = maybeChildren.last();
+
+            const lastChildInstance = Plugin._getPluginById(this._getId(lastChild));
+
+            return lastChildInstance.options.position + 1;
+        }
+
+        return this.options.position + 1;
     },
 
     /**
@@ -648,7 +669,6 @@ var Plugin = new Class({
             placeholder_id: CMS.config.clipboard.id,
             plugin_id: this.options.plugin_id,
             plugin_parent: '',
-            plugin_order: [this.options.plugin_id],
             target_language: CMS.config.request.language,
             csrfmiddlewaretoken: CMS.config.csrf
         };
@@ -729,40 +749,34 @@ var Plugin = new Class({
         // SAVING POSITION
         var placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
 
-        var plugin_parent = this._getId(dragitem.parent().closest('.cms-draggable'));
-        var plugin_order = this._getIds(dragitem.siblings('.cms-draggable').andSelf());
-
-        if (options.move_a_copy) {
-            plugin_order = plugin_order.map(function(pluginId) {
-                var id = pluginId;
-
-                // correct way would be to check if it's actually a
-                // pasted plugin and only then replace the id with copy token
-                // otherwise if we would copy from the same placeholder we would get
-                // two copy tokens instead of original and a copy.
-                // it's ok so far, as long as we copy only from clipboard
-                if (id === options.plugin_id) {
-                    id = '__COPY__';
-                }
-                return id;
-            });
-        }
-
         // cancel here if we have no placeholder id
         if (placeholder_id === false) {
             return false;
         }
+        var pluginParentElement = dragitem.parent().closest('.cms-draggable');
+        var plugin_parent = this._getId(pluginParentElement);
 
         // gather the data for ajax request
         var data = {
-            placeholder_id: placeholder_id,
             plugin_id: options.plugin_id,
             plugin_parent: plugin_parent || '',
             target_language: CMS.config.request.language,
-            plugin_order: plugin_order,
             csrfmiddlewaretoken: CMS.config.csrf,
             move_a_copy: options.move_a_copy
         };
+
+        if (Number(placeholder_id) === Number(options.placeholder_id)) {
+            Plugin._updatePluginPositions(options.placeholder_id);
+        } else {
+            data.placeholder_id = placeholder_id;
+
+            Plugin._updatePluginPositions(placeholder_id);
+            Plugin._updatePluginPositions(options.placeholder_id);
+        }
+
+        var position = this.options.position;
+
+        data.target_position = position;
 
         showLoader();
 
@@ -773,7 +787,7 @@ var Plugin = new Class({
             success: function(response) {
                 CMS.API.StructureBoard.invalidateState(
                     data.move_a_copy ? 'PASTE' : 'MOVE',
-                    $.extend({}, data, response)
+                    $.extend({}, data, { placeholder_id: placeholder_id }, response)
                 );
 
                 // enable actions again
@@ -2242,6 +2256,39 @@ Plugin._refreshPlugins = function refreshPlugins() {
             }
         }
     });
+};
+
+Plugin._getPluginById = function(id) {
+    return find(CMS._instances, ({ options }) => options.type === 'plugin' && Number(options.plugin_id) === Number(id));
+};
+
+Plugin._updatePluginPositions = function(placeholder_id) {
+    // TODO can this be done in pure js? keep a tree model of the structure
+    // on the placeholder and update things there?
+    const plugins = $(`.cms-dragarea-${placeholder_id} .cms-draggable`).toArray();
+
+    plugins.forEach((element, index) => {
+        const pluginId = CMS.API.StructureBoard.getId($(element));
+        const instance = Plugin._getPluginById(pluginId);
+
+        if (!instance) {
+            return;
+        }
+
+        instance.options.position = index + 1;
+    });
+};
+
+Plugin._recalculatePluginPositions = function(action, data) {
+    if (action === 'MOVE') {
+        // le sigh - recalculate all placeholders cause we don't know from where the
+        // plugin was moved from
+        filter(CMS._instances, ({ options }) => options.type === 'placeholder')
+            .map(({ options }) => options.placeholder_id)
+            .forEach(placeholder_id => Plugin._updatePluginPositions(placeholder_id));
+    } else if (data.placeholder_id) {
+        Plugin._updatePluginPositions(data.placeholder_id);
+    }
 };
 
 // shorthand for jQuery(document).ready();

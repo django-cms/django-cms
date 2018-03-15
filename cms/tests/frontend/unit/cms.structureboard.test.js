@@ -28,6 +28,8 @@ class FakePlugin {
         };
         pluginConstructor(container, opts);
     }
+
+    static _recalculatePluginPositions() {}
 }
 FakePlugin._updateRegistry = jasmine.createSpy();
 FakePlugin._updateClipboard = jasmine.createSpy().and.callFake(() => {

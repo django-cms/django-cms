@@ -178,7 +178,6 @@ describe('CMS.Plugin', function() {
                 plugin_type: 'TextPlugin',
                 plugin_id: 1,
                 plugin_parent: null,
-                plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
                 plugin_parent_restriction: jasmine.any(Array),
                 urls: {
@@ -198,7 +197,6 @@ describe('CMS.Plugin', function() {
                 plugin_type: 'RandomPlugin',
                 plugin_id: 2,
                 plugin_parent: null,
-                plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
                 plugin_parent_restriction: jasmine.any(Array),
                 urls: {
@@ -218,7 +216,6 @@ describe('CMS.Plugin', function() {
                 plugin_type: '',
                 plugin_id: null,
                 plugin_parent: null,
-                plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
                 plugin_parent_restriction: jasmine.any(Array),
                 urls: {
@@ -238,7 +235,6 @@ describe('CMS.Plugin', function() {
                 plugin_type: '',
                 plugin_id: null,
                 plugin_parent: null,
-                plugin_order: null,
                 plugin_restriction: jasmine.any(Array),
                 plugin_parent_restriction: jasmine.any(Array),
                 urls: {
@@ -520,6 +516,7 @@ describe('CMS.Plugin', function() {
 
             $(function() {
                 spyOn(CMS.API.Helpers, 'addEventListener');
+                spyOn(Plugin.prototype, '_getPluginAddPosition').and.returnValue(42);
                 plugin = new CMS.Plugin('cms-plugin-1', {
                     type: 'plugin',
                     plugin_id: 1,
@@ -564,6 +561,7 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_type=TextPlugin');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_language=en');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_parent=12');
+            expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_position=42');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('cms_path=');
         });
 
@@ -581,7 +579,8 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open).toHaveBeenCalledWith({
                 url:
                     '/en/admin/cms/page/add-plugin/' +
-                        '?placeholder_id=1&plugin_type=TextPlugin&cms_path=%2Fcontext.html&plugin_language=en',
+                        '?placeholder_id=1&plugin_type=TextPlugin&cms_path=%2Fcontext.html' +
+                        '&plugin_language=en&plugin_position=42',
                 title: 'Text plugin'
             });
         });
@@ -887,6 +886,20 @@ describe('CMS.Plugin', function() {
                 dragbars: [],
                 states: []
             };
+            CMS.API.StructureBoard = {
+                getId: function(el) {
+                    if (el.is('.cms-dragbar')) {
+                        return 1;
+                    }
+                    if (el.is('.cms-draggable')) {
+                        return false;
+                    }
+                },
+                getIds: function() {
+                    return [3, 2, 1];
+                },
+                invalidateState: jasmine.createSpy()
+            };
             spyOn(CMS.API.Helpers, 'reloadBrowser');
 
             $(function() {
@@ -927,7 +940,6 @@ describe('CMS.Plugin', function() {
                     placeholder_id: 'clipboardId',
                     plugin_id: 1,
                     plugin_parent: '',
-                    plugin_order: [1],
                     target_language: 'en',
                     csrfmiddlewaretoken: 'CSRF_TOKEN'
                 },
@@ -1153,7 +1165,6 @@ describe('CMS.Plugin', function() {
                 plugin_type: 'RandomPlugin',
                 plugin_id: 2,
                 plugin_parent: null,
-                plugin_order: null,
                 plugin_restriction: jasmine.arrayContaining([]),
                 plugin_parent_restriction: jasmine.arrayContaining([]),
                 urls: {
@@ -1207,9 +1218,6 @@ describe('CMS.Plugin', function() {
                             return false;
                         }
                     },
-                    getIds: function() {
-                        return [3, 2, 1];
-                    },
                     invalidateState: jasmine.createSpy()
                 };
 
@@ -1250,10 +1258,8 @@ describe('CMS.Plugin', function() {
             expect(request.url).toEqual('/en/admin/cms/page/move-plugin/?cms_path=%2Fcontext.html');
             expect(request.method).toEqual('POST');
             expect(request.data()).toEqual({
-                placeholder_id: ['1'],
                 plugin_id: ['1'],
                 plugin_parent: [''],
-                'plugin_order[]': ['3', '2', '1'],
                 target_language: ['en'],
                 csrfmiddlewaretoken: ['CSRF_TOKEN']
             });
@@ -1277,23 +1283,12 @@ describe('CMS.Plugin', function() {
             CMS.API.locked = false;
         });
 
-        it('uses modified plugin order if we are moving a copy', function() {
-            CMS.API.locked = false;
-            spyOn($, 'ajax').and.callFake(function(ajax) {
-                expect(ajax.data).toEqual(
-                    jasmine.objectContaining({
-                        plugin_order: [3, 2, '__COPY__']
-                    })
-                );
-            });
-            plugin.movePlugin($.extend(plugin.options, { move_a_copy: true }));
-        });
-
         it('does not reload the browser', function() {
             CMS.API.locked = false;
             spyOn($, 'ajax').and.callFake(function(ajax) {
                 ajax.success();
             });
+            plugin.options.position = 42;
             plugin.movePlugin();
             expect(CMS.API.Helpers.reloadBrowser).not.toHaveBeenCalled();
             expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('MOVE', {
@@ -1301,7 +1296,7 @@ describe('CMS.Plugin', function() {
                 plugin_id: 1,
                 plugin_parent: '',
                 target_language: 'en',
-                plugin_order: [3, 2, 1],
+                target_position: 42,
                 csrfmiddlewaretoken: 'CSRF_TOKEN'
             });
         });

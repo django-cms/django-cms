@@ -1,3 +1,4 @@
+from cms.api import add_plugin
 from cms.models import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -20,14 +21,12 @@ class MultiColumnPlugin(CMSPluginBase):
             request, obj, form, change
         )
         for x in range(int(form.cleaned_data['create'])):
-            col = CMSPlugin(
-                parent=obj,
+            add_plugin(
                 placeholder=obj.placeholder,
+                plugin_type=ColumnPlugin.__name__,
                 language=obj.language,
-                position=CMSPlugin.objects.filter(parent=obj).count(),
-                plugin_type=ColumnPlugin.__name__
+                target=obj,
             )
-            col.save()
         return response
 
 
