@@ -188,7 +188,6 @@ def get_page_from_request(request, use_path=None, clean_path=None):
 
 
 def get_all_pages_from_path(site, path, language):
-    path = path.strip('/')
     pages = get_pages_from_path(site, path, draft=True)
     pages |= get_pages_from_path(site, path, preview=True, draft=False)
     return pages.filter(title_set__language=language)

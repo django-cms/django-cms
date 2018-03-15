@@ -615,6 +615,18 @@ class PageTest(PageTestBase):
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
 
+    def test_copy_page_under_home(self):
+        """
+        Users should be able to copy a page and paste under the home page.
+        """
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+
+        root_page_a = create_page("root-a", "nav_playground.html", "en", published=True)
+
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(root_page_a, homepage)
+
     def test_copy_page_with_plugins(self):
         """
         Copying a page with plugins should copy all plugins for each translation
