@@ -12,6 +12,7 @@
 * Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
 * Fixed an ``InconsistentMigrationHistory`` error raised when the contenttypes app
   has a pending migration after the user has applied the ``0010_migrate_use_structure`` migration.
+* Fixed a bug where plugins rendered multiple times won't be editable
 
 
 === 3.4.5 (2017-10-12) ===
