@@ -594,6 +594,39 @@ class PageTest(PageTestBase):
                 page_markup = row_markup % (edit_url, page.get_title('en'))
                 self.assertContains(response, page_markup, html=True)
 
+    def test_publish_homepage_with_children(self):
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+        pending_child_1 =  create_page(
+            "child-1",
+            "nav_playground.html",
+            language="en",
+            parent=homepage,
+            published=True,
+        )
+        pending_child_2 = create_page(
+            "child-2",
+            "nav_playground.html",
+            language="en",
+            parent=homepage,
+            published=True,
+        )
+        endpoint = self.get_admin_url(Page, 'publish_page', homepage.pk, 'en')
+        expected_tree = [
+            (homepage, ''),
+            (pending_child_1, 'child-1'),
+            (pending_child_2, 'child-2'),
+        ]
+
+        with self.login_user_context(self.get_superuser()):
+            self.client.post(endpoint)
+
+            for page, url_path in expected_tree:
+                self.assertPublished(page)
+                page._clear_internal_cache()
+                self.assertEqual(page.get_path('en'), url_path)
+                self.assertEqual(page.publisher_public.get_path('en'), url_path)
+
     def test_copy_page(self):
         """
         Test that a page can be copied via the admin
@@ -614,6 +647,18 @@ class PageTest(PageTestBase):
             self.copy_page(page_a, page_b_a)
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
+
+    def test_copy_page_under_home(self):
+        """
+        Users should be able to copy a page and paste under the home page.
+        """
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+
+        root_page_a = create_page("root-a", "nav_playground.html", "en", published=True)
+
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(root_page_a, homepage)
 
     def test_copy_page_with_plugins(self):
         """
@@ -1098,6 +1143,50 @@ class PageTest(PageTestBase):
             self.assertEqual(page2.get_path(), page_data2['slug'])
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data2['slug'] + "/" + page_data3['slug'])
+
+    def test_move_home_page(self):
+        """
+        Users should be able to move the home-page
+        anywhere on the root of the tree.
+        """
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+        home_child_1 = create_page(
+            "child-1",
+            "nav_playground.html",
+            language="en",
+            parent=homepage,
+            published=True,
+        )
+        home_child_2 = create_page(
+            "child-2",
+            "nav_playground.html",
+            language="en",
+            parent=homepage,
+            published=True,
+        )
+        home_sibling_1 = create_page("root-1", "nav_playground.html", "en", published=True)
+
+        expected_tree = [
+            # Sadly treebeard doesn't switch the paths
+            (home_sibling_1, '0002', 'root-1'),
+            (homepage, '0003', ''),
+            (home_child_1, '00030001', 'child-1'),
+            (home_child_2, '00030002', 'child-2'),
+        ]
+
+        with self.login_user_context(self.get_superuser()):
+            # Moves the homepage to the second position in the tree
+            data = {'id': homepage.pk, 'position': 1}
+            endpoint = self.get_admin_url(Page, 'move_page', homepage.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+            for page, node_path, url_path in expected_tree:
+                page._clear_internal_cache()
+                self.assertEqual(page.node.path, node_path)
+                self.assertEqual(page.get_path('en'), url_path)
+                self.assertEqual(page.publisher_public.get_path('en'), url_path)
 
     def test_move_page_integrity(self):
         superuser = self.get_superuser()
