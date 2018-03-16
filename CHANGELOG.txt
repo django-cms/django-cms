@@ -3,6 +3,8 @@
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
 * Fixed a race condition in frontend code that could lead to sideframe being
   opened with blank page
+* Fixed a bug where the direct children of the homepage would get a leading ``/``
+  character when the homepage was moved or published.
 
 
 === 3.5.1 (2018-03-05) ===

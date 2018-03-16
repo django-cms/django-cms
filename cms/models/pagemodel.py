@@ -283,8 +283,7 @@ class Page(models.Model):
             base = ''
 
         title_obj = self.get_title_obj(language, fallback=False)
-        new_path = title_obj.get_path_for_base(base)
-        title_obj.path = new_path
+        title_obj.path = title_obj.get_path_for_base(base)
         title_obj.save()
 
     def _update_title_path_recursive(self, language):
@@ -294,14 +293,20 @@ class Page(models.Model):
         if self.node.is_leaf() or language not in self.get_languages():
             return
 
-        base = self.get_path(language, fallback=True)
         pages = self.get_child_pages()
+        base = self.get_path(language, fallback=True)
+
+        if base:
+            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
+        else:
+            # User is moving the homepage
+            new_path = models.F('slug')
 
         (Title
          .objects
          .filter(language=language, page__in=pages)
          .exclude(has_url_overwrite=True)
-         .update(path=Concat(models.Value(base), models.Value('/'), models.F('slug'))))
+         .update(path=new_path))
 
         for child in pages.filter(title_set__language=language).iterator():
             child._update_title_path_recursive(language)
@@ -635,15 +640,13 @@ class Page(models.Model):
 
             if parent_page:
                 base = parent_page.get_path(title.language)
-                path = '%s/%s' % (base, title.slug)
+                path = '%s/%s' % (base, title.slug) if base else title.slug
             else:
                 base = ''
                 path = title.slug
 
-            slug = get_available_slug(site, path, title.language)
-
-            title.slug = slug
-            title.path = '%s/%s' % (base, slug) if base else slug
+            title.slug = get_available_slug(site, path, title.language)
+            title.path = '%s/%s' % (base, title.slug) if base else title.slug
             title.save()
 
             new_page.title_cache[title.language] = title
@@ -1116,10 +1119,14 @@ class Page(models.Model):
             publisher_public__published=True,
         )
 
+        if base:
+            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
+        else:
+            # User is moving the homepage
+            new_path = models.F('slug')
+
         # Update public title paths
-        unpublished_public.exclude(has_url_overwrite=True).update(
-            path=Concat(models.Value(base), models.Value('/'), models.F('slug'))
-        )
+        unpublished_public.exclude(has_url_overwrite=True).update(path=new_path)
 
         # Set unpublished pending titles to published
         unpublished_public.filter(published=False).update(published=True)
