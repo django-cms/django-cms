@@ -1,0 +1,27 @@
+.. _upgrade-to-3.4.6:
+
+###################
+3.4.6 release notes
+###################
+
+
+
+*******************
+What's new in 3.4.6
+*******************
+
+Bug Fixes
+=========
+
+* Changed the way drag and drop works in the page tree. The page has to be
+  selected first before moving.
+* Fixed a bug where the cms alias plugin leaks context into the rendered aliased plugins.
+* Fixed a bug where users without the "Change advanced settings" permission could still
+  change a page's template.
+* Added ``on_delete`` to ``ForeignKey`` and ``OneToOneField`` to silence Django
+  deprecation warnings.
+* Fixed a bug where the sitemap would ignore the ``public`` setting of the site languages
+  and thus display hidden languages.
+* Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
+* Fixed an ``InconsistentMigrationHistory`` error raised when the contenttypes app
+  has a pending migration after the user has applied the ``0010_migrate_use_structure`` migration.
