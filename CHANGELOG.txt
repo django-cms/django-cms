@@ -5,6 +5,7 @@
   opened with blank page
 * Fixed a bug where the direct children of the homepage would get a leading ``/``
   character when the homepage was moved or published.
+* Fixed a bug where non-staff user would be able to open empty structure board
 
 
 === 3.5.1 (2018-03-05) ===

@@ -112,7 +112,7 @@ CMS.config = {
     'settings': {
         'version': '{{ cms_version }}',
         'toolbar': 'expanded',
-        'mode': {% if cms_toolbar.content_mode_active %}'edit'{% else %}'structure'{% endif %},
+        'mode': {% if cms_toolbar.structure_mode_active %}'structure'{% else %}'edit'{% endif %},
         'sideframe': { 'url': '' },
         'states': [],
         'edit': '{{ cms_edit_on }}',

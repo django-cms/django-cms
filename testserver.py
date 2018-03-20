@@ -152,7 +152,11 @@ else:
 
 def _helper_patch(*args, **kwargs):
     from django.core.management import call_command
+    from djangocms_helper import utils
+
     call_command('migrate', run_syncdb=True)
+    utils.create_user('normal', 'normal@normal.normal', 'normal', is_staff=True, base_cms_permissions=True,
+            permissions=['view_page'])
 
 
 def run():
