@@ -99,7 +99,8 @@ var INTEGRATION_TESTS = [
         'dragndrop',
         'copy-apphook-page',
         // 'revertLive', // disabled
-        'narrowScreen'
+        'narrowScreen',
+        'nonadmin'
     ]
 ];
 
