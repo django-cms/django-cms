@@ -97,3 +97,11 @@ You can now remove the mention of the Polls application (``url(r'^polls/', inclu
 namespace='polls'))``) from your project's ``urls.py`` - it's no longer even required there.
 
 Later, we'll install a django-CMS-compatible :ref:`third-party application <third_party>`.
+
+..  important::
+
+    Don't add child pages to a page with an apphook.
+
+    The apphook "swallows" all URLs below that of the page, handing them over to the attached
+    application. If you have any child pages of the apphooked page, django CMS will not be
+    able to serve them reliably.

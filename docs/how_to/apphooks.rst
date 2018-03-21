@@ -117,11 +117,13 @@ attached to a page whose URL path is ``/hello/world/``, its views will be expose
 Sub-pages of an apphooked page
 ==============================
 
-Usually, it's simplest to leave an apphook to swallow up all the URLs below its page's URL.
+..  important::
 
-However, as long as the application's urlconf is not too greedy and doesn't conflict with the URLs of any sub-pages,
-those sub-pages can be reached. That is, although the apphooked application will have priority, any URLs it *doesn't*
-consume will be available for ordinary django CMS pages, if they exist.
+    Don't add child pages to a page with an apphook.
+
+The apphook "swallows" all URLs below that of the page, handing them over to the attached
+application. If you have any child pages of the apphooked page, django CMS will not be
+able to serve them reliably.
 
 
 ******************
