@@ -67,7 +67,6 @@ If you switch to *Structure* mode, you'll see the new placeholders available for
 
 .. image:: /introduction/images/new-placeholder.png
    :alt: the new 'splashbox' placeholder
-   :width: 600
    :align: center
 
 
@@ -98,8 +97,19 @@ single page, we should add it to our base template
       {% static_placeholder 'footer' %}
     </footer>
 
-Save the template and return to your browser. Refresh any page in ``Structure`` mode, and you'll
-see the new static placeholder. If you add some content to it in the usual way, you'll see that it
+Save the template and return to your browser. Refresh any page in Structure mode, and you'll
+see the new static placeholder.
+
+.. image:: /introduction/images/static-placeholder.png
+   :alt: a static placeholder
+   :align: center
+
+..  note::
+
+    To reduce clutter in the interface, the plugins in static placeholders are hidden by default.
+    Click or tap on the name of the static placeholder to reveal/hide them.
+
+If you add some content to the new static placeholder in the usual way, you'll see that it
 appears on your site's other pages too.
 
 
