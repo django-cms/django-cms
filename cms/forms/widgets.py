@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.utils.compat import DJANGO_1_10
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
@@ -306,10 +305,9 @@ class ApplicationConfigSelect(Select):
             output.append(self._build_script(name, value, attrs))
 
             related_url = ''
-            output.append('<a href="%s" class="add-another" id="add_%s" onclick="return showAddAnotherPopup(this);"> '
-                          % (related_url, name))
-            output.append('<img src="%s" width="10" height="10" alt="%s"/></a>'
-                          % (static('admin/img/icon_addlink.gif'), _('Add Another')))
+            output.append('<a href="%s" class="add-another" id="add_%s" title="%s" onclick="return showAddAnotherPopup(this);">'
+                          % (related_url, name, _('Add Another')))
+            output.append('</a>')
             return mark_safe(''.join(output))
         else:
             return super(ApplicationConfigSelect, self).render(name, value, attrs, renderer)
