@@ -21,11 +21,7 @@ Open source enterprise content management system based on the Django framework.
 
 .. ATTENTION::
 
-    To propose **significant new features**, open pull requests based on and made against the **develop** branch. It's
-    the branch for features that will go into the next django CMS feature release.
-
-    To propose **fixes and backwards-compatible improvements**, please work on the latest **release** branch. This is
-    the branch that will become the next PyPI release ("the next version of django CMS").
+    Please use the ``develop`` branch as the target for pull requests for on-going development.
 
     Security fixes will be backported to older branches by the core team as appropriate.
 
