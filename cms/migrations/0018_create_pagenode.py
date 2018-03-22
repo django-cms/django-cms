@@ -7,6 +7,8 @@ import django.contrib.auth.models
 from django.db import migrations, models
 import django.db.models.deletion
 
+from ._base import IrreversibleMigration
+
 
 def get_descendants(root):
     """
@@ -23,38 +25,10 @@ def get_descendants(root):
             yield child
 
 
-def unpublish_never_published_pages(apps, schema_editor):
-    """
-    Prior to 3.5, pages would be marked as "pending"
-    when users tried to publish a page with an unpublished parent.
-    This is no longer allowed, as a result any page that's set as
-    published but does not have a public version is marked as unpublished.
-    """
-    Page = apps.get_model('cms', 'Page')
-    db_alias = schema_editor.connection.alias
-    draft_pages = Page.objects.using(db_alias).filter(publisher_is_draft=True)
-    never_published_pages = Page.objects.using(db_alias).filter(
-        title_set__published=True,
-        publisher_is_draft=True,
-        publisher_public__isnull=True,
-    )
-
-    for page in never_published_pages.distinct():
-        page.title_set.update(
-            published=False,
-            publisher_state=1,
-        )
-        draft_pages.filter(pk=page.pk).update(
-            publication_date=None,
-            publication_end_date=None,
-        )
-
-def migrate_to_page_nodes(apps, schema_editor):
+def create_page_nodes(apps, schema_editor):
     Page = apps.get_model('cms', 'Page')
     TreeNode = apps.get_model('cms', 'TreeNode')
     db_alias = schema_editor.connection.alias
-
-    public_pages = Page.objects.using(db_alias).filter(publisher_is_draft=False)
     root_draft_pages = Page.objects.using(db_alias).filter(
         publisher_is_draft=True,
         parent__isnull=True,
@@ -65,44 +39,36 @@ def migrate_to_page_nodes(apps, schema_editor):
     nodes_by_page = {}
 
     for root in root_draft_pages:
-        root.node = create_node(
+        node = create_node(
             site_id=root.site_id,
             path=root.path,
             depth=root.depth,
             numchild=root.numchild,
             parent=None,
         )
-        root.save(update_fields=['node'])
 
-        if root.publisher_public_id:
-            public_pages.filter(pk=root.publisher_public_id).update(node=root.node)
-
-        nodes_by_page[root.pk] = root.node
+        nodes_by_page[root.pk] = node
 
         for descendant in get_descendants(root):
-            descendant.node = create_node(
+            node = create_node(
                 site_id=descendant.site_id,
                 path=descendant.path,
                 depth=descendant.depth,
                 numchild=descendant.numchild,
                 parent=nodes_by_page[descendant.parent_id],
             )
-            descendant.save(update_fields=['node'])
-            nodes_by_page[descendant.pk] = descendant.node
-
-            if descendant.publisher_public_id:
-                public_pages.filter(pk=descendant.publisher_public_id).update(node=descendant.node)
+            nodes_by_page[descendant.pk] = node
 
 
-class Migration(migrations.Migration):
+class Migration(IrreversibleMigration):
 
     dependencies = [
         ('sites', '0001_initial'),
         ('cms', '0017_pagetype'),
     ]
+    replaces = [('cms', '0018_pagenode')]
 
     operations = [
-        migrations.RunPython(unpublish_never_published_pages),
         migrations.CreateModel(
             name='TreeNode',
             fields=[
@@ -118,54 +84,24 @@ class Migration(migrations.Migration):
                 'default_permissions': [],
             },
         ),
+        migrations.RunPython(create_page_nodes),
         migrations.AddField(
             model_name='page',
             name='node',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cms_pages',
                                     to='cms.TreeNode'),
         ),
+        migrations.AddField(
+            model_name='page',
+            name='migration_0018_control',
+            field=models.PositiveIntegerField(null=True),
+        ),
         migrations.AlterUniqueTogether(
             name='page',
             unique_together=set([('node', 'publisher_is_draft')]),
         ),
-        migrations.RunPython(migrate_to_page_nodes),
-        migrations.AlterModelOptions(
-            name='page',
-            options={'verbose_name': 'page', 'verbose_name_plural': 'pages', 'permissions': (
-            ('view_page', 'Can view page'), ('publish_page', 'Can publish page'),
-            ('edit_static_placeholder', 'Can edit static placeholders'))},
-        ),
-        migrations.AlterField(
-            model_name='page',
-            name='node',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cms_pages',
-                                    to='cms.TreeNode'),
-        ),
-        migrations.RemoveField(
-            model_name='page',
-            name='site',
-        ),
-        migrations.RemoveField(
-            model_name='page',
-            name='parent',
-        ),
-        migrations.RemoveField(
-            model_name='page',
-            name='revision_id',
-        ),
-        migrations.RemoveField(
-            model_name='page',
-            name='depth',
-        ),
-        migrations.RemoveField(
-            model_name='page',
-            name='numchild',
-        ),
-        migrations.RemoveField(
-            model_name='page',
-            name='path',
-        ),
     ]
+
 
 if django.VERSION >= (1, 10):
     Migration.operations.append(
