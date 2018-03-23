@@ -6,4 +6,4 @@ sphinx
 #sphinxcontrib-spelling
 pyenchant
 sphinx-autobuild
-sphinx_rtd_theme
+divio-docs-theme

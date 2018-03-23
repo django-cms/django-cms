@@ -2,9 +2,9 @@
 
     <style>
         .row {clear: both}
-        .row h2  {border-bottom: 1px solid black;}
+        .row h2  {border-bottom: 1px solid gray;}
 
-        .column img {border: 1px solid black;}
+        .column img {border: 1px solid gray;}
 
         @media only screen and (min-width: 1000px),
                only screen and (min-width: 500px) and (max-width: 768px){
