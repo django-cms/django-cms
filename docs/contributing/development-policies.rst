@@ -101,10 +101,6 @@ the latest (highest-numbered) ``release/x.y.z``
     This is the branch that will become the next release on PyPI. ``develop`` will be merged into ``release/x.y.z``
     regularly.
 
-``feature`` branches
-    Occasionally the development team may decide to open a ``feature`` branch for work on **new features and
-    backwards-incompatible changes** that by their nature require more substantial team co-ordination.
-
 Older ``release/x.y.z`` branches
      These represent the final point of development (the highest ``y`` of older versions). Releases in the full set of
      older versions have been tagged (use Git Tags to retrieve them).
