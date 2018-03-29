@@ -1,4 +1,30 @@
-=== 3.5.0 (unreleased) ===
+=== 3.5.2 (unreleased) ===
+
+* Fixed a bug where shortcuts menu entry would stop working after toolbar reload
+* Fixed a race condition in frontend code that could lead to sideframe being
+  opened with blank page
+* Fixed a bug where the direct children of the homepage would get a leading ``/``
+  character when the homepage was moved or published.
+* Fixed a bug where non-staff user would be able to open empty structure board
+* Fixed a bug where a static file from Django admin was referenced that no
+  longer existed in Django 1.9 and up.
+
+
+=== 3.5.1 (2018-03-05) ===
+
+* Fixed a bug where editing pages with primary keys greater than 999 would throw an
+  exception.
+* Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration
+  with multiple page types per site.
+* Fixed a bug which prevented toolbar js from working correctly when rendered
+  before toolbar.
+* Fixed a bug where CMS would incorrectly highlight plugin content when plugin
+  contains invisible elements
+* Fixed a regression where templates which inherit from a template using an ``{% extends %}``
+  tag with a default would raise an exception.
+
+
+=== 3.5.0 (2018-01-31) ===
 
 * Fixed a bug which prevented users from seeing the welcome screen when debug is
   turned off.
@@ -12,6 +38,9 @@
 * Changed the language chooser to always show all configured languages to staff members
   and public-only languages to anon users.
 * Introduced logic to copy pages to different sites from the admin.
+* Removed "View on Site" button when adding a page
+* Welcome page no longer uses multilingual URLs when not required.
+* Prevent users from passing a public page as parent in ``create_page`` api function
 
 
 === 3.4.5 (2017-10-12) ===

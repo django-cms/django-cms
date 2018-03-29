@@ -696,42 +696,6 @@ class RenderingTestCase(CMSTestCase):
         for cls in classes:
             self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
 
-    def test_render_placeholder_toolbar_js_escaping(self):
-        page = self.test_page.publisher_public
-        request = self.get_request(language='en', page=page)
-        renderer = self.get_content_renderer(request)
-        placeholder = page.placeholders.get(slot='main')
-
-        conf = {placeholder.slot: {'name': 'Content-with-dash'}}
-
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            content = renderer.get_placeholder_toolbar_js(placeholder, page)
-
-        expected_bits = [
-            '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
-            '"name": "Content-with-dash"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
-        ]
-
-        for bit in expected_bits:
-            self.assertIn(bit, content)
-
-    def test_render_placeholder_toolbar_js_with_no_plugins(self):
-        page = self.test_page.publisher_public
-        request = self.get_request(language='en', page=page)
-        renderer = self.get_content_renderer(request)
-        placeholder = page.placeholders.get(slot='empty')
-        content = renderer.get_placeholder_toolbar_js(placeholder, page)
-
-        expected_bits = [
-            '"addPluginHelpTitle": "Add plugin to placeholder \\"Empty\\""',
-            '"name": "Empty"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
-        ]
-
-        for bit in expected_bits:
-            self.assertIn(bit, content)
-
     def test_render_plugin_toolbar_markup(self):
         """
         Ensures that the edit-mode markup is correct

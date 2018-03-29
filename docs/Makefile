@@ -101,7 +101,7 @@ PORT = 8001
 # CORE COMMANDS
 install:
 	@echo "... setting up virtualenv"
-	virtualenv env
+	python3.6 -m venv env
 	. $(VENV); pip install -r requirements.txt
 	. $(VENV); $(SPHINXBUILD) . build/html
 	@echo "\n" \

@@ -4,6 +4,7 @@ import datetime
 import iptools
 import re
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -19,6 +20,7 @@ from django.utils.translation import ugettext_lazy as _, override
 from django.utils.encoding import force_text
 
 from cms.api import create_page, create_title, add_plugin
+from cms.admin.forms import RequestToolbarForm
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
                               LANGUAGE_MENU_IDENTIFIER)
 from cms.middleware.toolbar import ToolbarMiddleware
@@ -33,6 +35,7 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
                                       URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.toolbar_pool import toolbar_pool
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
@@ -177,6 +180,136 @@ class ToolbarTests(ToolbarTestBase):
         page_item = [item for item in items if force_text(item.name) == 'Page']
         self.assertEqual(len(page_item), 1)
         return page_item[0]
+
+    def test_toolbar_login(self):
+        admin = self.get_superuser()
+        endpoint = reverse('cms_login') + '?next=/en/admin/'
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        password = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={'username': username, 'password': password})
+        self.assertRedirects(response, '/en/admin/')
+        self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
+
+    def test_toolbar_login_error(self):
+        admin = self.get_superuser()
+        endpoint = reverse('cms_login') + '?next=/en/admin/'
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={'username': username, 'password': 'invalid'})
+        self.assertRedirects(response, '/en/admin/?cms_toolbar_login_error=1', target_status_code=302)
+        self.assertFalse(settings.SESSION_COOKIE_NAME in response.cookies)
+
+    def test_toolbar_login_invalid_redirect_to(self):
+        admin = self.get_superuser()
+        endpoint = reverse('cms_login') + '?next=http://example.com'
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        password = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={'username': username, 'password': password})
+        self.assertRedirects(response, '/en/')
+        self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
+
+    @override_settings(CMS_TOOLBARS=['cms.test_utils.project.sampleapp.cms_toolbars.ToolbarWithMedia'])
+    def test_toolbar_media(self):
+        """
+        Toolbar classes can declare a media class or property
+        to be rendered along with the toolbar.
+        """
+        old_pool = toolbar_pool.toolbars
+        toolbar_pool.clear()
+        cms_page = create_page("toolbar-page", "col_two.html", "en", published=True)
+
+        with self.login_user_context(self.get_superuser()):
+            endpoint = cms_page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<script type="text/javascript" src="/static/samplemap/js/sampleapp.js"></script>')
+            self.assertContains(response, '<link href="/static/samplemap/css/sampleapp.css" type="text/css" media="all" rel="stylesheet" />')
+        toolbar_pool.toolbars = old_pool
+        toolbar_pool._discovered = True
+
+    def test_toolbar_request_endpoint_validation(self):
+        endpoint = self.get_admin_url(UserSettings, 'get_toolbar')
+        cms_page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        cms_page_2 = create_page("toolbar-page-2", "col_two.html", "en", published=True)
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(
+                endpoint,
+                data={
+                    'obj_id': cms_page.pk,
+                    'obj_type': 'cms.page',
+                    'cms_path': cms_page.get_absolute_url('en')
+                },
+            )
+            self.assertEqual(response.status_code, 200)
+
+            # Invalid app / model
+            response = self.client.get(
+                endpoint,
+                data={
+                    'obj_id': cms_page.pk,
+                    'obj_type': 'cms.somemodel',
+                    'cms_path': cms_page.get_absolute_url('en')
+                },
+            )
+            self.assertEqual(response.status_code, 400)
+
+            # Page from path does not match attached toolbar obj
+            response = self.client.get(
+                endpoint,
+                data={
+                    'obj_id': cms_page.pk,
+                    'obj_type': 'cms.page',
+                    'cms_path': cms_page_2.get_absolute_url('en')
+                },
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_toolbar_request_form(self):
+        cms_page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        generic_obj = Example1.objects.create(
+            char_1="char_1",
+            char_2="char_2",
+            char_3="char_3",
+            char_4="char_4",
+        )
+
+        # Valid forms
+        form = RequestToolbarForm({
+            'obj_id': cms_page.pk,
+            'obj_type': 'cms.page',
+            'cms_path': cms_page.get_absolute_url('en'),
+        })
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['attached_obj'], cms_page)
+
+        form = RequestToolbarForm({
+            'obj_id': generic_obj.pk,
+            'obj_type': 'placeholderapp.example1',
+            'cms_path': cms_page.get_absolute_url('en'),
+        })
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['attached_obj'], generic_obj)
+
+        # Invalid forms
+        form = RequestToolbarForm({
+            'obj_id': 1000,
+            'obj_type': 'cms.page',
+            'cms_path': cms_page.get_absolute_url('en'),
+        })
+        self.assertFalse(form.is_valid())
+
+        form = RequestToolbarForm({
+            'obj_id': cms_page.pk,
+            'obj_type': 'cms.somemodel',
+            'cms_path': cms_page.get_absolute_url('en'),
+        })
+        self.assertFalse(form.is_valid())
+
+        form = RequestToolbarForm({
+            'obj_id': cms_page.pk,
+            'obj_type': 'cms.page',
+            'cms_path': 'https://example.com/some-path/',
+        })
+        self.assertFalse(form.is_valid())
 
     def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')

@@ -2,9 +2,9 @@
 
     <style>
         .row {clear: both}
-        .row h2  {border-bottom: 1px solid black;}
+        .row h2  {border-bottom: 1px solid gray;}
 
-        .column img {border: 1px solid black;}
+        .column img {border: 1px solid gray;}
 
         @media only screen and (min-width: 1000px),
                only screen and (min-width: 500px) and (max-width: 768px){
@@ -149,7 +149,7 @@ django CMS   Django                                      Python
 3.2.1-3.2.5  ⨯          ✓          ✓    ✓    ⨯     ⨯     ✓    ✓    ✓    ✓    ✓    ⨯
 3.3.0-3.4.1  ⨯          ⨯          ✓    ✓    ⨯     ⨯     ⨯    ✓    ✓    ✓    ✓    ⨯
 3.4.2-3.4.4  ⨯          ⨯          ✓    ✓    ✓     ⨯     ⨯    ✓    ✓    ✓    ✓    ⨯
-3.4.5        ⨯          ⨯          ✓    ✓    ✓     ✓     ⨯    ✓    ✓    ✓    ✓    ✓
+3.4.5-3.5.x  ⨯          ⨯          ✓    ✓    ✓     ✓     ⨯    ✓    ✓    ✓    ✓    ✓
 ===========  =========  =========  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===
 
 

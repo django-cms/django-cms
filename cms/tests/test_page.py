@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import os.path
+import functools
 from unittest import skipIf
 
 from django.conf import settings
@@ -65,6 +66,26 @@ class PagesTestCase(TransactionCMSTestCase):
             self.assertEqual(page_2.get_absolute_url(), '/fr/french-inner/')
             self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
             self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
+    def test_get_root_page(self):
+        _create = functools.partial(
+            create_page,
+            template='nav_playground.html',
+            language='en',
+            published=True,
+        )
+        page_a = _create('page_a')
+        page_a_a = _create('page_a_a_a', parent=page_a)
+        page_a_a_a = _create('page_a_a_a', parent=page_a_a)
+        page_tree_with_root = [
+            (page_a, page_a),
+            (page_a_a, page_a),
+            (page_a_a_a, page_a),
+        ]
+
+        for page, root in page_tree_with_root:
+            self.assertEqual(page.get_root(), root)
+            self.assertEqual(page.publisher_public.get_root(), root.publisher_public)
 
     def test_treebeard_delete(self):
         """

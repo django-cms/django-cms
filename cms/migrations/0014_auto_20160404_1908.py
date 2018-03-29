@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cms', '0013_urlconfrevision'),
-        ('contenttypes', '__latest__'),
+        ('contenttypes', '0001_initial'),
     ]
 
     operations = [
