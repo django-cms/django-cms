@@ -127,6 +127,8 @@ try:
 except:
     html_theme = 'default'
 
+show_cloud_banner = True
+
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 # html_theme = 'default'
