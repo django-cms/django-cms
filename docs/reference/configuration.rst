@@ -461,7 +461,7 @@ Example::
                 'fallbacks': ['de', 'fr'],
                 'public': True,
                 'hide_untranslated': True,
-                'redirect_on_fallback':False,
+                'redirect_on_fallback': False,
             },
             {
                 'code': 'de',
@@ -485,7 +485,7 @@ Example::
         ],
         'default': {
             'fallbacks': ['en', 'de', 'fr'],
-            'redirect_on_fallback':True,
+            'redirect_on_fallback': True,
             'public': True,
             'hide_untranslated': False,
         }
