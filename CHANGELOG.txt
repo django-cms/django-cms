@@ -1,4 +1,4 @@
-=== 3.5.2 (unreleased) ===
+=== 3.5.2 (2018-04-11) ===
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
 * Fixed a race condition in frontend code that could lead to sideframe being
