@@ -1792,6 +1792,60 @@ describe('CMS.StructureBoard', function() {
                 expect(board._drag).toHaveBeenCalled();
                 expect(board.ui.sortables.filter('.cms-dragarea-2 .new-draggable .cms-draggables')).toExist();
             });
+
+            it('handles top level move update when in same placeholder', () => {
+                const data = {
+                    placeholder_id: 1,
+                    plugin_id: 2,
+                    plugin_order: ['2', '1'],
+                    html: `
+                        <div class="cms-draggable cms-draggable-2 new-cms-draggable-2">
+                        </div>
+                    `,
+                    plugins: [{ plugin_id: 2, otherStuff: true }, { plugin_id: 1, otherStuff: true }]
+                };
+
+                board.handleMovePlugin(data);
+
+                expect($('.cms-draggable-1')).toExist();
+                expect($('.cms-draggable-2')).toExist();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
+                expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(2);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(2);
+                expect(board._drag).toHaveBeenCalled();
+                expect($('.new-cms-draggable-2')).toExist();
+                expect($('.cms-draggable-2').index()).toEqual(0); // account for "empty" message
+                expect($('.cms-draggable-1').index()).toEqual(2);
+            });
+
+            it('handles top level move update when in same placeholder', () => {
+                const data = {
+                    placeholder_id: 1,
+                    plugin_id: 1,
+                    plugin_order: ['2', '1'],
+                    html: `
+                        <div class="cms-draggable cms-draggable-1 new-cms-draggable-1">
+                        </div>
+                    `,
+                    plugins: [{ plugin_id: 2, otherStuff: true }, { plugin_id: 1, otherStuff: true }]
+                };
+
+                board.handleMovePlugin(data);
+
+                expect($('.cms-draggable-1')).toExist();
+                expect($('.cms-draggable-2')).toExist();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
+                expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(2);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(2);
+                expect(board._drag).toHaveBeenCalled();
+                expect($('.new-cms-draggable-1')).toExist();
+                expect($('.cms-draggable-2').index()).toEqual(1);
+                expect($('.cms-draggable-1').index()).toEqual(2);
+            });
         });
 
         describe('handleAddPlugin', () => {
