@@ -10,7 +10,7 @@ import Clipboard from './cms.clipboard';
 import URI from 'urijs';
 import DiffDOM from 'diff-dom';
 import PreventParentScroll from 'prevent-parent-scroll';
-import { find, findIndex, once, remove, compact, isEqual } from 'lodash';
+import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
 import ls from 'local-storage';
 
 import './jquery.ui.custom';
@@ -38,6 +38,8 @@ const triggerWindowResize = () => {
         window.dispatchEvent(evt);
     } catch (e) {}
 };
+
+const arrayEquals = (a1, a2) => every(zip(a1, a2), ([a, b]) => a === b);
 
 /**
  * Handles drag & drop, mode switching and collapsables.
@@ -1137,6 +1139,30 @@ class StructureBoard {
                     placeholderDraggables.prepend(draggable);
                 } else if (index !== -1) {
                     placeholderDraggables.find(`.cms-draggable-${pluginOrder[index - 1]}`).after(draggable);
+                }
+            }
+
+            // if we _are_ in the correct placeholder we still need to check if the order is correct
+            // since it could be an external update of a plugin moved in the same placeholder. also we are top-level
+            if (draggable.closest('.cms-draggables').parent().is(`.cms-dragarea-${data.placeholder_id}`)) {
+                const placeholderDraggables = $(`.cms-dragarea-${data.placeholder_id} > .cms-draggables`);
+                const actualPluginOrder = this.getIds(
+                    placeholderDraggables.find('> .cms-draggable')
+                );
+
+                if (!arrayEquals(actualPluginOrder, data.plugin_order)) {
+                    // so the plugin order is not correct, means it's an external update and we need to move
+                    const pluginOrder = data.plugin_order;
+                    const index = findIndex(
+                        pluginOrder,
+                        pluginId => Number(pluginId) === Number(data.plugin_id)
+                    );
+
+                    if (index === 0) {
+                        placeholderDraggables.prepend(draggable);
+                    } else if (index !== -1) {
+                        placeholderDraggables.find(`.cms-draggable-${pluginOrder[index - 1]}`).after(draggable);
+                    }
                 }
             }
 
