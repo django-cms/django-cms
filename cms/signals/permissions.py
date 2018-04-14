@@ -15,7 +15,11 @@ def post_save_user(instance, raw, created, **kwargs):
     from cms.utils.permissions import get_current_user
     # read current user from thread locals
     creator = get_current_user()
-    if not creator or not created or creator.is_anonymous():
+    try:
+        is_anonymous = request.user.is_anonymous() # Django<1.10
+    except TypeError:
+        is_anonymous = request.user.is_anonymous # Django 1.10 - 2.x
+    if not creator or not created or is_anonymous:
         return
 
     page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)

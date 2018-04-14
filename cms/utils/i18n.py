@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
+from django import VERSION as DJANGO_VERSION
+try:
+    from django.urls import get_resolver, LocalePrefixPattern
+except ImportError:
+    from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
@@ -197,8 +201,11 @@ def is_language_prefix_patterns_used():
     Returns `True` if the `LocaleRegexURLResolver` is used
     at root level of the urlpatterns, else it returns `False`.
     """
-    return any(isinstance(url_pattern, LocaleRegexURLResolver)
-               for url_pattern in get_resolver(None).url_patterns)
+    if DJANGO_VERSION < (2,0):
+        return any(isinstance(url_pattern, LocaleRegexURLResolver)
+               for url_pattern in get_resolver(None).url_patterns)    
+    return any(isinstance(url_pattern.pattern, LocalePrefixPattern)
+           for url_pattern in get_resolver(None).url_patterns)
 
 
 def is_valid_site_language(language, site_id):

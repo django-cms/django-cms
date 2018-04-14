@@ -6,7 +6,11 @@ import os
 import warnings
 
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
+try:
+    from django.urls import NoReverseMatch
+except ImportError:
+    from django.core.urlresolvers import NoReverseMatch
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import signals, Model, ManyToManyField
@@ -144,6 +148,7 @@ class PluginModelBase(ModelBase):
                     related_name='%(app_label)s_%(class)s',
                     auto_created=True,
                     parent_link=True,
+                    on_delete=models.CASCADE,
                 )
 
         # create a new class (using the super-metaclass)

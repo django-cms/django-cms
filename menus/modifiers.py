@@ -92,11 +92,15 @@ class AuthVisibility(Modifier):
         if post_cut or breadcrumb:
             return nodes
         final = []
+        try:
+            is_authenticated = request.user.is_authenticated() # Django<1.10
+        except TypeError:
+            is_authenticated = request.user.is_authenticated # Django 1.10 - 2.x
         for node in nodes:
             if (node.attr.get('visible_for_authenticated', True) and \
-                 request.user.is_authenticated()) or \
+                 is_authenticated) or \
                 (node.attr.get('visible_for_anonymous', True) and \
-                 not request.user.is_authenticated()):
+                 not request.user.is_authenticated):
                 final.append(node)
             else:
                 if node.parent and node in node.parent.children:

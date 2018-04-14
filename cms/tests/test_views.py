@@ -4,7 +4,10 @@ import sys
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import clear_url_caches
+try:
+    from django.urls import clear_url_caches
+except ImportError:
+    from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings

@@ -2,7 +2,11 @@
 
 
 def use_draft(request):
-    is_staff = (request.user.is_authenticated() and request.user.is_staff)
+    try:
+        is_authenticated = request.user.is_authenticated() # Django<1.10
+    except TypeError:
+        is_authenticated = request.user.is_authenticated # Django 1.10 - 2.x
+    is_staff = (is_authenticated and request.user.is_staff)
     return is_staff and not request.session.get('cms_preview')
 
 
