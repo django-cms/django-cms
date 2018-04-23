@@ -191,13 +191,20 @@ CMSPluginBase Attributes and Methods Reference
     ..  attribute:: text_enabled
 
         Default: ``False``
+        
+        This attribute controls whether your plugin will be usable (and rendered) 
+        in a text plugin. When you edit a text plugin on a page, the plugin will show up in
+        the "CMS Plugins" dropdown and can be configured and inserted. The output will even
+        be previewed in the text editor.
 
-        Not all plugins are usable in text plugins. If your plugin *is* usable in a text plugin:
+        Of course, not all plugins are usable in text plugins. Therefore the default of this
+        attribute is ``False``. If your plugin *is* usable in a text plugin:
 
         * set this to ``True``
-        * make sure your plugin provides its own :meth:`icon_src`
+        * make sure your plugin provides its own :meth"`icon_alt`, this will be used as a tooltip in 
+        the text-editor and comes in handy when you use multiple plugins in your text.
 
-        See also: :attr:`icon_src`, :attr:`icon_alt`.
+        See also: :attr:`icon_alt`, :attr:`icon_src`.
 
 
     **Methods**
@@ -326,18 +333,16 @@ CMSPluginBase Attributes and Methods Reference
 
     ..  method:: icon_alt()
 
-        Although it is optional, authors of "text enabled" plugins should consider
-        overriding this function as well.
-
-        This function accepts the ``instance`` as a parameter and returns a string to be
-        used as the ``alt`` text for the plugin's icon which will appear as a tooltip in
-        most browsers.  This is useful, because if the same plugin is used multiple
-        times within the same text plugin, they will typically all render with the
-        same icon rendering them visually identical to one another. This ``alt`` text and
-        related tooltip will help the operator distinguish one from the others.
-
         By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
         [instance]", but can be modified to return anything you like.
+
+        This function accepts the ``instance`` as a parameter and returns a string to be
+        used as the ``alt`` text for the plugin's preview or icon.
+
+        Authors of "text enabled" plugins should consider overriding this function as 
+        it will be rendered as a tooltip in most browser. This is useful, because if 
+        the same plugin is used multiple times, this tooltip can provide information about 
+        it's configuration.
 
         :meth:`icon_alt` takes 1 argument:
 
@@ -360,6 +365,9 @@ CMSPluginBase Attributes and Methods Reference
         Therefore, this should be overridden when the plugin has ``text_enabled`` set to
         ``True`` to return the path to an icon to display in the text of the text
         plugin.
+        
+        Since djangocms-text-ckeditor introduced inline previews of plugins, the icon
+        will not be rendered anymore.
 
         icon_src takes 1 argument:
 
