@@ -14,6 +14,7 @@ from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_language_list
+from cms.utils.moderator import use_draft
 
 APP_RESOLVERS = []
 
@@ -37,6 +38,9 @@ def applications_page_check(request, current_page=None, path=None):
     for lang in get_language_list():
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
+
+    use_public = not use_draft(request)
+
     for resolver in APP_RESOLVERS:
         try:
             page_id = resolver.resolve_page_id(path)
@@ -45,7 +49,7 @@ def applications_page_check(request, current_page=None, path=None):
             # If current page was matched, then we have some override for
             # content from cms, but keep current page. Otherwise return page
             # to which was application assigned.
-            return page
+            return page if use_public else page.publisher_public
         except Resolver404:
             # Raised if the page is not managed by an apphook
             pass
