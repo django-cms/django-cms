@@ -1,3 +1,7 @@
+=== 3.5.3 (unreleased) ===
+
+* Fixed "TreeNode matching query does not exist." when exporting and loading database contents via dumpdata and loaddata.
+
 === 3.5.2 (2018-04-11) ===
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
