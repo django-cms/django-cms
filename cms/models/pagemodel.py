@@ -1648,7 +1648,7 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(*args, **kwargs)
+        return super(TreeNode, self).add_sibling(*args, pos=pos, **kwargs)
 
     def update(self, **data):
         cls = self.__class__

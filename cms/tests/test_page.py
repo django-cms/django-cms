@@ -501,6 +501,16 @@ class PagesTestCase(TransactionCMSTestCase):
         # Now there should be "en", "de" and "fr" on the public page
         self.assertSequenceEqual(sorted(page.publisher_public.get_languages()), ['de', 'en', 'fr'])
 
+    def test_create_page_with_position_regression_6345(self):
+        # ref: https://github.com/divio/django-cms/issues/6345
+        parent = create_page("p", "nav_playground.html", "en")
+        rightmost = create_page("r", "nav_playground.html", "en",parent=parent)
+        leftmost = create_page("l", "nav_playground.html", "en",parent=rightmost, position="left")
+        create_page("m", "nav_playground.html", "en",parent=leftmost, position="right")
+        children_titles = list(p.get_title("de") for p in parent.get_child_pages())
+        self.assertEqual(children_titles, ["l","m","r"])
+
+
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
         child = create_page("Child", constants.TEMPLATE_INHERITANCE_MAGIC,
