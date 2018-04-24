@@ -1,3 +1,7 @@
+* Fixed a bug where creating a page via the cms.api.create_page ignores left/right
+  positions
+
+
 === 3.5.2 (2018-04-11) ===
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
