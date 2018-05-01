@@ -11,6 +11,13 @@ from cms.apphook_pool import apphook_pool
 from .models import SampleAppConfig
 
 
+class AppWithNoMenu(CMSApp):
+    app_name = 'app_with_no_menu'
+
+    def get_urls(self, page=None, language=None, **kwargs):
+        return ["cms.test_utils.project.sampleapp.urls"]
+
+
 class SampleApp(CMSApp):
     name = _("Sample App")
     permissions = True
