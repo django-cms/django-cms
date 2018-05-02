@@ -7,6 +7,9 @@
 * Fixed a bug where editing pages with primary keys greater than 9999 would throw an
   exception.
 * Fixed broken wizard page creation when no language is set within the template context (see #5828).
+* Fixed a bug where ``request.current_page`` would always be the public page,
+  regardless of the toolbar status (draft / live). This only affected custom
+  urls from an apphook.
 
 
 === 3.4.6 (2018-03-26) ===
