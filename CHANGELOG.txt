@@ -3,6 +3,9 @@
 * Removed extra quotation mark from the sideframe button template
 * Fixed a bug where xframe options were processed by clickjacking middleware
   when page was served from cache, rather then get this value from cache
+* Fixed a bug where ``request.current_page`` would always be the public page,
+  regardless of the toolbar status (draft / live). This only affected custom
+  urls from an apphook.
 
 
 === 3.4.6 (2018-03-26) ===
