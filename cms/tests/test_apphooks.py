@@ -20,6 +20,7 @@ from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Title, Page
+from cms.middleware.page import get_page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
@@ -325,20 +326,33 @@ class ApphooksTestCase(CMSTestCase):
 
         public_page = page.get_public_object()
 
+        with force_language("en"):
+            path = reverse('sample-settings')
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'en'
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+            self.assertEqual(attached_to_page.pk, public_page.pk)
+
+        with force_language("de"):
+            path = reverse('sample-settings')
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'de'
+            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+            self.assertEqual(attached_to_page.pk, public_page.pk)
+
         with self.login_user_context(superuser):
             with force_language("en"):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 request.LANGUAGE_CODE = 'en'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                response = self.client.get(path+"?edit")
-                self.assertContains(response, '?redirect=')
+                self.assertEqual(attached_to_page.pk, page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
                 request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 request.LANGUAGE_CODE = 'de'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-                self.assertEqual(attached_to_page.pk, public_page.pk)
+                self.assertEqual(attached_to_page.pk, page.pk)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_root_page_for_apphook_with_instance_namespace(self):
@@ -868,6 +882,85 @@ class ApphooksTestCase(CMSTestCase):
         self.assertTrue('/static/fresh/' in nodes_urls)
 
         self.apphook_clear()
+
+    @override_settings(
+        CMS_APPHOOKS=['cms.test_utils.project.sampleapp.cms_apps.AppWithNoMenu'],
+    )
+    def test_menu_node_is_selected_on_app_root(self):
+        """
+        If a user requests a page with an apphook,
+        the menu should mark the node for that page as selected.
+        """
+        defaults = {
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+            'template': 'nav_playground.html',
+        }
+        homepage = create_page('EN-P1', **defaults)
+        homepage.set_as_homepage()
+        app_root = create_page('EN-P2', apphook='AppWithNoMenu', apphook_namespace='app_with_no_menu', **defaults)
+
+        # Public version
+        request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
+        request.current_page = get_page(request)
+        menu_nodes = menu_pool.get_renderer(request).get_nodes()
+        self.assertEqual(len(menu_nodes), 2)
+        self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
+        self.assertEqual(menu_nodes[0].selected, False)
+        self.assertEqual(menu_nodes[1].id, app_root.publisher_public_id)
+        self.assertEqual(menu_nodes[1].selected, True)
+
+        # Draft version
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
+            request.current_page = get_page(request)
+            menu_nodes = menu_pool.get_renderer(request).get_nodes()
+            self.assertEqual(len(menu_nodes), 2)
+            self.assertEqual(menu_nodes[0].id, homepage.pk)
+            self.assertEqual(menu_nodes[0].selected, False)
+            self.assertEqual(menu_nodes[1].id, app_root.pk)
+            self.assertEqual(menu_nodes[1].selected, True)
+
+    @override_settings(
+        CMS_APPHOOKS=['cms.test_utils.project.sampleapp.cms_apps.AppWithNoMenu'],
+    )
+    def test_menu_node_is_selected_on_app_sub_path(self):
+        """
+        If a user requests a path belonging to an apphook,
+        the menu should mark the node for the apphook page as selected.
+        """
+        # Refs - https://github.com/divio/django-cms/issues/6336
+        defaults = {
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+            'template': 'nav_playground.html',
+        }
+        homepage = create_page('EN-P1', **defaults)
+        homepage.set_as_homepage()
+        app_root = create_page('EN-P2', apphook='AppWithNoMenu', apphook_namespace='app_with_no_menu', **defaults)
+
+        # Public version
+        request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
+        request.current_page = get_page(request)
+        menu_nodes = menu_pool.get_renderer(request).get_nodes()
+        self.assertEqual(len(menu_nodes), 2)
+        self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
+        self.assertEqual(menu_nodes[0].selected, False)
+        self.assertEqual(menu_nodes[1].id, app_root.publisher_public_id)
+        self.assertEqual(menu_nodes[1].selected, True)
+
+        # Draft version
+        with self.login_user_context(self.get_superuser()):
+            request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
+            request.current_page = get_page(request)
+            menu_nodes = menu_pool.get_renderer(request).get_nodes()
+            self.assertEqual(len(menu_nodes), 2)
+            self.assertEqual(menu_nodes[0].id, homepage.pk)
+            self.assertEqual(menu_nodes[0].selected, False)
+            self.assertEqual(menu_nodes[1].id, app_root.pk)
+            self.assertEqual(menu_nodes[1].selected, True)
 
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):
