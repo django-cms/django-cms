@@ -45,18 +45,18 @@ Functions and constants
 
 .. data:: VISIBILITY_ALL
 
-    Used for the ``limit_menu_visibility`` keyword argument to
+    Used for the ``limit_visibility_in_menu`` keyword argument to
     :func:`create_page`. Does not limit menu visibility.
 
 
 .. data:: VISIBILITY_USERS
 
-    Used for the ``limit_menu_visibility`` keyword argument to
+    Used for the ``limit_visibility_in_menu`` keyword argument to
     :func:`create_page`. Limits menu visibility to authenticated users.
 
 .. data:: VISIBILITY_ANONYMOUS
 
-    Used for the ``limit_menu_visibility`` keyword argument to
+    Used for the ``limit_visibility_in_menu`` keyword argument to
     :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
@@ -90,8 +90,8 @@ Functions and constants
     :param site: Site to put this page on
     :type site: :class:`django.contrib.sites.models.Site` instance
     :param bool login_required: Whether users must be logged in or not to view this page
-    :param limit_menu_visibility: Limits visibility of this page in the menu
-    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
+    :param limit_visibility_in_menu: Limits visibility of this page in the menu
+    :type limit_visibility_in_menu: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection

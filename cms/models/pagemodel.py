@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import copy
-import warnings
 from collections import OrderedDict
 from logging import getLogger
 from os.path import join
@@ -33,6 +32,115 @@ from treebeard.mp_tree import MP_Node
 
 
 logger = getLogger(__name__)
+
+
+@python_2_unicode_compatible
+class TreeNode(MP_Node):
+
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name='children',
+        db_index=True,
+    )
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        verbose_name=_("site"),
+        related_name='djangocms_nodes',
+        db_index=True,
+    )
+
+    objects = PageNodeManager()
+
+    class Meta:
+        app_label = 'cms'
+        ordering = ('path',)
+        default_permissions = []
+
+    def __str__(self):
+        return self.path
+
+    @cached_property
+    def item(self):
+        return self.get_item()
+
+    def get_item(self):
+        # Paving the way...
+        return Page.objects.get(node=self, publisher_is_draft=True)
+
+    @property
+    def is_branch(self):
+        return bool(self.numchild)
+
+    def get_ancestor_paths(self):
+        paths = frozenset(
+            self.path[0:pos]
+            for pos in range(0, len(self.path), self.steplen)[1:]
+        )
+        return paths
+
+    def add_child(self, **kwargs):
+        if len(kwargs) == 1 and 'instance' in kwargs:
+            kwargs['instance'].parent = self
+        else:
+            kwargs['parent'] = self
+        return super(TreeNode, self).add_child(**kwargs)
+
+    def add_sibling(self, pos=None, *args, **kwargs):
+        if len(kwargs) == 1 and 'instance' in kwargs:
+            kwargs['instance'].parent_id = self.parent_id
+        else:
+            kwargs['parent_id'] = self.parent_id
+        return super(TreeNode, self).add_sibling(*args, **kwargs)
+
+    def update(self, **data):
+        cls = self.__class__
+        cls.objects.filter(pk=self.pk).update(**data)
+
+        for field, value in data.items():
+            setattr(self, field, value)
+        return
+
+    def get_cached_ancestors(self):
+        if self._has_cached_hierarchy():
+            return self._ancestors
+        return []
+
+    def get_cached_descendants(self):
+        if self._has_cached_hierarchy():
+            return self._descendants
+        return []
+
+    def _reload(self):
+        """
+        Reload a page node from the database
+        """
+        return self.__class__.objects.get(pk=self.pk)
+
+    def _has_cached_hierarchy(self):
+        return hasattr(self, '_descendants') and hasattr(self, '_ancestors')
+
+    def _set_hierarchy(self, nodes, ancestors=None):
+        if self.is_branch:
+            self._descendants = [node for node in nodes
+                           if node.path.startswith(self.path)
+                           and node.depth > self.depth]
+        else:
+            self._descendants = []
+
+        if self.is_root():
+            self._ancestors = []
+        else:
+            self._ancestors = ancestors
+
+        children = (node for node in self._descendants
+                    if node.depth == self.depth + 1)
+
+        for child in children:
+            child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
 @python_2_unicode_compatible
@@ -179,55 +287,6 @@ class Page(models.Model):
 
         if hasattr(self, '_prefetched_objects_cache'):
             del self._prefetched_objects_cache
-
-    @property
-    def parent(self):
-        warnings.warn(
-            'Pages no longer have a "parent" field. '
-            'To get the parent object of any given page, use the "parent_page" attribute. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.parent_page
-
-    @property
-    def parent_id(self):
-        warnings.warn(
-            'Pages no longer have a "parent_id" attribute. '
-            'To get the parent id of any given page, '
-            'call "pk" on the "parent_page" attribute. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        if self.parent_page:
-            return self.parent_page.pk
-        return None
-
-    @property
-    def site(self):
-        warnings.warn(
-            'Pages no longer have a "site" field. '
-            'To get the site object of any given page, '
-            'call "site" on the page "node" object. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.node.site
-
-    @property
-    def site_id(self):
-        warnings.warn(
-            'Pages no longer have a "site_id" attribute. '
-            'To get the site id of any given page, '
-            'call "site_id" on the page "node" object. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.node.site_id
 
     @cached_property
     def parent_page(self):
@@ -539,19 +598,16 @@ class Page(models.Model):
         source_title.save()
         return source_title
 
-    def _clear_placeholders(self, language):
+    def _clear_placeholders(self, language=None):
         from cms.models import CMSPlugin
-        from cms.signals.utils import disable_cms_plugin_signals
 
         placeholders = list(self.get_placeholders())
         placeholder_ids = (placeholder.pk for placeholder in placeholders)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
 
-        with disable_cms_plugin_signals():
-            plugins = CMSPlugin.objects.filter(
-                language=language,
-                placeholder__in=placeholder_ids,
-            )
-            models.query.QuerySet.delete(plugins)
+        if language:
+            plugins = plugins.filter(language=language)
+        models.query.QuerySet.delete(plugins)
         return placeholders
 
     def _copy_contents(self, target, language):
@@ -650,6 +706,7 @@ class Page(models.Model):
             title.save()
 
             new_page.title_cache[title.language] = title
+        new_page.update_languages([trans.language for trans in translations])
 
         # copy the placeholders (and plugins on those placeholders!)
         for placeholder in self.placeholders.iterator():
@@ -1586,112 +1643,3 @@ class PageType(Page):
 
     def is_potential_home(self):
         return False
-
-
-@python_2_unicode_compatible
-class TreeNode(MP_Node):
-
-    parent = models.ForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        related_name='children',
-        db_index=True,
-    )
-    site = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-        verbose_name=_("site"),
-        related_name='djangocms_nodes',
-        db_index=True,
-    )
-
-    objects = PageNodeManager()
-
-    class Meta:
-        app_label = 'cms'
-        ordering = ('path',)
-        default_permissions = []
-
-    def __str__(self):
-        return self.path
-
-    @cached_property
-    def item(self):
-        return self.get_item()
-
-    def get_item(self):
-        # Paving the way...
-        return Page.objects.get(node=self, publisher_is_draft=True)
-
-    @property
-    def is_branch(self):
-        return bool(self.numchild)
-
-    def get_ancestor_paths(self):
-        paths = frozenset(
-            self.path[0:pos]
-            for pos in range(0, len(self.path), self.steplen)[1:]
-        )
-        return paths
-
-    def add_child(self, **kwargs):
-        if len(kwargs) == 1 and 'instance' in kwargs:
-            kwargs['instance'].parent = self
-        else:
-            kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
-
-    def add_sibling(self, pos=None, *args, **kwargs):
-        if len(kwargs) == 1 and 'instance' in kwargs:
-            kwargs['instance'].parent_id = self.parent_id
-        else:
-            kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(*args, **kwargs)
-
-    def update(self, **data):
-        cls = self.__class__
-        cls.objects.filter(pk=self.pk).update(**data)
-
-        for field, value in data.items():
-            setattr(self, field, value)
-        return
-
-    def get_cached_ancestors(self):
-        if self._has_cached_hierarchy():
-            return self._ancestors
-        return []
-
-    def get_cached_descendants(self):
-        if self._has_cached_hierarchy():
-            return self._descendants
-        return []
-
-    def _reload(self):
-        """
-        Reload a page node from the database
-        """
-        return self.__class__.objects.get(pk=self.pk)
-
-    def _has_cached_hierarchy(self):
-        return hasattr(self, '_descendants') and hasattr(self, '_ancestors')
-
-    def _set_hierarchy(self, nodes, ancestors=None):
-        if self.is_branch:
-            self._descendants = [node for node in nodes
-                           if node.path.startswith(self.path)
-                           and node.depth > self.depth]
-        else:
-            self._descendants = []
-
-        if self.is_root():
-            self._ancestors = []
-        else:
-            self._ancestors = ancestors
-
-        children = (node for node in self._descendants
-                    if node.depth == self.depth + 1)
-
-        for child in children:
-            child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))

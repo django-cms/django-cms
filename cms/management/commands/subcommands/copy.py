@@ -63,6 +63,9 @@ class CopyLangCommand(SubcommandsCommand):
                     title.publisher_public_id = None
                     title.publisher_state = 0
                     title.language = to_lang
+
+                    if to_lang not in page.get_languages():
+                        page.update_languages(page.get_languages() + [to_lang])
                     title.save()
                 if copy_content:
                     # copy plugins using API

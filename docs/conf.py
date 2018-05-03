@@ -33,14 +33,14 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.autodoc']
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/1.10/', 'https://docs.djangoproject.com/en/1.10/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
     'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
-#templates_path = ['templates']
+# templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -120,13 +120,14 @@ todo_include_todos = True
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    try:
-        import sphinx_rtd_theme
-        html_theme = 'sphinx_rtd_theme'
-        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    except:
-        html_theme = 'default'
+try:
+    import divio_docs_theme
+    html_theme = 'divio_docs_theme'
+    html_theme_path = [divio_docs_theme.get_html_theme_path()]
+except:
+    html_theme = 'default'
+
+show_cloud_banner = True
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
@@ -159,7 +160,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.

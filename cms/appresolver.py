@@ -13,8 +13,8 @@ from django.utils.translation import get_language, override
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
-from cms.utils.compat import DJANGO_1_8, DJANGO_1_9
 from cms.utils.i18n import get_language_list
+from cms.utils.moderator import use_draft
 
 APP_RESOLVERS = []
 
@@ -38,6 +38,9 @@ def applications_page_check(request, current_page=None, path=None):
     for lang in get_language_list():
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
+
+    use_public = not use_draft(request)
+
     for resolver in APP_RESOLVERS:
         try:
             page_id = resolver.resolve_page_id(path)
@@ -46,7 +49,7 @@ def applications_page_check(request, current_page=None, path=None):
             # If current page was matched, then we have some override for
             # content from cms, but keep current page. Otherwise return page
             # to which was application assigned.
-            return page
+            return page if use_public else page.publisher_public
         except Resolver404:
             # Raised if the page is not managed by an apphook
             pass
@@ -117,18 +120,11 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
             args = pattern.default_kwargs
             if default_args:
                 args.update(default_args)
-            if DJANGO_1_8:
-                # this is an 'include', recurse!
-                resolver = RegexURLResolver(regex, 'cms_appresolver',
-                                            pattern.default_kwargs, pattern.app_name, pattern.namespace)
-                # see lines 243 and 236 of urlresolvers.py to understand the next line
-                resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
-            else:
-                # see lines 243 and 236 of urlresolvers.py to understand the next line
-                urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
-                # this is an 'include', recurse!
-                resolver = RegexURLResolver(regex, urlconf_module,
-                                            pattern.default_kwargs, pattern.app_name, pattern.namespace)
+            # see lines 243 and 236 of urlresolvers.py to understand the next line
+            urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+            # this is an 'include', recurse!
+            resolver = RegexURLResolver(regex, urlconf_module,
+                                        pattern.default_kwargs, pattern.app_name, pattern.namespace)
         else:
             # Re-do the RegexURLPattern with the new regular expression
             args = pattern.default_args
@@ -149,10 +145,7 @@ def _set_permissions(patterns, exclude_permissions):
             _set_permissions(pattern.url_patterns, exclude_permissions)
         else:
             from cms.utils.decorators import cms_perms
-            if DJANGO_1_9:
-                pattern._callback = cms_perms(pattern.callback)
-            else:
-                pattern.callback = cms_perms(pattern.callback)
+            pattern.callback = cms_perms(pattern.callback)
 
 
 def get_app_urls(urls):

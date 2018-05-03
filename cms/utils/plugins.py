@@ -301,7 +301,7 @@ def downcast_plugins(plugins,
             yield plugin_lookup[plugin.pk]
 
 
-def reorder_plugins(placeholder, parent_id, language, order):
+def reorder_plugins(placeholder, parent_id, language, order=None):
     """
     Reorder the plugins according the order parameter
 
@@ -316,10 +316,9 @@ def reorder_plugins(placeholder, parent_id, language, order):
         language=language,
     ).order_by('position')
 
-    # Make sure we're dealing with a list
-    order = list(order)
-
     if order:
+        # Make sure we're dealing with a list
+        order = list(order)
         plugins = plugins.filter(pk__in=order)
 
         for plugin in plugins.iterator():

@@ -17,17 +17,7 @@
         {% endif %}
 
         <div class="choice-wrapper">
-            {% if DJANGO_1_10 %}
-                {% for entry, wizard in form.get_wizard_entries %}
-                    <label tabindex="0" class="choice{% if forloop.first %} active{% endif %}">
-                        <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}"{% if forloop.first %} checked{% endif %}>
-                        <strong>{{ wizard.get_title }}</strong>
-                        <span class="info">{{ wizard.get_description }}</span>
-                    </label>
-                {% endfor %}
-            {% else %}
-                {{ form.entry }}
-            {% endif %}
+            {{ form.entry }}
         </div>
         <div class="submit-row">
             <input type="submit" value="{% trans 'Next' %}" class="default cms-btn cms-btn-action" name="_continue">
