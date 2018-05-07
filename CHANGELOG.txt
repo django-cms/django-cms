@@ -4,6 +4,8 @@
 * Dropped Django < 1.11 support.
 * Removed the translatable content get / set methods from ``CMSPlugin`` model.
 * Removed signal handlers for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models.
+* Moved ``Title.meta_description`` length restriction from model to form 
+  and increased its max length to 320 characters.
 
 
 === 3.5.2 (2018-04-11) ===

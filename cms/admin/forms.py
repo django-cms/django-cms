@@ -127,9 +127,9 @@ class BasePageForm(forms.ModelForm):
                                  help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
                                  required=False)
     meta_description = forms.CharField(label=_('Description meta tag'), required=False,
-                                       widget=forms.Textarea(attrs={'maxlength': '155', 'rows': '4'}),
+                                       widget=forms.Textarea(attrs={'maxlength': '320', 'rows': '4'}),
                                        help_text=_('A description of the page used by search engines.'),
-                                       max_length=155)
+                                       max_length=320)
 
     class Meta:
         model = Page
