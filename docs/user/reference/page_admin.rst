@@ -224,7 +224,7 @@ and bookmarks, and in search engine results.
 *Description meta tag* is expected to be used to populate a `<meta>` tag in the document `<head>`.
 This is not displayed on the page, but is used for example by search engines for indexing and to
 show a summary of page content. It can also be used by other Django applications for similar
-purposes. Description is restricted to 155 characters, the number of characters search engines
+purposes. Description is restricted to 320 characters, the number of characters search engines
 typically use to show content.
 
 =================
