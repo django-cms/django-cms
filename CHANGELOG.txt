@@ -1,3 +1,8 @@
+=== 3.4.7 (unreleased) ===
+
+* Removed extra quotation mark from the sideframe button template
+
+
 === 3.4.6 (2018-03-26) ===
 
 * Changed the way drag and drop works in the page tree. The page has to be
