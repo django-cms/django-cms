@@ -5,6 +5,8 @@
   opened with blank page
 * Fixed a bug where the direct children of the homepage would get a leading ``/``
   character when the homepage was moved or published.
+* Fixed a bug where xframe options were processed by clickjacking middleware
+  when page was served from cache, rather then get this value from cache
 
 
 === 3.5.1 (2018-03-05) ===
