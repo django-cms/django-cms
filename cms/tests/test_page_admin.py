@@ -1145,7 +1145,7 @@ class PageTest(PageTestBase):
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data2['slug'] + "/" + page_data3['slug'])
 
-    def test_user_cant_neast_home_page(self):
+    def test_user_cant_nest_home_page(self):
         """
         Users should not be able to move the home-page
         inside another node of the tree.

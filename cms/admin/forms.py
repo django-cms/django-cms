@@ -839,11 +839,12 @@ class PageTreeForm(forms.Form):
 
 class MovePageForm(PageTreeForm):
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data = super(MovePageForm, self).clean()
 
-        # The user doesn't have permission to do this anymore
-        if self.page.is_home and cleaned_data.get('target', None):
+        if self.page.is_home and cleaned_data.get('target'):
             self.add_error('target', force_text(_('You can\'t move the home page to this place')))
+
+        return cleaned_data
 
     def get_tree_options(self):
         options = super(MovePageForm, self).get_tree_options()
