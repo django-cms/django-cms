@@ -843,7 +843,6 @@ class MovePageForm(PageTreeForm):
 
         if self.page.is_home and cleaned_data.get('target'):
             self.add_error('target', force_text(_('You can\'t move the home page to this place')))
-
         return cleaned_data
 
     def get_tree_options(self):
