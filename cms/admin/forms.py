@@ -838,11 +838,12 @@ class PageTreeForm(forms.Form):
 
 
 class MovePageForm(PageTreeForm):
+
     def clean(self):
         cleaned_data = super(MovePageForm, self).clean()
 
         if self.page.is_home and cleaned_data.get('target'):
-            self.add_error('target', force_text(_('You can\'t move the home page to this place')))
+            self.add_error('target', force_text(_('You can\'t move the home page inside another page')))
         return cleaned_data
 
     def get_tree_options(self):
