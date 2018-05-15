@@ -21,6 +21,7 @@
 * Fixed a bug where setting the ``on_delete`` option on ``PlaceholderField``
   and ``PageField`` fields would be ignored.
 * Fixed a bug when deleting a modal from changelist inside a modal
+* Added form validation logic to prevent users from moving the home page under another page.
 
 
 === 3.5.2 (2018-04-11) ===
