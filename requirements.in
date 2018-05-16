@@ -12,7 +12,7 @@ https://control.divio.com/api/v1/apps/serve/djangocms-modules/0.0.4/ca71b210-449
 https://control.divio.com/api/v1/apps/serve/djangocms-picture/2.0.6/005e8663-d1cc-4667-936c-30709edad076/djangocms-picture-2.0.6.tar.gz#egg=djangocms-picture==2.0.6
 https://control.divio.com/api/v1/apps/serve/djangocms-snippet/2.0.0/03734ae6-5d3e-44aa-8641-8f764dbced64/djangocms-snippet-2.0.0.tar.gz#egg=djangocms-snippet==2.0.0
 https://control.divio.com/api/v1/apps/serve/djangocms-style/2.0.2/51797e49-ec8c-461d-92e0-1cc274eb96af/djangocms-style-2.0.2.tar.gz#egg=djangocms-style==2.0.2
-https://control.divio.com/api/v1/apps/serve/djangocms-text-ckeditor/3.5.1rc4/c9b74131-adc0-4785-9a05-77c54671a9f2/djangocms-text-ckeditor-3.5.1rc4.tar.gz#egg=djangocms-text-ckeditor==3.5.1rc4
+https://control.divio.com/api/v1/apps/serve/djangocms-text-ckeditor/3.5.3/a7b5179f-cea5-4af8-b235-6b7f709c4e6a/djangocms-text-ckeditor-3.5.3.tar.gz#egg=djangocms-text-ckeditor==3.5.3
 https://control.divio.com/api/v1/apps/serve/djangocms-video/2.0.4/d62adbd2-40e9-4cc5-9a10-01a5e141bf85/djangocms-video-2.0.4.tar.gz#egg=djangocms-video==2.0.4
 https://control.divio.com/api/v1/apps/serve/django-filer/1.2.7.1/bb3dab96-7bcd-4654-a2ab-a36814ef253f/django-filer-1.2.7.1.tar.gz#egg=django-filer==1.2.7.1
 # </INSTALLED_ADDONS>

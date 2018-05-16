@@ -27,22 +27,6 @@ class Form(forms.BaseForm):
             'language': '{{ language }}',
             'toolbar': 'CMS',
             'skin': 'moono-lisa',
-            'extraPlugins': 'cmsplugins',
-            'toolbar_HTMLField': [
-                ['Undo', 'Redo'],
-                ['cmsplugins', '-', 'ShowBlocks'],
-                ['Format', 'Styles'],
-                ['TextColor', 'BGColor', '-', 'PasteText', 'PasteFromWord'],
-                ['Maximize', ''],
-                '/',
-                ['Bold', 'Italic', 'Underline', '-', 'Subscript', 'Superscript', '-', 'RemoveFormat'],
-                ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
-                ['HorizontalRule'],
-                ['Link', 'Unlink'],
-                ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Table'],
-                ['Source'],
-                ['Link', 'Unlink', 'Anchor'],
-            ],
         }
 
         # This could fail if aldryn-django-cms has not been configured yet.
