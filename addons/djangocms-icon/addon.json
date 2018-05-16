@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "djangocms_icon"
+    ], 
+    "package-name": "djangocms-icon"
+}
