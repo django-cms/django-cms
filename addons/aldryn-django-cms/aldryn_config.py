@@ -77,7 +77,6 @@ class Form(forms.BaseForm):
             'menus',
             'sekizai',
             'treebeard',
-            'reversion',
         ])
 
         # TODO: break out this stuff into other addons
