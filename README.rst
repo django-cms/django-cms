@@ -55,10 +55,10 @@ Requirements
 ************
 
 See the `Python/Django requirements for the current release version
-<http://docs.django-cms.org/en/stable/#software-version-requirements-and-release-notes>`_ in our documentation.
+<http://docs.django-cms.org/en/latest/#software-version-requirements-and-release-notes>`_ in our documentation.
 
 See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
-<http://docs.django-cms.org/en/stable/how-to/install.html>`_
+<http://docs.django-cms.org/en/latest/how_to/install.html>`_
 
 *************
 Documentation
@@ -71,7 +71,7 @@ We maintain documentation for several versions of the project. Key versions are:
 * `develop <http://docs.django-cms.org/en/develop/>`_, representing the latest build of the **develop branch**
 
 For more information about our branch policy, see `Branches
-<http://docs.django-cms.org/en/stable/contributing/development-policies.html>`_.
+<http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
