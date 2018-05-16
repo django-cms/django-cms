@@ -1,0 +1,153 @@
+@import 'popover';
+.djangocms-icon {
+    .caret {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 2px;
+        border-top:   4px dashed;
+        border-right: 4px solid transparent;
+        border-left:  4px solid transparent;
+    }
+}
+
+.djangocms-icon-left {
+    &:before {
+        content: '←';
+    }
+}
+.djangocms-icon-right {
+    &:before {
+        content: '→';
+    }
+}
+.iconpicker-popover {
+    .form-control {
+        line-height: 34px;;
+        height: 34px;;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .search-control {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .form-control {
+        display: block;
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+        -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+        transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    }
+    .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+}
+.djangocms-icon select.form-control {
+    width: auto !important;
+}
+.djangocms-icon .icon-widgets label {
+    display: inline !important;
+}
+.djangocms-icon select {
+    margin: 0;
+    vertical-align: top;
+}
+.djangocms-icon .icon-widgets {
+    display: flex;
+    align-items: center;
+}
+.djangocms-icon button.iconpicker {
+    height: 36px;
+    font-size: 20px !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+    display: inline-flex;
+    align-items: center;
+}
+
+.iconpicker-popover .search-control {
+    width: 100% !important;
+}
+.iconpicker-popover table tfoot tr td {
+   padding-top: 10px;
+   border-top: 0;
+   background: none;
+}
+.iconpicker-popover .page-count {
+    display: inline-block;
+    padding-top: 12px;
+}
+
+.iconpicker-popover .fa- {
+    width: 14px;
+}
+
+.icon[data-svg="true"] {
+    &:before {
+        content: none !important;
+    }
+}
+.djangocms-svg-icon:before {
+    content: none !important;
+}
+.djangocms-svg-icon {
+    font-size: 20px;
+}
+.djangocms-svg-icon svg {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: top;
+}
+.table-icons .disabled {
+    /*
+     work around the bug in the icon picker when disabled buttons could
+     be clicked which would result in icon page overflow errors
+     */
+    pointer-events: none !important;
+}
+
+.table-icons {
+    .btn {
+        width: 72px !important;
+        font-size: 20px !important;
+
+        .icon {
+            vertical-align: middle !important;
+        }
+    }
+    td {
+        padding: 2px;
+    }
+}

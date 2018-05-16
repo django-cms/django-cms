@@ -1,0 +1,1 @@
+{% load cms_tags djangocms_icon_tags %}<i class="{{ icon_class|iconset_from_class }} {{ icon_class }} {{ instance.attributes.class }}" aria-hidden="true" {% for key, value in instance.attributes.items %}{% if key != 'class' %} {{ key }}="{{ value }}"{% endif %}{% endfor %}></i>
