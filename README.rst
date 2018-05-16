@@ -2,7 +2,7 @@
 django CMS
 ##########
 .. image:: https://travis-ci.org/divio/django-cms.svg?branch=develop
-    :target: http://travis-ci.org/divio/django-cms
+    :target: https://travis-ci.org/divio/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
@@ -48,7 +48,7 @@ Features
 
 Developing applications that integrate with and take advantage of django CMS features is easy and well-documented.
 
-More information on `our website <http://www.django-cms.org>`_.
+More information on `our website <https://www.django-cms.org>`_.
 
 ************
 Requirements
@@ -122,7 +122,7 @@ Credits
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
+* JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
 * Many thanks to the
   `over 515 contributors <https://github.com/divio/django-cms/blob/develop/AUTHORS>`_
   to the django CMS!
