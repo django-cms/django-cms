@@ -2,5 +2,6 @@
     "disable_default_language_prefix": true, 
     "enable_gis": false, 
     "languages": "[\"en\"]", 
+    "session_timeout": "", 
     "use_manifeststaticfilesstorage": false
 }
