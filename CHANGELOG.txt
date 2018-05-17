@@ -5,7 +5,7 @@
 * Fixed a bug where ``request.current_page`` would always be the public page,
   regardless of the toolbar status (draft / live). This only affected custom
   urls from an apphook.
-* Removed extra quotation mark from the sideframe button tmeplate
+* Removed extra quotation mark from the sideframe button template
 
 
 === 3.5.2 (2018-04-11) ===
