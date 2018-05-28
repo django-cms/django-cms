@@ -216,6 +216,13 @@ describe('CMS.StructureBoard', function() {
 
             expect(board.ui.toolbarModeSwitcher.find('.cms-btn')).toHaveClass('cms-btn-disabled');
         });
+
+        it('sets loaded content and structure flags if it is a legacy renderer', () => {
+            CMS.config.settings.legacy_mode = true;
+            board = new CMS.StructureBoard();
+            expect(board._loadedStructure).toEqual(true);
+            expect(board._loadedContent).toEqual(true);
+        });
     });
 
     describe('.show()', function() {
@@ -2538,6 +2545,36 @@ describe('CMS.StructureBoard', function() {
 
                 StructureBoard.__ResetDependency__('Helpers');
             });
+        });
+
+        it('does not preload the opposite mode (legacy renderer)', () => {
+            const div = document.createElement('div');
+            const _getWindow = jasmine.createSpy().and.returnValue(div);
+
+            StructureBoard.__Rewire__('Helpers', {
+                _getWindow
+            });
+
+            const board = new StructureBoard();
+
+            spyOn(board, '_requestMode');
+
+            jasmine.clock().install();
+
+            CMS.config.settings.legacy_mode = true;
+            board._loadedContent = true;
+            board._loadedStructure = true;
+
+            board._preloadOppositeMode();
+            expect(board._requestMode).not.toHaveBeenCalled();
+            $(div).trigger('load');
+            expect(board._requestMode).not.toHaveBeenCalled();
+            jasmine.clock().tick(2001);
+            expect(board._requestMode).not.toHaveBeenCalled();
+
+            jasmine.clock().uninstall();
+
+            StructureBoard.__ResetDependency__('Helpers');
         });
     });
 
