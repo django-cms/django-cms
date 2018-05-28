@@ -6,6 +6,8 @@
   regardless of the toolbar status (draft / live). This only affected custom
   urls from an apphook.
 * Removed extra quotation mark from the sideframe button template
+* Fixed a bug where structureboard tried to preload markup when using legacy
+  renderer
 
 
 === 3.5.2 (2018-04-11) ===

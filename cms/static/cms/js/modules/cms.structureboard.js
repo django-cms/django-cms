@@ -156,6 +156,9 @@ class StructureBoard {
     }
 
     _preloadOppositeMode() {
+        if (CMS.config.settings.legacy_mode) {
+            return;
+        }
         const WAIT_BEFORE_PRELOADING = 2000;
 
         $(Helpers._getWindow()).one('load', () => {
