@@ -127,7 +127,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
         app_label = 'cms'
         ordering = ('position',)
         indexes = [
-            models.Index(fields=['placeholder', 'language']),
             models.Index(fields=['placeholder', 'language', 'position']),
         ]
         unique_together = ('placeholder', 'language', 'position')

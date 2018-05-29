@@ -43,7 +43,6 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.plugins import get_plugins
 from django.utils.http import urlencode
@@ -352,14 +351,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             live_page_context = self.get_context(live_page.get_absolute_url(), page=live_page)
             rendered_live_placeholder = _render_placeholder(live_placeholder, live_page_context)
             self.assertEqual(rendered_live_placeholder, "I'm the firstI'm the secondI'm the third")
-
-        columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
-        column = api.add_plugin(
-            placeholder,
-            "ColumnPlugin",
-            "en",
-            target=columns,
-        )
 
     def test_plugin_position(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
