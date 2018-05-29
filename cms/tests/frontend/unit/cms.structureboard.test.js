@@ -2411,6 +2411,51 @@ describe('CMS.StructureBoard', function() {
         });
     });
 
+    describe('_getPluginDataFromMarkup()', () => {
+        [
+            {
+                args: ['', [1, 2, 3]],
+                expected: []
+            },
+            {
+                args: ['whatever', []],
+                expected: []
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 3]],
+                expected: []
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 4]],
+                expected: [['cms-plugin-4', { plugin_id: '4' }]]
+            },
+            {
+                args: [
+                    `CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);
+                    CMS._plugins.push(["cms-plugin-10", { "plugin_id": "meh"}]);`, [1, 2, 10]],
+                expected: [['cms-plugin-10', { plugin_id: 'meh' }]]
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",{plugin_id:"4"}])', [4]],
+                expected: []
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",not a json :(]);', [4]],
+                expected: []
+            },
+            {
+                args: [`CMS._plugins.push(["cms-plugin-4", {
+                    "something": 1
+                }])`, [4]],
+                expected: [['cms-plugin-4', { something: 1 }]]
+            }
+        ].forEach((test, i) => {
+            it(`extracts plugin data from markup ${i}`, () => {
+                expect(StructureBoard._getPluginDataFromMarkup(...test.args)).toEqual(test.expected);
+            });
+        });
+    });
+
     describe('_extractMessages()', () => {
         let board;
 

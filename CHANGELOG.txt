@@ -13,6 +13,8 @@
 * Fixed a bug where xframe options were processed by clickjacking middleware
   when page was served from cache, rather then get this value from cache
 * Fixed a bug where cached page permissions overrides global permissions
+* Fixed a bug where plugins that are not rendered in content wouldn't be
+  editable in structure board
 
 
 === 3.5.2 (2018-04-11) ===
