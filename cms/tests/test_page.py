@@ -1198,11 +1198,13 @@ class PageTreeTests(CMSTestCase):
         override['CMS_PAGE_CACHE'] = True
 
         with self.settings(**override):
-            page = create_page('test page 1', 'nav_playground.html', 'en', published=True)
-
-            page.xframe_options = Page.X_FRAME_OPTIONS_ALLOW
-            page.save()
-            page.publish('en')
+            page = create_page(
+                'test page 1',
+                'nav_playground.html',
+                'en',
+                published=True,
+                xframe_options=Page.X_FRAME_OPTIONS_ALLOW,
+            )
 
             # Normal response from render_page
             resp = self.client.get(page.get_absolute_url('en'))
