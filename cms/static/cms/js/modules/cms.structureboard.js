@@ -379,18 +379,16 @@ class StructureBoard {
     }
 
     _loadStructure() {
-        var that = this;
-
         // case when structure mode is already loaded
         if (CMS.config.settings.mode === 'structure' || this._loadedStructure) {
             return Promise.resolve();
         }
 
         showLoader();
-        return that
+        return this
             ._requestMode('structure')
-            .done(function(contentMarkup) {
-                that._requeststructure = null;
+            .done(contentMarkup => {
+                this._requeststructure = null;
                 hideLoader();
 
                 CMS.settings.states = Helpers.getSettings().states;
@@ -405,6 +403,15 @@ class StructureBoard {
 
                     return elem.is('[type="text/cms-template"]'); // cms scripts
                 });
+                const pluginIds = this.getIds(body.find('.cms-draggable'));
+                const pluginDataSource = body.filter('script[data-cms]').toArray()
+                    .map(script => script.textContent || '').join();
+                const pluginData = StructureBoard._getPluginDataFromMarkup(
+                    pluginDataSource,
+                    pluginIds
+                );
+
+                Plugin._updateRegistry(pluginData.map(([, data]) => data));
 
                 CMS.API.Toolbar._refreshMarkup(toolbar);
 
@@ -426,11 +433,11 @@ class StructureBoard {
                     }
                 });
 
-                that.ui.sortables = $('.cms-draggables');
-                that._drag();
+                this.ui.sortables = $('.cms-draggables');
+                this._drag();
                 StructureBoard._initializeDragItemsStates();
 
-                that._loadedStructure = true;
+                this._loadedStructure = true;
             })
             .fail(function() {
                 window.location.href = new URI(window.location.href)
@@ -1491,6 +1498,39 @@ class StructureBoard {
             });
         }
     }
+
+    /**
+     * Get's plugins data from markup
+     *
+     * @method _getPluginDataFromMarkup
+     * @private
+     * @param {String} markup
+     * @param {Array<Number | String>} pluginIds
+     * @returns {Array<[String, Object]>}
+     */
+    static _getPluginDataFromMarkup(markup, pluginIds) {
+        return compact(
+            pluginIds.map(pluginId => {
+                // oh boy
+                const regex = new RegExp(`CMS._plugins.push\\((\\["cms\-plugin\-${pluginId}",[\\s\\S]*?\\])\\)`, 'g');
+                const matches = regex.exec(markup);
+                let settings;
+
+                if (matches) {
+                    try {
+                        settings = JSON.parse(matches[1]);
+                    } catch (e) {
+                        settings = false;
+                    }
+                } else {
+                    settings = false;
+                }
+
+                return settings;
+            })
+        );
+    }
+
 }
 
 /**
