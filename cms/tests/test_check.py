@@ -120,7 +120,7 @@ class CheckTests(CheckAssertMixin, TestCase):
             self.assertCheck(False, warnings=0, errors=1)
 
     @isolate_apps("test_app")
-    def test_placeholder_mixin(self):
+    def test_placeholder_field(self):
         from django.db import models
         from django.contrib import admin
         from cms.models.fields import PlaceholderField
