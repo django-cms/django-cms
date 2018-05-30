@@ -1145,6 +1145,24 @@ class PageTest(PageTestBase):
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data2['slug'] + "/" + page_data3['slug'])
 
+    def test_user_cant_nest_home_page(self):
+        """
+        Users should not be able to move the home-page
+        inside another node of the tree.
+        """
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+        home_sibling_1 = create_page("root-1", "nav_playground.html", "en", published=True)
+
+        payload = {'id': homepage.pk, 'position': 0, 'target': home_sibling_1}
+
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(Page, 'move_page', homepage.pk)
+            response = self.client.post(endpoint, payload)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json().get('status', 400), 400)
+
     def test_move_home_page(self):
         """
         Users should be able to move the home-page
