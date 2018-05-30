@@ -30,7 +30,7 @@ What's new in 3.4
 * Added a new ``Shift`` + ``Space`` shortcut to switch between structure and
   content mode while highlighting the current plugin, revealing its position.
 * Improved keyboard navigation
-* Added help modal about available shortcuts
+* Added help modal about available short-cuts
 * Added fuzzy matching to the plugin picker.
 * Changed the ``downcast_plugins`` utility to return a generator instead of a
   list.
@@ -108,7 +108,7 @@ The following methods were changed to require a user parameter instead of a requ
  * ``Page.has_change_permissions_permission``
  * ``Page.has_move_page_permission``
 
-These are also deprecated in favor of their counterparts in ``cms.utils.page_permissions``.
+These are also deprecated in favour of their counterparts in ``cms.utils.page_permissions``.
 
 To keep consistency with both django CMS permissions and Django permissions,
 we've modified the vanilla permissions system (``CMS_PERMISSIONS = False``)

@@ -4,8 +4,6 @@
 How to extend the Toolbar
 #########################
 
-.. versionadded:: 3.0
-
 You can add and remove toolbar items. This allows you to integrate django CMS's frontend editing
 mode into your application, and provide your users with a streamlined editing experience.
 
@@ -18,6 +16,7 @@ For the toolbar API reference, please refer to :ref:`toolbar-api-reference`.
     behaviour in the user's browser.
 
     In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
+
 
 ***********
 Registering
@@ -106,7 +105,7 @@ When adding items, all arguments other than the name or identifier should be
 given as **keyword arguments**. This will help ensure that your custom toolbar
 items survive upgrades.
 
-Following our :doc:`/introduction/toolbar`, let's add the poll app
+Following our example in the :ref:`toolbar tutorial <toolbar_introduction>`, let's add the poll app
 to the toolbar::
 
     from django.core.urlresolvers import reverse
