@@ -122,7 +122,7 @@ Finally, there's a list of the **sites** they can perform the actions on.
 Page-specific permissions
 -------------------------
 
-The CMS permissions system also provides permisions control for particular pages or hierarchies of pages in the site -
+The CMS permissions system also provides permissions control for particular pages or hierarchies of pages in the site -
 row-level permissions, in other words.
 
 These are controlled by selecting *Permissions* from the *Page* menu in the toolbar when on the page (this options is only

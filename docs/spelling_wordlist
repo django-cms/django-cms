@@ -1,39 +1,31 @@
+
+
+
+#
+#
+#
 #
 #					Important
-#
 # Different systems, have different ideas of correct spelling, so a reported
 # error, or an accepted spelling, might not be seen on a different system, or
 # indeed on Travis.
-#
-# Until further notice please do not commit changes to this file before a
-# review by Daniele Procida.
-#
 # Please keep the two sections below separate.
-
+# review by Daniele Procida.
+# Until further notice please do not commit changes to this file before a
+#### accepted entries ####
 #### entries that need to be checked for various different reasons        ####
 #### for example because different operating systems' dictionaries differ ####
-alt
-api
-dev
-fallback
-fallbacks
-js
-jsTree
-practices
-rc
-regexps
-src
-url
-vs
-
-#### accepted entries ####
-
 addon
 addons
 Admin
 admin
+ajax
 Aldryn
+alskgj
+alt
 Alvarado
+Andras
+api
 app
 apphook
 apphooked
@@ -42,6 +34,7 @@ apps
 astagi
 Asus
 attr
+auth
 backport
 backported
 backticks
@@ -55,20 +48,24 @@ casper
 changelist
 Changelog
 checkboxes
+cleanup
 clickable
 Clickjacking
 CMS
 cms
 codebase
+Config
 counterintuitive
-cleanup
 CSS
 customisable
 Daniele
+db
 Debian
 deprecations
 Deutsch
+dev
 dialogs
+Diemer
 Dini
 dirtycoder
 Divio
@@ -83,7 +80,11 @@ draggable
 driesdesmet
 elpaso
 etc
+fallback
+fallbacks
 Fankhauser
+Farzy
+Fedoseev
 fieldset
 filenames
 fillable
@@ -95,12 +96,17 @@ framebuffer
 freenode
 frontend
 furiousdave
+Gianluca
 gigaroby
 Google
 Googlemap
+Guarini
+Gyömrey
 Homebrew
 Html5lib
 hvad
+Hähne
+i
 Iacopo
 iframe
 ikudryavtsev
@@ -113,17 +119,24 @@ ipsum
 Japanisch
 JavaScript
 jedie
+Jens
 jokerejoker
 josjevv
 jQuery
 jrief
+js
 jsma
+jsTree
+Júlio
 Koistinen
+kwarg
+kwargs
 Larghi
 Lauber
 ldgarcia
 lin
 linted
+linter
 linters
 linting
 localhost
@@ -132,6 +145,8 @@ logout
 lookup
 Lorem
 lowercased
+Lucchese
+m
 maqnouch
 Matteo
 max
@@ -145,6 +160,7 @@ multi
 namespace
 namespaced
 namespaces
+Namespacing
 newsblog
 nikolas
 northben
@@ -153,6 +169,7 @@ Nüesch
 Obrist
 olarcheveque
 online
+Paramonov
 Paulo
 peterfarrell
 Placeholder
@@ -160,39 +177,50 @@ placeholder
 placeholders
 plugin
 plugins
+practices
 pre
 prized
 Procida
 programmatically
 queryset
+rc
 rebase
 recurses
 refactor
 refactored
+regexps
+resizable
+Rief
 runserver
 runtime
+Salmanul
 Saltvik
 sam
 Samsung
 Sass
 Schoen
+screenshots
 searchable
 Sekizai
 sekizai
 sephii
+Sergey
 sideframe
 Sikora
 sitemap
 sitemaps
-screenshots
 slugified
 Spalletti
+src
 stefanw
+Steinhauser
 structureboard
 stylesheets
+svg
 Sylvain
-templating
 templatetags
+templating
+timezone
 timgraham
 Todo
 tomwardill
@@ -206,6 +234,7 @@ treebeard
 tuple
 tuples
 Ubuntu
+un
 uncached
 unclosed
 uncomment
@@ -216,18 +245,23 @@ unihandecode
 unimprovable
 uninstall
 uninstallable
+uninstalled
 uninstalling
 uninstalls
 unoverridden
 unpublish
 unregister
 upgraders
+url
 urlconf
+urlconfs
 username
+utils
 vad
 Vadim
 viewable
 Vimeo
+vs
 vs
 vstoykov
 whitespace
@@ -237,6 +271,7 @@ writeable
 xframe
 Xperia
 YouTube
+Zakharenko
 Zürich
 Øyvind
 日本語
