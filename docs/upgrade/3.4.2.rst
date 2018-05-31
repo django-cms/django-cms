@@ -57,7 +57,7 @@ Deprecations
   CMSPlugin model.
 * Added a deprecation warning to method ``render_plugin()`` in class ``CMSPlugin``.
 * Deprecated ``frontend_edit_template`` attribute of ``CMSPluginBase``.
-* The ``post_`` methods in ```PlaceholderAdminMixin`` have been deprecated in favor of
+* The ``post_`` methods in ```PlaceholderAdminMixin`` have been deprecated in favour of
   placeholder operation signals.
 
 Other changes

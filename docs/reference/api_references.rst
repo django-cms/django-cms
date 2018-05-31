@@ -66,34 +66,34 @@ Functions and constants
     creates a :class:`cms.models.Title` instance for the specified
     language.
 
-    :param string title: Title of the page
-    :param string template: Template to use for this page. Must be in :setting:`CMS_TEMPLATES`
-    :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
-    :param string menu_title: Menu title for this page
-    :param string slug: Slug for the page, by default uses a slugified version of *title*
+    :param str title: Title of the page
+    :param str template: Template to use for this page. Must be in :setting:`CMS_TEMPLATES`
+    :param str language: Language code for this page. Must be in :setting:`django:LANGUAGES`
+    :param str menu_title: Menu title for this page
+    :param str slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
-    :type apphook: string or :class:`cms.app_base.CMSApp` sub-class
-    :param string apphook_namespace: Name of the apphook namespace
-    :param string redirect: URL redirect
-    :param string meta_description: Description of this page for SEO
+    :type apphook: str or :class:`cms.app_base.CMSApp` sub-class
+    :param str apphook_namespace: Name of the apphook namespace
+    :param str redirect: URL redirect
+    :param str meta_description: Description of this page for SEO
     :param created_by: User that is creating this page
-    :type created_by: string of :class:`django.contrib.auth.models.User` instance
+    :type created_by: str of :class:`django.contrib.auth.models.User` instance
     :param parent: Parent page of this page
     :type parent: :class:`cms.models.Page` instance
     :param datetime publication_date: Date to publish this page
     :param datetime publication_end_date: Date to unpublish this page
     :param bool in_navigation: Whether this page should be in the navigation or not
     :param bool soft_root: Whether this page is a soft root or not
-    :param string reverse_id: Reverse ID of this page (for template tags)
-    :param string navigation_extenders: Menu to attach to this page. Must be a valid menu
+    :param str reverse_id: Reverse ID of this page (for template tags)
+    :param str navigation_extenders: Menu to attach to this page. Must be a valid menu
     :param bool published: Whether this page should be published or not
     :param site: Site to put this page on
     :type site: :class:`django.contrib.sites.models.Site` instance
     :param bool login_required: Whether users must be logged in or not to view this page
     :param limit_visibility_in_menu: Limits visibility of this page in the menu
     :type limit_visibility_in_menu: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
-    :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
-    :param string overwrite_url: Overwritten path for this page
+    :param str position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
+    :param str   overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection
 
 
@@ -101,17 +101,17 @@ Functions and constants
 
     Creates a :class:`cms.models.Title` instance and returns it.
 
-    :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
-    :param string title: Title of the page
+    :param str language: Language code for this page. Must be in :setting:`django:LANGUAGES`
+    :param str title: Title of the page
     :param page: The page for which to create this title
     :type page: :class:`cms.models.Page` instance
-    :param string menu_title: Menu title for this page
-    :param string slug: Slug for the page, by default uses a slugified version of *title*
-    :param string redirect: URL redirect
-    :param string meta_description: Description of this page for SEO
+    :param str menu_title: Menu title for this page
+    :param str slug: Slug for the page, by default uses a slugified version of *title*
+    :param str redirect: URL redirect
+    :param str meta_description: Description of this page for SEO
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.Page` instance
-    :param string overwrite_url: Overwritten path for this page
+    :param str overwrite_url: Overwritten path for this page
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
@@ -121,9 +121,9 @@ Functions and constants
     :param placeholder: Placeholder to add the plugin to
     :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
     :param plugin_type: What type of plugin to add
-    :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
-    :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
-    :param string position: Position to add this plugin to the placeholder, must be a valid django-treebeard ``pos``
+    :type plugin_type: str or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
+    :param str language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
+    :param str position: Position to add this plugin to the placeholder, must be a valid django-treebeard ``pos``
         value for :meth:`treebeard:treebeard.models.Node.add_sibling`
     :param target: Parent plugin. Must be plugin instance
     :param data: Data for the plugin type instance
@@ -165,14 +165,14 @@ Functions and constants
     :type page: :class:`cms.models.Page` instance
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
-    :param string language: The target language to publish to
+    :param str language: The target language to publish to
 
 .. function:: publish_pages(include_unpublished=False, language=None, site=None)
 
     Publishes multiple pages defined by parameters.
 
     :param bool include_unpublished: Set to ``True`` to publish all drafts, including unpublished ones; otherwise, only already published pages will be republished
-    :param string language: If given, only pages in this language will be published; otherwise, all languages will be published
+    :param str language: If given, only pages in this language will be published; otherwise, all languages will be published
     :param site: Specify a site to publish pages for specified site only; if not specified pages from all sites are published
     :type site: :class:`django.contrib.sites.models.Site` instance
 
@@ -196,8 +196,8 @@ Functions and constants
 
     :param page: the page to copy
     :type page: :class:`cms.models.Page` instance
-    :param string source_language: The source language code, must be in :setting:`django:LANGUAGES`
-    :param string target_language: The source language code, must be in :setting:`django:LANGUAGES`
+    :param str source_language: The source language code, must be in :setting:`django:LANGUAGES`
+    :param str target_language: The source language code, must be in :setting:`django:LANGUAGES`
     :param bool only_empty: if False, plugin are copied even if plugins exists in the
      target language (on a placeholder basis).
     :return int: number of copied plugins
