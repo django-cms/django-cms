@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, add_plugin, create_title

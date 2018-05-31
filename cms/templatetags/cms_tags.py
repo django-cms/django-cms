@@ -7,7 +7,7 @@ from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string

@@ -100,15 +100,10 @@ class Migration(IrreversibleMigration):
             name='page',
             unique_together=set([('node', 'publisher_is_draft')]),
         ),
-    ]
-
-
-if django.VERSION >= (1, 10):
-    Migration.operations.append(
         migrations.AlterModelManagers(
             name='pageusergroup',
             managers=[
                 ('objects', django.contrib.auth.models.GroupManager()),
             ],
         ),
-    )
+    ]

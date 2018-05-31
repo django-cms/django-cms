@@ -9,7 +9,7 @@ from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language

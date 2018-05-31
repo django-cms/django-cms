@@ -111,7 +111,6 @@ if __name__ == '__main__':
                 'loaders': (
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
                 )
             }
         }

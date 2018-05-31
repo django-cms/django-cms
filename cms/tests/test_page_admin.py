@@ -4,7 +4,7 @@ import json
 import sys
 
 from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
+from django.urls import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.forms.models import model_to_dict
@@ -1044,13 +1044,12 @@ class PageTest(PageTestBase):
                     'name': 'English',
                     'fallbacks': ['fr', 'de'],
                     'public': True,
-                    'fallbacks':['fr']
                 },
                 {
                     'code': 'fr',
                     'name': 'French',
                     'public': True,
-                    'fallbacks':['en']
+                    'fallbacks': ['en']
                 },
         ]}
         with self.settings(CMS_LANGUAGES=languages):

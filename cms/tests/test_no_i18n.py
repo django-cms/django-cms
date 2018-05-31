@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import clear_url_caches
+from django.urls import clear_url_caches
 from django.template import Template
 from django.test import RequestFactory
 from django.test.utils import override_settings

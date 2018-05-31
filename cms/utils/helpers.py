@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
 
+from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
-from django.utils.translation import force_text
 
 
 def find_placeholder_relation(obj):

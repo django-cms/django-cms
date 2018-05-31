@@ -11,9 +11,9 @@ else:
 urlpatterns = [
     # Public pages
     url(r'^example/',
-        include('cms.test_utils.project.sampleapp.urls_example', namespace="example1", app_name='example_app')),
+        include('cms.test_utils.project.sampleapp.urls_example', namespace="example1")),
     url(r'^example2/',
-        include('cms.test_utils.project.sampleapp.urls_example', namespace="example2", app_name='example_app')),
+        include('cms.test_utils.project.sampleapp.urls_example', namespace="example2")),
     url(r'^$', details, {'slug': ''}, name='pages-root'),
     reg,
 ]

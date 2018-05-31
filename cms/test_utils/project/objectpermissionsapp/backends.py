@@ -9,7 +9,7 @@ class ObjectPermissionBackend(object):
         if user_obj and user_obj.is_superuser:
             return True
         elif obj is None or not isinstance(obj, Model) or \
-                not user_obj.is_authenticated() or not user_obj.is_active:
+                not user_obj.is_authenticated or not user_obj.is_active:
             return False
         if len(perm.split('.')) > 1:
             app_label, perm = perm.split('.')

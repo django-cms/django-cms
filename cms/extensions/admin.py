@@ -4,7 +4,7 @@ from cms.utils.page_permissions import user_can_change_page
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 

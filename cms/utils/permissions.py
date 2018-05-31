@@ -61,7 +61,7 @@ def get_model_permission_codename(model, action):
 
 
 def _has_global_permission(user, site, action):
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.is_superuser:
@@ -115,7 +115,7 @@ def get_user_permission_level(user, site):
         2.
 
     """
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         raise NoPermissionsException
 
     if user.is_superuser or not get_cms_setting('PERMISSION'):

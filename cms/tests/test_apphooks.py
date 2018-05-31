@@ -7,7 +7,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches, reverse, resolve, NoReverseMatch
+from django.urls import clear_url_caches, reverse, resolve, NoReverseMatch
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.timezone import now
