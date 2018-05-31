@@ -37,33 +37,13 @@ This is a very basic example of an apphook for a django CMS application:
             return ["polls.urls"]
 
 
-Instead of defining the URL patterns in another file ``polls/urls.py``, it also is possible
-to return them directly, for instance as:
+In this ``PollsApphook`` class, we have done several key things:
 
-.. code-block:: python
-
-    from django.conf.urls import url
-    from polls.views import PollListView, PollDetailView
-
-    class PollsApphook(CMSApp):
-        # ...
-        def get_urls(self, page=None, language=None, **kwargs):
-            return [
-                url(r'^$', PollListView.as_view()),
-                url(r'^(?P<slug>[\w-]+)/?$', PollDetailView.as_view()),
-            ]
-
-
-What this all means
-===================
-
-In the ``PollsApphook`` class, we have done several key things:
-
-* The ``app_name`` attribute gives the system a way to refer to the apphook - see :ref:`multi_apphook` for details
-  on why this matters.
-* ``name`` is a human-readable name for the admin user.
-* The ``get_urls()`` method is what actually hooks the application in, returning a list of URL configurations that will
-  be made active wherever the apphook is used.
+* ``app_name`` attribute gives the system a unique way to refer to the apphook - see
+  :ref:`multi_apphook` for details on why this matters.
+* ``name`` is a human-readable name, and will be displayed to the admin user.
+* ``get_urls()`` method is what actually hooks the application in, returning a
+  list of URL configurations that will be made active wherever the apphook is used.
 
 **Restart the runserver**. This is necessary because we have created a new file containing Python
 code that won't be loaded until the server restarts. You only have to do this the first time the
@@ -80,7 +60,7 @@ Now we need to create a new page, and attach the Polls application to it through
 
 Create and save a new page, then publish it.
 
-.. note:: Your apphook won't work until the page has been published.
+..  note:: Your apphook won't work until the page has been published.
 
 In its *Advanced settings*, choose "Polls Application" from the *Application* menu, and save once
 more.
@@ -94,9 +74,11 @@ Refresh the page, and you'll find that the Polls application is now available
 directly from the new django CMS page.
 
 You can now remove the mention of the Polls application (``url(r'^polls/', include('polls.urls',
-namespace='polls'))``) from your project's ``urls.py`` - it's no longer even required there.
+namespace='polls'))``) from your project's ``urls.py`` - it's no longer even required there,
+because we reach the polls via the apphook instead. If you leave it there, then you'll receive a
+warning in the logs::
 
-Later, we'll install a django-CMS-compatible :ref:`third-party application <third_party>`.
+    URL namespace 'polls' isn't unique. You may not be able to reverse all URLs in this namespace.
 
 ..  important::
 
