@@ -8,19 +8,17 @@ django CMS allows you to control what appears in the toolbar. This allows you
 to integrate your application in the frontend editing mode of django CMS and
 provide your users with a streamlined editing experience.
 
+In this section of the tutorial, we will add a new *Polls* menu to the toolbar.
 
-******************
-Create the toolbar
-******************
 
-Add the basic ``PollToolbar`` class
-===================================
+*********************************
+Add a basic ``PollToolbar`` class
+*********************************
 
-We'll create a toolbar using a ``cms.toolbar_base.CMSToolbar`` sub-class.
+We'll create a toolbar menu using a ``cms.toolbar_base.CMSToolbar`` sub-class.
 
-Start by adding a new ``cms_toolbars.py`` file to your Polls/CMS Integration application.
-
-Create the ``CMSToolbar``:
+Start by adding a new ``cms_toolbars.py`` file to your Polls/CMS Integration application, and
+create the ``CMSToolbar``:
 
 ..  code-block:: python
 
@@ -41,6 +39,7 @@ Create the ``CMSToolbar``:
     # register the toolbar
     toolbar_pool.register(PollToolbar)
 
+
 ..  note::
 
     Don't forget to restart the runserver to have your new ``cms_toolbars.py`` file recognised.
@@ -51,17 +50,19 @@ You will now find, in every page of the site, a new item in the toolbar:
    :alt: The Polls menu in the toolbars
    :width: 630
 
-The ``populate()`` method is what gets called when the toolbar is built. Here, we're using
+The ``populate()`` method is what gets called when the toolbar is built. In it, we're using
 :meth:`get_or_create_menu() <cms.toolbar.toolbar.CMSToolbar.get_or_create_menu()>` to add a *Polls*
 item to the toolbar.
 
 
+*****************************
 Add nodes to the *Polls* menu
-=============================
+*****************************
 
 So far, the *Polls* menu is empty. We can extend ``populate()`` to add some items.
-``get_or_create_menu`` returns a menu that we can manipulate, so let's change the
-``populate()`` method to add an item that allows us to see the full list of polls in the sideframe, with :meth:`add_sideframe_item() <cms.toolbar.items.ToolbarMixin.add_sideframe_item()>`.
+``get_or_create_menu`` returns a menu that we can manipulate, so let's change the ``populate()``
+method to add an item that allows us to see the full list of polls in the sideframe, with
+:meth:`add_sideframe_item() <cms.toolbar.items.ToolbarMixin.add_sideframe_item()>`.
 
 ..  code-block:: python
     :emphasize-lines: 1, 8, 10-13
@@ -101,13 +102,14 @@ end of the ``populate()`` method:
                 )
 
 
+*******************
 Further refinements
-===================
+*******************
 
 The *Polls* menu appears in the toolbar everywhere in the site. It would be useful to restrict this
-to pages that actually relevant.
+to pages that are actually relevant.
 
-The first thing to add is a test to the start of the ``populate()`` method:
+The first thing to add is a test right at the start of the ``populate()`` method:
 
 ..  code-block:: python
     :emphasize-lines: 3-4
@@ -117,8 +119,10 @@ The first thing to add is a test to the start of the ``populate()`` method:
             if not self.is_current_app:
                 return
 
+            [...]
+
 The ``is_current_app`` flag tells us if the function handling this view (e.g. the list of polls)
-belongs to the same application as the one responsible for this toolbar menu. Normally, this can be
+belongs to the same application as the one responsible for this toolbar menu. Often, this can be
 detected automatically, but in this case, the view belongs to the ``polls`` application, whereas
 the toolbar menu belongs to ``polls_cms_integration``. So, we need to tell the ``PollToolbar``
 class explicitly that it's actually associated with the ``polls`` application:
@@ -133,8 +137,9 @@ class explicitly that it's actually associated with the ``polls`` application:
 Now, the menu will only appear in relevant pages.
 
 
+********************************
 The complete ``cms_toolbars.py``
-================================
+********************************
 
 For completeness, here is the full example:
 
