@@ -52,6 +52,7 @@ def details(request, slug):
         if cache_content is not None:
             content, headers, expires_datetime = cache_content
             response = HttpResponse(content)
+            response.xframe_options_exempt = True
             response._headers = headers
             # Recalculate the max-age header for this cached response
             max_age = int(
