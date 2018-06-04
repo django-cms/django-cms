@@ -80,7 +80,7 @@ def mark_urlconf_as_changed():
     return new_revision
 
 
-def reload_urlconf(urlconf=None, new_revision=None):
+def reload_urlconf(urlconf=None, new_revision=None, clear_cache=True):
     from cms.appresolver import clear_app_resolvers, get_app_patterns
 
     if 'cms.urls' in sys.modules:
@@ -89,8 +89,9 @@ def reload_urlconf(urlconf=None, new_revision=None):
         urlconf = settings.ROOT_URLCONF
     if urlconf in sys.modules:
         reload(sys.modules[urlconf])
-    clear_app_resolvers()
-    clear_url_caches()
+    if clear_cache:
+        clear_app_resolvers()
+        clear_url_caches()
     get_app_patterns()
     if new_revision is not None:
         set_local_revision(new_revision)
