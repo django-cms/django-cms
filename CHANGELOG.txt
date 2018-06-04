@@ -1,6 +1,8 @@
 === 3.4.7 (unreleased) ===
 
 * Removed extra quotation mark from the sideframe button template
+* Fixed a bug where xframe options were processed by clickjacking middleware
+  when page was served from cache, rather then get this value from cache
 
 
 === 3.4.6 (2018-03-26) ===
