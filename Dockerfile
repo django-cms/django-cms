@@ -11,8 +11,8 @@ FROM aldryn/base-project:py3-3.23
 # <NODE>
 ADD tools/build /stack/boilerplate
 
-ENV NODE_VERSION=6.10.1 \
-    NPM_VERSION=3.10.10
+ENV NODE_VERSION=8.11.0 \
+    NPM_VERSION=6.1.0
 
 RUN bash /stack/boilerplate/install.sh
 
@@ -44,9 +44,8 @@ RUN test -s /.cache.node_modules.tar.gz \
   && tar xzf /.cache.node_modules.tar.gz -C / \
   && echo "Extracted .cache.node_modules.tar.gz to /node_modules" \
   || true
-RUN npm install -g npm-install-retry
-COPY package.json /
-RUN (cd / && npm prune && npm-install-retry -- --production && rm -rf /tmp/*)
+COPY package*.json /
+RUN (cd / && npm prune && npm install --production && rm -rf /tmp/*)
 # </NPM>
 
 # <SOURCE>
