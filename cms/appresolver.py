@@ -147,7 +147,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
 
             regex_pattern = regex
             if django.VERSION >= (2, 0):
-                regex_pattern = RegexPattern(regex)
+                regex_pattern = RegexPattern(regex, name=pattern.name)
             resolver = URLPattern(regex_pattern, pattern.callback, args,
                                   pattern.name)
         resolver.page_id = page_id

@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from functools import wraps
 from threading import local
 
+import django
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
@@ -203,7 +204,13 @@ def get_page_actions_for_user(user, site):
 
     for perm in page_permissions.iterator():
         # set internal fk cache to our page with loaded ancestors and descendants
-        perm._page_cache = pages_by_id[perm.page_id]
+        if django.VERSION >= (2, 0):
+            if not hasattr(perm._state, 'fields_cache'):
+                perm._state.fields_cache = {}
+            perm._state.fields_cache['page'] = pages_by_id[perm.page_id]
+        else:
+            perm._page_cache = pages_by_id[perm.page_id]
+
         page_ids = frozenset(perm.get_page_ids())
 
         for action in perm.get_configured_actions():
@@ -354,7 +361,12 @@ def get_view_restrictions(pages):
 
     for perm in page_permissions:
         # set internal fk cache to our page with loaded ancestors and descendants
-        perm._page_cache = pages_by_id[perm.page_id]
+        if django.VERSION >= (2, 0):
+            if not hasattr(perm._state, 'fields_cache'):
+                perm._state.fields_cache = {}
+            perm._state.fields_cache['page'] = pages_by_id[perm.page_id]
+        else:
+            perm._page_cache = pages_by_id[perm.page_id]
 
         for page_id in perm.get_page_ids():
             restricted_pages[page_id].append(perm)

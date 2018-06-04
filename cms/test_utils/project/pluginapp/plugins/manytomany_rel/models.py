@@ -30,7 +30,7 @@ class ArticlePluginModel(CMSPlugin):
         return self.title
 
     def copy_relations(self, oldinstance):
-        self.sections = oldinstance.sections.all()
+        self.sections.set(oldinstance.sections.all())
 
 
 ###
@@ -60,4 +60,4 @@ class PluginModelWithM2MToModel(CMSPlugin):
 
     def copy_relations(self, oldinstance):
         # Like suggested in the docs
-        self.m2m_field = oldinstance.m2m_field.all()
+        self.m2m_field.set(oldinstance.m2m_field.all())

@@ -156,8 +156,8 @@ class UserSelectAdminWidget(Select):
     Current user should be assigned to widget in form constructor as an user
     attribute.
     """
-    def render(self, name, value, attrs=None, choices=()):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs)]
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, renderer=renderer)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon

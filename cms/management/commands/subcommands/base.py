@@ -42,6 +42,7 @@ class SubcommandsCommand(BaseCommand):
     instances = {}
     help_string = ''
     command_name = ''
+    stealth_options = ('interactive',)
 
     subcommand_dest = 'subcmd'
 
@@ -69,7 +70,12 @@ class SubcommandsCommand(BaseCommand):
 
                 add_builtin_arguments(parser=parser_sub)
                 instance.add_arguments(parser_sub)
+                self.stealth_options = (
+                    *self.stealth_options,
+                    *{action.dest for action in parser_sub._actions},
+                )
                 self.instances[command] = instance
+            self.stealth_options = tuple({*self.stealth_options})
 
     def handle(self, *args, **options):
         if options[self.subcommand_dest] in self.instances:

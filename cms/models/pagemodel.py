@@ -237,6 +237,7 @@ class Page(models.Model):
     objects = PageManager()
 
     class Meta:
+        default_permissions = ('add', 'change', 'delete')
         permissions = (
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
@@ -277,9 +278,10 @@ class Page(models.Model):
         if hasattr(self, '_node_cache'):
             del self._node_cache
 
-        if hasattr(self, 'fields_cache'):
-            # Django >= 2.0
-            self.fields_cache = {}
+        # Django >= 2.0
+        if hasattr(self._state, 'fields_cache'):
+            if self._state.fields_cache.get('node'):
+                del self._state.fields_cache['node']
 
     def _clear_internal_cache(self):
         self.title_cache = {}
@@ -773,6 +775,7 @@ class Page(models.Model):
             new_root_node.move(target_node, position)
             new_root_node.refresh_from_db(fields=('path', 'depth'))
 
+        self._clear_node_cache()
         nodes_by_id = {self.node.pk: new_root_node}
 
         for page in descendants:
@@ -784,6 +787,8 @@ class Page(models.Model):
                 permissions=copy_permissions,
             )
             nodes_by_id[page.node_id] = new_page.node
+
+        new_root_page._clear_node_cache()
         return new_root_page
 
     def delete(self, *args, **kwargs):

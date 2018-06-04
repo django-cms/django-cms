@@ -174,7 +174,7 @@ def details(request, slug):
 def login(request):
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
 
-    if not is_safe_url(url=redirect_to, host=request.get_host()):
+    if not is_safe_url(url=redirect_to, allowed_hosts=request.get_host()):
         redirect_to = reverse("pages-root")
 
     if request.user.is_authenticated:

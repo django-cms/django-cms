@@ -3,9 +3,7 @@ from django.shortcuts import render
 from django.template import RequestContext
 from django.template.engine import Engine
 from django.views.generic import DetailView
-from cms.test_utils.project.placeholderapp.models import (
-    Example1, MultilingualExample1, CharPksExample)
-from cms.utils import get_language_from_request
+from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
 
 
 def example_view(request):
@@ -29,28 +27,6 @@ def _base_detail(request, instance, template_name='detail.html',
         return HttpResponse(template.render(context))
     else:
         return render(request, template_name, context)
-
-
-def list_view_multi(request):
-    context = {}
-    context['examples'] = MultilingualExample1.objects.language(
-        get_language_from_request(request)).all()
-    context['instance_class'] = MultilingualExample1
-    return render(request, 'list.html', context)
-
-
-def detail_view_multi(request, pk, template_name='detail_multi.html',
-                      item_name="char_1", template_string='',):
-    instance = MultilingualExample1.objects.language(
-        get_language_from_request(request)).get(pk=pk)
-    return _base_detail(request, instance, template_name, item_name,
-                        template_string)
-
-
-def detail_view_multi_unfiltered(request, pk, template_name='detail_multi.html',
-                                 item_name="char_1", template_string='',):
-    instance = MultilingualExample1.objects.get(pk=pk)
-    return _base_detail(request, instance, template_name, item_name, template_string)
 
 
 def list_view(request):

@@ -20,5 +20,4 @@ pyenchant
 djangocms-helper
 mock>=2.0.0
 django-reversion>=2.0
-https://github.com/KristianOellegaard/django-hvad/archive/master.zip
 django-formtools

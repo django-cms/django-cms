@@ -149,7 +149,7 @@ class BaseCMSTestCase(object):
         options.update(**kwargs)
 
         gpp = GlobalPagePermission.objects.create(**options)
-        gpp.sites = Site.objects.all()
+        gpp.sites.add(*Site.objects.all())
         return gpp
 
     def add_page_permission(self, user, page, **kwargs):

@@ -75,7 +75,6 @@ if __name__ == '__main__':
         'cms',
         'menus',
         'sekizai',
-        'hvad',
     ] + PLUGIN_APPS
 
     MIGRATION_MODULES = {
