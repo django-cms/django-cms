@@ -38,11 +38,14 @@ class PagePermissionInlineAdmin(TabularInline):
     extra = 0  # edit page load time boost
     show_with_view_permissions = False
 
-    def has_add_permission(self, request, obj=None):
-        if not obj:
-            return False
+    def has_change_permission(self, request, obj=None):
         site = self.get_site(request)
+        if not obj:
+            return permissions.has_global_permission(request.user, site, 'can_change_pagepermission')
         return page_permissions.user_can_change_page_permissions(request.user, page=obj, site=site)
+
+    def has_add_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
 
     def get_site(self, request):
         site_id = request.session.get('cms_admin_site')

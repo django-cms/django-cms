@@ -669,6 +669,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
         return can_change_page
 
+    def has_view_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
+
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
             return False

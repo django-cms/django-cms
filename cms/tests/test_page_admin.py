@@ -598,7 +598,7 @@ class PageTest(PageTestBase):
     def test_publish_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en", published=True)
         homepage.set_as_homepage()
-        pending_child_1 =  create_page(
+        pending_child_1 = create_page(
             "child-1",
             "nav_playground.html",
             language="en",
