@@ -12,7 +12,7 @@ the CMS.
 Create a plugin model
 *********************************
 
-In your the ``models.py`` of ``polls_cms_integration`` add the following:
+In the ``models.py`` of ``polls_cms_integration`` add the following:
 
 ..  code-block:: python
 
