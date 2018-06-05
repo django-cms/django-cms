@@ -63,8 +63,8 @@ Create and save a new page, then publish it.
 
 ..  note:: Your apphook won't work until the page has been published.
 
-In its *Advanced settings*, choose "Polls Application" from the *Application* menu, and save once
-more.
+In its *Advanced settings* (from the toolbar, select *Page > Advanced settings...*) choose "Polls
+Application" from the *Application* pop-up menu, and save once more.
 
 .. image:: /introduction/images/select-application.png
    :alt: select the 'Polls' application
