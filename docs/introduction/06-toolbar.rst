@@ -81,7 +81,7 @@ method to add an item that allows us to see the full list of polls in the sidefr
                 url=admin_reverse('polls_poll_changelist'),
                 )
 
-After refreshing the page to load the changes, you can now add see the list of polls directly from
+After refreshing the page to load the changes, you can now see the list of polls directly from
 the menu.
 
 Also useful would be an option to create new polls. We'll use a modal window for this, invoked with
