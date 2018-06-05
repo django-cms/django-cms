@@ -1,9 +1,6 @@
-/* stylelint-disable */
 @import 'bootstrap/scss/functions';
+
 // Variables
-//
-// Copy settings from this file into the provided `_custom.scss` to override
-// the Bootstrap defaults without modifying key, versioned files.
 //
 // Variables should follow the `$component-state-property-size` formula for
 // consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
@@ -88,7 +85,7 @@ $teal:    #20c997;
 $cyan:    #17a2b8;
 $snow:    #EDF1F5;
 $stone:   #D4DCE5;
-$slate:   #8392A4;
+$slate:   #6C85A0;
 $twilight:#2D3146;
 $night:   #25293D;
 
@@ -233,7 +230,7 @@ $grid-gutter-width: 30px;
 $line-height-lg:         1.5;
 $line-height-sm:         1.5;
 
-$border-width: 0;
+$border-width: 1px;
 $border-color: transparent;
 
 $border-radius:          .25rem;
@@ -254,24 +251,24 @@ $transition-collapse:    height .35s ease;
 //
 // Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif: "Museo Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-$font-family-monospace:  "Museo Sans", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-family-sans-serif: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-family-monospace:  "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 $font-family-base:       $font-family-sans-serif;
 
 $font-size-base: 1rem; // Assumes the browser default, typically `16px`
-$font-size-lg:   1.25rem;
-$font-size-sm:   .875rem;
+$font-size-lg:   (18rem/16);
+$font-size-sm:   (14rem/16);
 
-$font-weight-light: 500;
-$font-weight-normal: 500;
-$font-weight-bold: 900;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
 
 $font-weight-base: $font-weight-normal;
 $line-height-base: 1.5;
 
-$h1-font-size: 1.7rem;
-$h2-font-size: 1.3rem;
-$h3-font-size: 1.2rem;
+$h1-font-size: 2rem;
+$h2-font-size: 1.5rem;
+$h3-font-size: 1.3rem;
 $h4-font-size: 1.2rem;
 $h5-font-size: 1.125rem;
 $h6-font-size: 1.125rem;
@@ -279,26 +276,26 @@ $h6-font-size: 1.125rem;
 
 $headings-margin-bottom: 1rem;
 $headings-font-family:   inherit;
-$headings-font-weight:   900;
+$headings-font-weight:   normal;
 $headings-line-height:   1.1;
 $headings-color:         inherit;
 
-$display1-size: 1.8rem;
-$display2-size: 1.6rem;
-$display3-size: 1.6rem;
-$display4-size: 1.6rem;
+$display1-size: 50px;
+$display2-size: 40px;
+$display3-size: 35px;
+$display4-size: 28px;
 
-$display1-weight:     900;
-$display2-weight:     900;
-$display3-weight:     900;
-$display4-weight:     900;
+$display1-weight:     300;
+$display2-weight:     300;
+$display3-weight:     300;
+$display4-weight:     300;
 
-$display-line-height: $headings-line-height;
+$display-line-height: 1.2;
 
-$lead-font-size:   1.25rem;
+$lead-font-size:   22px;
 $lead-font-weight: 300;
 
-$small-font-size: 80%;
+$small-font-size: 14px;
 
 $text-muted: $gray-600;
 
