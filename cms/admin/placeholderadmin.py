@@ -2,6 +2,7 @@
 import uuid
 import warnings
 
+import django
 from django.conf.urls import url
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
@@ -1029,8 +1030,13 @@ class PlaceholderAdminMixin(object):
 
         opts = plugin._meta
         using = router.db_for_write(opts.model)
+        get_deleted_objects_additional_kwargs = {}
+        if django.VERSION < (2, 1):
+            get_deleted_objects_additional_kwargs = {'opts': opts, 'using': using}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
-            [plugin], opts, request.user, self.admin_site, using)
+            [plugin], user=request.user, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs,
+        )
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
@@ -1117,8 +1123,13 @@ class PlaceholderAdminMixin(object):
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
+        get_deleted_objects_additional_kwargs = {}
+        if django.VERSION < (2, 1):
+            get_deleted_objects_additional_kwargs = {'opts': opts, 'using': using}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
-            plugins, opts, request.user, self.admin_site, using)
+            plugins, user=request.user, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs,
+        )
 
         obj_display = force_text(placeholder)
 

@@ -442,8 +442,14 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
+
+        get_deleted_objects_additional_kwargs = {}
+        if django.VERSION < (2, 1):
+            get_deleted_objects_additional_kwargs = {'opts': opts, 'using': using}
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            objs, opts, request.user, self.admin_site, using)
+            objs, user=request.user, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs,
+        )
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
@@ -1272,20 +1278,21 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
 
         using = router.db_for_read(self.model)
-        kwargs = {
-            'admin_site': self.admin_site,
-            'user': request.user,
-            'using': using
-        }
+
+        kwargs = {'admin_site': self.admin_site, 'user': request.user}
+        if django.VERSION < (2, 1):
+            kwargs.update({'using': using, 'opts': titleopts})
 
         deleted_objects, __, perms_needed = get_deleted_objects(
             [translation],
-            titleopts,
             **kwargs
         )[:3]
+
+        if django.VERSION < (2, 1):
+            kwargs.update({'opts': pluginopts})
+
         to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
             saved_plugins,
-            pluginopts,
             **kwargs
         )[:3]
 

@@ -77,6 +77,10 @@ class GenericCmsPermissionAdmin(object):
             return False
         return self._has_change_permissions_permission(request)
 
+    def has_view_permission(self, request, obj=None):
+        # work around for dj21
+        return self.has_change_permission(request, obj)
+
 
 class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
     form = PageUserChangeForm

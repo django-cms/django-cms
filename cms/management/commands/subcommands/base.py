@@ -4,6 +4,7 @@ import os
 
 from collections import OrderedDict
 
+import django
 from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import no_style
 
@@ -47,10 +48,13 @@ class SubcommandsCommand(BaseCommand):
     subcommand_dest = 'subcmd'
 
     def create_parser(self, prog_name, subcommand):
+        kwargs = {}
+        if django.VERSION < (2, 1):
+            kwargs = {'cmd': self}
         parser = CommandParser(
-            self,
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
-            description=self.help or None
+            description=self.help or None,
+            **kwargs,
         )
         self.add_arguments(parser)
         return parser
@@ -63,9 +67,12 @@ class SubcommandsCommand(BaseCommand):
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
+                kwargs = {}
+                if django.VERSION < (2, 1):
+                    kwargs = {'cmd': self}
                 parser_sub = subparsers.add_parser(
-                    cmd=self, name=instance.command_name, help=instance.help_string,
-                    description=instance.help_string
+                    name=instance.command_name, help=instance.help_string,
+                    description=instance.help_string, **kwargs
                 )
 
                 add_builtin_arguments(parser=parser_sub)

@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.i18n import i18n_patterns
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.static import serve
 from django.views.i18n import JavaScriptCatalog
@@ -27,11 +27,11 @@ urlpatterns += staticfiles_urlpatterns()
 
 
 urlpatterns += i18n_patterns(
-    url(r'^sample/login_other/$', login,
+    url(r'^sample/login_other/$', LoginView.as_view(),
         kwargs={'authentication_form': LoginForm2}),
-    url(r'^sample/login/$', login,
+    url(r'^sample/login/$', LoginView.as_view(),
         kwargs={'authentication_form': LoginForm}),
-    url(r'^sample/login3/$', login,
+    url(r'^sample/login3/$', LoginView.as_view(),
         kwargs={'authentication_form': LoginForm3}),
     url(r'^admin/', admin.site.urls),
     url(r'^example/$', example_view),
