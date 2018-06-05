@@ -50,7 +50,7 @@ Add the ``poll`` URL configuration to ``urlpatterns`` in the project's ``urls.py
 
     urlpatterns += i18n_patterns(
         url(r'^admin/', include(admin.site.urls)),
-        url(r'^polls/', include('polls.urls', namespace='polls'))
+        url(r'^polls/', include('polls.urls', namespace='polls')),
         url(r'^', include('cms.urls')),
     )
 
