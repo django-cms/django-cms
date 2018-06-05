@@ -43,7 +43,8 @@ In this ``PollsApphook`` class, we have done several key things:
   :ref:`multi_apphook` for details on why this matters.
 * ``name`` is a human-readable name, and will be displayed to the admin user.
 * ``get_urls()`` method is what actually hooks the application in, returning a
-  list of URL configurations that will be made active wherever the apphook is used.
+  list of URL configurations that will be made active wherever the apphook is used - in this case,
+  it will use the ``urls.py`` from ``polls``.
 
 **Restart the runserver**. This is necessary because we have created a new file containing Python
 code that won't be loaded until the server restarts. You only have to do this the first time the
