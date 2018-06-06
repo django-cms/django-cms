@@ -40,29 +40,6 @@ The file needs to contain a :class:`CMSApp <cms.app_base.CMSApp>` sub-class. For
     in version 3.5.
 
 
-Returning apphook URLs manually
-===============================
-
-Instead of defining the URL patterns in another file ``myapp/urls.py``, it also is possible
-to return them manually, for example if you need to override the set provided. An example:
-
-..  code-block:: python
-
-    from django.conf.urls import url
-    from myapp.views import SomeListView, SomeDetailView
-
-    class MyApphook(CMSApp):
-        # ...
-        def get_urls(self, page=None, language=None, **kwargs):
-            return [
-                url(r'^$', SomeListView.as_view()),
-                url(r'^(?P<slug>[\w-]+)/?$', SomeDetailView.as_view()),
-                ]
-
-However, it's much neater to keep them in the application's ``urls.py``, where they can easily be
-reused.
-
-
 Apphooks for namespaced applications
 ====================================
 
@@ -98,6 +75,29 @@ time; attempting to apply them a second time will cause an error. Only one insta
 apphooks can exist.
 
 See :ref:`multi_apphook` for more on having multiple apphook instances.
+
+
+Returning apphook URLs manually
+===============================
+
+Instead of defining the URL patterns in another file ``myapp/urls.py``, it also is possible
+to return them manually, for example if you need to override the set provided. An example:
+
+..  code-block:: python
+
+    from django.conf.urls import url
+    from myapp.views import SomeListView, SomeDetailView
+
+    class MyApphook(CMSApp):
+        # ...
+        def get_urls(self, page=None, language=None, **kwargs):
+            return [
+                url(r'^$', SomeListView.as_view()),
+                url(r'^(?P<slug>[\w-]+)/?$', SomeDetailView.as_view()),
+                ]
+
+However, it's much neater to keep them in the application's ``urls.py``, where they can easily be
+reused.
 
 
 .. _reloading_apphooks:
