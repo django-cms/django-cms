@@ -1,0 +1,17 @@
+{% load staticfiles %}
+<blockquote class="testimonial mt-5 js-waypoint" style="opacity: 0;" data-waypoint='{
+    "offset": "bottom-in-view",
+    "animation": "transition.slideUpIn"
+}'>
+    <div class="testimonial-body">
+        <img class="testimonial-img rounded-circle" src="{% static 'img/dummy/iacopo.png' %}">
+        <div class="testimonial-text js-stagger">
+            Divio Cloud reduces environment setup frustration to minimal, if not totally. We are migrating our Django projects to Divio Cloud because it allows us to focus on what really matters to our clients.
+            {% include 'includes/icon.html' with icon='speech-bubble-tail' %}
+        </div>
+    </div>
+    <footer class="testimonial-footer">
+        <cite class="testimonial-cite">Iacopo Spaletti<br>Founder & CEO Nephila</cite>
+        <img class="testimonial-logo" src="{% static 'img/dummy/nephila-logo.png' %}">
+    </footer>
+</blockquote>

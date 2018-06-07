@@ -1,0 +1,103 @@
+{% extends "content.html" %}
+{% load staticfiles %}
+
+{% block breadcrumb %}{% endblock %}
+{% block title %}How it works{% endblock %}
+
+{% block content %}
+{% include 'divio_styleguide/includes/page-header.html' with cta=False title='Create a professional website' lead='Create a professional website complete with a CMS in a few simple steps.<br> You can customise everything.' %}
+
+<div class="container">
+    <div class="section-fullwidth mt-6">
+        <div class="stripe stripe-very-steep-up">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 my--6">
+                        <div class="placeholder" style="height: 500px;">
+                            le image
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-7 offset-md-2">
+            <div class="media row my-7">
+                <div class="col-2 text-right">
+                    {% include 'includes/icon.html' with icon='circle' class="media-icon" %}
+                </div>
+                <div class="media-body col-10">
+                    <h3 class="display-4">Automated site monitoring</h3>
+
+                    <p class="lead">Built-in monitoring alerts our team to potential issues, so they can be dealt with before they become
+                    problems.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 offset-md-1 mt-7">
+            <div class="placeholder" style="height: 500px;">
+                le image
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-7 offset-md-2">
+            <div class="media row my-7">
+                <div class="col-2 text-right">
+                    {% include 'includes/icon.html' with icon='circle' class="media-icon" %}
+                </div>
+                <div class="media-body col-10">
+                    <h3 class="display-4">Create a desktop development environment</h3>
+
+                    <p class="lead">Divio Desktop can automatically setup a local desktop development environment and synchronise your project</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-fullwidth my-6">
+        <div class="stripe stripe-very-steep-down">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 mt--6 mb-4">
+                        <div class="placeholder" style="height: 500px;">
+                            le image
+                        </div>
+                    </div>
+                    <div class="col-md-7 offset-md-2">
+                        <div class="media row mt-5 mb--6">
+                            <div class="col-2 text-right">
+                                {% include 'includes/icon.html' with icon='circle' class="media-icon" %}
+                            </div>
+                            <div class="media-body col-10">
+                                <h3 class="display-4">Deploy and go live</h3>
+
+                                <p class="lead">Make your changes and publish your site for fast feedback sharing or go live.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-1"></div>
+
+    <div class="row mt-7 align-items-center">
+        <div class="col-md-5 mb-4">
+            <div class="placeholder" style="height: 250px;">
+                le image
+            </div>
+        </div>
+
+        <div class="col-md-6 offset-md-1">
+            <h3 class="display-4">Looking for an Enterprise Level Solution?</h3>
+            <p>Divio offers 24/7 Support, Guaranteed Response Time, On-premise Hosting option, Unlimited Diskspace and Traffic and scaling.</p>
+            <a href="#">Learn more about our enterprise plans</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+$testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
+
+.testimonial {
+    display: flex;
+    flex-direction: column;
+    max-width: 450px;
+
+    @each $breakpoint, $container-max-width in $testimonial-container-max-widths {
+        @include media-breakpoint-up($breakpoint) {
+            margin-left: -$container-max-width / 12;
+        }
+    }
+}
+
+.testimonial-body {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.testimonial-text {
+    color: white;
+    padding: 20px;
+    position: relative;
+    font-size: 14px;
+    line-height: 18px;
+    border-radius: 20px;
+    background-color: #9DECFE;
+    color: #1A406B;
+
+    .icon {
+        position: absolute;
+        right: 100%;
+        width: 30px;
+        height: 30px;
+        margin-right: -3px;
+        bottom: 5px;
+
+        svg,
+        use {
+            fill: #9DECFE;
+        }
+    }
+}
+
+.testimonial-img {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 1px solid $snow;
+    margin-bottom: 5px;
+    margin-right: $grid-gutter-width;
+
+    @each $breakpoint, $container-max-width in $testimonial-container-max-widths {
+        @include media-breakpoint-up($breakpoint) {
+            margin-right: $container-max-width / 12 - 44px;
+        }
+    }
+}
+
+.testimonial-footer {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.testimonial-cite {
+    display: block;
+    color: #1A406B;
+    font-size: 11px;
+    font-style: normal;
+    line-height: 16px;
+}
+
+.testimonial-logo {
+    max-height: 32px;
+}

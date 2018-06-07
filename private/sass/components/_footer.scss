@@ -4,23 +4,23 @@
     padding: 1rem;
     background: white;
     margin-top: 50px;
+    font-size: 14px;
 
-    .footer-social {
-        li {
-            display: inline-block;
+    .footer-logo {
+        width: 100px;
+        height: 18px;
+        margin-top: 4px;
+        margin-bottom: 4px;
 
-            a {
-                padding: 5px;
-            }
-
-            .icon {
-                width: 20px;
-                height: 20px;
-            }
+        svg,
+        use {
+            fill: #00416A;
         }
     }
 
     .footer-help {
+        background-color: #F3F6FA;
+
         .icon {
             width: 20px;
             height: 20px;
@@ -35,19 +35,77 @@
         }
 
         a {
-            color: $night;
             line-height: 1.5rem;
+            color: theme-color(secondary);
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
     }
 }
 
 @include media-breakpoint-up(sm) {
     .main-footer {
-        border-top: 1px solid $snow;
         padding-top: 2rem;
 
         .footer-links {
             column-count: auto;
         }
     }
+}
+
+
+.footer-links-title {
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 28px;
+    color: #1A406B;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 0px;
+    margin-bottom: 7px;
+}
+
+.footer-slogan {
+    font-weight: 600;
+}
+
+.footer-built-with {
+    margin-bottom: 0px;
+    color: theme-color(secondary);
+    font-weight: bold;
+}
+
+.footer-copyright {
+    margin-bottom: 0px;
+    color: #8392A4;
+    text-transform: uppercase;
+}
+
+.footer-social {
+    margin-top: auto;
+
+    ul {
+        white-space: nowrap;
+    }
+
+    li {
+        display: inline-block;
+
+        a {
+            padding: 5px;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+.footer-social-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #8392A4;
+    text-transform: uppercase;
 }

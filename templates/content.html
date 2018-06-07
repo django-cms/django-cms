@@ -5,49 +5,34 @@
 
 {% block extend_root %}
 {% block header %}
-    <header class="navbar navbar-expand-lg {% block navbar_class %}{% endblock %} main-nav">
-        <a class="navbar-brand" href="{% url "pages-root" %}">
-            <span class="sr-only">{{ request.site.name }}</span>
-            {% include "includes/icon.html" with icon="divio" class="navbar-logo" title="{{ request.site.name }}" %}
-        </a>
-        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon">
-                {% for row in 123|make_list %}<span class="icon-bar"></span>{% endfor %}
-            </span>
-        </button>
+    <header class="navbar navbar-expand-lg main-nav">
+        <div class="container">
+            <a href="{% url "pages-root" %}">
+                <span class="sr-only">{{ request.site.name }}</span>
+                {% include "includes/icon.html" with icon="divio" class="navbar-logo" title=request.site.name %}
+            </a>
+            <button class="navbar-toggler collapsed" type="button" data-toggle="custom-collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon">
+                    {% for row in 123|make_list %}<span class="icon-bar"></span>{% endfor %}
+                </span>
+            </button>
 
-        <div class="collapse navbar-collapse" id="main-nav">
-            {# render_model_block request.current_page "changelist" #}
-                {% with dropdown="true" %}
-                    <ul class="navbar-nav mx-auto">
-                        {% show_menu 0 1 100 100 'includes/navigation.html' %}
-                    </ul>
-                {% endwith %}
-            {# endrender_model_block #}
-            <div class="nav-btnlinks">
-                <a href="#" class="btn btn-outline-primary nav-btn btn-sm">Login</a>
-                <a href="#" class="btn btn-primary nav-btn btn-sm">Get started</a>
+            <div class="collapse navbar-collapse" id="main-nav">
+                <div class="navbar-collapse-container">
+                    {% with dropdown="true" %}
+                        <ul class="navbar-nav mx-lg-auto">
+                            {% show_menu 0 1 100 100 'includes/navigation.html' %}
+                        </ul>
+                    {% endwith %}
+                    <div class="nav-btnlinks">
+                        <a href="#" class="nav-link">Login</a>
+                        <a href="#" class="nav-link nav-link-get-started">Get started {% include "includes/icon.html" with icon="arrow-right" %}</a>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 {% endblock header %}
-
-{% comment %}
-{% block breadcrumb %}
-    {% if not request.current_page.is_home %}
-        <nav class="navbar navbar-breadcrumb" role="navigation">
-            <h3 class="sr-only">{% trans "You are here" %}</h3>
-            <div class="container">
-                <ol class="breadcrumb">
-                    {% block extend_breadcrumb %}
-                        {% show_breadcrumb 0 'includes/breadcrumbs.html' 0 %}
-                    {% endblock extend_breadcrumb %}
-                </ol>
-            </div>
-        </nav>
-    {% endif %}
-{% endblock breadcrumb %}
-{% endcomment %}
 
 {% if request.toolbar and request.toolbar.edit_mode_active %}
     <a href="/styleguide" class="btn-circle btn-styleguide">Styleguide</a>
@@ -58,50 +43,64 @@
     {% block messages %}
         {% include "includes/messages.html" %}
     {% endblock messages %}
-    {% block content %}
-        <div class="container">
-            {% placeholder "content" %}
-        </div>
-    {% endblock %}
+    <div class="content">
+        {% block content %}
+            <div class="container">
+                {% placeholder "content" %}
+            </div>
+        {% endblock %}
+    </div>
 {% endblock extend_base %}
 <hr class="sr-only" />
 
 {% block footer %}
 <footer class="main-footer">
     <div class="container">
-        <div class="row d-flex">
-            <div class="col-12 col-sm-12 col-lg-3 pt-4 order-5 order-lg-1">
-                <a href="/"><img src="{% static "img/logo-divio-black.svg" %}" width="80px" alt="{{ request.site.name }}" /></a>
-                <p class="text-secondary mt-2">Your complete digital experience platform.</p>
-                <p class="h5">Keep up to date</p>
-                <ul class="list-unstyled list-inline footer-social">
-                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                    <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                </ul>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-lg-2 pt-4 order-5 d-flex flex-column order-lg-1">
+                <a href="/">{% include "includes/icon.html" with icon="divio" class="footer-logo" title=request.site.name %}</a>
+                <p class="text-secondary mt-2 footer-slogan">Your django project on autopilot</p>
+                <div class="footer-social">
+                    <p class="footer-social-title">Keep up to date</p>
+                    <ul class="list-unstyled list-inline">
+                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="col-12 col-sm-4 col-lg-2  pt-4 order-2">
-                <ul class="list-unstyled footer-links">
-                    <li><p class="h5">Support</p></li>
-                    {% show_menu_below_id "support" %}
-                </ul>
+            <div class="col-12 col-lg-7 order-2">
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
+                        <ul class="list-unstyled footer-links">
+                            <li><p class="footer-links-title">Help and Support</p></li>
+                            {% show_menu_below_id "support" %}
+                        </ul>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
+                        <ul class="list-unstyled footer-links">
+                            <li><p class="footer-links-title">Company</p></li>
+                            {% show_menu_below_id "company" %}
+                        </ul>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
+                        <ul class="list-unstyled footer-links">
+                            <li><p class="footer-links-title">Investors</p></li>
+                            {% show_menu_below_id "legal" %}
+                        </ul>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
+                        <ul class="list-unstyled footer-links">
+                            <li><p class="footer-links-title">Security</p></li>
+                            {% show_menu_below_id "legal" %}
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-sm-4 col-lg-2  pt-4 order-3">
-                <ul class="list-unstyled footer-links">
-                    <li><p class="h5">Company</p></li>
-                    {% show_menu_below_id "company" %}
-                </ul>
-            </div>
-            <div class="col-12 col-sm-4 col-lg-2  pt-4 order-4">
-                <ul class="list-unstyled footer-links">
-                    <li><p class="h5">Legal</p></li>
-                    {% show_menu_below_id "legal" %}
-                </ul>
-            </div>
-            <div class="col-12 col-sm-12 col-lg-3 bg-light p-4 order-1 order-lg-5 footer-help">
-                <p class="h5">Need help?</p>
+            <div class="col-12 col-sm-12 col-lg-3 p-4 order-1 order-lg-5 footer-help">
+                <p class="footer-links-title">Need help?</p>
                 <p>We’re here for you 24/7</p>
                 <div class="row">
                     <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
@@ -137,16 +136,14 @@
                 </div>
                 <div class="row">
                     <div class="col-12 mt-4">
-                        <a href="" class="btn btn-primary">I have an emergancy</a>
+                        <a href="#" class="btn btn-primary btn-block">I have an emergancy</a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row py-4">
-            <div class="col-12">
-                <p class="text-secondary mb-0"><small>This site is built with Django &amp; Powered by Divio Cloud</small></p>
-                <p class="text-secondary mb-0"><small>COPYRIGHT © 2001-2017 DIVIO AG. ALL RIGHTS RESERVED.</small></p>
-            </div>
+        <div class="py-4">
+            <p class="footer-built-with">This site is built with Django &amp; Powered by Divio Cloud</p>
+            <p class="footer-copyright">COPYRIGHT © 2001-{% now "Y" %} DIVIO AG. ALL RIGHTS RESERVED.</p>
         </div>
     </div>
 </footer>

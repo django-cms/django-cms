@@ -13,6 +13,7 @@
 "bookmark",
 "chat",
 "check",
+"circle",
 "close",
 "cloud",
 "code",
@@ -21,6 +22,7 @@
 "divio",
 "download-icon",
 "email",
+"external",
 "find-agency",
 "fingerprint",
 "info",
@@ -37,6 +39,7 @@
 "social-gplus",
 "social-linkedin",
 "social-twitter",
+"speech-bubble-tail",
 "windows"
                 ]
             }

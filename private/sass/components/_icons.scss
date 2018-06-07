@@ -13,92 +13,56 @@
         width: 100%;
         height: 100%;
     }
-
 }
 
 .icon-md {
-      width: 50px;
-      height: 50px;
+    width: 50px;
+    height: 50px;
 }
 
 a .icon {
     svg,
-    use { fill: currentColor; }
+    use {
+        fill: currentColor;
+    }
 }
 
+// .hero-icon {
+//     width: 100px;
+//     height: 100px;
+//     background-image: url('../img/dots.png');
+//     position: relative;
+//     border-radius: 50px;
+//     background-size: 40px;
+//     margin-bottom: 20px;
 //
-// Product icons
-// Gradients and shadow created with CSS not SVG
-
-.product-icon {
-    position: relative;
-    width: 50px;
-    height: 50px;
-
-    &::before {
-        content: '';
-        background: $gradient-blue;
-        width: 90%;
-        height: 90%;
-        display: block;
-        position: absolute;
-        top: 5%;
-        bottom: 5%;
-        left: 5%;
-        right: 5%;
-        z-index: 0;
-        border-radius: 100px;
-    }
-
-    svg {
-        position: relative;
-        z-index: 1;
-    }
-}
-
-.hero-icon {
-    width: 100px;
-    height: 100px;
-    background-image: url('../img/dots.png');
-    position: relative;
-    border-radius: 50px;
-    background-size: 40px;
-    margin-bottom: 20px;
-
-    &:before {
-        content: '';
-        background-color: #fff;
-        border-radius: 32px;
-        width: 64px;
-        height: 64px;
-        position: absolute;
-        z-index: 1;
-        left: 50%;
-        top: 50%;
-        margin-left: -32px;
-        margin-top: -32px;
-    }
-
-    svg {
-        z-index: 2;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        margin-left: -20px;
-        margin-top: -20px;
-        width: 40px;
-        height: 40px;
-    }
-}
+//     &:before {
+//         content: '';
+//         background-color: #fff;
+//         border-radius: 32px;
+//         width: 64px;
+//         height: 64px;
+//         position: absolute;
+//         z-index: 1;
+//         left: 50%;
+//         top: 50%;
+//         margin-left: -32px;
+//         margin-top: -32px;
+//     }
+//
+//     svg {
+//         z-index: 2;
+//         position: absolute;
+//         left: 50%;
+//         top: 50%;
+//         margin-left: -20px;
+//         margin-top: -20px;
+//         width: 40px;
+//         height: 40px;
+//     }
+// }
 
 //Product icons with shadow
-
-.product-icon-shadow {
-    &::before {
-        content: '';
-        box-shadow: 0 4px 20px rgba(000, 000, 000, 0.2);
-    }
-}
 
 .icon-white {
     svg,
@@ -106,6 +70,7 @@ a .icon {
         fill: white;
     }
 }
+
 .icon-blue {
     svg,
     use {

@@ -1,9 +1,0 @@
-$maxwidth: 100, 150, 200, 250, 300, 350, 400, 450, 550, 800, 1250;
-
-@each $i in $maxwidth {
-    .mw#{$i} {
-        max-width: #{$i}px;
-        display: block;
-        margin: 0 auto;
-    }
-}

@@ -1,43 +1,43 @@
-// #############################################################################
-// FONTS
-// there are two options to choose from when integrating fonts:
-$font-path: '../fonts/museo-sans';
-
-@font-face {
-    font-family: "Museo Sans";
-    src: url($font-path + "/a29947fd-0c53-492b-b2f4-399b01153b30.eot?#iefix");
-    src:
-        url($font-path + "/a29947fd-0c53-492b-b2f4-399b01153b30.eot?#iefix") format("eot"),
-        url($font-path + "/d9896899-f08c-4750-a874-a9e10d83c2cb.woff2") format("woff2"),
-        url($font-path + "/d42dd843-62b0-4623-8855-d5882512c3c9.woff") format("woff"),
-        url($font-path + "/6d532ccb-086c-4000-bab2-5d16862fcf01.ttf") format("truetype"),
-        url($font-path + "/f56b7407-f97b-4cb3-9ce6-4e13065eec93.svg#f56b7407-f97b-4cb3-9ce6-4e13065eec93") format("svg");
-    font-weight: 500;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Museo Sans";
-    src: url($font-path + "/3d0a39cf-115c-4800-9b1e-31c7912abfc2.eot?#iefix");
-    src:
-        url($font-path + "/3d0a39cf-115c-4800-9b1e-31c7912abfc2.eot?#iefix") format("eot"),
-        url($font-path + "/e2d37f34-6bca-473c-b64d-93811f4dc046.woff2") format("woff2"),
-        url($font-path + "/eadbb595-a394-48fc-834f-8bf5da15cddf.woff") format("woff"),
-        url($font-path + "/9bcba093-b507-4b9b-9c83-303003d3815c.ttf") format("truetype"),
-        url($font-path + "/9a2af429-2624-4bd1-a676-8f0eed3e7e31.svg#9a2af429-2624-4bd1-a676-8f0eed3e7e31") format("svg");
-    font-weight: 700;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Museo Sans";
-    src: url($font-path + "/7e90c1ee-e4b1-46f0-9134-93a8ba421545.eot?#iefix");
-    src:
-        url($font-path + "/7e90c1ee-e4b1-46f0-9134-93a8ba421545.eot?#iefix") format("eot"),
-        url($font-path + "/009ca58d-46af-4651-a359-f0ae2301085b.woff2") format("woff2"),
-        url($font-path + "/3619b5f4-8df9-44f5-8c53-b7c236e9c74e.woff") format("woff"),
-        url($font-path + "/9b2d949a-4e1c-435c-8412-f377c80583ae.ttf") format("truetype"),
-        url($font-path + "/7a319e11-05eb-49ce-bdb7-f692766e6477.svg#7a319e11-05eb-49ce-bdb7-f692766e6477") format("svg");
-    font-weight: 900;
-    font-style: normal;
-}
+// // #############################################################################
+// // FONTS
+// // there are two options to choose from when integrating fonts:
+// $font-path: '../fonts/museo-sans';
+//
+// @font-face {
+//     font-family: "Museo Sans";
+//     src: url($font-path + "/a29947fd-0c53-492b-b2f4-399b01153b30.eot?#iefix");
+//     src:
+//         url($font-path + "/a29947fd-0c53-492b-b2f4-399b01153b30.eot?#iefix") format("eot"),
+//         url($font-path + "/d9896899-f08c-4750-a874-a9e10d83c2cb.woff2") format("woff2"),
+//         url($font-path + "/d42dd843-62b0-4623-8855-d5882512c3c9.woff") format("woff"),
+//         url($font-path + "/6d532ccb-086c-4000-bab2-5d16862fcf01.ttf") format("truetype"),
+//         url($font-path + "/f56b7407-f97b-4cb3-9ce6-4e13065eec93.svg#f56b7407-f97b-4cb3-9ce6-4e13065eec93") format("svg");
+//     font-weight: 500;
+//     font-style: normal;
+// }
+//
+// @font-face {
+//     font-family: "Museo Sans";
+//     src: url($font-path + "/3d0a39cf-115c-4800-9b1e-31c7912abfc2.eot?#iefix");
+//     src:
+//         url($font-path + "/3d0a39cf-115c-4800-9b1e-31c7912abfc2.eot?#iefix") format("eot"),
+//         url($font-path + "/e2d37f34-6bca-473c-b64d-93811f4dc046.woff2") format("woff2"),
+//         url($font-path + "/eadbb595-a394-48fc-834f-8bf5da15cddf.woff") format("woff"),
+//         url($font-path + "/9bcba093-b507-4b9b-9c83-303003d3815c.ttf") format("truetype"),
+//         url($font-path + "/9a2af429-2624-4bd1-a676-8f0eed3e7e31.svg#9a2af429-2624-4bd1-a676-8f0eed3e7e31") format("svg");
+//     font-weight: 700;
+//     font-style: normal;
+// }
+//
+// @font-face {
+//     font-family: "Museo Sans";
+//     src: url($font-path + "/7e90c1ee-e4b1-46f0-9134-93a8ba421545.eot?#iefix");
+//     src:
+//         url($font-path + "/7e90c1ee-e4b1-46f0-9134-93a8ba421545.eot?#iefix") format("eot"),
+//         url($font-path + "/009ca58d-46af-4651-a359-f0ae2301085b.woff2") format("woff2"),
+//         url($font-path + "/3619b5f4-8df9-44f5-8c53-b7c236e9c74e.woff") format("woff"),
+//         url($font-path + "/9b2d949a-4e1c-435c-8412-f377c80583ae.ttf") format("truetype"),
+//         url($font-path + "/7a319e11-05eb-49ce-bdb7-f692766e6477.svg#7a319e11-05eb-49ce-bdb7-f692766e6477") format("svg");
+//     font-weight: 900;
+//     font-style: normal;
+// }

@@ -1,16 +1,35 @@
 /* stylelint-disable selector-max-type */
 html {
-    overflow-y: scroll;
-    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-size: 13px;
+
+    @include media-breakpoint-up(md) {
+        font-size: 16px;
+    }
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
+    // this is bad, but this is easiest
+    // to do the fullwidth sections with pure css
+    // should probably do breakout ones instead
+    overflow-x: hidden;
+
     @include media-breakpoint-up(lg) {
-        padding-top: 51px;
+        padding-top: $header-height;
     }
+}
+
+.content {
+    flex-grow: 1;
 }
 
 body.cke_editable {
@@ -190,4 +209,42 @@ body.cke_editable {
             color: $night;
         }
     }
+}
+
+
+.section-fullwidth {
+    margin-left: -15px;
+    margin-right: -15px;
+
+    @include media-breakpoint-up(sm) {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+}
+
+.page-header {
+    padding-top: 40px;
+
+    @include media-breakpoint-up(sm) {
+        padding-top: 80px;
+    }
+
+
+    .lead {
+        margin-bottom: 25px;
+    }
+}
+
+.media-icon {
+    width: 42px;
+    height: 42px;
+}
+
+.media-body {
+    font-size: 14px;
+    line-height: 20px;
 }

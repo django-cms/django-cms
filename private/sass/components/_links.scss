@@ -1,3 +1,27 @@
 a {
     display: inline-flex;
 }
+
+.link-wrapper {
+    text-decoration: none;
+
+    &:hover,
+    &:active,
+    &:focus {
+        text-decoration: none;
+
+        .link-inner {
+            text-decoration: underline;
+        }
+    }
+
+    &.btn {
+        &:hover,
+        &:active,
+        &:focus {
+            .link-inner {
+                text-decoration: none;
+            }
+        }
+    }
+}

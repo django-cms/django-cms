@@ -4,80 +4,95 @@
 // Hrere are some additional type styles
 // stylelint-disable selector-max-type
 
-h4,
-.h4 {
-    font-weight: $font-weight-med;
-}
-
-body h6 {
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-}
-
 .is-breakable {
     word-break: break-word;
 }
 
-// Add standard margins if block of text
-.text-block {
-    h3,
-    .h3 {
-        margin-top: 3rem;
+// // Add standard margins if block of text
+// .text-block {
+//     h3,
+//     .h3 {
+//         margin-top: 3rem;
+//
+//         &:first-child {
+//             margin-top: 1rem;
+//         }
+//     }
+//
+//     h4,
+//     .h4 {
+//         margin-top: 2rem;
+//     }
+//
+//     h3 + h4,
+//     .h3 + .h4 {
+//         margin-top: 1rem;
+//     }
+// }
 
-        &:first-child {
-            margin-top: 1rem;
-        }
-    }
-
-    h4,
-    .h4 {
-        margin-top: 2rem;
-    }
-
-    h3 + h4,
-    .h3 + .h4 {
-        margin-top: 1rem;
-    }
+.display-1 {
+    color: theme-color(primary);
+    line-height: rem(60px);
 }
 
-// Desktop type
-@include media-breakpoint-up(md) {
-    body {
-        line-height: $d-line-height-base;
-    }
-
-    .display-1 {
-        font-size: $d-display1-size;
-    }
-
-    h1,
-    .h1 {
-        font-size: $d-h1-font-size;
-    }
-
-    h2,
-    .h2 {
-        font-size: $d-h2-font-size;
-    }
-
-    h3,
-    .h3 {
-        font-size: $d-h3-font-size;
-    }
-
-    h4,
-    .h4 {
-        font-size: $d-h4-font-size;
-    }
-
-    h5,
-    .h5 {
-        font-size: $d-h5-font-size;
-    }
+.display-2 {
+    color: theme-color(primary);
+    line-height: rem(50px);
 }
 
-// Background colour extensions to bootstrap text/other backgrounds
-.bg-palegrey {
-    background: #f9fbfd !important;
+.display-3 {
+    color: theme-color(primary);
+    line-height: rem(44px);
+}
+
+.display-4 {
+    color: theme-color(primary);
+    line-height: rem(32px);
+}
+
+.lead {
+    line-height: rem(32px);
+}
+
+.h7 {
+    color: #0bf;
+    font-size: rem(14px);
+    letter-spacing: rem(1px);
+    line-height: rem(20px);
+    text-transform: uppercase;
+}
+
+.spitzmarke,
+.spitzmarke-lg {
+    display: block;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: rem(12px);
+    line-height: rem(20px);
+    letter-spacing: rem(2px);
+    color: theme-color(secondary);
+    margin-bottom: rem(18px);
+}
+
+.spitzmarke-lg {
+    font-size: rem(16px);
+    letter-spacing: rem(5px);
+    margin-bottom: 0px;
+}
+
+.section-link {
+    align-items: center;
+    text-transform: uppercase;
+    font-size: rem(12px);
+    font-weight: bold;
+    line-height: rem(20px);
+
+    .icon {
+        margin-left: 15px;
+        margin-right: 0px;
+    }
+
+    .icon-external {
+        margin-top: -3px;
+    }
 }

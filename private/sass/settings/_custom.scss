@@ -7,61 +7,20 @@
 
 $speed-base: 200ms;
 
+$header-height: 80px;
+
 // Z-INDEX
 // DOCS: http://www.sitepoint.com/better-solution-managing-z-index-sass/
 // http://sassmeister.com/gist/341c052928c956c1a751
 // use case: header { z-index: z("modal", "header"); }
 
-/*
 $z-layers: (
-    "goku":            9001,
-    "shoryuken":       8000,
-    "modal": (
-        "base":         500,
-        "close":        100,
-        "header":        50,
-        "footer":        10
+    "header": (
+        "menu": 9999,
+        "logo": 10000,
+        "toggler": 10000,
     ),
     "default":            1,
     "below":             -1,
     "bottomless-pit": -9000
 );
-*/
-
-//COLORS
-
-// gradient swatches
-$gradient1: #00A3FF;
-$gradient2: #3B74FC;
-$gradient3: #595AFA;
-$gradient4: #8139F8;
-
-// gradients
-$gradient-pale: radial-gradient(at 50% 180%, #DEE5EF 0%, #F9FBFD 60%);
-$gradient-blue: linear-gradient(212.31deg, #8834F8 0%, #00A3FF 100%);
-
-$font-weight-med: 700;
-
-$line-height-base: 1.3;
-$font-weight-base: $font-weight-normal;
-
-$h4-font-weight:   700;
-
-$lead-font-size:   1.125rem;
-$lead-font-weight: 700;
-$link-color:       $azure;
-
-//DESKTOP HEADINGS
-$d-display1-size: 2.5rem;
-$d-display2-size: 2.2rem;
-$d-display3-size: 2rem;
-$d-display4-size: 1.8rem;
-
-$d-h1-font-size: 1.9rem;
-$d-h2-font-size: 1.6rem;
-$d-h3-font-size: 1.3rem;
-$d-h4-font-size: 1.3rem;
-$d-h5-font-size: 1.125rem;
-$d-h6-font-size: 1.125rem;
-
-$d-line-height-base: 1.4;

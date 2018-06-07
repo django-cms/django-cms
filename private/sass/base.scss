@@ -17,3 +17,11 @@
 
 // importing components
 @import "components/all";
+
+.placeholder {
+    border: 1px dashed darken(#F2F3F4, 5%);
+    background: #F2F3F4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

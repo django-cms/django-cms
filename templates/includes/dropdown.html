@@ -3,22 +3,22 @@
 {% for child in children %}
     <a class="dropdown-item" href="{{ child.attr.redirect_url|default:child.get_absolute_url }}">
         {% if child.attr.reverse_id == 'control' %}
-            {% include "includes/icon.html" with icon="control" class="product-icon product-icon-shadow" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% elif child.attr.reverse_id == 'code' %}
-            {% include "includes/icon.html" with icon="code" class="product-icon product-icon-shadow" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% elif child.attr.reverse_id == 'content' %}
-            {% include "includes/icon.html" with icon="content" class="product-icon product-icon-shadow" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% elif child.attr.reverse_id == 'cloud' %}
-            {% include "includes/icon.html" with icon="cloud" class="product-icon product-icon-shadow" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% elif child.attr.reverse_id == 'perfect-for-agencies' %}
-            {% include "includes/icon.html" with icon="agency" class="product-icon" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% elif child.attr.reverse_id == 'find-an-agency' %}
-            {% include "includes/icon.html" with icon="find-agency" class="product-icon" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% elif child.attr.reverse_id == 'become-a-partner' %}
-            {% include "includes/icon.html" with icon="bookmark" class="product-icon" %}
+            {% include "includes/icon.html" with icon="check" class="" %}
         {% endif %}
         <span class="dropdown-desc">
-            <b>{{ child.get_menu_title }}</b>
+            <span class="dropdown-desc-title">{{ child.get_menu_title }}</span>
             {% if child.attr.reverse_id == 'control' %}
                 <span class="dropdown-desc-more">{% trans "Create, manage and deploy project with one easy to use tool." %}</span>
             {% elif child.attr.reverse_id == 'code' %}

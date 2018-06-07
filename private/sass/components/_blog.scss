@@ -62,12 +62,28 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    font-size: 12px;
+    line-height: 15px;
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+    }
 
     // stylelint-disable-next-line selector-max-type
     img {
-        border: 2px solid $snow;
-        margin-right: 0.8rem;
-        width: 2rem;
+        border: 1px solid $snow;
+        margin-right: 10px;
+        width: 38px;
+    }
+
+    .link-inner {
+        color: #2D3146;
+    }
+
+    .author-meta {
+        display: flex;
+        flex-direction: column;
     }
 }
 

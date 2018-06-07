@@ -4,222 +4,172 @@
 
 // stylelint-disable selector-max-type
 
-.hero {
-    position: relative;
-}
-
-// hero with a central image
-
-.hero-img-c {
-    text-align: center;
-    padding: 1rem 0 0;
-
-    img {
-        max-width: 100%;
-        max-height: 100%;
-        margin: 0 auto;
-    }
-}
-
-// Hero with central text
-.hero-text-c {
-    .container {
-        min-height: 55vh;
-        padding-top: 8rem;
-        padding-bottom: 14rem;
-        position: relative;
-    }
-}
-
 .stripe {
     position: relative;
-}
-
-.hero {
-    .stripe-element {
-        height: 200%;
-        bottom: 60px;
-    }
-
-    &.stripe-up {
-        .stripe-element {
-            transform: skewY(-5deg) translateZ(0);
-        }
-    }
-
-    &.stripe-down {
-        .stripe-element {
-            transform: skewY(5deg) translateZ(0);
-        }
-    }
+    padding: 70px 0;
 }
 
 // Stripe background
-
-.stripe-element {
+.stripe:before {
+    content: '';
     width: 100%;
-    height: calc(100% + 120px);
+    height: 100%;
     bottom: 0;
-    transform-origin: 0;
+    transform-origin: center center;
     position: absolute;
     z-index: -1;
+    background-color: #F8FAFB;
 }
 
-.stripe-gradient .stripe-element {
-    background: $gradient-pale;
-}
-
-.stripe-twilight {
-    .stripe-element {
-        background: $twilight;
-    }
-
-    &::after {
-        background: $twilight;
-    }
-}
-
-.stripe-night {
-    .stripe-element {
-        background: $night;
-    }
-
-    &::after {
-        background: $night;
-    }
-}
-
-.stripe-snow {
-    .stripe-element {
-        background: $snow;
-    }
-
-    &::after {
-        background: $snow;
-    }
-}
-
-.stripe-white {
-    .stripe-element {
-        background: $white;
-    }
-
-    &::after {
-        background: $white;
-    }
-}
-
-.stripe-primary {
-    .stripe-element {
-        background: $blue;
-    }
-
-    &::after {
-        background: $blue;
-    }
-}
-
-.stripe-primary,
-.stripe-night,
-.stripe-twilight {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    p,
-    ul,
-    .sub-menu a {
-        @extend .text-white;
-    }
-}
-
-//
 // stripe direction
-
 .stripe-up {
-    .stripe-element {
-        transform: skewY(-3deg) translateZ(0);
+    &:before {
+        transform: skewY(-2.8deg) translateZ(0);
     }
 }
 
 .stripe-down {
-    .stripe-element {
-        transform: skewY(3deg) translateZ(0);
+    &:before {
+        transform: skewY(2.8deg) translateZ(0);
     }
 }
 
-// .stripe-up:not(.hero) {
-//     .stripe-element {
-//         transform: skewY(-3deg) translate3d(0, 0, 0);
-//     }
-// }
-//
-// .stripe-down:not(.hero) {
-//     .stripe-element {
-//         transform: skewY(3deg) translate3d(0, 0, 0);
-//     }
-// }
+.stripe-steep-up {
+    &:before {
+        transform: skewY(-5.4deg) translateZ(0);
+    }
+}
 
-.stripe:not(.hero) {
-    margin-top: 100px;
-    padding: 50px 0;
+.stripe-steep-down {
+    &:before {
+        transform: skewY(5.4deg) translateZ(0);
+    }
+}
+
+.stripe-very-steep-up {
+    &:before {
+        transform: skewY(-3deg) translateZ(0);
+    }
 
     @include media-breakpoint-up(md) {
-        padding: 100px 0;
-    }
+        padding-top: 180px;
+        padding-bottom: 180px;
 
-    .stripe-element {
-        height: calc(100% + 100px);
-        top: 0;
-        transform-origin: top;
-    }
+        &:before {
+            transform: skewY(-15deg) translateZ(0);
+        }
 
-    &.stripe-standalone .stripe-element {
-        height: 100%;
-    }
+        .row-align-angle {
+            [class*=col]:first-child {
+                margin-bottom: -120px;
+            }
 
-    .container {
-        padding-top: 40px;
-        padding-bottom: 40px;
-    }
-
-    margin-left: -15px;
-    margin-right: -15px;
-
-    @include media-breakpoint-up(sm) {
-        width: 100vw;
-        position: relative;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw;
-        margin-right: -50vw;
-    }
-
-    &.feature-image {
-        height: auto;
-    }
-}
-
-// Different styling if Stipe is immediately after another
-
-.stripe + .stripe {
-    margin-top: 0;
-}
-
-//
-// Hero
-@include media-breakpoint-up(sm) {
-    .hero {
-        //  max-height: 70vh;
-        height: 100%;
-
-        img {
-            max-height: 70vh;
+            [class*=col]:last-child {
+                margin-top: -120px;
+            }
         }
     }
 }
 
+.stripe-very-steep-down {
+    &:before {
+        transform: skewY(3deg) translateZ(0);
+    }
+
+    @include media-breakpoint-up(md) {
+        padding-top: 180px;
+        padding-bottom: 180px;
+
+        &:before {
+            transform: skewY(15deg) translateZ(0);
+        }
+
+        .row-align-angle {
+            [class*=col]:first-child {
+                margin-top: -120px;
+            }
+
+            [class*=col]:last-child {
+                margin-bottom: -120px;
+            }
+        }
+    }
+}
+
+// .stripe-up:not(.hero) {
+//     &:before {
+//         transform: skewY(-2.8deg) translate3d(0, 0, 0);
+//     }
+// }
+//
+// .stripe-down:not(.hero) {
+//     &:before {
+//         transform: skewY(2.8deg) translate3d(0, 0, 0);
+//     }
+// }
+
+// .stripe:not(.hero) {
+//     margin-top: 100px;
+//     padding: 50px 0;
+//
+//     @include media-breakpoint-up(md) {
+//         padding: 100px 0;
+//     }
+//
+//
+//     &:before {
+//         height: calc(100% + 100px);
+//         top: 0;
+//         transform-origin: top;
+//     }
+//
+//     &.stripe-standalone &:before {
+//         height: 100%;
+//     }
+//
+//     .container {
+//         padding-top: 40px;
+//         padding-bottom: 40px;
+//     }
+//
+//     margin-left: -15px;
+//     margin-right: -15px;
+//
+//     @include media-breakpoint-up(sm) {
+//         width: 100vw;
+//         position: relative;
+//         left: 50%;
+//         right: 50%;
+//         margin-left: -50vw;
+//         margin-right: -50vw;
+//     }
+//
+//
+//     &.feature-image {
+//         height: auto;
+//     }
+// }
+//
+// // Different styling if Stipe is immediately after another
+//
+// .stripe + .stripe {
+//     margin-top: 0;
+// }
+//
+// //
+// // Hero
+// @include media-breakpoint-up(sm) {
+//     .hero {
+//         //  max-height: 70vh;
+//         height: 100%;
+//
+//         img {
+//             max-height: 70vh;
+//         }
+//     }
+// }
+//
+//
 @each $name, $color in $colors {
     .bg-#{$name} {
         background-color: $color;

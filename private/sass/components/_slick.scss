@@ -1,0 +1,130 @@
+// stylelint-disable selector-max-type
+.carousel {
+    position: relative;
+    display: none;
+    padding-bottom: 20px;
+}
+
+.slick-slide:focus {
+    outline: none;
+}
+
+// .carousel-style-standard {
+//     .carousel-inner {
+//         margin-left: 60px;
+//         margin-right: 60px;
+//     }
+//
+//     .carousel-link {
+//         display: block;
+//         text-align: center;
+//         @media (min-width: $screen-sm-min) {
+//             margin-left: 50px;
+//             margin-right: 50px;
+//         }
+//     }
+//
+//     .item {
+//         text-align: center;
+//
+//         // stylelint-disable-next-line
+//         img {
+//             width: auto;
+//             height: 215px;
+//             margin: 0 auto 20px;
+//         }
+//     }
+// }
+
+.carousel-ready {
+    display: block;
+}
+
+.carousel-item {
+    height: 100%;
+}
+
+.carousel-control {
+    display: none;
+    font-size: 48px;
+    height: 48px;
+    position: absolute;
+    top: 50%;
+    margin-top: -45px;
+
+    .carousel-ready & {
+        display: block;
+    }
+
+    &.left {
+        left: 0;
+    }
+
+    &.right {
+        right: 0;
+    }
+
+    &.slick-disabled {
+        opacity: 0.5;
+
+        // stylelint-disable-next-line
+        svg,
+        use {
+            fill: #ccc;
+        }
+    }
+
+    &:focus {
+        box-shadow: none;
+    }
+}
+
+// .carousel-style-basic {
+//     .carousel-inner {
+//         margin-bottom: 0;
+//     }
+//
+//     .carousel-control {
+//         filter: drop-shadow(0 0 3px rgba(black, 0.2));
+//         margin-top: -26px;
+//
+//         svg,
+//         use {
+//             fill: white;
+//         }
+//
+//         &.slick-disabled {
+//             opacity: 0.2;
+//         }
+//     }
+//
+//     .slick-dots {
+//         position: absolute;
+//         bottom: 10px;
+//         left: 0;
+//         right: 0;
+//
+//         li {
+//             button {
+//                 width: 10px;
+//                 height: 10px;
+//                 border-radius: 100%;
+//                 border: 2px solid white;
+//                 box-shadow: 0 3px 6px rgba(black, 0.16);
+//
+//                 @media (min-width: $screen-sm-min) {
+//                     width: 16px;
+//                     height: 16px;
+//                 }
+//
+//                 &:before {
+//                     content: '';
+//                 }
+//             }
+//
+//             &.slick-active button {
+//                 background-color: white;
+//             }
+//         }
+//     }
+// }
