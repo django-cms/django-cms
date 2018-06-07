@@ -4,7 +4,7 @@
             "modules": false
         }]
     ],
-    "plugins": ["transform-runtime"],
+    "plugins": ["transform-runtime","transform-object-rest-spread"],
     "env": {
         "production": {
             "plugins": [

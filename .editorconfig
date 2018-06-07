@@ -11,8 +11,11 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 max_line_length = 80
 
-[*.{html,js}]
+[*.{js}]
 max_line_length = 120
+
+[*.{html,js}]
+max_line_length = 99999
 
 [*.yml]
 indent_size = 2

@@ -90,8 +90,7 @@ gulp.task('sass:inline', ['sass:critical'], task('sass/inline'));
  * - "gulp lint:sass" (runs the linter for sass)
  * - "gulp lint:javascript" (runs the linter for javascript)
  */
-gulp.task('lint', ['lint:sass', 'lint:javascript']);
-gulp.task('lint:sass', task('lint/sass'));
+gulp.task('lint', ['lint:javascript']);
 gulp.task('lint:javascript', task('lint/javascript'));
 
 /**
