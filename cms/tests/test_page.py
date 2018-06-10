@@ -1015,6 +1015,40 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
 
+    def test_xframe_options_with_cms_page_cache_and_clickjacking_middleware(self):
+        # Refs: 6346
+        if getattr(settings, 'MIDDLEWARE', None):
+            override = {
+                'MIDDLEWARE': settings.MIDDLEWARE + [
+                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                ]
+            }
+        else:
+            override = {
+                'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES + [
+                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                ]
+            }
+
+        override['CMS_PAGE_CACHE'] = True
+
+        with self.settings(**override):
+            page = create_page(
+                'test page 1',
+                'nav_playground.html',
+                'en',
+                published=True,
+                xframe_options=Page.X_FRAME_OPTIONS_ALLOW,
+            )
+
+            # Normal response from render_page
+            resp = self.client.get(page.get_absolute_url('en'))
+            self.assertEqual(resp.get('X-Frame-Options'), None)
+
+            # Response from page cache
+            resp = self.client.get(page.get_absolute_url('en'))
+            self.assertEqual(resp.get('X-Frame-Options'), None)
+
     def test_page_used_on_request(self):
         """
         The rendered page changes depending on request and
