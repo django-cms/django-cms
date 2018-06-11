@@ -74,7 +74,9 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-    def test_if_cached_page_permissions_dont_override_global_permissions(self):
+    def test_cached_permission_precedence(self):
+        # refs - https://github.com/divio/django-cms/issues/6335
+        # cached page permissions should not override global permissions
         page = create_page(
             "test page",
             "nav_playground.html",
@@ -92,13 +94,6 @@ class PermissionCacheTests(CMSTestCase):
         can_publish = user_can_publish_page(
             self.user_normal,
             page,
-            Site.objects.get_current(),
-        )
-        self.assertTrue(can_publish)
-
-        can_publish = user_can_publish_page(
-            self.user_normal,
-            self.home_page,
             Site.objects.get_current(),
         )
         self.assertTrue(can_publish)
