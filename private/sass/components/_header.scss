@@ -121,6 +121,7 @@
         .nav-link.nav-link-get-started {
             padding-right: 0 !important;
             color: rgba(#1A406B, 1);
+            transition: color 0.5s;
 
             @include media-breakpoint-down(md) {
                 order: 1;
@@ -142,6 +143,10 @@
                 }
             }
         }
+    }
+
+    &.main-nav-scrolled .nav-btnlinks .nav-link.nav-link-get-started {
+        color: theme-color(primary);
     }
 
     .nav-btn {

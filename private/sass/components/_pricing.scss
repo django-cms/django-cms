@@ -1,0 +1,118 @@
+.pricing {
+    font-size: 14px;
+    line-height: 20px;
+
+    @include media-breakpoint-up(xl) {
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+}
+
+.pricing-title {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: rem(18px);
+    line-height: rem(20px);
+    letter-spacing: rem(7px);
+    margin-bottom: rem(20px);
+    color: theme-color(secondary);
+    font-weight: bold;
+}
+
+.pricing .card-body {
+    padding: rem(20px);
+
+    .spitzmarke-lg {
+        font-size: rem(14px);
+        letter-spacing: rem(3px);
+        margin-left: rem(-20px);
+        margin-right: rem(-20px);
+        margin-bottom: rem(20px);
+
+        @include media-breakpoint-up(lg) {
+            letter-spacing: rem(3px);
+        }
+
+
+        @include media-breakpoint-up(xl) {
+            letter-spacing: rem(4px);
+        }
+    }
+}
+
+.pricing-icon {
+    width: rem(86px);
+    height: rem(86px);
+    margin-bottom: rem(20px);
+}
+
+.pricing-price {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: rem(20px);
+}
+
+.pricing-currency {
+    font-size: rem(20px);
+    line-height: 1;
+    font-weight: bold;
+    color: theme-color(secondary);
+    align-self: flex-start;
+}
+
+.pricing-value {
+    font-size: rem(54px);
+    line-height: rem(46px);
+    height: rem(46px);
+    font-weight: bold;
+    color: theme-color(secondary);
+    align-self: flex-end;
+}
+
+.pricing-period {
+    color: theme-color(primary);
+    font-size: rem(24px);
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: rem(5px);
+    align-self: flex-end;
+}
+
+.pricing-ideal {
+    display: block;
+    color: theme-color(primary);
+    font-weight: 600;
+}
+
+.pricing-guarantee {
+    display: block;
+    font-weight: 600;
+}
+
+.pricing-cta {
+    font-size: 12px;
+    height: 38px;
+    padding-left: 30px;
+    padding-right: 30px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.pricing-features {
+    color: theme-color(secondary);
+    font-weight: bold;
+
+    .spitzmarke {
+        color: rgba(theme-color(secondary), 0.6);
+    }
+}
+
+.pricing-additional {
+    color: theme-color(secondary);
+}
+
+.pricing-vip {
+    color: #1A406B;
+    font-weight: bold;
+}

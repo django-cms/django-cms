@@ -9,6 +9,7 @@
     white-space: nowrap;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
 
     .icon {
         margin-right: 10px;
@@ -63,8 +64,9 @@
     }
 }
 
-.btn-rounded {
+.btn {
     border-radius: 100px;
     padding-left: 30px;
     padding-right: 30px;
+    text-transform: uppercase;
 }

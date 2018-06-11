@@ -5,6 +5,235 @@
 {% block title %}Pricing{% endblock %}
 
 {% block content %}
-    {% include 'divio_styleguide/includes/page-header.html' with cta=False title='Create a professional website' lead='Create a professional website complete with a CMS in a few simple steps.<br> You can customise everything.' %}
+{% include 'divio_styleguide/includes/page-header.html' with side=True cta=False title='Simple transparent pricing.<br>No lock-in.' lead='Get started by creating a new project and picking your preferred configuration. Modern container-based hosting with the freedom to migrate anytime.' %}
 
+
+<div class="container">
+    <div class="section-fullwidth mt-4">
+        <div class="stripe stripe-steep-down">
+            <div class="container">
+                <div class="row pricing">
+                    <div class="col-12">
+                        <h1 class="pricing-title">Most popular</h1>
+                    </div>
+                    <div class="col-md-8 offset-md-2 col-lg-4 mb-4 offset-lg-0">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h2 class="spitzmarke-lg">Professional</h2>
+                                {% include 'includes/icon.html' with icon='circle' class='pricing-icon' %}
+                                <div class="pricing-price">
+                                    <span class="pricing-currency">$</span>
+                                    <span class="pricing-value">49</span>
+                                    <span class="pricing-period">/mo</span>
+                                </div>
+                                <span class="pricing-ideal">
+                                    Ideal for up to 50k pageviews/mo
+                                </span>
+                                <span class="pricing-guarantee">
+                                    99.95% uptime guarantee
+                                </span>
+
+                                <a href="#" class="btn btn-primary pricing-cta">Get started for free</a>
+                                <hr>
+                                <div class="pricing-features">
+                                    <span class="spitzmarke">Includes</span>
+                                    <p>
+                                        Test & Live Server<br>
+                                        Priority support
+                                    </p>
+                                    <p>
+                                    7 Daily / 4 Weekly  Automatic backups<br>
+                                    2x 512 MB Application RAM<br>
+                                    50 GB Disk space<br>
+                                    200 GB/mo Traffic<br>
+                                    50M rows Fully-managed database
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="pricing-additional">
+                                    <p>SSL via Let's Encrypt</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 offset-md-2 col-lg-4 mb-4 offset-lg-0">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h2 class="spitzmarke-lg">Business</h2>
+                                {% include 'includes/icon.html' with icon='circle' class='pricing-icon' %}
+                                <div class="pricing-price">
+                                    <span class="pricing-currency">$</span>
+                                    <span class="pricing-value">99</span>
+                                    <span class="pricing-period">/mo</span>
+                                </div>
+                                <span class="pricing-ideal">
+                                    Ideal for up to 100k pageviews/mo
+                                </span>
+                                <span class="pricing-guarantee">
+                                    99.95% uptime guarantee
+                                </span>
+
+                                <a href="#" class="btn btn-primary pricing-cta">Get started for free</a>
+                                <hr>
+                                <div class="pricing-features">
+                                    <span class="spitzmarke">Includes</span>
+                                    <p>
+                                        Test & Live Server<br>
+                                        Priority support
+                                    </p>
+                                    <p>
+                                    7 Daily / 4 Weekly  Automatic backups<br>
+                                    2x 512 MB Application RAM<br>
+                                    50 GB Disk space<br>
+                                    200 GB/mo Traffic<br>
+                                    50M rows Fully-managed database
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="pricing-additional">
+                                    <p>
+                                    SSL via Cloudflare<br>
+                                    Access to ElasticSearch cluster<br>
+                                    Celery support for asynchronous tasks<br>
+                                    CloudFlare Pro subscription worth $20/mo for one domain<br>
+                                    Mobile optimisations with  Cloudflare Mirage
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 offset-md-2 col-lg-4 mb-4 offset-lg-0">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h2 class="spitzmarke-lg">Business Protection+</h2>
+                                {% include 'includes/icon.html' with icon='circle' class='pricing-icon' %}
+                                <div class="pricing-price">
+                                    <span class="pricing-currency">$</span>
+                                    <span class="pricing-value">499</span>
+                                    <span class="pricing-period">/mo</span>
+                                </div>
+                                <span class="pricing-ideal">
+                                    Ideal for up to 500k pageviews/mo
+                                </span>
+                                <span class="pricing-guarantee">
+                                    99.95% uptime guarantee
+                                </span>
+
+                                <a href="#" class="btn btn-primary pricing-cta">Get started for free</a>
+                                <hr>
+                                <div class="pricing-features">
+                                    <span class="spitzmarke">Includes</span>
+                                    <p>
+                                        Test & Live Server<br>
+                                        Priority support
+                                    </p>
+                                    <p>
+                                    7 Daily / 4 Weekly / 12 Monthly  Automatic backups<br>
+                                    2x 1024 MB Application RAM<br>
+                                    200 GB Disk space<br>
+                                    1 TB/mo Traffic<br>
+                                    100M rows Fully-managed database<br>
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="pricing-additional">
+                                    <p>
+                                    Custom SSL via Cloudflare (incl. EV)<br>
+                                    Access to ElasticSearch cluster<br>
+                                    Celery support for asynchronous tasks<br>
+                                    CloudFlare Business subscription worth $200/mo for one domain<br>
+                                    Mobile optimisations with  Cloudflare Mirage<br>
+                                    </p>
+                                </div>
+                                <p class="pricing-vip">VIP on-boarding and extensive  go-live check by  Divio Core Engineers</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <p class="mt-lg--3">Need a more details overview? <a href="#">Compare our plans</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-7 align-items-center">
+        <div class="col-md-5 mb-4">
+            <div class="placeholder" style="height: 250px;">
+                le image
+            </div>
+        </div>
+
+        <div class="col-md-6 offset-md-1">
+            <h3 class="display-4">Looking for an Enterprise Level Solution?</h3>
+            <p>Divio offers 24/7 Support, Guaranteed Response Time, On-premise Hosting option, Unlimited Diskspace and Traffic and scaling.</p>
+            <a href="#">Learn more about our enterprise plans</a>
+        </div>
+    </div>
+
+    <div class="section-fullwidth mt-4">
+        <div class="stripe stripe-steep-up">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h2 class="text-center display-4">Most popular</h2>
+                        <p class="lead text-center">
+                        You can choose pre-configured and optimised or a minimalistic setup to work your way. Your project will be deployed to a testing and stage environment momentarily.
+                        </p>
+                    </div>
+                    {% for i in 'abc'|make_list %}
+                    <div class="col-md-8 offset-md-2 col-lg-4 mb-4 offset-lg-0">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="h6">Divio vs. Digital Ocean</h3>
+                                <p>DigitalOcean gives you a plain old virtual server. Everything else is up to you. Divio Cloud on the other hand is dedicated to the needs of Django developers. It’s optimised for their work and for Django hosting, by Django experts.</p>
+                                <a href="#">Learn more</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-7 align-items-center justify-content-around">
+        <div class="col-12 mb-5 text-center">
+            <h2 class="spitzmarke-lg">Self-Service</h2>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card card-small">
+                <div class="card-body text-center">
+                    <h3 class="spitzmarke">Personal</h3>
+                    <p class="text-secondary">
+                    Free SSL certificate<br>
+                    256 MB RAM, 5 GB Diskspace<br>
+                    5M rows managed database<br>
+                    1 Test & 1 Live server included<br>
+                    Basic Support with best effort response time
+                    </p>
+                    <hr>
+                    <a href="#" class="btn btn-primary">Get started for free</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card card-small">
+                <div class="card-body text-center">
+                    <h3 class="spitzmarke">Custom</h3>
+                    <p class="text-secondary">
+                    Free SSL certificate<br>
+                    256 MB RAM, 5 GB Diskspace<br>
+                    5M rows managed database<br>
+                    1 Test & 1 Live server included<br>
+                    Basic Support with best effort response time
+                    </p>
+                    <hr>
+                    <a href="#" class="btn btn-primary">Get started for free</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

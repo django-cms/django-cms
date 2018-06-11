@@ -54,8 +54,17 @@
     line-height: rem(32px);
 }
 
+.h6 {
+    font-weight: bold;
+    font-size: rem(18px);
+    line-height: rem(28px);
+    letter-spacing: rem(1.8px);
+    text-transform: uppercase;
+    color: #1A406B;
+}
+
 .h7 {
-    color: #0bf;
+    color: theme-color(primary);
     font-size: rem(14px);
     letter-spacing: rem(1px);
     line-height: rem(20px);

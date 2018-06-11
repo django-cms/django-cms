@@ -13,12 +13,18 @@
 }
 
 .card-body {
-    padding: 35px 30px 30px;
+    padding: rem(35px) rem(30px) rem(30px);
 }
 
 .card-title {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: rem(24px);
+    line-height: rem(32px);
     font-weight: 600;
     color: theme-color(primary);
+}
+
+.card-small {
+    .card-body {
+        font-size: rem(14px);
+    }
 }
