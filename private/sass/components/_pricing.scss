@@ -116,3 +116,48 @@
     color: #1A406B;
     font-weight: bold;
 }
+
+.pricing-detail-table {
+    text-align: center;
+
+    .icon {
+        display: block;
+        margin: 0 auto rem(4px);
+
+        svg,
+        use {
+            fill: theme-color(secondary);
+        }
+    }
+
+    thead th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: rem(12px);
+        letter-spacing: rem(2px);
+        color: #2D3146;
+        border-bottom-width: 1px;
+        border-top: 0;
+        height: rem(60px);
+    }
+
+    tbody {
+        th {
+            text-align: left;
+            color: theme-color(primary);
+            font-weight: bold;
+            font-size: rem(14px);
+        }
+
+        td {
+            color: theme-color(secondary);
+        }
+
+        tr:last-child {
+            th,
+            td {
+                border-bottom: 1px solid $table-border-color;
+            }
+        }
+    }
+}

@@ -2,6 +2,9 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
+                {% if spitzmarke %}
+                <span class="spitzmarke-lg">{{ spitzmarke }}</span>
+                {% endif %}
                 <h1 class="display-1">{{ title|default:'Your Django<br> Projects on Autopilot' }}</h1>
             </div>
             <div class="col-md-{% if not side %}12{% else %}7{% endif %}">

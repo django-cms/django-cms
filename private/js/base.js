@@ -8,6 +8,7 @@ import { initLocalScroll } from 'addons/localscroll';
 import { initHeader } from 'addons/header';
 import { initBlogCarousel } from 'addons/carousel';
 import { initWaypoints } from 'addons/waypoints';
+import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
 
 svg4everybody({
     polyfill: true,
@@ -23,6 +24,9 @@ $(() => {
     initHeader();
     initBlogCarousel();
     initWaypoints();
+    // TODO load this on demand
+    initFixedHeaderTables();
+    initTableCrossHover();
     outdatedBrowser({
         languagePath: '',
         lowerThan: 'boxShadow',

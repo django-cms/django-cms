@@ -1,0 +1,66 @@
+/* For appearance */
+.sticky-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.sticky-wrap .sticky-thead,
+.sticky-wrap .sticky-col,
+.sticky-wrap .sticky-intersect {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: auto;
+    table-layout: fixed;
+
+    td, th {
+        background: white;
+    }
+
+    td.hover,
+    th.hover {
+        background-color: $table-hover-bg;
+    }
+
+    .hover th {
+        background-color: $table-hover-bg;
+    }
+}
+
+.sticky-wrap .sticky-thead {
+    z-index: 100;
+    width: 100%;
+    background: white;
+
+    td, th {
+        background: white;
+    }
+}
+
+.sticky-wrap .sticky-intersect {
+    opacity: 1;
+    z-index: 150;
+
+    td, th {
+        border: none;
+    }
+}
+
+.sticky-wrap .sticky-intersect th {}
+
+.sticky-wrap td,
+.sticky-wrap th {
+    box-sizing: border-box;
+}
+
+.table-hover .hover {
+    background-color: $table-hover-bg;
+}
+
+tr.hover td.hover {
+    background-color: darken($table-hover-bg, 3%);
+}

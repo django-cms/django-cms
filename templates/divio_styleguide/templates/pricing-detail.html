@@ -1,0 +1,142 @@
+{% extends "content.html" %}
+{% load staticfiles %}
+
+{% block breadcrumb %}{% endblock %}
+{% block title %}Pricing{% endblock %}
+
+{% block content %}
+{% include 'divio_styleguide/includes/page-header.html' with cta=False title='Divio cloud pricing comparison' lead='You can choose pre-configured and optimised<br> or a minimalistic setup to work you way.' spitzmarke='pricing' %}
+
+
+<div class="container">
+    <div class="pricing-detail-table mb-7">
+        <table class="table js-table table-hover">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>Free</th>
+                    <th>Personal</th>
+                    <th>Custom</th>
+                    <th>Professional</th>
+                    <th>Business</th>
+                    <th>Business Protection+</th>
+                    <th>Enterprise</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Monthly Price</th>
+                    <td>$0</td>
+                    <td>$9</td>
+                    <td>Starting at $13</td>
+                    <td>$49</td>
+                    <td>$99</td>
+                    <td>$499</td>
+                    <td>Custom</td>
+                </tr>
+                <tr>
+                    <th>Full access to all development adn deployment tools</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                </tr>
+                <tr>
+                    <th>Application RAM</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
+                </tr>
+                <tr>
+                    <th>Backup</th>
+                    <td>{% include 'includes/icon.html' with icon='close' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} <small><b>On demand:</b><br> Up to 30 days and maximum 3 backups</small></td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} <small><b>On demand:</b><br> Up to 30 days and maximum 5 backups</small></td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} <small><b>Scheduled:</b><br> 7 Daily<br>4 Weekly</small></td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} <small><b>Scheduled:</b><br> 7 Daily<br>4 Weekly</small></td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} <small><b>Scheduled:</b><br> 7 Daily<br>4 Weekly<br>12 Monthly</small></td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} <small><b>Custom</b></small></td>
+                </tr>
+                <tr>
+                    <th>Disk space</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
+                </tr>
+                <tr>
+                    <th>Includes fully-managed database</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
+                </tr>
+                <tr>
+                    <th>Disk space</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
+                </tr>
+                <tr>
+                    <th>Access to ElasticSearch Cluster</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                </tr>
+                <tr>
+                    <th>Celery support for asynchronouse tasks</th>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="row justify-content-center text-center">
+        <div class="col-md-6">
+            <div class="placeholder mb-4" style="height: 150px;">
+                le image
+            </div>
+            <p class="lead">Are you interested in a model?</p>
+            <form>
+                <div class="form-group">
+                    <select class="custom-select">
+                        <option>Business</option>
+                        <option>Business Protection+</option>
+                        <option>Business Protection++</option>
+                        <option>Business Protection+++</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Contact us</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
