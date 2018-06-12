@@ -8,28 +8,6 @@
     word-break: break-word;
 }
 
-// // Add standard margins if block of text
-// .text-block {
-//     h3,
-//     .h3 {
-//         margin-top: 3rem;
-//
-//         &:first-child {
-//             margin-top: 1rem;
-//         }
-//     }
-//
-//     h4,
-//     .h4 {
-//         margin-top: 2rem;
-//     }
-//
-//     h3 + h4,
-//     .h3 + .h4 {
-//         margin-top: 1rem;
-//     }
-// }
-
 .display-1 {
     color: theme-color(primary);
     line-height: rem(60px);
