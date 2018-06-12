@@ -3,43 +3,36 @@
 <!-- LEGAL PAGE TEMPLATE (E.G TERMS & CONDITIONS) -->
 
 <!-- Hero -->
-<header class="hero stripe stripe-up stripe-gradient hero-text-c">
-    <div class="stripe-element">
-    </div>
-    <div class="container text-center justify-content-center align-items-center d-flex flex-column">
-          {% include "divio_styleguide/includes/hero-title.html" with cls='' title='Terms of Service' sub_title='Our commitment to you'%}
-        <div class="sub-menu sub-menu-vertical navbar-expand-lg" >
-            <p class="h5 sub-menu-title">Jump to topic</p>
-            <p class="h5 sub-menu-toggler collapsed" data-toggle="collapse" data-target="#sub-menu-content" aria-expanded="false" aria-label="Toggle navigation">Jump to topic
+{% include 'divio_styleguide/includes/page-header.html' with title='Terms of Service' spitzmarke='Our commitment to you' nolead=True %}
 
-                  {% include "includes/icon.html" with icon="arrow-right" class="sub-menu-toggler" color="blue" %}
-
-            </p>
-            <ul class="collapse navbar-collapse" id="sub-menu-content">
-              <li><a href="#link-1">Divio Cloud / django CMS Marketplace</a></li>
-              <li><a href="#link-2">Enterprise / Training / Dedicated Team / Custom Development / Migration</a></li>
-              <li><a href="#link-3">Responsibility of Website Visitors</a></li>
-              <li><a href="#link-4">Content Posted on Other Websites</a></li>
-              <li><a href="#link-5">Intellectual Property</a></li>
-              <li><a href="#link-6">Domain Names</a></li>
-              <li><a href="#link-7">Changes</a></li>
-              <li><a href="#link-8">Termination</a></li>
-              <li><a href="#link-9">Disclaimer of Warranties</a></li>
-              <li><a href="#link-10">Limitation of Liability</a></li>
-              <li><a href="#link-11">General Representation &amp; Warranty</a></li>
-              <li><a href="#link-12">Indemnification</a></li>
-              <li><a href="#link-13">Miscellaneous</a></li>
-              <li><a href="#link-14">Changelog</a></li>
-            </ul>
-        </div>
-    </div>
-</header>
-
-<!-- Body of text -->
-<!-- Add class 'text-block' to add formatting for areas with large amounts of text -->
 <div class="container">
-    <div class="row justify-content-end">
-        <div class="col-12 col-lg-8 text-block">
+    <div class="row my-5">
+        <div class="col-12 col-lg-4">
+            <div class="sub-menu mt-3 sub-menu-vertical navbar-expand-lg">
+                <p class="h5 sub-menu-title">Jump to topic</p>
+                <p class="h5 sub-menu-toggler collapsed" data-toggle="collapse" data-target="#sub-menu-content" aria-expanded="false" aria-label="Toggle navigation">Jump to topic
+                    {% include "includes/icon.html" with icon="arrow-right" class="sub-menu-toggler" color="blue" %}
+                </p>
+                <ul class="collapse navbar-collapse" id="sub-menu-content">
+                <li><a href="#link-1">Divio Cloud / django CMS Marketplace</a></li>
+                <li><a href="#link-2">Enterprise / Training / Dedicated Team / Custom Development / Migration</a></li>
+                <li><a href="#link-3">Responsibility of Website Visitors</a></li>
+                <li><a href="#link-4">Content Posted on Other Websites</a></li>
+                <li><a href="#link-5">Intellectual Property</a></li>
+                <li><a href="#link-6">Domain Names</a></li>
+                <li><a href="#link-7">Changes</a></li>
+                <li><a href="#link-8">Termination</a></li>
+                <li><a href="#link-9">Disclaimer of Warranties</a></li>
+                <li><a href="#link-10">Limitation of Liability</a></li>
+                <li><a href="#link-11">General Representation &amp; Warranty</a></li>
+                <li><a href="#link-12">Indemnification</a></li>
+                <li><a href="#link-13">Miscellaneous</a></li>
+                <li><a href="#link-14">Changelog</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div class="text-block">
             <h3>The basics</h3>
             <p class="lead">If you find a Divio Cloud powered site that you believe violates our terms of service, please report this immediately via our Divio Support. If you don’t feel like you want to agree to these terms of service – and therefore not being able
                 to use our services – we strongly recommend to check out the open source projects <a href="http://django-cms.org/">django CMS</a>. We commit intensely to these projects and will continue to do so in the future. Thanks to the folks at
@@ -288,9 +281,10 @@
                         and conditions; Divio may assign its rights under this Agreement without condition. This Agreement will be binding upon and will inure to the benefit of the parties, their successors and permitted assigns.</p>
                 </li>
             </ol>
-            <div class="card bg-light mb-3">
-                    <div class="card-header"><p class="h4">Change log</p></div>
+        </div>
+            <div class="card mb-3">
                     <div class="card-body">
+                    <p class="card-title">Change log</p>
                         <div class="row mb-3">
                             <div class="col-12 col-lg-4">
                                 <p class="h5">November 16, 2016</p>

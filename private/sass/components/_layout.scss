@@ -42,7 +42,6 @@ body.cke_editable {
 .sub-menu {
     text-align: left;
     width: 100%;
-    max-width: 400px;
 
     .h5 {
         text-align: center;
@@ -50,13 +49,15 @@ body.cke_editable {
 
     .sub-menu-toggler {
         cursor: pointer;
-        color: $azure;
+        display: flex;
+        align-items: center;
 
         .icon {
+            display: block;
             width: 0.8rem;
             height: 0.8rem;
+            margin-left: rem(8px);
             transform: rotate(-90deg);
-            margin-top: 3px;
         }
     }
 
@@ -69,53 +70,55 @@ body.cke_editable {
 .sub-menu-horizontal {
     ul {
         list-style-type: none;
-        padding: 10px 0 0;
+        padding: 0 0 20px;
         margin-bottom: 0;
         justify-content: center;
 
         a {
-            padding: 0 10px;
-            margin: 0 10px 10px;
+            color: #2D3146;
+            margin: 0 0 rem(10px);
             display: block;
-            border-left: 2px solid transparent;
-        }
-
-        li:last-child {
-            a {
-                margin-bottom: 0;
-            }
+            text-transform: uppercase;
+            font-size: rem(12px);
+            line-height: rem(15px);
+            letter-spacing: rem(2px);
+            font-weight: bold;
         }
 
         .active {
-            border-left: 2px solid $azure;
-
-            @extend .text-primary;
+            color: theme-color(primary);
         }
     }
 }
 
 // SUB MENU vertically aligned like t&cs page
 .sub-menu-vertical {
-    padding: 0 20px;
-
     ul {
         list-style-type: none;
-        padding: 10px 0 0;
+        padding: 0 0 20px;
 
         a {
-            color: $night;
+            color: #2D3146;
             margin: 0 0 10px;
             display: block;
+            text-transform: uppercase;
+            font-size: rem(12px);
+            line-height: rem(15px);
+            letter-spacing: rem(2px);
+            font-weight: bold;
         }
-    }
-
-    #sub-menu-content {
-        flex-direction: column;
-        align-items: flex-start;
     }
 
     .sub-menu-title {
         display: none;
+    }
+
+    .sub-menu-toggler,
+    .sub-menu-title {
+        font-size: rem(14px);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: rem(1px);
     }
 }
 
@@ -125,37 +128,20 @@ body.cke_editable {
 
         ul {
             a {
-                padding: 0;
+                padding: 0 10px;
                 border-left: none;
-                border-bottom: 2px solid transparent;
-            }
-
-            .active {
-                border-left: none;
-                border-bottom: 2px solid $azure;
+                text-decoration: none;
             }
         }
     }
 
     .sub-menu-vertical {
-        max-width: 300px;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        padding: 20px;
         text-align: left;
+        position: relative;
 
-        &::before {
-            content: '';
-            background: $snow;
-            left: 0;
-            transform: skewY(-3deg) translate3d(0, 0, 0);
-            width: 100%;
-            height: calc(100% + 20px);
-            bottom: -20px;
-            transform-origin: 0;
-            position: absolute;
-            z-index: -1;
+        .collapse {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .h5 {
@@ -168,7 +154,7 @@ body.cke_editable {
     }
 
     .sub-menu-toggler {
-        display: none;
+        display: none !important;
     }
 
     .icon-dropdown {
@@ -251,4 +237,29 @@ body.cke_editable {
 .media-body {
     font-size: 14px;
     line-height: 20px;
+}
+
+.text-block {
+    h3, h3, h3, .h3 {
+        margin-top: 3rem;
+    }
+
+    h3:first-child,
+    .h3:first-child {
+        margin-top: 1rem;
+    }
+
+    h4,
+    .h4 {
+        margin-top: 2rem;
+    }
+
+    h3 + h4,
+    .h3 + .h4 {
+        margin-top: 1rem;
+    }
+
+    p, p:last-child {
+        margin-bottom: 1.5rem;
+    }
 }

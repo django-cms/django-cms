@@ -64,3 +64,19 @@
 tr.hover td.hover {
     background-color: darken($table-hover-bg, 3%);
 }
+
+.table {
+    thead th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: rem(12px);
+        letter-spacing: rem(2px);
+        color: #2D3146;
+        border-bottom-width: 1px;
+        border-top-width: 0;
+    }
+}
+
+.table-bordered thead th {
+    border-top-width: 1px;
+}

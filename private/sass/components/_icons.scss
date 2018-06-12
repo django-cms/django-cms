@@ -15,9 +15,9 @@
     }
 }
 
-.icon-md {
-    width: 50px;
-    height: 50px;
+.icon-lg {
+    width: 42px;
+    height: 42px;
 }
 
 a .icon {
@@ -26,43 +26,6 @@ a .icon {
         fill: currentColor;
     }
 }
-
-// .hero-icon {
-//     width: 100px;
-//     height: 100px;
-//     background-image: url('../img/dots.png');
-//     position: relative;
-//     border-radius: 50px;
-//     background-size: 40px;
-//     margin-bottom: 20px;
-//
-//     &:before {
-//         content: '';
-//         background-color: #fff;
-//         border-radius: 32px;
-//         width: 64px;
-//         height: 64px;
-//         position: absolute;
-//         z-index: 1;
-//         left: 50%;
-//         top: 50%;
-//         margin-left: -32px;
-//         margin-top: -32px;
-//     }
-//
-//     svg {
-//         z-index: 2;
-//         position: absolute;
-//         left: 50%;
-//         top: 50%;
-//         margin-left: -20px;
-//         margin-top: -20px;
-//         width: 40px;
-//         height: 40px;
-//     }
-// }
-
-//Product icons with shadow
 
 .icon-white {
     svg,

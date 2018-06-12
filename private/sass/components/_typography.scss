@@ -54,7 +54,21 @@
     line-height: rem(32px);
 }
 
-.h6 {
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4 {
+    color: theme-color(primary);
+}
+
+h5, .h5 {
+    font-weight: 600;
+    font-size: rem(24px);
+    line-height: rem(30px);
+    color: theme-color(primary);
+}
+
+h6, .h6 {
     font-weight: bold;
     font-size: rem(18px);
     line-height: rem(28px);
@@ -104,4 +118,8 @@
     .icon-external {
         margin-top: -3px;
     }
+}
+
+p:last-child {
+    margin-bottom: 0px;
 }

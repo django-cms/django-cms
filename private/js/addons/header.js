@@ -48,7 +48,7 @@ function initSticky() {
         //     console.log('scrolling down');
         // }
 
-        if (scroll > 15) {
+        if (scroll >= 20) {
             $('.main-nav').addClass('main-nav-scrolled');
         } else {
             $('.main-nav').removeClass('main-nav-scrolled');

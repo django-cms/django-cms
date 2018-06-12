@@ -6,7 +6,9 @@
 // Navigation bar {
 .main-nav {
     background-color: transparent;
-    min-height: $header-height - 30px;
+    min-height: $header-height - 40px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     transition: height $speed-base;
 
     @include media-breakpoint-up(sm) {
@@ -21,7 +23,7 @@
         top: 0;
         left: 0;
         right: 0;
-        margin-top: 15px;
+        margin-top: 20px;
         z-index: 1030;
         position: absolute;
 
@@ -307,10 +309,32 @@
         }
 
 
+        @include media-breakpoint-up(lg) {
+            &:before {
+                content: '';
+                position: absolute;
+                box-shadow: 0 0 1rem rgba($black, 0.175);
+                width: 20px;
+                height: 20px;
+                transform: rotate(45deg);
+                background-color: white;
+                z-index: -9;
+                left: 50%;
+                margin-left: -10px;
+                top: -9px;
+            }
+        }
+
+
         .dropdown-item {
             display: flex;
             flex-direction: row;
             max-width: 400px;
+
+            @include media-breakpoint-up(lg) {
+                background: white;
+            }
+
 
             &:active {
                 color: black;
@@ -329,8 +353,13 @@
             .dropdown-desc {
                 white-space: normal;
                 margin-left: 1rem;
-                font-size: 14px;
-                margin-bottom: 1rem;
+                font-size: rem(14px);
+                color: theme-color(secondary);
+
+                @include media-breakpoint-down(md) {
+                    margin-bottom: 1rem;
+                }
+
 
                 .dropdown-desc-title {
                     display: block;
@@ -342,9 +371,11 @@
             }
         }
 
-        .dropdown-item:hover,
-        .dropdown-item:focus {
-            background-color: transparent;
+        @include media-breakpoint-down(md) {
+            .dropdown-item:hover,
+            .dropdown-item:focus {
+                background-color: transparent;
+            }
         }
     }
 }
@@ -353,7 +384,7 @@
     max-height: 999px;
     opacity: 1;
 
-    @include media-breakpoint-down(lg) {
+    @include media-breakpoint-down(md) {
         padding: 10px;
     }
 }

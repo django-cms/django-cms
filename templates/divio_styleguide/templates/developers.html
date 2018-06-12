@@ -1,0 +1,101 @@
+{% extends "content.html" %}
+{% load staticfiles %}
+
+{% block breadcrumb %}{% endblock %}
+{% block title %}Developers{% endblock %}
+
+{% block content %}
+{% include 'divio_styleguide/includes/page-header.html' with h2=True spitzmarke="Pricing" cta=True side=True sideContent='<div class="placeholder" style="height: 200px">le image</div>' title='Write code. Not deployments scripts' lead='You can choose pre-configured and optimised or a minimalistic setup to work your way. ' %}
+
+<div class="container">
+    <div class="section-fullwidth mt-6">
+        <div class="stripe stripe-down">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3 mb-5">
+                        <span class="spitzmarke">support</span>
+                        <h2 class="display-2">All features at a glance</h2>
+                        <p>Divio brings together django optimised hosting, developer tools and pre-configured projects including django CMS and Wagtail, into one easy-to-use service backed by expert support.</p>
+                        <p>You can create a production-ready site by choosing from a pre-configured project, adding your content and deploying in a few steps.</p>
+                        <p>In less than an hour you can create a professional custom website complete with a content management system.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-7 align-items-center">
+        <div class="col-md-5 mb-4">
+            <div class="placeholder" style="height: 270px;">
+                le image
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4 offset-md-1">
+            <h3 class="h5">Built upon trusted Amazon infrastructure</h3>
+            <p>By building upon trusted and proven Amazons infrastructure we can deliver Amazon features and standards compliance enhanced with powerful Divio features and optimisations.</p>
+            <p>Integrating Divio into your enterprise is made easier given the wide spread adoption of Amazon web services already deployed and accepted in enterprise IT environments</p>
+        </div>
+    </div>
+
+    <div class="row mt-7 align-items-center">
+        <div class="col-md-5 offset-md-1 mb-4 order-md-2">
+            <div class="placeholder" style="height: 270px;">
+                le image
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4 offset-md-1 order-md-1">
+            <h3 class="h5">Built upon trusted Amazon infrastructure</h3>
+            <p>By building upon trusted and proven Amazons infrastructure we can deliver Amazon features and standards compliance enhanced with powerful Divio features and optimisations.</p>
+            <p>Integrating Divio into your enterprise is made easier given the wide spread adoption of Amazon web services already deployed and accepted in enterprise IT environments</p>
+        </div>
+    </div>
+
+    <div class="section-fullwidth mt-6">
+        <div class="stripe stripe-up">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-5 offset-md-4 mb-5">
+                        {% include 'divio_styleguide/includes/testimonial.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-7">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h2 class="display-4">Much more than hosting</h2>
+            <p class="lead text-secondary">
+            You can choose pre-configured and optimised or a minimalistic setup to work your way. Your project will be deployed to a testing and stage environment momentarily.
+            </p>
+        </div>
+    </div>
+
+    <div class="row my-7 justify-content-around">
+        {% for i in 'abc'|make_list %}
+        <div class="col-md-3">
+            {% include 'includes/icon.html' with class="icon-lg mb-3" icon='circle' %}
+            <h3 class="h6">Git based asset management</h3>
+            <p>DigitalOcean gives you a plain old virtual server. Everything else is up to you. Divio Cloud on the other hand is dedicated to the needs of Django developers. It’s optimised for their work and for Django hosting, by Django experts.</p>
+            <a href="#">Learn more</a>
+        </div>
+        {% endfor %}
+    </div>
+    <hr class="my-7">
+
+    <div class="row align-items-center">
+        <div class="col-md-9 mb-4">
+
+            <h2 class="display-4">Ready to use Divio Cloud?</h2>
+            <p class="lead text-secondary">
+            Activate a free trial for your business or learn more below.
+            </p>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <a href="#" class="btn btn-primary">Request access</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

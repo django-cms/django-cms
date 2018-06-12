@@ -274,12 +274,12 @@ $font-weight-bold: 700;
 $font-weight-base: $font-weight-normal;
 $line-height-base: 1.5;
 
-$h1-font-size: 2rem;
-$h2-font-size: 1.5rem;
-$h3-font-size: 1.3rem;
-$h4-font-size: 1.2rem;
-$h5-font-size: 1.125rem;
-$h6-font-size: 1.125rem;
+$h1-font-size: rem(40px);
+$h2-font-size: rem(38px);
+$h3-font-size: rem(36px);
+$h4-font-size: rem(32px);
+$h5-font-size: rem(24px);
+$h6-font-size: rem(18px);
 
 
 $headings-margin-bottom: 1rem;

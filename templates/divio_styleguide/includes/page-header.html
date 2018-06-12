@@ -1,22 +1,40 @@
-<div class="page-header">
+<div class="page-header{% if centered %} text-center {% endif %}">
     <div class="container">
         <div class="row">
-            <div class="col-12">
-                {% if spitzmarke %}
-                <span class="spitzmarke-lg">{{ spitzmarke }}</span>
+            {% if sideContent %}
+                <div class="col-md-8 mb-5">
+                    {% if spitzmarke %}
+                    <span class="spitzmarke-lg">{{ spitzmarke }}</span>
+                    {% endif %}
+                    <h1 class="display-{% if h2 %}2{% else %}1{% endif %}">{{ title|default:'Your Django<br> Projects on Autopilot' }}</h1>
+                    <p class="lead">{{ lead|default:'Divio is a platform for running your Django projects.<br> Trusted to serve over 100 million requests every month.' }}</p>
+                    {% if cta %}
+                        <a href="#" class="btn btn-rounded text-uppercase btn-primary">Get started for free</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 d-none d-md-block">
+                    {{ sideContent|safe }}
+                </div>
+            {% else %}
+                <div class="col-12">
+                    {% if spitzmarke %}
+                    <span class="spitzmarke-lg">{{ spitzmarke }}</span>
+                    {% endif %}
+                    <h1 class="display-{% if h2 %}2{% else %}1{% endif %}">{{ title|default:'Your Django<br> Projects on Autopilot' }}</h1>
+                </div>
+                <div class="col-md-{% if not side %}12{% else %}7{% endif %}">
+                    {% if not nolead %}
+                    <p class="lead">{{ lead|default:'Divio is a platform for running your Django projects.<br> Trusted to serve over 100 million requests every month.' }}</p>
+                    {% endif %}
+                    {% if cta %}
+                        <a href="#" class="btn btn-rounded text-uppercase btn-primary">Get started for free</a>
+                    {% endif %}
+                </div>
+                {% if side %}
+                    <div class="col-md-4 offset-md-1">
+                        {% include 'divio_styleguide/includes/testimonial.html' with nomargin=True %}
+                    </div>
                 {% endif %}
-                <h1 class="display-1">{{ title|default:'Your Django<br> Projects on Autopilot' }}</h1>
-            </div>
-            <div class="col-md-{% if not side %}12{% else %}7{% endif %}">
-                <p class="lead">{{ lead|default:'Divio is a platform for running your Django projects.<br> Trusted to serve over 100 million requests every month.' }}</p>
-                {% if cta %}
-                <a href="#" class="btn btn-rounded text-uppercase btn-primary">Get started for free</a>
-                {% endif %}
-            </div>
-            {% if side %}
-            <div class="col-md-4 offset-md-1">
-                {% include 'divio_styleguide/includes/testimonial.html' with nomargin=True %}
-            </div>
             {% endif %}
         </div>
     </div>

@@ -5,16 +5,10 @@
 {% block navbar_class %}navbar-light {% endblock %}
 
 {% block content %}
-<header class="hero stripe stripe-up stripe-gradient hero-text-c">
-    <div class="stripe-element">
-    </div>
-    <div class="container text-center justify-content-center align-items-center d-flex flex-column">
-        {% include "divio_styleguide/includes/hero-title.html" with cls='' title='' sub_title='Subtitle' %}
-    </div>
-</header>
+{% include 'divio_styleguide/includes/page-header.html' with title='Title' centered=True %}
 
 <div class="container">
-    <div class="row justify-content-center">
+    <div class="row my-7 justify-content-center">
         <div class="col-12 col-lg-8 text-block">
             <h2>Heading</h2>
             <p>At Divio we build web applications that aim to make the life of developers easier. We would love for you to use them. We offer a free service and also paid services or products . Feel free to use these tools to create awesome new websites or applications. However be responsible in what you publish. In particular, make sure that none of the prohibited items listed below appear on your site or get linked to from your site (things like spam, viruses, or hate content).</p>

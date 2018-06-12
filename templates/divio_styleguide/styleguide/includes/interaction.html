@@ -78,7 +78,7 @@ window.onload = function () {
                     }[key];
                     output += '<h3>' + key + '</h3><div class="row">';
                     for (var i = 0; i < icons[key].length; i++) {
-                        output += '<div class="col-lg-3 col-md-4 col-sm-6"><p><span style="vertical-align: middle; font-size: 30px; margin-right: 10px;" class="icon icon-' + icons[key][i] + '"><svg role="presentation"><use xlink:href="{% static "sprites/" %}' + spriteName + '.svg#' + icons[key][i] + '"></use></svg></span> <code style="display: inline-block; vertical-align: middle">' + icons[key][i] + '</code></p></div>';
+                        output += '<div class="col-lg-3 col-md-4 py-3 col-sm-6"><p><span style="vertical-align: middle; font-size: 30px; margin-right: 10px;" class="icon icon-' + icons[key][i] + '"><svg role="presentation"><use xlink:href="{% static "sprites/" %}' + spriteName + '.svg#' + icons[key][i] + '"></use></svg></span> <code style="display: inline-block; vertical-align: middle">' + icons[key][i] + '</code></p></div>';
                     }
                     output += '</div>';
                 }

@@ -100,19 +100,6 @@
 
         <hr />
 
-        <div class="row my-5">
-            <div class="col-md-4">
-                <h3>Heading Block</h3>
-                <p>To be used on marketing pages as a heading
-                </p>
-            </div>
-            <div class="col-md-8 col-linebreak">
-                <div class="code-container">
-                    {% include "divio_styleguide/includes/section-title.html" with cls='' title='For every Platform' sub_title='Download the app for all the platforms you love' %}
-                </div>
-            </div>
-        </div>
-        <hr />
 
         <div class="row my-5">
             <div class="col-md-4">
@@ -433,22 +420,6 @@
         styles. For complete reference, please visit the
         <a href="http://getbootstrap.com/css/#tables">Bootstrap</a> documentation.</p>
 
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Basic Table</h3>
-            <p>The basic table is the default behaviour when using the <code>.table</code> class. Not adding a class will result in a table without styles at all.</p>
-            <p>To ensure a table is responsive, add the wrapper class <code>.table-responsive</code> to the table.</p>
-            <p>More about the basics of a table can be found within the <a href="http://getbootstrap.com/css/#tables-example">Bootstrap</a> documentation.</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="code-container">
-                <div class="table-responsive">
-                    {% with cls="table" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
-                </div>
-            </div>
-        </div>
-    </div>
-
     <hr />
     <div class="row my-5">
         <div class="col-md-4">
@@ -516,21 +487,6 @@
                 <div class="table-responsive">
                     {% with cls="table table-bordered table-striped table-hover" extras="true" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <hr>
-
-    <div class="row my-5">
-        <div class="col-md-4">
-            <h3>Size</h3>
-            <p>There is also a small table available</p>
-            <p>Small modifier is independent of others and can be applied independently of others</p>
-        </div>
-        <div class="col-md-8 col-linebreak">
-            <div class="code-container">
-                {% with cls="table table-sm table-responsive table-hover" %} {% include "divio_styleguide/styleguide/components/table.html" %} {% endwith %}
             </div>
         </div>
     </div>
