@@ -1,7 +1,7 @@
 {
-    "boilerplate_name": "bootstrap3",
-    "cms_content_cache_duration": 60,
-    "cms_menus_cache_duration": 3600,
-    "cms_templates": "[[\"content.html\", \"Content\"]]",
+    "boilerplate_name": "bootstrap3", 
+    "cms_content_cache_duration": 60, 
+    "cms_menus_cache_duration": 3600, 
+    "cms_templates": "[[\"content.html\", \"Content\"]]", 
     "permissions_enabled": false
 }
