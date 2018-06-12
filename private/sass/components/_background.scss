@@ -24,29 +24,17 @@
 // stripe direction
 .stripe-up {
     &:before {
-        transform: skewY(-2.8deg) translateZ(0);
+        transform: skewY(-5.4deg) translateZ(0);
     }
 }
 
 .stripe-down {
     &:before {
-        transform: skewY(2.8deg) translateZ(0);
-    }
-}
-
-.stripe-steep-up {
-    &:before {
-        transform: skewY(-5.4deg) translateZ(0);
-    }
-}
-
-.stripe-steep-down {
-    &:before {
         transform: skewY(5.4deg) translateZ(0);
     }
 }
 
-.stripe-very-steep-up {
+.stripe-steep-up {
     &:before {
         transform: skewY(-3deg) translateZ(0);
     }
@@ -71,7 +59,7 @@
     }
 }
 
-.stripe-very-steep-down {
+.stripe-steep-down {
     &:before {
         transform: skewY(3deg) translateZ(0);
     }
@@ -96,80 +84,6 @@
     }
 }
 
-// .stripe-up:not(.hero) {
-//     &:before {
-//         transform: skewY(-2.8deg) translate3d(0, 0, 0);
-//     }
-// }
-//
-// .stripe-down:not(.hero) {
-//     &:before {
-//         transform: skewY(2.8deg) translate3d(0, 0, 0);
-//     }
-// }
-
-// .stripe:not(.hero) {
-//     margin-top: 100px;
-//     padding: 50px 0;
-//
-//     @include media-breakpoint-up(md) {
-//         padding: 100px 0;
-//     }
-//
-//
-//     &:before {
-//         height: calc(100% + 100px);
-//         top: 0;
-//         transform-origin: top;
-//     }
-//
-//     &.stripe-standalone &:before {
-//         height: 100%;
-//     }
-//
-//     .container {
-//         padding-top: 40px;
-//         padding-bottom: 40px;
-//     }
-//
-//     margin-left: -15px;
-//     margin-right: -15px;
-//
-//     @include media-breakpoint-up(sm) {
-//         width: 100vw;
-//         position: relative;
-//         left: 50%;
-//         right: 50%;
-//         margin-left: -50vw;
-//         margin-right: -50vw;
-//     }
-//
-//
-//     &.feature-image {
-//         height: auto;
-//     }
-// }
-//
-// // Different styling if Stipe is immediately after another
-//
-// .stripe + .stripe {
-//     margin-top: 0;
-// }
-//
-// //
-// // Hero
-// @include media-breakpoint-up(sm) {
-//     .hero {
-//         //  max-height: 70vh;
-//         height: 100%;
-//
-//         img {
-//             max-height: 70vh;
-//         }
-//     }
-// }
-//
-//
 @each $name, $color in $colors {
     .bg-#{$name} {
         background-color: $color;
