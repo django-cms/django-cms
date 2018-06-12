@@ -91,9 +91,5 @@ class PermissionCacheTests(CMSTestCase):
         page_permission.sites.add(Site.objects.get_current())
         set_permission_cache(self.user_normal, "publish_page", [])
 
-        can_publish = user_can_publish_page(
-            self.user_normal,
-            page,
-            Site.objects.get_current(),
-        )
+        can_publish = user_can_publish_page(self.user_normal, page)
         self.assertTrue(can_publish)
