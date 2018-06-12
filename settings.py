@@ -22,6 +22,7 @@ INSTALLED_ADDONS = [
     'djangocms-snippet',
     'djangocms-style',
     'djangocms-text-ckeditor',
+    'djangocms-transfer',
     'djangocms-video',
     'django-filer',
     # </INSTALLED_ADDONS>
