@@ -167,18 +167,31 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         ph2_pl2 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin3').cmsplugin_ptr
 
+        endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)
+
+        # Move ph2_pl3 to position 1 on placeholder 2
+        data = {
+            'plugin_id': str(ph2_pl3.pk),
+            'target_language': 'en',
+            'target_position': 1,
+        }
+
+        response = self.client.post(endpoint, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2], list(ph2.cmsplugin_set.order_by('position')))
+
+        # Move ph1_pl2 to last position on placeholder 2
         data = {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
             'target_language': 'en',
-            'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
+            'target_position': ph2.get_next_plugin_position('en', insert_order='last'),
         }
-        endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)
 
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
-        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
+        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2], list(ph2.cmsplugin_set.order_by('position')))
 
     def test_placeholder_render_ghost_plugin(self):
         """

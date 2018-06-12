@@ -272,7 +272,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
-        plugins = [root] + list(root.get_descendants().order_by('path'))
+        plugins = [root] + list(root.get_descendants())
 
         child_classes = self.get_child_classes(
             slot=obj.placeholder.slot,
@@ -312,12 +312,13 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         This have to be made, because if object is newly created, he must know
         where he lives.
         """
-        pl_admin = obj.placeholder._get_attached_admin()
+        pl = obj.placeholder
+        pl_admin = pl._get_attached_admin()
 
         if pl_admin:
             operation_kwargs = {
                 'request': request,
-                'placeholder': obj.placeholder,
+                'placeholder': pl,
             }
 
             if change:
@@ -332,10 +333,10 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 operation_kwargs['tree_order'] = tree_order
             # Remember the operation token
             self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
-
+        # Saves the plugin
         # remember the saved object
-        self.saved_object = obj
-        return super(CMSPluginBase, self).save_model(request, obj, form, change)
+        self.saved_object = pl.add_plugin(obj)
+        pl.mark_as_dirty(obj.language, clear_cache=False)
 
     def save_form(self, request, form, change):
         obj = super(CMSPluginBase, self).save_form(request, form, change)

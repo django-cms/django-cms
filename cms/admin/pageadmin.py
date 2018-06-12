@@ -64,7 +64,7 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import pre_obj_operation, post_obj_operation
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
+from cms.utils import permissions, get_current_site, get_language_from_request
 from cms.utils import page_permissions
 from cms.utils.i18n import (
     get_language_list,
@@ -72,6 +72,7 @@ from cms.utils.i18n import (
     get_language_object,
     get_site_language_from_request,
 )
+from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -971,11 +972,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
         for placeholder in page.get_placeholders():
-            plugins = list(
-                placeholder.get_plugins(language=source_language).order_by('path'))
+            plugins = placeholder.get_plugins_list(source_language)
+
             if not placeholder.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
-            copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
+            copy_plugins_to_placeholder(plugins, placeholder, language=target_language)
         return HttpResponse("ok")
 
     @require_POST

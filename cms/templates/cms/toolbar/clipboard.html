@@ -4,7 +4,7 @@
     <div class="cms-plugins"></div>
     <div class="cms-clipboard-containers cms-dragarea cms-draggables">
         {% if clipboard_plugin %}
-            {% include cms_toolbar.templates.drag_item_template with clipboard="true" plugin=clipboard_plugin %}
+            {% include cms_toolbar.templates.drag_item_template with clipboard="true" plugin=clipboard_plugin allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins %}
         {% endif %}
     </div>
 </div>
