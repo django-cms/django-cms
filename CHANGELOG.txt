@@ -3,6 +3,7 @@
 * Removed extra quotation mark from the sideframe button template
 * Fixed a bug where xframe options were processed by clickjacking middleware
   when page was served from cache, rather then get this value from cache
+* Fixed a bug where cached page permissions overrides global permissions
 
 
 === 3.4.6 (2018-03-26) ===
