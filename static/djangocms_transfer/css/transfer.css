@@ -1,0 +1,29 @@
+div.cms .cms-structure .cms-submenu-item a[data-icon=import]:before,
+div.cms .cms-structure .cms-submenu-item a[data-icon=export]:before {
+    position: absolute;
+    content: '';
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+    background-image: url('../img/icons.png') !important;
+    background-size: 16px 64px !important;
+    top: 15px !important;
+    overflow: hidden !important;
+    line-height: 16px !important;
+    min-height: 16px !important;
+}
+div.cms .cms-structure .cms-submenu-item a[data-icon=import]:before {
+    background-position: 0 -32px;
+}
+div.cms .cms-structure .cms-submenu-item a[data-icon=export]:hover:before,
+div.cms .cms-structure .cms-submenu-item a[data-icon=export]:focus:before {
+    background-position: 0 -16px;
+}
+div.cms .cms-structure .cms-submenu-item a[data-icon=import]:hover:before,
+div.cms .cms-structure .cms-submenu-item a[data-icon=import]:focus:before {
+    background-position: 0 -48px;
+}
+div.cms .cms-structure.cms-structure-condensed .cms-submenu-item a[data-icon=export]:before,
+div.cms .cms-structure.cms-structure-condensed .cms-submenu-item a[data-icon=import]:before {
+    top: 12px !important;
+}
