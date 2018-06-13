@@ -127,4 +127,25 @@ matrix:
     - python: 3.5
       env: FRONTEND=1 LINT=1
 
+    - python: 2.7
+      env: FRONTEND=1 UNIT=1
+    - python: 2.7
+      env: FRONTEND=1 LINT=1
+    - python: 2.7
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 2.7
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 2.7
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+
+  allow_failures:
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+
   fast_finish: true
+
+
