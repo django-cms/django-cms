@@ -5,13 +5,15 @@
 {% block navbar_class %}navbar-dark {% endblock %}
 {% block body_class %}{{ block.super }} bg-snow{% endblock %}
 
-{% block content %}
+{% block feature %}
 <div class="page-header">
     <div class="container text-center justify-content-center align-items-center d-flex flex-column">
         {% include "divio_styleguide/includes/hero-title.html" with cls='' title='Security' sub_title='How to report issues' %}
         <a href="#" class="btn btn-primary">Report an issue</a>
     </div>
 </div>
+{% endblock %}
+{% block content %}
 
 <div class="container">
     <div class="row my-7 justify-content-center">

@@ -16,7 +16,7 @@ export function initWaypoints(selector = '.js-waypoint') {
                 new Velocity([el, ...staggered], data.animation, {
                     duration: 400,
                     delay: 200,
-                    stagger: true,
+                    stagger: 200,
                 });
             }),
             ...data,

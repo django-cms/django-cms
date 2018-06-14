@@ -3,10 +3,7 @@
 {% load i18n staticfiles cms_tags menu_tags %}
 {% block title %}Blog{% endblock %}
 {% block body_class %}{{ block.super }} bg-snow{% endblock %}
-{% block content %}
-<!-- BLOG INDEX TEMPLATE -->
-
-
+{% block feature %}
 <!-- Hero -->
 <div class="page-header">
     <div class="container text-center justify-content-center align-items-center d-flex flex-column">
@@ -29,6 +26,11 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block content %}
+<!-- BLOG INDEX TEMPLATE -->
+
+
 <div class="container">
 
 <div class="section-fullwidth mt-5">

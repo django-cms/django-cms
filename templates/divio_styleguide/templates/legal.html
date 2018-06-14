@@ -1,10 +1,10 @@
 {% extends "content.html" %}  {% load i18n staticfiles cms_tags menu_tags %}
 {% block title %}Terms & Conditions{% endblock %}
+{% block feature %}
+{% include 'divio_styleguide/includes/page-header.html' with title='Terms of Service' spitzmarke='Our commitment to you' nolead=True %}
+{% endblock %}
 {% block content %}
 
-
-<!-- Hero -->
-{% include 'divio_styleguide/includes/page-header.html' with title='Terms of Service' spitzmarke='Our commitment to you' nolead=True %}
 
 <div class="container">
     <div class="row my-5">

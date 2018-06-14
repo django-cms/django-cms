@@ -69,3 +69,5 @@ DJANGOCMS_BOOTSTRAP4_SPACER_SIZES = (
     ('6', '* 5'),
     ('7', '* 7'),
 )
+
+TEXT_HTML_SANITIZE = False

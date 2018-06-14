@@ -4,7 +4,7 @@
             {% if sideContent %}
                 <div class="col-md-8 mb-5">
                     {% if spitzmarke %}
-                    <span class="spitzmarke-lg">{{ spitzmarke }}</span>
+                    <span class="spitzmarke">{{ spitzmarke }}</span>
                     {% endif %}
                     <h1 class="display-{% if h2 %}2{% else %}1{% endif %}">{{ title|default:'Your Django<br> Projects on Autopilot' }}</h1>
                     <p class="lead">{{ lead|default:'Divio is a platform for running your Django projects.<br> Trusted to serve over 100 million requests every month.' }}</p>
@@ -18,7 +18,7 @@
             {% else %}
                 <div class="col-12">
                     {% if spitzmarke %}
-                    <span class="spitzmarke-lg">{{ spitzmarke }}</span>
+                    <span class="spitzmarke">{{ spitzmarke }}</span>
                     {% endif %}
                     <h1 class="display-{% if h2 %}2{% else %}1{% endif %}">{{ title|default:'Your Django<br> Projects on Autopilot' }}</h1>
                 </div>

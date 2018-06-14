@@ -1,5 +1,6 @@
 /* global CMS */
 import $ from 'jquery';
+import { initWaypoints } from 'addons/waypoints';
 
 CMS.$(window).on('cms-content-refresh', () => {
     // SVGs for some reason don't like DOM diffing, probably related to creation of elements
@@ -9,4 +10,6 @@ CMS.$(window).on('cms-content-refresh', () => {
     });
 
     $(window).trigger('scroll');
+
+    initWaypoints();
 });

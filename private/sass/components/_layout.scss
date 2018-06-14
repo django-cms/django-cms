@@ -232,9 +232,9 @@ body.cke_editable {
         margin-bottom: 25px;
     }
 
-    .spitzmarke-lg {
-        color: #899DB3;
-        margin-bottom: 15px;
+    .spitzmarke {
+        font-size: rem(16px);
+        margin-bottom: rem(15px);
     }
 }
 
@@ -246,4 +246,25 @@ body.cke_editable {
 .media-body {
     font-size: 14px;
     line-height: 20px;
+}
+
+.row-equal-heights {
+    > [class*=col] {
+        display: flex;
+        flex-direction: column;
+
+        > .card {
+            flex-grow: 1;
+
+            > .card-body {
+                display: flex;
+                flex-direction: column;
+            }
+
+            hr {
+                width: 100%;
+                margin-top: auto;
+            }
+        }
+    }
 }
