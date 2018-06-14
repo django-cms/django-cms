@@ -38,3 +38,12 @@ def setup():
     validate_dependencies()
     validate_settings()
     plugin_pool.validate_templates()
+
+
+def setup_cms_apps():
+    """
+    Check for django apps which provide functionality that extends the
+    cms. Autodiscover all apps which have configs that declare use of
+    any of this functionality.
+    """
+    pass
