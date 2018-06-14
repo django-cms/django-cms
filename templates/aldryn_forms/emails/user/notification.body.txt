@@ -1,0 +1,7 @@
+{% load i18n %}
+{% if body_text %}
+{{ body_text }}
+{% else %}
+{% blocktrans %}Form name: {{ form_name }}{% endblocktrans %}
+{% include "aldryn_forms/emails/includes/form_data.txt" %}
+{% endif %}

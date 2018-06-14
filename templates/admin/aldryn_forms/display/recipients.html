@@ -1,0 +1,9 @@
+{% spaceless %}
+    {% if people %}
+        <ul>
+            {% for person in people %}
+                <li>{{ person|escape }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endspaceless %}

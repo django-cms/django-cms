@@ -1,0 +1,36 @@
+{% load aldryn_forms_tags i18n %}
+
+{% if field %}
+    {% block form_field_label %}
+        <label class="control-label">
+            {{ field.label }}
+            {% if field.field.required %}
+                <abbr title="{% trans "Required field" %}">*</abbr>
+            {% endif %}
+        </label>
+    {% endblock form_field_label %}
+
+    {% for choice in field.field.choices %}
+        <div class="radio{% if field.field.required %} form-required{% endif %}{% if field.errors %} has-error{% endif %}">
+            {% block form_field %}
+                <label for="{{ field.auto_id }}_{{ choice.0 }}">
+                    <input type="radio" name="{{ field.name }}" id="{{ field.auto_id }}_{{ choice.0 }}" value="{{ choice.0 }}"{% if choice.0|force_text == field.value|force_text %} checked="checked"{% endif %}>
+                    {{ choice.1 }}
+                </label>
+            {% endblock form_field %}
+            {% block form_field_errors %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            {% endblock form_field_errors %}
+        </div>
+    {% endfor %}
+
+    {% block form_field_help_text %}
+        {% if field.help_text %}
+            <p class="help-block">{{ field.help_text }}</p>
+        {% endif %}
+    {% endblock form_field_help_text %}
+{% endif %}

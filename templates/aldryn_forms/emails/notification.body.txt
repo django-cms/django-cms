@@ -1,0 +1,3 @@
+{% load i18n %}
+{% blocktrans %}Form name: {{ form_name }}{% endblocktrans %}
+{% include "aldryn_forms/emails/includes/form_data.txt" %}

@@ -1,0 +1,1 @@
+{% load aldryn_forms_tags i18n %}{% render_notification_text email_notification 'subject' as subject %}{% if subject %}{{ subject }}{% else %}{% blocktrans %}[Form submission] {{ form_name }}{% endblocktrans %}{% endif %}

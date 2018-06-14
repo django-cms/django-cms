@@ -1,0 +1,45 @@
+{% load i18n sekizai_tags cms_tags %}
+
+<form method="post" role="form"
+    {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
+    {% if instance.form_attributes %} {{ instance.form_attributes_str }}{% endif %}
+    class="aldryn aldryn-forms{% block form_classes %}{% if instance.custom_classes %} {{ instance.custom_classes }}{% endif %}{% endblock form_classes %}">
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if post_success %}
+        {% if form_success_url %}
+            <div class="alert alert-success" role="alert">
+                <p>{% blocktrans %}Thank you for submitting your information, you will be <a href="{{ form_success_url }}">redirected shortly</a>.{% endblocktrans %}</p>
+            </div>
+        {% elif instance.success_message %}
+                <div class="alert alert-success" role="alert">{{ instance.success_message }}</div>
+        {% else %}
+            <div class="alert alert-success" role="alert">{% blocktrans %}Thank you for submitting your information.{% endblocktrans %}</div>
+        {% endif %}
+    {% else %}
+        {% csrf_token %}
+        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
+    {% endif %}
+</form>
+
+
+{# INFO: this hack is currently required because we can't redirect from a plugin. #}
+{% if post_success and form_success_url %}
+{% addtoblock "js" %}
+<script>
+setTimeout(function () {
+    window.location.href = '{{ form_success_url }}';
+}, 5000);
+</script>
+{% endaddtoblock %}
+{% endif %}

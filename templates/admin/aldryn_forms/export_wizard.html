@@ -1,0 +1,15 @@
+{% extends "admin/aldryn_forms/export.html" %}
+{% load i18n %}
+
+{% block aldryn_form_hidden %}
+    {{ wizard.management_form }}
+    {{ form.non_field_errors }}
+{% endblock %}
+
+{% block aldryn_form_buttons %}
+    {% if wizard.steps.current == wizard.steps.last %}
+        <input type="submit" class="default" value="{% trans 'Export' %}" />
+    {% else %}
+        <input type="submit" class="default" value="{% trans 'Continue' %}" />
+    {% endif %}
+{% endblock %}
