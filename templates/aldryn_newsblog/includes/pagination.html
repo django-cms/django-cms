@@ -1,0 +1,60 @@
+{% load i18n %}
+
+{% if is_paginated %}
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+            {% if page_obj.number > pagination.pages_visible_total %}
+                <li>
+                    <a href="?page={{ page_obj.paginator.page_range|first }}" aria-label="{% trans 'First' %}" title="{% trans 'First' %}">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}" aria-label="{% trans 'Previous' %}" title="{% trans 'Previous' %}">
+                    <span aria-hidden="true">&lsaquo;</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if paginator.num_pages > pagination.pages_start %}
+            {% if page_obj.number > pagination.pages_visible_total %}
+                <li><a href="?page={{ page_obj.number|add:pagination.pages_visible_total_negative }}">...</a></li>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <li class="active"><span>{{ num }}</span></li>
+                {% elif num > page_obj.number|add:pagination.pages_visible_total_negative and num < page_obj.number|add:pagination.pages_visible_total %}
+                    <li><a href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.number < paginator.num_pages|add:pagination.pages_visible_negative %}
+                <li><a href="?page={{ page_obj.number|add:pagination.pages_visible_total }}">...</a></li>
+            {% endif %}
+        {% else %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <li class="active"><span>{{ num }}</span></li>
+                {% else %}
+                    <li><a href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}" aria-label="{% trans 'Next' %}" title="{% trans 'Next' %}">
+                    <span aria-hidden="true">&rsaquo;</span>
+                </a>
+            </li>
+            {% if page_obj.number < paginator.num_pages|add:pagination.pages_visible_negative %}
+                <li>
+                    <a href="?page={{ paginator.num_pages }}" aria-label="{% trans 'Last' %}" title="{% trans 'Last' %}">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        {% endif %}
+    </ul>
+{% endif %}

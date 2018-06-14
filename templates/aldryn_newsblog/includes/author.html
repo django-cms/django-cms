@@ -1,0 +1,25 @@
+{% load i18n staticfiles thumbnail apphooks_config_tags %}
+
+<div class="aldryn-newsblog-meta">
+    {% if author and author.slug %}
+        <div class="image pull-left">
+            <a href="{% namespace_url "article-list-by-author" author.slug namespace=namespace default='' %}">
+                {% if author.visual %}
+                    {% thumbnail author.visual "50x50" crop upscale subject_location=author.visual.subject_location as author_image %}
+                    <img src="{{ author_image.url }}" width="50" height="50" alt="{{ author }}">
+                {% else %}
+                    <img src="{% static "img/aldryn_newsblog/no-photo.png" %}" height="50" width="50" alt="{{ author }}">
+                {% endif %}
+            </a>
+        </div>
+        <div class="meta">
+            <p class="author"><a href="{% namespace_url "article-list-by-author" author.slug namespace=namespace default='' %}">{{ author.name }}</a></p>
+            {% if author_view and author.slug %}
+                <p class="job">{{ author.function }}</p>
+                <p class="badge">{{ author.article_count }}</p>
+            {% else %}
+                <p class="date">{{ article.publishing_date|date }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
