@@ -3,8 +3,9 @@
     padding-top: 46px !important;
 
     @include media-breakpoint-up(lg) {
-        padding-top: 51px + 46px !important;
+        padding-top: 46px !important;
     }
+
 
     @include media-breakpoint-up(lg) {
         .main-nav {
@@ -12,4 +13,3 @@
         }
     }
 }
-

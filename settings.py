@@ -54,7 +54,17 @@ if STAGE in {'local', 'test'}:
 with open('static/iconset.json') as fh:
     ICONSET = fh.read()
 
-ALDRYN_BOOTSTRAP3_ICONSETS = (
+DJANGOCMS_ICON_SETS = (
     (ICONSET, 'divio', 'Divio icons'),
 )
 
+DJANGOCMS_BOOTSTRAP4_SPACER_SIZES = (
+    ('0', '* 0'),
+    ('1', '* .25'),
+    ('2', '* .5'),
+    ('3', '* 1'),
+    ('4', '* 1.5'),
+    ('5', '* 3'),
+    ('6', '* 5'),
+    ('7', '* 7'),
+)

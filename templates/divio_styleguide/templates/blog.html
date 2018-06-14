@@ -1,7 +1,7 @@
 {% extends "content.html" %}
 {% block breadcrumb %}{% endblock %}
 {% load i18n staticfiles cms_tags menu_tags %}
-{% block navbar_class %}navbar-dark {% endblock %}
+{% block title %}Blog{% endblock %}
 {% block body_class %}{{ block.super }} bg-snow{% endblock %}
 {% block content %}
 <!-- BLOG INDEX TEMPLATE -->
@@ -29,30 +29,34 @@
         </div>
     </div>
 </div>
-
 <div class="container">
-    <div class="row blog-article-list">
-        {% include "divio_styleguide/includes/article-long.html" with title='Introducing the Managed Cloud' desc='If you need an SLA guaranteeing service and response times, theres a Managed Cloud option to suit your needs.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
-        {% include "divio_styleguide/includes/article-short.html" with title='Backups on Divio Cloud' desc='An easily-managed backup history is part of every Divio Cloud project.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
-        {% include "divio_styleguide/includes/article-short.html" with title='PyCon Namibia 2017' desc='The Namibian Python community and its annual PyCon are growing. Weve been part of it since the beginning.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
-        {% include "divio_styleguide/includes/article-short.html" with title='Meet us at PyCon Australia' desc='This year, Divio will be at PyCon Australia for the first time ever. PyCon Australia 2017 takes place in Melbourne, from the 3rd to the 8th August.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png'%}
-        {% include "divio_styleguide/includes/article-short.html" with title='Backups on Divio Cloud' desc='An easily-managed backup history is part of every Divio Cloud project.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
-        {% include "divio_styleguide/includes/article-short.html" with title='PyCon Namibia 2017' desc='The Namibian Python community and its annual PyCon are growing. Weve been part of it since the beginning.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
-        {% include "divio_styleguide/includes/article-short.html" with title='Meet us at PyCon Australia' desc='This year, Divio will be at PyCon Australia for the first time ever. PyCon Australia 2017 takes place in Melbourne, from the 3rd to the 8th August.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png'%}
+
+<div class="section-fullwidth mt-5">
+    <div class="stripe stripe-up">
+        <div class="container">
+            <div class="row blog-article-list mt--7">
+                {% include "divio_styleguide/includes/article-long.html" with title='Introducing the Managed Cloud' desc='If you need an SLA guaranteeing service and response times, theres a Managed Cloud option to suit your needs.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
+                {% include "divio_styleguide/includes/article-short.html" with title='Backups on Divio Cloud' desc='An easily-managed backup history is part of every Divio Cloud project.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
+                {% include "divio_styleguide/includes/article-short.html" with title='PyCon Namibia 2017' desc='The Namibian Python community and its annual PyCon are growing. Weve been part of it since the beginning.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
+                {% include "divio_styleguide/includes/article-short.html" with title='Meet us at PyCon Australia' desc='This year, Divio will be at PyCon Australia for the first time ever. PyCon Australia 2017 takes place in Melbourne, from the 3rd to the 8th August.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png'%}
+                {% include "divio_styleguide/includes/article-short.html" with title='Backups on Divio Cloud' desc='An easily-managed backup history is part of every Divio Cloud project.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
+                {% include "divio_styleguide/includes/article-short.html" with title='PyCon Namibia 2017' desc='The Namibian Python community and its annual PyCon are growing. Weve been part of it since the beginning.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png' article_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/5a/35/5a35f99a-13f8-4666-868b-25f62b927ca8/divio_cloud_infrastructure.png__800x450_q90_crop_subsampling-2.png'%}
+                {% include "divio_styleguide/includes/article-short.html" with title='Meet us at PyCon Australia' desc='This year, Divio will be at PyCon Australia for the first time ever. PyCon Australia 2017 takes place in Melbourne, from the 3rd to the 8th August.' author_name='Daniele Procida' author_img='https://divio-ag-2016-1884645.aldryn-media.io/filer_public_thumbnails/filer_public/16/ce/16ce05de-fa49-4c94-bdd4-03eec2a71949/small-daniele.png__50x50_q90_crop_subsampling-2_upscale.png'%}
+            </div>
+            <ul class="pagination justify-content-center blog-pagination mt-5 mb-4">
+                <li class="page-item disabled"><a href="#" tabindex="-1" class="page-link">&laquo;</a></li>
+                <li class="page-item active"><a href="#" class="page-link">1 <span class="sr-only">(current)</span></a></li>
+                <li class="page-item"><a href="#" class="page-link">2</a></li>
+                <li class="page-item"><a href="#" class="page-link">3</a></li>
+                <li class="page-item"><a href="#" class="page-link">4</a></li>
+                <li class="page-item"><a href="#" class="page-link">5</a></li>
+                <li class="page-item"><a href="#" class="page-link">&raquo;</a></li>
+            </ul>
+        </div>
     </div>
-    <ul class="pagination justify-content-center blog-pagination mt-6 mb-7">
-        <li class="page-item disabled"><a href="#" tabindex="-1" class="page-link">&laquo;</a></li>
-        <li class="page-item active"><a href="#" class="page-link">1 <span class="sr-only">(current)</span></a></li>
-        <li class="page-item"><a href="#" class="page-link">2</a></li>
-        <li class="page-item"><a href="#" class="page-link">3</a></li>
-        <li class="page-item"><a href="#" class="page-link">4</a></li>
-        <li class="page-item"><a href="#" class="page-link">5</a></li>
-        <li class="page-item"><a href="#" class="page-link">&raquo;</a></li>
-    </ul>
-
-    <hr class="my-7">
-
-    <div class="row align-items-center">
+</div>
+<div class="container">
+    <div class="row mt-7 align-items-center">
         <div class="col-md-9 mb-4">
 
             <h2 class="display-4">Ready to use Divio Cloud?</h2>
@@ -63,7 +67,8 @@
         <div class="col-md-3 mb-4 text-center">
             <a href="#" class="btn btn-primary">Request access</a>
         </div>
+
     </div>
 </div>
-
+</div>
 {% endblock %}

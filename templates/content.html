@@ -44,6 +44,14 @@
         {% include "includes/messages.html" %}
     {% endblock messages %}
     <div class="content">
+        {% block feature %}
+            <div class="page-header">
+                <div class="container">
+                    {% placeholder "feature" %}
+                </div>
+            </div>
+        {% endblock %}
+
         {% block content %}
             <div class="container">
                 {% placeholder "content" %}
@@ -136,7 +144,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12 mt-4">
-                        <a href="#" class="btn btn-primary btn-block">I have an emergency</a>
+                        <a href="#" class="btn btn-primary btn-sm btn-block">I have an emergency</a>
                     </div>
                 </div>
             </div>

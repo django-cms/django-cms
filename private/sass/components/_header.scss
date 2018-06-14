@@ -30,7 +30,7 @@
         &.main-nav-scrolled {
             position: fixed;
             background-color: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             margin-top: 0px;
 
             &.navbar-light {
@@ -45,7 +45,12 @@
         height: 18px;
 
         svg, use {
-            fill: rgba(#1A406B, 0.7);
+            // fill: rgba($body-color;
+            fill: #5F7998;
+
+            @include media-breakpoint-down(md) {
+                fill: $body-color;
+            }
         }
     }
 
@@ -56,7 +61,12 @@
         font-size: 12px;
         align-items: center;
         font-weight: bold;
-        color: rgba(#1A406B, 0.64);
+        color: #5F7998;
+
+        @include media-breakpoint-down(md) {
+            color: $body-color;
+        }
+
 
         @include media-breakpoint-down(xl) {
             padding-left: 0px;
@@ -113,6 +123,7 @@
             padding-bottom: 15px;
 
             .nav-link {
+                color: $body-color;
                 padding-bottom: 20px;
                 padding-top: 20px;
                 order: 2;
@@ -122,7 +133,7 @@
 
         .nav-link.nav-link-get-started {
             padding-right: 0 !important;
-            color: rgba(#1A406B, 1);
+            color: $body-color;
             transition: color 0.5s;
 
             @include media-breakpoint-down(md) {
@@ -247,7 +258,7 @@
         width: 22px;
         height: 2px;
         border-radius: 2px;
-        background-color: $body-color;
+        background-color: #5F7998;
         transition: all 0.3s;
         position: absolute;
 

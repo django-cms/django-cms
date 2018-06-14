@@ -5,7 +5,18 @@
 {% block title %}Pricing{% endblock %}
 
 {% block content %}
-{% include 'divio_styleguide/includes/page-header.html' with cta=False title='Divio cloud pricing comparison' lead='You can choose pre-configured and optimised<br> or a minimalistic setup to work you way.' spitzmarke='pricing' %}
+
+<div class="page-header">
+    <div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 mb-6">
+            <span class="spitzmarke-lg">Pricing</span>
+            <h1 class="display-2">Divio cloud pricing comparison</h1>
+            <p class="lead">You can choose pre-configured and optimised<br> or a minimalistic setup to work you way.</p>
+        </div>
+    </div>
+</div>
+</div>
 
 
 <div class="container">
@@ -35,7 +46,7 @@
                     <td>Custom</td>
                 </tr>
                 <tr>
-                    <th>Full access to all development adn deployment tools</th>
+                    <th>Full access to all development and deployment tools</th>
                     <td>{% include 'includes/icon.html' with icon='check' %}</td>
                     <td>{% include 'includes/icon.html' with icon='check' %}</td>
                     <td>{% include 'includes/icon.html' with icon='check' %}</td>
@@ -46,12 +57,12 @@
                 </tr>
                 <tr>
                     <th>Application RAM</th>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
                     <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
                 </tr>
                 <tr>
@@ -66,32 +77,32 @@
                 </tr>
                 <tr>
                     <th>Disk space</th>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
                     <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
                 </tr>
                 <tr>
                     <th>Includes fully-managed database</th>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
                     <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
                 </tr>
                 <tr>
                     <th>Disk space</th>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
-                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 128 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 256 MB+</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x256 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 512 MB</td>
+                    <td>{% include 'includes/icon.html' with icon='check' %} 2x 1024 MB</td>
                     <td>{% include 'includes/icon.html' with icon='check' %} Custom</td>
                 </tr>
                 <tr>

@@ -81,7 +81,7 @@ export function initFixedHeaderTables(selector = '.js-table') {
                 repositionStickyHead = function() {
                     // Return value of calculated allowance
                     var allowance = calcAllowance();
-                    var extraOffset = window.innerWidth >= 992 ? 54 : 0;
+                    var extraOffset = window.innerWidth >= 992 ? 40 : 0;
 
                     // If it is not overflowing (basic layout)
                     // Position sticky header based on viewport scrollTop

@@ -37,20 +37,6 @@ a .icon {
 .icon-blue {
     svg,
     use {
-        fill: $azure;
-    }
-}
-
-.icon-stone {
-    svg,
-    use {
-        fill: $stone;
-    }
-}
-
-.icon-slate {
-    svg,
-    use {
-        fill: $slate;
+        fill: theme-color(primary);
     }
 }

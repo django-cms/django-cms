@@ -11,6 +11,11 @@
     justify-content: center;
     font-weight: bold;
 
+    @include media-breakpoint-down(sm) {
+        min-height: 40px;
+    }
+
+
     .icon {
         margin-right: 10px;
         font-size: 18px;
@@ -68,5 +73,27 @@
     border-radius: 100px;
     padding-left: 30px;
     padding-right: 30px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: rem(40px);
+    font-size: rem(14px);
     text-transform: uppercase;
+    font-weight: bold;
+}
+
+.btn + .btn.dropdown-toggle {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.btn-sm {
+    font-weight: bold;
+    font-size: rem(12px);
+    padding-top: 0;
+    height: rem(34px);
+    padding-bottom: 0;
+}
+
+.btn-lg {
+    height: rem(45px);
 }

@@ -90,31 +90,56 @@
     font-weight: 600;
 }
 
-.pricing-cta {
-    font-size: 12px;
-    height: 38px;
-    padding-left: 30px;
-    padding-right: 30px;
-    font-weight: bold;
+.pricing .btn-sm {
     margin-top: 20px;
 }
 
 .pricing-features {
     color: theme-color(secondary);
-    font-weight: bold;
 
     .spitzmarke {
         color: rgba(theme-color(secondary), 0.6);
+    }
+
+    p {
+        text-align: left;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 }
 
 .pricing-additional {
     color: theme-color(secondary);
+
+    p {
+        text-align: left;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    ul {
+        text-align: left;
+        list-style-type: none;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding-left: 0px;
+
+        li {
+            margin-bottom: 5px;
+        }
+    }
 }
 
 .pricing-vip {
-    color: #1A406B;
+    color: $body-color;
     font-weight: bold;
+    margin-top: 1rem;
+
+    p {
+        text-align: left;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
 }
 
 .pricing-detail-table {

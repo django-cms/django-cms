@@ -30,6 +30,7 @@
 
 .lead {
     line-height: rem(32px);
+    color: theme-color(secondary);
 }
 
 h1, .h1,
@@ -52,7 +53,7 @@ h6, .h6 {
     line-height: rem(28px);
     letter-spacing: rem(1.8px);
     text-transform: uppercase;
-    color: #1A406B;
+    color: $body-color;
 }
 
 .h7 {
@@ -100,4 +101,23 @@ h6, .h6 {
 
 p:last-child {
     margin-bottom: 0px;
+}
+
+.text-block {
+    h2 {
+        font-size: $h4-font-size;
+    }
+
+    h3 {
+        font-weight: bold;
+        font-size: rem(18px);
+        line-height: rem(28px);
+        letter-spacing: rem(1.8px);
+        text-transform: uppercase;
+        color: $body-color;
+    }
+
+    p, p:last-child {
+        margin-bottom: 1.5rem;
+    }
 }

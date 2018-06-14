@@ -2,6 +2,7 @@ $testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
 
 .testimonial {
     display: flex;
+    opacity: 0;
     flex-direction: column;
 
     // max-width: 450px;
@@ -24,10 +25,15 @@ $testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
     padding: 20px;
     position: relative;
     font-size: 14px;
-    line-height: 18px;
+    font-weight: 600;
+    line-height: 20px;
     border-radius: 20px;
-    background-color: #9DECFE;
-    color: #1A406B;
+    color: white;
+    background-color: theme-color(primary);
+
+    p {
+        margin-bottom: 0px;
+    }
 
     .icon {
         position: absolute;
@@ -39,7 +45,24 @@ $testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
 
         svg,
         use {
-            fill: #9DECFE;
+            fill: theme-color(primary);
+        }
+    }
+}
+
+@each $name, $color in $theme-colors {
+    .testimonial-#{$name} {
+        .testimonial-text {
+            background-color: $color;
+
+            svg,
+            use {
+                fill: $color;
+            }
+
+            @if $name == "light" {
+                color: $body-color;
+            }
         }
     }
 }
@@ -64,12 +87,16 @@ $testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    p {
+        margin-bottom: 0px;
+    }
 }
 
 .testimonial-cite {
     display: block;
-    color: #1A406B;
-    font-size: 11px;
+    color: $body-color;
+    font-size: 12px;
     font-style: normal;
     line-height: 16px;
 }

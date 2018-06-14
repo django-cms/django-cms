@@ -11,14 +11,15 @@
 // Color system
 //
 
+// DO NOT USE WHAT IS NOT CUSTOM
 $white:    #fff;
 $gray-100: #f8f9fa;
-$gray-200: #e9ecef;
-$gray-300: #dee2e6;
+$gray-200: #edf1f5; // custom!
+$gray-300: #eaeaf0; // custom!
 $gray-400: #ced4da;
-$gray-500: #adb5bd;
-$gray-600: #6c757d;
-$gray-700: #495057;
+$gray-500: #a7b7c6; // custom!
+$gray-600: #889eb3; // custom!
+$gray-700: #6c85a0; // custom!
 $gray-800: #343a40;
 $gray-900: #212529;
 $black:    #000;
@@ -40,37 +41,15 @@ $grays: map-merge(
   $grays
 );
 
-$blue:    #00BBFF;
-$azure:   #00BBFF;
-$indigo:  #6610f2;
-$purple:  #6f42c1;
-$pink:    #e83e8c;
-$red:     #dc3545;
-$orange:  #fd7e14;
-$yellow:  #ffc107;
-$green:   #21C3A8;
-$teal:    #20c997;
-$cyan:    #17a2b8;
+$pink:    #ef2c96;
 $snow:    #EDF1F5;
-$stone:   #D4DCE5;
-$slate:   #6C85A0;
-$twilight:#2D3146;
 $night:   #25293D;
 
 $colors: ();
 // stylelint-disable-next-line scss/dollar-variable-default
 $colors: map-merge(
   (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
     "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
     "white":      $white,
     "gray":       $gray-600,
     "gray-dark":  $gray-800
@@ -78,12 +57,12 @@ $colors: map-merge(
   $colors
 );
 
-$primary:       $blue;
-$secondary:     $slate;
-$success:       $green;
-$info:          $cyan;
-$warning:       $yellow;
-$danger:        $red;
+$primary:       #0bf;
+$secondary:     #6C85A0;
+$success:       #28a745;
+$info:          #17a2b8;
+$warning:       #ffc107;
+$danger:        #dc3545;
 $light:         $gray-100;
 $dark:          $gray-800;
 
@@ -98,6 +77,7 @@ $theme-colors: map-merge(
     "warning":    $warning,
     "danger":     $danger,
     "light":      $light,
+    "pink":       $pink,
     "dark":       $dark
   ),
   $theme-colors
@@ -171,7 +151,7 @@ $sizes: map-merge(
 // Settings for the `<body>` element.
 
 $body-bg:                   $white;
-$body-color:                $gray-900;
+$body-color:                #1a406b;
 
 // Links
 //
@@ -334,7 +314,7 @@ $table-cell-padding-sm:       .3rem;
 
 $table-bg:                    transparent;
 $table-accent-bg:             rgba($black, .05);
-$table-hover-bg:              #E9EDEF;
+$table-hover-bg:              #f8f9fa;
 $table-active-bg:             $table-hover-bg;
 
 $table-border-width:          $border-width;
@@ -392,10 +372,10 @@ $btn-padding-y-lg:            $input-btn-padding-y-lg;
 $btn-padding-x-lg:            $input-btn-padding-x-lg;
 $btn-line-height-lg:          $input-btn-line-height-lg;
 
-$btn-border-width:            $input-btn-border-width;
+$btn-border-width:            2px;
 
 $btn-font-weight:             $font-weight-normal;
-$btn-box-shadow:              inset 0 1px 0 rgba($white, .15), 0 1px 1px rgba($black, .075);
+$btn-box-shadow:              0 1px 1px rgba($black, .075);
 $btn-focus-width:             $input-btn-focus-width;
 $btn-focus-box-shadow:        $input-btn-focus-box-shadow;
 $btn-disabled-opacity:        .65;
@@ -689,7 +669,7 @@ $pagination-padding-x-lg:           1.5rem;
 $pagination-line-height:            1.25;
 
 $pagination-color:                  $link-color;
-$pagination-bg:                     $white;
+$pagination-bg:                     transparent;
 $pagination-border-width:           0;
 $pagination-border-color:           $gray-300;
 
@@ -705,7 +685,7 @@ $pagination-active-bg:              $component-active-bg;
 $pagination-active-border-color:    $pagination-active-bg;
 
 $pagination-disabled-color:         $gray-600;
-$pagination-disabled-bg:            $white;
+$pagination-disabled-bg:            transparent;
 $pagination-disabled-border-color:  $gray-300;
 
 
