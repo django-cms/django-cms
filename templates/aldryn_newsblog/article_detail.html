@@ -1,0 +1,31 @@
+{% extends "aldryn_newsblog/fullwidth.html" %}
+{% load i18n cms_tags apphooks_config_tags %}
+
+{% block title %}{{ article.title }} - {{ block.super }}{% endblock %}
+{% block breadcrumb %}{% endblock %}
+
+{% block newsblog_content %}
+    <div class="aldryn-newsblog-detail">
+        {% include "aldryn_newsblog/includes/article.html" with detail_view="true" %}
+    </div>
+    {% static_placeholder "newsblog_social" %}
+{% endblock %}
+
+{% block newsblog_footer %}
+    <div class="aldryn-newsblog-pager">
+        <ul class="pager">
+            {% if prev_article %}
+                <li class="previous"><a href="{{ prev_article.get_absolute_url }}"><span aria-hidden="true">&larr;</span> {% trans "Previous Article" %}</a></li>
+            {% else %}
+                <li class="previous"><span class="text-muted"><span aria-hidden="true">&larr;</span> {% trans "Previous Article" %}</span></li>
+            {% endif %}
+            <li><span class="pager-back">– <a href="{% namespace_url "article-list" %}">{% trans "Back to Overview" %}</a> –</span></li>
+            {% if next_article %}
+                <li class="next"><a href="{{ next_article.get_absolute_url }}">{% trans "Next Article" %} <span aria-hidden="true">&rarr;</span></a></li>
+            {% else %}
+                <li class="next"><span class="text-muted">{% trans "Next Article" %} <span aria-hidden="true">&rarr;</span></span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% static_placeholder "newsblog_comments" %}
+{% endblock %}

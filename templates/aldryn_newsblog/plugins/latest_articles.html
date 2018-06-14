@@ -1,0 +1,9 @@
+{% load i18n %}
+
+<div class="aldryn aldryn-newsblog aldryn-newsblog-articles">
+    {% for article in article_list %}
+        {% include "aldryn_newsblog/includes/article.html" with namespace=instance.app_config.namespace %}
+    {% empty %}
+        <p class="well">{% trans "No items available" %}</p>
+    {% endfor %}
+</div>

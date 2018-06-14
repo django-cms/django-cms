@@ -1,0 +1,7 @@
+{% load i18n %}
+
+<div class="aldryn aldryn-newsblog aldryn-newsblog-articles aldryn-newsblog-articles-featured">
+    {% for article in articles_list %}
+        {% include "aldryn_newsblog/includes/article.html" with namespace=instance.app_config.namespace %}
+    {% endfor %}
+</div>

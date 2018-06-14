@@ -1,0 +1,16 @@
+{% load i18n %}
+
+{% if article %}
+    <div class="aldryn aldryn-newsblog aldryn-newsblog-related">
+        <ul class="list-unstyled">
+            {% for article in article_list %}
+                <li>
+                    <h3><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h3>
+                    <p>{% trans "by" %} <a href="#">{{ article.author }}</a> {{ article.publishing_date|date }}</p>
+                </li>
+            {% empty %}
+                <li class="well">{% trans "No items available" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

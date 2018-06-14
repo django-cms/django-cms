@@ -1,0 +1,13 @@
+{% load i18n %}
+
+<div class="aldryn aldryn-newsblog aldryn-newsblog-authors">
+    <ul class="list-unstyled">
+        {% for author in authors_list %}
+            <li>
+                {% include "aldryn_newsblog/includes/author.html" with author_view="true" namespace=instance.app_config.namespace %}
+            </li>
+        {% empty %}
+            <li class="well">{% trans "No items available" %}</li>
+        {% endfor %}
+    </ul>
+</div>
