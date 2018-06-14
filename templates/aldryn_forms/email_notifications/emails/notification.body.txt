@@ -1,0 +1,11 @@
+{% extends email_txt_theme %}
+{% load aldryn_forms_tags i18n %}
+{% block email_content %}
+{% render_notification_text email_notification 'body_text' as text_message %}
+{% if text_message %}
+{{ text_message|safe }}
+{% else %}
+{% blocktrans %}Form name: {{ form_name }}{% endblocktrans %}
+{% include "aldryn_forms/emails/includes/form_data.txt" %}
+{% endif %}
+{% endblock email_content %}

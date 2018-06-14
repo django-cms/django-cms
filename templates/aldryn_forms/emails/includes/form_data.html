@@ -1,0 +1,3 @@
+{% for name, value in form_data %}
+    <p>{{ name }}: {{ value|default_if_none:"—" }}</p>
+{% endfor %}

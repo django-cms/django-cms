@@ -1,0 +1,10 @@
+{
+    "installed-apps": [
+        "emailit", 
+        "captcha", 
+        "django_tablib", 
+        "aldryn_forms", 
+        "aldryn_forms.contrib.email_notifications"
+    ], 
+    "package-name": "aldryn-forms"
+}

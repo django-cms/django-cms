@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools %}
+	<ul class="object-tools">
+        {% block object-tools-items %}
+            <li>
+                {% url cl.opts|admin_urlname:'export' as export_url %}
+                <a href="{{ export_url }}" class="addlink">{% trans "Export Form Entries" %}</a>
+            </li>
+            {% if has_add_permission %}
+                {{ block.super }}
+            {% endif %}
+        {% endblock %}
+    </ul>
+{% endblock %}
