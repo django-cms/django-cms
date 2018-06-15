@@ -3,6 +3,7 @@ from importlib import import_module
 
 from django.apps import apps
 from django.utils.module_loading import module_has_submodule
+from django.core.exceptions import ImproperlyConfigured
 
 
 CMS_CONFIG_NAME = 'cms_apps'
@@ -24,16 +25,27 @@ def autodiscover_cms_files():
             if module_has_submodule(app_config.module, CMS_CONFIG_NAME):
                 raise
         else:
+            cms_app_classes = []
             for name, obj in inspect.getmembers(cms_module):
-                # TODO: Raise exception if a suitable class can't be
-                # found in the module or if there's more than one?
-                if inspect.isclass(obj) and CMSAppConfig in obj.__mro__:
-                    # We are adding this attribute here rather than in
-                    # django's app config definition because there are
-                    # all kinds of limitations as to what can be
-                    # imported in django's apps.py and this could cause
-                    # issues
-                    app_config.cms_app = obj()
+                is_cms_app_config = (
+                    inspect.isclass(obj) and
+                    issubclass(obj, CMSAppConfig) and
+                    # Ignore the import of CMSAppConfig itself
+                    obj != CMSAppConfig
+                )
+                if is_cms_app_config:
+                    cms_app_classes.append(obj)
+
+            if len(cms_app_classes) == 1:
+                # We are adding this attribute here rather than in
+                # django's app config definition because there are
+                # all kinds of limitations as to what can be imported
+                # in django's apps.py and this could cause issues
+                app_config.cms_app = cms_app_classes[0]()
+            else:
+                raise ImproperlyConfigured(
+                    "cms_apps.py files must define exactly one "
+                    "class which inherits from CMSAppConfig")
 
 
 def register_cms_extensions():

@@ -3,6 +3,7 @@ from mock import patch, Mock
 
 from django.test import override_settings
 from django.apps import apps
+from django.core.exceptions import ImproperlyConfigured
 
 from cms import app_registration
 from cms.test_utils.testcases import CMSTestCase
@@ -66,6 +67,20 @@ class AutodiscoverTestCase(CMSTestCase):
         self.assertEqual(
             app_list[0].cms_app.__class__.__name__, 'CMSSomeFeatureConfig')
         self.assertFalse(hasattr(app_list[1], 'cms_app'))
+
+    @override_settings(INSTALLED_APPS=[
+        'cms.tests.test_app_registry.app_without_cms_app_class',
+    ])
+    def test_raises_exception_when_no_cms_app_class_found_in_cms_file(self):
+        with self.assertRaises(ImproperlyConfigured):
+            app_registration.autodiscover_cms_files()
+
+    @override_settings(INSTALLED_APPS=[
+        'cms.tests.test_app_registry.app_with_two_cms_app_classes',
+    ])
+    def test_raises_exception_when_more_than_one_cms_app_class_found_in_cms_file(self):
+        with self.assertRaises(ImproperlyConfigured):
+            app_registration.autodiscover_cms_files()
 
 
 class RegisterExtensionsTestCase(CMSTestCase):
