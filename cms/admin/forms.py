@@ -414,6 +414,10 @@ class ChangePageForm(BasePageForm):
             data['path'] = ''
             return data
 
+        if self.title_obj.has_url_overwrite:
+            data['path'] = self.title_obj.path
+            return data
+
         if 'slug' not in self.fields:
             # the {% edit_title_fields %} template tag
             # allows users to edit specific fields for a translation.
@@ -448,8 +452,11 @@ class ChangePageForm(BasePageForm):
         translation_data = {field: data[field]
                             for field in self.translation_fields if field in data}
 
-        if 'path' in data and not self.title_obj.has_url_overwrite:
-            # this field is managed manually
+        if 'path' in data:
+            # The path key is set if
+            # the slug field is present in the form,
+            # or if the page being edited is the home page,
+            # or if the translation has a url override.
             translation_data['path'] = data['path']
 
         update_count = cms_page.update_translations(
