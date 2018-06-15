@@ -68,50 +68,6 @@ class AutodiscoverTestCase(CMSTestCase):
         self.assertFalse(hasattr(app_list[1], 'cms_app'))
 
 
-class RegisterExtensionIfExistsTestCase(CMSTestCase):
-
-    @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_cms_extension',
-    ])
-    def test_if_has_extend_method_run_it(self):
-        app = apps.get_app_config('app_with_cms_extension')
-        # The cms_app would normally be set by the
-        # autodiscover_cms_files function
-        app.cms_app = Mock()
-
-        app_registration._register_cms_extension_if_exists(app)
-
-        self.assertEqual(app.cms_app.register_extension.call_count, 1)
-
-    @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_cms_config',
-    ])
-    def test_if_doesnt_have_extend_method_dont_raise_exception(self):
-        app = apps.get_app_config('app_with_cms_config')
-        from cms.tests.test_app_registry.app_with_cms_config.cms_apps import CMSOnlyConfig
-        # The cms_app would normally be set by the
-        # autodiscover_cms_files function
-        app.cms_app = CMSOnlyConfig()
-
-        try:
-            app_registration._register_cms_extension_if_exists(app)
-        except AttributeError:
-            self.fail(
-                "Raised exception when register_extension method"
-                " not present")
-
-    @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_without_cms_file',
-    ])
-    def test_if_doesnt_have_cms_app_attr_dont_raise_exception(self):
-        app = apps.get_app_config('app_without_cms_file')
-
-        try:
-            app_registration._register_cms_extension_if_exists(app)
-        except AttributeError:
-            self.fail("Raised exception when cms_app attr not set on app")
-
-
 class RegisterExtensionsTestCase(CMSTestCase):
 
     @patch.object(apps, 'get_app_configs')
