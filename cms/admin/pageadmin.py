@@ -75,6 +75,7 @@ from cms.utils.i18n import (
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+from cms.utils.log_operations import log_page_addition, log_page_change, log_page_move, log_page_delete
 
 require_POST = method_decorator(require_POST)
 
@@ -119,6 +120,24 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     duplicate_form = DuplicatePageForm
 
     inlines = PERMISSION_ADMIN_INLINES
+
+    def log_addition(self, request, object, message):
+        """
+        Log that a page has been successfully added.
+        """
+        log_page_addition(request, object)
+
+    def log_change(self, request, object, message):
+        """
+        Log that a page has been changed
+        """
+        log_page_change(request, object, message)
+
+    def log_deletion(self, request, object, object_repr):
+        """
+        Log that a page has been deleted
+        """
+        log_page_delete(request, object, object_repr)
 
     def get_admin_url(self, action, *args):
         url_name = "{}_{}_{}".format(
@@ -900,6 +919,10 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             token=operation_token,
             obj=page,
         )
+
+        # Log the operation
+        log_page_move(request, page)
+
         return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):
@@ -1221,6 +1244,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             page.unpublish(language)
             message = _('The %(language)s page "%(page)s" was successfully unpublished') % {
                 'language': language_name, 'page': page}
+
             messages.info(request, message)
             LogEntry.objects.log_action(
                 user_id=request.user.id,

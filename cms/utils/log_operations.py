@@ -1,0 +1,137 @@
+# -*- coding: utf-8 -*-
+
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+
+from django.contrib.contenttypes.models import ContentType
+
+
+# TODO:
+#  - Add page Logging should be implemented in: AddPageForm so the wizard and admin form both fire the log as the wizard does not currently.
+#  - Title, Placeholder and Plugin operations
+
+"""
+Logs are all collected here to keep the messages and contents consistent across all operations. May seem repetitive but allows each log to be unique for different circumstances.
+Method names make the log being created clear and concise
+
+Issues with current solution:
+    - A log entry isn't created when a page is created using the new page wizard. Again showing a flaw with testing via the API and not the actual fn's!!
+    - Difficult to find the log page creation in the current solution!! The existing implementation,uses the LogEntry model directly, others use the ModelAdmin Implementation. There should be one way where possible!!
+
+Considerations:
+    - Allow others to add their own plugins into the logger???
+    - Have a log helper that uses LogEntry and allows the removal of LogEntry at a later date.
+
+Ideas:
+    - Django admin keeps all logs in one area rather than spreading them out and potentially having them set inconsistently.
+    - Logs will be scattered all over files leaving a standardised implementation difficult if not in one place
+
+"""
+
+"""
+Log helper
+"""
+
+
+def create_log(user_id, content_type_id, object_id, object_repr, action_flag, change_message):
+    """
+    Helper method
+    Although this function is repetitive it allows external plugins to access the same logging mechanisms as the cms
+    It also removes the dependency of the admin LogEntry in any Django CMS code
+    """
+    return LogEntry.objects.log_action(
+        user_id=user_id,
+        content_type_id=content_type_id,
+        object_id=object_id,
+        object_repr=object_repr,
+        action_flag=action_flag,
+        change_message=change_message,
+    )
+
+"""
+Page logs
+"""
+
+
+def log_page_addition(request, page_object, message=None):
+    """
+    Log that a page object has been successfully created.
+    """
+
+    if not message:
+        message = "Page %(page_id)s added" % {'page_id': str(page_object.pk)}
+
+    create_log(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(page_object).pk,
+        object_id=page_object.pk,
+        object_repr=str(page_object),
+        action_flag=ADDITION,
+        change_message=message,
+    )
+
+
+def log_page_change(request, page_object, change_list):
+    """
+    Log that a page object has been successfully changed.
+    """
+
+    message = "Page %(page_id)s %(changes)s" % {'page_id': str(page_object.pk), 'changes': str(change_list)}
+
+    create_log(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(page_object).pk,
+        object_id=page_object.pk,
+        object_repr=str(page_object),
+        action_flag=CHANGE,
+        change_message=message,
+    )
+
+
+def log_page_move(request, page_object, message=None):
+    """
+    Log that a page object has been successfully moved.
+    """
+
+    if not message:
+        message = "Page %(page_id)s moved" % {'page_id': str(page_object.pk)}
+
+    create_log(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(page_object).pk,
+        object_id=page_object.pk,
+        object_repr=str(page_object),
+        action_flag=DELETION,
+        change_message=message,
+    )
+
+
+def log_page_delete(request, page_object, object_repr, message=None):
+    """
+    Log that a page object has been successfully deleted.
+    """
+
+    if not message:
+        message = "Page %(page_id)s deleted" % {'page_id': str(page_object.pk)}
+
+    create_log(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(page_object).pk,
+        object_id=page_object.pk,
+        object_repr=object_repr,
+        action_flag=CHANGE,
+        change_message=message,
+    )
+
+
+# TODO:
+"""
+Title logs
+"""
+
+"""
+Placeholder logs
+"""
+
+"""
+Plugin logs
+"""
