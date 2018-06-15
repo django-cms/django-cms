@@ -12,6 +12,7 @@
   operation was to move a plugin in the top level of same placeholder
 * Fixed a bug where xframe options were processed by clickjacking middleware
   when page was served from cache, rather then get this value from cache.
+* Fixed a bug where cached page permissions overrides global permissions.
 * Fixed a bug where descendant pages with a custom url would loose the overwritten
   url on save.
 
