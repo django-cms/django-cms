@@ -761,13 +761,13 @@ $popover-arrow-outer-color:         fade-in($popover-border-color, .05);
 
 // Badges
 
-$badge-font-size:                   75%;
+$badge-font-size:                   rem(16px);
 $badge-font-weight:                 $font-weight-bold;
-$badge-padding-y:                   .25em;
-$badge-padding-x:                   .4em;
+$badge-padding-y:                   rem(5px);
+$badge-padding-x:                   rem(5px);
 $badge-border-radius:               $border-radius;
 
-$badge-pill-padding-x:              .6em;
+$badge-pill-padding-x:              rem(25px);
 // Use a higher than normal value to ensure completely rounded edges when
 // customizing padding or font-size on labels.
 $badge-pill-border-radius:          10rem;
@@ -876,18 +876,18 @@ $figure-caption-color:              $gray-600;
 
 // Breadcrumbs
 
-$breadcrumb-padding-y:              .75rem;
-$breadcrumb-padding-x:              1rem;
+$breadcrumb-padding-y:              0rem;
+$breadcrumb-padding-x:              0rem;
 $breadcrumb-item-padding:           .5rem;
 
 $breadcrumb-margin-bottom:          1rem;
 
-$breadcrumb-bg:                     $gray-200;
-$breadcrumb-divider-color:          $gray-600;
-$breadcrumb-active-color:           $gray-600;
+$breadcrumb-bg:                     transparent;
+$breadcrumb-divider-color:          $body-color;
+$breadcrumb-active-color:           theme-color(primary);
 $breadcrumb-divider:                quote("/");
 
-$breadcrumb-border-radius:          $border-radius;
+$breadcrumb-border-radius:          0;
 
 
 // Carousel

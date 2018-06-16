@@ -1,18 +1,49 @@
 {% extends "aldryn_newsblog/base.html" %}
-{% load i18n cms_tags %}
+{% load i18n thumbnail apphooks_config_tags cms_tags %}
 
-{% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-16 col-md-push-4">
-                <div class="aldryn aldryn-newsblog">
-                    {% block newsblog_content %}{% endblock %}
+{% block feature %}
+    <div class="page-header">
+        {% if not newsblog_author %}
+        <div class="container text-center justify-content-center align-items-center d-flex flex-column">
+            <h1 class="display-1">Blog</h1>
+
+            {% static_placeholder "newsblog categories" %}
+        </div>
+        {% else %}
+        <div class="container text-center d-flex flex-column align-items-center justify-content-center">
+            <div class="w-50">
+                {% if newsblog_author.visual %}
+                    {% thumbnail newsblog_author.visual "60x60" crop upscale subject_location=newsblog_author.visual.subject_location as author_image %}
+                    <img class="rounded-circle img-fluid" src="{{ author_image.url }}" alt="{{ author }}">
+                {% endif %}
+                <h2>{{ newsblog_author }}</h2>
+                    <ul class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="{% namespace_url "article-list" namespace=instance.app_config.namespace default='' %}">Divio blog</a>
+                        <li class="breadcrumb-item active"><span>{{ newsblog_author }}</span></li>
+                    </ul>
+                {% if newsblog_author.description %}
+                <div class="text-secondary">
+                    {{ newsblog_author.description }}
                 </div>
+                {% endif %}
             </div>
         </div>
+        {% endif %}
+    </div>
+{% endblock %}
 
-        <div class="aldryn aldryn-newsblog">
-            {% block newsblog_footer %}{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="section-fullwidth mt-5">
+        <div class="stripe stripe-up">
+            <div class="container">
+                {% block newsblog_content %}{% endblock %}
+            </div>
         </div>
     </div>
+
+    <div class="aldryn aldryn-newsblog">
+        {% block newsblog_footer %}{% endblock %}
+    </div>
+</div>
 {% endblock content %}

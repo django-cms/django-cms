@@ -2,11 +2,15 @@
 {% load i18n cms_tags %}
 
 {% block newsblog_content %}
-    <div class="aldryn-newsblog-list">
+    <div class="row blog-article-list mt--7">
+        {% block newsblog_header %}
+            {% if not newsblog_author %}
+                {% static_placeholder "Newsblog featured article" %}
+            {% endif %}
+        {% endblock %}
         {% for article in article_list %}
             {% include "aldryn_newsblog/includes/article.html" %}
         {% empty %}
-            <p class="well">{% trans "No items available" %}</p>
         {% endfor %}
     </div>
 {% endblock %}

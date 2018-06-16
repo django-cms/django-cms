@@ -38,14 +38,14 @@ RUN pip-reqs compile && \
 ENV PATH=/node_modules/.bin:$PATH
 
 # If there is a .cache.node_modules.tar.gz file, copy it in.
-# COPY .cache.node_modules.* /
-# # Only extract if file not empty
-# RUN test -s /.cache.node_modules.tar.gz \
-#   && tar xzf /.cache.node_modules.tar.gz -C / \
-#   && echo "Extracted .cache.node_modules.tar.gz to /node_modules" \
-#   || true
-# COPY package*.json /
-# RUN (cd / && npm prune && npm install --production && rm -rf /tmp/*)
+COPY .cache.node_modules.* /
+# Only extract if file not empty
+RUN test -s /.cache.node_modules.tar.gz \
+  && tar xzf /.cache.node_modules.tar.gz -C / \
+  && echo "Extracted .cache.node_modules.tar.gz to /node_modules" \
+  || true
+COPY package*.json /
+RUN (cd / && npm prune && npm install --production && rm -rf /tmp/*)
 # </NPM>
 
 # <SOURCE>
@@ -53,8 +53,8 @@ COPY . /app
 # </SOURCE>
 
 # <GULP>
-# ENV GULP_MODE=production
-# RUN gulp build
+ENV GULP_MODE=production
+RUN gulp build
 # </GULP>
 
 # <STATIC>

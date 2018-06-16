@@ -1,14 +1,16 @@
 {% load i18n apphooks_config_tags %}
 
- <div class="aldryn aldryn-newsblog aldryn-newsblog-categories">
-    <ul class="list-unstyled">
-        <li{% if not newsblog_category %} class="active"{% endif %}>
-            <a href="{% namespace_url "article-list" namespace=instance.app_config.namespace default='' %}">{% trans "All" %}</a>
+<div class="sub-menu sub-menu-horizontal navbar-expand-lg mt-4">
+    <p class="h5 sub-menu-toggler collapsed" data-toggle="collapse" data-target="#sub-menu-content" aria-expanded="false" aria-label="Toggle navigation">Browse topics
+        {% include "includes/icon.html" with icon="arrow-right" class="sub-menu-toggler" color="blue" %}
+    </p>
+    <ul class="collapse navbar-collapse" id="sub-menu-content">
+        <li>
+            <a{% if not newsblog_category %} class="active"{% endif %} href="{% namespace_url "article-list" namespace=instance.app_config.namespace default='' %}">{% trans "All" %}</a>
         </li>
         {% for category in categories %}
-            <li{% if newsblog_category.id == category.id %} class="active"{% endif %}>
-                <span class="badge">{{ category.article_count }}</span>
-                <a href="{% namespace_url "article-list-by-category" category.slug namespace=instance.app_config.namespace default='' %}">{{ category.name }}</a>
+            <li>
+                <a{% if newsblog_category.id == category.id %} class="active"{% endif %} href="{% namespace_url "article-list-by-category" category.slug namespace=instance.app_config.namespace default='' %}">{{ category.name }}</a>
             </li>
         {% endfor %}
     </ul>

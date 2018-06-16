@@ -121,3 +121,15 @@ p:last-child {
         margin-bottom: 1.5rem;
     }
 }
+
+.breadcrumb-item > a {
+    color: $body-color;
+}
+
+.breadcrumb-item {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: rem(12px);
+    line-height: rem(15px);
+    letter-spacing: rem(2px);
+}

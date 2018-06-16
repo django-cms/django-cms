@@ -1,31 +1,97 @@
 {% extends "aldryn_newsblog/fullwidth.html" %}
-{% load i18n cms_tags apphooks_config_tags %}
+{% load i18n thumbnail cms_tags apphooks_config_tags %}
 
 {% block title %}{{ article.title }} - {{ block.super }}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 
-{% block newsblog_content %}
-    <div class="aldryn-newsblog-detail">
-        {% include "aldryn_newsblog/includes/article.html" with detail_view="true" %}
+{% block feature %}
+<div class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-8 offset-md-2 text-center mb-5">
+                <ul class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a href="{% namespace_url "article-list" namespace=instance.app_config.namespace default='' %}">Divio blog</a></li>
+                </ul>
+                <h2>{% render_model article "title" %}</h2>
+                {% if article.categories %}
+                    <ul class="breadcrumb justify-content-center">
+                        {% for category in article.categories.all %}
+                            <li class="breadcrumb-item">
+                                <a href="{% namespace_url 'article-list-by-category' category.slug namespace=namespace default='' %}">{{ category.name }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
     </div>
-    {% static_placeholder "newsblog_social" %}
+</div>
+{% endblock %}
+
+
+{% block newsblog_content %}
+    <div class="aldryn-newsblog-detail mt--7">
+        {% if article.featured_image_id %}
+            <div class="row">
+                <div class="col-12 col-md-8 offset-md-2 text-center">
+                    <img class="img-fluid mb-5" src="{% thumbnail article.featured_image 800x450 crop subject_location=article.featured_image.subject_location %}" alt="{{ article.featured_image.alt }}" class="img-responsive">
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-7">
+                {% if article.lead_in %}
+                <div class="lead mb-3">
+                    {% render_model article "lead_in" %}
+                </div>
+                {% endif %}
+
+                <div class="text-block">
+                    {% render_placeholder article.content language placeholder_language %}
+                </div>
+                <p class="tags mb-5">
+                    {% for tag in article.tags.all %}
+                        <a class="badge badge-pill badge-secondary" href="{% namespace_url 'article-list-by-tag' tag=tag.slug namespace=namespace default='' %}">{{ tag.name }}</a>
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+
+        {% if article.author %}
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8">
+                <div class="aldryn-newsblog-detail-author">
+                    <div class="media">
+                        {% if article.author.visual %}
+                            {% thumbnail article.author.visual "50x50" crop upscale subject_location=article.author.visual.subject_location as author_image %}
+                            <img class="rounded-circle img-fluid mr-4" src="{{ author_image.url }}" alt="{{ author }}">
+                        {% endif %}
+
+                        <div class="media-body">
+                            <p class="h5">{{ article.author }}</p>
+                            {% if article.author.function %}
+                                <p class="text-secondary">{{ article.author.function }}</p>
+                            {% endif %}
+                            {% if article.author.description %}
+                                <div class="aldryn-newsblog-detail-author-description mb-3">
+                                    {{ article.author.description }}
+                                </div>
+                            {% endif %}
+                            <div class="text-right">
+                                <a class="link-wrapper d-inline-flex flex-row align-items-center" href="{% namespace_url "article-list-by-author" article.author.slug namespace=namespace default='' %}"><span class="link-inner">More articles by {{ article.author }}</span> {% include 'includes/icon.html' with icon='arrow-right' %}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
 {% endblock %}
 
 {% block newsblog_footer %}
-    <div class="aldryn-newsblog-pager">
-        <ul class="pager">
-            {% if prev_article %}
-                <li class="previous"><a href="{{ prev_article.get_absolute_url }}"><span aria-hidden="true">&larr;</span> {% trans "Previous Article" %}</a></li>
-            {% else %}
-                <li class="previous"><span class="text-muted"><span aria-hidden="true">&larr;</span> {% trans "Previous Article" %}</span></li>
-            {% endif %}
-            <li><span class="pager-back">– <a href="{% namespace_url "article-list" %}">{% trans "Back to Overview" %}</a> –</span></li>
-            {% if next_article %}
-                <li class="next"><a href="{{ next_article.get_absolute_url }}">{% trans "Next Article" %} <span aria-hidden="true">&rarr;</span></a></li>
-            {% else %}
-                <li class="next"><span class="text-muted">{% trans "Next Article" %} <span aria-hidden="true">&rarr;</span></span></li>
-            {% endif %}
-        </ul>
-    </div>
     {% static_placeholder "newsblog_comments" %}
+    {% static_placeholder "Newsblog article footer" %}
 {% endblock %}

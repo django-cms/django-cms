@@ -1,61 +1,34 @@
 {% load i18n apphooks_config_tags cms_tags sekizai_tags staticfiles thumbnail %}
 
-<article class="aldryn-newsblog-article{% if article.is_featured %} aldryn-newsblog-featured{% endif %}{% if not article.published %} unpublished{% endif %}{% if article.future %} future{% endif %}">
-    {% if article.featured_image_id %}
-        <p class="visual">
-            {% if not detail_view %}
-                <a href="{{ article.get_absolute_url }}">
-            {% endif %}
-            <img src="{% thumbnail article.featured_image 800x450 crop subject_location=article.featured_image.subject_location %}" alt="{{ article.featured_image.alt }}" class="img-responsive">
-            {% if not detail_view %}
-                </a>
-            {% endif %}
-        </p>
-    {% endif %}
-
-    {% if article.categories %}
-        <p class="category">
-            {% for category in article.categories.all %}
-                <a href="{% namespace_url 'article-list-by-category' category.slug namespace=namespace default='' %}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </p>
-    {% endif %}
-
-    <h2>
-        {% if not detail_view %}
-            <a href="{% namespace_url 'article-detail' article.slug namespace=namespace default='' %}">{% render_model article "title" %}</a>
-        {% else %}
-            {% render_model article "title" %}
+<div class="{% if long %}col-12 article-tile article-tile-long{% else %}col-12 col-sm-6 col-lg-4 article-tile article-tile-short{% endif %}">
+    <article class="article-tile-wrap {% if article.is_featured %} aldryn-newsblog-featured{% endif %}{% if not article.published %} unpublished{% endif %}{% if article.future %} future{% endif %}">
+    {% if long %}<div class="row">{% endif %}
+        {% if article.featured_image_id %}
+        <div class="article-tile-img">
+            <div class="article-img" style="background-image: url({% thumbnail article.featured_image 380x280 crop subject_location=article.featured_image.subject_location %})">
+            </div>
+        </div>
         {% endif %}
-    </h2>
 
-    {% if not detail_view %}
-        <div class="lead">
-            {% render_model article "lead_in" "" "" "truncatewords_html:'20'" %}
+        {% if long %}
+        <div class="col-12 col-sm-6 col-lg-4">
+        {% endif %}
+        <div class="article-tile-content">
+            <h2 class="h5">
+                <a href="{% namespace_url 'article-detail' article.slug namespace=namespace default='' %}">{% render_model article "title" %}</a>
+            </h2>
+
+            <div class="text-secondary mb-3">
+                {% render_model article "lead_in" "" "" "truncatewords_html:'20'" %}
+            </div>
+
+            {% include "aldryn_newsblog/includes/author.html" with author=article.author %}
         </div>
-    {% endif %}
-
-    {% include "aldryn_newsblog/includes/author.html" with author=article.author %}
-
-    {% if article.tags and detail_view %}
-        <p class="tags">
-            {% for tag in article.tags.all %}
-                <a href="{% namespace_url 'article-list-by-tag' tag=tag.slug namespace=namespace default='' %}">{{ tag.name }}</a>
-            {% endfor %}
-        </p>
-    {% endif %}
-
-    {% if detail_view %}
-        <div class="lead">
-            {% render_model article "lead_in" %}
-        </div>
-    {% endif %}
-
-    {% if detail_view %}
-        <div class="content">
-            {% render_placeholder article.content language placeholder_language %}
-        </div>
-    {% endif %}
-</article>
+        {% if long %}
+    </div>
+</div>
+{% endif %}
+    </article>
+</div>
 
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static 'css/aldryn-newsblog/article.css' %}">{% endaddtoblock %}
