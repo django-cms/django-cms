@@ -51,7 +51,7 @@ def autodiscover_cms_configs():
 
 def get_cms_apps_with_features():
     """
-    Returns cms app configs of apps with features
+    Returns app configs of apps with cms features
     """
     apps_with_features = []
 
@@ -60,10 +60,9 @@ def get_cms_apps_with_features():
         # function if a cms_apps.py file with a suitable class is found.
         is_cms_app = hasattr(app_config, 'cms_app')
         if is_cms_app:
-            # The register_extension method is only present on the cms
-            # app class if there is an extension to register. For
-            # classes that only have config this method will not be
-            # present.
+            # The configure_app method is only present on the cms
+            # app class if the app provides a cms feature. For classes
+            # that only have config this method will not be present.
             has_cms_extension = hasattr(
                 app_config.cms_app, 'configure_app')
         else:

@@ -15,7 +15,7 @@ class SomeClass():
 
 class CMSSomeFeatureConfig(CMSAppConfig):
 
-    def register_extension(self, app):
+    def configure_app(self, app):
         pass
 
 
