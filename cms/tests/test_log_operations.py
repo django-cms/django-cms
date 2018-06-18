@@ -9,23 +9,7 @@ from cms.models.pagemodel import Page
 from cms.forms.wizards import CreateCMSPageForm
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
 
-
-"""
-Make sure that only one entry is created for each action, for example when a page is moved it is deleted and recreated!!
-
-Dev helper code FIXME: REMOVEME:
-    log_entries = LogEntry.objects.all()
-    entry = LogEntry.objects.filter(user=user, object_id=instance_id, action_flag__in=(CHANGE,))[0]
-    Check id's match in log self.assertEqual(page_data.pk, int(LogEntry.objects.all()[0].object_id))
-
-TODO: Test the correct flag is set!!
-
-Log messages are inconsistent atm regarding what's set for Move, Change and Delete messages
-
-Using get_change_message vs change message???
-"""
-
-# Snippet taken from: test_wizards.py
+# Snippet to create wizard page taken from: test_wizards.py
 CreateCMSPageForm = step2_form_factory(
     mixin_cls=WizardStep2BaseForm,
     entry_form_class=CreateCMSPageForm,
@@ -42,11 +26,11 @@ class LogPageOperationsTests(CMSTestCase):
         # Check to see if the page added log entry exists
         self.assertEqual(1, LogEntry.objects.count())
 
-        # Check that the contents of the log is correct
         log_entry = LogEntry.objects.all()[0]
+
+        # Check that the contents of the log message is correct
         message = '[{"added": {}}]'
         self.assertEqual(message, log_entry.change_message)
-        # FIXME: Keep both or one??
         message = 'Added.'
         self.assertEqual(message, log_entry.get_change_message())
 
@@ -134,11 +118,11 @@ class LogPageOperationsTests(CMSTestCase):
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 
-            # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
+
+            # Check that the contents of the log message is correct
             message = '[{"changed": {"fields": ["title"]}}]'
             self.assertEqual(message, log_entry.change_message)
-            # FIXME: Keep both or one??
             message = 'Changed title.'
             self.assertEqual(message, log_entry.get_change_message())
 
@@ -170,11 +154,11 @@ class LogPageOperationsTests(CMSTestCase):
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 
-            # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            message = 'Moved.'
+
+            # Check that the contents of the log message is correct
+            message = "Moved."
             self.assertEqual(message, log_entry.change_message)
-            # FIXME: Keep both or one??
             message = "Moved."
             self.assertEqual(message, log_entry.get_change_message())
 
@@ -207,11 +191,11 @@ class LogPageOperationsTests(CMSTestCase):
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 
-            # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
+
+            # Check that the contents of the log message is correct
             message = ""
             self.assertEqual(message, log_entry.change_message)
-            # FIXME: Keep both or one??
             message = ""
             self.assertEqual(message, log_entry.get_change_message())
 

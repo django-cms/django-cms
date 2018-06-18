@@ -1,35 +1,28 @@
 # -*- coding: utf-8 -*-
 
-
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
-
 from django.contrib.contenttypes.models import ContentType
-
 from django.utils.translation import ugettext_lazy as _
-
 
 # TODO:
 #  - Add page Logging should be implemented in: AddPageForm so the wizard and admin form both fire the log as the wizard does not currently.
-#  - Title, Placeholder and Plugin operations
 
 """
-Logs are all collected here to keep the messages and contents consistent across all operations. May seem repetitive but allows each log to be unique for different circumstances.
+Logs are all collected here to keep the messages and contents consistent across all operations.
+May seem repetitive but allows each log to be unique for different circumstances.
 Method names make the log being created clear and concise
 
 Issues with current solution:
     - A log entry isn't created when a page is created using the new page wizard. Again showing a flaw with testing via the API and not the actual fn's!!
     - Difficult to find the log page creation in the current solution!! The existing implementation,uses the LogEntry model directly, others use the ModelAdmin Implementation. There should be one way where possible!!
 
-Considerations:
-    - Allow others to add their own plugins into the logger???
-    - Have a log helper that uses LogEntry and allows the removal of LogEntry at a later date.
-    - A page move event is recorded as CHANGE with no message. Manually added a Moved message
-
-Ideas:
-    - Django admin keeps all logs in one area rather than spreading them out and potentially having them set inconsistently.
-    - Logs will be scattered all over files leaving a standardised implementation difficult if not in one place
-
+Design Considerations:
+    - Allow plugins to integrate with the CMS logger??
+    - A log helper method "create_log" that uses LogEntry and allows the removal of LogEntry at a later date.
+    - A page move event is recorded as CHANGE with no message. A "Moved." message has been manually added
+    - Django admin keeps all logs in one area rather than spreading them out and potentially having them set inconsistently and scattered in multiple files.
 """
+
 
 """
 Log helper
@@ -40,7 +33,7 @@ def create_log(user_id, content_type_id, object_id, object_repr, action_flag, ch
     """
     Helper method
     Although this function is repetitive it allows external plugins to access the same logging mechanisms as the cms
-    It also removes the dependency of the admin LogEntry in any Django CMS code
+    It also removes the dependency of the admin LogEntry in any other Django CMS code
     """
     return LogEntry.objects.log_action(
         user_id=user_id,
