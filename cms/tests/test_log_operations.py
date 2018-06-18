@@ -1,4 +1,4 @@
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 
 from cms.api import create_page
 from cms.test_utils.testcases import (
@@ -9,8 +9,6 @@ from cms.models.pagemodel import Page
 from cms.forms.wizards import CreateCMSPageForm
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
 
-
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 
 """
 Make sure that only one entry is created for each action, for example when a page is moved it is deleted and recreated!!
@@ -37,6 +35,25 @@ class LogPageOperationsTests(CMSTestCase):
     def setUp(self):
         pass
 
+    def _check_page_addition_log(self, page):
+
+        # Check to see if the page added log entry exists
+        self.assertEqual(1, LogEntry.objects.count())
+
+        # Check that the contents of the log is correct
+        log_entry = LogEntry.objects.all()[0]
+        message = '[{"added": {}}]'
+        self.assertEqual(message, log_entry.change_message)
+
+        # Check the action flag is set correctly
+        self.assertEqual(ADDITION, log_entry.action_flag)
+
+        # Check the object id is set correctly
+        self.assertEqual(str(page.pk), log_entry.object_id)
+
+        # Check the object_repr is set correctly
+        self.assertEqual(str(page), log_entry.object_repr)
+
     def test_log_for_create_admin_page(self):
         """
         Test that when a page is created on the UI using the page admin a log entry is created.
@@ -50,16 +67,7 @@ class LogPageOperationsTests(CMSTestCase):
             page_one_response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
 
-            # Check to see if the page added log entry exists
-            self.assertEqual(1, LogEntry.objects.count())
-
-            # Check that the contents of the log is correct
-            log_entry = LogEntry.objects.all()[0]
-            message = '[{"added": {}}]'
-            self.assertEqual(message, log_entry.change_message)
-
-            # Check the action flag is set correctly
-            self.assertEqual(ADDITION, log_entry.action_flag)
+            self._check_page_addition_log(page_one)
 
     def test_log_for_create_wizard_page(self):
         """
@@ -83,16 +91,7 @@ class LogPageOperationsTests(CMSTestCase):
 
         with self.login_user_context(superuser):
 
-            # Check to see if the page added log entry exists
-            self.assertEqual(1, LogEntry.objects.count())
-
-            # Check that the log message is correct
-            log_entry = LogEntry.objects.all()[0]
-            message = '[{"added": {}}]'
-            self.assertEqual(message, log_entry.change_message)
-
-            # Check the action flag is set correctly
-            self.assertEqual(ADDITION, log_entry.action_flag)
+            self._check_page_addition_log(page)
 
     def test_log_for_create_api_page(self):
         """
@@ -138,6 +137,12 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
 
+            # Check the object id is set correctly
+            self.assertEqual(str(page.pk), log_entry.object_id)
+
+            # Check the object_repr is set correctly
+            self.assertEqual(str(page), log_entry.object_repr)
+
     def test_log_for_move_admin_page(self):
         """
 
@@ -159,12 +164,16 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            message = '[{"moved": {}}]'
-            self.assertEqual(message, log_entry.change_message)
+            self.assertEqual("Moved", log_entry.change_message)
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
 
+            # Check the object id is set correctly
+            self.assertEqual(str(page_2.pk), log_entry.object_id)
+
+            # Check the object_repr is set correctly
+            self.assertEqual(str(page_2), log_entry.object_repr)
 
     def test_log_for_delete_admin_page(self):
         """
@@ -176,6 +185,8 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(superuser):
 
             page = create_page("page_a", "nav_playground.html", "en", published=False)
+            pre_delete_repr = str(page)
+
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
             post_data = {'post': 'yes'}
 
@@ -191,3 +202,9 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check the action flag is set correctly
             self.assertEqual(DELETION, log_entry.action_flag)
+
+            # Check the object id is set correctly
+            self.assertEqual(str(page.pk), log_entry.object_id)
+
+            # Check the object_repr is set correctly
+            self.assertEqual(pre_delete_repr, log_entry.object_repr)

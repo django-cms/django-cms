@@ -5,6 +5,7 @@ from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
 
 
+
 # TODO:
 #  - Add page Logging should be implemented in: AddPageForm so the wizard and admin form both fire the log as the wizard does not currently.
 #  - Title, Placeholder and Plugin operations
@@ -20,6 +21,7 @@ Issues with current solution:
 Considerations:
     - Allow others to add their own plugins into the logger???
     - Have a log helper that uses LogEntry and allows the removal of LogEntry at a later date.
+    - A page move event is recorded as CHANGE with no message. Manually added a Moved message
 
 Ideas:
     - Django admin keeps all logs in one area rather than spreading them out and potentially having them set inconsistently.
@@ -87,17 +89,13 @@ def log_page_move(request, page_object, message=""):
     Log that a page object has been successfully moved.
     """
 
-    # A message is set manually here due to LogEntry not having a "Page Moved" action flag
-    if message == "":
-        message = '[{"moved": {}}]'
-
     create_log(
         user_id=request.user.pk,
         content_type_id=ContentType.objects.get_for_model(page_object).pk,
         object_id=page_object.pk,
         object_repr=str(page_object),
         action_flag=CHANGE,
-        change_message=message,
+        change_message="Moved",
     )
 
 
