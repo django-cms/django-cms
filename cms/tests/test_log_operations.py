@@ -16,6 +16,8 @@ Dev helper code FIXME: REMOVEME:
     log_entries = LogEntry.objects.all()
     entry = LogEntry.objects.filter(user=user, object_id=instance_id, action_flag__in=(CHANGE,))[0]
     Check id's match in log self.assertEqual(page_data.pk, int(LogEntry.objects.all()[0].object_id))
+
+TODO: Test the correct flag is set!!
 """
 
 # Snippet taken from: test_wizards.py
@@ -124,6 +126,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_move_admin_page(self):
         """
+
         """
 
         superuser = self.get_superuser()
@@ -147,6 +150,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_delete_admin_page(self):
         """
+
         """
 
         superuser = self.get_superuser()

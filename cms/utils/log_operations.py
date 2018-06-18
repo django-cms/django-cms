@@ -75,7 +75,7 @@ def log_page_change(request, page_object, change_list):
     Log that a page object has been successfully changed.
     """
 
-    message = "Page %(page_id)s %(changes)s" % {'page_id': str(page_object.pk), 'changes': str(change_list)}
+    #message = "Page %(page_id)s %(changes)s" % {'page_id': str(page_object.pk), 'changes': str(change_list)}
 
     create_log(
         user_id=request.user.pk,
@@ -83,7 +83,7 @@ def log_page_change(request, page_object, change_list):
         object_id=page_object.pk,
         object_repr=str(page_object),
         action_flag=CHANGE,
-        change_message=message,
+        change_message=change_list,
     )
 
 
@@ -100,7 +100,7 @@ def log_page_move(request, page_object, message=None):
         content_type_id=ContentType.objects.get_for_model(page_object).pk,
         object_id=page_object.pk,
         object_repr=str(page_object),
-        action_flag=DELETION,
+        action_flag=CHANGE,
         change_message=message,
     )
 
@@ -118,7 +118,7 @@ def log_page_delete(request, page_object, object_repr, message=None):
         content_type_id=ContentType.objects.get_for_model(page_object).pk,
         object_id=page_object.pk,
         object_repr=object_repr,
-        action_flag=CHANGE,
+        action_flag=DELETION,
         change_message=message,
     )
 
