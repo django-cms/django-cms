@@ -9,10 +9,10 @@ from django.core.exceptions import ImproperlyConfigured
 CMS_CONFIG_NAME = 'cms_apps'
 
 
-def autodiscover_cms_files():
+def autodiscover_cms_configs():
     """
-    Find and import all cms_apps.py modules. Add a cms_app attribute
-    to django's app config.
+    Find and import all cms_apps.py files. Add a cms_app attribute
+    to django's app config with an instance of the cms config.
     """
     for app_config in apps.get_app_configs():
         try:
@@ -26,6 +26,7 @@ def autodiscover_cms_files():
                 raise
         else:
             cms_app_classes = []
+            # Find all classes that inherit from CMSAppConfig
             for name, obj in inspect.getmembers(cms_module):
                 is_cms_app_config = (
                     inspect.isclass(obj) and
@@ -48,25 +49,48 @@ def autodiscover_cms_files():
                     "class which inherits from CMSAppConfig")
 
 
-def register_cms_extensions():
+def get_cms_apps_with_features():
     """
-    Run register extension code for each cms app
+    Returns cms app configs of apps with features
     """
+    apps_with_features = []
+
     for app_config in apps.get_app_configs():
-        # The cms_app attr is added by the autodiscover_cms_files
+        # The cms_app attr is added by the autodiscover_cms_configs
         # function if a cms_apps.py file with a suitable class is found.
         is_cms_app = hasattr(app_config, 'cms_app')
-        # The register_extension method is only present on the cms app
-        # class if there is an extension to register. For classes that
-        # only have config this method will not be present.
         if is_cms_app:
+            # The register_extension method is only present on the cms
+            # app class if there is an extension to register. For
+            # classes that only have config this method will not be
+            # present.
             has_cms_extension = hasattr(
-                app_config.cms_app, 'register_extension')
+                app_config.cms_app, 'configure_app')
         else:
             has_cms_extension = False
-
         if is_cms_app and has_cms_extension:
-            app_config.cms_app.register_extension()
+            apps_with_features.append(app_config)
+
+    return apps_with_features
+
+
+def configure_cms_apps(apps_with_features):
+    """
+    Check installed apps for apps that are configured to use cms addons
+    and run code to register them with their config
+    """
+    for app_with_feature in apps_with_features:
+        enabled_property = "{app_name}_enabled".format(
+            app_name=app_with_feature.name)
+        configure_app = app_with_feature.cms_app.configure_app
+
+        for app_config in apps.get_app_configs():
+            if not hasattr(app_config, 'cms_app'):
+                # Not a cms app, so ignore
+                continue
+            if getattr(app_config.cms_app, enabled_property, False):
+                # Feature enabled for this app so configure
+                configure_app(app_config)
 
 
 class CMSAppConfig():
