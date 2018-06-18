@@ -1978,9 +1978,13 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
     });
 
     $document.on(Plugin.click, '.cms-dragarea-static .cms-dragbar', e => {
-        if (!e.isDefaultPrevented()) {
-            $(e.target).closest('.cms-dragarea').toggleClass('cms-dragarea-static-expanded');
+        const placeholder = $(e.target).closest('.cms-dragarea');
+
+        if (placeholder.hasClass('cms-dragarea-static-expanded') && e.isDefaultPrevented()) {
+            return;
         }
+
+        placeholder.toggleClass('cms-dragarea-static-expanded');
     });
 
     $window.on('blur.cms', () => {
