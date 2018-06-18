@@ -49,6 +49,21 @@ Page logs
 """
 
 
+def log_page_form_addition(user, page_object, message=""):
+    """
+    Log that a page object has been successfully created.
+    """
+
+    create_log(
+        user_id=user.pk,
+        content_type_id=ContentType.objects.get_for_model(page_object).pk,
+        object_id=page_object.pk,
+        object_repr=str(page_object),
+        action_flag=ADDITION,
+        change_message=message,
+    )
+
+
 def log_page_addition(request, page_object, message=""):
     """
     Log that a page object has been successfully created.

@@ -125,7 +125,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """
         Log that a page has been successfully added.
         """
-        log_page_addition(request, object, message)
+        #FIXME: The page wizard doesn't invoke this method!! This solution is the cleanest!
+        #log_page_addition(request, object, message)
+        pass
 
     def log_change(self, request, object, message):
         """

@@ -37,6 +37,13 @@ from cms.utils.permissions import (
 from menus.menu_pool import menu_pool
 
 
+from cms.utils.log_operations import log_page_form_addition
+from django.contrib.admin.utils import (
+    construct_change_message
+)
+
+
+
 def get_permission_accessor(obj):
     User = get_user_model()
 
@@ -294,6 +301,11 @@ class AddPageForm(BasePageForm):
             # its the first page. publish it right away
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
+
+        # Log page creation
+        change_message = construct_change_message(form=False, formsets=False, add=True)
+        log_page_form_addition(self._user, new_page, change_message)
+
         return new_page
 
 
