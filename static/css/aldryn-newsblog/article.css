@@ -1,9 +1,0 @@
-.aldryn-newsblog-article-search .results-list .unpublished,
-.aldryn-newsblog-article.unpublished {
-    background: #f9fcee url('../../img/aldryn_newsblog/unpublished.png') repeat; /* hsl(44, 70%, 97%) */
-}
-
-.aldryn-newsblog-article-search .results-list .future,
-.aldryn-newsblog-article.future {
-    background: #eefcfc url('../../img/aldryn_newsblog/future.png') repeat; /* hsl(181, 70%, 96%) */
-}
