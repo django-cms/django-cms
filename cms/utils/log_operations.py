@@ -52,13 +52,10 @@ Page logs
 """
 
 
-def log_page_addition(request, page_object, message=None):
+def log_page_addition(request, page_object, message=""):
     """
     Log that a page object has been successfully created.
     """
-
-    if not message:
-        message = "Page %(page_id)s added" % {'page_id': str(page_object.pk)}
 
     create_log(
         user_id=request.user.pk,
@@ -70,12 +67,10 @@ def log_page_addition(request, page_object, message=None):
     )
 
 
-def log_page_change(request, page_object, change_list):
+def log_page_change(request, page_object, change_list=""):
     """
     Log that a page object has been successfully changed.
     """
-
-    #message = "Page %(page_id)s %(changes)s" % {'page_id': str(page_object.pk), 'changes': str(change_list)}
 
     create_log(
         user_id=request.user.pk,
@@ -87,13 +82,14 @@ def log_page_change(request, page_object, change_list):
     )
 
 
-def log_page_move(request, page_object, message=None):
+def log_page_move(request, page_object, message=""):
     """
     Log that a page object has been successfully moved.
     """
 
-    if not message:
-        message = "Page %(page_id)s moved" % {'page_id': str(page_object.pk)}
+    # A message is set manually here due to LogEntry not having a "Page Moved" action flag
+    if message == "":
+        message = '[{"moved": {}}]'
 
     create_log(
         user_id=request.user.pk,
@@ -105,13 +101,10 @@ def log_page_move(request, page_object, message=None):
     )
 
 
-def log_page_delete(request, page_object, object_repr, message=None):
+def log_page_delete(request, page_object, object_repr, message=""):
     """
     Log that a page object has been successfully deleted.
     """
-
-    if not message:
-        message = "Page %(page_id)s deleted" % {'page_id': str(page_object.pk)}
 
     create_log(
         user_id=request.user.pk,

@@ -125,7 +125,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """
         Log that a page has been successfully added.
         """
-        log_page_addition(request, object)
+        log_page_addition(request, object, message)
 
     def log_change(self, request, object, message):
         """

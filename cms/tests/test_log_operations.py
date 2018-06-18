@@ -9,6 +9,9 @@ from cms.models.pagemodel import Page
 from cms.forms.wizards import CreateCMSPageForm
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
 
+
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+
 """
 Make sure that only one entry is created for each action, for example when a page is moved it is deleted and recreated!!
 
@@ -18,6 +21,8 @@ Dev helper code FIXME: REMOVEME:
     Check id's match in log self.assertEqual(page_data.pk, int(LogEntry.objects.all()[0].object_id))
 
 TODO: Test the correct flag is set!!
+
+Log messages are inconsistent atm regarding what's set for Move, Change and Delete messages
 """
 
 # Snippet taken from: test_wizards.py
@@ -50,8 +55,11 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            message = "Page %(page_id)s added" % {'page_id': str(page_one.pk)}
+            message = '[{"added": {}}]'
             self.assertEqual(message, log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(ADDITION, log_entry.action_flag)
 
     def test_log_for_create_wizard_page(self):
         """
@@ -78,10 +86,13 @@ class LogPageOperationsTests(CMSTestCase):
             # Check to see if the page added log entry exists
             self.assertEqual(1, LogEntry.objects.count())
 
-            # Check that the contents of the log is correct
+            # Check that the log message is correct
             log_entry = LogEntry.objects.all()[0]
-            message = "Page %(page_id)s added" % {'page_id': str(page.pk)}
+            message = '[{"added": {}}]'
             self.assertEqual(message, log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(ADDITION, log_entry.action_flag)
 
     def test_log_for_create_api_page(self):
         """
@@ -121,8 +132,11 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            message = "Page %(page_id)s [{'changed': {'fields': ['title']}}]" % {'page_id': str(page.pk)}
+            message = '[{"changed": {"fields": ["title"]}}]'
             self.assertEqual(message, log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(CHANGE, log_entry.action_flag)
 
     def test_log_for_move_admin_page(self):
         """
@@ -145,8 +159,12 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            message = "Page %(page_id)s moved" % {'page_id': str(page_2.pk)}
+            message = '[{"moved": {}}]'
             self.assertEqual(message, log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(CHANGE, log_entry.action_flag)
+
 
     def test_log_for_delete_admin_page(self):
         """
@@ -168,5 +186,8 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            message = "Page %(page_id)s deleted" % {'page_id': str(page.pk)}
+            message = ""
             self.assertEqual(message, log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(DELETION, log_entry.action_flag)
