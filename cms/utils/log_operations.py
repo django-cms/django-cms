@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 
 from django.contrib.contenttypes.models import ContentType
 
+from django.utils.translation import ugettext_lazy as _
 
 
 # TODO:
@@ -89,13 +91,16 @@ def log_page_move(request, page_object, message=""):
     Log that a page object has been successfully moved.
     """
 
+    if message == "":
+        message = _("Moved.")
+
     create_log(
         user_id=request.user.pk,
         content_type_id=ContentType.objects.get_for_model(page_object).pk,
         object_id=page_object.pk,
         object_repr=str(page_object),
         action_flag=CHANGE,
-        change_message="Moved",
+        change_message=message,
     )
 
 

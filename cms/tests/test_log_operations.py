@@ -21,6 +21,8 @@ Dev helper code FIXME: REMOVEME:
 TODO: Test the correct flag is set!!
 
 Log messages are inconsistent atm regarding what's set for Move, Change and Delete messages
+
+Using get_change_message vs change message???
 """
 
 # Snippet taken from: test_wizards.py
@@ -44,6 +46,9 @@ class LogPageOperationsTests(CMSTestCase):
         log_entry = LogEntry.objects.all()[0]
         message = '[{"added": {}}]'
         self.assertEqual(message, log_entry.change_message)
+        # FIXME: Keep both or one??
+        message = 'Added.'
+        self.assertEqual(message, log_entry.get_change_message())
 
         # Check the action flag is set correctly
         self.assertEqual(ADDITION, log_entry.action_flag)
@@ -107,7 +112,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_change_admin_page(self):
         """
-        Test that a page edit is logged
+        Test that a page edit is logged correctly
         """
 
         superuser = self.get_superuser()
@@ -133,6 +138,9 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
             message = '[{"changed": {"fields": ["title"]}}]'
             self.assertEqual(message, log_entry.change_message)
+            # FIXME: Keep both or one??
+            message = 'Changed title.'
+            self.assertEqual(message, log_entry.get_change_message())
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
@@ -145,7 +153,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_move_admin_page(self):
         """
-
+        Test that a page move is logged correctly
         """
 
         superuser = self.get_superuser()
@@ -164,7 +172,11 @@ class LogPageOperationsTests(CMSTestCase):
 
             # Check that the contents of the log is correct
             log_entry = LogEntry.objects.all()[0]
-            self.assertEqual("Moved", log_entry.change_message)
+            message = 'Moved.'
+            self.assertEqual(message, log_entry.change_message)
+            # FIXME: Keep both or one??
+            message = "Moved."
+            self.assertEqual(message, log_entry.get_change_message())
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
@@ -177,7 +189,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_delete_admin_page(self):
         """
-
+        Test that a page delete is logged correctly
         """
 
         superuser = self.get_superuser()
@@ -199,6 +211,9 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
             message = ""
             self.assertEqual(message, log_entry.change_message)
+            # FIXME: Keep both or one??
+            message = ""
+            self.assertEqual(message, log_entry.get_change_message())
 
             # Check the action flag is set correctly
             self.assertEqual(DELETION, log_entry.action_flag)
