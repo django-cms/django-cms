@@ -46,7 +46,7 @@ Apphooks for namespaced applications
 Your application should use :ref:`namespaced URLs <django:topics-http-defining-url-namespaces>`.
 
 In the example above, the application uses the ``myapp`` namespace. Your ``CMSApp``
-sub-class must reflect the application's namespace in the ``app_name`` attribute.
+sub-class **must reflect the application's namespace** in the ``app_name`` attribute.
 
 The application may specify a namespace by supplying an ``app_name`` in its ``urls.py``, or its
 documentation might advise that you when include its URLs, you do it thus:
@@ -55,7 +55,7 @@ documentation might advise that you when include its URLs, you do it thus:
 
     url(r'^myapp/', include('myapp.urls', app_name='myapp'))
 
-If you fail to this, then any templates in the application that invoke URLs using the form ``{% url
+If you fail to do this, then any templates in the application that invoke URLs using the form ``{% url
 'myapp:index' %}`` or views that call (for example) ``reverse('myapp:index')`` will throw a
 ``NoReverseMatch`` error.
 
@@ -67,7 +67,7 @@ If you are writing apphooks for third-party applications, you may find one that 
 not have an application namespace for its URLs. Such an application is liable to tun into namespace
 conflicts, and doesn't represent good practice.
 
-However if you *do* encounter such a beast, your apphook for it will need to do without the
+However if you *do* encounter such an application, your own apphook for it will need in turn to forgo the
 ``app_name`` attribute.
 
 Note that unlike apphooks without ``app_name`` attributes can be attached only to one page at a
@@ -125,7 +125,8 @@ Otherwise, you will need to restart the server manually.
 Using an apphook
 ****************
 
-Once your apphook has been set up and loaded, you'll now be able to select the *Application* that's hooked into that page from its *Advanced settings*.
+Once your apphook has been set up and loaded, you'll now be able to select the *Application* that's
+hooked into that page from its *Advanced settings*.
 
 .. note::
 
@@ -155,9 +156,9 @@ Sub-pages of an apphooked page
 
     Don't add child pages to a page with an apphook.
 
-The apphook "swallows" all URLs below that of the page, handing them over to the attached
-application. If you have any child pages of the apphooked page, django CMS will not be
-able to serve them reliably.
+    The apphook "swallows" all URLs below that of the page, handing them over to the attached
+    application. If you have any child pages of the apphooked page, django CMS will not be
+    able to serve them reliably.
 
 
 *****************
@@ -167,7 +168,7 @@ Managing apphooks
 Uninstalling an apphook with applied instances
 ==============================================
 
-If you remove an apphook class (in effect uninstalling it) from your system that still has
+If you remove an apphook class from your system (in effect uninstalling it) that still has
 instances applied to pages, django CMS tries to handle this as gracefully as possible:
 
 * Affected pages still maintain a record of the applied apphook; if the apphook class is
@@ -181,7 +182,7 @@ instances applied to pages, django CMS tries to handle this as gracefully as pos
 Management commands
 ===================
 
-You can clear uninstalled apphook instances using a CMS management command ``uninstall apphooks``; for example::
+You can clear uninstalled apphook instances using the CMS management command ``uninstall apphooks``. For example::
 
     manage.py cms uninstall apphooks MyApphook MyOtherApphook
 
@@ -240,7 +241,7 @@ and all its URLs will have the same requirements.
 
 To disable this behaviour set ``permissions = False`` on your apphook::
 
-    class SampleApp(CMSApp):
+    class MyApphook(CMSApp):
         [...]
         permissions = False
 
@@ -254,9 +255,9 @@ Here is a simple example::
     def my_view(request, **kw):
         ...
 
-If you have your own permission checks in your application, then use ``exclude_permissions`` property of the apphook::
+If you make your own permission checks in your application, then use the ``exclude_permissions`` property of the apphook::
 
-    class SampleApp(CMSApp):
+    class MyApphook(CMSApp):
         [...]
         permissions = True
         exclude_permissions = ["some_nested_app"]
@@ -285,8 +286,8 @@ the signal ``cms.signals.urls_need_reloading``.
     Django applications, there is no way we can provide a generic solution for
     this problem that will always work.
 
-    The signal is fired **after** a request. If you change something via an API
-    you'll need a request for the signal to fire.
+    The signal is fired **after** a request - for example, upon saving a page's settings. If you
+    change and apphook's setting via an API the signal won't fire until a subsequent request.
 
 
 **************************************
