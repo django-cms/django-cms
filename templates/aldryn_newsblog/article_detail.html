@@ -52,7 +52,7 @@
                 </div>
                 <p class="tags mb-5">
                     {% for tag in article.tags.all %}
-                        <a class="badge badge-pill badge-secondary" href="{% namespace_url 'article-list-by-tag' tag=tag.slug namespace=namespace default='' %}">{{ tag.name }}</a>
+                        <a class="badge mb-1 badge-pill badge-secondary" href="{% namespace_url 'article-list-by-tag' tag=tag.slug namespace=namespace default='' %}">{{ tag.name }}</a>
                     {% endfor %}
                 </p>
             </div>
