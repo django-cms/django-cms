@@ -4,8 +4,6 @@ from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
-# TODO:
-#  - Add page Logging should be implemented in: AddPageForm so the wizard and admin form both fire the log as the wizard does not currently.
 
 """
 Logs are all collected here to keep the messages and contents consistent across all operations.
