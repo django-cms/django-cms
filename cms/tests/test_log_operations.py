@@ -21,7 +21,7 @@ class LogPageOperationsTests(CMSTestCase):
     def setUp(self):
         pass
 
-    def _check_page_addition_log(self, page):
+    def _assert_page_addition_log_created(self, page):
 
         # Check to see if the page added log entry exists
         self.assertEqual(1, LogEntry.objects.count())
@@ -56,7 +56,7 @@ class LogPageOperationsTests(CMSTestCase):
             page_one_response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
 
-            self._check_page_addition_log(page_one)
+            self._assert_page_addition_log_created(page_one)
 
     def test_log_for_create_wizard_page(self):
         """
@@ -80,7 +80,7 @@ class LogPageOperationsTests(CMSTestCase):
 
         with self.login_user_context(superuser):
 
-            self._check_page_addition_log(page)
+            self._assert_page_addition_log_created(page)
 
     def test_log_for_create_api_page(self):
         """
