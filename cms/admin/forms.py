@@ -5,6 +5,9 @@ from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.contrib.admin.utils import (
+    construct_change_message
+)
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
@@ -34,14 +37,9 @@ from cms.utils.permissions import (
     get_subordinate_groups,
     get_user_permission_level,
 )
-from menus.menu_pool import menu_pool
-
-
 from cms.utils.log_operations import log_page_form_addition
-from django.contrib.admin.utils import (
-    construct_change_message
-)
 
+from menus.menu_pool import menu_pool
 
 
 def get_permission_accessor(obj):
