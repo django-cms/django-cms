@@ -32,15 +32,15 @@
 {% block newsblog_content %}
     <div class="aldryn-newsblog-detail mt--7">
         {% if article.featured_image_id %}
-            <div class="row">
-                <div class="col-12 col-md-8 offset-md-2 text-center">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8 text-center">
                     <img class="img-fluid mb-5" src="{% thumbnail article.featured_image 800x450 crop subject_location=article.featured_image.subject_location %}" alt="{{ article.featured_image.alt }}" class="img-responsive">
                 </div>
             </div>
         {% endif %}
 
         <div class="row justify-content-center">
-            <div class="col-12 col-md-7">
+            <div class="col-12 col-md-9 col-lg-7">
                 {% if article.lead_in %}
                 <div class="lead mb-3">
                     {% render_model article "lead_in" %}
@@ -60,7 +60,7 @@
 
         {% if article.author %}
         <div class="row justify-content-center">
-            <div class="col-12 col-md-8">
+            <div class="col-12 col-md-10 col-lg-8">
                 <div class="aldryn-newsblog-detail-author">
                     <div class="media">
                         {% if article.author.visual %}
