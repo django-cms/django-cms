@@ -75,7 +75,7 @@ from cms.utils.i18n import (
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-from cms.utils.log_operations import log_page_addition, log_page_change, log_page_move, log_page_delete
+from cms.utils.log_operations import log_page_change, log_page_move, log_page_delete
 
 require_POST = method_decorator(require_POST)
 

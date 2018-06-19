@@ -53,7 +53,7 @@ class LogPageOperationsTests(CMSTestCase):
 
         with self.login_user_context(superuser):
 
-            page_one_response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
             page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
 
             self._assert_page_addition_log_created(page_one)
@@ -89,7 +89,7 @@ class LogPageOperationsTests(CMSTestCase):
         """
 
         # Create  a page
-        page_data = create_page('home', 'nav_playground.html', 'en', published=True)
+        create_page('home', 'nav_playground.html', 'en', published=True)
 
         # Check to see if any logs exist, none should exist
         self.assertEqual(0, LogEntry.objects.count())
@@ -104,16 +104,16 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(superuser):
 
             page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
 
             # Empty any logs
             LogEntry.objects.all().delete()
 
             # Get and edit the page
-            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
+            self.client.get(URL_CMS_PAGE_CHANGE % page.id)
             page_data['title'] = 'changed title'
-            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
+            self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
 
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
@@ -144,12 +144,12 @@ class LogPageOperationsTests(CMSTestCase):
 
         with self.login_user_context(superuser):
 
-            page_home = create_page("page_home", "nav_playground.html", "en", published=False)
+            create_page("page_home", "nav_playground.html", "en", published=False)
             page_1 = create_page("page_a", "nav_playground.html", "en", published=False)
             page_2 = create_page("page_b", "nav_playground.html", "en", published=False)
 
             # move pages
-            response = self.client.post(URL_CMS_PAGE_MOVE % page_2.pk, {"target": page_1.pk, "position": "0"})
+            self.client.post(URL_CMS_PAGE_MOVE % page_2.pk, {"target": page_1.pk, "position": "0"})
 
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
@@ -186,7 +186,7 @@ class LogPageOperationsTests(CMSTestCase):
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
             post_data = {'post': 'yes'}
 
-            response = self.client.post(endpoint, post_data)
+            self.client.post(endpoint, post_data)
 
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
