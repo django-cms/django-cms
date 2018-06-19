@@ -25,6 +25,7 @@
     {% if instance.width %} width="{{ instance.width }}"{% endif %}
     {% if instance.height %} height="{{ instance.height }}"{% endif %}
     {{ instance.attributes_str }}
+    {% if not instance.picture.default_alt_text and not instance.attributes.alt %} alt=""{% endif %}
 >
 
 {# start render figure/figcaption #}
