@@ -35,6 +35,8 @@ class AutodiscoverTestCase(CMSTestCase):
     def test_imports_cms_apps_files(self):
         app_registration.autodiscover_cms_configs()
 
+        # Make sure all the cms apps/files are imported during the cms
+        # config autodiscover
         loaded = set([
             str(module) for module in sys.modules
             if 'cms.tests.test_app_registry' in module])
@@ -52,6 +54,9 @@ class AutodiscoverTestCase(CMSTestCase):
         'cms.tests.test_app_registry.app_with_bad_cms_file',
     ])
     def test_raises_exception_raised_in_cms_file(self):
+        # The cms file is badly written and raises a KeyError. We need
+        # to make sure the exception definitely bubbles up and doesn't
+        # get caught.
         with self.assertRaises(KeyError):
             app_registration.autodiscover_cms_configs()
 
@@ -62,6 +67,8 @@ class AutodiscoverTestCase(CMSTestCase):
     def test_adds_cms_app_attribute_to_django_app_config(self):
         app_registration.autodiscover_cms_configs()
 
+        # If a cms config is defined, add a cms_app attribute to the
+        # django app config instance. Otherwise don't.
         app_list = [app for app in apps.get_app_configs()]
         self.assertTrue(hasattr(app_list[0], 'cms_app'))
         self.assertEqual(
@@ -72,6 +79,7 @@ class AutodiscoverTestCase(CMSTestCase):
         'cms.tests.test_app_registry.app_without_cms_app_class',
     ])
     def test_raises_exception_when_no_cms_app_class_found_in_cms_file(self):
+        # No cms config defined in the cms file so raise exception
         with self.assertRaises(ImproperlyConfigured):
             app_registration.autodiscover_cms_configs()
 
@@ -79,6 +87,7 @@ class AutodiscoverTestCase(CMSTestCase):
         'cms.tests.test_app_registry.app_with_two_cms_app_classes',
     ])
     def test_raises_exception_when_more_than_one_cms_app_class_found_in_cms_file(self):
+        # More than one cms config defined so raise exception
         with self.assertRaises(ImproperlyConfigured):
             app_registration.autodiscover_cms_configs()
 
@@ -106,6 +115,8 @@ class GetCmsAppsWithFeaturesTestCase(CMSTestCase):
 
         apps_with_features = app_registration.get_cms_apps_with_features()
 
+        # Of the 4 installed apps only 2 have features (1 is a
+        # non-cms app and 1 is a cms app without a feature)
         self.assertListEqual(
             apps_with_features,
             [app_with_cms_ext1, app_with_cms_ext2])
@@ -122,18 +133,20 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         feature_app.name = 'djangocms_feature_x'
         feature_app.cms_app = Mock(spec=['configure_app'])
         # Set up app that makes use of djangocms_feature_x
-        config_app_enabled = Mock(spec=AppConfig)
-        config_app_enabled.cms_app = Mock(
+        config_app = Mock(spec=AppConfig)
+        config_app.cms_app = Mock(
             spec=['djangocms_feature_x_enabled'])
-        config_app_enabled.cms_app.djangocms_feature_x_enabled = True
+        config_app.cms_app.djangocms_feature_x_enabled = True
         # Pretend these mocked apps are in INSTALLED_APPS
         mocked_apps.return_value = [
-            feature_app, config_app_enabled]
+            feature_app, config_app]
 
         app_registration.configure_cms_apps([feature_app])
 
+        # If an app has enabled a feature, the configure method
+        # for that feature should have run with that app as the arg
         feature_app.cms_app.configure_app.assert_called_once_with(
-            config_app_enabled)
+            config_app)
 
     @patch.object(apps, 'get_app_configs')
     def test_doesnt_run_configure_app_method_for_disabled_app(
@@ -158,6 +171,8 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
 
         app_registration.configure_cms_apps([feature_app])
 
+        # If an app has not enabled a feature, the configure method
+        # for that feature should not have been run for that app
         self.assertFalse(feature_app.cms_app.configure_app.called)
 
     @patch.object(apps, 'get_app_configs')
@@ -173,6 +188,8 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         # Pretend these mocked apps are in INSTALLED_APPS
         mocked_apps.return_value = [feature_app, non_cms_app]
 
+        # An app that does not define a cms config should just be
+        # ignored and not cause any exceptions
         try:
             app_registration.configure_cms_apps([feature_app])
         except AttributeError:
