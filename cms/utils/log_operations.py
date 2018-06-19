@@ -6,30 +6,12 @@ from django.utils.translation import ugettext_lazy as _
 
 
 """
-Logs are all collected here to keep the messages and contents consistent across all operations.
-May seem repetitive but allows each log to be unique for different circumstances.
-Method names make the log being created clear and concise
-
-Issues with current solution:
-    - A log entry isn't created when a page is created using the new page wizard. Again showing a flaw with testing via the API and not the actual fn's!!
-    - Difficult to find the log page creation in the current solution!! The existing implementation,uses the LogEntry model directly, others use the ModelAdmin Implementation. There should be one way where possible!!
-
-Design Considerations:
-    - Allow plugins to integrate with the CMS logger??
-    - A log helper method "create_log" that uses LogEntry and allows the removal of LogEntry at a later date.
-    - A page move event is recorded as CHANGE with no message. A "Moved." message has been manually added
-    - Django admin keeps all logs in one area rather than spreading them out and potentially having them set inconsistently and scattered in multiple files.
-"""
-
-
-"""
 Log helper
 """
 
 
 def create_log(user_id, content_type_id, object_id, object_repr, action_flag, change_message):
     """
-    Helper method
     Although this function is repetitive it allows external plugins to access the same logging mechanisms as the cms
     It also removes the dependency of the admin LogEntry in any other Django CMS code
     """
@@ -97,6 +79,7 @@ def log_page_move(request, page_object, message=""):
     Log that a page object has been successfully moved.
     """
 
+    # FIXME: REMOVEME: @Paulo this is set due to the fact that a page move is a CHANGE but no fields are changed so Django sets it as an empty message by default
     if message == "":
         message = _("Moved.")
 

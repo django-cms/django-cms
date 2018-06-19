@@ -60,7 +60,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_create_wizard_page(self):
         """
-        Test that when a page is created via the create page wizard UI a log entry is created.
+        Test that when a page is created via the create page wizard a log entry is created.
         """
 
         superuser = self.get_superuser()
