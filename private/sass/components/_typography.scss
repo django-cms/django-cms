@@ -133,3 +133,14 @@ p:last-child {
     line-height: rem(15px);
     letter-spacing: rem(2px);
 }
+
+pre {
+    border-radius: $border-radius;
+    background-color: $gray-200;
+    padding: 1rem;
+
+    .text-block & {
+        margin-left: -1rem;
+        margin-right: -1rem;
+    }
+}
