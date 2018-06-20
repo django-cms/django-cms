@@ -27,16 +27,11 @@ a .icon {
     }
 }
 
-.icon-white {
-    svg,
-    use {
-        fill: white;
-    }
-}
-
-.icon-blue {
-    svg,
-    use {
-        fill: theme-color(primary);
+@each $name, $color in $theme-colors {
+    .icon-#{$name} {
+        svg,
+        use {
+            fill: $color;
+        }
     }
 }
