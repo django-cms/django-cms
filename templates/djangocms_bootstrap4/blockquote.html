@@ -1,0 +1,11 @@
+{% load i18n cms_tags %}
+
+<blockquote {{ instance.attributes_str }}>
+    {% include 'includes/icon.html' with icon='quote' %}
+    {{ instance.quote_content }}
+    {% if instance.quote_origin %}
+        <footer class="blockquote-footer">
+            <cite title="{{ instance.quote_origin }}">{{ instance.quote_origin }}</cite>
+        </footer>
+    {% endif %}
+</blockquote>

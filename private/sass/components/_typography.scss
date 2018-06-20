@@ -144,3 +144,41 @@ pre {
         margin-right: -1rem;
     }
 }
+
+.blockquote {
+    font-weight: 300;
+    color: theme-color(secondary);
+    font-size: rem(22px);
+    line-height: rem(32px);
+    text-align: center !important;
+    margin-top: rem(22px);
+    margin-bottom: rem(22px);
+
+    .icon-quote {
+        display: block;
+        width: 20px;
+        height: 20px;
+        margin: 0 auto rem(22px);
+        fill: theme-color(primary);
+    }
+}
+
+.blockquote-footer {
+    margin-top: rem(22px);
+    text-align: center !important;
+
+    &:before {
+        content: '';
+    }
+
+    &,
+    cite {
+        font-weight: bold;
+        font-size: rem(18px);
+        line-height: rem(22px);
+        font-style: normal;
+        text-transform: uppercase;
+        color: $body-color;
+        letter-spacing: rem(3px);
+    }
+}
