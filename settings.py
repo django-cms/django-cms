@@ -16,6 +16,7 @@ INSTALLED_ADDONS = [
     'aldryn-newsblog',
     'divio-styleguide',
     'djangocms-bootstrap4',
+    'djangocms-file',
     'djangocms-history',
     'djangocms-icon',
     'djangocms-link',
