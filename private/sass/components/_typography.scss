@@ -182,3 +182,12 @@ pre {
         letter-spacing: rem(3px);
     }
 }
+
+figure {
+    img + figcaption {
+        display: block;
+        margin-top: 5px;
+        color: theme-color(secondary);
+        font-size: rem(14px);
+    }
+}
