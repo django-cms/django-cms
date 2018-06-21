@@ -15,8 +15,11 @@ class SomeClass():
 
 class CMSSomeFeatureConfig(CMSAppConfig):
 
+    num_configured_apps = 0
+
     def configure_app(self, app):
-        pass
+        app.cms_app.configured = True
+        self.num_configured_apps += 1
 
 
 class SomeOtherClass():

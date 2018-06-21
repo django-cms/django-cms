@@ -2,6 +2,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from cms.utils.compat.dj import is_installed as app_is_installed
+from cms.app_registration import (
+    autodiscover_cms_configs, get_cms_apps_with_features,
+    configure_cms_apps)
 
 
 def validate_dependencies():
@@ -43,7 +46,9 @@ def setup():
 def setup_cms_apps():
     """
     Check for django apps which provide functionality that extends the
-    cms. Autodiscover all apps which have configs that declare use of
+    cms. Configure all apps which have configs that declare use of
     any of this functionality.
     """
-    pass
+    autodiscover_cms_configs()
+    apps_with_cms_features = get_cms_apps_with_features()
+    configure_cms_apps(apps_with_cms_features)
