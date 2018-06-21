@@ -50,11 +50,16 @@
                 <div class="text-block">
                     {% render_placeholder article.content language placeholder_language %}
                 </div>
+                {% comment %}
+                I talked to Mathias and he said that since we have categories
+                and there can be multiple of them per article then we don't
+                really need the tags. No one really uses them for articles anyway at the moment
                 <p class="tags mb-5">
                     {% for tag in article.tags.all %}
                         <a class="badge mb-1 badge-pill badge-secondary" href="{% namespace_url 'article-list-by-tag' tag=tag.slug namespace=namespace default='' %}">{{ tag.name }}</a>
                     {% endfor %}
                 </p>
+                {% endcomment %}
             </div>
         </div>
 

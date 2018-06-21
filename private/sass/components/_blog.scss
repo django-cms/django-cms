@@ -106,11 +106,12 @@
 
 .article-tile-short {
     .article-tile-img {
-        height: 280px;
+        height: 207px;
         display: flex;
         flex: 0 0 auto;
-        height: 100%;
-        margin: 0 -15px;
+
+        // margin: 0 -15px;
+
     }
 
     > .row {

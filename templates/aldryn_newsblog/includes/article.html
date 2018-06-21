@@ -5,8 +5,13 @@
     {% if long %}<div class="row">{% endif %}
         {% if article.featured_image_id %}
         <div class="article-tile-img">
-            <div class="article-img" style="background-image: url({% thumbnail article.featured_image 380x280 crop subject_location=article.featured_image.subject_location %})">
+            {% if article.is_featured %}
+            <div class="article-img" style="background-image: url({% thumbnail article.featured_image 800x450 crop subject_location=article.featured_image.subject_location %})">
             </div>
+            {% else %}
+            <div class="article-img" style="background-image: url({% thumbnail article.featured_image 380x207 crop subject_location=article.featured_image.subject_location %})">
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 

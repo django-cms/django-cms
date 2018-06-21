@@ -44,8 +44,8 @@
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-item" href="?page={{ page_obj.next_page_number }}" aria-label="{% trans 'Next' %}" title="{% trans 'Next' %}">
-                    <span class="page-link" aria-hidden="true">&rsaquo;</span>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="{% trans 'Next' %}" title="{% trans 'Next' %}">
+                    <span aria-hidden="true">&rsaquo;</span>
                 </a>
             </li>
             {% if page_obj.number < paginator.num_pages|add:pagination.pages_visible_negative %}
