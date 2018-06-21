@@ -6,12 +6,12 @@ from django.utils.module_loading import module_has_submodule
 from django.core.exceptions import ImproperlyConfigured
 
 
-CMS_CONFIG_NAME = 'cms_apps'
+CMS_CONFIG_NAME = 'cms_config'
 
 
 def autodiscover_cms_configs():
     """
-    Find and import all cms_apps.py files. Add a cms_app attribute
+    Find and import all cms_config.py files. Add a cms_app attribute
     to django's app config with an instance of the cms config.
     """
     for app_config in apps.get_app_configs():
@@ -19,9 +19,9 @@ def autodiscover_cms_configs():
             cms_module = import_module(
                 '%s.%s' % (app_config.name, CMS_CONFIG_NAME))
         except:
-            # If something in cms_apps.py raises an exception let that
+            # If something in cms_config.py raises an exception let that
             # exception bubble up. Only catch the exception if
-            # cms_apps.py doesn't exist
+            # cms_config.py doesn't exist
             if module_has_submodule(app_config.module, CMS_CONFIG_NAME):
                 raise
         else:
@@ -43,15 +43,10 @@ def autodiscover_cms_configs():
                 # all kinds of limitations as to what can be imported
                 # in django's apps.py and this could cause issues
                 app_config.cms_app = cms_app_classes[0]()
-            # TODO: Reinstate the exception once decision made with
-            # Paulo on what the filename should be. cms_apps.py as a
-            # name causes all tests to fail because
-            # test_utils.project.sampleapp contains a cms_apps.py which
-            # is not used for app registration
-            #~ else:
-                #~ raise ImproperlyConfigured(
-                    #~ "cms_apps.py files must define exactly one "
-                    #~ "class which inherits from CMSAppConfig")
+            else:
+                raise ImproperlyConfigured(
+                    "cms_config.py files must define exactly one "
+                    "class which inherits from CMSAppConfig")
 
 
 def get_cms_apps_with_features():
@@ -62,7 +57,7 @@ def get_cms_apps_with_features():
 
     for app_config in apps.get_app_configs():
         # The cms_app attr is added by the autodiscover_cms_configs
-        # function if a cms_apps.py file with a suitable class is found.
+        # function if a cms_config.py file with a suitable class is found.
         is_cms_app = hasattr(app_config, 'cms_app')
         if is_cms_app:
             # The configure_app method is only present on the cms
