@@ -18,12 +18,18 @@ class AutodiscoverTestCase(CMSTestCase):
         """Helper method to clear imports"""
         sys.path_importer_cache.clear()
 
-        sys.modules.pop('cms.tests.test_app_registry.app_without_cms_file', None)
         sys.modules.pop('cms.tests.test_app_registry', None)
-        sys.modules.pop('cms.tests.test_app_registry.app_with_cms_feature.models', None)
-        sys.modules.pop('cms.tests.test_app_registry.app_without_cms_file.models', None)
         sys.modules.pop('cms.tests.test_app_registry.app_with_cms_feature', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_with_cms_feature.apps', None)
         sys.modules.pop('cms.tests.test_app_registry.app_with_cms_feature.cms_apps', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_with_cms_feature.models', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_with_bad_cms_file', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_with_bad_cms_file.apps', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_with_bad_cms_file.cms_apps', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_with_bad_cms_file.models', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_without_cms_file', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_without_cms_file.apps', None)
+        sys.modules.pop('cms.tests.test_app_registry.app_without_cms_file.models', None)
 
     def setUp(self):
         self._clear_autodiscover_imports()
@@ -44,14 +50,14 @@ class AutodiscoverTestCase(CMSTestCase):
             str(module) for module in sys.modules
             if 'cms.tests.test_app_registry' in module])
         expected = set([
+            'cms.tests.test_app_registry',
+            'cms.tests.test_app_registry.app_with_cms_feature',
+            'cms.tests.test_app_registry.app_with_cms_feature.apps',
+            'cms.tests.test_app_registry.app_with_cms_feature.cms_apps',
+            'cms.tests.test_app_registry.app_with_cms_feature.models',
             'cms.tests.test_app_registry.app_without_cms_file',
             'cms.tests.test_app_registry.app_without_cms_file.apps',
-            'cms.tests.test_app_registry',
-            'cms.tests.test_app_registry.app_with_cms_feature.models',
             'cms.tests.test_app_registry.app_without_cms_file.models',
-            'cms.tests.test_app_registry.app_with_cms_feature',
-            'cms.tests.test_app_registry.app_with_cms_feature.cms_apps',
-            'cms.tests.test_app_registry.app_with_cms_feature.apps'
         ])
         self.assertSetEqual(loaded, expected)
 
@@ -59,7 +65,7 @@ class AutodiscoverTestCase(CMSTestCase):
         'cms.tests.test_app_registry.app_with_bad_cms_file',
     ])
     def test_raises_exception_raised_in_cms_file(self):
-        # The cms file is badly written and raises a KeyError. We need
+        # The cms file intentionally raises a KeyError. We need
         # to make sure the exception definitely bubbles up and doesn't
         # get caught.
         with self.assertRaises(KeyError):
@@ -80,6 +86,10 @@ class AutodiscoverTestCase(CMSTestCase):
             app_list[0].cms_app.__class__.__name__, 'CMSSomeFeatureConfig')
         self.assertFalse(hasattr(app_list[1], 'cms_app'))
 
+    # TODO: Reinstate these tests once decision made with Paulo on
+    # filename. At present having this feature causes all tests to fail
+    # because test_utils.project.sampleapp contains a cms_apps.py which
+    # is not used for app registration
     #~ @override_settings(INSTALLED_APPS=[
         #~ 'cms.tests.test_app_registry.app_without_cms_app_class',
     #~ ])

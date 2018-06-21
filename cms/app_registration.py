@@ -43,6 +43,11 @@ def autodiscover_cms_configs():
                 # all kinds of limitations as to what can be imported
                 # in django's apps.py and this could cause issues
                 app_config.cms_app = cms_app_classes[0]()
+            # TODO: Reinstate the exception once decision made with
+            # Paulo on what the filename should be. cms_apps.py as a
+            # name causes all tests to fail because
+            # test_utils.project.sampleapp contains a cms_apps.py which
+            # is not used for app registration
             #~ else:
                 #~ raise ImproperlyConfigured(
                     #~ "cms_apps.py files must define exactly one "
