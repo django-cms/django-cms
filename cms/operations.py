@@ -13,7 +13,9 @@ ADD_PLUGINS_FROM_PLACEHOLDER = 'add_plugins_from_placeholder'
 CLEAR_PLACEHOLDER = 'clear_placeholder'
 
 # Page operations
+ADD_PAGE = 'add_page'
 MOVE_PAGE = 'move_page'
+CHANGE_PAGE = 'change_page'
 DELETE_PAGE = 'delete_page'
 
 # Page translation operations

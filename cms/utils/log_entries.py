@@ -7,14 +7,16 @@ from django.utils.translation import ugettext_lazy as _
 
 """
 Log helper
-"""
+
+
+
+def page_log_handler(operation_type):
+    pass
 
 
 def create_log(user_id, content_type_id, object_id, object_repr, action_flag, change_message):
-    """
     Although this function is repetitive it allows external plugins to access the same logging mechanisms as the cms
     It also removes the dependency of the admin LogEntry in any other Django CMS code
-    """
     return LogEntry.objects.log_action(
         user_id=user_id,
         content_type_id=content_type_id,
@@ -24,15 +26,14 @@ def create_log(user_id, content_type_id, object_id, object_repr, action_flag, ch
         change_message=change_message,
     )
 
-"""
-Page logs
-"""
+
+## Page logs
+
 
 
 def log_page_form_addition(user, page_object, message=""):
-    """
-    Log that a page object has been successfully created.
-    """
+
+    # Log that a page object has been successfully created.
 
     create_log(
         user_id=user.pk,
@@ -45,9 +46,7 @@ def log_page_form_addition(user, page_object, message=""):
 
 
 def log_page_addition(request, page_object, message=""):
-    """
-    Log that a page object has been successfully created.
-    """
+    # Log that a page object has been successfully created.
 
     create_log(
         user_id=request.user.pk,
@@ -60,9 +59,7 @@ def log_page_addition(request, page_object, message=""):
 
 
 def log_page_change(request, page_object, change_list=""):
-    """
-    Log that a page object has been successfully changed.
-    """
+    #Log that a page object has been successfully changed.
 
     create_log(
         user_id=request.user.pk,
@@ -75,9 +72,7 @@ def log_page_change(request, page_object, change_list=""):
 
 
 def log_page_move(request, page_object, message=""):
-    """
-    Log that a page object has been successfully moved.
-    """
+    # Log that a page object has been successfully moved.
 
     # FIXME: REMOVEME: @Paulo this is set due to the fact that a page move is a CHANGE but no fields are changed so Django sets it as an empty message by default
     if message == "":
@@ -94,9 +89,7 @@ def log_page_move(request, page_object, message=""):
 
 
 def log_page_delete(request, page_object, object_repr, message=""):
-    """
-    Log that a page object has been successfully deleted.
-    """
+    # Log that a page object has been successfully deleted.
 
     create_log(
         user_id=request.user.pk,
@@ -109,14 +102,14 @@ def log_page_delete(request, page_object, object_repr, message=""):
 
 
 # TODO:
-"""
-Title logs
-"""
 
-"""
-Placeholder logs
-"""
+# Title logs
 
-"""
-Plugin logs
+
+
+# Placeholder logs
+
+
+
+# Plugin logs
 """
