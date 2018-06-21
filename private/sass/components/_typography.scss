@@ -104,21 +104,71 @@ p:last-child {
 }
 
 .text-block {
+    // 32
+    // 28
+    // 24
+    // 18
+    // 16
     h2 {
         font-size: $h4-font-size;
+        margin-top: rem(40px);
+        margin-bottom: rem(10px);
+
+        &:first-child {
+            margin-top: 0px;
+        }
     }
 
     h3 {
-        font-weight: bold;
-        font-size: rem(18px);
-        line-height: rem(28px);
-        letter-spacing: rem(1.8px);
+        // font-weight: bold;
+        font-size: rem(28px);
+        line-height: 1.1;
+
+        // text-transform: uppercase;
+        // color: $body-color;
+        margin-top: rem(50px);
+        margin-bottom: rem(10px);
+    }
+
+    h4 {
+        font-size: rem(20px);
+        line-height: 1.1;
         text-transform: uppercase;
         color: $body-color;
+        font-weight: 600;
+        margin-top: rem(50px);
+        margin-bottom: rem(10px);
+        letter-spacing: rem(2px);
+    }
+
+    h3 + h4 {
+        margin-top: rem(30px);
+    }
+
+    h5 {
+        font-size: rem(18px);
+        line-height: 1.1;
+        text-transform: uppercase;
+        color: $body-color;
+        font-weight: 600;
+        letter-spacing: rem(2px);
+        margin-top: rem(40px);
+        margin-bottom: rem(10px);
+    }
+
+    h4 + h5 {
+        margin-top: rem(30px);
+    }
+
+    h6 {
+        font-size: rem(16px);
+        font-weight: 600;
+        margin-top: rem(40px);
+        margin-bottom: rem(10px);
     }
 
     p, p:last-child {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 }
 
@@ -150,14 +200,18 @@ pre {
     color: theme-color(secondary);
     font-size: rem(22px);
     line-height: rem(32px);
-    text-align: center !important;
+    text-align: left !important;
     margin-top: rem(22px);
     margin-bottom: rem(22px);
+    padding-left: rem(40px);
+    position: relative;
 
     .icon-quote {
         display: block;
-        width: 20px;
-        height: 20px;
+        position: absolute;
+        left: 0;
+        width: 25px;
+        height: 25px;
         margin: 0 auto rem(22px);
         fill: theme-color(primary);
     }
@@ -165,7 +219,7 @@ pre {
 
 .blockquote-footer {
     margin-top: rem(22px);
-    text-align: center !important;
+    text-align: left !important;
 
     &:before {
         content: '';
