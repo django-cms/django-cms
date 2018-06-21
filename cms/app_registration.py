@@ -43,10 +43,15 @@ def autodiscover_cms_configs():
                 # all kinds of limitations as to what can be imported
                 # in django's apps.py and this could cause issues
                 app_config.cms_app = cms_app_classes[0]()
-            else:
-                raise ImproperlyConfigured(
-                    "cms_apps.py files must define exactly one "
-                    "class which inherits from CMSAppConfig")
+            # TODO: Reinstate the exception once decision made with
+            # Paulo on what the filename should be. cms_apps.py as a
+            # name causes all tests to fail because
+            # test_utils.project.sampleapp contains a cms_apps.py which
+            # is not used for app registration
+            #~ else:
+                #~ raise ImproperlyConfigured(
+                    #~ "cms_apps.py files must define exactly one "
+                    #~ "class which inherits from CMSAppConfig")
 
 
 def get_cms_apps_with_features():
@@ -79,8 +84,8 @@ def configure_cms_apps(apps_with_features):
     and run code to register them with their config
     """
     for app_with_feature in apps_with_features:
-        enabled_property = "{app_name}_enabled".format(
-            app_name=app_with_feature.name)
+        enabled_property = "{app_label}_enabled".format(
+            app_label=app_with_feature.label)
         configure_app = app_with_feature.cms_app.configure_app
 
         for app_config in apps.get_app_configs():

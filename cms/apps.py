@@ -7,6 +7,7 @@ class CMSConfig(AppConfig):
     verbose_name = _("django CMS")
 
     def ready(self):
-        from cms.utils.setup import setup
+        from cms.utils.setup import setup, setup_cms_apps
 
         setup()
+        setup_cms_apps()
