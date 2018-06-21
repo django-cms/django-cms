@@ -1,44 +1,43 @@
-import t from 'jquery';
+import $ from 'jquery';
 
 // this was taken from swiss.com
 
-function e() {
-    return !1;
-}
-function getBounds(t) {
-    var e = t.getBoundingClientRect(),
-        i = document.documentElement,
-        n = document.defaultView,
-        s = document.body,
-        o = i.clientTop || s.clientTop || 0,
-        a = i.clientLeft || s.clientLeft || 0,
-        r = n.pageYOffset || i.scrollTop || s.scrollTop,
-        l = n.pageXOffset || i.scrollLeft || s.scrollLeft,
-        h = e.top + r - o,
-        u = e.left + l - a;
+function getBounds(element) {
+    var rect = element.getBoundingClientRect();
+    var documentElement = document.documentElement;
+    var documentView = document.defaultView;
+    var body = document.body;
+    var topOffset = documentElement.clientTop || body.clientTop || 0;
+    var leftOffset = documentElement.clientLeft || body.clientLeft || 0;
+    var scrollTop = documentView.pageYOffset || documentElement.scrollTop || body.scrollTop;
+    var scrollLeft = documentView.pageXOffset || documentElement.scrollLeft || body.scrollLeft;
+    var top = rect.top + scrollTop - topOffset;
+    var left = rect.left + scrollLeft - leftOffset;
+
     return {
-        top: h,
-        left: u,
-        width: e.width,
-        height: e.height,
-        bottom: h + e.height,
-        right: u + e.width,
+        top: top,
+        left: left,
+        width: rect.width,
+        height: rect.height,
+        bottom: top + rect.height,
+        right: left + rect.width,
     };
 }
-function n(el) {
-    var elementsToFocus = t(el),
-        id = elementsToFocus.attr('id'),
-        label = t('label[for="' + id + '"]:visible');
+
+function getBoundsOfFocusedElements(el) {
+    var elementsToFocus = $(el);
+    var id = elementsToFocus.attr('id');
+    var label = $('label[for="' + id + '"]:visible');
 
     if (label.length) {
         elementsToFocus = elementsToFocus.add(label.closest('.custom-control'));
     }
     elementsToFocus = elementsToFocus.add(label);
     var bounds = {
-        top: 1e6,
-        left: 1e6,
-        bottom: -1e4,
-        right: -1e4,
+        top: 1000000,
+        left: 1000000,
+        bottom: -10000,
+        right: -10000,
     };
     elementsToFocus.each(function() {
         var el = getBounds(this);
@@ -52,89 +51,125 @@ function n(el) {
     bounds.height = bounds.bottom - bounds.top;
     return bounds;
 }
-function s(t, e, i) {
-    t.addEventListener ? t.addEventListener(e, i, !1) : t.attachEvent('on' + e, i);
-}
-function o() {
-    g || (clearTimeout(m), clearTimeout(w), (w = setTimeout(a, 10)));
-}
-function a() {
-    t(c).removeClass('flying-focus_visible'), (g = !0), clearTimeout($);
-}
-function r() {
-    clearTimeout(w), clearTimeout($);
-    var e = g ? 0 : p / 1e3;
-    (c.style.transitionDuration = c.style.WebkitTransitionDuration = e + 's'),
-        (k = 0),
-        ($ = setTimeout(l, 100)),
-        g && (t(c).addClass('flying-focus_visible'), (g = !1));
-}
-function l() {
-    var t = h(f);
-    t.top != y.top || t.left != y.left || t.width != y.width || t.height != y.height ? ((y = t), (k = 0)) : k++,
-        ($ = 3 > k ? setTimeout(l, 100) : setTimeout(l, 1e3));
-}
-function h(t) {
-    if (!g) {
-        var e = n(t);
-        return (
-            (e.top != y.top || e.left != y.left || e.width != y.width || e.height != y.height) &&
-                ((c.style.left = e.left + 'px'),
-                (c.style.top = e.top + 'px'),
-                (c.style.width = e.width + 'px'),
-                (c.style.height = e.height + 'px')),
-            e
-        );
+
+function addEvent(element, event, callback) {
+    if (element.addEventListener) {
+        element.addEventListener(event, callback, false);
+    } else {
+        element.attachEvent('on' + event, callback);
     }
 }
-var u = '.flying-focus',
-    d = !0;
+
+function onFocusOut() {
+    if (!initialFocus) {
+        clearTimeout(showTimeout);
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(hide, 10);
+    }
+}
+function hide() {
+    $(focusElement).removeClass('flying-focus_visible');
+    initialFocus = true;
+    clearTimeout(resizeTimeout);
+}
+function show() {
+    clearTimeout(hideTimeout);
+    clearTimeout(resizeTimeout);
+    var e = initialFocus ? 0 : '0.15';
+
+    focusElement.style.transitionDuration = focusElement.style.WebkitTransitionDuration = e + 's';
+    checks = 0;
+    resizeTimeout = setTimeout(resize, 100);
+
+    if (initialFocus) {
+        $(focusElement).addClass('flying-focus_visible');
+        initialFocus = false;
+    }
+}
+function resize() {
+    var bounds = setDimensions(lastFocusedElement);
+
+    if (bounds.top != currentBounds.top || bounds.left != currentBounds.left || bounds.width != currentBounds.width || bounds.height != currentBounds.height) {
+        currentBounds = bounds;
+        checks = 0;
+    } else {
+        checks++;
+    }
+
+    if (checks < 3) {
+        resizeTimeout = setTimeout(resize, 100);
+    } else {
+        resizeTimeout = setTimeout(resize, 1000);
+    }
+}
+function setDimensions(focusedElement) {
+    if (!initialFocus) {
+        var bounds = getBoundsOfFocusedElements(focusedElement);
+        if (bounds.top != currentBounds.top || bounds.left != currentBounds.left || bounds.width != currentBounds.width || bounds.height != currentBounds.height) {
+            focusElement.style.left = bounds.left + 'px';
+            focusElement.style.top = bounds.top + 'px';
+            focusElement.style.width = bounds.width + 'px';
+            focusElement.style.height = bounds.height + 'px';
+        }
+        return bounds;
+    }
+}
+
+var namespace = '.flying-focus';
+var justPressed = true;
+
 if (!document.getElementById('flying-focus') && document.documentElement.addEventListener) {
-    var c = document.createElement('flying-focus');
-    (c.id = 'flying-focus'),
-        t(function() {
-            document.body.appendChild(c);
-        });
-    var p = 150;
-    !!navigator.userAgent.match(/gecko/i) && !navigator.userAgent.match(/webkit/i);
-    var f,
-        m,
-        g = !0,
-        v = 0,
-        y = {};
-    s(
-        document.documentElement,
-        'keydown',
-        function(t) {
-            t.keyCode < 65 && ((v = new Date()), (d = !0));
-        },
-        !0
-    ),
-        t(document).on('focusin' + u, function(t) {
-            clearTimeout(w),
-                (m = setTimeout(function() {
-                    var i = e(t.target);
-                    if (i || d) {
-                        var n = t.target;
-                        if ('flying-focus' !== n.id) {
-                            var s = new Date();
-                            (!i && g && s - v > 100) || (r(), (y = h(n)), (f = n));
-                        }
+    var focusElement = document.createElement('flying-focus');
+    focusElement.id = 'flying-focus';
+
+    $(function() {
+        document.body.appendChild(focusElement);
+    });
+
+    var lastFocusedElement;
+    var showTimeout;
+    var initialFocus = true;
+    var keyDownTime = 0;
+    var currentBounds = {};
+
+    var hideTimeout;
+    var resizeTimeout;
+    var checks = 0;
+
+    addEvent(document.documentElement, 'keydown', function(e) {
+        // all of control keys are before the "a" which is 65. arrows, enter, tab, etc
+        if (e.keyCode < 65) {
+            keyDownTime = new Date();
+            justPressed = true;
+        }
+    });
+    $(document).on('focusin' + namespace, function(e) {
+        clearTimeout(hideTimeout);
+        showTimeout = setTimeout(function() {
+            if (justPressed) {
+                var focusedElement = e.target;
+                if ('flying-focus' !== focusedElement.id) {
+                    var now = new Date();
+
+                    if (!initialFocus || now - keyDownTime < 100) {
+                        show();
+                        currentBounds = setDimensions(focusedElement);
+                        lastFocusedElement = focusedElement;
                     }
-                }, 1));
-        }),
-        t(document).on('focusout' + u, function() {
-            o();
-        });
-    var b = function() {
-        o(), (d = !1);
+                }
+            }
+        }, 1);
+    });
+    $(document).on('focusout' + namespace, function() {
+        onFocusOut();
+    });
+    var onMouseClick = function() {
+        onFocusOut();
+        justPressed = false;
     };
-    s(document.documentElement, 'mousedown', b),
-        s(document.documentElement, 'mouseup', b),
-        s(window, 'resize', function() {
-            h(f);
-        });
-    var w,
-        $,
-        k = 0;
+    addEvent(document.documentElement, 'mousedown', onMouseClick);
+    addEvent(document.documentElement, 'mouseup', onMouseClick);
+    addEvent(window, 'resize', function() {
+        setDimensions(lastFocusedElement);
+    });
 }
