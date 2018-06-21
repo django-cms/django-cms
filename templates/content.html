@@ -7,9 +7,9 @@
 {% block header %}
     <header class="navbar navbar-expand-lg main-nav">
         <div class="container">
-            <a href="{% url "pages-root" %}">
+            <a class="d-block" href="{% url "pages-root" %}">
                 <span class="sr-only">{{ request.site.name }}</span>
-                {% include "includes/icon.html" with icon="divio" class="navbar-logo" title=request.site.name %}
+                {% include "includes/icon.html" with icon="divio" class="navbar-logo d-block" title=request.site.name %}
             </a>
             <button class="navbar-toggler collapsed" type="button" data-toggle="custom-collapse" data-target="#main-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon">

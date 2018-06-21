@@ -135,6 +135,13 @@
     border-radius: rem(20px);
     background-color: $snow;
     padding: rem(20px);
+    display: block;
+
+    &:hover,
+    &:active,
+    &:focus {
+        text-decoration: none;
+    }
 
     @include media-breakpoint-up(md) {
         padding: rem(20px) rem(40px);

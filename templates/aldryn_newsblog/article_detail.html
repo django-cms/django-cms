@@ -66,7 +66,7 @@
         {% if article.author %}
         <div class="row justify-content-center">
             <div class="col-12 col-md-10 col-lg-8">
-                <div class="aldryn-newsblog-detail-author">
+                <a href="{% namespace_url "article-list-by-author" article.author.slug namespace=namespace default='' %}" class="aldryn-newsblog-detail-author">
                     <div class="media">
                         {% if article.author.visual %}
                             {% thumbnail article.author.visual "50x50" crop upscale subject_location=article.author.visual.subject_location as author_image %}
@@ -83,12 +83,9 @@
                                     {{ article.author.description }}
                                 </div>
                             {% endif %}
-                            <div class="text-right">
-                                <a class="link-wrapper d-inline-flex flex-row align-items-center" href="{% namespace_url "article-list-by-author" article.author.slug namespace=namespace default='' %}"><span class="link-inner">More articles by {{ article.author }}</span> {% include 'includes/icon.html' with icon='arrow-right' %}</a>
-                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         {% endif %}

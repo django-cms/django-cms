@@ -1,0 +1,39 @@
+*:focus {
+    outline: none !important;
+}
+
+#flying-focus {
+    position: absolute;
+    margin: 0;
+    top: -100px;
+    background: transparent;
+    transition-property: left, top, width, height, opacity;
+    transition-timing-function: cubic-bezier(0, 0.2, 0, 1);
+    visibility: hidden;
+    pointer-events: none;
+    display: none;
+}
+
+#flying-focus.flying-focus_visible {
+    visibility: visible;
+    z-index: 10000000;
+    display: block;
+}
+
+#flying-focus:after {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: -9px;
+    bottom: -9px;
+    right: -9px;
+    border-radius: 3px;
+    border: 1px solid rgba($gray-200, 0.85);
+    box-shadow: 0 0 54px 0px rgba(0, 0, 0, 0.25), 0 0 5px 1px #fff inset;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    #flying-focus:after {
+        box-shadow: 0 0 15px 0px rgba(0, 0, 0, 0.125), 0 0 5px 1px #fff inset;
+    }
+}
