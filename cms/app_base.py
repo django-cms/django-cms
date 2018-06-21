@@ -93,3 +93,10 @@ class CMSApp(object):
         :return: list of urlconfs strings
         """
         return self._urls
+
+
+class CMSAppConfig():
+    """Base class that all cms app configurations should inherit from"""
+
+    def configure_app(self, app):
+        raise NotImplementedError()

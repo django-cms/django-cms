@@ -56,34 +56,30 @@ class AutodiscoverTestCase(CMSTestCase):
             app_registration.autodiscover_cms_configs()
 
 
-class GetCmsAppsWithFeaturesTestCase(CMSTestCase):
+class GetCmsAppsTestCase(CMSTestCase):
 
     @patch.object(apps, 'get_app_configs')
-    def test_returns_only_apps_with_features(self, mocked_apps):
+    def test_returns_only_cms_apps(self, mocked_apps):
         # apps with cms_app attr and a configure method
-        app_with_cms_ext1 = Mock(cms_app=Mock(spec=['configure_app']))
-        app_with_cms_ext2 = Mock(cms_app=Mock(spec=['configure_app']))
-        # app with cms_app attr without a configure method
-        # this throws an AttributeError if configure_app is accessed
-        app_with_cms_config = Mock(cms_app=Mock(spec=[]))
+        cms_app1 = Mock(cms_app=Mock(spec=['configure_app']))
+        cms_app2 = Mock(cms_app=Mock(spec=['configure_app']))
         # app without cms_app attr
         # this throws an AttributeError if cms_app is accessed
         non_cms_app = Mock(spec=[])
         # mock what apps have been installed
         mocked_apps.return_value = [
-            app_with_cms_ext1,
-            app_with_cms_config,
-            app_with_cms_ext2,
+            cms_app1,
+            cms_app2,
             non_cms_app,
         ]
 
-        apps_with_features = app_registration.get_cms_apps_with_features()
+        cms_apps = app_registration.get_cms_apps()
 
-        # Of the 4 installed apps only 2 have features (1 is a
-        # non-cms app and 1 is a cms app without a feature)
+        # Of the 3 installed apps only 2 have features (1 is a
+        # non-cms app)
         self.assertListEqual(
-            apps_with_features,
-            [app_with_cms_ext1, app_with_cms_ext2])
+            cms_apps,
+            [cms_app1, cms_app2])
 
 
 class ConfigureCmsAppsTestCase(CMSTestCase):
@@ -255,3 +251,11 @@ class SetupCmsAppsTestCase(CMSTestCase):
         # whole app registration code to run through.
         self.assertEqual(feature_app.cms_app.num_configured_apps, 1)
         self.assertTrue(config_app.cms_app.configured)
+
+    @override_settings(INSTALLED_APPS=[
+        'cms.tests.test_app_registry.app_with_cms_config',
+        'cms.tests.test_app_registry.app_using_non_feature'
+    ])
+    def test_raises_not_implemented_exception_when_feature_app_doesnt_implement_configure_method(self):
+        with self.assertRaises(NotImplementedError):
+            setup.setup_cms_apps()
