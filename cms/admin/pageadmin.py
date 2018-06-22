@@ -75,7 +75,6 @@ from cms.utils.i18n import (
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-from cms.utils.log_operations import log_page_change, log_page_move, log_page_delete
 
 require_POST = method_decorator(require_POST)
 
@@ -121,25 +120,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     inlines = PERMISSION_ADMIN_INLINES
 
-    def log_addition(self, request, object, message):
-        """
-        Log that a page has been successfully added.
-        """
-        #FIXME: The page wizard doesn't invoke this method!! This solution is the cleanest!
-        #log_page_addition(request, object, message)
-        pass
-
-    def log_change(self, request, object, message):
-        """
-        Log that a page has been changed
-        """
-        log_page_change(request, object, message)
-
     def log_deletion(self, request, object, object_repr):
-        """
-        Log that a page has been deleted
-        """
-        log_page_delete(request, object, object_repr)
+        # Block the log for deletion. A signal takes care of this!
+        pass
 
     def get_admin_url(self, action, *args):
         url_name = "{}_{}_{}".format(
@@ -922,9 +905,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             obj=page,
         )
 
-        # Log the operation
-        log_page_move(request, page)
-
         return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):
@@ -1246,8 +1226,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             page.unpublish(language)
             message = _('The %(language)s page "%(page)s" was successfully unpublished') % {
                 'language': language_name, 'page': page}
-
             messages.info(request, message)
+
+            # FIXME: AA: Change to fire a signal???
             LogEntry.objects.log_action(
                 user_id=request.user.id,
                 content_type_id=ContentType.objects.get_for_model(Page).pk,

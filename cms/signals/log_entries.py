@@ -1,7 +1,6 @@
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
-
 from django.contrib.contenttypes.models import ContentType
-
+from django.utils.translation import ugettext_lazy as _
 
 from cms import operations
 
@@ -32,7 +31,6 @@ def log_page_operations(sender, **kwargs):
     handler = operations.PAGE_OPERATIONS[find_operation]
     """
 
-
     request = kwargs.pop('request')
     operation_type = kwargs.pop('operation')
     obj = kwargs.pop('obj')
@@ -42,19 +40,19 @@ def log_page_operations(sender, **kwargs):
     object_id = obj.pk
     object_repr = str(obj)
 
+    if operation_type == operations.MOVE_PAGE:
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Moved"))
+    elif operation_type == operations.DELETE_PAGE:
+        create_log_entry(user_id, content_type_id, object_id, object_repr, DELETION, _("Deleted"))
+
+    """
+    # NOT Implemented
     if operation_type == operations.ADD_PAGE:
         create_log_entry(user_id, content_type_id, object_id, object_repr, ADDITION, "Added")
-    elif operation_type == operations.MOVE_PAGE:
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Moved")
     elif operation_type == operations.CHANGE_PAGE:
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Change")
-    elif operation_type == operations.DELETE_PAGE:
-        create_log_entry(user_id, content_type_id, object_id, object_repr, DELETION, "Deleted")
-    else:
-        return
+    """
 
-
-# FIXME: This is very repetitive and ugly
 def log_placeholder_operations(sender, **kwargs):
     """
     Create the log for the correct operation type
@@ -75,7 +73,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = plugin.pk
         object_repr = str(plugin)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, ADDITION, "Added Plugin")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, ADDITION, _("Added Plugin"))
 
     elif operation_type == operations.CHANGE_PLUGIN:
 
@@ -84,7 +82,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = plugin.pk
         object_repr = str(plugin)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Changed Plugin")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Changed Plugin"))
 
     elif operation_type == operations.MOVE_PLUGIN:
 
@@ -93,7 +91,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = plugin.pk
         object_repr = str(plugin)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Moved Plugin")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Moved Plugin"))
 
     elif operation_type == operations.DELETE_PLUGIN:
 
@@ -102,7 +100,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = plugin.pk
         object_repr = str(plugin)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, DELETION, "Deleted Plugin")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, DELETION, _("Deleted Plugin"))
 
     elif operation_type == operations.CUT_PLUGIN:
 
@@ -111,7 +109,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = plugin.pk
         object_repr = str(plugin)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Cut Plugin")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Cut Plugin"))
 
     elif operation_type == operations.PASTE_PLUGIN:
 
@@ -120,7 +118,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = plugin.pk
         object_repr = str(plugin)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Paste Plugin")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Paste Plugin"))
 
 
 
@@ -131,7 +129,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = placeholder.pk
         object_repr = str(placeholder)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Paste Placeholder")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Paste to Placeholder"))
 
     elif operation_type == operations.ADD_PLUGINS_FROM_PLACEHOLDER:
 
@@ -144,7 +142,7 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = placeholder.pk
         object_repr = str(placeholder)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Added Plugins to Placeholder")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Added plugins to placeholder from clipboard"))
 
     elif operation_type == operations.CLEAR_PLACEHOLDER:
 
@@ -153,4 +151,4 @@ def log_placeholder_operations(sender, **kwargs):
         object_id = placeholder.pk
         object_repr = str(placeholder)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Cleared Placeholder")
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Cleared Placeholder"))

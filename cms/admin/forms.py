@@ -5,9 +5,6 @@ from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.contrib.admin.utils import (
-    construct_change_message
-)
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
@@ -15,7 +12,7 @@ from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from cms import api
+from cms import api, operations
 from cms.apphook_pool import apphook_pool
 from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import PluginLimitReached
@@ -37,7 +34,6 @@ from cms.utils.permissions import (
     get_subordinate_groups,
     get_user_permission_level,
 )
-from cms.utils.log_operations import log_page_form_addition
 
 from menus.menu_pool import menu_pool
 
@@ -301,8 +297,17 @@ class AddPageForm(BasePageForm):
             new_page.set_as_homepage(self._user)
 
         # Log page creation
-        change_message = construct_change_message(form=False, formsets=False, add=True)
-        log_page_form_addition(self._user, new_page, change_message)
+        # from django.contrib.admin.utils import construct_change_message
+        # from cms.utils.log_entries import log_page_form_addition
+        # change_message = construct_change_message(form=False, formsets=False, add=True)
+        # FIXME: REMOVEME: log_page_form_addition(self._user, new_page, change_message)
+        # TODO: Add a signal here. Issue is sending through the request??
+        """
+        self._send_pre_page_operation(
+            operation=operations.ADD_PAGE,
+            obj=new_page,
+        )
+        """
 
         return new_page
 
