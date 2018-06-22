@@ -15,8 +15,8 @@ from cms.test_utils.testcases import CMSTestCase
 class AutodiscoverTestCase(CMSTestCase):
 
     @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_cms_feature',
-        'cms.tests.test_app_registry.app_without_cms_file'
+        'cms.test_utils.project.app_with_cms_feature',
+        'cms.test_utils.project.app_without_cms_file'
     ])
     def test_adds_cms_app_attribute_to_django_app_config(self):
         app_registration.autodiscover_cms_configs()
@@ -30,7 +30,7 @@ class AutodiscoverTestCase(CMSTestCase):
         self.assertFalse(hasattr(app_list[1], 'cms_app'))
 
     @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_bad_cms_file',
+        'cms.test_utils.project.app_with_bad_cms_file',
     ])
     def test_raises_exception_raised_in_cms_file(self):
         # The cms file intentionally raises a KeyError. We need
@@ -40,7 +40,7 @@ class AutodiscoverTestCase(CMSTestCase):
             app_registration.autodiscover_cms_configs()
 
     @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_without_cms_app_class',
+        'cms.test_utils.project.app_without_cms_app_class',
     ])
     def test_raises_exception_when_no_cms_app_class_found_in_cms_file(self):
         # No cms config defined in the cms file so raise exception
@@ -48,7 +48,7 @@ class AutodiscoverTestCase(CMSTestCase):
             app_registration.autodiscover_cms_configs()
 
     @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_two_cms_app_classes',
+        'cms.test_utils.project.app_with_two_cms_app_classes',
     ])
     def test_raises_exception_when_more_than_one_cms_app_class_found_in_cms_file(self):
         # More than one cms config defined so raise exception
@@ -226,9 +226,9 @@ class SetupCmsAppsTestCase(CMSTestCase):
         mocked_setup.assert_called_once()
 
     @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_cms_feature',
-        'cms.tests.test_app_registry.app_without_cms_file',
-        'cms.tests.test_app_registry.app_with_cms_config'
+        'cms.test_utils.project.app_with_cms_feature',
+        'cms.test_utils.project.app_without_cms_file',
+        'cms.test_utils.project.app_with_cms_config'
     ])
     def test_cms_apps_setup_after_setup_function_run(self):
         # This is the function that gets run on startup
@@ -253,8 +253,8 @@ class SetupCmsAppsTestCase(CMSTestCase):
         self.assertTrue(config_app.cms_app.configured)
 
     @override_settings(INSTALLED_APPS=[
-        'cms.tests.test_app_registry.app_with_cms_config',
-        'cms.tests.test_app_registry.app_using_non_feature'
+        'cms.test_utils.project.app_with_cms_config',
+        'cms.test_utils.project.app_using_non_feature'
     ])
     def test_raises_not_implemented_exception_when_feature_app_doesnt_implement_configure_method(self):
         with self.assertRaises(NotImplementedError):
