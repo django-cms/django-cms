@@ -93,3 +93,24 @@ class CMSApp(object):
         :return: list of urlconfs strings
         """
         return self._urls
+
+
+class CMSAppConfig(object):
+    """Base class that all cms app configurations should inherit from"""
+
+    def configure_app(self, app):
+        """
+        Implement this method if the app provides functionality that
+        other apps can use and configure.
+
+        This method will be run once for every app that defines an
+        attribute like "<app_label>_enabled" as True on its cms app
+        config class.
+        So for example if app A with label "app_a" implements this
+        method and app B and app C define app_a_enabled = True on their
+        cms config classes, the method app A has defined will run twice,
+        once for app B and once for app C.
+
+        :param app: django app that has defined the feature as enabled
+        """
+        raise NotImplementedError()

@@ -3,7 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms.utils.compat.dj import is_installed as app_is_installed
 from cms.app_registration import (
-    autodiscover_cms_configs, get_cms_apps_with_features,
+    autodiscover_cms_configs, get_cms_apps,
     configure_cms_apps)
 
 
@@ -50,5 +50,5 @@ def setup_cms_apps():
     any of this functionality.
     """
     autodiscover_cms_configs()
-    apps_with_cms_features = get_cms_apps_with_features()
-    configure_cms_apps(apps_with_cms_features)
+    cms_apps = get_cms_apps()
+    configure_cms_apps(cms_apps)

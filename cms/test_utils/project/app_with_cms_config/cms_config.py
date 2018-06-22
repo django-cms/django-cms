@@ -1,4 +1,4 @@
-from cms.app_registration import CMSAppConfig
+from cms.app_base import CMSAppConfig
 
 
 class CMSConfigConfig(CMSAppConfig):
