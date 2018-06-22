@@ -189,12 +189,12 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(pre_delete_repr, log_entry.object_repr)
 
 
-class LogTitleOperationsTests(CMSTestCase):
+class LogPageTranslationOperationsTests(CMSTestCase):
 
     def setUp(self):
         self._admin_user = self.get_superuser()
 
-    def test_log_for_create_title(self):
+    def test_log_for_create_page_translation(self):
         """
         Test that a title creation is logged correctly
         """
@@ -203,13 +203,13 @@ class LogTitleOperationsTests(CMSTestCase):
 
         self.assertEqual(False, "TODO: Not implemented")
 
-    def test_log_for_change_title(self):
+    def test_log_for_change_translation(self):
         """
         """
         self.assertEqual(False, "TODO: Not implemented")
 
 
-    def test_log_for_delete_title(self):
+    def test_log_for_delete_translation(self):
         """
         """
         self.assertEqual(False, "TODO: Not implemented")
@@ -272,7 +272,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(_("Added Plugin"), log_entry.change_message)
 
             # Check the action flag is set correctly
-            self.assertEqual(ADDITION, log_entry.action_flag)
+            self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
             #FIXME: self.assertEqual(str(plugin.pk), log_entry.object_id)
@@ -286,7 +286,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
         plugin = self._add_plugin()
         endpoint = self.get_move_plugin_uri(plugin)
-        #source_placeholder = plugin.placeholder
+        page = plugin.placeholder.page
 
         data = {
             'plugin_id': plugin.pk,
@@ -310,10 +310,10 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            self.assertEqual(str(plugin.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_change_plugin(self):
         """
@@ -322,6 +322,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         plugin = self._add_plugin()
         endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
+        page = plugin.placeholder.page
 
         data = {'name': 'A Link 2', 'external_link': 'https://www.django-cms.org'}
 
@@ -340,11 +341,11 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
 
-           # Check the object id is set correctly
-            self.assertEqual(str(plugin.pk), log_entry.object_id)
+            # Check the object id is set correctly
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_delete_plugin(self):
         """
@@ -353,6 +354,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         plugin = self._add_plugin()
         endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
+        page = plugin.placeholder.page
 
         with self.login_user_context(self._admin_user):
             data = {'post': True}
@@ -369,13 +371,13 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(_("Deleted Plugin"), log_entry.change_message)
 
             # Check the action flag is set correctly
-            self.assertEqual(DELETION, log_entry.action_flag)
+            self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            self.assertEqual(str(plugin.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_cut_plugin(self):
         """
@@ -388,6 +390,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         )
         plugin = self._add_plugin()
         endpoint = self.get_move_plugin_uri(plugin)
+        page = plugin.placeholder.page
 
         data = {
             'plugin_id': plugin.pk,
@@ -411,10 +414,10 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
            # Check the object id is set correctly
-            self.assertEqual(str(plugin.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_paste_plugin(self):
         """
@@ -427,6 +430,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         )
         plugin = self._add_plugin(placeholder=user_settings.clipboard)
         endpoint = self.get_move_plugin_uri(plugin)
+        page = self._placeholder_1.page
 
         data = {
             'plugin_id': plugin.pk,
@@ -452,12 +456,10 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            # FIXME: Fails because we need the updated plugin!!
-            # self.assertEqual(str(plugin.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            # FIXME: Fails because we need the updated plugin!!
-            #self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_add_plugin_to_placeholder(self):
         """
@@ -465,7 +467,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
         plugin = self._add_plugin()
         endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
-        source_placeholder = plugin.placeholder
+        page = plugin.placeholder.page
 
         data = {
             'source_language': 'en',
@@ -490,10 +492,10 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            self.assertEqual(str(plugin.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_paste_placeholder(self):
         """
@@ -510,9 +512,10 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         )
         ref_placeholder = placeholder_plugin.placeholder_ref
 
-        self._add_plugin(ref_placeholder)
+        plugin = self._add_plugin(ref_placeholder)
 
         endpoint = self.get_move_plugin_uri(placeholder_plugin)
+        page = self._placeholder_1.page
 
         data = {
             'plugin_id': placeholder_plugin.pk,
@@ -538,10 +541,10 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            self.assertEqual(str(self._placeholder_1.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(self._placeholder_1), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_clear_placeholder(self):
         """
@@ -549,6 +552,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
         self._add_plugin()
         endpoint = self.get_clear_placeholder_url(self._placeholder_1)
+        page = self._placeholder_1.page
 
         with self.login_user_context(self._admin_user):
             response = self.client.post(endpoint, {'test': 0})
@@ -566,7 +570,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            self.assertEqual(str(self._placeholder_1.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            self.assertEqual(str(self._placeholder_1), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)

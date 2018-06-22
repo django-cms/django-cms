@@ -23,12 +23,19 @@ def create_log_entry(user_id, content_type_id, object_id, object_repr, action_fl
     )
 
 
+_page_operations_map = {
+    operations.MOVE_PAGE: {
+        'message': _("Moved"),
+        'flag': CHANGE,
+    },
+    operations.DELETE_PAGE: {
+        'message': _("Deleted"),
+        'flag': DELETION,
+    },
+}
+
 def log_page_operations(sender, **kwargs):
     """
-
-    # Get the operation type
-    find_operation = operations.PAGE_OPERATIONS.index(operation_type)
-    handler = operations.PAGE_OPERATIONS[find_operation]
     """
 
     request = kwargs.pop('request')
@@ -40,18 +47,10 @@ def log_page_operations(sender, **kwargs):
     object_id = obj.pk
     object_repr = str(obj)
 
-    if operation_type == operations.MOVE_PAGE:
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Moved"))
-    elif operation_type == operations.DELETE_PAGE:
-        create_log_entry(user_id, content_type_id, object_id, object_repr, DELETION, _("Deleted"))
+    operation_handler = _page_operations_map[operation_type]
 
-    """
-    # NOT Implemented
-    if operation_type == operations.ADD_PAGE:
-        create_log_entry(user_id, content_type_id, object_id, object_repr, ADDITION, "Added")
-    elif operation_type == operations.CHANGE_PAGE:
-        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, "Change")
-    """
+    if operation_handler:
+        create_log_entry(user_id, content_type_id, object_id, object_repr, operation_handler['flag'], operation_handler['message'])
 
 def log_placeholder_operations(sender, **kwargs):
     """
@@ -69,65 +68,74 @@ def log_placeholder_operations(sender, **kwargs):
     if operation_type == operations.ADD_PLUGIN:
 
         plugin = kwargs.pop('plugin')
-        content_type_id = ContentType.objects.get_for_model(plugin).pk
-        object_id = plugin.pk
-        object_repr = str(plugin)
+        page = plugin.placeholder.page
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, ADDITION, _("Added Plugin"))
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
+
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Added Plugin"))
 
     elif operation_type == operations.CHANGE_PLUGIN:
 
         plugin = kwargs.pop('new_plugin')
-        content_type_id = ContentType.objects.get_for_model(plugin).pk
-        object_id = plugin.pk
-        object_repr = str(plugin)
+        page = plugin.placeholder.page
+
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Changed Plugin"))
 
     elif operation_type == operations.MOVE_PLUGIN:
 
         plugin = kwargs.pop('plugin')
-        content_type_id = ContentType.objects.get_for_model(plugin).pk
-        object_id = plugin.pk
-        object_repr = str(plugin)
+        page = plugin.placeholder.page
+
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Moved Plugin"))
 
     elif operation_type == operations.DELETE_PLUGIN:
 
         plugin = kwargs.pop('plugin')
-        content_type_id = ContentType.objects.get_for_model(plugin).pk
-        object_id = plugin.pk
-        object_repr = str(plugin)
+        page = plugin.placeholder.page
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, DELETION, _("Deleted Plugin"))
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
+
+        create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Deleted Plugin"))
 
     elif operation_type == operations.CUT_PLUGIN:
 
         plugin = kwargs.pop('plugin')
-        content_type_id = ContentType.objects.get_for_model(plugin).pk
-        object_id = plugin.pk
-        object_repr = str(plugin)
+        page = plugin.placeholder.page
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Cut Plugin"))
 
     elif operation_type == operations.PASTE_PLUGIN:
-
         plugin = kwargs.pop('plugin')
-        content_type_id = ContentType.objects.get_for_model(plugin).pk
-        object_id = plugin.pk
-        object_repr = str(plugin)
+        page = plugin.placeholder.page
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Paste Plugin"))
-
-
 
     elif operation_type == operations.PASTE_PLACEHOLDER:
 
         placeholder = kwargs.pop('target_placeholder')
+        page = placeholder.page
+
         content_type_id = ContentType.objects.get_for_model(placeholder).pk
-        object_id = placeholder.pk
-        object_repr = str(placeholder)
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Paste to Placeholder"))
 
@@ -136,19 +144,21 @@ def log_placeholder_operations(sender, **kwargs):
         source_placeholder = kwargs.pop('source_placeholder')
         target_placeholder = kwargs.pop('target_placeholder')
 
-        placeholder = target_placeholder
+        page = target_placeholder.page
 
-        content_type_id = ContentType.objects.get_for_model(placeholder).pk
-        object_id = placeholder.pk
-        object_repr = str(placeholder)
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Added plugins to placeholder from clipboard"))
 
     elif operation_type == operations.CLEAR_PLACEHOLDER:
 
         placeholder = kwargs.pop('placeholder')
-        content_type_id = ContentType.objects.get_for_model(placeholder).pk
-        object_id = placeholder.pk
-        object_repr = str(placeholder)
+        page = placeholder.page
+
+        content_type_id = ContentType.objects.get_for_model(page).pk
+        object_id = page.pk
+        object_repr = str(page)
 
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Cleared Placeholder"))
