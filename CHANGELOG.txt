@@ -1,4 +1,12 @@
-=== 3.4.6 (unreleased) ===
+=== 3.4.7 (unreleased) ===
+
+* Removed extra quotation mark from the sideframe button template
+* Fixed a bug where xframe options were processed by clickjacking middleware
+  when page was served from cache, rather then get this value from cache
+* Fixed a bug where cached page permissions overrides global permissions
+
+
+=== 3.4.6 (2018-03-26) ===
 
 * Changed the way drag and drop works in the page tree. The page has to be
   selected first before moving.
@@ -12,6 +20,7 @@
 * Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
 * Fixed an ``InconsistentMigrationHistory`` error raised when the contenttypes app
   has a pending migration after the user has applied the ``0010_migrate_use_structure`` migration.
+* Fixed a bug where plugins rendered multiple times won't be editable
 
 
 === 3.4.5 (2017-10-12) ===
