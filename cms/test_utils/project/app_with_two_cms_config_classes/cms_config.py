@@ -1,4 +1,4 @@
-from cms.app_base import CMSAppConfig
+from cms.app_base import CMSAppConfig, CMSAppExtension
 
 
 class CMSConfigConfig(CMSAppConfig):
@@ -6,4 +6,8 @@ class CMSConfigConfig(CMSAppConfig):
 
 
 class CMSConfigConfig2(CMSAppConfig):
+    pass
+
+
+class CMSExtension(CMSAppExtension):
     pass

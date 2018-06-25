@@ -14,6 +14,14 @@ CMS_CONFIG_NAME = 'cms_config'
 
 
 def _find_config(cms_module):
+    """
+    Helper function.
+
+    Returns the class inheriting from CMSAppConfig in the given module.
+    If no such class exists in the module, returns None.
+    If multiple classes inherit from CMSAppConfig, raises
+    ImproperlyConfigured exception.
+    """
     cms_config_classes = []
     # Find all classes that inherit from CMSAppConfig
     for name, obj in inspect.getmembers(cms_module):
@@ -28,9 +36,22 @@ def _find_config(cms_module):
 
     if len(cms_config_classes) == 1:
         return cms_config_classes[0]
+    elif len(cms_config_classes) > 1:
+        raise ImproperlyConfigured(
+            "cms_config.py files can't define more than one "
+            "class which inherits from CMSAppConfig")
 
 
 def _find_extension(cms_module):
+    """
+    Helper function.
+
+    Returns the class inheriting from CMSAppExtension in the given module.
+    If no such class exists in the module, returns None.
+    If multiple classes inherit from CMSAppExtension, raises
+    ImproperlyConfigured exception.
+    """
+
     cms_extension_classes = []
     # Find all classes that inherit from CMSAppExtension
     for name, obj in inspect.getmembers(cms_module):
@@ -45,6 +66,10 @@ def _find_extension(cms_module):
 
     if len(cms_extension_classes) == 1:
         return cms_extension_classes[0]
+    elif len(cms_extension_classes) > 1:
+        raise ImproperlyConfigured(
+            "cms_config.py files can't define more than one "
+            "class which inherits from CMSAppExtension")
 
 
 def autodiscover_cms_configs():
@@ -75,12 +100,11 @@ def autodiscover_cms_configs():
                 app_config.cms_config = config()
             if extension:
                 app_config.cms_extension = extension()
-            # TODO: What if has both but one doubled up
             if not config and not extension:
                 raise ImproperlyConfigured(
-                    "cms_config.py files must define one "
-                    "class which inherits from CMSAppConfig and/or"
-                    "one class which inherits from CMSAppExtension")
+                    "cms_config.py files must define at least one "
+                    "class which inherits from CMSAppConfig or"
+                    "CMSAppExtension")
 
 
 @lru_cache(maxsize=None)
