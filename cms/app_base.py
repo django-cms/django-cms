@@ -113,4 +113,4 @@ class CMSAppConfig(object):
 
         :param app: django app that has defined the feature as enabled
         """
-        raise NotImplementedError()
+        raise NotImplementedError

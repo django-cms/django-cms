@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import inspect
+from functools import lru_cache
 from importlib import import_module
 
 from django.apps import apps
@@ -52,18 +53,15 @@ def autodiscover_cms_configs():
                     "class which inherits from CMSAppConfig")
 
 
+@lru_cache(maxsize=None)
 def get_cms_apps():
     """
     Returns django app configs of apps with a cms config
     """
-    cms_apps = []
-
-    for app_config in apps.get_app_configs():
-        # The cms_app attr is added by the autodiscover_cms_configs
-        # function if a cms_config.py file with a suitable class is found.
-        if hasattr(app_config, 'cms_app'):
-            cms_apps.append(app_config)
-
+    # NOTE: The cms_app attr is added by the autodiscover_cms_configs
+    # function if a cms_config.py file with a suitable class is found.
+    cms_apps = [app_config for app_config in apps.get_app_configs()
+                if hasattr(app_config, 'cms_app')]
     return cms_apps
 
 

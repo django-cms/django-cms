@@ -3,8 +3,10 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms.utils.compat.dj import is_installed as app_is_installed
 from cms.app_registration import (
-    autodiscover_cms_configs, get_cms_apps,
-    configure_cms_apps)
+    autodiscover_cms_configs,
+    configure_cms_apps,
+    get_cms_apps,
+)
 
 
 def validate_dependencies():

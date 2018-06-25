@@ -32,10 +32,10 @@ class AutodiscoverTestCase(CMSTestCase):
         'cms.test_utils.project.app_with_bad_cms_file',
     ])
     def test_raises_exception_raised_in_cms_file(self):
-        # The cms file intentionally raises a KeyError. We need
+        # The cms file intentionally raises a RuntimeError. We need
         # to make sure the exception definitely bubbles up and doesn't
         # get caught.
-        with self.assertRaises(KeyError):
+        with self.assertRaises(RuntimeError):
             app_registration.autodiscover_cms_configs()
 
     @override_settings(INSTALLED_APPS=[
@@ -56,6 +56,13 @@ class AutodiscoverTestCase(CMSTestCase):
 
 
 class GetCmsAppsTestCase(CMSTestCase):
+
+    def setUp(self):
+        # The result of get_cms_apps is cached. Clear this cache
+        # because installed apps change between tests and therefore
+        # unlike in a live environment, results of this function
+        # can change between tests
+        app_registration.get_cms_apps.cache_clear()
 
     @patch.object(apps, 'get_app_configs')
     def test_returns_only_cms_apps(self, mocked_apps):
@@ -215,6 +222,13 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
 
 
 class SetupCmsAppsTestCase(CMSTestCase):
+
+    def setUp(self):
+        # The result of get_cms_apps is cached. Clear this cache
+        # because installed apps change between tests and therefore
+        # unlike in a live environment, results of this function
+        # can change between tests
+        app_registration.get_cms_apps.cache_clear()
 
     @patch.object(setup, 'setup_cms_apps')
     def test_setup_cms_apps_function_run_on_startup(self, mocked_setup):
