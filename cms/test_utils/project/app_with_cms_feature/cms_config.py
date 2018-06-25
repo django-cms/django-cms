@@ -1,4 +1,4 @@
-from cms.app_base import CMSAppConfig
+from cms.app_base import CMSAppExtension
 
 
 def some_function(*args, **kwargs):
@@ -13,12 +13,12 @@ class SomeClass():
         raise Exception('SomeClass instantiated')
 
 
-class CMSSomeFeatureConfig(CMSAppConfig):
+class CMSSomeFeatureConfig(CMSAppExtension):
 
     num_configured_apps = 0
 
     def configure_app(self, app):
-        app.cms_app.configured = True
+        app.cms_config.configured = True
         self.num_configured_apps += 1
 
 
