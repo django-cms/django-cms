@@ -221,8 +221,6 @@ body.cke_editable {
 }
 
 .page-header {
-    padding-top: 40px;
-
     @include media-breakpoint-up(sm) {
         padding-top: 80px;
     }
@@ -235,6 +233,54 @@ body.cke_editable {
     .spitzmarke {
         font-size: rem(16px);
         margin-bottom: rem(15px);
+    }
+}
+
+.page-header-with-image {
+    position: relative;
+    padding-top: 210px;
+
+    @include media-breakpoint-up(sm) {
+        padding-top: 320px;
+        margin-top: -70px;
+    }
+
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 0px;
+        margin-top: 0px;
+    }
+}
+
+.page-header-image {
+    width: 100%;
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+
+    @include media-breakpoint-up(sm) {}
+
+
+    @include media-breakpoint-up(md) {
+        left: auto;
+        width: auto;
+        z-index: -1;
+        top: 0;
+        height: 55%;
+        right: 0;
+    }
+
+
+    @include media-breakpoint-up(lg) {
+        top: 5px;
+        height: calc(100% - 10px);
+    }
+
+
+    @include media-breakpoint-up(xl) {
+        top: -50px;
+        height: calc(100% + 100px);
     }
 }
 
