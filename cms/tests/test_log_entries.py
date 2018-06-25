@@ -413,7 +413,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
 
-           # Check the object id is set correctly
+            # Check the object id is set correctly
             self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly

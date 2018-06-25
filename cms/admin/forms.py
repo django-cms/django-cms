@@ -12,7 +12,7 @@ from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from cms import api, operations
+from cms import api
 from cms.apphook_pool import apphook_pool
 from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import PluginLimitReached
@@ -295,19 +295,6 @@ class AddPageForm(BasePageForm):
             # its the first page. publish it right away
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
-
-        # Log page creation
-        # from django.contrib.admin.utils import construct_change_message
-        # from cms.utils.log_entries import log_page_form_addition
-        # change_message = construct_change_message(form=False, formsets=False, add=True)
-        # FIXME: REMOVEME: log_page_form_addition(self._user, new_page, change_message)
-        # TODO: Add a signal here. Issue is sending through the request??
-        """
-        self._send_pre_page_operation(
-            operation=operations.ADD_PAGE,
-            obj=new_page,
-        )
-        """
 
         return new_page
 

@@ -34,6 +34,18 @@ _page_operations_map = {
     },
 }
 
+
+"""
+ADD_PAGE_TRANSLATION = 'add_page_translation'
+CHANGE_PAGE_TRANSLATION = 'change_page_translation'
+DELETE_PAGE_TRANSLATION = 'delete_page_translation'
+PUBLISH_PAGE_TRANSLATION = 'publish_page_translation'
+REVERT_PAGE_TRANSLATION_TO_LIVE = 'revert_page_translation_to_live'
+"""
+
+
+
+
 def log_page_operations(sender, **kwargs):
     """
     """
@@ -41,6 +53,8 @@ def log_page_operations(sender, **kwargs):
     request = kwargs.pop('request')
     operation_type = kwargs.pop('operation')
     obj = kwargs.pop('obj')
+
+    print(operation_type)
 
     user_id = request.user.pk
     content_type_id = ContentType.objects.get_for_model(obj).pk
@@ -65,10 +79,12 @@ def log_placeholder_operations(sender, **kwargs):
 
     user_id = request.user.pk
 
+    print(operation_type)
+
     if operation_type == operations.ADD_PLUGIN:
 
-        plugin = kwargs.pop('plugin')
-        page = plugin.placeholder.page
+        placeholder = kwargs.pop('placeholder')
+        page = placeholder.page
 
         content_type_id = ContentType.objects.get_for_model(page).pk
         object_id = page.pk
@@ -78,8 +94,8 @@ def log_placeholder_operations(sender, **kwargs):
 
     elif operation_type == operations.CHANGE_PLUGIN:
 
-        plugin = kwargs.pop('new_plugin')
-        page = plugin.placeholder.page
+        placeholder = kwargs.pop('placeholder')
+        page = placeholder.page
 
         content_type_id = ContentType.objects.get_for_model(page).pk
         object_id = page.pk
@@ -89,8 +105,8 @@ def log_placeholder_operations(sender, **kwargs):
 
     elif operation_type == operations.MOVE_PLUGIN:
 
-        plugin = kwargs.pop('plugin')
-        page = plugin.placeholder.page
+        placeholder = kwargs.pop('target_placeholder')
+        page = placeholder.page
 
         content_type_id = ContentType.objects.get_for_model(page).pk
         object_id = page.pk
@@ -100,8 +116,8 @@ def log_placeholder_operations(sender, **kwargs):
 
     elif operation_type == operations.DELETE_PLUGIN:
 
-        plugin = kwargs.pop('plugin')
-        page = plugin.placeholder.page
+        placeholder = kwargs.pop('placeholder')
+        page = placeholder.page
 
         content_type_id = ContentType.objects.get_for_model(page).pk
         object_id = page.pk
@@ -111,8 +127,8 @@ def log_placeholder_operations(sender, **kwargs):
 
     elif operation_type == operations.CUT_PLUGIN:
 
-        plugin = kwargs.pop('plugin')
-        page = plugin.placeholder.page
+        placeholder = kwargs.pop('source_placeholder')
+        page = placeholder.page
         content_type_id = ContentType.objects.get_for_model(page).pk
         object_id = page.pk
         object_repr = str(page)
@@ -120,8 +136,10 @@ def log_placeholder_operations(sender, **kwargs):
         create_log_entry(user_id, content_type_id, object_id, object_repr, CHANGE, _("Cut Plugin"))
 
     elif operation_type == operations.PASTE_PLUGIN:
-        plugin = kwargs.pop('plugin')
-        page = plugin.placeholder.page
+
+        placeholder = kwargs.pop('target_placeholder')
+        page = placeholder.page
+
         content_type_id = ContentType.objects.get_for_model(page).pk
         object_id = page.pk
         object_repr = str(page)
@@ -141,7 +159,6 @@ def log_placeholder_operations(sender, **kwargs):
 
     elif operation_type == operations.ADD_PLUGINS_FROM_PLACEHOLDER:
 
-        source_placeholder = kwargs.pop('source_placeholder')
         target_placeholder = kwargs.pop('target_placeholder')
 
         page = target_placeholder.page
