@@ -1,7 +1,8 @@
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+from django.forms.models import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
-from cms.api import create_page, add_plugin
+from cms.api import create_page, add_plugin, create_title
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_MOVE,
     URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD,
@@ -50,7 +51,9 @@ class LogPageOperationsTests(CMSTestCase):
 
         with self.login_user_context(self._admin_user):
 
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertEqual(response.status_code, 302)
+
             page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
 
             self._assert_page_addition_log_created(page_one)
@@ -98,16 +101,21 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
 
             page_data = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertEqual(response.status_code, 302)
+
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
 
             # Empty any logs
             LogEntry.objects.all().delete()
 
             # Get and edit the page
-            self.client.get(URL_CMS_PAGE_CHANGE % page.id)
-            page_data['title'] = 'changed title'
-            self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
+            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
+            self.assertEqual(response.status_code, 200)
+
+            page_data['slug'] = 'changed slug'
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
+            self.assertEqual(response.status_code, 302)
 
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
@@ -115,7 +123,7 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
 
             # Check that the contents of the log message is correct
-            self.assertEqual('[{"changed": {"fields": ["title"]}}]', log_entry.change_message)
+            self.assertEqual('[{"changed": {"fields": ["slug"]}}]', log_entry.change_message)
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
@@ -138,7 +146,8 @@ class LogPageOperationsTests(CMSTestCase):
             page_2 = create_page("page_b", "nav_playground.html", "en", published=False)
 
             # move pages
-            self.client.post(URL_CMS_PAGE_MOVE % page_2.pk, {"target": page_1.pk, "position": "0"})
+            response = self.client.post(URL_CMS_PAGE_MOVE % page_2.pk, {"target": page_1.pk, "position": "0"})
+            self.assertEqual(response.status_code, 200)
 
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
@@ -169,7 +178,8 @@ class LogPageOperationsTests(CMSTestCase):
 
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
             post_data = {'post': 'yes'}
-            self.client.post(endpoint, post_data)
+            response = self.client.post(endpoint, post_data)
+            self.assertEqual(response.status_code, 302)
 
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
@@ -188,34 +198,119 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the object_repr is set correctly
             self.assertEqual(pre_delete_repr, log_entry.object_repr)
 
-
-class LogPageTranslationOperationsTests(CMSTestCase):
-
-    def setUp(self):
-        self._admin_user = self.get_superuser()
-
     def test_log_for_create_page_translation(self):
         """
-        Test that a title creation is logged correctly
+        Test that a page translation creation is logged correctly
         """
 
-        superuser = self.get_superuser()
+        page_data = self.get_new_page_data()
 
-        self.assertEqual(False, "TODO: Not implemented")
+        with self.login_user_context(self._admin_user):
+
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertEqual(response.status_code, 302)
+
+            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+
+            # Test that the log count is correct
+            self.assertEqual(1, LogEntry.objects.count())
+
+            log_entry = LogEntry.objects.all()[0]
+
+            # Check that the contents of the log message is correct
+            self.assertEqual(_("Changed Page Translation"), log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(CHANGE, log_entry.action_flag)
+
+            # Check the object id is set correctly
+            self.assertEqual(str(page.pk), log_entry.object_id)
+
+            # Check the object_repr is set correctly
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_change_translation(self):
         """
+        Test that a page translation change is logged correctly
         """
-        self.assertEqual(False, "TODO: Not implemented")
 
+        with self.login_user_context(self._admin_user):
+
+            page = create_page("page_a", "nav_playground.html", "en", published=False)
+            title = create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
+
+            endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
+
+            data = model_to_dict(title, fields=['title'])
+            data['title'] = 'my_new_title_field'
+
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+            # Test that the log count is correct
+            self.assertEqual(1, LogEntry.objects.count())
+
+            log_entry = LogEntry.objects.all()[0]
+
+            # Check that the contents of the log message is correct
+            self.assertEqual(_("Changed Page Translation"), log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(CHANGE, log_entry.action_flag)
+
+            # Check the object id is set correctly
+            self.assertEqual(str(page.pk), log_entry.object_id)
+
+            # Check the object_repr is set correctly
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_delete_translation(self):
         """
+        Test that a page translation deletion is logged correctly
         """
-        self.assertEqual(False, "TODO: Not implemented")
+
+        with self.login_user_context(self._admin_user):
+
+            page = create_page("page_a", "nav_playground.html", "en", published=False)
+            create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
+
+            endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+            post_data = {'post': 'yes', 'language': 'de'}
+
+            response = self.client.post(endpoint, post_data)
+            self.assertEqual(response.status_code, 302)
+
+            # Test that the log count is correct
+            self.assertEqual(1, LogEntry.objects.count())
+
+            log_entry = LogEntry.objects.all()[0]
+
+            # Check that the contents of the log message is correct
+            self.assertEqual(_("Deleted Page Translation"), log_entry.change_message)
+
+            # Check the action flag is set correctly
+            self.assertEqual(CHANGE, log_entry.action_flag)
+
+            # Check the object id is set correctly
+            self.assertEqual(str(page.pk), log_entry.object_id)
+
+            # Check the object_repr is set correctly
+            self.assertEqual(str(page), log_entry.object_repr)
 
 
 class LogPlaceholderOperationsTests(CMSTestCase):
+
+    def setUp(self):
+        self._admin_user = self.get_superuser()
+        self._cms_page = self.create_homepage(
+            "home",
+            "nav_playground.html",
+            "en",
+            created_by=self._admin_user,
+            published=True,
+        )
+        self._placeholder_1 = self._cms_page.placeholders.get(slot='body')
+        self._placeholder_2 = self._cms_page.placeholders.get(slot='right-column')
 
     def _add_plugin(self, placeholder=None, plugin_type='LinkPlugin', language='en'):
         placeholder = placeholder or self._placeholder_1
@@ -239,24 +334,14 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         )
         return uri
 
-    def setUp(self):
-        self._admin_user = self.get_superuser()
-        self._cms_page = self.create_homepage(
-            "home",
-            "nav_playground.html",
-            "en",
-            created_by=self._admin_user,
-            published=True,
-        )
-        self._placeholder_1 = self._cms_page.placeholders.get(slot='body')
-        self._placeholder_2 = self._cms_page.placeholders.get(slot='right-column')
-
     def test_log_for_add_plugin(self):
         """
+        Test that a log is created when a plugin is created
         """
 
         endpoint = self._get_add_plugin_uri()
         data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+        page = self._placeholder_1.page
 
         with self.login_user_context(self._admin_user):
 
@@ -275,13 +360,14 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(CHANGE, log_entry.action_flag)
 
             # Check the object id is set correctly
-            #FIXME: self.assertEqual(str(plugin.pk), log_entry.object_id)
+            self.assertEqual(str(page.pk), log_entry.object_id)
 
             # Check the object_repr is set correctly
-            #FIXME: self.assertEqual(str(plugin), log_entry.object_repr)
+            self.assertEqual(str(page), log_entry.object_repr)
 
     def test_log_for_move_plugin(self):
         """
+        Test that a log is created when a plugin is moved
         """
 
         plugin = self._add_plugin()
@@ -317,6 +403,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_change_plugin(self):
         """
+        Test that a log is created when a plugin is changed
         """
 
         plugin = self._add_plugin()
@@ -349,6 +436,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_delete_plugin(self):
         """
+        Test that a log is created when a plugin is deleted
         """
 
         plugin = self._add_plugin()
@@ -381,6 +469,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_cut_plugin(self):
         """
+        Test that a log is created when a plugin is cut
         """
 
         user_settings = UserSettings.objects.create(
@@ -421,6 +510,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_paste_plugin(self):
         """
+        Test that a log is created when a plugin is pasted
         """
 
         user_settings = UserSettings.objects.create(
@@ -463,6 +553,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_add_plugin_to_placeholder(self):
         """
+        Test that a log is created when a plugin is added to a placeholder
         """
 
         plugin = self._add_plugin()
@@ -499,6 +590,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_paste_placeholder(self):
         """
+        Test that a log is created when a plugin is pasted in a placeholder
         """
 
         user_settings = UserSettings.objects.create(
@@ -548,6 +640,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_clear_placeholder(self):
         """
+        Test that a log is created when a placeholder is emptied of plugins
         """
 
         self._add_plugin()

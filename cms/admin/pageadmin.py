@@ -120,9 +120,17 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     inlines = PERMISSION_ADMIN_INLINES
 
+
+    def log_addition(self, request, object, object_repr):
+        # Block the log for deletion. A signal takes care of this!
+        return
+
     def log_deletion(self, request, object, object_repr):
         # Block the log for deletion. A signal takes care of this!
-        pass
+        return
+
+    def log_change(self, request, object, message):
+        return
 
     def get_admin_url(self, action, *args):
         url_name = "{}_{}_{}".format(
@@ -1158,13 +1166,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                     messages.warning(request, _("Page not published! A parent page is not published yet."))
                 else:
                     messages.info(request, _('The content was successfully published.'))
-                LogEntry.objects.log_action(
-                    user_id=request.user.id,
-                    content_type_id=ContentType.objects.get_for_model(Page).pk,
-                    object_id=page_id,
-                    object_repr=page.get_title(language),
-                    action_flag=CHANGE,
-                )
             else:
                 if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                     messages.warning(request, _("Page not published! A parent page is not published yet."))
@@ -1621,7 +1622,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not cancel_clicked and request.method == 'POST':
             form = PageTitleForm(instance=translation, data=request.POST)
             if form.is_valid():
+
+
                 form.save()
+
+
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=translation)
