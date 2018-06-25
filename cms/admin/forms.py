@@ -34,7 +34,6 @@ from cms.utils.permissions import (
     get_subordinate_groups,
     get_user_permission_level,
 )
-
 from menus.menu_pool import menu_pool
 
 
@@ -295,7 +294,6 @@ class AddPageForm(BasePageForm):
             # its the first page. publish it right away
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
-
         return new_page
 
 
