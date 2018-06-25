@@ -11,7 +11,7 @@ from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin, messages
-from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
@@ -120,16 +120,16 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     inlines = PERMISSION_ADMIN_INLINES
 
-
     def log_addition(self, request, object, object_repr):
-        # Block the log for deletion. A signal takes care of this!
+        # Block the admin log for addition. A signal takes care of this!
         return
 
     def log_deletion(self, request, object, object_repr):
-        # Block the log for deletion. A signal takes care of this!
+        # Block the admin log for deletion. A signal takes care of this!
         return
 
     def log_change(self, request, object, message):
+        # Block the admin log for change. A signal takes care of this!
         return
 
     def get_admin_url(self, action, *args):
@@ -1229,15 +1229,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 'language': language_name, 'page': page}
             messages.info(request, message)
 
-            # FIXME: AA: Change to fire a signal???
-            LogEntry.objects.log_action(
-                user_id=request.user.id,
-                content_type_id=ContentType.objects.get_for_model(Page).pk,
-                object_id=page_id,
-                object_repr=page.get_title(),
-                action_flag=CHANGE,
-                change_message=message,
-            )
         except RuntimeError:
             exc = sys.exc_info()[1]
             messages.error(request, exc.message)
