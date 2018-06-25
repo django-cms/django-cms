@@ -265,9 +265,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             form=self.get_form_class(request, obj),
             **kwargs
         )
-        form._user = request.user
         form._site = self.get_site(request)
-        form._language = get_site_language_from_request(request, site_id=form._site.pk)
+        form._request = request
         return form
 
     def duplicate(self, request, object_id):

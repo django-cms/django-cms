@@ -13,7 +13,7 @@ from django.utils.translation import (
 
 from cms.admin.forms import AddPageForm
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_current_site, permissions
+from cms.utils import permissions
 from cms.utils.page import get_available_slug
 from cms.utils.page_permissions import (
     user_can_add_page,
@@ -43,7 +43,6 @@ class SlugWidget(forms.widgets.TextInput):
 
 
 class CreateCMSPageForm(AddPageForm):
-    page = None
     sub_page_form = False
 
     # Field overrides
@@ -65,9 +64,6 @@ class CreateCMSPageForm(AddPageForm):
         )
 
     def __init__(self, *args, **kwargs):
-        self._site = get_current_site()
-        self._user = self.user
-        self._language = self.language_code
         super(CreateCMSPageForm, self).__init__(*args, **kwargs)
         self.fields['title'].help_text = _(u"Provide a title for the new page.")
         self.fields['slug'].required = False
@@ -90,6 +86,10 @@ class CreateCMSPageForm(AddPageForm):
                 return ph
 
         return None
+
+    @property
+    def _language(self):
+        return self.language_code
 
     def clean(self):
         """
@@ -124,21 +124,21 @@ class CreateCMSPageForm(AddPageForm):
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people from possible form-hacking.
-        if self.page and self.sub_page_form:
+        if self._page and self.sub_page_form:
             # User is adding a page which will be a direct
             # child of the current page.
-            parent_page = self.page
-        elif self.page and self.page.parent_page:
+            parent_page = self._page
+        elif self._page and self._page.parent_page:
             # User is adding a page which will be a right
             # sibling to the current page.
-            parent_page = self.page.parent_page
+            parent_page = self._page.parent_page
         else:
             parent_page = None
 
         if parent_page:
-            has_perm = user_can_add_subpage(self.user, target=parent_page)
+            has_perm = user_can_add_subpage(self._user, target=parent_page)
         else:
-            has_perm = user_can_add_page(self.user)
+            has_perm = user_can_add_page(self._user)
 
         if not has_perm:
             message = ugettext('You don\'t have the permissions required to add a page.')
@@ -181,7 +181,7 @@ class CreateCMSPageForm(AddPageForm):
 
         if plugin_type in plugin_pool.plugins and plugin_body:
             if content and permissions.has_plugin_permission(
-                    self.user, plugin_type, "add"):
+                    self._user, plugin_type, "add"):
                 new_page.rescan_placeholders()
                 placeholder = self.get_placeholder(new_page, slot=slot)
                 if placeholder:
