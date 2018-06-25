@@ -5,7 +5,7 @@ from cms.utils.compat.dj import is_installed as app_is_installed
 from cms.app_registration import (
     autodiscover_cms_configs,
     configure_cms_apps,
-    get_cms_apps,
+    get_cms_extension_apps,
 )
 
 
@@ -52,5 +52,5 @@ def setup_cms_apps():
     any of this functionality.
     """
     autodiscover_cms_configs()
-    cms_apps = get_cms_apps()
+    cms_apps = get_cms_extension_apps()
     configure_cms_apps(cms_apps)

@@ -97,6 +97,14 @@ class CMSApp(object):
 
 class CMSAppConfig(object):
     """Base class that all cms app configurations should inherit from"""
+    # NOTE: Atm this does not define any attributes or methods, but this
+    # may change. In the mean time the main reason all cms app configs
+    # must inherit from this class is because we find the app configs
+    # by checking for classes which are subclasses of CMSAppConfig.
+
+
+class CMSAppExtension(object):
+    """Base class that all cms app extensions should inherit from"""
 
     def configure_app(self, app):
         """

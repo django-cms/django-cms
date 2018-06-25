@@ -14,19 +14,42 @@ from cms.test_utils.testcases import CMSTestCase
 class AutodiscoverTestCase(CMSTestCase):
 
     @override_settings(INSTALLED_APPS=[
-        'cms.test_utils.project.app_with_cms_feature',
+        'cms.test_utils.project.app_with_cms_config',
+        'cms.test_utils.project.app_with_cms_feature_and_config',
         'cms.test_utils.project.app_without_cms_file'
     ])
-    def test_adds_cms_app_attribute_to_django_app_config(self):
+    def test_adds_cms_config_attribute_to_django_app_config(self):
         app_registration.autodiscover_cms_configs()
 
-        # If a cms config is defined, add a cms_app attribute to the
+        # If a cms config is defined, add a cms_config attribute to the
         # django app config instance. Otherwise don't.
         app_list = [app for app in apps.get_app_configs()]
-        self.assertTrue(hasattr(app_list[0], 'cms_app'))
+        self.assertTrue(hasattr(app_list[0], 'cms_config'))
         self.assertEqual(
-            app_list[0].cms_app.__class__.__name__, 'CMSSomeFeatureConfig')
-        self.assertFalse(hasattr(app_list[1], 'cms_app'))
+            app_list[0].cms_config.__class__.__name__, 'CMSConfigConfig')
+        self.assertTrue(hasattr(app_list[1], 'cms_config'))
+        self.assertEqual(
+            app_list[1].cms_config.__class__.__name__, 'CMSConfig')
+        self.assertFalse(hasattr(app_list[2], 'cms_config'))
+
+    @override_settings(INSTALLED_APPS=[
+        'cms.test_utils.project.app_with_cms_feature',
+        'cms.test_utils.project.app_with_cms_feature_and_config',
+        'cms.test_utils.project.app_without_cms_file'
+    ])
+    def test_adds_cms_extension_attribute_to_django_app_config(self):
+        app_registration.autodiscover_cms_configs()
+
+        # If a cms extension is defined, add a cms_extension attribute
+        # to the django app config instance. Otherwise don't.
+        app_list = [app for app in apps.get_app_configs()]
+        self.assertTrue(hasattr(app_list[0], 'cms_extension'))
+        self.assertEqual(
+            app_list[0].cms_extension.__class__.__name__, 'CMSSomeFeatureConfig')
+        self.assertTrue(hasattr(app_list[1], 'cms_extension'))
+        self.assertEqual(
+            app_list[1].cms_extension.__class__.__name__, 'CMSExtension')
+        self.assertFalse(hasattr(app_list[2], 'cms_extension'))
 
     @override_settings(INSTALLED_APPS=[
         'cms.test_utils.project.app_with_bad_cms_file',
@@ -47,45 +70,50 @@ class AutodiscoverTestCase(CMSTestCase):
             app_registration.autodiscover_cms_configs()
 
     @override_settings(INSTALLED_APPS=[
-        'cms.test_utils.project.app_with_two_cms_app_classes',
+        'cms.test_utils.project.app_with_two_cms_config_classes',
     ])
-    def test_raises_exception_when_more_than_one_cms_app_class_found_in_cms_file(self):
+    def test_raises_exception_when_more_than_one_cms_config_class_found_in_cms_file(self):
         # More than one cms config defined so raise exception
         with self.assertRaises(ImproperlyConfigured):
             app_registration.autodiscover_cms_configs()
 
+    @override_settings(INSTALLED_APPS=[
+        'cms.test_utils.project.app_with_two_cms_feature_classes',
+    ])
+    def test_raises_exception_when_more_than_one_cms_extension_class_found_in_cms_file(self):
+        # More than one cms extension defined so raise exception
+        with self.assertRaises(ImproperlyConfigured):
+            app_registration.autodiscover_cms_configs()
 
-class GetCmsAppsTestCase(CMSTestCase):
+
+class GetCmsExtensionAppsTestCase(CMSTestCase):
 
     def setUp(self):
-        # The result of get_cms_apps is cached. Clear this cache
+        # The result of get_cms_extension_apps is cached. Clear this cache
         # because installed apps change between tests and therefore
         # unlike in a live environment, results of this function
         # can change between tests
-        app_registration.get_cms_apps.cache_clear()
+        app_registration.get_cms_extension_apps.cache_clear()
 
     @patch.object(apps, 'get_app_configs')
-    def test_returns_only_cms_apps(self, mocked_apps):
-        # apps with cms_app attr and a configure method
-        cms_app1 = Mock(cms_app=Mock(spec=['configure_app']))
-        cms_app2 = Mock(cms_app=Mock(spec=['configure_app']))
-        # app without cms_app attr
-        # this throws an AttributeError if cms_app is accessed
-        non_cms_app = Mock(spec=[])
-        # mock what apps have been installed
+    def test_returns_only_cms_apps_with_extension(self, mocked_apps):
+        app_with_extension = Mock(label='a', cms_extension=Mock(), spec=[])
+        app_with_config = Mock(label='b', cms_config=Mock(), spec=[])
+        app_with_both = Mock(
+            label='c', cms_config=Mock(), cms_extension=Mock(), spec=[])
+        non_cms_app = Mock(label='d', spec=[]),
         mocked_apps.return_value = [
-            cms_app1,
-            cms_app2,
+            app_with_extension,
+            app_with_config,
+            app_with_both,
             non_cms_app,
         ]
 
-        cms_apps = app_registration.get_cms_apps()
+        cms_apps = app_registration.get_cms_extension_apps()
 
-        # Of the 3 installed apps only 2 have features (1 is a
-        # non-cms app)
+        # Of the 4 installed apps only 2 have extensions
         self.assertListEqual(
-            cms_apps,
-            [cms_app1, cms_app2])
+            cms_apps, [app_with_extension, app_with_both])
 
 
 class ConfigureCmsAppsTestCase(CMSTestCase):
@@ -97,12 +125,12 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app = Mock(spec=AppConfig)
         feature_app.label = 'djangocms_feature_x'
-        feature_app.cms_app = Mock(spec=['configure_app'])
+        feature_app.cms_extension = Mock(spec=['configure_app'])
         # Set up app that makes use of djangocms_feature_x
         config_app = Mock(spec=AppConfig)
-        config_app.cms_app = Mock(
+        config_app.cms_config = Mock(
             spec=['djangocms_feature_x_enabled'])
-        config_app.cms_app.djangocms_feature_x_enabled = True
+        config_app.cms_config.djangocms_feature_x_enabled = True
         # Pretend these mocked apps are in INSTALLED_APPS
         mocked_apps.return_value = [
             feature_app, config_app]
@@ -111,7 +139,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
 
         # If an app has enabled a feature, the configure method
         # for that feature should have run with that app as the arg
-        feature_app.cms_app.configure_app.assert_called_once_with(
+        feature_app.cms_extension.configure_app.assert_called_once_with(
             config_app)
 
     @patch.object(apps, 'get_app_configs')
@@ -121,16 +149,16 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app = Mock(spec=AppConfig)
         feature_app.label = 'djangocms_feature_x'
-        feature_app.cms_app = Mock(spec=['configure_app'])
+        feature_app.cms_extension = Mock(spec=['configure_app'])
         # Set up two apps that do not make use of djangocms_feature_x.
         # One does not define the enabled attr at all (most common
         # use case) and one defines it as False
         config_app_disabled1 = Mock(spec=AppConfig)
-        config_app_disabled1.cms_app = Mock(spec=[])
+        config_app_disabled1.cms_config = Mock(spec=[])
         config_app_disabled2 = Mock(spec=AppConfig)
-        config_app_disabled2.cms_app = Mock(
+        config_app_disabled2.cms_config = Mock(
             spec=['djangocms_feature_x_enabled'])
-        config_app_disabled2.cms_app.djangocms_feature_x_enabled = False
+        config_app_disabled2.cms_config.djangocms_feature_x_enabled = False
         # Pretend all these mocked apps are in INSTALLED_APPS
         mocked_apps.return_value = [
             feature_app, config_app_disabled1, config_app_disabled2]
@@ -139,7 +167,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
 
         # If an app has not enabled a feature, the configure method
         # for that feature should not have been run for that app
-        self.assertFalse(feature_app.cms_app.configure_app.called)
+        self.assertFalse(feature_app.cms_extension.configure_app.called)
 
     @patch.object(apps, 'get_app_configs')
     def test_doesnt_raise_exception_if_not_cms_app(
@@ -148,7 +176,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app = Mock(spec=AppConfig)
         feature_app.label = 'djangocms_feature_x'
-        feature_app.cms_app = Mock(spec=['configure_app'])
+        feature_app.cms_extension = Mock(spec=['configure_app'])
         # Set up non cms app
         non_cms_app = Mock(spec=AppConfig)
         # Pretend these mocked apps are in INSTALLED_APPS
@@ -168,29 +196,29 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app_x = Mock(spec=AppConfig)
         feature_app_x.label = 'djangocms_feature_x'
-        feature_app_x.cms_app = Mock(spec=['configure_app'])
+        feature_app_x.cms_extension = Mock(spec=['configure_app'])
         # Set up app with label djangocms_feature_y that has a cms feature
         feature_app_y = Mock(spec=AppConfig)
         feature_app_y.label = 'djangocms_feature_y'
-        feature_app_y.cms_app = Mock(spec=['configure_app'])
-        # Set up apps that makes use of djangocms_feature_x
+        feature_app_y.cms_extension = Mock(spec=['configure_app'])
+        # Set up apps that make use of djangocms_feature_x
         config_app_x = Mock(spec=AppConfig)
-        config_app_x.cms_app = Mock(
+        config_app_x.cms_config = Mock(
             spec=['djangocms_feature_x_enabled'])
-        config_app_x.cms_app.djangocms_feature_x_enabled = True
+        config_app_x.cms_config.djangocms_feature_x_enabled = True
         # Set up app that makes use of djangocms_feature_y
         config_app_y = Mock(spec=AppConfig)
-        config_app_y.cms_app = Mock(
+        config_app_y.cms_config = Mock(
             spec=['djangocms_feature_y_enabled'])
-        config_app_y.cms_app.djangocms_feature_y_enabled = True
+        config_app_y.cms_config.djangocms_feature_y_enabled = True
         # Set up app that makes use of feature x & y
         config_app_xy = Mock(spec=AppConfig)
-        config_app_xy.cms_app = Mock(
+        config_app_xy.cms_config = Mock(
             spec=['djangocms_feature_x_enabled',
                   'djangocms_feature_y_enabled']
         )
-        config_app_xy.cms_app.djangocms_feature_x_enabled = True
-        config_app_xy.cms_app.djangocms_feature_y_enabled = True
+        config_app_xy.cms_config.djangocms_feature_x_enabled = True
+        config_app_xy.cms_config.djangocms_feature_y_enabled = True
         # Set up non cms app
         non_cms_app = Mock(spec=AppConfig)
         # Pretend these mocked apps are in INSTALLED_APPS
@@ -203,32 +231,32 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
 
         # Assert we configured the 2 apps we expected with feature x
         self.assertEqual(
-            feature_app_x.cms_app.configure_app.call_count, 2)
+            feature_app_x.cms_extension.configure_app.call_count, 2)
         self.assertEqual(
-            feature_app_x.cms_app.configure_app.call_args_list[0][0][0],
+            feature_app_x.cms_extension.configure_app.call_args_list[0][0][0],
             config_app_xy)
         self.assertEqual(
-            feature_app_x.cms_app.configure_app.call_args_list[1][0][0],
+            feature_app_x.cms_extension.configure_app.call_args_list[1][0][0],
             config_app_x)
         # Assert we configured the 2 apps we expected with feature y
         self.assertEqual(
-            feature_app_y.cms_app.configure_app.call_count, 2)
+            feature_app_y.cms_extension.configure_app.call_count, 2)
         self.assertEqual(
-            feature_app_y.cms_app.configure_app.call_args_list[0][0][0],
+            feature_app_y.cms_extension.configure_app.call_args_list[0][0][0],
             config_app_xy)
         self.assertEqual(
-            feature_app_y.cms_app.configure_app.call_args_list[1][0][0],
+            feature_app_y.cms_extension.configure_app.call_args_list[1][0][0],
             config_app_y)
 
 
 class SetupCmsAppsTestCase(CMSTestCase):
 
     def setUp(self):
-        # The result of get_cms_apps is cached. Clear this cache
+        # The result of get_cms_extension_apps is cached. Clear this cache
         # because installed apps change between tests and therefore
         # unlike in a live environment, results of this function
         # can change between tests
-        app_registration.get_cms_apps.cache_clear()
+        app_registration.get_cms_extension_apps.cache_clear()
 
     @patch.object(setup, 'setup_cms_apps')
     def test_setup_cms_apps_function_run_on_startup(self, mocked_setup):
@@ -240,6 +268,7 @@ class SetupCmsAppsTestCase(CMSTestCase):
 
     @override_settings(INSTALLED_APPS=[
         'cms.test_utils.project.app_with_cms_feature',
+        'cms.test_utils.project.app_with_cms_feature_and_config',
         'cms.test_utils.project.app_without_cms_file',
         'cms.test_utils.project.app_with_cms_config'
     ])
@@ -250,23 +279,33 @@ class SetupCmsAppsTestCase(CMSTestCase):
         # Get the django app configs to do asserts on them later
         feature_app = apps.get_app_config('app_with_cms_feature')
         config_app = apps.get_app_config('app_with_cms_config')
+        feature_and_config_app = apps.get_app_config(
+            'app_with_cms_feature_and_config')
         non_cms_app = apps.get_app_config('app_without_cms_file')
 
-        # cms_app attribute has been added to all app configs
-        # that correctly define a cms_apps.py file
-        self.assertFalse(hasattr(non_cms_app, 'cms_app'))
-        self.assertTrue(hasattr(feature_app, 'cms_app'))
-        self.assertTrue(hasattr(config_app, 'cms_app'))
+        # cms_config attribute has been added to all app configs
+        # that define a cms config class
+        self.assertFalse(hasattr(non_cms_app, 'cms_config'))
+        self.assertFalse(hasattr(feature_app, 'cms_config'))
+        self.assertTrue(hasattr(config_app, 'cms_config'))
+        self.assertTrue(hasattr(feature_and_config_app, 'cms_config'))
+
+        # cms_extension attribute has been added to all app configs
+        # that define a cms extension class
+        self.assertFalse(hasattr(non_cms_app, 'cms_extension'))
+        self.assertTrue(hasattr(feature_app, 'cms_extension'))
+        self.assertFalse(hasattr(config_app, 'cms_extension'))
+        self.assertTrue(hasattr(feature_and_config_app, 'cms_extension'))
 
         # Code from the configure method did what we expected.
         # Relying on checking that the code in the app_with_cms_feature
         # test app ran. This is so as to avoid mocking and allow the
         # whole app registration code to run through.
-        self.assertEqual(feature_app.cms_app.num_configured_apps, 1)
-        self.assertTrue(config_app.cms_app.configured)
+        self.assertEqual(feature_app.cms_extension.num_configured_apps, 1)
+        self.assertTrue(config_app.cms_config.configured)
 
     @override_settings(INSTALLED_APPS=[
-        'cms.test_utils.project.app_with_cms_config',
+        'cms.test_utils.project.app_with_feature_not_implemented',
         'cms.test_utils.project.app_using_non_feature'
     ])
     def test_raises_not_implemented_exception_when_feature_app_doesnt_implement_configure_method(self):
