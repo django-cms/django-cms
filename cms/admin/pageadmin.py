@@ -211,7 +211,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return url_patterns + super(BasePageAdmin, self).get_urls()
 
     def _send_pre_page_operation(self, request, operation, **kwargs):
-
         return send_pre_page_operation(
             request=request,
             operation=operation,
@@ -489,7 +488,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return self.render_delete_form(request, context)
 
     def delete_model(self, request, obj):
-
         operation_token = self._send_pre_page_operation(
             request,
             operation=operations.DELETE_PAGE,

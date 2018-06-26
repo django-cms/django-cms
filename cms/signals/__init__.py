@@ -112,5 +112,3 @@ if get_cms_setting('PERMISSION'):
                              dispatch_uid='cms_pre_save_globalpagepermission')
     signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
                                dispatch_uid='cms_pre_delete_globalpagepermission')
-
-
