@@ -26,7 +26,7 @@ from cms.models.permissionmodels import User
 from cms.operations import (
     helpers as operation_helpers,
     ADD_PAGE_TRANSLATION,
-    CHANGE_PAGE_TRANSLATION,
+    CHANGE_PAGE,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
@@ -470,7 +470,7 @@ class ChangePageForm(BasePageForm):
 
         operation_token = operation_helpers.send_pre_page_operation(
             request=self.request,
-            operation=CHANGE_PAGE_TRANSLATION
+            operation=CHANGE_PAGE,
         )
 
         data = self.cleaned_data
@@ -500,7 +500,7 @@ class ChangePageForm(BasePageForm):
 
         operation_helpers.send_post_page_operation(
             request=self.request,
-            operation=CHANGE_PAGE_TRANSLATION,
+            operation=CHANGE_PAGE,
             token=operation_token,
             obj=cms_page,
         )

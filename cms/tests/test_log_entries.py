@@ -110,9 +110,6 @@ class LogPageOperationsTests(CMSTestCase):
             LogEntry.objects.all().delete()
 
             # Get and edit the page
-            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
-            self.assertEqual(response.status_code, 200)
-
             page_data['slug'] = 'changed slug'
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             self.assertEqual(response.status_code, 302)
@@ -123,7 +120,7 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
 
             # Check that the contents of the log message is correct
-            self.assertEqual('Changed Page Translation', log_entry.change_message)
+            self.assertEqual('Changed', log_entry.change_message)
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)

@@ -10,6 +10,10 @@ _page_operations_map = {
         'message': _("Moved"),
         'flag': CHANGE,
     },
+    operations.CHANGE_PAGE: {
+        'message': _("Changed"),
+        'flag': CHANGE,
+    },
     operations.DELETE_PAGE: {
         'message': _("Deleted"),
         'flag': DELETION,
