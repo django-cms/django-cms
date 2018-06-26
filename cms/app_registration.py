@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import inspect
-from functools import lru_cache
 from importlib import import_module
 
 from django.apps import apps
+from django.utils.lru_cache import lru_cache
 from django.utils.module_loading import module_has_submodule
 from django.core.exceptions import ImproperlyConfigured
 
