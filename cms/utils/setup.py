@@ -1,6 +1,11 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+from cms.app_registration import (
+    autodiscover_cms_configs,
+    configure_cms_apps,
+    get_cms_extension_apps,
+)
 from cms.utils.compat.dj import is_installed as app_is_installed
 
 
@@ -38,3 +43,14 @@ def setup():
     validate_dependencies()
     validate_settings()
     plugin_pool.validate_templates()
+
+
+def setup_cms_apps():
+    """
+    Check for django apps which provide functionality that extends the
+    cms. Configure all apps which have configs that declare use of
+    any of this functionality.
+    """
+    autodiscover_cms_configs()
+    cms_apps = get_cms_extension_apps()
+    configure_cms_apps(cms_apps)
