@@ -311,12 +311,12 @@ class AddPageForm(BasePageForm):
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
 
-            operation_helpers.send_post_page_operation(
-                request=self.request,
-                operation=ADD_PAGE_TRANSLATION,
-                token=operation_token,
-                obj=new_page,
-            )
+        operation_helpers.send_post_page_operation(
+            request=self.request,
+            operation=ADD_PAGE_TRANSLATION,
+            token=operation_token,
+            obj=new_page,
+        )
 
         return new_page
 

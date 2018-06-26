@@ -222,7 +222,7 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
 
             # Check that the contents of the log message is correct
-            self.assertEqual(_("Added Page Translation"), log_entry.change_message)
+            self.assertEqual(_("Changed Page Translation"), log_entry.change_message)
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)

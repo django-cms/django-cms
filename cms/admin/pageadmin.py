@@ -1610,7 +1610,24 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not cancel_clicked and request.method == 'POST':
             form = PageTitleForm(instance=translation, data=request.POST)
             if form.is_valid():
+
+                operation_token = self._send_pre_page_operation(
+                    request,
+                    operation=operations.CHANGE_PAGE_TRANSLATION,
+                    obj=page,
+                    translation=translation,
+                )
+
                 form.save()
+
+                self._send_post_page_operation(
+                    request,
+                    operation=operations.CHANGE_PAGE_TRANSLATION,
+                    token=operation_token,
+                    obj=page,
+                    translation=translation,
+                )
+
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=translation)
