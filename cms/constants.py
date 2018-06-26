@@ -46,3 +46,5 @@ GRANT_ALL_PERMISSIONS = 'All'
 PUBLISH_COMMENT = "Publish"
 
 SCRIPT_USERNAME = 'script'
+
+CMS_CONFIG_NAME = 'cms_config'

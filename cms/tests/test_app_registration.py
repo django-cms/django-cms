@@ -162,9 +162,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         app_registration.get_cms_config_apps.cache_clear()
 
     @patch.object(apps, 'get_app_configs')
-    def test_runs_configure_app_method_for_app_with_enabled_config(
-        self, mocked_apps
-    ):
+    def test_runs_configure_app_method_for_app_with_enabled_config(self, mocked_apps):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app = Mock(spec=AppConfig)
         feature_app.label = 'djangocms_feature_x'
@@ -186,9 +184,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
             config_app.cms_config)
 
     @patch.object(apps, 'get_app_configs')
-    def test_doesnt_run_configure_app_method_for_disabled_app(
-        self, mocked_apps
-    ):
+    def test_doesnt_run_configure_app_method_for_disabled_app(self, mocked_apps):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app = Mock(spec=AppConfig)
         feature_app.label = 'djangocms_feature_x'
@@ -213,9 +209,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         self.assertFalse(feature_app.cms_extension.configure_app.called)
 
     @patch.object(apps, 'get_app_configs')
-    def test_doesnt_raise_exception_if_not_cms_app(
-        self, mocked_apps
-    ):
+    def test_doesnt_raise_exception_if_not_cms_app(self, mocked_apps):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app = Mock(spec=AppConfig)
         feature_app.label = 'djangocms_feature_x'
@@ -233,9 +227,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
             self.fail("Exception raised when cms app config not defined")
 
     @patch.object(apps, 'get_app_configs')
-    def test_runs_configure_app_method_for_correct_apps_when_multiple_apps(
-        self, mocked_apps
-    ):
+    def test_runs_configure_app_method_for_correct_apps_when_multiple_apps(self, mocked_apps):
         # Set up app with label djangocms_feature_x that has a cms feature
         feature_app_x = Mock(spec=AppConfig)
         feature_app_x.label = 'djangocms_feature_x'

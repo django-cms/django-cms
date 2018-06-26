@@ -8,27 +8,25 @@ from django.utils.module_loading import module_has_submodule
 from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_base import CMSAppConfig, CMSAppExtension
+from cms.constants import CMS_CONFIG_NAME
 
 
-CMS_CONFIG_NAME = 'cms_config'
-
-
-def _find_subclasses(cms_module, klass):
+def _find_subclasses(module, klass):
     """
     Helper function.
 
-    Returns a list of classes in cms_module which inherit from klass.
+    Returns a list of classes in module which inherit from klass.
     """
     classes = []
     # Find all classes that inherit from klass
-    for name, obj in inspect.getmembers(cms_module):
-        is_cms_config = (
+    for name, obj in inspect.getmembers(module):
+        is_subclass = (
             inspect.isclass(obj) and
             issubclass(obj, klass) and
             # Ignore the import of klass itself
             obj != klass
         )
-        if is_cms_config:
+        if is_subclass:
             classes.append(obj)
     return classes
 

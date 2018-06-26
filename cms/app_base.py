@@ -122,6 +122,6 @@ class CMSAppExtension(six.with_metaclass(ABCMeta)):
         cms config classes, the method app A has defined will run twice,
         once for app B and once for app C.
 
-        :param app: django app that has defined the feature as enabled
+        :param cms_config: the cms config class of the app
         """
         pass
