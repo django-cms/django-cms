@@ -40,9 +40,11 @@
     }
 }
 
-.pricing-icon {
-    width: rem(86px);
-    height: rem(86px);
+.pricing-image {
+    display: block;
+    height: rem(100px);
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: rem(20px);
 }
 
