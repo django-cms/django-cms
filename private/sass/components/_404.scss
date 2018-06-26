@@ -1,0 +1,35 @@
+.container-404 {
+    background-image: url("../img/404.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    color: theme-color("purple") !important;
+    min-height: 400px;
+    background-size: cover;
+
+    @include media-breakpoint-up(md) {
+        min-height: 500px;
+    }
+
+
+    @include media-breakpoint-up(lg) {
+        min-height: 601px;
+    }
+
+
+    h1 {
+        color: theme-color("purple") !important;
+        font-weight: bold;
+        font-size: rem(150px);
+        padding-top: 90px;
+        margin-bottom: -10px;
+    }
+
+    p {
+        font-weight: bold;
+        font-size: rem(30px);
+
+        @include media-breakpoint-down(md) {
+            font-size: rem(20px);
+        }
+    }
+}
