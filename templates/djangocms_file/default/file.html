@@ -1,7 +1,15 @@
-<a href="{{ instance.file_src.url }}"
+<a class="file-link link-wrapper{% if instance.attributres.class %} {{ instance.attributes.class }}{% endif %}" href="{{ instance.file_src.url }}"
     {% if instance.link_target %} target="{{ instance.link_target }}"{% endif %}
     {% if instance.link_title %} title="{{ instance.link_title }}"{% endif %}
-    {{ instance.attributes_str }}>
+
+    {% for key, value in instance.attributes.items %}
+        {% if key != 'class' %}
+            {{ key }}="{{ value }}"
+        {% endif %}
+    {% endfor %}
+    >
+    {% include 'includes/icon.html' with icon='file' %}
+    <span class="link-inner">
     {% if instance.file_name %}
         {{ instance.file_name }}
     {% else %}
@@ -10,6 +18,7 @@
     {% if instance.show_file_size %}
         <span>{{ instance.file_src.size|filesizeformat }}</span>
     {% endif %}
+    </span>
 </a>
 
 {% comment %}

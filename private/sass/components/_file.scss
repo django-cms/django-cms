@@ -1,0 +1,10 @@
+.file-link {
+    display: inline-flex;
+
+    .icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 5px;
+        flex-shrink: 0;
+    }
+}

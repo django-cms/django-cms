@@ -3,7 +3,13 @@
 <div class="embed-responsive embed-responsive-16by9">
 {% if instance.embed_link %}
     {# show iframe if embed_link is provided #}
-    <iframe class="embed-responsive-item" src="{{ instance.embed_link }}" {{ instance.attributes_str }} frameborder="0" allowfullscreen="true"></iframe>
+    <iframe class="embed-responsive-item{% if instance.attributres.class %} {{ instance.attributes.class }}{% endif %}" src="{{ instance.embed_link }}"
+        {% for key, value in instance.attributes.items %}
+            {% if key != 'class' %}
+                {{ key }}="{{ value }}"
+            {% endif %}
+        {% endfor %}
+        frameborder="0" allowfullscreen="true"></iframe>
     {% with disabled=instance.embed_link %}
         {% for plugin in instance.child_plugin_instances %}
             {% render_plugin plugin %}
