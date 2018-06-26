@@ -16,7 +16,7 @@ _page_operations_map = {
     },
     operations.ADD_PAGE_TRANSLATION: {
         'message': _("Added Page Translation"),
-        'flag': CHANGE,
+        'flag': ADDITION,
     },
     operations.CHANGE_PAGE_TRANSLATION: {
         'message': _("Changed Page Translation"),

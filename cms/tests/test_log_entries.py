@@ -31,7 +31,7 @@ class LogPageOperationsTests(CMSTestCase):
         log_entry = LogEntry.objects.all()[0]
 
         # Check that the contents of the log message is correct
-        self.assertEqual('[{"added": {}}]', log_entry.change_message)
+        self.assertEqual('Added Page Translation', log_entry.change_message)
 
         # Check the action flag is set correctly
         self.assertEqual(ADDITION, log_entry.action_flag)
@@ -123,7 +123,7 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
 
             # Check that the contents of the log message is correct
-            self.assertEqual('[{"changed": {"fields": ["slug"]}}]', log_entry.change_message)
+            self.assertEqual('Changed Page Translation', log_entry.change_message)
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
@@ -198,37 +198,6 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the object_repr is set correctly
             self.assertEqual(pre_delete_repr, log_entry.object_repr)
 
-    def test_log_for_create_page_translation(self):
-        """
-        Test that a page translation creation is logged correctly
-        """
-
-        page_data = self.get_new_page_data()
-
-        with self.login_user_context(self._admin_user):
-
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertEqual(response.status_code, 302)
-
-            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-
-            # Test that the log count is correct
-            self.assertEqual(1, LogEntry.objects.count())
-
-            log_entry = LogEntry.objects.all()[0]
-
-            # Check that the contents of the log message is correct
-            self.assertEqual(_("Changed Page Translation"), log_entry.change_message)
-
-            # Check the action flag is set correctly
-            self.assertEqual(CHANGE, log_entry.action_flag)
-
-            # Check the object id is set correctly
-            self.assertEqual(str(page.pk), log_entry.object_id)
-
-            # Check the object_repr is set correctly
-            self.assertEqual(str(page), log_entry.object_repr)
-
     def test_log_for_change_translation(self):
         """
         Test that a page translation change is logged correctly
@@ -253,7 +222,7 @@ class LogPageOperationsTests(CMSTestCase):
             log_entry = LogEntry.objects.all()[0]
 
             # Check that the contents of the log message is correct
-            self.assertEqual(_("Changed Page Translation"), log_entry.change_message)
+            self.assertEqual(_("Added Page Translation"), log_entry.change_message)
 
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)

@@ -41,6 +41,9 @@ from cms.utils.permissions import (
 )
 from menus.menu_pool import menu_pool
 
+# FIXME: REMOVEME:
+from attrdict import AttrDict
+
 
 def get_permission_accessor(obj):
     User = get_user_model()
@@ -135,6 +138,9 @@ class BasePageForm(forms.ModelForm):
                                        widget=forms.Textarea(attrs={'maxlength': '320', 'rows': '4'}),
                                        help_text=_('A description of the page used by search engines.'),
                                        max_length=320)
+
+    # FIXME: REMOVEME: Waiting for request to be passed through, temp hack for testing in the UI
+    request = AttrDict({'user': {'pk': 1 }})
 
     class Meta:
         model = Page
@@ -268,7 +274,6 @@ class AddPageForm(BasePageForm):
 
         operation_token = operation_helpers.send_pre_page_operation(
             request=self.request,
-            sender=self.model,
             operation=ADD_PAGE_TRANSLATION,
         )
 
@@ -308,9 +313,9 @@ class AddPageForm(BasePageForm):
 
             operation_helpers.send_post_page_operation(
                 request=self.request,
-                sender=self.model,
                 operation=ADD_PAGE_TRANSLATION,
                 token=operation_token,
+                obj=new_page,
             )
 
         return new_page
@@ -465,7 +470,6 @@ class ChangePageForm(BasePageForm):
 
         operation_token = operation_helpers.send_pre_page_operation(
             request=self.request,
-            sender=self.model,
             operation=CHANGE_PAGE_TRANSLATION
         )
 
@@ -496,9 +500,9 @@ class ChangePageForm(BasePageForm):
 
         operation_helpers.send_post_page_operation(
             request=self.request,
-            sender=self.model,
             operation=CHANGE_PAGE_TRANSLATION,
-            token=operation_token
+            token=operation_token,
+            obj=cms_page,
         )
 
         return cms_page
