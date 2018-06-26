@@ -34,7 +34,7 @@
         {% if article.featured_image_id %}
             <div class="row justify-content-center">
                 <div class="col-12 col-md-10 col-lg-8 text-center">
-                    <img class="img-fluid mb-5" src="{% thumbnail article.featured_image 800x450 crop subject_location=article.featured_image.subject_location %}" alt="{{ article.featured_image.alt }}" class="img-responsive">
+                    <img src="{% thumbnail article.featured_image 800x450 crop subject_location=article.featured_image.subject_location %}" alt="{{ article.featured_image.alt }}" class="img-fluid mb-5">
                 </div>
             </div>
         {% endif %}

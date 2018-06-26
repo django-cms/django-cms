@@ -9,7 +9,7 @@
                 {{ key }}="{{ value }}"
             {% endif %}
         {% endfor %}
-        frameborder="0" allowfullscreen="true"></iframe>
+        allowfullscreen></iframe>
     {% with disabled=instance.embed_link %}
         {% for plugin in instance.child_plugin_instances %}
             {% render_plugin plugin %}
