@@ -3,8 +3,6 @@ from collections import namedtuple
 import copy
 import json
 import sys
-import uuid
-
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -60,8 +58,8 @@ from cms.models import (
     Title, CMSPlugin, PagePermission,
     GlobalPagePermission, StaticPlaceholder,
 )
+from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_obj_operation, post_obj_operation
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
@@ -75,6 +73,7 @@ from cms.utils.i18n import (
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+
 
 require_POST = method_decorator(require_POST)
 
@@ -212,22 +211,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return url_patterns + super(BasePageAdmin, self).get_urls()
 
     def _send_pre_page_operation(self, request, operation, **kwargs):
-        token = str(uuid.uuid4())
-        pre_obj_operation.send(
-            sender=self.__class__,
-            operation=operation,
+
+        return send_pre_page_operation(
             request=request,
-            token=token,
-            **kwargs
-        )
-        return token
+            operation=operation,
+            sender=self.__class__,
+            **kwargs)
 
     def _send_post_page_operation(self, request, operation, token, **kwargs):
-        post_obj_operation.send(
-            sender=self.__class__,
+        send_post_page_operation(
             operation=operation,
             request=request,
             token=token,
+            sender=self.__class__,
             **kwargs
         )
 
@@ -493,6 +489,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return self.render_delete_form(request, context)
 
     def delete_model(self, request, obj):
+
         operation_token = self._send_pre_page_operation(
             request,
             operation=operations.DELETE_PAGE,
@@ -1613,11 +1610,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not cancel_clicked and request.method == 'POST':
             form = PageTitleForm(instance=translation, data=request.POST)
             if form.is_valid():
-
-
                 form.save()
-
-
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=translation)

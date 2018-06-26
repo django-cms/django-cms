@@ -23,6 +23,11 @@ from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationC
 from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, GlobalPagePermission, TreeNode)
 from cms.models.permissionmodels import User
+from cms.operations import (
+    helpers as operation_helpers,
+    ADD_PAGE_TRANSLATION,
+    CHANGE_PAGE_TRANSLATION,
+)
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.conf import get_cms_setting
@@ -261,6 +266,12 @@ class AddPageForm(BasePageForm):
         source = self.cleaned_data.get('source')
         parent = self.cleaned_data.get('parent_node')
 
+        operation_token = operation_helpers.send_pre_page_operation(
+            request=self.request,
+            sender=self.model,
+            operation=ADD_PAGE_TRANSLATION,
+        )
+
         if source:
             new_page = self.from_source(source, parent=parent)
 
@@ -294,6 +305,14 @@ class AddPageForm(BasePageForm):
             # its the first page. publish it right away
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
+
+            operation_helpers.send_post_page_operation(
+                request=self.request,
+                sender=self.model,
+                operation=ADD_PAGE_TRANSLATION,
+                token=operation_token,
+            )
+
         return new_page
 
 
@@ -443,6 +462,13 @@ class ChangePageForm(BasePageForm):
         return data
 
     def save(self, commit=True):
+
+        operation_token = operation_helpers.send_pre_page_operation(
+            request=self.request,
+            sender=self.model,
+            operation=CHANGE_PAGE_TRANSLATION
+        )
+
         data = self.cleaned_data
         cms_page = super(ChangePageForm, self).save(commit=False)
 
@@ -467,6 +493,14 @@ class ChangePageForm(BasePageForm):
         else:
             cms_page._update_title_path_recursive(self._language)
         cms_page.clear_cache(menu=True)
+
+        operation_helpers.send_post_page_operation(
+            request=self.request,
+            sender=self.model,
+            operation=CHANGE_PAGE_TRANSLATION,
+            token=operation_token
+        )
+
         return cms_page
 
 
