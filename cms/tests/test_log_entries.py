@@ -570,7 +570,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         )
         ref_placeholder = placeholder_plugin.placeholder_ref
 
-        plugin = self._add_plugin(ref_placeholder)
+        self._add_plugin(ref_placeholder)
 
         endpoint = self.get_move_plugin_uri(placeholder_plugin)
         page = self._placeholder_1.page
