@@ -87,7 +87,6 @@ def autodiscover_cms_configs():
         else:
             config = _find_config(cms_module)
             extension = _find_extension(cms_module)
-
             # We are adding these attributes here rather than in
             # django's app config definition because there are
             # all kinds of limitations as to what can be imported
@@ -100,7 +99,7 @@ def autodiscover_cms_configs():
             if not config and not extension:
                 raise ImproperlyConfigured(
                     "cms_config.py files must define at least one "
-                    "class which inherits from CMSAppConfig or"
+                    "class which inherits from CMSAppConfig or "
                     "CMSAppExtension")
 
 
