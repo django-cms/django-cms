@@ -1,13 +1,13 @@
-{% extends "base.html" %}
-{% load i18n %}
+{% extends "content.html" %}
+{% load i18n staticfiles %}
 
 {% block body_class %}tpl-404{% endblock %}
 
 {% block title %}{% trans "404 - Page not found" %}{% endblock %}
 
 {% block content %}
-    <div class="text-center">
-        <h1>{% trans "404 - Page not found" %}</h1>
-        <p>{% trans "We're sorry, but the requested page could not be found." %}</p>
+    <div class="container-404 text-center">
+        <h1>{% trans "404" %}</h1>
+        <p>{% trans "Ups, your plane vanished!" %}</p>
     </div>
 {% endblock content %}
