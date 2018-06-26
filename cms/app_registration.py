@@ -43,7 +43,6 @@ def _find_config(cms_module):
     ImproperlyConfigured exception.
     """
     cms_config_classes = _find_subclasses(cms_module, CMSAppConfig)
-
     if len(cms_config_classes) == 1:
         return cms_config_classes[0]
     elif len(cms_config_classes) > 1:
@@ -61,9 +60,7 @@ def _find_extension(cms_module):
     If multiple classes inherit from CMSAppExtension, raises
     ImproperlyConfigured exception.
     """
-
     cms_extension_classes = _find_subclasses(cms_module, CMSAppExtension)
-
     if len(cms_extension_classes) == 1:
         return cms_extension_classes[0]
     elif len(cms_extension_classes) > 1:
