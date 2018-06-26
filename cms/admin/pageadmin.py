@@ -74,7 +74,6 @@ from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
-
 require_POST = method_decorator(require_POST)
 
 
