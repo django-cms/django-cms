@@ -65,7 +65,7 @@
 
         {% if article.author %}
         <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8">
+            <div class="col-12 col-md-10 col-lg-8 mt-5">
                 <a href="{% namespace_url "article-list-by-author" article.author.slug namespace=namespace default='' %}" class="aldryn-newsblog-detail-author">
                     <div class="media">
                         {% if article.author.visual %}
@@ -79,7 +79,7 @@
                                 <p class="text-secondary">{{ article.author.function }}</p>
                             {% endif %}
                             {% if article.author.description %}
-                                <div class="aldryn-newsblog-detail-author-description mb-3">
+                                <div class="aldryn-newsblog-detail-author-description">
                                     {{ article.author.description }}
                                 </div>
                             {% endif %}
