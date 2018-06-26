@@ -7,5 +7,5 @@ class CMSConfig(CMSAppConfig):
 
 class CMSExtension(CMSAppExtension):
 
-    def configure_app(self, app):
+    def configure_app(self, cms_config):
         pass

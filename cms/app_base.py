@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from abc import ABC, abstractmethod
 
 
 class CMSApp(object):
@@ -97,16 +98,16 @@ class CMSApp(object):
 
 class CMSAppConfig(object):
     """Base class that all cms app configurations should inherit from"""
-    # NOTE: Atm this does not define any attributes or methods, but this
-    # may change. In the mean time the main reason all cms app configs
-    # must inherit from this class is because we find the app configs
-    # by checking for classes which are subclasses of CMSAppConfig.
+
+    def __init__(self, django_app_config):
+        self.app_config = django_app_config
 
 
-class CMSAppExtension(object):
+class CMSAppExtension(ABC):
     """Base class that all cms app extensions should inherit from"""
 
-    def configure_app(self, app):
+    @abstractmethod
+    def configure_app(self, cms_config):
         """
         Implement this method if the app provides functionality that
         other apps can use and configure.
@@ -121,4 +122,4 @@ class CMSAppExtension(object):
 
         :param app: django app that has defined the feature as enabled
         """
-        raise NotImplementedError
+        pass

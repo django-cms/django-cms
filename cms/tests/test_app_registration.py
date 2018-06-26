@@ -15,46 +15,52 @@ class AutodiscoverTestCase(CMSTestCase):
 
     @override_settings(INSTALLED_APPS=[
         'cms.test_utils.project.app_with_cms_config',
-        'cms.test_utils.project.app_with_cms_feature_and_config',
-        'cms.test_utils.project.app_without_cms_file'
     ])
-    def test_adds_cms_config_attribute_to_django_app_config(self):
+    def test_adds_only_cms_config_attr_to_config_only_app(self):
         app_registration.autodiscover_cms_configs()
 
-        # If a cms config is defined, add a cms_config attribute to the
-        # django app config instance. Otherwise don't.
-        app_list = [app for app in apps.get_app_configs()]
-        self.assertTrue(hasattr(app_list[0], 'cms_config'))
+        app = apps.get_app_config('app_with_cms_config')
+        # Make sure the app has a cms_config attribute
+        self.assertTrue(hasattr(app, 'cms_config'))
         self.assertEqual(
-            app_list[0].cms_config.__class__.__name__, 'CMSConfigConfig')
-        self.assertTrue(hasattr(app_list[1], 'cms_config'))
-        self.assertEqual(
-            app_list[1].cms_config.__class__.__name__, 'CMSConfig')
-        self.assertFalse(hasattr(app_list[2], 'cms_config'))
+            app.cms_config.__class__.__name__, 'CMSConfigConfig')
+        self.assertEqual(app.cms_config.app_config, app)
+        # Make sure the app doesn't have a cms_extension attribute
+        self.assertFalse(hasattr(app, 'cms_extension'))
 
     @override_settings(INSTALLED_APPS=[
-        'cms.test_utils.project.app_with_cms_feature',
         'cms.test_utils.project.app_with_cms_feature_and_config',
-        'cms.test_utils.project.app_without_cms_file'
     ])
-    def test_adds_cms_extension_attribute_to_django_app_config(self):
+    def test_adds_both_cms_config_and_cms_extension_attr(self):
         app_registration.autodiscover_cms_configs()
 
-        # If a cms extension is defined, add a cms_extension attribute
-        # to the django app config instance. Otherwise don't.
-        app_list = [app for app in apps.get_app_configs()]
-        self.assertTrue(hasattr(app_list[0], 'cms_extension'))
+        app = apps.get_app_config('app_with_cms_feature_and_config')
+        # Make sure the app has a cms_config attribute
+        self.assertTrue(hasattr(app, 'cms_config'))
         self.assertEqual(
-            app_list[0].cms_extension.__class__.__name__, 'CMSSomeFeatureConfig')
-        self.assertTrue(hasattr(app_list[1], 'cms_extension'))
+            app.cms_config.__class__.__name__, 'CMSConfig')
+        self.assertEqual(app.cms_config.app_config, app)
+        # Make sure the app has a cms_extension attribute
+        self.assertTrue(hasattr(app, 'cms_extension'))
         self.assertEqual(
-            app_list[1].cms_extension.__class__.__name__, 'CMSExtension')
-        self.assertFalse(hasattr(app_list[2], 'cms_extension'))
+            app.cms_extension.__class__.__name__, 'CMSExtension')
+
+    @override_settings(INSTALLED_APPS=[
+        'cms.test_utils.project.app_without_cms_file',
+    ])
+    def test_doesnt_add_attrs_to_app_without_cms_config(self):
+        app_registration.autodiscover_cms_configs()
+
+        app = apps.get_app_config('app_without_cms_file')
+        # Make sure the app doesn't have a cms_config attribute
+        self.assertFalse(hasattr(app, 'cms_config'))
+        # Make sure the app doesn't have a cms_extension attribute
+        self.assertFalse(hasattr(app, 'cms_extension'))
 
     @override_settings(INSTALLED_APPS=[
         'cms.test_utils.project.app_with_bad_cms_file',
     ])
-    def test_raises_exception_raised_in_cms_file(self):
+    def test_exception_propagates_from_cms_file(self):
         # The cms file intentionally raises a RuntimeError. We need
         # to make sure the exception definitely bubbles up and doesn't
         # get caught.
@@ -116,7 +122,44 @@ class GetCmsExtensionAppsTestCase(CMSTestCase):
             cms_apps, [app_with_extension, app_with_both])
 
 
+class GetCmsConfigAppsTestCase(CMSTestCase):
+
+    def setUp(self):
+        # The result of get_cms_config_apps is cached. Clear this cache
+        # because installed apps change between tests and therefore
+        # unlike in a live environment, results of this function
+        # can change between tests
+        app_registration.get_cms_config_apps.cache_clear()
+
+    @patch.object(apps, 'get_app_configs')
+    def test_returns_only_cms_apps_with_config(self, mocked_apps):
+        app_with_extension = Mock(label='a', cms_extension=Mock(), spec=[])
+        app_with_config = Mock(label='b', cms_config=Mock(), spec=[])
+        app_with_both = Mock(
+            label='c', cms_config=Mock(), cms_extension=Mock(), spec=[])
+        non_cms_app = Mock(label='d', spec=[]),
+        mocked_apps.return_value = [
+            app_with_extension,
+            app_with_config,
+            app_with_both,
+            non_cms_app,
+        ]
+
+        cms_apps = app_registration.get_cms_config_apps()
+
+        # Of the 4 installed apps only 2 have configs
+        self.assertListEqual(
+            cms_apps, [app_with_config, app_with_both])
+
+
 class ConfigureCmsAppsTestCase(CMSTestCase):
+
+    def setUp(self):
+        # The result of get_cms_config_apps is cached. Clear this cache
+        # because installed apps change between tests and therefore
+        # unlike in a live environment, results of this function
+        # can change between tests
+        app_registration.get_cms_config_apps.cache_clear()
 
     @patch.object(apps, 'get_app_configs')
     def test_runs_configure_app_method_for_app_with_enabled_config(
@@ -140,7 +183,7 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
         # If an app has enabled a feature, the configure method
         # for that feature should have run with that app as the arg
         feature_app.cms_extension.configure_app.assert_called_once_with(
-            config_app)
+            config_app.cms_config)
 
     @patch.object(apps, 'get_app_configs')
     def test_doesnt_run_configure_app_method_for_disabled_app(
@@ -234,29 +277,30 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
             feature_app_x.cms_extension.configure_app.call_count, 2)
         self.assertEqual(
             feature_app_x.cms_extension.configure_app.call_args_list[0][0][0],
-            config_app_xy)
+            config_app_xy.cms_config)
         self.assertEqual(
             feature_app_x.cms_extension.configure_app.call_args_list[1][0][0],
-            config_app_x)
+            config_app_x.cms_config)
         # Assert we configured the 2 apps we expected with feature y
         self.assertEqual(
             feature_app_y.cms_extension.configure_app.call_count, 2)
         self.assertEqual(
             feature_app_y.cms_extension.configure_app.call_args_list[0][0][0],
-            config_app_xy)
+            config_app_xy.cms_config)
         self.assertEqual(
             feature_app_y.cms_extension.configure_app.call_args_list[1][0][0],
-            config_app_y)
+            config_app_y.cms_config)
 
 
 class SetupCmsAppsTestCase(CMSTestCase):
 
     def setUp(self):
-        # The result of get_cms_extension_apps is cached. Clear this cache
-        # because installed apps change between tests and therefore
-        # unlike in a live environment, results of this function
-        # can change between tests
+        # The results of get_cms_extension_apps and get_cms_config_apps
+        # are cached. Clear this cache because installed apps change
+        # between tests and therefore unlike in a live environment,
+        # results of this function can change between tests
         app_registration.get_cms_extension_apps.cache_clear()
+        app_registration.get_cms_config_apps.cache_clear()
 
     @patch.object(setup, 'setup_cms_apps')
     def test_setup_cms_apps_function_run_on_startup(self, mocked_setup):
@@ -302,12 +346,6 @@ class SetupCmsAppsTestCase(CMSTestCase):
         # test app ran. This is so as to avoid mocking and allow the
         # whole app registration code to run through.
         self.assertEqual(feature_app.cms_extension.num_configured_apps, 1)
-        self.assertTrue(config_app.cms_config.configured)
-
-    @override_settings(INSTALLED_APPS=[
-        'cms.test_utils.project.app_with_feature_not_implemented',
-        'cms.test_utils.project.app_using_non_feature'
-    ])
-    def test_raises_not_implemented_exception_when_feature_app_doesnt_implement_configure_method(self):
-        with self.assertRaises(NotImplementedError):
-            setup.setup_cms_apps()
+        self.assertListEqual(
+            feature_app.cms_extension.configured_apps,
+            ['app_with_cms_config'])

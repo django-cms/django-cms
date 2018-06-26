@@ -6,7 +6,7 @@ def some_function(*args, **kwargs):
     raise Exception('some_function called')
 
 
-class SomeClass():
+class SomeClass(object):
     # this should not be picked up by autodiscover
 
     def __init__(self, *args, **kwargs):
@@ -15,14 +15,16 @@ class SomeClass():
 
 class CMSSomeFeatureConfig(CMSAppExtension):
 
-    num_configured_apps = 0
+    def __init__(self, *args, **kwargs):
+        self.num_configured_apps = 0
+        self.configured_apps = []
 
-    def configure_app(self, app):
-        app.cms_config.configured = True
+    def configure_app(self, cms_config):
         self.num_configured_apps += 1
+        self.configured_apps.append(cms_config.app_config.label)
 
 
-class SomeOtherClass():
+class SomeOtherClass(object):
     # this should not be picked up by autodiscover
 
     def __init__(self, *args, **kwargs):

@@ -13,6 +13,26 @@ from cms.app_base import CMSAppConfig, CMSAppExtension
 CMS_CONFIG_NAME = 'cms_config'
 
 
+def _find_subclasses(cms_module, klass):
+    """
+    Helper function.
+
+    Returns a list of classes in cms_module which inherit from klass.
+    """
+    classes = []
+    # Find all classes that inherit from klass
+    for name, obj in inspect.getmembers(cms_module):
+        is_cms_config = (
+            inspect.isclass(obj) and
+            issubclass(obj, klass) and
+            # Ignore the import of klass itself
+            obj != klass
+        )
+        if is_cms_config:
+            classes.append(obj)
+    return classes
+
+
 def _find_config(cms_module):
     """
     Helper function.
@@ -22,17 +42,7 @@ def _find_config(cms_module):
     If multiple classes inherit from CMSAppConfig, raises
     ImproperlyConfigured exception.
     """
-    cms_config_classes = []
-    # Find all classes that inherit from CMSAppConfig
-    for name, obj in inspect.getmembers(cms_module):
-        is_cms_config = (
-            inspect.isclass(obj) and
-            issubclass(obj, CMSAppConfig) and
-            # Ignore the import of CMSAppConfig itself
-            obj != CMSAppConfig
-        )
-        if is_cms_config:
-            cms_config_classes.append(obj)
+    cms_config_classes = _find_subclasses(cms_module, CMSAppConfig)
 
     if len(cms_config_classes) == 1:
         return cms_config_classes[0]
@@ -52,17 +62,7 @@ def _find_extension(cms_module):
     ImproperlyConfigured exception.
     """
 
-    cms_extension_classes = []
-    # Find all classes that inherit from CMSAppExtension
-    for name, obj in inspect.getmembers(cms_module):
-        is_cms_extension = (
-            inspect.isclass(obj) and
-            issubclass(obj, CMSAppExtension) and
-            # Ignore the import of CMSAppExtension itself
-            obj != CMSAppExtension
-        )
-        if is_cms_extension:
-            cms_extension_classes.append(obj)
+    cms_extension_classes = _find_subclasses(cms_module, CMSAppExtension)
 
     if len(cms_extension_classes) == 1:
         return cms_extension_classes[0]
@@ -97,7 +97,7 @@ def autodiscover_cms_configs():
             # in django's apps.py and leaving it to devs to define this
             # there could cause issues
             if config:
-                app_config.cms_config = config()
+                app_config.cms_config = config(app_config)
             if extension:
                 app_config.cms_extension = extension()
             if not config and not extension:
@@ -119,6 +119,18 @@ def get_cms_extension_apps():
     return cms_apps
 
 
+@lru_cache(maxsize=None)
+def get_cms_config_apps():
+    """
+    Returns django app configs of apps with a cms config
+    """
+    # NOTE: The cms_config attr is added by the autodiscover_cms_configs
+    # function if a cms_config.py file with a suitable class is found.
+    cms_apps = [app_config for app_config in apps.get_app_configs()
+                if hasattr(app_config, 'cms_config')]
+    return cms_apps
+
+
 def configure_cms_apps(apps_with_features):
     """
     Check installed apps for apps that are configured to use cms addons
@@ -128,10 +140,7 @@ def configure_cms_apps(apps_with_features):
         enabled_property = "{}_enabled".format(app_with_feature.label)
         configure_app = app_with_feature.cms_extension.configure_app
 
-        for app_config in apps.get_app_configs():
-            if not hasattr(app_config, 'cms_config'):
-                # Not a cms app with a config, so ignore
-                continue
+        for app_config in get_cms_config_apps():
             if getattr(app_config.cms_config, enabled_property, False):
                 # Feature enabled for this app so configure
-                configure_app(app_config)
+                configure_app(app_config.cms_config)
