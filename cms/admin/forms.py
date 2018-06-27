@@ -10,6 +10,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms import api
@@ -27,7 +28,11 @@ from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.forms import UserChangeForm
-from cms.utils.i18n import get_language_list, get_language_object
+from cms.utils.i18n import (
+    get_language_list,
+    get_language_object,
+    get_site_language_from_request,
+)
 from cms.utils.permissions import (
     get_current_user,
     get_subordinate_users,
@@ -113,9 +118,8 @@ class CopyPermissionForm(forms.Form):
 
 
 class BasePageForm(forms.ModelForm):
-    _user = None
     _site = None
-    _language = None
+    _request = None
 
     title = forms.CharField(label=_("Title"), max_length=255, widget=forms.TextInput(),
                             help_text=_('The default title'))
@@ -141,6 +145,14 @@ class BasePageForm(forms.ModelForm):
         if not slug:
             raise ValidationError(_("Slug must not be empty."))
         return slug
+
+    @cached_property
+    def _language(self):
+        return get_site_language_from_request(self._request, site_id=self._site.pk)
+
+    @property
+    def _user(self):
+        return self._request.user
 
 
 class AddPageForm(BasePageForm):
@@ -485,9 +497,8 @@ class PublicationDatesForm(forms.ModelForm):
 class AdvancedSettingsForm(forms.ModelForm):
     from cms.forms.fields import PageSmartLinkField
 
-    _user = None
     _site = None
-    _language = None
+    _request = None
 
     application_urls = forms.ChoiceField(label=_('Application'),
                                          choices=(), required=False,
@@ -590,6 +601,10 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
             self.fields['overwrite_url'].initial = self.title_obj.path
+
+    @cached_property
+    def _language(self):
+        return get_site_language_from_request(self._request, site_id=self._site.pk)
 
     def get_apphooks(self):
         for hook in apphook_pool.get_apphooks():

@@ -888,7 +888,6 @@ class AdminFormsTests(AdminTestsBase):
         site = Site.objects.get_current()
         page = create_page('Page 1', 'nav_playground.html', 'en')
         page_data = {
-            'language': 'en',
             'site': site.pk,
             'template': 'col_two.html',
         }
@@ -903,7 +902,6 @@ class AdminFormsTests(AdminTestsBase):
 
         # Now switch it up by adding german as the current language
         # Note that german has not been created as page translation.
-        page_data['language'] = 'de'
         page_data['template'] = 'nav_playground.html'
 
         with self.login_user_context(admin_user):

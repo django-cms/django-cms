@@ -84,7 +84,8 @@ class WizardCreateView(SessionWizardView):
     def get_form_kwargs(self, step=None):
         """This is called by self.get_form()"""
         kwargs = super(WizardCreateView, self).get_form_kwargs()
-        kwargs['wizard_user'] = self.request.user
+        kwargs['wizard_request'] = self.request
+        kwargs['wizard_site'] = self.site
         if self.is_second_step(step):
             kwargs['wizard_page'] = self.get_origin_page()
             kwargs['wizard_language'] = self.get_origin_language()
