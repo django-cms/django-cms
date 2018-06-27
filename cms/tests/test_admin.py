@@ -484,17 +484,6 @@ class AdminTests(AdminTestsBase):
             page = self.reload(page)
             self.assertFalse(page.is_published('en'))
 
-    def test_change_status_adds_log_entry(self):
-        page = self.get_page()
-        admin_user = self.get_admin()
-        with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'no': 'data'})
-            self.assertFalse(LogEntry.objects.count())
-            response = self.admin_class.publish_page(request, page.pk, "en")
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(1, LogEntry.objects.count())
-            self.assertEqual(page.pk, int(LogEntry.objects.all()[0].object_id))
-
     def test_change_innavigation(self):
         page = self.get_page()
         permless = self.get_permless()
