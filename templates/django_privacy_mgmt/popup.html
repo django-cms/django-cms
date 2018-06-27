@@ -1,0 +1,138 @@
+{% load staticfiles sekizai_tags i18n %}
+
+{% addtoblock "js" %}
+    <script>
+        // handles cookie bar settings
+        jQuery(document).ready(function () {
+
+            var COOKIE_NAME = 'django-privacy-mgmt-settings';
+            var inputs = $('.js-gdpr-optin');
+            var privacyModal = $('#privacysettings');
+
+            $('.js-modal-accept').on('click', function (e) {
+                e.preventDefault();
+                // this should never be set, it breaks any third-party script, such as click-tracking / analytics, etc.
+                // e.stopImmediatePropagation();
+
+                privacyModal.modal('hide');
+
+                inputs.each(function () {
+                    // initialize on modal load
+                    var el = $(this);
+                    var name = el.data('gdpr-category-name');
+                    var preference = django_privacy_mgmt.setPreference(name, el.prop('checked'));
+                });
+            });
+
+            $('.js-cookie-settings').on('click', function (e) {
+                e.preventDefault();
+                privacyModal.modal('show')
+            });
+
+            inputs.each(function () {
+                // initialize on modal load
+                var el = $(this);
+                var name = el.data('gdpr-category-name');
+                var preference = django_privacy_mgmt.getPreference(name);
+                el.prop('checked', preference);
+            });
+        });
+    </script>
+{% endaddtoblock %}
+
+<div class="modal fade cookie-modal" id="privacysettings" tabindex="-1" role="dialog" aria-labelledby="privacylabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="privacylabel">{% trans 'Privacy Settings' %}</h4>
+            </div>
+            <div class="modal-body">
+                <p class="alert alert-info">
+                    {% blocktrans %}
+                        Websites do not have full control over cookies that may set by various third-party scripts.
+                        To see detailed information about and to manage cookies in your browser, please check its
+                        privacy
+                        settings.
+                    {% endblocktrans %}
+                </p>
+
+                <div class="category essentials">
+                    <h5>{% trans "Essentials" %}</h5>
+                    <p>These cookies and scripts cannot be deactivated as they are needed to correctly render this
+                        website.</p>
+                    {% if essentials %}
+                        <ul>
+                            {% for item in essentials %}
+                                <li>
+                                    {{ item.name }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p><em>Currently none in use.</em></p>
+                    {% endif %}
+                </div>
+
+                <hr/>
+                ​
+                <div class="category analytics">
+                    <h5>
+                        {% trans "Statistics" %}
+                        <label class="pull-right small toggle-check">
+                            <input type="checkbox" name="statistics" data-gdpr-category-name="STATISTICS"
+                                   class="js-gdpr-optin toggle-check-input"/>
+                            <span class="toggle-check-text"></span>
+                        </label>
+                    </h5>
+                    <p>
+                        These tools are used to collect statistics about user behaviour that helps us to improve our
+                        website and services.
+                        No personal data are collected.
+                    </p>
+                    {% if statistics %}
+                        <ul>
+                            {% for item in statistics %}
+                                <li>
+                                    {{ item.name }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p><em>Currently none in use.</em></p>
+                    {% endif %}
+                </div>
+                ​
+                <hr/>
+
+                <div class="category marketing">
+                    <h5>
+                        {% trans 'Personalisation' %}
+                        <label class="pull-right small toggle-check">
+                            <input type="checkbox" name="marketing" data-gdpr-category-name="MARKETING" id="marketing"
+                                   class="js-gdpr-optin toggle-check-input"/>
+                            <span class="toggle-check-text"></span>
+                        </label>
+                    </h5>
+                    <p>In order to improve your experience of our services, we will customise your experience based upon
+                        your usage.</p>
+                    {% if marketing %}
+                        <ul class="items">
+                            {% for item in marketing %}
+                                <li>
+                                    {{ item.name }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p><em>Currently none in use.</em></p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default js-modal-accept">{% trans "Accept" %}</button>
+            </div>
+        </div>
+    </div>
+</div>

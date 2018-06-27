@@ -1,0 +1,64 @@
+{% load staticfiles sekizai_tags i18n %}
+​
+
+{% addtoblock "css" %}
+    <link rel="stylesheet" type="text/css" href="{% static 'django_privacy_mgmt/css/main.css' %}" media="screen"/>
+{% endaddtoblock %}
+
+
+{% addtoblock "js" %}
+    <script>
+        // handles cookie bar settings
+        jQuery(document).ready(function () {
+
+            var COOKIE_NAME = 'django-privacy-mgmt-banner-state';
+            var cookie_banner_state = Cookies.getJSON(COOKIE_NAME) || {hidden: false};
+
+            if (!cookie_banner_state.hidden) {
+                $('.js-cookie-bar').show();
+            }
+
+            // accepting
+            $('.js-cookie-accept').on('click', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                django_privacy_mgmt.setPreference('STATISTICS', true);
+                django_privacy_mgmt.setPreference('MARKETING', true);
+
+                closeBar();
+            });
+
+            $('.js-modal-accept').on('click', function (e) {
+                closeBar();
+            });
+
+            function closeBar() {
+                Cookies.set(COOKIE_NAME, {hidden: true}, {
+                    // in FF this is required so that the cookie is not deleted after ending the browser session
+                    // we set it to a very high number of dates so that this cookie 'never' expires.
+                    expires: 2000
+                });
+                $('.js-cookie-bar').hide();
+            }
+
+            // reset for debugging
+            // Cookies.set(COOKIE_NAME, { hidden: false }, {
+                // in FF this is required so that the cookie is not deleted after ending the browser session
+                // we set it to a very high number of dates so that this cookie 'never' expires.
+                // expires: 2000
+            // })
+        });
+    </script>
+{% endaddtoblock %}
+​
+<div class="cookie-bar js-cookie-bar" hidden>
+    <div class="container">
+        {% blocktrans %}
+            <a href="#" class="btn btn-default btn-xs js-cookie-accept pull-right">Accept</a>
+            This website uses cookies to help ensure that you enjoy the best experience.<br/>
+            If you do not consent to our use of cookies, please adjust your
+            <a href="#" class="js-cookie-settings">privacy settings</a> accordingly.
+        {% endblocktrans %}
+    </div>
+</div>

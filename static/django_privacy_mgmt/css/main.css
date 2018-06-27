@@ -1,0 +1,90 @@
+@charset "UTF-8";
+/* line 1, ../../../private/scss/main.scss */
+.cookie-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  ​color: white;
+  font-weight: 300;
+  padding: 20px 0;
+  background: LightGray;
+}
+/* line 12, ../../../private/scss/main.scss */
+.cookie-bar .btn {
+  margin-top: 5px;
+}
+
+/* line 19, ../../../private/scss/main.scss */
+.cookie-modal label {
+  color: gray;
+}
+
+/* line 23, ../../../private/scss/main.scss */
+​
+.toggle-check-input {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  visibility: hidden;
+}
+
+/* line 32, ../../../private/scss/main.scss */
+​
+.toggle-check-text {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  text-transform: uppercase;
+  color: white;
+  padding: 5px;
+  width: 55px;
+  border-radius: 10px;
+  background: #ccc;
+  transition: background-color 0.15s;
+  padding-left: 23px;
+  padding-right: 0;
+}
+
+/* line 49, ../../../private/scss/main.scss */
+​
+.toggle-check-text:after {
+  content: ' ';
+  display: block;
+  background: white;
+  width: 17px;
+  height: 17px;
+  border-radius: 100%;
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  transition: left 0.15s, margin-left 0.15s;
+}
+
+/* line 63, ../../../private/scss/main.scss */
+​
+.toggle-check-text:before {
+  content: 'Off';
+}
+
+/* line 68, ../../../private/scss/main.scss */
+​
+.toggle-check-input:checked ~ .toggle-check-text:before {
+  content: 'On';
+}
+
+/* line 73, ../../../private/scss/main.scss */
+​
+.toggle-check-input:checked ~ .toggle-check-text {
+  background: LightGray;
+  padding-left: 6px;
+  padding-right: 0;
+}
+
+/* line 81, ../../../private/scss/main.scss */
+​
+.toggle-check-input:checked ~ .toggle-check-text:after {
+  left: 100%;
+  margin-left: -1.4em;
+}
