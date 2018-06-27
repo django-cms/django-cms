@@ -68,11 +68,11 @@
                 <div class="footer-social">
                     <p class="footer-social-title">Keep up to date</p>
                     <ul class="list-unstyled list-inline">
-                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on Twitter " color="blue" %}</a></li>
-                        <li><a href="#" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                        <li><a href="https://twitter.com/divio" target="_blank">{% include "includes/icon.html" with icon="social-twitter" class="" title="Follow us on Twitter " color="blue" %}</a></li>
+                        <li><a href="https://www.facebook.com/divio.ch" target="_blank">{% include "includes/icon.html" with icon="social-facebook" class="" title="Follow us on Facebook " color="blue" %}</a></li>
+                        <li><a href="https://www.linkedin.com/company/divio-ag" target="_blank">{% include "includes/icon.html" with icon="social-linkedin" class="" title="Follow us on LinkedIn " color="blue" %}</a></li>
+                        <li><a href="https://github.com/divio" target="_blank">{% include "includes/icon.html" with icon="social-github" class="" title="Follow us on GitHub " color="blue" %}</a></li>
+                        <li><a href="https://plus.google.com/+DivioAGZ%C3%BCrich" target="_blank">{% include "includes/icon.html" with icon="social-gplus" class="" title="Follow us on Google Plus " color="blue" %}</a></li>
                     </ul>
                 </div>
             </div>
@@ -81,25 +81,27 @@
                     <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
                         <ul class="list-unstyled footer-links">
                             <li><p class="footer-links-title">Help and Support</p></li>
-                            {% show_menu_below_id "support" %}
+                            {% show_menu_below_id "support" 0 0 100 100 %}
                         </ul>
                     </div>
                     <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
                         <ul class="list-unstyled footer-links">
                             <li><p class="footer-links-title">Company</p></li>
-                            {% show_menu_below_id "company" %}
+                            {% show_menu_below_id "company" 0 0 100 100 %}
                         </ul>
                     </div>
+                    {% comment %}
                     <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
                         <ul class="list-unstyled footer-links">
                             <li><p class="footer-links-title">Investors</p></li>
-                            {% show_menu_below_id "legal" %}
+                            {% show_menu_below_id "investors" 0 0 100 100 %}
                         </ul>
                     </div>
+                    {% endcomment %}
                     <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
                         <ul class="list-unstyled footer-links">
-                            <li><p class="footer-links-title">Security</p></li>
-                            {% show_menu_below_id "legal" %}
+                            <li><p class="footer-links-title">Terms</p></li>
+                            {% show_menu_below_id "legal" 0 0 100 100 %}
                         </ul>
                     </div>
                 </div>
@@ -113,14 +115,14 @@
                             {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
                             <div class="pl-2 pl-xl-0">
                                 <p class="mb-0">USA</p>
-                                <a href="">1231321</a>
+                                <a href="tel:+12016934846">+12016934846</a>
                             </div>
                         </div>
                         <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
                             {% include "includes/icon.html" with icon="phone" class="d-xl-none" color="slate" %}
                             <div class="pl-2 pl-xl-0">
                                 <p class="mb-0">Worldwide</p>
-                                <a href="">1231321</a>
+                                <a href="tel:+41444801270">+41444801270</a>
                             </div>
                         </div>
                     </div>
@@ -129,20 +131,20 @@
                             {% include "includes/icon.html" with icon="email" class="d-xl-none" color="slate" %}
                             <div class="pl-2 pl-xl-0">
                                 <p class="mb-0">Email</p>
-                                <a href="mailto:help@divio.com">help@divio.com</a>
+                                <a href="mailto:sales@divio.com">sales@divio.com</a>
                             </div>
                         </div>
                         <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
                             {% include "includes/icon.html" with icon="chat" class="d-xl-none" color="slate" %}
                             <div class="pl-2 pl-xl-0">
                                 <p class="mb-0">Chat</p>
-                                <a href="">Start Chat</a>
+                                <a href="javascript:Intercom('showNewMessage');return false;">Start Chat</a>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12 mt-4">
-                            <a href="#" class="btn btn-primary btn-sm btn-block">I have an emergency</a>
+                            <a href="tel:+41444801270" class="btn btn-primary btn-sm btn-block">I have an emergency</a>
                         </div>
                     </div>
                 </div>
