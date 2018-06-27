@@ -3,12 +3,13 @@ from django.forms.models import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from cms.api import create_page, add_plugin, create_title
+from cms.forms.wizards import CreateCMSPageForm
+from cms.models import Page, Placeholder, UserSettings
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_MOVE,
     URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD,
 )
-from cms.models import Page, Placeholder, UserSettings
-from cms.forms.wizards import CreateCMSPageForm
+from cms.utils import get_current_site
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
 
 # Snippet to create wizard page taken from: test_wizards.py
@@ -63,6 +64,10 @@ class LogPageOperationsTests(CMSTestCase):
         Test that when a page is created via the create page wizard a log entry is created.
         """
 
+        with self.login_user_context(self._admin_user):
+            request = self.get_request()
+
+        site = get_current_site()
         data = {
             'title': 'page 1',
             'slug': 'page_1',
@@ -71,15 +76,13 @@ class LogPageOperationsTests(CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=self._admin_user,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         page = form.save()
-
-        with self.login_user_context(self._admin_user):
-
-            self._assert_page_addition_log_created(page)
+        self._assert_page_addition_log_created(page)
 
     def test_log_for_create_api_page(self):
         """
