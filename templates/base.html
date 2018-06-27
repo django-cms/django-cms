@@ -48,6 +48,7 @@
             }
         </style>
     {% endif %}
+    {% include 'django_privacy_mgmt/api.html' %}
 </head>
 <body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
 {% include "includes/analytics.html" %}
@@ -55,7 +56,6 @@
 
 {% block extend_root %}{% endblock %}
 
-{# TODO defer as soon as styleguide is fixed #}
 <script defer src="{% static 'js/dist/base.bundle.js' %}"></script>
 {% if request.toolbar and request.toolbar.edit_mode_active %}
     <script defer src="{% static 'js/dist/cms.bundle.js' %}"></script>
@@ -64,5 +64,7 @@
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}
 {% include "includes/browser.html" %}
+{% include 'django_privacy_mgmt/popup.html' %}
+{% include 'django_privacy_mgmt/banner.html' %}
 </body>
 </html>

@@ -9,6 +9,7 @@ import { initHeader } from 'addons/header';
 import { initBlogCarousel } from 'addons/carousel';
 import { initWaypoints } from 'addons/waypoints';
 import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
+import { initPrivacySettings } from 'addons/privacy';
 import 'addons/flying-focus';
 
 svg4everybody({
@@ -32,4 +33,5 @@ $(() => {
         languagePath: '',
         lowerThan: 'boxShadow',
     });
+    initPrivacySettings();
 });
