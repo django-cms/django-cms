@@ -28,8 +28,9 @@ class BaseFormMixin(object):
     has_separate_optional_fields = False
 
     def __init__(self, *args, **kwargs):
-        self.page = kwargs.pop('wizard_page', None)
-        self.user = kwargs.pop('wizard_user', None)
+        self._page = kwargs.pop('wizard_page', None)
+        self._site = kwargs.pop('wizard_site')
+        self._request = kwargs.pop('wizard_request')
         self.language_code = kwargs.pop('wizard_language')
         super(BaseFormMixin, self).__init__(*args, **kwargs)
 
@@ -76,8 +77,8 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         super(WizardStep1Form, self).__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
         self.fields['entry'].choices = entry_choices(
-            user=self.user,
-            page=self.page,
+            user=self._request.user,
+            page=self._page,
         )
 
     def get_wizard_entries(self):
@@ -87,4 +88,5 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
 
 class WizardStep2BaseForm(BaseFormMixin):
-    user = None
+    pass
+

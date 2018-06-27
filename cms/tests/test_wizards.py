@@ -224,7 +224,11 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertIn(hex(id(page_wizard)), repr(page_wizard))
 
     def test_wizard_first_page_published(self):
+        site = get_current_site()
         superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         data = {
             'title': 'page 1',
             'slug': 'page_1',
@@ -233,8 +237,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         page = form.save()
@@ -247,7 +252,11 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_wizard_create_child_page(self):
+        site = get_current_site()
         superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         parent_page = create_page(
             title="Parent",
             template=TEMPLATE_INHERITANCE_MAGIC,
@@ -261,8 +270,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSSubPageForm(
             data=data,
             wizard_page=parent_page,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         child_page = form.save()
@@ -280,6 +290,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         """
         site = get_current_site()
         superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         source_page = create_page(
             title="Source",
             template=TEMPLATE_INHERITANCE_MAGIC,
@@ -302,8 +315,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSSubPageForm(
             data=data,
             wizard_page=parent_page,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
 
@@ -322,7 +336,11 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         # invalid template which causes Django to throw an error when the
         # template is scanned for placeholders and thus short circuits the
         # creation mechanism.
+        site = get_current_site()
         superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         data = {
             'title': 'page 1',
             'slug': 'page_1',
@@ -331,8 +349,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
 
         self.assertTrue(form.is_valid())
@@ -349,6 +368,11 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         Tests that the PageWizard respects the
         CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER setting.
         """
+        site = get_current_site()
+        superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         templates = get_cms_setting('TEMPLATES')
         # NOTE, there are 4 placeholders on this template, defined in this
         # order: 'header', 'content', 'sub-content', 'footer'.
@@ -362,7 +386,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         }
 
         with override_settings(**settings):
-            superuser = self.get_superuser()
             page = create_page("wizard home", "page_wizard.html", "en")
             publish_page(page, superuser, "en")
             content = '<p>sub-content content.</p>'
@@ -375,8 +398,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             form = CreateCMSPageForm(
                 data=data,
                 wizard_page=page,
-                wizard_user=superuser,
+                wizard_site=site,
                 wizard_language='en',
+                wizard_request=request,
             )
             self.assertTrue(form.is_valid())
             page = form.save()
@@ -396,6 +420,11 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         targeting a static-placeholder. In this case, will just fail to
         add the content (without error).
         """
+        site = get_current_site()
+        superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         templates = get_cms_setting('TEMPLATES')
         # NOTE, there are 4 placeholders on this template, defined in this
         # order: 'header', 'content', 'sub-content', 'footer'.
@@ -410,7 +439,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         }
 
         with override_settings(**settings):
-            superuser = self.get_superuser()
             page = create_page("wizard home", "page_wizard.html", "en")
             publish_page(page, superuser, "en")
             content = '<p>footer content.</p>'
@@ -423,8 +451,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             form = CreateCMSPageForm(
                 data=data,
                 wizard_page=page,
-                wizard_user=superuser,
+                wizard_site=site,
                 wizard_language='en',
+                wizard_request=request,
             )
             self.assertTrue(form.is_valid())
             page = form.save()
@@ -436,7 +465,11 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 self.assertNotContains(response, content, status_code=200)
 
     def test_create_page_with_empty_fields(self):
+        site = get_current_site()
         superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         data = {
             'title': '',
             'slug': '',
@@ -445,13 +478,18 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertFalse(form.is_valid())
 
     def test_create_page_with_existing_slug(self):
+        site = get_current_site()
         superuser = self.get_superuser()
+
+        with self.login_user_context(superuser):
+            request = self.get_request()
         data = {
             'title': 'page',
             'slug': 'page',
@@ -469,8 +507,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2'))
@@ -479,8 +518,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-3'))
@@ -492,8 +532,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2-2'))
@@ -502,8 +543,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         form = CreateCMSPageForm(
             data=data,
             wizard_page=None,
-            wizard_user=superuser,
+            wizard_site=site,
             wizard_language='en',
+            wizard_request=request,
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2-3'))

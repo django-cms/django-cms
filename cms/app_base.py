@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from abc import ABCMeta, abstractmethod
+
+from django.utils import six
 
 
 class CMSApp(object):
@@ -93,3 +96,32 @@ class CMSApp(object):
         :return: list of urlconfs strings
         """
         return self._urls
+
+
+class CMSAppConfig(object):
+    """Base class that all cms app configurations should inherit from"""
+
+    def __init__(self, django_app_config):
+        self.app_config = django_app_config
+
+
+class CMSAppExtension(six.with_metaclass(ABCMeta)):
+    """Base class that all cms app extensions should inherit from"""
+
+    @abstractmethod
+    def configure_app(self, cms_config):
+        """
+        Implement this method if the app provides functionality that
+        other apps can use and configure.
+
+        This method will be run once for every app that defines an
+        attribute like "<app_label>_enabled" as True on its cms app
+        config class.
+        So for example if app A with label "app_a" implements this
+        method and app B and app C define app_a_enabled = True on their
+        cms config classes, the method app A has defined will run twice,
+        once for app B and once for app C.
+
+        :param cms_config: the cms config class of the app
+        """
+        pass

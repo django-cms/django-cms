@@ -193,6 +193,8 @@ class ApphooksTestCase(CMSTestCase):
         site1, _ = Site.objects.get_or_create(pk=1)
         site2, _ = Site.objects.get_or_create(pk=2)
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        request = self.get_request()
+        request.user = superuser
         home_site_1 = create_page(
             "home", "nav_playground.html", "en", created_by=superuser, published=True, site=site1
         )
@@ -211,16 +213,28 @@ class ApphooksTestCase(CMSTestCase):
             "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_2,
             site=site2
         )
-        form = AdvancedSettingsForm(instance=page_a_1)
-        form._site = site1
+
+        # AdvancedSettingsForm expects a _site and _request attribute
+        # on __init__. These are normally set by the admin.
+        # In this case, we need to set these in a new class.
+        Meta = type('Meta', (AdvancedSettingsForm.Meta, object), {})
+        formClass = type(AdvancedSettingsForm)(
+            'AdvancedSettingsForm',
+            (AdvancedSettingsForm,),
+            {'Meta': Meta, '_site': site1, '_request': request},
+        )
+        form = formClass(instance=page_a_1)
         self.assertFalse(form._check_unique_namespace_instance("instance"))
 
-        form = AdvancedSettingsForm(instance=page_a_2)
-        form._site = site1
+        form = formClass(instance=page_a_2)
         self.assertTrue(form._check_unique_namespace_instance("instance"))
 
-        form = AdvancedSettingsForm(instance=page_b_1)
-        form._site = site2
+        formClass = type(AdvancedSettingsForm)(
+            'AdvancedSettingsForm',
+            (AdvancedSettingsForm,),
+            {'Meta': Meta, '_site': site2, '_request': request},
+        )
+        form = formClass(instance=page_b_1)
         self.assertFalse(form._check_unique_namespace_instance("instance"))
 
         self.apphook_clear()

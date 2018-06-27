@@ -24,7 +24,6 @@ from cms.admin.forms import RequestToolbarForm
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
                               LANGUAGE_MENU_IDENTIFIER)
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Page, UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import (Example1, CharPksExample,
                                                           MultilingualExample1)
@@ -643,45 +642,6 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, AnonymousUser(), edit=False)
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.show_toolbar)
-
-    def test_publish_button(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
-        # Needed because publish button only shows if the page is dirty
-        page.set_publisher_state('en', state=PUBLISHER_STATE_DIRTY)
-
-        request = self.get_page_request(page, self.get_superuser(), edit=True)
-        toolbar = CMSToolbar(request)
-        toolbar.populate()
-        toolbar.post_template_populate()
-        self.assertTrue(toolbar.edit_mode_active)
-        items = toolbar.get_left_items() + toolbar.get_right_items()
-        self.assertEqual(len(items), 7)
-
-    def test_no_publish_button(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
-        user = self.get_staff()
-        request = self.get_page_request(page, user, edit=True)
-        toolbar = CMSToolbar(request)
-        toolbar.populate()
-        toolbar.post_template_populate()
-        self.assertTrue(page.has_change_permission(request.user))
-        self.assertFalse(page.has_publish_permission(request.user))
-        self.assertTrue(toolbar.edit_mode_active)
-        items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 5)
-
-        # adding back structure mode permission
-        permission = Permission.objects.get(codename='use_structure')
-        user.user_permissions.add(permission)
-
-        request.user = get_user_model().objects.get(pk=user.pk)
-        toolbar = CMSToolbar(request)
-        toolbar.populate()
-        toolbar.post_template_populate()
-        items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit mode + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
 
     def test_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
