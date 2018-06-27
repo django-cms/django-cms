@@ -21,6 +21,8 @@
 * Fixed a bug where setting the ``on_delete`` option on ``PlaceholderField``
   and ``PageField`` fields would be ignored.
 * Fixed a bug when deleting a modal from changelist inside a modal
+* Fixed a bug where the menu would render draft pages even if the page on the request
+  was a public page. This happens when a user without change permissions requests edit mode.
 
 
 === 3.5.2 (2018-04-11) ===
