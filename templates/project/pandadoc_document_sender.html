@@ -1,12 +1,12 @@
 {% load i18n sekizai_tags %}
 
 <form action="{% url 'admin:pandadoc-send-document' %}" method="post" class="js-pandadoc-form">
-    <div class="size-16 alert alert-success js-success-message hidden">
+    <div class="size-16 alert alert-success js-success-message" style="display: none">
         <strong>
             Thank you very much, you will receive an email shortly!
         </strong>
     </div>
-    <div class="js-form-wrapper">
+    <div class="js-form-wrapper mb-3">
         {% csrf_token %}
         <input name="plugin_id" value="{{ instance.id }}" hidden="hidden">
         <div class="form-group">
@@ -33,7 +33,7 @@
             <div id="recaptcha"></div>
         </div>
 
-        <button type="submit" class="btn btn-default js-pandadoc-submit" data-processing-text="" disabled>{% trans "Send" %}</button>
+        <button type="submit" class="btn btn-primary js-pandadoc-submit" data-processing-text="" disabled>{% trans "Send" %}</button>
     </div>
 </form>
 
