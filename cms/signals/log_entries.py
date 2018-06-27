@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
 from cms import operations
+from cms.models import Page, PageType
 
 
 _page_operations_map = {
@@ -81,18 +84,14 @@ _placeholder_operations_map = {
 }
 
 
-def create_log_entry(user_id, content_type_id, object_id, object_repr, action_flag, change_message):
+create_log_entry = LogEntry.objects.log_action
+
+
+def _is_valid_page_instance(page):
     """
-    Create a log entry
+    Check if the supplied object is a valid Page / PageType object
     """
-    return LogEntry.objects.log_action(
-        user_id=user_id,
-        content_type_id=content_type_id,
-        object_id=object_id,
-        object_repr=object_repr,
-        action_flag=action_flag,
-        change_message=change_message,
-    )
+    return isinstance(page, Page) or isinstance(page, PageType)
 
 
 def log_page_operations(sender, **kwargs):
@@ -100,19 +99,25 @@ def log_page_operations(sender, **kwargs):
     Create a log for the correct page operation type
     """
 
-    request = kwargs.pop('request')
-    operation_type = kwargs.pop('operation')
-    obj = kwargs.pop('obj')
+    request = kwargs.get('request')
+    operation_type = kwargs.get('operation')
+    obj = kwargs.get('obj')
 
-    if operation_type in _page_operations_map:
-
+    # Check that we have instructions for the operation and an instance of Page to link to in the log
+    if operation_type in _page_operations_map and _is_valid_page_instance(obj):
         operation_handler = _page_operations_map[operation_type]
         user_id = request.user.pk
         content_type_id = ContentType.objects.get_for_model(obj).pk
         object_id = obj.pk
         object_repr = str(obj)
-
-        create_log_entry(user_id, content_type_id, object_id, object_repr, operation_handler['flag'], operation_handler['message'])
+        create_log_entry(
+            user_id=user_id,
+            content_type_id=content_type_id,
+            object_id=object_id,
+            object_repr=object_repr,
+            action_flag=operation_handler['flag'],
+            change_message=operation_handler['message'],
+        )
 
 
 def log_placeholder_operations(sender, **kwargs):
@@ -120,17 +125,26 @@ def log_placeholder_operations(sender, **kwargs):
     Create a log for the correct placeholder operation type
     """
 
-    request = kwargs.pop('request')
-    operation_type = kwargs.pop('operation')
+    request = kwargs.get('request')
+    operation_type = kwargs.get('operation')
 
+    # Check that we have instructions for the operation
     if operation_type in _placeholder_operations_map:
-
         operation_handler = _placeholder_operations_map[operation_type]
         user_id = request.user.pk
-        placeholder = kwargs.pop(operation_handler['placeholder_kwarg'])
+        placeholder = kwargs.get(operation_handler['placeholder_kwarg'])
         page = placeholder.page
-        content_type_id = ContentType.objects.get_for_model(page).pk
-        object_id = page.pk
-        object_repr = str(page)
 
-        create_log_entry(user_id, content_type_id, object_id, object_repr, operation_handler['flag'], operation_handler['message'])
+        # Check that we have an instance of Page to link to in the log
+        if _is_valid_page_instance(page):
+            content_type_id = ContentType.objects.get_for_model(page).pk
+            object_id = page.pk
+            object_repr = str(page)
+            create_log_entry(
+                user_id=user_id,
+                content_type_id=content_type_id,
+                object_id=object_id,
+                object_repr=object_repr,
+                action_flag=operation_handler['flag'],
+                change_message=operation_handler['message'],
+            )
