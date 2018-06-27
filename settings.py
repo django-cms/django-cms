@@ -28,6 +28,7 @@ INSTALLED_ADDONS = [
     'djangocms-transfer',
     'djangocms-video',
     'django-filer',
+    'django-privacy-mgmt',
     # </INSTALLED_ADDONS>
 ]
 

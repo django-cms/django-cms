@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "django_privacy_mgmt"
+    ], 
+    "package-name": "django-privacy-mgmt"
+}
