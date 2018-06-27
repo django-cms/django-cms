@@ -78,7 +78,9 @@ class GenericCmsPermissionAdmin(object):
         return self._has_change_permissions_permission(request)
 
     def has_view_permission(self, request, obj=None):
-        # work around for dj21
+        # For django 2.1
+        # Default is to return True if user got `change` perm, but we have to
+        # get in consideration also cms permission system
         return self.has_change_permission(request, obj)
 
 

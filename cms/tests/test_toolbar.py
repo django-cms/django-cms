@@ -6,18 +6,18 @@ import re
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
+from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import escape
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import force_text
 
 from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm

@@ -19,5 +19,4 @@ pyenchant
 # required to run the server for integration tests
 djangocms-helper
 mock>=2.0.0
-django-reversion>=2.0
 django-formtools

@@ -2,7 +2,6 @@
 from collections import OrderedDict
 from importlib import import_module
 
-import django
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
@@ -13,15 +12,10 @@ from django.urls import Resolver404, reverse
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
+from cms.utils.compat import DJANGO_1_11
+from cms.utils.compat.dj import RegexPattern, URLPattern, URLResolver
 from cms.utils.i18n import get_language_list
 from cms.utils.moderator import use_draft
-
-try:
-    from django.urls import URLResolver
-    from django.urls.resolvers import RegexPattern, URLPattern
-except ImportError:
-    # django 1.11 support
-    from django.core.urlresolvers import RegexURLResolver as URLResolver, RegexURLPattern as URLPattern
 
 
 APP_RESOLVERS = []
@@ -134,7 +128,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
             urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
             # this is an 'include', recurse!
             regex_pattern = regex
-            if django.VERSION >= (2, 0):
+            if not DJANGO_1_11:
                 regex_pattern = RegexPattern(regex)
             resolver = URLResolver(regex_pattern, urlconf_module,
                                    pattern.default_kwargs, pattern.app_name,
@@ -146,7 +140,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
                 args.update(default_args)
 
             regex_pattern = regex
-            if django.VERSION >= (2, 0):
+            if not DJANGO_1_11:
                 regex_pattern = RegexPattern(regex, name=pattern.name)
             resolver = URLPattern(regex_pattern, pattern.callback, args,
                                   pattern.name)
@@ -266,9 +260,7 @@ def _get_app_patterns(site):
         for lang in hooked_applications[page_id].keys():
             (app_ns, inst_ns), current_patterns, app = hooked_applications[page_id][lang]  # nopyflakes
             if not resolver:
-                regex_pattern = r''
-                if django.VERSION >= (2, 0):
-                    regex_pattern = RegexPattern(regex_pattern)
+                regex_pattern = RegexPattern(r'') if not DJANGO_1_11 else r''
                 resolver = AppRegexURLResolver(
                     regex_pattern, 'app_resolver', app_name=app_ns, namespace=inst_ns)
                 resolver.page_id = page_id

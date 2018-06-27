@@ -4,9 +4,10 @@ import os
 
 from collections import OrderedDict
 
-import django
 from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import no_style
+
+from cms.utils.compat import DJANGO_2_0
 
 
 def add_builtin_arguments(parser):
@@ -48,13 +49,11 @@ class SubcommandsCommand(BaseCommand):
     subcommand_dest = 'subcmd'
 
     def create_parser(self, prog_name, subcommand):
-        kwargs = {}
-        if django.VERSION < (2, 1):
-            kwargs = {'cmd': self}
+        kwargs = {'cmd': self} if DJANGO_2_0 else {}
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
-            **kwargs,
+            **kwargs
         )
         self.add_arguments(parser)
         return parser
@@ -63,13 +62,12 @@ class SubcommandsCommand(BaseCommand):
         self.instances = {}
 
         if self.subcommands:
+            stealth_options = list(self.stealth_options)
             subparsers = parser.add_subparsers(dest=self.subcommand_dest)
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
-                kwargs = {}
-                if django.VERSION < (2, 1):
-                    kwargs = {'cmd': self}
+                kwargs = {'cmd': self} if DJANGO_2_0 else {}
                 parser_sub = subparsers.add_parser(
                     name=instance.command_name, help=instance.help_string,
                     description=instance.help_string, **kwargs
@@ -77,12 +75,9 @@ class SubcommandsCommand(BaseCommand):
 
                 add_builtin_arguments(parser=parser_sub)
                 instance.add_arguments(parser_sub)
-                self.stealth_options = (
-                    *self.stealth_options,
-                    *{action.dest for action in parser_sub._actions},
-                )
+                stealth_options.extend({action.dest for action in parser_sub._actions})
                 self.instances[command] = instance
-            self.stealth_options = tuple({*self.stealth_options})
+            self.stealth_options = tuple(set(stealth_options))
 
     def handle(self, *args, **options):
         if options[self.subcommand_dest] in self.instances:

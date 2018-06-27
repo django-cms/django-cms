@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from functools import wraps
 from threading import local
 
-import django
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
@@ -13,7 +12,8 @@ from django.utils.lru_cache import lru_cache
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import (Page, PagePermission, GlobalPagePermission)
+from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
@@ -204,10 +204,8 @@ def get_page_actions_for_user(user, site):
 
     for perm in page_permissions.iterator():
         # set internal fk cache to our page with loaded ancestors and descendants
-        if django.VERSION >= (2, 0):
-            if not hasattr(perm._state, 'fields_cache'):
-                perm._state.fields_cache = {}
-            perm._state.fields_cache['page'] = pages_by_id[perm.page_id]
+        if not DJANGO_1_11:
+            PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
         else:
             perm._page_cache = pages_by_id[perm.page_id]
 
@@ -361,10 +359,8 @@ def get_view_restrictions(pages):
 
     for perm in page_permissions:
         # set internal fk cache to our page with loaded ancestors and descendants
-        if django.VERSION >= (2, 0):
-            if not hasattr(perm._state, 'fields_cache'):
-                perm._state.fields_cache = {}
-            perm._state.fields_cache['page'] = pages_by_id[perm.page_id]
+        if not DJANGO_1_11:
+            PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
         else:
             perm._page_cache = pages_by_id[perm.page_id]
 

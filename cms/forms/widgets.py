@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
+from django.forms.widgets import MultiWidget, Select, TextInput
 from django.urls import NoReverseMatch, reverse_lazy
-from django.forms.widgets import Select, MultiWidget, TextInput
 from django.utils.encoding import force_text
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe

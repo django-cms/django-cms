@@ -1,8 +1,9 @@
-from cms.models.fields import PlaceholderField
-from django.urls import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from treebeard.mp_tree import MP_Node
+
+from cms.models.fields import PlaceholderField
 
 
 @python_2_unicode_compatible

@@ -62,8 +62,8 @@ class AdminTestsBase(CMSTestCase):
         perms = Permission.objects.filter(
             codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
         )
-        normal_guy.user_permissions.add(*perms)
         normal_guy.save()
+        normal_guy.user_permissions.set(perms)
         if use_global_permissions:
             gpp = GlobalPagePermission.objects.create(
                 user=normal_guy,
@@ -74,7 +74,7 @@ class AdminTestsBase(CMSTestCase):
                 can_change_permissions=False,
                 can_move_page=True,
             )
-            gpp.sites.add(*Site.objects.all())
+            gpp.sites.set(Site.objects.all())
         return normal_guy
 
 

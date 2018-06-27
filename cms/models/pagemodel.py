@@ -7,6 +7,7 @@ from os.path import join
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.db import models
+from django.db.models.base import ModelState
 from django.db.models.functions import Concat
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -22,6 +23,7 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
+from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
@@ -275,13 +277,12 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if hasattr(self, '_node_cache'):
-            del self._node_cache
-
-        # Django >= 2.0
-        if hasattr(self._state, 'fields_cache'):
-            if self._state.fields_cache.get('node'):
-                del self._state.fields_cache['node']
+        if DJANGO_1_11:
+            if hasattr(self, '_node_cache'):
+                del self._node_cache
+        else:
+            if Page.node.is_cached(self):
+                Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.title_cache = {}
@@ -665,6 +666,7 @@ class Page(models.Model):
             parent_page = None
 
         new_page = copy.copy(self)
+        new_page._state = ModelState()
         new_page._clear_internal_cache()
         new_page.pk = None
         new_page.node = new_node
@@ -775,7 +777,6 @@ class Page(models.Model):
             new_root_node.move(target_node, position)
             new_root_node.refresh_from_db(fields=('path', 'depth'))
 
-        self._clear_node_cache()
         nodes_by_id = {self.node.pk: new_root_node}
 
         for page in descendants:
@@ -787,8 +788,6 @@ class Page(models.Model):
                 permissions=copy_permissions,
             )
             nodes_by_id[page.node_id] = new_page.node
-
-        new_root_page._clear_node_cache()
         return new_root_page
 
     def delete(self, *args, **kwargs):

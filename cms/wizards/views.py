@@ -2,12 +2,12 @@
 
 import os
 
-from django.forms import Form
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
-from django.urls import NoReverseMatch
+from django.forms import Form
 from django.template.response import SimpleTemplateResponse
+from django.urls import NoReverseMatch
 
 from formtools.wizard.views import SessionWizardView
 

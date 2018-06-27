@@ -3,14 +3,14 @@ import datetime
 import json
 import sys
 
-from django.core.cache import cache
-from django.urls import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
+from django.urls import clear_url_caches
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
@@ -1044,6 +1044,7 @@ class PageTest(PageTestBase):
                     'name': 'English',
                     'fallbacks': ['fr', 'de'],
                     'public': True,
+                    'fallbacks': ['fr']
                 },
                 {
                     'code': 'fr',
