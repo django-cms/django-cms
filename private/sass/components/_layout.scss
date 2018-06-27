@@ -101,6 +101,11 @@ body.cke_editable {
         list-style-type: none;
         padding: 0 0 20px;
 
+        ul {
+            padding-left: 20px;
+            padding-bottom: 0px;
+        }
+
         a {
             color: $body-color;
             margin: 0 0 10px;
@@ -108,7 +113,7 @@ body.cke_editable {
             text-transform: uppercase;
             font-size: rem(14px);
             line-height: rem(20px);
-            letter-spacing: rem(2px);
+            letter-spacing: rem(1px);
             font-weight: bold;
 
             @include media-breakpoint-up(lg) {

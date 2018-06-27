@@ -1,0 +1,82 @@
+.cookie-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+    color: #fff;
+    font-weight: 300;
+    padding: 20px 0;
+    background: $body-color;
+
+    a:not(.btn) {
+        color: white;
+        text-decoration: underline;
+    }
+}
+
+.cookie-modal {
+    label {}
+}
+
+.toggle-check {
+    line-height: 23px;
+}
+
+.toggle-check-input {
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    visibility: hidden;
+}
+
+.toggle-check-text {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    text-transform: uppercase;
+    color: #fff;
+    width: 55px;
+    height: 23px;
+    border-radius: 10px;
+    background: #ccc;
+    transition: background-color 0.15s;
+
+    // text position change
+    padding-left: 23px;
+    padding-right: 0;
+}
+
+.toggle-check-text:after {
+    content: ' ';
+    display: block;
+    background: #fff;
+    width: 17px;
+    height: 17px;
+    border-radius: 100%;
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    transition: left 0.15s, margin-left 0.15s;
+}
+
+.toggle-check-text:before {
+    content: 'Off';
+}
+
+.toggle-check-input:checked ~ .toggle-check-text:before {
+    content: 'On';
+}
+
+.toggle-check-input:checked ~ .toggle-check-text {
+    background: theme-color(primary);
+
+    // text position change
+    padding-left: 6px;
+    padding-right: 0;
+}
+
+.toggle-check-input:checked ~ .toggle-check-text:after {
+    left: 100%;
+    margin-left: -1.4em;
+}

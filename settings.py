@@ -40,6 +40,7 @@ aldryn_addons.settings.load(locals())
 
 INSTALLED_APPS.extend([
     # add your project specific apps here
+    'project',
 ])
 
 MIDDLEWARE_CLASSES.extend([
@@ -74,3 +75,18 @@ DJANGOCMS_BOOTSTRAP4_SPACER_SIZES = (
 )
 
 TEXT_HTML_SANITIZE = False
+
+
+# =============================================================================
+# Pandadoc Plugin
+# =============================================================================
+PANDADOC_CLIENT_ID = env('PANDADOC_CLIENT_ID')
+PANDADOC_CLIENT_SECRET = env('PANDADOC_CLIENT_SECRET')
+PANDADOC_REDIRECT_URI = env('PANDADOC_REDIRECT_URI')
+
+# =============================================================================
+# Google reCAPTCHA
+# =============================================================================
+RECAPTCHA_SITE_KEY = env('RECAPTCHA_SITE_KEY')
+RECAPTCHA_SECRET_KEY = env('RECAPTCHA_SECRET_KEY')
+

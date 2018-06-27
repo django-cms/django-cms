@@ -1,11 +1,27 @@
-{# INFO: from html5 boilerplate https://github.com/h5bp/html5-boilerplate/blob/master/index.html #}
-{% if GOOGLE_ANALYTICS_ID %}
-    <script>
-    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-    e.src='//www.google-analytics.com/analytics.js';
-    r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-    ga('create','{{ GOOGLE_ANALYTICS_ID }}','auto');ga('send','pageview');
-    </script>
-{% endif %}
+{% load project_tags %}
+
+<script>
+!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t,e){var n=document.createElement("script");n.type="text/javascript";n.async=!0;n.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var o=document.getElementsByTagName("script")[0];o.parentNode.insertBefore(n,o);analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.1.0";
+    {% if not debug %}
+    analytics.load("5yNO8Ao0hgByWenhQbYzA0zKSoanNKpk", analyticsIntegrations);
+    {% else %}
+    analytics.load("hwaBqSDiqdb0cWBxV8r7bIPCHUGYDULA", analyticsIntegrations);
+    {% endif %}
+    {% if request.user.id %}
+        // intercom identity verification
+        analytics.identify('aldryn-cloud-id_{{ request.user.id }}', {
+            email: '{{ request.user.email }}',
+            name: '{{ request.user.get_full_name }}',
+            createdAt: '{{ request.user.date_joined|date:"U" }}'
+        }, {
+            integrations: {
+                Intercom: {
+                    user_hash: '{{ request.user.id|hmac_str:"Qv7B3qdXrBdyc16yI6_VFufzMz0pDUsJUZygqXpS" }}'
+                }
+            }
+        });
+    {% endif %}
+
+    analytics.page();
+}}();
+</script>

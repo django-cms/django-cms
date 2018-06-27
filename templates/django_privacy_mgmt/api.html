@@ -1,5 +1,9 @@
 {% load staticfiles %}
-{% comment %}require.js is not loaded yet {% endcomment %}
-<script src="{% static 'django_privacy_mgmt/js/libs/jquery.cookie.2.2.0.js' %}"></script>
-<script src="{% static 'django_privacy_mgmt/js/main.js' %}"></script>
-
+<script type="text/javascript">
+    {% if debug %}
+    var baseHost = window.location.hostname.replace('www\.', '');
+    {% else %}
+    var baseHost = 'divio.com';
+    {% endif %}
+</script>
+<script src="{% static 'js/dist/gdpr.bundle.js' %}"></script>

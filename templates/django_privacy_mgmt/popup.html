@@ -1,52 +1,12 @@
 {% load staticfiles sekizai_tags i18n %}
 
-{% addtoblock "js" %}
-    <script>
-        // handles cookie bar settings
-        jQuery(document).ready(function () {
-
-            var COOKIE_NAME = 'django-privacy-mgmt-settings';
-            var inputs = $('.js-gdpr-optin');
-            var privacyModal = $('#privacysettings');
-
-            $('.js-modal-accept').on('click', function (e) {
-                e.preventDefault();
-                // this should never be set, it breaks any third-party script, such as click-tracking / analytics, etc.
-                // e.stopImmediatePropagation();
-
-                privacyModal.modal('hide');
-
-                inputs.each(function () {
-                    // initialize on modal load
-                    var el = $(this);
-                    var name = el.data('gdpr-category-name');
-                    var preference = django_privacy_mgmt.setPreference(name, el.prop('checked'));
-                });
-            });
-
-            $('.js-cookie-settings').on('click', function (e) {
-                e.preventDefault();
-                privacyModal.modal('show')
-            });
-
-            inputs.each(function () {
-                // initialize on modal load
-                var el = $(this);
-                var name = el.data('gdpr-category-name');
-                var preference = django_privacy_mgmt.getPreference(name);
-                el.prop('checked', preference);
-            });
-        });
-    </script>
-{% endaddtoblock %}
-
 <div class="modal fade cookie-modal" id="privacysettings" tabindex="-1" role="dialog" aria-labelledby="privacylabel">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
+                <h5 class="modal-title" id="privacylabel">{% trans 'Privacy Settings' %}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="privacylabel">{% trans 'Privacy Settings' %}</h4>
             </div>
             <div class="modal-body">
                 <p class="alert alert-info">
@@ -76,11 +36,10 @@
                 </div>
 
                 <hr/>
-                ​
                 <div class="category analytics">
-                    <h5>
+                    <h5 class="d-flex justify-content-between">
                         {% trans "Statistics" %}
-                        <label class="pull-right small toggle-check">
+                        <label class="small toggle-check">
                             <input type="checkbox" name="statistics" data-gdpr-category-name="STATISTICS"
                                    class="js-gdpr-optin toggle-check-input"/>
                             <span class="toggle-check-text"></span>
@@ -103,13 +62,12 @@
                         <p><em>Currently none in use.</em></p>
                     {% endif %}
                 </div>
-                ​
                 <hr/>
 
                 <div class="category marketing">
-                    <h5>
+                    <h5 class="d-flex justify-content-between">
                         {% trans 'Personalisation' %}
-                        <label class="pull-right small toggle-check">
+                        <label class="small toggle-check">
                             <input type="checkbox" name="marketing" data-gdpr-category-name="MARKETING" id="marketing"
                                    class="js-gdpr-optin toggle-check-input"/>
                             <span class="toggle-check-text"></span>
@@ -131,7 +89,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default js-modal-accept">{% trans "Accept" %}</button>
+                <button type="button" class="btn btn-primary js-modal-accept">{% trans "Accept" %}</button>
             </div>
         </div>
     </div>
