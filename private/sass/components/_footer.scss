@@ -31,6 +31,12 @@
     .footer-links {
         column-count: 2;
 
+        li {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
         li:first-child {
             column-span: all;
         }
