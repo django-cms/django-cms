@@ -1,0 +1,37 @@
+{% extends "content.html" %}
+{% load i18n staticfiles cms_tags menu_tags %}
+
+{% block feature %}
+    <div class="page-header">
+        <div class="container">
+            {% placeholder "feature" inherit or %}
+                <span class="spitzmarke">Our commitment to you</span>
+                <h1 class="display-1">{% page_attribute menu_title request.current_page.get_root %}</h1>
+            {% endplaceholder %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-12 col-lg-4">
+                <div class="sub-menu mt-3 sub-menu-vertical navbar-expand-lg">
+                    <h2 class="h5 sub-menu-title">Navigation</h2>
+                    <p class="h5 sub-menu-toggler collapsed"
+                        data-toggle="collapse" data-target="#sub-menu-content"
+                        aria-expanded="false" aria-label="Toggle navigation" role="navigation">
+                        Jump to topic
+                        {% include "includes/icon.html" with icon="arrow-right" class="sub-menu-toggler" %}
+                    </p>
+                    <ul class="collapse navbar-collapse" id="sub-menu-content">
+                        {% show_menu 1 5 0 1 %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-12 col-lg-8">
+                {% placeholder "content" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
