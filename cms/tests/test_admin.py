@@ -5,7 +5,6 @@ import datetime
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
-from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
