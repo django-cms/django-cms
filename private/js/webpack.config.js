@@ -113,7 +113,7 @@ module.exports = {
                 ],
             },
             {
-                test: /bootstrap/,
+                test: /bootstrap(?!-breakpoints)/,
                 use: [
                     {
                         loader: 'imports-loader',
