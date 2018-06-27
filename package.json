@@ -29,7 +29,7 @@
     "gutil": "^1.6.4",
     "imports-loader": "^0.7.1",
     "jquery": "^3.2.1",
-    "js-cookie": "^2.1.4",
+    "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
     "npm-sass": "^2.2.1",
