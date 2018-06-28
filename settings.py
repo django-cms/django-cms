@@ -49,10 +49,6 @@ MIDDLEWARE_CLASSES.extend([
     # add your own middlewares here
 ])
 
-TEMPLATES[0]['OPTIONS']['context_processors'].extend([
-    'project.banner.context_processors.banner_message',
-])
-
 if STAGE in {'local', 'test'}:
     CMS_PAGE_CACHE = False
     CMS_PLACEHOLDER_CACHE = False

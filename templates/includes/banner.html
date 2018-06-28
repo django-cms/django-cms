@@ -1,12 +1,13 @@
 {# from project.banner #}
+{% load banner_tags %}
 
-{{ banner.object }}
+{% banner as alert %}
 
-{% if banner.enabled %}
+{% if alert.enabled %}
     <div class="alert alert-info alert-dismissible fade show px-0 rounded-0" role="alert">
         <div class="container">
             <p class="mb-0">
-                {{ banner.content|safe }}
+                {{ alert.content|safe }}
             </p>
         </div>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
