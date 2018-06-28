@@ -1,0 +1,16 @@
+<script>
+$(function() {
+    $.ajax({
+        url: "https://control.divio.com/api/v1/user-detail/",
+        xhrFields: {
+        withCredentials: true
+        }
+    })
+        .done(function( data ) {
+            if ( console && console.log ) {
+                // TODO: handle response and change template content
+                console.log( data );
+            }
+        });
+});
+</script>

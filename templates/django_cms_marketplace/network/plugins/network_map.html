@@ -1,0 +1,71 @@
+{% load i18n menu_tags static cms_tags sekizai_tags marketplace %}
+
+{% if instance.title %}
+    <div class="display-subheading row">
+        <div class="col-md-14">
+            <h2>
+                {{ instance.title }}
+            </h2>
+        </div>
+    </div>
+{% endif %}
+
+<div class="main-container map-box container-with-legend clearfix">
+    <div class="col-md-18 content-side">
+        <section class="map map-container"
+            {% autoescape on %}
+                data-organisations='[{% for organisation in locations %}
+                    {
+                        "location": [{{ organisation.location.lon }}, {{ organisation.location.lat }}],
+                        "markup": "{% spaceless %}{{ organisation.markup|escapejs }}{% endspaceless %}"
+                    }{% if not forloop.last %},{% endif %}{% endfor %}]'>
+            {% endautoescape %}
+            <div class="map-canvas" data-markers=""></div>
+        </section>
+    </div>
+    <div class="col-md-6 country-list-container legend-side">
+        <h3 class="network-map-filter-header">{% trans "Companies & Individuals by country:" %}</h3>
+        <ul class="list-unstyled network-map-filter-items">
+            {% for country_code, country, usage_count in countries %}
+                <li>
+                    <div class="col-xs-20">
+                        <a href="{% get_url 'network_profile_list' %}?country={{ country_code|lower }}">{{ country|title }}</a>
+                    </div>
+                    <div class="col-cs-4 text-right">
+                        {{ usage_count }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js?key={{ DJANGO_CMS_MARKETPLACE_GOOGLE_MAPS_KEY }}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'js/addons/jquery.network.main.js' %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'js/libs/markerclusterer.js' %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script>
+jQuery(document).ready( function() {
+    var mapData = [
+        {% for organisation in locations %}
+            {
+                'location': [{{ organisation.location.lat }}, {{ organisation.location.lon }}],
+                'markup': "{% spaceless %}{{ organisation.markup|escapejs }}{% endspaceless %}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    var map = $('.map-container').data('CustomMap');
+
+    map.removeMarkers();
+    map.markers = mapData;
+    map.filterMarkers();
+    map.groupMarkers();
+});
+
+jQuery(window).load( function(){
+    $('html,body').animate({scrollTop: $('.btn-outline').offset().top - 60},'slow');
+});
+
+</script>
+{% endaddtoblock %}

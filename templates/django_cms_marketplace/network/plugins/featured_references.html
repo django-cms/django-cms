@@ -1,0 +1,32 @@
+{% load thumbnail %}
+
+{% if instance.title %}
+    <div class="display-subheading row">
+        <div class="col-md-14">
+            <h2>
+                {{ instance.title }}
+            </h2>
+        </div>
+    </div>
+{% endif %}
+
+{% if references_exception %}
+    <strong>Error while retrieving featured references <pre>{{ references_exception }}</pre></strong>
+{% endif %}
+<div class="row">
+    {% for reference in references %}
+        <div class="col-md-6">
+            <div class="selected-reference-box">
+                <a href="{{ reference.url }}" class="selected-reference-link" target="_blank">
+                    <img src="{{ reference.screenshot_url }}" class="selected-reference-img" alt="{{ reference.title }}">
+                    <span aria-hidden="true" class="fa fa-fw fa-2x fa-link fa-stack hide"></span>
+                    <span aria-hidden="true" class="fa fa-fw fa-4x fa-circle-thin fa-stack hide"></span>
+                </a>
+                <span class="selected-reference-project">
+                    {{ reference.title }}
+                </span>
+                <a href="{{ reference.detail_url }}" class="selected-reference-author">{{ reference.organisation }}</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>

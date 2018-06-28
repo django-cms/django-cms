@@ -1,0 +1,28 @@
+{% load cms_tags staticfiles sekizai_tags thumbnail menu_tags i18n %}
+
+{# TODO #}
+<div class="addons-box-container clearfix">
+    <div class="column">
+        <div class="holder teaser-holder">
+            <div class="frame">
+                <div class="addon-cover">
+                    <img src="{% if instance.image %}{{ instance.image.url }}{% endif %}" alt="image description" width="250" height="160">
+                </div>
+                <div class="box teaser-box">
+                    <a href="{{ instance.primary_url }}">
+                        <span class="fa fa-external-link pull-right"></span>
+                        <h3 class="features-name">{{ instance.title }}</h3>
+                        <h4 class="features-owner">{{ instance.subtitle }}</h4>
+                        <article class="description-text">
+                            {{ instance.description }}
+                        </article>
+                        <div class="action-link-container text-right">
+                            {% trans "Details" %}
+                            <span aria-hidden="true" class="fa fa-chevron-right fa-fw"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

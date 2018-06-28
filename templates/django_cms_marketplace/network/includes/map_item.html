@@ -1,0 +1,37 @@
+{% load i18n static cms_tags menu_tags sekizai_tags %}
+
+<div class="point">
+    <a href="#" class="opener"></a>
+    <div class="map-popup">
+        {% if organisation.logo %}
+        <div class="col">
+            <div class="partner-logo">
+                <a href="{{ organisation.detail_url }}{{ back_url }}">
+                    <img src="{{ organisation.logo }}">
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        <div class="data-box">
+            <dl>
+                {% if organisation.expertise %}
+                <dt>Expertise</dt>
+                <dd>{{ organisation.expertise|join:', ' }}</dd>
+                {% endif %}
+                {% if organisation.projects %}
+                <dt>Projects from</dt>
+                <dd>{{ organisation.projects }}</dd>
+                {% endif %}
+            </dl>
+        </div>
+        <div class="col">
+            <h2>{{ organisation.name }}</h2>
+            <address>{{ organisation.address }}</address>
+            <p>{{ organisation.description|safe|truncatewords:42 }}</p>
+            <div class="detail-link">
+                <a href="{{ organisation.detail_url }}{{ back_url }}" class="btn btn-primary">Details</a>
+            </div>
+        </div>
+        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+</div>

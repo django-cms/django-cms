@@ -1,0 +1,53 @@
+{% load i18n sekizai_tags static marketplace %}
+
+<div class="display-subheading row">
+    <div class="col-sm-16">
+        {% if instance.title %}
+            <h2>
+                {{ instance.title }}
+            </h2>
+        {% endif %}
+    </div>
+    <div class="col-sm-8 text-right">
+        <a class="browse-all-link" href="{% get_url 'marketplace_addon_list' %}">
+            <span class="fa fa-chevron-right" aria-hidden="true"></span>
+            {% trans "See all addons" %}
+        </a>
+    </div>
+</div>
+
+<div id="carousel-featured-addons"
+    class="carousel slide featured-addons-carousel js-featured-addons-carousel"
+    data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators-slick list-unstyled js-carousel-slick">
+        {% for addon in addon_list %}
+            <li data-target="#carousel-featured-addons"
+                data-slide-to="{{ forloop.counter0 }}">
+                <img src="{{ addon.small_promo_image_url }}">
+            </li>
+        {% endfor %}
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner-slick js-carousel-inner" role="listbox">
+        {% for addon in addon_list %}
+            <div class="item">
+                <a href="{{ addon.detail_url }}">
+                    {% if addon.marquee_image_url %}
+                        <img src="{{ addon.marquee_image_url }}" width="1400" height="560">
+                    {% else %}
+                        <img src="{{ addon.small_promo_image_url }}" width="1400" height="560">
+                    {% endif %}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% addtoblock "js" %}
+    <script src="{% static 'js/libs/slick.min.js' %}"></script>
+{% endaddtoblock %}
+{% addtoblock "js" %}
+    <script src="{% static 'js/addons/jquery.featured.carousel.js' %}"></script>
+{% endaddtoblock %}

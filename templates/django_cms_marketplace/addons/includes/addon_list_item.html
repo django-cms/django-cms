@@ -1,0 +1,23 @@
+{% load cms_tags staticfiles sekizai_tags thumbnail menu_tags i18n %}
+
+<div class="addon-list-item clearfix">
+    <div>
+        <a href="{{ addon.detail_url }}">
+            <div class="col-sm-7 js-searchable-child-selector">
+                <h3 class="features-name">{{ addon.name }}</h3>
+                <h4 class="features-owner">{{ addon.author.name }}</h4>
+            </div>
+            <div class="col-sm-14">
+                <p class="addon-description">{{ addon.description|striptags|safe|truncatechars:150 }}</p>
+            </div>
+            <div class="col-sm-3 text-right addon-item-price">
+                {% if addon.price == 0 %}
+                    <span class="label label-primary addon-description-label">{% trans "Free" %}</span>
+                {% else %}
+                    <span>{{ addon.price }}</span>
+                {% endif %}
+                <br>
+            </div>
+        </a>
+    </div>
+</div>

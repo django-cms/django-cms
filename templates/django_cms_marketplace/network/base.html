@@ -1,0 +1,30 @@
+{% extends "fullwidth.html" %}
+{% load cms_tags static sekizai_tags menu_tags i18n %}
+
+{% block content %}
+<div id="wrapper">
+    <section class="network-display">
+        {% block network_fitler_form %}
+            <div class="row">
+                <div class="col-sm-7">
+                    <div class="display-heading">
+                        <h1>{% trans "Companies & individuals" %}</h1>
+                    </div>
+                </div>
+                {% block search_input_map_active %}{% endblock %}
+                <div class="col-sm-8 text-right">
+                    <div class="spacer display-heading-actions">
+                        {% static_placeholder 'network_search_header' %}
+                    </div>
+                </div>
+            </div>
+        {% endblock network_fitler_form %}
+        {% block organisations_display %}{% endblock %}
+    </section>
+    {% static_placeholder "additional_network_info" %}
+</div>
+
+{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js?key={{ DJANGO_CMS_MARKETPLACE_GOOGLE_MAPS_KEY }}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'js/addons/jquery.network.main.js' %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'js/addons/jquery.network.map.js' %}"></script>{% endaddtoblock %}
+{% endblock content %}

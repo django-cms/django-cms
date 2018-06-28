@@ -1,0 +1,13 @@
+{% if instance.title %}
+    <div class="display-subheading row">
+        <div class="col-sm-16">
+            <h2>{{ instance.title }}</h2>
+        </div>
+    </div>
+{% endif %}
+
+<div class="addons-list-container clearfix">
+    {% for addon in addon_list %}
+        {% include 'django_cms_marketplace/addons/includes/addon_list_item.html' %}
+    {% endfor %}
+</div>

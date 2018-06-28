@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {% if not no_header %}
+                <div class="modal-header clearfix">
+                    {% if closeable %}
+                        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {% endif %}
+                    {% block "modal_header" %}
+                    <h4 class="modal-title">{% trans "Modal title" %}</h4>
+                    {% endblock %}
+                </div>
+            {% endif %}
+            <div class="modal-body">
+                {% block "modal_content" %}{% endblock %}
+            </div>
+            {% if not no_footer %}
+                <div class="modal-footer clearfix">
+                    {% block modal_actions %}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
+                        <button type="button" class="btn btn-primary">{% trans "Save changes" %}</button>
+                    {% endblock %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block "modal_scripts" %}{% endblock %}

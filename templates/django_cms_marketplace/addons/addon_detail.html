@@ -1,0 +1,191 @@
+{% extends 'django_cms_marketplace/addons/base.html' %}
+{% load cms_tags staticfiles sekizai_tags thumbnail menu_tags i18n marketplace %}
+
+{% block content %}
+    <section class="section marketplace-detail profile">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-16 profile-information">
+                    <div class="content">
+                        <div class="profile-heading clearfix">
+                            {% if object.install_url %}
+                                <div class="profile-head-actions pull-right clearfix">
+                                    <a href="{{ object.install_url }}"
+                                        class="btn btn-primary text-right"
+                                        target="_blank">
+                                        <span class="icon icon-aldryn"></span>
+                                        {% trans "Install on Divio Cloud" %}
+                                    </a>
+                                </div>
+                            {% endif %}
+                            <div class="display-heading pull-left">
+                                <h1 class="title left">{{ object.name }}</h1>
+                            </div>
+                        </div>
+                        <div class="profile-description">
+                            {{ object.description|safe }}
+                        </div>
+                        {% if object.marketing.images %}
+                            <div class="network-references">
+                                <div class="slick-carousel clearfix" id="portfolioCarousel">
+                                    {% for image in object.marketing.images %}
+                                        <div class="item col-sm-8">
+                                            <div class="network-references-item">
+                                                <div class="network-references-item-image">
+                                                    <img src="{{ image.full }}" class="img-responsive" alt="{{ object.name }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-sm-8 profile-sidebar">
+                    <div class="back-link-container">
+                        <div class="profile-back">
+                            <a href="{% get_url 'marketplace_addon_list' %}" class="back">
+                                <span class="fa fa-chevron-left" aria-hidden="true"></span>
+                                {% trans "back to overview" %}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        {% if object.small_promo_image_url %}
+                            <div class="col-md-10">
+                                <div class="profile-logo">
+                                    <img src="{{ object.small_promo_image_url }}" alt="{{ object.name }}">
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="col-md-14">
+                            <div class="profile-logo-info">
+                                {% if object.latest_version %}
+                                    <div class="info-item">
+                                        <span class="fa fa-code-fork fa-fw" aria-hidden="true"></span>
+                                        {% trans "Version:" %}
+                                        {{ object.latest_version }}
+                                    </div>
+                                {% endif %}
+                                {% if object.repository_url %}
+                                    <div class="info-item">
+                                        <a class="view-website-link"
+                                            href="{{ object.repository_url }}" target="_blank">
+                                            <span class="fa fa-external-link fa-fw" aria-hidden="true"></span>
+                                            {% trans "Go to repository" %}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if object.docs_url %}
+                                    <div class="info-item">
+                                        <a class="view-website-link"
+                                            href="{{ object.docs_url }}" target="_blank">
+                                            <span class="fa fa-book fa-fw" aria-hidden="true"></span>
+                                            {% trans "View Docs" %}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row detail-block detail-responsive">
+                        {% if object.license %}
+                            <div class="col-md-12">
+                                <div class="box-item">
+                                    <h3 class="box-item-header">
+                                        {% trans "License" %}
+                                    </h3>
+                                    <div class="box-item-content">
+                                        <ul class="list-unstyled fa-ul">
+                                            <li>
+                                                <a title="{{ object.license.name }}" data-toggle="modal"
+                                                    data-target=".js-license-modal" href="#"
+                                                    class="list-item-link">
+                                                    <span class="fa fa-fw fa-file-o" aria-hidden="true"></span>
+                                                    {{ object.license.category }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if object.latest_version_date_added %}
+                            <div class="col-md-12">
+                                <div class="box-item">
+                                    <h3 class="box-item-header">
+                                        {% trans "Last updated" %}
+                                    </h3>
+                                    <div class="box-item-content">
+                                        <ul class="list-unstyled fa-ul">
+                                            <li>
+                                                {{ object.latest_version_date_added }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="col-xs-24">
+                            <div class="box-item box-author">
+                                <h3 class="box-item-header">
+                                    {% trans "Author" %}
+                                </h3>
+                                <div class="box-item-content">
+                                    <div class="row">
+                                        {% if object.author.avatar_url %}
+                                            <div class="col-sm-10 col-xs-8">
+                                                <div class="profile-logo">
+                                                    <img src="{{ object.author.avatar_url }}" alt="{{ object.author.name }}">
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        <div class="col-sm-14 col-xs-16">
+                                            <span class="autor">
+                                                {{ object.author.name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% addtoblock "js" %}
+        <script src="{% static 'js/libs/slick.min.js' %}"></script>
+    {% endaddtoblock %}
+    {% addtoblock "js" %}
+        <script>
+            $(document).ready(function () {
+                $('#portfolioCarousel').slick({
+                    slidesToShow: 3,
+                    slidetToScroll: 1,
+                    autoplay: true,
+                    autoplaySpeed: 3000
+                });
+            });
+        </script>
+    {% endaddtoblock %}
+
+    <!-- Modal for the License -->
+    <div class="modal fade js-license-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">{{ object.license.name }}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>{{ object.license.text|linebreaksbr }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% static_placeholder "additional_marketplace_info" %}
+
+{% endblock content %}

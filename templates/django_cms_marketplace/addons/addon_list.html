@@ -1,0 +1,68 @@
+{% extends 'django_cms_marketplace/addons/base.html' %}
+{% load cms_tags staticfiles sekizai_tags menu_tags i18n %}
+
+{% block content %}
+<div id="wrapper">
+    <section class="addons-display" id="searchable-addon">
+        <div class="search-section clearfix">
+            <div>
+                <div class="col-sm-7">
+                    <div class="display-heading">
+                        <h1>{% trans "Addons" %}</h1>
+                    </div>
+                </div>
+                <div class="col-sm-9">
+                    <form action="." class="search-input-container">
+                        <div class="form-group">
+                            <label class="sr-only" for="search">
+                                {% trans 'Search Addons' %}
+                            </label>
+                            <input type="search"
+                                   {% if request.GET.name %}
+                                       value="{{request.GET.name }}"
+                                   {% endif %}
+                                   id="search"
+                                   name="name"
+                                   class="form-control input-search"
+                                   placeholder="{% trans 'Search Addons' %}">
+                            <button type="submit" class="btn search-button">
+                                <span aria-hidden="true" class="fa fa-search"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-8 text-right">
+                   <div class="spacer display-heading-actions">
+                        {% static_placeholder 'addons_search_header' %}
+                   </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-24">
+                {% if object_list %}
+                    <div class="row addons-list-container">
+                        {% for addon in object_list %}
+                            <div class="col-md-24">
+                                {% include 'django_cms_marketplace/addons/includes/addon_list_item.html' %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% include 'django_cms_marketplace/network/includes/pagination.html' %}
+                {% else %}
+                    <div class="well text-center">
+                        <span class="center-block ">{% trans "No results found" %}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    <div class="additional-marketplace-info">
+        {% static_placeholder "additional_marketplace_info" %}
+    </div>
+</div>
+{% addtoblock 'js' %}
+    <script src="{% static 'js/libs/jquery.searchable.min.js' %}"></script>
+    <script src="{% static 'js/addons/jquery.search.js' %}"></script>
+{% endaddtoblock %}
+{% endblock %}

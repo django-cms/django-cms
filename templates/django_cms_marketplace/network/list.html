@@ -1,0 +1,143 @@
+{% extends 'django_cms_marketplace/network/base.html' %}
+{% load cms_tags staticfiles sekizai_tags menu_tags i18n marketplace %}
+
+{% block filter_form_list_active %}active{% endblock %}
+{% block search_input_map_active %}
+    <div class="col-sm-9">
+        {% if filtered_by_tag %}
+            <h2 class="h6 search-tag-value">
+                {% trans "Search by tag:" %} <span class="text-primary">{{ filtered_by_tag }}</span>
+            </h2>
+        {% else %}
+            <form action="." class="search-input-container">
+                <div class="form-group">
+                    <label class="sr-only" for="search">
+                        {% trans 'Search Companies & Individuals' %}
+                    </label>
+                    <input type="search"
+                           {% if request.GET.name %}
+                               value="{{request.GET.name }}"
+                           {% endif %}
+                           id="search"
+                           name="name"
+                           class="form-control input-search"
+                           placeholder="{% trans 'Search Companies & Individuals' %}">
+                    <button type="submit" class="btn search-button">
+                        <span aria-hidden="true" class="fa fa-search"></span>
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block organisations_display %}
+<div class="clearfix">
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="network-list-filter network-filters">
+                <ul class="list-unstyled network-list-filter-context">
+                    {% if request.GET %}
+                        <li class="network-list-filter-clear pull-right">
+                            <a href="{{ request.path }}">
+                                <span class="fa fa-times"></span> <span>{% trans "Clear filters" %}</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a{% if not request.GET.kind %} class="active"{% endif %}
+                            href="?{% url_add_or_replace 'kind' None %}">{% trans "Everyone" %}</a>
+                    </li>
+                    {% for kind in kinds %}
+                        <li>
+                            {% if kind.available %}
+                                <a href="?{% url_add_or_replace 'kind' kind.slug %}"{% if kind.active %} class="active"{% endif %}>
+                                    {% trans kind.name %}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">{% trans kind.name %}</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <h3 class="network-list-filter-header">{% trans "By country" %}</h3>
+                <ul class="list-unstyled network-list-filter-items">
+                    <li>
+                        <a{% if not request.GET.kind %} class="active"{% endif %}
+                            href="?{% url_add_or_replace 'kind' None %}">
+                        </a>
+                        {% trans "Everyone" %}
+                    </li>
+                    {% for country_code, country in countries %}
+                        <li>
+                            <a{% if request.GET.country == country_code|lower %} class="active"{% endif %}
+                                href="?{% url_add_or_replace 'country' country_code|lower %}">
+                                {{ country|title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="network-list-filter-mobile">
+                    {% if request.GET %}
+                        <a href="{{ request.path }}" class="mobile-filters-clear">
+                            <span class="fa fa-times"></span> <span>{% trans "Clear filters" %}</span>
+                        </a>
+                    {% endif %}
+                    <select class="form-control" onchange="location = this.options[this.selectedIndex].value;">
+                        <option
+                                value="?{% url_add_or_replace 'kind' None %}"
+                                {% if not request.GET.kind %} selected="selected"{% endif %}>
+                            {% trans "Everyone" %}
+                        </option>
+                        {% for kind in kinds %}
+                            {% if kind.available %}
+                                <option value="?{% url_add_or_replace 'kind' kind.slug %}"
+                                        {% if kind.active %} selected="selected"{% endif %}>
+                                    {% trans kind.name %}
+                                </option>
+                            {% else %}
+                                <option disabled>
+                                    {% trans kind.name %}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <div class="spacer-xs"></div>
+                    <select class="form-control" onchange="location = this.options[this.selectedIndex].value;">
+                        <option
+                                value="?{% url_add_or_replace 'country' None %}"
+                                {% if not request.GET.country %} selected="selected"{% endif %}>
+                            {% trans "All countries" %}
+                        </option>
+                        {% for country_code, country in countries %}
+                            <option value="?{% url_add_or_replace 'country' country_code|lower %}"
+                                    {% if request.GET.country == country_code|lower %} selected="selected"{% endif %}>
+                                {{ country|title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="spacer-xs"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-17">
+            {% if profiles %}
+                <div class="partners row">
+                    {% for profile in profiles %}
+                        <div class="col-sm-24">
+                            <div class="network-list-container">
+                                {% include 'django_cms_marketplace/network/includes/item.html' %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% include 'django_cms_marketplace/network/includes/pagination.html' %}
+            {% else %}
+                <div class="well text-center">
+                    <span class="center-block ">{% trans "No results found" %}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock organisations_display %}

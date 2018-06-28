@@ -1,0 +1,26 @@
+{% load cms_tags staticfiles sekizai_tags thumbnail menu_tags i18n %}
+
+<div class="col-sm-12 col-md-6 js-hide-on-search">
+    <div class="column">
+        <div class="holder">
+            <div class="frame">
+            <div class="addon-cover">
+                <img src="{{ addon.small_promo_image_url }}" alt="image description" width="250" height="160">
+            </div>
+                <div class="box js-searchable-child-selector">
+                    <h3 class="features-name">{{ addon.name }}</h3>
+                    <h4 class="features-owner">{{ addon.author.name }}</h4>
+                    <article class="description-text">
+                        {{ addon.description|striptags|safe|truncatechars:150 }}
+                    </article>
+                    <div class="action-link-container text-right">
+                        <a class="details-link" href="{{ addon.detail_url }}">
+                            {% trans "Details" %}
+                            <span aria-hidden="true" class="fa fa-chevron-right fa-fw"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,236 @@
+{% extends 'django_cms_marketplace/network/base.html' %}
+{% load cms_tags staticfiles sekizai_tags thumbnail menu_tags i18n marketplace %}
+
+{% block content %}
+    <section class="network-detail profile">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-16 profile-information">
+                    <div class="content">
+                        <div class="profile-heading clearfix">
+                            <div class="profile-head-actions pull-right clearfix">
+                                {% if profile.contact %}
+                                    {% if profile.kind|lower == "individual" %}
+                                        <a class="text-right btn btn-primary" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20django%20CMS%20Marketplace">{% trans "Hire me" %}</a>
+                                    {% else %}
+                                        <a class="text-right btn btn-primary" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20django%20CMS%20Marketplace">{% trans "Hire us" %}</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="display-heading pull-left">
+                                <h1 class="title left">{{ profile.name }}</h1>
+                            </div>
+                        </div>
+                        {% if profile.backdrop %}
+                            <div class="content-image">
+                                <img src="{{ profile.backdrop }}" alt="">
+                            </div>
+                        {% endif %}
+                        <div class="profile-description">
+                            {{ profile.description|safe }}
+                        </div>
+                        {% if profile.references %}
+                            <div class="network-references">
+                                <div class="display-subheading">
+                                    {% if profile.kind|lower == "individual" %}
+                                        {% trans "My portfolio" %}
+                                    {% else %}
+                                        {% trans "Our portfolio" %}
+                                    {% endif %}
+                                </div>
+                                <div class="slick-carousel clearfix" id="portfolioCarousel">
+                                    {% for reference in profile.references %}
+                                        <div class="item col-sm-8 col-xs-24">
+                                            <div class="network-references-item">
+                                                <div class="network-references-item-image">
+                                                    <a href="{{ reference.url }}" title="{{ reference.title }}" target="_blank">
+                                                        <img src="{{ reference.screenshot_url }}" class="img-responsive" alt="{{ reference.title }}">
+                                                        <span aria-hidden="true" class="fa fa-fw fa-2x fa-link fa-stack hide"></span>
+                                                        <span aria-hidden="true" class="fa fa-fw fa-4x fa-circle-thin fa-stack hide"></span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-sm-8 profile-sidebar">
+                    <div class="back-link-container">
+                        {% if back_url %}
+                            <a href="{{ back_url }}" class="profile-back">
+                                <span class="fa fa-chevron-left" aria-hidden="true"></span>
+                                {% trans "back to overview" %}
+                            </a>
+                        {% else %}
+                            <a href="#" class="profile-back js-back-link" data-default="{% get_url 'network_profile_list' %}">
+                                <span class="fa fa-chevron-left" aria-hidden="true"></span>
+                                {% trans "back to overview" %}
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            {% if profile.logo %}
+                                <div class="profile-logo">
+                                    <img src="{{ profile.logo }}" alt="{{ profile.name }}">
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-14">
+                            <dl class="profile-logo-info">
+                                {% if profile.active_for %}
+                                    <div class="info-item">
+                                        <span class="fa fa-flag fa-fw" aria-hidden="true"></span>
+                                            {# blocktrans does not work here #}
+                                            {{ profile.active_for }} Yr{{ profile.active_for|pluralize }}. experience
+                                    </div>
+                                {% elif profile.active_since %}
+                                    <div class="info-item">
+                                        <span class="fa fa-flag fa-fw" aria-hidden="true"></span>
+                                        {% trans "Since" %} {{ profile.active_since }}
+                                    </div>
+                                {% endif %}
+                                {% if profile.url %}
+                                    <div class="info-item">
+                                        <a href="{{ profile.url }}" class="view-website-link" target="_blank">
+                                            <span class="fa fa-globe fa-fw" aria-hidden="true"></span>
+                                            {% trans "View website" %}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% with main_location=profile.main_location %}
+                                    {% if main_location and main_location.lat and main_location.lon %}
+                                        <div class="info-item">
+                                            <a href="#"
+                                               class="view-onmap-link js-show-map"
+                                               data-location="[
+                                                   {% for location in profile.locations %}
+                                                        [{{ location.lat }}, {{ location.lon }}]
+                                                        {% if not forloop.last %},{% endif %}
+                                                    {% endfor %}
+                                                ]">
+                                                <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
+                                                {% trans "Show on map" %}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="contact-block">
+                        <h2 class="title info-name-header">{{ profile.name }}</h2>
+                        {% if profile.published_organisation_id %}
+                            {% get_published_organisation profile.published_organisation_id as published_organisation %}
+                            {% if published_organisation %}
+                                <span class="author">
+                                    <a href="{{ published_organisation.detail_url }}">{{ published_organisation.name }}</a>
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                        {% if profile.locations %}
+                            <div class="box-item">
+                                <h3 class="box-item-header">
+                                    {% trans "Locations" %}
+                                </h3>
+                                <div class="box-item-content location-box">
+                                    <ul class="fa-ul list-unstyled">
+                                        {% for location in profile.locations %}
+                                            <li>
+                                                {% if location and location.lat and location.lon %}
+                                                    <a href="#" class="view-onmap-link js-show-map"
+                                                        data-location="[[{{ location.lat }}, {{ location.lon }}]]">
+                                                        <span class="fa-li fa fa-location-arrow" aria-hidden="true"></span>
+                                                        {{ location.full_address }}
+                                                    </a>
+                                                {% else %}
+                                                    <span class="fa-li fa fa-location-arrow" aria-hidden="true"></span>
+                                                    {{ location.full_address }}
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if profile.expertise %}
+                            <div class="box-item">
+                                <h3 class="box-item-header">
+                                    {% trans "Expertise" %}
+                                </h3>
+                                <div class="box-item-content">
+                                    <ul class="fa-ul list-unstyled">
+                                        {% for expertise in profile.expertise %}
+                                            <li>
+                                                <span class="fa-li fa fa-check" aria-hidden="true"></span>
+                                                {{ expertise }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if profile.tags %}
+                            <div class="box-item profile-tags">
+                                <h3 class="box-item-header">
+                                    {% trans "Tags" %}
+                                </h3>
+                                <div class="box-item-content">
+                                    {% for tag in profile.tags %}
+                                        <a href="{% get_url 'network_profile_list' %}?tag={{ tag.0 }}">{{ tag.0 }}</a>{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="box-item">
+                            {% if profile.is_partner %}
+                                <a class="partner-logo" href="https://www.divio.com/en/divio-partner/" target="_blank">
+                                    <img src="{% static 'img/divio-white.svg' %}" alt="{% trans "Divio Partner" %}">
+                                    <div class="bottom">
+                                        {% trans "Divio Partner" %}
+                                    </div>
+                                </a>
+                            {% endif %}
+                        </div>
+                        {% include "django_cms_marketplace/modals/network_detail_map.html" with modal_id="mapShow" closeable="true" no_footer="true" location=profile.main_location %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% static_placeholder "additional_network_info" %}
+    </section>
+
+    {% addtoblock "js" %}
+        <script src="{% static 'js/libs/slick.min.js' %}"></script>
+        <script src="{% static 'js/addons/cl.back.js' %}"></script>
+    {% endaddtoblock %}
+    {% addtoblock "js" %}
+        <script>
+            $(document).ready(function () {
+                $('#portfolioCarousel').slick({
+                    slidesToShow: 3,
+                    slidetToScroll: 1,
+                    autoplay: true,
+                    autoplaySpeed: 3000,
+                    responsive: [
+                        {
+                            breakpoint: 768,
+                            settings: {
+                                slidesToShow: 1,
+                                slidesToScroll: 1
+                            }
+                        }
+                    ]
+                });
+            });
+
+            var backButton = new Cl.Back({
+                originalDomain: '{{ request.META.HTTP_HOST }}'
+            });
+        </script>
+    {% endaddtoblock %}
+{% endblock %}

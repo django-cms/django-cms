@@ -1,0 +1,32 @@
+{% load i18n thumbnail %}
+<a href="{{ profile.detail_url }}{{ back_url }}" class="panel-list-link">
+    <div class="panel panel-list-network">
+        <div class="row">
+            <div class="col-xs-2 text-center">
+                <div class="panel-list-network-logo">
+                    {% if profile.logo %}
+                        <img src="{{ profile.logo }}" alt="{{ profile.name }}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-xs-16">
+                <h2 class="h6 panel-list-network-name">
+                    {{ profile.name }}
+                    {% if profile.is_partner %}
+                        <span class="partner-label">
+                            {% trans "Divio Partner" %}
+                        </span>
+                    {% endif %}
+                    <span class="panel-list-network-location">
+                        {% for location in profile.locations %}
+                            {{ location.country_long }}{% if not forloop.last %} |{% endif %}
+                        {% endfor %}
+                    </span>
+                </h2>
+            </div>
+            <div class="col-xs-6 text-right">
+                <span class="fa fa-chevron-right"></span>
+            </div>
+        </div>
+    </div>
+</a>

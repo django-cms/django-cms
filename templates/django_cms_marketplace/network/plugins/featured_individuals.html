@@ -1,0 +1,52 @@
+{% load i18n marketplace %}
+
+<div class="display-subheading row">
+    <div class="col-md-14">
+        {% if instance.title %}
+            <h2>
+                {{ instance.title }}
+            </h2>
+        {% endif %}
+    </div>
+    <div class="col-md-10 text-right">
+        <a class="browse-all-link" href="{% get_url 'network_profile_list' %}?kind=individual">
+            <span class="fa fa-chevron-right" aria-hidden="true"></span>
+            {% trans "Browse all" %}
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    {% for individual in featured_individuals %}
+        <div class="block-featured-individuals panel panel-list-network col-md-24 col-sm-12">
+            <a href="{{ individual.detail_url }}" class="panel-list-link">
+                <div class="row">
+                    <div class="col-md-5 col-xs-4 text-center">
+                        <div class="panel-list-network-logo">
+                            <img src="{{ individual.logo }}" alt="{{ individual.name }}">
+                        </div>
+                    </div>
+                    <div class="col-md-19 col-xs-20">
+                        <h2 class="h6 panel-list-network-name">
+                            {{ individual.name }}
+                            <span class="panel-list-network-location">
+                                {% for location in individual.locations %}
+                                    {% if location.is_primary %}
+                                        {{ location.country_long }}
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        </h2>
+                    </div>
+                </div>
+                {% if individual.is_partner %}
+                    <div class="ribbon">
+                        <div class="ribbon-text">
+                            {% trans "Divio Partner" %}
+                        </div>
+                    </div>
+                {% endif %}
+            </a>
+        </div>
+    {% endfor %}
+</div>

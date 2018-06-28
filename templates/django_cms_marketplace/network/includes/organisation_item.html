@@ -1,0 +1,54 @@
+{% load thumbnail %}
+<div class="panel panel-network">
+    <div class="row">
+        <div class="col-md-6 text-center">
+            {% if organisation.logo %}
+            <div class="organisation-logo">
+                <a href="{{ organisation.detail_url }}{{ back_url }}">
+                    <img src="{{ organisation.logo }}" alt="{{ organisation.name }}">
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-12">
+            <h2 class="h6">
+                <a href="{{ organisation.detail_url }}{{ back_url }}">
+                    {{ organisation.name }}
+                </a>
+            </h2>
+            {% if organisation.address %}
+            <address class="text-muted"><span class="fa fa-location-arrow"></span>&nbsp;{{ organisation.address }}</address>
+            {% endif %}
+            <div class="description">
+                {{ organisation.description|safe|truncatewords:20 }}
+                {% if organisation.description.strip|safe|length > organisation.description.strip|safe|truncatewords:20|length %}
+                    <a href="{{ organisation.detail_url }}{{ back_url }}">
+                        more
+                    </a>
+                {% endif %}
+            </div>
+            <ul class="list-unstyled">
+            {% if organisation.tags %}
+                <li>
+                {% for tag in organisation.tags %}
+                    {# FIXME: please change back to slug after CP will be fixed to use existing tags. Slug is more reliable #}
+                    <a href="{% url 'network_organisations_by_tag' tag_slug=tag.0|slugify %}" class="label label-primary">{{ tag.0 }}</a>&nbsp;
+                {% endfor %}
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+        <div class="col-md-6 text-right">
+            <a class="center-block" href="{{ organisation.url }}"><span class="fa fa-external-link"></span>&nbsp;{{ organisation.url }}</a>
+            {% comment %}
+            <ul class="list-unstyled">
+                {% if organisation.expertise %}
+                <li>
+                Expertise&nbsp;<strong>{{ organisation.expertise|join:', ' }}</strong>
+                </li>
+                {% endif %}
+            </ul>
+            {% endcomment %}
+        </div>
+    </div>
+</div>
