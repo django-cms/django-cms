@@ -24,7 +24,7 @@ class LogPageOperationsTests(CMSTestCase):
     def setUp(self):
         self._admin_user = self.get_superuser()
 
-    def _assert_page_addition_log_created(self, page):
+    def _assert_log_created_on_page_add(self, page):
         # Check to see if the page added log entry exists
         self.assertEqual(1, LogEntry.objects.count())
 
@@ -40,7 +40,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_create_admin_page(self):
         """
-        Test that when a page is created on the UI using the page admin a log entry is created.
+        When a page is created using the page admin a log entry is created.
         """
         page_data = self.get_new_page_data()
 
@@ -49,7 +49,7 @@ class LogPageOperationsTests(CMSTestCase):
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
             page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-            self._assert_page_addition_log_created(page_one)
+            self._assert_log_created_on_page_add(page_one)
 
     def test_log_for_create_wizard_page(self):
         """
@@ -74,7 +74,7 @@ class LogPageOperationsTests(CMSTestCase):
 
         self.assertTrue(form.is_valid())
         page = form.save()
-        self._assert_page_addition_log_created(page)
+        self._assert_log_created_on_page_add(page)
 
     def test_log_for_create_api_page(self):
         """
@@ -91,14 +91,8 @@ class LogPageOperationsTests(CMSTestCase):
         Test that a page edit is logged correctly
         """
         with self.login_user_context(self._admin_user):
+            page = create_page('home', 'nav_playground.html', 'en', published=True)
             page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            # Test that the end point is valid
-            self.assertEqual(response.status_code, 302)
-
-            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-            # Empty any logs
-            LogEntry.objects.all().delete()
 
             # Get and edit the page
             page_data['slug'] = 'changed slug'
