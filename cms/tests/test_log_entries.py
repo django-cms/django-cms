@@ -53,7 +53,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_create_wizard_page(self):
         """
-        Test that when a page is created via the create page wizard a log entry is created.
+        When a page is created via the create page wizard a log entry is created.
         """
         with self.login_user_context(self._admin_user):
             request = self.get_request()
@@ -78,8 +78,8 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_create_api_page(self):
         """
-        Test that when a page is created via the create page api a log entry is NOT created.
-        May help determine why other tests might fail if the api started creating a log for page creation!!
+        When a page is created via the create page api a log entry is NOT created.
+        It may help determine why other tests might fail if the api started creating a log for page creation!!
         """
         # Create a page
         create_page('home', 'nav_playground.html', 'en', published=True)
@@ -88,7 +88,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_change_admin_page(self):
         """
-        Test that a page edit is logged correctly
+        When a page is edited a log entry is created.
         """
         with self.login_user_context(self._admin_user):
             page = create_page('home', 'nav_playground.html', 'en', published=True)
@@ -114,7 +114,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_move_admin_page(self):
         """
-        Test that a page move is logged correctly
+        When a page is moved a log entry is created.
         """
         with self.login_user_context(self._admin_user):
             create_page("page_home", "nav_playground.html", "en", published=False)
@@ -140,7 +140,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_delete_admin_page(self):
         """
-        Test that a page delete is logged correctly
+        When a page is deleted a log entry is created.
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en", published=False)
@@ -167,7 +167,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_change_translation(self):
         """
-        Test that a page translation change is logged correctly
+        When a pages translation is changed a log entry is created.
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en", published=False)
@@ -194,7 +194,7 @@ class LogPageOperationsTests(CMSTestCase):
 
     def test_log_for_delete_translation(self):
         """
-        Test that a page translation deletion is logged correctly
+        When a pages translation is deleted a log entry is created.
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en", published=False)
@@ -257,7 +257,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_add_plugin(self):
         """
-        Test that a log is created when a plugin is created
+        When a plugin is created a log entry is created.
         """
         endpoint = self._get_add_plugin_uri()
         data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
@@ -282,7 +282,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_move_plugin(self):
         """
-        Test that a log is created when a plugin is moved
+        When a plugin is moved a log entry is created.
         """
         plugin = self._add_plugin()
         endpoint = self.get_move_plugin_uri(plugin)
@@ -312,7 +312,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_change_plugin(self):
         """
-        Test that a log is created when a plugin is changed
+        When a plugin is changed a log entry is created.
         """
         plugin = self._add_plugin()
         endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
@@ -340,7 +340,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_delete_plugin(self):
         """
-        Test that a log is created when a plugin is deleted
+        When a plugin is deleted a log entry is created.
         """
         plugin = self._add_plugin()
         endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
@@ -367,7 +367,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_cut_plugin(self):
         """
-        Test that a log is created when a plugin is cut
+        When a plugin is cut a log entry is created.
         """
         user_settings = UserSettings.objects.create(
             language="en",
@@ -402,7 +402,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_paste_plugin(self):
         """
-        Test that a log is created when a plugin is pasted
+        When a plugin is pasted a log entry is created.
         """
         user_settings = UserSettings.objects.create(
             language="en",
@@ -439,7 +439,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_add_plugin_to_placeholder(self):
         """
-        Test that a log is created when a plugin is added to a placeholder
+        When a plugin is added to a placeholder a log entry is created.
         """
         plugin = self._add_plugin()
         endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
@@ -471,7 +471,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_paste_placeholder(self):
         """
-        Test that a log is created when a plugin is pasted in a placeholder
+        When a plugin is pasted in a placeholder a log entry is created.
         """
         user_settings = UserSettings.objects.create(
             language="en",
@@ -516,7 +516,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
 
     def test_log_for_clear_placeholder(self):
         """
-        Test that a log is created when a placeholder is emptied of plugins
+        When a placeholder is emptied of plugins a log entry is created.
         """
         self._add_plugin()
         endpoint = self.get_clear_placeholder_url(self._placeholder_1)
