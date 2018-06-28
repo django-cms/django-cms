@@ -75,9 +75,7 @@ class Form(forms.BaseForm):
         initial=False,
         help_text=(
             'For example, http://example.com/ rather than '
-            'http://example.com/en/ if en (English) is the default language. '
-            'If multiple languages are configured, this option will be ignored '
-            'for Django versions prior to 1.10.'
+            'http://example.com/en/ if en (English) is the default language.'
         )
     )
     session_timeout = forms.NumberField(
@@ -139,7 +137,6 @@ class Form(forms.BaseForm):
         settings['CACHES']['default'] = django_cache_url.parse(settings['CACHE_URL'])
 
         settings['ROOT_URLCONF'] = env('ROOT_URLCONF', 'urls')
-        settings['ADDON_URLS'].append('aldryn_django.urls')
         settings['ADDON_URLS_I18N'].append('aldryn_django.i18n_urls')
 
         settings['WSGI_APPLICATION'] = 'wsgi.application'
@@ -169,13 +166,13 @@ class Form(forms.BaseForm):
                     'context_processors': [
                         'django.contrib.auth.context_processors.auth',
                         'django.contrib.messages.context_processors.messages',
-                        'django.core.context_processors.i18n',
-                        'django.core.context_processors.debug',
-                        'django.core.context_processors.request',
-                        'django.core.context_processors.media',
-                        'django.core.context_processors.csrf',
-                        'django.core.context_processors.tz',
-                        'django.core.context_processors.static',
+                        'django.template.context_processors.i18n',
+                        'django.template.context_processors.debug',
+                        'django.template.context_processors.request',
+                        'django.template.context_processors.media',
+                        'django.template.context_processors.csrf',
+                        'django.template.context_processors.tz',
+                        'django.template.context_processors.static',
                         'aldryn_django.context_processors.debug',
                     ],
                     'loaders': loader_list_class([
@@ -226,8 +223,6 @@ class Form(forms.BaseForm):
         return settings
 
     def domain_settings(self, data, settings, env):
-        from aldryn_addons.utils import boolean_ish
-
         settings['ALLOWED_HOSTS'] = env('ALLOWED_HOSTS', ['localhost', '*'])
         # will take a full config dict from ALDRYN_SITES_DOMAINS if available,
         # otherwise fall back to constructing the dict from DOMAIN,
@@ -237,8 +232,6 @@ class Form(forms.BaseForm):
             settings['DOMAIN'] = domain
 
         domains = env('ALDRYN_SITES_DOMAINS', {})
-        permanent_redirect = boolean_ish(env('ALDRYN_SITES_REDIRECT_PERMANENT', False))
-
         if not domains and domain:
             domain_aliases = [
                 d.strip()
@@ -259,7 +252,6 @@ class Form(forms.BaseForm):
                 },
             }
         settings['ALDRYN_SITES_DOMAINS'] = domains
-        settings['ALDRYN_SITES_REDIRECT_PERMANENT'] = permanent_redirect
 
         # This is ensured again by aldryn-sites, but we already do it here
         # as we need the full list of domains later when configuring
@@ -304,47 +296,11 @@ class Form(forms.BaseForm):
             'django.middleware.security.SecurityMiddleware',
         )
 
-        # Add the debreach middlewares to counter CRIME/BREACH attacks.
-        # We always add it even if the GZipMiddleware is not enabled because
-        # we cannot assume that every upstream proxy implements a
-        # countermeasure itself.
-        s['RANDOM_COMMENT_EXCLUDED_VIEWS'] = set([])
-        if 'django.middleware.gzip.GZipMiddleware' in s['MIDDLEWARE_CLASSES']:
-            index = s['MIDDLEWARE_CLASSES'].index('django.middleware.gzip.GZipMiddleware') + 1
-        else:
-            index = 0
-        s['MIDDLEWARE_CLASSES'].insert(index, 'aldryn_django.middleware.RandomCommentExclusionMiddleware')
-        s['MIDDLEWARE_CLASSES'].insert(index, 'debreach.middleware.RandomCommentMiddleware')
-        if 'django.middleware.csrf.CsrfViewMiddleware' in s['MIDDLEWARE_CLASSES']:
-            s['MIDDLEWARE_CLASSES'].insert(
-                s['MIDDLEWARE_CLASSES'].index('django.middleware.csrf.CsrfViewMiddleware'),
-                'debreach.middleware.CSRFCryptMiddleware',
-            )
-
     def server_settings(self, settings, env):
         settings['PORT'] = env('PORT', 80)
         settings['BACKEND_PORT'] = env('BACKEND_PORT', 8000)
-        settings['ENABLE_NGINX'] = env('ENABLE_NGINX', False)
-        settings['ENABLE_PAGESPEED'] = env(
-            'ENABLE_PAGESPEED',
-            env('PAGESPEED', False),
-        )
         settings['STATICFILES_DEFAULT_MAX_AGE'] = env(
-            'STATICFILES_DEFAULT_MAX_AGE',
-            # Keep BROWSERCACHE_MAX_AGE for backwards compatibility
-            env('BROWSERCACHE_MAX_AGE', 300),
-        )
-        settings['NGINX_CONF_PATH'] = env('NGINX_CONF_PATH')
-        settings['NGINX_PROCFILE_PATH'] = env('NGINX_PROCFILE_PATH')
-        settings['PAGESPEED_ADMIN_HTPASSWD_PATH'] = env(
-            'PAGESPEED_ADMIN_HTPASSWD_PATH',
-            os.path.join(
-                os.path.dirname(settings['NGINX_CONF_PATH']),
-                'pagespeed_admin.htpasswd',
-            )
-        )
-        settings['PAGESPEED_ADMIN_USER'] = env('PAGESPEED_ADMIN_USER')
-        settings['PAGESPEED_ADMIN_PASSWORD'] = env('PAGESPEED_ADMIN_PASSWORD')
+            'STATICFILES_DEFAULT_MAX_AGE', 300)
         settings['DJANGO_WEB_WORKERS'] = env('DJANGO_WEB_WORKERS', 3)
         settings['DJANGO_WEB_MAX_REQUESTS'] = env('DJANGO_WEB_MAX_REQUESTS', 500)
         settings['DJANGO_WEB_TIMEOUT'] = env('DJANGO_WEB_TIMEOUT', 120)
@@ -371,7 +327,7 @@ class Form(forms.BaseForm):
                     'stream': sys.stdout,
                 },
                 'null': {
-                    'class': 'django.utils.log.NullHandler',
+                    'class': 'logging.NullHandler',
                 },
             },
             'loggers': {
@@ -403,7 +359,11 @@ class Form(forms.BaseForm):
 
         if sentry_dsn:
             settings['INSTALLED_APPS'].append('raven.contrib.django')
-            settings['RAVEN_CONFIG'] = {'dsn': sentry_dsn}
+            settings['RAVEN_CONFIG'] = {
+                'dsn': sentry_dsn,
+                'release': env('GIT_COMMIT', 'develop'),
+                'environment': env('STAGE', 'local'),
+            }
             settings['LOGGING']['handlers']['sentry'] = {
                 'level': 'ERROR',
                 'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
@@ -505,12 +465,7 @@ class Form(forms.BaseForm):
             settings['SERVER_EMAIL'] = server_email
 
     def i18n_settings(self, data, settings, env):
-        from django.utils.translation import ugettext_lazy
-
-        settings['ALL_LANGUAGES'] = [
-            (code, ugettext_lazy(name))
-            for code, name in settings['LANGUAGES']
-        ]
+        settings['ALL_LANGUAGES'] = list(settings['LANGUAGES'])
         settings['ALL_LANGUAGES_DICT'] = dict(settings['ALL_LANGUAGES'])
 
         settings['USE_L10N'] = True
@@ -541,12 +496,7 @@ class Form(forms.BaseForm):
         settings['LOCALE_PATHS'] = [
             os.path.join(settings['BASE_DIR'], 'locale'),
         ]
-
-        if len(settings['LANGUAGES']) <= 1:
-            settings['PREFIX_DEFAULT_LANGUAGE'] = not data['disable_default_language_prefix']
-        else:
-            # this is not supported for django versions < 1.10
-            settings['PREFIX_DEFAULT_LANGUAGE'] = True
+        settings['PREFIX_DEFAULT_LANGUAGE'] = not data['disable_default_language_prefix']
 
         if not settings['PREFIX_DEFAULT_LANGUAGE']:
             settings['MIDDLEWARE_CLASSES'].insert(
