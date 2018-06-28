@@ -42,10 +42,15 @@ aldryn_addons.settings.load(locals())
 INSTALLED_APPS.extend([
     # add your project specific apps here
     'project',
+    'project.banner',
 ])
 
 MIDDLEWARE_CLASSES.extend([
     # add your own middlewares here
+])
+
+TEMPLATES[0]['OPTIONS']['context_processors'].extend([
+    'project.banner.context_processors.banner_message',
 ])
 
 if STAGE in {'local', 'test'}:
@@ -90,4 +95,3 @@ PANDADOC_REDIRECT_URI = env('PANDADOC_REDIRECT_URI')
 # =============================================================================
 RECAPTCHA_SITE_KEY = env('RECAPTCHA_SITE_KEY')
 RECAPTCHA_SECRET_KEY = env('RECAPTCHA_SECRET_KEY')
-
