@@ -1,9 +1,5 @@
 {% load staticfiles %}
 <script type="text/javascript">
-    {% if debug %}
     var baseHost = window.location.hostname.replace('www\.', '');
-    {% else %}
-    var baseHost = 'divio.com';
-    {% endif %}
 </script>
 <script src="{% static 'js/dist/gdpr.bundle.js' %}"></script>
