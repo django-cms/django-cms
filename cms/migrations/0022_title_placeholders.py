@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import warnings
+import warnings, os
 
 from django.db import migrations, models
 
@@ -17,18 +17,24 @@ def forwards(apps, schema_editor):
         title_list = title_model.objects.all()
         page_list = page_model.objects.all()
 
+        page_count = page_list.count()
+
+        for page in page_list:
+            title_set_count = page.title_set
+
+        """
+            # for each page language
+            for page_title in page.title_set:
+                new_title = page_title
         """
 
-        for each page language
-
-
-        """
         # 2. Move all plugins for each language into their respective placeholder
 
-        raise Exception
 
     except Exception:
         warnings.warn(u'Placeholder migration failure.')
+
+    raise os.sys.exit(u'Placeholder migration failure.')
 
 
 def backwards(apps, schema_editor):
@@ -42,10 +48,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='title',
-            name='placeholders',
-            field=models.ManyToManyField(editable=False, to='cms.Placeholder'),
-        ),
-        migrations.RunPython(forwards, backwards)
+        migrations.RunPython(forwards)
     ]
+
+    """
+    migrations.AddField(
+        model_name='title',
+        name='placeholders',
+        field=models.ManyToManyField(editable=False, to='cms.Placeholder'),
+    ),
+    """
+
+
