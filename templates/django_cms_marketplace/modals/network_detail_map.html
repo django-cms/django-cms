@@ -1,29 +1,12 @@
 {% extends "django_cms_marketplace/modals/modal_base.html" %}
-{% load static sekizai_tags i18n %}
+{% load staticfiles sekizai_tags i18n %}
 
 {% block "modal_header" %}
     <h2 class="title info-name-header modal-map-header pull-left">{{ profile.name }}</h2>
 {% endblock %}
 {% block "modal_content" %}
-    <div id="network-detail-map" class="network-detail-map"></div>
-{% endblock %}
-
-{% block "modal_scripts" %}
-    {% addtoblock "js" %}
-        <script src="https://maps.googleapis.com/maps/api/js?key={{ DJANGO_CMS_MARKETPLACE_GOOGLE_MAPS_KEY }}"></script>
-        <script src="{% static 'js/addons/cl.map.detail.js' %}"></script>
-    {% endaddtoblock %}
-    {% addtoblock "js" %}
-        <script>
-            var detailMap = new Cl.Map({
-                map_canvas: 'network-detail-map',
-                modal_container: '#mapShow',
-                links: '.js-show-map',
-                title: '{{ profile.name }}',
-                map_settings: {
-                    zoom: 13
-                }
-            });
-        </script>
-    {% endaddtoblock %}
+    <div data-map='{
+        "title": "{{ profile.name }}"
+        "apiKey": "AIzaSyDKX_ncBnAaDLFjzcEovAj2tFE4fz9bXbg"
+    }' id="network-detail-map" class="network-detail-map"></div>
 {% endblock %}

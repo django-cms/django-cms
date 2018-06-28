@@ -8,16 +8,14 @@
                 <div class="col-sm-16 profile-information">
                     <div class="content">
                         <div class="profile-heading clearfix">
-                            {% if object.install_url %}
-                                <div class="profile-head-actions pull-right clearfix">
-                                    <a href="{{ object.install_url }}"
-                                        class="btn btn-primary text-right"
-                                        target="_blank">
-                                        <span class="icon icon-aldryn"></span>
-                                        {% trans "Install on Divio Cloud" %}
-                                    </a>
-                                </div>
-                            {% endif %}
+                            <div class="profile-head-actions pull-right clearfix">
+                                <a href="{{ object.install_url }}"
+                                    class="btn btn-primary text-right"
+                                    target="_blank">
+                                    <span class="icon icon-aldryn"></span>
+                                    {% trans "Install on Aldryn Cloud" %}
+                                </a>
+                            </div>
                             <div class="display-heading pull-left">
                                 <h1 class="title left">{{ object.name }}</h1>
                             </div>
@@ -52,13 +50,13 @@
                         </div>
                     </div>
                     <div class="row clearfix">
-                        {% if object.small_promo_image_url %}
-                            <div class="col-md-10">
+                        <div class="col-md-10">
+                            {% if object.author.avatar_url %}
                                 <div class="profile-logo">
                                     <img src="{{ object.small_promo_image_url }}" alt="{{ object.name }}">
                                 </div>
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                         <div class="col-md-14">
                             <div class="profile-logo-info">
                                 {% if object.latest_version %}
@@ -134,13 +132,11 @@
                                 </h3>
                                 <div class="box-item-content">
                                     <div class="row">
-                                        {% if object.author.avatar_url %}
-                                            <div class="col-sm-10 col-xs-8">
-                                                <div class="profile-logo">
-                                                    <img src="{{ object.author.avatar_url }}" alt="{{ object.author.name }}">
-                                                </div>
+                                        <div class="col-sm-10 col-xs-8">
+                                            <div class="profile-logo">
+                                                <img src="{{ object.author.avatar_url }}" alt="{{ object.author.name }}">
                                             </div>
-                                        {% endif %}
+                                        </div>
                                         <div class="col-sm-14 col-xs-16">
                                             <span class="autor">
                                                 {{ object.author.name }}

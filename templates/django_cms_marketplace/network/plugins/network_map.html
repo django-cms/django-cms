@@ -1,4 +1,4 @@
-{% load i18n menu_tags static cms_tags sekizai_tags marketplace %}
+{% load i18n menu_tags staticfiles cms_tags sekizai_tags marketplace %}
 
 {% if instance.title %}
     <div class="display-subheading row">
@@ -40,7 +40,7 @@
     </div>
 </div>
 
-{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js?key={{ DJANGO_CMS_MARKETPLACE_GOOGLE_MAPS_KEY }}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static 'js/addons/jquery.network.main.js' %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static 'js/libs/markerclusterer.js' %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}

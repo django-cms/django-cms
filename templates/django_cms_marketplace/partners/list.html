@@ -1,1 +1,16 @@
-{% extends "django_cms_marketplace/network/list.html" %}
+{% extends "django_cms_marketplace/base.html" %}
+{% load i18n cms_tags %}
+
+{% block feature %}
+<div class="page-header">
+    <div class="container">
+        {% static_placeholder "Partner Header" %}
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% static_placeholder "Partner Content" %}
+</div>
+{% endblock %}

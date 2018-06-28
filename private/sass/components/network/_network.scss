@@ -1,0 +1,361 @@
+.network-detail,
+.marketplace-detail {
+    position: relative;
+
+    .display-heading h1 {
+        position: relative;
+        font-size: 20px;
+        margin: 20px 0 25px 0;
+        border: none;
+
+        &:after {
+            left: 0;
+            margin-left: 0;
+        }
+    }
+
+    .profile-head-actions {
+        padding: 18px 0 0;
+
+        @include media-breakpoint-down(md) {
+            + .display-heading {
+                max-width: 80%;
+            }
+        }
+    }
+
+    .profile-information {
+        @include media-breakpoint-up(md) {
+            padding: 35px 0 0 70px;
+        }
+
+
+        .content:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: -100%;
+            bottom: -100%;
+            left: -100%;
+            z-index: -1;
+            width: 200%;
+            height: 9999px;
+            background-color: white;
+        }
+
+        .content-image {
+            padding: 10px 0 20px;
+
+            img {
+                width: 100%;
+            }
+        }
+    }
+
+    h3 {
+        font-size: 15px;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: #000;
+        margin-bottom: 10px;
+    }
+
+    .list-unstyled {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .profile-sidebar {
+        padding: 0;
+        text-align: center;
+        margin-bottom: 30px;
+
+        @include media-breakpoint-up(md) {
+            text-align: right;
+        }
+
+
+        .back-link-container {
+            padding-bottom: 17px;
+        }
+
+        .profile-back {
+            text-transform: uppercase;
+        }
+
+        .profile-logo {
+            float: right !important;
+            display: table;
+            vertical-align: middle;
+            width: 180px;
+            min-height: 180px;
+            padding: 10px;
+            margin-bottom: $line-height-computed;
+            border: 1px solid $gray-200;
+            background: #fff;
+
+            .profile-logo-inner {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            @include media-breakpoint-down(sm) {
+                float: none !important;
+                margin: 0 auto $line-height-computed;
+            }
+
+
+            img {
+                width: 100%;
+            }
+        }
+
+        .profile-logo-info {
+            margin-top: 0;
+
+            .info-item {
+                padding: 5px 0;
+            }
+
+            .active-since {
+                color: $gray-600;
+            }
+
+            @include media-breakpoint-down(lg) {
+                padding: 5px 0;
+            }
+        }
+
+        .view-website-link,
+        .view-onmap-link,
+        .list-item-link {
+            color: $gray-900;
+            text-transform: initial;
+
+            &:hover,
+            &:active {
+                color: theme-color(primary);
+                text-decoration: none;
+            }
+        }
+
+        .profile-tags {
+            text-transform: uppercase;
+        }
+
+        .detail-responsive .list-unstyled {
+            margin-left: 0 !important;
+        }
+
+        .contact-block,
+        .detail-block {
+            .info-name-header {
+                font-size: 13px;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }
+
+            .box-item {
+                margin: 25px 0 15px;
+
+                &-header {
+                    color: $gray-600;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                }
+
+                .box-item-header {}
+
+                &-content {
+                    font-size: 12px;
+
+                    &.location-box {
+                        color: $gray-900;
+                    }
+
+                    ul {
+                        color: $gray-900;
+                        line-height: 1.7;
+
+                        .fa-check {
+                            color: $gray-900;
+                        }
+
+                        .tags-item a {
+                            color: $gray-900;
+                            font-size: 12px;
+                            line-height: 1.5;
+                            text-transform: initial;
+                        }
+                    }
+                }
+            }
+
+            .box-author {
+                .box-item-content {
+                    margin: 10px 0;
+                    padding: 10px 0;
+                    border-top: 1px solid $gray-200;
+                    border-bottom: 1px solid $gray-200;
+                }
+            }
+        }
+    }
+
+    .slick-carousel {
+        position: relative;
+        overflow: hidden;
+        margin-right: -10px;
+        margin-left: -10px;
+        padding-bottom: 50px;
+
+        .slick-active {
+            outline: none;
+        }
+
+        .slick-arrow {
+            position: absolute;
+            top: auto;
+            bottom: 25px;
+            left: auto;
+
+            &:before {
+                color: theme-color(primary);
+                font-family: "FontAwesome";
+                font-size: 13px;
+            }
+        }
+
+        .slick-prev {
+            right: 30px;
+
+            &:before {
+                content: "\f053";
+            }
+        }
+
+        .slick-next {
+            right: 10px;
+
+            &:before {
+                content: "\f054";
+            }
+        }
+
+        @include media-breakpoint-down(md) {
+            .slick-arrow {
+                top: 50%;
+                bottom: auto;
+                z-index: 999;
+                margin-top: -50px;
+
+                &.slick-prev {
+                    left: 0;
+                }
+
+                &.slick-next {
+                    right: 10px;
+                }
+
+                &:before {
+                    font-size: 40px;
+                }
+            }
+        }
+    }
+
+    .network-references .display-subheading {
+        text-transform: uppercase;
+        min-height: inherit;
+        margin-top: 40px;
+    }
+
+    .network-references-item {
+        overflow: hidden;
+        margin: 10px 0;
+
+        &-image {
+            position: relative;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+            }
+
+            a {
+                display: block;
+                overflow: hidden;
+                height: 73px;
+
+                .icon {
+                    display: none;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    z-index: 100;
+                    color: white;
+                    width: 30px;
+                    height: 30px;
+                    transform: translate(-50%, -50%);
+                }
+            }
+
+            @include media-breakpoint-up(lg) {
+                a {
+                    height: 86px;
+                }
+            }
+
+
+            @include media-breakpoint-up(lg) {
+                a {
+                    height: 118px;
+                }
+            }
+
+
+            a:hover {
+                .icon {
+                    display: block !important;
+                }
+
+                .fa-link {
+                    transform: translate(-50%, -50%) rotate(270deg);
+
+                    &:before {
+                        position: relative;
+                        top: 1px;
+                    }
+                }
+
+                &:after {
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0.5;
+                    background-color: theme-color(primary);
+                }
+            }
+        }
+    }
+
+    @include media-breakpoint-down(md) {
+        margin: 0 -10px -20px;
+        background-color: #fff;
+    }
+
+
+    .box-author .profile-logo {
+        width: 80px;
+        height: 80px;
+
+        @include media-breakpoint-down(md) {
+            width: 60px;
+            height: 60px;
+        }
+    }
+}
