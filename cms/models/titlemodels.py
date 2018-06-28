@@ -38,6 +38,9 @@ class Title(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
 
+    # Placeholders (plugins)
+    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
+
     # Publisher fields
     published = models.BooleanField(_("is published"), blank=True, default=False)
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
