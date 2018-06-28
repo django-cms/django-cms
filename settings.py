@@ -11,7 +11,6 @@ INSTALLED_ADDONS = [
     'aldryn-django',
     'aldryn-sso',
     'aldryn-django-cms',
-    'aldryn-devsync',
     'aldryn-forms',
     'aldryn-newsblog',
     'divio-styleguide',
@@ -42,6 +41,7 @@ aldryn_addons.settings.load(locals())
 INSTALLED_APPS.extend([
     # add your project specific apps here
     'project',
+    'project.banner',
 ])
 
 MIDDLEWARE_CLASSES.extend([
@@ -90,4 +90,3 @@ PANDADOC_REDIRECT_URI = env('PANDADOC_REDIRECT_URI')
 # =============================================================================
 RECAPTCHA_SITE_KEY = env('RECAPTCHA_SITE_KEY')
 RECAPTCHA_SECRET_KEY = env('RECAPTCHA_SECRET_KEY')
-
