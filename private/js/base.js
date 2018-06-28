@@ -10,6 +10,7 @@ import { initBlogCarousel } from 'addons/carousel';
 import { initWaypoints } from 'addons/waypoints';
 import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
 import { initPrivacySettings } from 'addons/privacy';
+import { initPartnerMap } from 'addons/map';
 import 'addons/flying-focus';
 
 svg4everybody({
@@ -45,4 +46,5 @@ $(() => {
         lowerThan: 'boxShadow',
     });
     initPrivacySettings();
+    initPartnerMap();
 });

@@ -1,0 +1,58 @@
+$speed-base: 200ms;
+$btn-sign-color: theme-color(primary);
+$gray2: #333;
+$gray3: #999;
+$gray4: #e4e4e6;
+$gray5: #f4f4f5;
+$gray6: #e6e6e6;
+$gray7: #e9e9ea;
+$gray8: #676767;
+$gray9: #35363c;
+$red: #be2923;
+$bright-yellow-green: #a4b600;
+
+//starter
+$herbal: #68b735;
+
+//basic
+$jungle: #26b775;
+
+//business
+$turquoise: #00b7b5;
+$link-color: $btn-sign-color;
+$navbar-default-color: $white;
+$navbar-default-link-color: $white;
+$navbar-default-link-hover-color: $btn-sign-color;
+$input-bg: #fff;
+$input-color: #999;
+$input-color-placeholder: #999;
+$input-border: #ccc;
+$input-height-base: 38px;
+$input-border-radius: $border-radius;
+$btn-header-font-size: 12px;
+$text-network-filter-header-size: 12px;
+$text-network-filter-size: 13px;
+$text-network-filter-line: 24px;
+$label-primary-bg: theme-color(primary);
+$map-height-large: 350px;
+$map-height-tablet: 250px;
+$map-opener-bg: #cf3f30;
+$carousel-indicator-width: 300px;
+$carousel-indicator-width-tablet: 200px;
+$promo-splitter-text-size: 13px;
+$featured-organisations-text-size: 15px;
+$featured-organisations-block-bg: #fdfdfd;
+$browse-all-link-size: 13px;
+$featured-addons-height: 353px;
+$featured-addons-height-tab: 252px;
+$featured-addons-height-mobile: 152px;
+$featured-addons-marker-size: 20px;
+
+@import "map_popup";
+@import "custom";
+@import "markers";
+@import "network";
+@import "teaser";
+@import "slick_theme";
+@import "references";
+@import "landing";

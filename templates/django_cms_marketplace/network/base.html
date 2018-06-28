@@ -1,5 +1,5 @@
-{% extends "fullwidth.html" %}
-{% load cms_tags static sekizai_tags menu_tags i18n %}
+{% extends "content.html" %}
+{% load cms_tags staticfiles sekizai_tags menu_tags i18n %}
 
 {% block content %}
 <div id="wrapper">
@@ -24,7 +24,7 @@
     {% static_placeholder "additional_network_info" %}
 </div>
 
-{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js?key={{ DJANGO_CMS_MARKETPLACE_GOOGLE_MAPS_KEY }}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static 'js/addons/jquery.network.main.js' %}"></script>{% endaddtoblock %}
 {% addtoblock "js" %}<script src="{% static 'js/addons/jquery.network.map.js' %}"></script>{% endaddtoblock %}
 {% endblock content %}

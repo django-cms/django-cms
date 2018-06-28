@@ -1,54 +1,37 @@
-{% load i18n marketplace %}
+{% load i18n staticfiles marketplace %}
 
-<div class="display-subheading row">
-    <div class="col-sm-16">
-        {% if instance.title %}
-            <h2>
-                {{ instance.title }}
-            </h2>
-        {% endif %}
-    </div>
-    <div class="col-sm-8 text-right">
-        <a class="browse-all-link" href="{% get_url 'network_profile_list' %}?kind=organisation">
-            <span class="fa fa-chevron-right" aria-hidden="true"></span>
-            {% trans "Browse all" %}
-        </a>
-    </div>
-</div>
-
-<div class="featured-organisations row">
+<div class="row my-5">
     {% for organisation in featured_organisations %}
-        <div class="col-sm-8">
-            <a href="{{ organisation.detail_url }}">
-                <div class="block block-featured-organisations">
-                    <div class="row">
-                        <div class="col-md-7 block-featured-organisations-logo">
-                            <div class="logo-wrapper">
-                                <img src="{{ organisation.logo }}">
-                            </div>
-                        </div>
-                        <div class="col-md-17 block-featured-organisations-info">
-                            <h3 class="block-featured-organisations-name">
-                                {{ organisation.name }}
-                            </h3>
-                            <h4 class="block-featured-organisations-country">
-                                {% for location in organisation.locations %}
-                                    {% if location.is_primary %}
-                                        {{ location.country_long }}
-                                    {% endif %}
-                                {% endfor %}
-                            </h4>
-                        </div>
+    <div class="col-md-6 col-lg-4 divio-network">
+            {% if organisation.description %}
+                <a href="{{ organisation.detail_url }}" class="divio-network-box d-flex align-items-center divio-network-box-item">
+            {% else %}
+                <div class="divio-network-box divio-network-box-item d-flex align-items-center divio-network-box-item-nohover">
+            {% endif %}
+                <div class="network-visual">
+                    <div class="network-visual-position">
+                        {% if organisation.logo %}
+                            <img src="{{ organisation.logo }}" alt="{{ organisation.name }}">
+                        {% else %}
+                            <img src="{% static 'img/partners/logo.png' %}" alt="{{ organisation.name }}">
+                        {% endif %}
                     </div>
-                    {% if organisation.is_partner %}
-                        <div class="ribbon">
-                            <div class="ribbon-text">
-                                {% trans "Divio Partner" %}
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
-            </a>
+                <div class="network-content">
+                    <h3>{{ organisation.name }}</h3>
+                    <h4>
+                        {% for location in organisation.locations %}
+                            {% if location.is_primary %}
+                                {{ location.country_long }}
+                            {% endif %}
+                        {% endfor %}
+                    </h4>
+                </div>
+            {% if organisation.description %}
+                </a>
+            {% else %}
+                </div>
+            {% endif %}
         </div>
     {% endfor %}
 </div>

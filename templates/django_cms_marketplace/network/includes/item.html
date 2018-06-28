@@ -12,11 +12,6 @@
             <div class="col-xs-16">
                 <h2 class="h6 panel-list-network-name">
                     {{ profile.name }}
-                    {% if profile.is_partner %}
-                        <span class="partner-label">
-                            {% trans "Divio Partner" %}
-                        </span>
-                    {% endif %}
                     <span class="panel-list-network-location">
                         {% for location in profile.locations %}
                             {{ location.country_long }}{% if not forloop.last %} |{% endif %}

@@ -11,9 +11,9 @@
                             <div class="profile-head-actions pull-right clearfix">
                                 {% if profile.contact %}
                                     {% if profile.kind|lower == "individual" %}
-                                        <a class="text-right btn btn-primary" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20django%20CMS%20Marketplace">{% trans "Hire me" %}</a>
+                                        <a class="text-right btn btn-primary" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Aldryn%20Marketplace">{% trans "Hire me" %}</a>
                                     {% else %}
-                                        <a class="text-right btn btn-primary" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20django%20CMS%20Marketplace">{% trans "Hire us" %}</a>
+                                        <a class="text-right btn btn-primary" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Aldryn%20Marketplace">{% trans "Hire us" %}</a>
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -65,7 +65,7 @@
                                 {% trans "back to overview" %}
                             </a>
                         {% else %}
-                            <a href="#" class="profile-back js-back-link" data-default="{% get_url 'network_profile_list' %}">
+                            <a href="#" onclick="window.history.back();return false;" class="profile-back">
                                 <span class="fa fa-chevron-left" aria-hidden="true"></span>
                                 {% trans "back to overview" %}
                             </a>
@@ -75,7 +75,9 @@
                         <div class="col-md-10">
                             {% if profile.logo %}
                                 <div class="profile-logo">
-                                    <img src="{{ profile.logo }}" alt="{{ profile.name }}">
+                                    <div class="profile-logo-inner">
+                                        <img src="{{ profile.logo }}" alt="{{ profile.name }}">
+                                    </div>
                                 </div>
                             {% endif %}
                         </div>
@@ -123,14 +125,6 @@
                     </div>
                     <div class="contact-block">
                         <h2 class="title info-name-header">{{ profile.name }}</h2>
-                        {% if profile.published_organisation_id %}
-                            {% get_published_organisation profile.published_organisation_id as published_organisation %}
-                            {% if published_organisation %}
-                                <span class="author">
-                                    <a href="{{ published_organisation.detail_url }}">{{ published_organisation.name }}</a>
-                                </span>
-                            {% endif %}
-                        {% endif %}
                         {% if profile.locations %}
                             <div class="box-item">
                                 <h3 class="box-item-header">
@@ -140,16 +134,12 @@
                                     <ul class="fa-ul list-unstyled">
                                         {% for location in profile.locations %}
                                             <li>
-                                                {% if location and location.lat and location.lon %}
-                                                    <a href="#" class="view-onmap-link js-show-map"
-                                                        data-location="[[{{ location.lat }}, {{ location.lon }}]]">
-                                                        <span class="fa-li fa fa-location-arrow" aria-hidden="true"></span>
-                                                        {{ location.full_address }}
-                                                    </a>
-                                                {% else %}
+                                                <a href="#"
+                                                   class="view-onmap-link js-show-map"
+                                                   data-location="[[{{ location.lat }}, {{ location.lon }}]]">
                                                     <span class="fa-li fa fa-location-arrow" aria-hidden="true"></span>
                                                     {{ location.full_address }}
-                                                {% endif %}
+                                                </a>
                                             </li>
                                         {% endfor %}
                                     </ul>
@@ -186,16 +176,14 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <div class="box-item">
-                            {% if profile.is_partner %}
-                                <a class="partner-logo" href="https://www.divio.com/en/divio-partner/" target="_blank">
-                                    <img src="{% static 'img/divio-white.svg' %}" alt="{% trans "Divio Partner" %}">
-                                    <div class="bottom">
-                                        {% trans "Divio Partner" %}
-                                    </div>
-                                </a>
+                        {% if profile.published_organisation_id %}
+                            {% get_published_organisation profile.published_organisation_id as published_organisation %}
+                            {% if published_organisation %}
+                                <span class="author">
+                                    <a href="{{ published_organisation.detail_url }}">{{ published_organisation.name }}</a>
+                                </span>
                             {% endif %}
-                        </div>
+                        {% endif %}
                         {% include "django_cms_marketplace/modals/network_detail_map.html" with modal_id="mapShow" closeable="true" no_footer="true" location=profile.main_location %}
                     </div>
                 </div>
@@ -206,7 +194,6 @@
 
     {% addtoblock "js" %}
         <script src="{% static 'js/libs/slick.min.js' %}"></script>
-        <script src="{% static 'js/addons/cl.back.js' %}"></script>
     {% endaddtoblock %}
     {% addtoblock "js" %}
         <script>
@@ -226,10 +213,6 @@
                         }
                     ]
                 });
-            });
-
-            var backButton = new Cl.Back({
-                originalDomain: '{{ request.META.HTTP_HOST }}'
             });
         </script>
     {% endaddtoblock %}

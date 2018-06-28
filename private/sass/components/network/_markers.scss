@@ -1,0 +1,44 @@
+.point {
+    position: absolute;
+    bottom: 8px;
+    left: -10px;
+
+    .opener {
+        display: block;
+        position: relative;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: $map-opener-bg;
+
+        &:after {
+            content: "";
+            position: absolute;
+            top: 16px;
+            left: 2px;
+            width: 0;
+            height: 0;
+            border-width: 12px 8px 0 8px;
+            border-style: solid;
+            border-color: $map-opener-bg transparent transparent transparent;
+        }
+    }
+
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    &.popup-active {
+        z-index: 200;
+
+        .opener {
+            background: $gray-900;
+
+            &:after {
+                border-color: $gray-900 transparent transparent transparent;
+            }
+        }
+    }
+}
