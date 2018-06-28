@@ -20,6 +20,7 @@ INSTALLED_ADDONS = [
     'djangocms-history',
     'djangocms-icon',
     'djangocms-link',
+    'django-cms-marketplace',
     'djangocms-modules',
     'djangocms-picture',
     'djangocms-snippet',

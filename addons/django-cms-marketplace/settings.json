@@ -1,0 +1,10 @@
+{
+    "addons_api_cache_timeout": 300, 
+    "addons_api_url": "https://control.aldryn.com/apps/addons-marketplace-data/aldryn.com/", 
+    "marketplace_addon_base_url": "https://marketplace.django-cms.org/en/addons/browse/", 
+    "marketplace_google_maps_key": "", 
+    "marketplace_network_base_url": "https://marketplace.django-cms.org/en/network/browse/", 
+    "network_api_cache_timeout": 300, 
+    "network_api_url": "https://control.aldryn.com/network/profiles", 
+    "network_references_api_url": "https://control.aldryn.com/network/references/"
+}
