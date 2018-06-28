@@ -120,6 +120,10 @@ body.cke_editable {
                 font-size: rem(12px);
             }
         }
+
+        .selected > a {
+            color: theme-color(primary);
+        }
     }
 
     .sub-menu-title {
