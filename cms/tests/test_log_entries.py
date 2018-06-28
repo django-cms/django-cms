@@ -150,6 +150,8 @@ class LogPageOperationsTests(CMSTestCase):
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en", published=False)
+            pre_deleted_page_id = str(page.pk)
+            pre_deleted_page = str(page)
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
             post_data = {'post': 'yes'}
 
@@ -165,9 +167,9 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the action flag is set correctly
             self.assertEqual(DELETION, log_entry.action_flag)
             # Check the object id is set correctly
-            self.assertEqual(str(page.pk), log_entry.object_id)
+            self.assertEqual(pre_deleted_page_id, log_entry.object_id)
             # Check the object_repr is set correctly
-            self.assertEqual(str(page), log_entry.object_repr)
+            self.assertEqual(pre_deleted_page, log_entry.object_repr)
 
     def test_log_for_change_translation(self):
         """
