@@ -470,7 +470,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return self.render_delete_form(request, context)
 
     def delete_model(self, request, obj):
-
         operation_token = send_pre_page_operation(
             request=request,
             operation=operations.DELETE_PAGE,
@@ -894,7 +893,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             obj=page,
             sender=self.model,
         )
-
         return jsonify_request(HttpResponse(status=200))
 
     def get_permissions(self, request, page_id):

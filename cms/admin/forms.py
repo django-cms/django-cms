@@ -501,7 +501,6 @@ class ChangePageForm(BasePageForm):
         else:
             cms_page._update_title_path_recursive(self._language)
         cms_page.clear_cache(menu=True)
-
         send_post_page_operation(
             request=self._request,
             operation=CHANGE_PAGE,

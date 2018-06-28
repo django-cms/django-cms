@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
@@ -98,23 +100,20 @@ def log_page_operations(sender, **kwargs):
     """
     Create a log for the correct page operation type
     """
-
     request = kwargs.get('request')
     operation_type = kwargs.get('operation')
     obj = kwargs.get('obj')
 
-    # Check that we have instructions for the operation and an instance of Page to link to in the log
+    # Check that we have instructions for the operation
+    # and an instance of Page to link to in the log
     if operation_type in _page_operations_map and _is_valid_page_instance(obj):
         operation_handler = _page_operations_map[operation_type]
-        user_id = request.user.pk
         content_type_id = ContentType.objects.get_for_model(obj).pk
-        object_id = obj.pk
-        object_repr = str(obj)
         create_log_entry(
-            user_id=user_id,
+            user_id=request.user.pk,
             content_type_id=content_type_id,
-            object_id=object_id,
-            object_repr=object_repr,
+            object_id=obj.pk,
+            object_repr=str(obj),
             action_flag=operation_handler['flag'],
             change_message=operation_handler['message'],
         )
@@ -124,27 +123,23 @@ def log_placeholder_operations(sender, **kwargs):
     """
     Create a log for the correct placeholder operation type
     """
-
     request = kwargs.get('request')
     operation_type = kwargs.get('operation')
 
     # Check that we have instructions for the operation
     if operation_type in _placeholder_operations_map:
         operation_handler = _placeholder_operations_map[operation_type]
-        user_id = request.user.pk
         placeholder = kwargs.get(operation_handler['placeholder_kwarg'])
         page = placeholder.page
 
         # Check that we have an instance of Page to link to in the log
         if _is_valid_page_instance(page):
             content_type_id = ContentType.objects.get_for_model(page).pk
-            object_id = page.pk
-            object_repr = str(page)
             create_log_entry(
-                user_id=user_id,
+                user_id=request.user.pk,
                 content_type_id=content_type_id,
-                object_id=object_id,
-                object_repr=object_repr,
+                object_id=page.pk,
+                object_repr=str(page),
                 action_flag=operation_handler['flag'],
                 change_message=operation_handler['message'],
             )
