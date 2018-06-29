@@ -1,0 +1,25 @@
+// /agencies/find-agency/
+.network-list {
+    .card {
+        margin-bottom: 20px;
+    }
+    .media {
+        min-height: 100px;
+    }
+    h2 {
+        font-size: $font-size-base;
+        line-height: $line-height-base;
+    }
+    img {
+        max-height: 100px;
+    }
+    .media-link {
+        display: block;
+        text-decoration: none;
+        transition: 100ms all;
+        &:hover {
+            background: $gray-200;
+            border-radius: $border-radius;
+        }
+    }
+}

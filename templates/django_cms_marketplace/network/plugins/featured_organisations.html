@@ -1,36 +1,27 @@
 {% load i18n staticfiles marketplace %}
 
-<div class="row my-5">
+<div class="card-columns align-center network-list">
     {% for organisation in featured_organisations %}
-    <div class="col-md-6 col-lg-4 divio-network">
+        <div class="card">
             {% if organisation.description %}
-                <a href="{{ organisation.detail_url }}" class="divio-network-box d-flex align-items-center divio-network-box-item">
-            {% else %}
-                <div class="divio-network-box divio-network-box-item d-flex align-items-center divio-network-box-item-nohover">
+                <a href="{{ organisation.detail_url }}" class="media-link">
             {% endif %}
-                <div class="network-visual">
-                    <div class="network-visual-position">
-                        {% if organisation.logo %}
-                            <img src="{{ organisation.logo }}" alt="{{ organisation.name }}">
-                        {% else %}
-                            <img src="{% static 'img/partners/logo.png' %}" alt="{{ organisation.name }}">
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="network-content">
-                    <h3>{{ organisation.name }}</h3>
-                    <h4>
+            <div class="media">
+                <img src="{% if organisation.logo %}{{ organisation.logo }}{% else %}{% static 'img/partners/logo.png' %}{% endif %}"
+                    class="media-left align-self-center p-3 mr-3" width="100" alt="{{ organisation.name }}">
+                <div class="media-body align-self-center">
+                    <h2 class="h6 mt-3 mb-0 pr-2">{{ organisation.name }}</h2>
+                    <p class="mb-3">
                         {% for location in organisation.locations %}
                             {% if location.is_primary %}
                                 {{ location.country_long }}
                             {% endif %}
                         {% endfor %}
-                    </h4>
+                    </p>
                 </div>
+            </div>
             {% if organisation.description %}
                 </a>
-            {% else %}
-                </div>
             {% endif %}
         </div>
     {% endfor %}
