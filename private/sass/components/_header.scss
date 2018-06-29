@@ -45,8 +45,7 @@
         height: 18px;
 
         svg, use {
-            // fill: rgba($body-color;
-            fill: #5F7998;
+            fill: #00416A;
 
             @include media-breakpoint-down(md) {
                 fill: $body-color;
