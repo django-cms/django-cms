@@ -155,43 +155,45 @@ export function initFixedHeaderTables(selector = '.js-table') {
 }
 
 export function initTableCrossHover(selector = '.js-table') {
-    const wrapper = $(selector).closest('.sticky-wrap');
+    $(selector).closest('.sticky-wrap').each((i, el) => {
+        const wrapper = $(el);
 
-    wrapper
-        .on('mouseover', 'td, th', e => {
-            const cell = $(e.currentTarget);
-            const row = cell.parent();
+        wrapper
+            .on('mouseover', 'td, th', e => {
+                const cell = $(e.currentTarget);
+                const row = cell.parent();
 
-            const cellIndex = cell.index();
-            const rowIndex = row.index();
+                const cellIndex = cell.index();
+                const rowIndex = row.index();
 
-            if (!cellIndex && !rowIndex && !row.closest('.sticky-col').length) {
-                return;
-            }
+                if (!cellIndex && !rowIndex && !row.closest('.sticky-col').length) {
+                    return;
+                }
 
-            if (rowIndex >= 0 && !row.closest('.sticky-thead').length) {
-                wrapper.find('table').each((i, el) =>
-                    $(el)
-                        .find(`tr:eq(${rowIndex + 1})`)
-                        .addClass('hover')
-                );
-            }
+                if (rowIndex >= 0 && !row.closest('.sticky-thead').length) {
+                    wrapper.find('table').each((i, el) =>
+                        $(el)
+                            .find(`tr:eq(${rowIndex + 1})`)
+                            .addClass('hover')
+                    );
+                }
 
-            if (cellIndex >= 1) {
-                wrapper.find('tr').each((i, el) => {
-                    $(el)
-                        .find(`td:eq(${cellIndex - 1})`)
-                        .addClass('hover');
-                });
+                if (cellIndex >= 1) {
+                    wrapper.find('tr').each((i, el) => {
+                        $(el)
+                            .find(`td:eq(${cellIndex - 1})`)
+                            .addClass('hover');
+                    });
 
-                wrapper.find('tr').each((i, el) => {
-                    $(el)
-                        .find(`th:eq(${cellIndex})`)
-                        .addClass('hover');
-                });
-            }
-        })
-        .on('mouseout', 'td, th', () => {
-            wrapper.find('tr, td, th').removeClass('hover');
-        });
+                    wrapper.find('tr').each((i, el) => {
+                        $(el)
+                            .find(`th:eq(${cellIndex})`)
+                            .addClass('hover');
+                    });
+                }
+            })
+            .on('mouseout', 'td, th', () => {
+                wrapper.find('tr, td, th').removeClass('hover');
+            });
+    });
 }

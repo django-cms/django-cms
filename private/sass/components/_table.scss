@@ -80,3 +80,13 @@ tr.hover td.hover {
 .table-bordered thead th {
     border-top-width: 1px;
 }
+
+.table-comparison {
+    .icon {
+        font-size: 30px;
+    }
+
+    tr td:last-child {
+        text-align: left;
+    }
+}
