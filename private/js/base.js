@@ -11,6 +11,9 @@ import { initWaypoints } from 'addons/waypoints';
 import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
 import { initPrivacySettings } from 'addons/privacy';
 import { initPartnerMap } from 'addons/map';
+import { initIntercom } from 'addons/intercom';
+import { initAnalytics } from 'addons/analytics';
+import { initPandadocForms } from 'addons/pandadoc';
 import 'addons/flying-focus';
 
 svg4everybody({
@@ -19,6 +22,7 @@ svg4everybody({
 
 window.$ = window.jQuery = $;
 
+// patch bootstrap 4 modal
 $.fn.modal.Constructor.prototype._checkScrollbar = function () {
     // taken from bootstrap 3
     // https://github.com/twbs/bootstrap-sass/blob/51486a8bd836d32b9f413e911ed83b433ef4ad39/assets/javascripts/bootstrap/modal.js#L259-L267
@@ -38,7 +42,6 @@ $(() => {
     initHeader();
     initBlogCarousel();
     initWaypoints();
-    // TODO load this on demand
     initFixedHeaderTables();
     initTableCrossHover();
     outdatedBrowser({
@@ -47,4 +50,7 @@ $(() => {
     });
     initPrivacySettings();
     initPartnerMap();
+    initIntercom();
+    initAnalytics();
+    initPandadocForms();
 });

@@ -207,7 +207,11 @@
         overflow: hidden;
         margin-right: -10px;
         margin-left: -10px;
-        padding-bottom: 50px;
+        padding-bottom: 20px;
+
+        .slick-dots {
+            bottom: -20px;
+        }
 
         .slick-active {
             outline: none;
