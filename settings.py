@@ -48,8 +48,10 @@ MIDDLEWARE_CLASSES.extend([
     # add your own middlewares here
 ])
 
+# without this the access-control-allow-origin iframes won't work
+CMS_PAGE_CACHE = False
+
 if STAGE in {'local', 'test'}:
-    CMS_PAGE_CACHE = False
     CMS_PLACEHOLDER_CACHE = False
     CMS_CACHE_DURATIONS = {
         'menus': 0,
