@@ -202,7 +202,7 @@ CMSPluginBase Attributes and Methods Reference
 
         * set this to ``True``
         * make sure your plugin provides its own :meth"`icon_alt`, this will be used as a tooltip in 
-        the text-editor and comes in handy when you use multiple plugins in your text.
+          the text-editor and comes in handy when you use multiple plugins in your text.
 
         See also: :attr:`icon_alt`, :attr:`icon_src`.
 
