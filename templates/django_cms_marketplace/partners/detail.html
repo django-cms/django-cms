@@ -6,179 +6,138 @@
 {% block extend_base %}
     <div class="page-header">
         <div class="container">
-        {% block partner_header %}
-            {% static_placeholder "Partner Header Detail" %}
-        {% endblock %}
+            <div class="page-header-with-image">
+                <p class="spitzmarke">Divio Partner</p>
+                <h1 class="display-1">{{ profile.name }}</h1>
+                <div class="lead">{{ profile.description|safe|truncatewords:"25" }}</div>
+                <a href="../../../" class="btn btn-outline-primary mr-2">
+                    {% include "includes/icon.html" with icon="arrow-right" class="icon-rotate-180" %} &nbsp;
+                    {% trans "Back" %}
+                </a>
+                {% if profile.contact %}
+                    {% if profile.kind|lower == "individual" %}
+                        <a class="btn btn-primary js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
+                            data-page="Partners"
+                            data-process="{{ profile.name }}"
+                            data-event="Clicked on Hire me"
+                        >{% trans "Hire us" %}</a>
+                    {% else %}
+                        <a class="btn btn-primary js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
+                            data-page="Partners"
+                            data-process="{{ profile.name }}"
+                            data-event="Clicked on Hire us"
+                        >{% trans "Hire us" %}</a>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 
     <div class="section section-fullwidth stripe stripe-up">
         <div class="container">
-            <section class="network-detail profile mt-5">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-4 profile-sidebar">
-                            <div class="back-link-container">
-                                <a href="../../../" class="profile-back">
-                                    <span class="fa fa-chevron-left" aria-hidden="true"></span>
-                                    {% trans "back to overview" %}
-                                </a>
-                            </div>
-                            {% if profile.logo %}
-                                <div class="profile-logo">
-                                    <div class="profile-logo-inner">
-                                        <img src="{{ profile.logo }}" alt="{{ profile.name }}">
-                                    </div>
-                                </div>
-                                <div class="clearfix"></div>
-                            {% endif %}
+            <div class="row">
+                <div class="col-md-4">
+                    {% if profile.logo %}
+                        <img src="{{ profile.logo }}" alt="{{ profile.name }}" class="img-thumbnail p-3 mb-3">
+                    {% endif %}
 
-                            <div class="mb-3">
-                                {% if profile.active_for %}
-                                    <div class="info-item">
-                                        <span class="fa fa-flag fa-fw" aria-hidden="true"></span>
-                                            {# blocktrans does not work here #}
-                                            {{ profile.active_for }} Yr{{ profile.active_for|pluralize }}. experience
-                                    </div>
-                                {% elif profile.active_since %}
-                                    <div class="info-item">
-                                        {% trans "Since" %} {{ profile.active_since }}
+                    <div class="list-group mb-3">
+                        <div class="list-group-item active"><strong>{% trans "About" %}</strong></div>
+                        {% if profile.active_for %}
+                            <div class="list-group-item">
+                                {{ profile.active_for }} Yr{{ profile.active_for|pluralize }}. experience
+                            </div>
+                        {% elif profile.active_since %}
+                            <div class="list-group-item">
+                                {% trans "Since" %} {{ profile.active_since }}
+                            </div>
+                        {% endif %}
+
+                        {% if profile.url %}
+                            <a href="{{ profile.url }}" class="list-group-item list-group-item-action" target="_blank">
+                                {% trans "View website" %}
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if profile.locations %}
+                        <div class="list-group mb-3">
+                            <div class="list-group-item active"><strong>{% trans "Locations" %}</strong></div>
+                            {% for location in profile.locations %}
+                                {% if location and location.lat and location.lon %}
+                                    <a href="https://www.google.com/maps/place/{{ location.full_address|slugify }}/@{{ location.lat }},{{ location.lon }},14z"
+                                        class="list-group-item" target="_blank">
+                                        {{ location.full_address }}
+                                    </a>
+                                {% else %}
+                                    <div class="list-group-item">
+                                        {{ location.full_address }}
                                     </div>
                                 {% endif %}
-                                {% if profile.url %}
-                                    <div class="info-item">
-                                        <a href="{{ profile.url }}" class="view-website-link" target="_blank">
-                                            {% trans "View website" %}
-                                        </a>
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            {% if profile.locations %}
-                                <div class="box-item mb-3">
-                                    <h3 class="box-item-header">
-                                        {% trans "Locations" %}
-                                    </h3>
-                                    <div class="box-item-content location-box">
-                                        <ul class="fa-ul list-unstyled">
-                                            {% for location in profile.locations %}
-                                                <li>
-                                                    {% if location and location.lat and location.lon %}
-                                                    <a href="#" class="view-onmap-link js-show-map"
-                                                        data-location="[[{{ location.lat }}, {{ location.lon }}]]">
-                                                        {{ location.full_address }}
-                                                    </a>
-                                                    {% else %}
-                                                        {{ location.full_address }}
-                                                    {% endif %}
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            {% if profile.expertise %}
-                                <div class="box-item mb-3">
-                                    <h3 class="box-item-header">
-                                        {% trans "Expertise" %}
-                                    </h3>
-                                    <div class="box-item-content">
-                                        <ul class="fa-ul list-unstyled">
-                                            {% for expertise in profile.expertise %}
-                                                <li>{{ expertise }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
+                    {% endif %}
 
-                        <div class="col-md-8 profile-information">
-                            <div class="profile-heading d-flex align-items-center justify-content-between">
-                                    <h1 class="display-2">{{ profile.name }}</h1>
-                                    {% if profile.contact %}
-                                        {% if profile.kind|lower == "individual" %}
-                                            <a class="text-right btn btn-primary js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
-                                                data-page="Partners"
-                                                data-process="{{ profile.name }}"
-                                                data-event="Clicked on Hire me"
-                                            >{% trans "Hire me" %}</a>
-                                        {% else %}
-                                            <a class="text-right btn btn-primary js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
-                                                data-page="Partners"
-                                                data-process="{{ profile.name }}"
-                                                data-event="Clicked on Hire us"
-                                            >{% trans "Hire us" %}</a>
-                                        {% endif %}
-                                    {% endif %}
-                            </div>
-                            {% if profile.backdrop %}
-                                <div class="content-image">
-                                    <img src="{{ profile.backdrop }}" alt="">
-                                </div>
-                            {% endif %}
-                            <div class="profile-description mb-5">
-                                {{ profile.description|safe }}
-                                {% comment %}
-                                <pre>New infos</pre>
-                                <pre>company size: {{ profile.company_size }}</pre>
-                                <pre>services: {{ profile.services|safe }}</pre>
-                                {% endcomment %}
-                            </div>
-                            <div class="spacer spacer-sm"></div>
-                            {% if profile.references %}
-                                <div class="network-references">
-                                    <h3>
-                                        {% if profile.kind|lower == "individual" %}
-                                            {% trans "My portfolio" %}
-                                        {% else %}
-                                            {% trans "Our portfolio" %}
-                                        {% endif %}
-                                    </h3>
-                                    <div class="slick-carousel carousel js-carousel clearfix" data-carousel='{
-                                        "slidesToShow": 3,
-                                        "slidetToScroll": 1,
-                                        "autoplay": true,
-                                        "arrows": false,
-                                        "dots": true,
-                                        "autoplaySpeed": 3000,
-                                        "responsive": [
-                                            {
-                                                "breakpoint": 768,
-                                                "settings": {
-                                                    "slidesToShow": 1,
-                                                    "slidesToScroll": 1
-                                                }
-                                            }
-                                        ]
-                                    }'>
-                                        <div class="carousel-inner">
-                                        {% for reference in profile.references %}
-                                            <div class="item px-2">
-                                                <div class="network-references-item">
-                                                    <div class="network-references-item-image">
-                                                        <a href="{{ reference.url }}" title="{{ reference.title }}" target="_blank">
-                                                            <img src="{{ reference.screenshot_url }}" class="img-responsive" alt="{{ reference.title }}">
-                                                            {% include 'includes/icon.html' with icon='link' %}
-                                                        </a>
-                                                    </div>
-                                                </div>
+                    {% if profile.expertise %}
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item active"><strong>{% trans "Expertise" %}</strong></li>
+                            {% for expertise in profile.expertise %}
+                                <li class="list-group-item">{{ expertise }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h2>{% trans "Description" %}</h2>
+                    {% if profile.backdrop %}
+                        <p><img src="{{ profile.backdrop }}" alt="" class="img-fluid rounded"></p>
+                    {% endif %}
+                    {{ profile.description|safe }}
+
+                    {% if profile.references %}
+                        <div class="network-references">
+                            <h2>
+                                {% if profile.kind|lower == "individual" %}
+                                    {% trans "My portfolio" %}
+                                {% else %}
+                                    {% trans "Our portfolio" %}
+                                {% endif %}
+                            </h2>
+                            <div class="slick-carousel carousel js-carousel clearfix" data-carousel='{
+                                "slidesToShow": 3,
+                                "slidetToScroll": 1,
+                                "autoplay": true,
+                                "arrows": false,
+                                "dots": true,
+                                "autoplaySpeed": 3000,
+                                "responsive": [
+                                    {
+                                        "breakpoint": 768,
+                                        "settings": {
+                                            "slidesToShow": 1,
+                                            "slidesToScroll": 1
+                                        }
+                                    }
+                                ]
+                            }'>
+                                <div class="carousel-inner">
+                                {% for reference in profile.references %}
+                                    <div class="item px-2">
+                                        <div class="network-references-item">
+                                            <div class="network-references-item-image">
+                                                <a href="{{ reference.url }}" title="{{ reference.title }}" target="_blank">
+                                                    <img src="{{ reference.screenshot_url }}" class="img-fluid" alt="{{ reference.title }}">
+                                                </a>
                                             </div>
-                                            {% endfor %}
                                         </div>
                                     </div>
+                                    {% endfor %}
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
-
-                {% include "django_cms_marketplace/modals/network_detail_map.html" with modal_id="mapShow" closeable="true" no_footer="true" location=profile.main_location %}
-            </section>
-
-            {% static_placeholder "Partner Footer Detail" %}
+            </div>
         </div>
     </div>
-
 {% endblock extend_base %}
