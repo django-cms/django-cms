@@ -10,7 +10,7 @@ import { initBlogCarousel } from 'addons/carousel';
 import { initWaypoints } from 'addons/waypoints';
 import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
 import { initPrivacySettings } from 'addons/privacy';
-import { initPartnerMap } from 'addons/map';
+// import { initPartnerMap } from 'addons/map';
 import { initIntercom } from 'addons/intercom';
 import { initAnalytics } from 'addons/analytics';
 import { initPandadocForms } from 'addons/pandadoc';
@@ -49,7 +49,7 @@ $(() => {
         lowerThan: 'boxShadow',
     });
     initPrivacySettings();
-    initPartnerMap();
+    // initPartnerMap();
     initIntercom();
     initAnalytics();
     initPandadocForms();
