@@ -238,7 +238,11 @@ class LogPageOperationsTests(CMSTestCase):
 class LogPlaceholderOperationsTests(CMSTestCase):
 
     def setUp(self):
+        # Multiple users are created to ensure that the user tests are fair
+        # and not just the only user available, or the first and last
+        self._create_user("user_one", is_staff=True, add_default_permissions=True)
         self._admin_user = self.get_superuser()
+        self._create_user("user_three", is_staff=True, add_default_permissions=True)
         self._cms_page = self.create_homepage(
             "home",
             "nav_playground.html",
