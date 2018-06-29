@@ -22,7 +22,11 @@ CreateCMSPageForm = step2_form_factory(
 class LogPageOperationsTests(CMSTestCase):
 
     def setUp(self):
+        # Multiple users are created to ensure that the user tests are fair
+        # and not just the only user available, or the first and last
+        self._create_user("user_one", is_staff=True, add_default_permissions=True)
         self._admin_user = self.get_superuser()
+        self._create_user("user_three", is_staff=True, add_default_permissions=True)
 
     def _assert_log_created_on_page_add(self, page):
         # Check to see if the page added log entry exists
@@ -37,6 +41,8 @@ class LogPageOperationsTests(CMSTestCase):
         self.assertEqual(str(page.pk), log_entry.object_id)
         # Check the object_repr is set correctly
         self.assertEqual(str(page), log_entry.object_repr)
+        # Check that the correct user created the log
+        self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_create_admin_page(self):
         """
@@ -50,6 +56,16 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(response.status_code, 302)
             page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self._assert_log_created_on_page_add(page_one)
+
+    def test_log_for_create_api_page(self):
+        """
+        When a page is created via the create page api a log entry is NOT created.
+        It may help determine why other tests might fail if the api started creating a log for page creation!!
+        """
+        # Create a page
+        create_page('home', 'nav_playground.html', 'en', published=True)
+        # Check to see if any logs exist, none should exist
+        self.assertEqual(0, LogEntry.objects.count())
 
     def test_log_for_create_wizard_page(self):
         """
@@ -76,16 +92,6 @@ class LogPageOperationsTests(CMSTestCase):
         page = form.save()
         self._assert_log_created_on_page_add(page)
 
-    def test_log_for_create_api_page(self):
-        """
-        When a page is created via the create page api a log entry is NOT created.
-        It may help determine why other tests might fail if the api started creating a log for page creation!!
-        """
-        # Create a page
-        create_page('home', 'nav_playground.html', 'en', published=True)
-        # Check to see if any logs exist, none should exist
-        self.assertEqual(0, LogEntry.objects.count())
-
     def test_log_for_change_admin_page(self):
         """
         When a page is edited a log entry is created.
@@ -111,6 +117,8 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_move_admin_page(self):
         """
@@ -137,6 +145,8 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(str(page_2.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page_2), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_delete_admin_page(self):
         """
@@ -164,6 +174,8 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(pre_deleted_page_id, log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(pre_deleted_page, log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_change_translation(self):
         """
@@ -191,6 +203,8 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_delete_translation(self):
         """
@@ -217,6 +231,8 @@ class LogPageOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
 
 class LogPlaceholderOperationsTests(CMSTestCase):
@@ -279,6 +295,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_move_plugin(self):
         """
@@ -309,6 +327,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_change_plugin(self):
         """
@@ -337,6 +357,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_delete_plugin(self):
         """
@@ -364,6 +386,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_cut_plugin(self):
         """
@@ -399,6 +423,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_paste_plugin(self):
         """
@@ -436,6 +462,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_add_plugin_to_placeholder(self):
         """
@@ -468,6 +496,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_paste_placeholder(self):
         """
@@ -513,6 +543,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
 
     def test_log_for_clear_placeholder(self):
         """
@@ -538,3 +570,5 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
             self.assertEqual(str(page), log_entry.object_repr)
+            # Check that the correct user created the log
+            self.assertEqual(self._admin_user.id, log_entry.user_id)
