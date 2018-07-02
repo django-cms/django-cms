@@ -21,7 +21,7 @@ body {
     // this is bad, but this is easiest
     // to do the fullwidth sections with pure css
     // should probably do breakout ones instead
-    overflow-x: hidden;
+    overflow-x: hidden !important;
 
     @include media-breakpoint-up(lg) {
         padding-top: $header-height;
