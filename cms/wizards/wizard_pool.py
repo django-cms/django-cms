@@ -2,7 +2,8 @@
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import ugettext as _
 
-from .wizard_base import Wizard
+from cms.wizards.helpers import get_entries
+from cms.wizards.wizard_base import Wizard
 
 
 class AlreadyRegisteredException(Exception):
@@ -70,6 +71,8 @@ class WizardPool(object):
 
         Raises AlreadyRegisteredException if the entry is already registered.
         """
+        # TODO: Use the new app registration instead of this
+        # TODO: Add deprecation warning
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
         if self.is_registered(entry, passive=True):
             model = entry.get_model()
@@ -110,10 +113,10 @@ class WizardPool(object):
         """
         Returns all entries in weight-order.
 
-        NOTE: This method triggers pool discovery.
+        NOTE: This method is here for backwards compatibility only.
+        Use cms.wizards.helpers.get_entries when possible.
         """
-        self._discover()
-        return [value for (key, value) in sorted(
-            self._entries.items(), key=lambda e: getattr(e[1], 'weight'))]
+        # TODO: Deprecated warning
+        return get_entries()
 
 wizard_pool = WizardPool()

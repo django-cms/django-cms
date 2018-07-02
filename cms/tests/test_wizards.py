@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from mock import patch
 
 from django import forms
 from django.core.urlresolvers import reverse
@@ -10,16 +11,22 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 
 from cms.api import create_page, publish_page
-from cms.cms_wizards import CMSPageWizard
+from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 from cms.models import Page, PageType, UserSettings
+from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
+from cms.wizards.helpers import get_entries
 from cms.wizards.wizard_base import Wizard
-from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
+from cms.wizards.wizard_pool import (
+    AlreadyRegisteredException,
+    entry_choices,
+    wizard_pool,
+)
 
 
 CreateCMSPageForm = step2_form_factory(
@@ -183,45 +190,25 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         entry = wizard_pool.get_entry(self.page_wizard)
         self.assertEqual(entry, self.page_wizard)
 
-    def test_get_entries(self):
+    @patch('cms.wizards.wizard_pool.get_entries')
+    def test_get_entries(self, mocked_get_entries):
         """
-        Test that the registered entries are returned in weight-order, no matter
-        which order they were added.
+        Test for backwards compatibility of wizard_pool.get_entries.
+        Checking we use the new get_entries under the hood.
         """
-        wizard_pool._clear()
-        wizard_pool.register(self.page_wizard)
-        wizard_pool.register(self.user_settings_wizard)
-        wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
-        entries = wizard_pool.get_entries()
-        self.assertSequencesEqual(entries, wizards)
-
-        wizard_pool._clear()
-        wizard_pool.register(self.user_settings_wizard)
-        wizard_pool.register(self.page_wizard)
-        wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
-        entries = wizard_pool.get_entries()
-        self.assertSequencesEqual(entries, wizards)
+        wizard_pool.get_entries()
+        mocked_get_entries.assert_called_once()
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
 
     def test_str(self):
-        page_wizard = [
-            entry for entry in wizard_pool.get_entries()
-            if isinstance(entry, CMSPageWizard)
-        ][0]
-        self.assertEqual(str(page_wizard), page_wizard.title)
+        self.assertEqual(str(cms_page_wizard), cms_page_wizard.title)
 
     def test_repr(self):
-        page_wizard = [
-            entry for entry in wizard_pool.get_entries()
-            if isinstance(entry, CMSPageWizard)
-        ][0]
-        self.assertIn("cms.cms_wizards.CMSPageWizard", repr(page_wizard))
-        self.assertIn("id={}".format(page_wizard.id), repr(page_wizard))
-        self.assertIn(hex(id(page_wizard)), repr(page_wizard))
+        self.assertIn("cms.cms_wizards.CMSPageWizard", repr(cms_page_wizard))
+        self.assertIn("id={}".format(cms_page_wizard.id), repr(cms_page_wizard))
+        self.assertIn(hex(id(cms_page_wizard)), repr(cms_page_wizard))
 
     def test_wizard_first_page_published(self):
         superuser = self.get_superuser()
@@ -507,3 +494,39 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().title_set.filter(slug='page-2-3'))
+
+
+class TestWizardHelpers(CMSTestCase):
+
+    def test_get_entries_orders_by_weight(self):
+        # The test setup registers two wizards from cms itself
+        # (cms_page_wizard and cms_subpage_wizard) and one from
+        # test_utils.project.sampleapp (sample_wizard)
+        # We know these are definitely being ordered by weight if
+        # sample_wizard is in the middle because app registration
+        # would first add the wizards from cms to a list and then add
+        # those from sampleapp, so the sampleapp wizard could not
+        # be in the middle by default
+        expected = [cms_page_wizard, sample_wizard, cms_subpage_wizard]
+        entries = get_entries()
+        self.assertListEqual(entries, expected)
+
+
+#~ class TestEntryChoices(CMSTestCase):
+
+    #~ def test_generates_choices(self):
+        #~ user = self.get_staff_user_with_no_permissions()
+        #~ user = self.get_superuser()
+        #~ page = create_page('home', 'nav_playground.html', 'en', published=True)
+        #~ self.add_page_permission(user, page, can_add=True)
+
+        #~ wizard_choices = [option for option in entry_choices(user, page)]
+
+        #~ from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
+        #~ from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
+        #~ expected = [
+            #~ (cms_page_wizard.id, cms_page_wizard.title),
+            #~ (cms_subpage_wizard.id, cms_subpage_wizard.title),
+            #~ (sample_wizard.id, sample_wizard.title),
+        #~ ]
+        #~ self.assertListEqual(wizard_choices, expected)
