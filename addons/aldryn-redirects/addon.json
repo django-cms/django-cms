@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "aldryn_redirects"
+    ], 
+    "package-name": "aldryn-redirects"
+}

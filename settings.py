@@ -13,6 +13,7 @@ INSTALLED_ADDONS = [
     'aldryn-django-cms',
     'aldryn-forms',
     'aldryn-newsblog',
+    'aldryn-redirects',
     'divio-styleguide',
     'djangocms-bootstrap4',
     'djangocms-file',
