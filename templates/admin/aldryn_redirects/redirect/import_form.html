@@ -1,0 +1,29 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block content %}
+    {% if errors %}
+        <p class="errornote">
+        {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+        </p>
+        {{ adminform.non_field_errors }}
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <fieldset class="module aligned">
+                {% for field in adminform %}
+                    <div class="form-row">
+                        <div{% if field.errors %} class="errors"{% endif %}>
+                            {% if field.errors %}{{ field.errors }}{% endif %}
+                            {{ field.label_tag }}
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="{% trans "Import" %}" class="default" name="export">
+        </div>
+    </form>
+{% endblock %}
