@@ -1,0 +1,144 @@
+{% extends "content.html" %}
+{% load i18n staticfiles cms_tags sekizai_tags menu_tags %}
+
+
+{% block feature %}
+    <div class="page-header">
+        <div class="container">
+            {% placeholder "feature" inherit or %}
+                <span class="spitzmarke">Our commitment to you</span>
+                <h1 class="display-1">{% page_attribute menu_title request.current_page.get_root %}</h1>
+            {% endplaceholder %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mt-5 justify-content-between">
+            <aside class="col-12 col-lg-3">
+                <h3 class="sr-only">{% trans "Sidebar" %}</h3>
+
+                <div class="sub-menu sub-menu-vertical navbar-expand-lg">
+                    <h2 class="h5 sub-menu-title">Navigation</h2>
+                    <p class="h5 sub-menu-toggler collapsed"
+                        data-toggle="collapse" data-target="#sub-menu-content"
+                        aria-expanded="false" aria-label="Toggle navigation" role="navigation">
+                        Jump to topic
+                        {% include "includes/icon.html" with icon="arrow-right" class="sub-menu-toggler" %}
+                    </p>
+                    <ul class="collapse navbar-collapse" id="sub-menu-content">
+                        {% show_menu 1 5 0 1 %}
+                    </ul>
+                </div>
+
+                {% if request.GET.subscription_success %}
+                    <div class="alert alert-success my-3">
+                        {% trans "Thanks for subscribing!" %}
+                    </div>
+                {% endif %}
+
+                {% if not request.GET.subscription_success %}
+                    <form method="post" action="http://publish.ne.cision.com/Subscription/Subscribe" name="pageForm">
+                        <input type="hidden" name="subscriptionUniqueIdentifier" value="5a80f66bb8"/>
+                        <input type="hidden" name="redirectUrlSubscriptionSuccess" value="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% page_url request.current_page %}?subscription_success=1"/>
+                        <input type="hidden" name="redirectUrlSubscriptionFailed" value="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% page_url request.current_page %}?subscription_failure=1"/>
+                        <input type="hidden" name="Replylanguage" value="{{ LANGUAGE_CODE }}"/>
+                        <div class="sub-menu sub-menu-vertical">
+                            <h2 class="h5 sub-menu-title">{% trans "Subscribe" %}</h2>
+                        </div>
+                        {% if request.GET.subscription_failure %}
+                            <div class="alert alert-danger">
+                                {% trans "There was an error subscribing." %}
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label>{% trans "Language" %}</label>
+
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox"{% if LANGUAGE_CODE == 'sv' %} checked{% endif %} name="Language" value="sv" id="lang_sv">
+                                <label class="custom-control-label" for="lang_sv">
+                                    Swedish
+                                </label>
+                            </div>
+
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox"{% if LANGUAGE_CODE == 'en' %} checked{% endif %} name="Language" value="en" id="lang_en">
+                                <label class="custom-control-label" for="lang_en">English</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="kmk,rpt" id="interim"/>
+                                <label class="custom-control-label" id="interim">{% trans "Interim reports" %}</label>
+                            </div>
+
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="rdv" id="annual"/>
+                                <label class="custom-control-label" id="annual">{% trans "Annual reports" %}</label>
+                            </div>
+
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="prm" id="press"/>
+                                <label class="custom-control-label" id="press">{% trans "Press releases" %}</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">{% trans "Name" %}</label><br/>
+                            <input type="text" class="form-control" name="Name" id="name"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="companyname">{% trans "Company Name" %}</label><br/>
+                            <input type="text" class="form-control" name="CompanyName" id="companyname" />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">{% trans "Email" %} <abbr title="Required">*</abbr></label><br/>
+                            <input type="text" required class="form-control" name="Email" id="email" />
+                        </div>
+                        <div class="form-group">
+                            <label for="SMS">SMS (+46709123456)</label><br/>
+                            <input type="text" class="form-control" name="Cellphone" id="SMS"/>
+                        </div>
+                        <input class="btn btn-primary" type="submit" value="{% trans 'Submit' %}"/>
+                    </form>
+                {% endif %}
+            </aside>
+            <div class="col-12 col-lg-8">
+                <div class="aldryn aldryn-newsblog press-releases-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script id="press-releases-list-tmpl" type="text/template">
+        <div class="aldryn-newsblog-list">
+            <% Releases.forEach(function (release) { %>
+                <article class="mb-5">
+                    <h2>
+                        <a href="<%= release.CisionWireUrl || release.SyndicatedUrl || release.CanonicalUrl || 'http://publish.ne.cision.com/Release/GetReleaseDetail?releaseId=' + release.EncryptedId %>"><%= release.Title %></a>
+                    </h2>
+                    <p><%= moment(release.PublishDate).format('LL') %></p>
+                    <div class="lead">
+                        <p><%= release.Intro %></p>
+                    </div>
+                </article>
+            <% }); %>
+        </div>
+        <ul class="pagination mt-5">
+            <% for (var i = 1; i <= Math.ceil(TotalFoundReleases / PageSize); i++) { %>
+                <% if (i === PageIndex) { %>
+                    <li class="page-item active"><span class="page-link"><%= i %></span></li>
+                <% } else { %>
+                    <li class="page-item"><a class="page-link js-change-page" href="<%= window.location.pathname %>?page=<%= i %>"><%= i %></a></li>
+                <% } %>
+            <% } %>
+        </ul>
+    </script>
+    {% addtoblock "js" %}<script>
+        var ID = 'B6B94687E7F4488FB0DE9168DB52BA06'; // sv
+        var ID = 'FA052C6ED9244D81B8211FAF0420FF0B'; // en
+        var ID = 'A275C0BF733048FFAE9126ACA64DD08F'; // TEST
+    </script>{% endaddtoblock %}
+    {% addtoblock "js" %}<script src="{% static "js/dist/press.bundle.js" %}"></script>{% endaddtoblock %}
+{% endblock %}

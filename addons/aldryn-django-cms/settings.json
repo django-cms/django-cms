@@ -1,7 +1,7 @@
 {
-    "boilerplate_name": "bootstrap3", 
-    "cms_content_cache_duration": 60, 
-    "cms_menus_cache_duration": 3600, 
-    "cms_templates": "[[\"content.html\", \"Content\"], [\"sidebar.html\", \"Sidebar\"], [\"base_iframe.html\", \"Iframe\"]]", 
+    "boilerplate_name": "bootstrap3",
+    "cms_content_cache_duration": 60,
+    "cms_menus_cache_duration": 3600,
+    "cms_templates": "[[\"content.html\", \"Content\"], [\"sidebar.html\", \"Sidebar\"], [\"base_iframe.html\", \"Iframe\"], [\"press/press_list.html\", \"Press releases\"]]",
     "permissions_enabled": false
 }

@@ -18,8 +18,9 @@ plugins.push(
     }),
     new webpack.optimize.CommonsChunkPlugin({
         name: 'base',
-        chunks: ['base', 'cms'],
-    })
+        chunks: ['base', 'cms', 'press'],
+    }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 );
 
 // add plugins depending on if we are debugging or not
@@ -70,6 +71,7 @@ module.exports = {
         gdpr: path.join(__dirname, 'gdpr.js'),
         base: path.join(__dirname, 'base.js'),
         cms: path.join(__dirname, 'cms.js'),
+        press: path.join(__dirname, 'press.js'),
         // detail: path.join(__dirname, 'detail.js'),
     },
     output: {

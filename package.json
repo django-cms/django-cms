@@ -33,6 +33,7 @@
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
     "minimist": "^1.2.0",
+    "moment": "^2.22.2",
     "npm-sass": "^2.2.1",
     "popper.js": "^1.12.5",
     "postcss-critical-split": "^2.5.1",
