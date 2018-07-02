@@ -1,4 +1,4 @@
-{% load i18n staticfiles cms_tags sekizai_tags %}
+{% load i18n staticfiles cms_tags sekizai_tags privacy %}
 <!doctype html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -66,7 +66,7 @@
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}
 {% include "includes/browser.html" %}
-{% include 'django_privacy_mgmt/popup.html' %}
 {% include 'django_privacy_mgmt/banner.html' %}
+{% render_privacy_settings_modal %}
 </body>
 </html>
