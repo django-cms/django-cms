@@ -11,6 +11,7 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 
 from cms.api import create_page, publish_page
+from cms.app_registration import get_cms_extension_apps, get_cms_config_apps
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
@@ -497,6 +498,14 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
 
 class TestWizardHelpers(CMSTestCase):
+
+    def setUp(self):
+        # The results of get_cms_extension_apps and get_cms_config_apps
+        # are cached. Clear this cache because installed apps change
+        # between tests and therefore unlike in a live environment,
+        # results of this function can change between tests
+        get_cms_extension_apps.cache_clear()
+        get_cms_config_apps.cache_clear()
 
     def test_get_entries_orders_by_weight(self):
         # The test setup registers two wizards from cms itself

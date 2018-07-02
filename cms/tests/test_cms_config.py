@@ -2,6 +2,7 @@ from mock import Mock
 
 from django.apps import apps
 
+from cms.app_registration import get_cms_extension_apps, get_cms_config_apps
 from cms.cms_config import CMSCoreExtensions
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
@@ -34,6 +35,14 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
 
 
 class ConfigureWizardsIntegrationTestCase(CMSTestCase):
+
+    def setUp(self):
+        # The results of get_cms_extension_apps and get_cms_config_apps
+        # are cached. Clear this cache because installed apps change
+        # between tests and therefore unlike in a live environment,
+        # results of this function can change between tests
+        get_cms_extension_apps.cache_clear()
+        get_cms_config_apps.cache_clear()
 
     def test_adds_all_wizards_to_dict(self):
         setup_cms_apps()
