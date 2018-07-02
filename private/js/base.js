@@ -14,6 +14,7 @@ import { initPrivacySettings } from 'addons/privacy';
 import { initIntercom } from 'addons/intercom';
 import { initAnalytics } from 'addons/analytics';
 import { initPandadocForms } from 'addons/pandadoc';
+import { initMessages } from 'addons/messages';
 import 'addons/flying-focus';
 
 svg4everybody({
@@ -53,4 +54,5 @@ $(() => {
     initIntercom();
     initAnalytics();
     initPandadocForms();
+    initMessages();
 });

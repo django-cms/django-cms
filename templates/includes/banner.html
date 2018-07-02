@@ -4,7 +4,7 @@
 {% banner as alert %}
 
 {% if alert.enabled %}
-    <div class="alert alert-info alert-dismissible fade show px-0 rounded-0" role="alert">
+    <div data-id="{{ pk }}" style="display: none;" class="alert alert-info js-global-alert alert-dismissible fade mx-0 px-0 rounded-0" role="alert">
         <div class="container">
             <p class="mb-0">
                 {{ alert.content|safe }}

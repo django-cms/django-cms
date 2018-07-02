@@ -13,6 +13,7 @@ def banner(*args, **kwargs):
     banner = Banner.objects.filter(enabled=True).last()
 
     dict = {
+        'pk': '',
         'content': '',
         'enabled': False
     }
@@ -20,5 +21,6 @@ def banner(*args, **kwargs):
     if banner:
         dict['content'] = banner.content
         dict['enabled'] = banner.enabled
+        dict['pk'] = banner.pk
 
     return dict
