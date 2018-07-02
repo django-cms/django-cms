@@ -4,6 +4,8 @@ const gutil = require('gulp-util');
 const postcss = require('gulp-postcss');
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
+const cleanCSS = require('gulp-clean-css');
+const concat = require('gulp-concat-util');
 const { importer } = require('npm-sass');
 
 module.exports = function(gulp, opts) {
@@ -35,6 +37,16 @@ module.exports = function(gulp, opts) {
                     }),
                 ])
             )
+            .pipe(gulpif(!opts.argv.debug, cleanCSS({
+                rebase: false,
+            })))
+            // this information is added on top of the generated .css file
+            .pipe(concat.header(
+                '/*\n    This file is generated.\n' +
+                '    Do not edit directly.\n' +
+                '    Edit original files in\n' +
+                '    /private/sass instead\n */ \n\n'
+            ))
             .pipe(gulpif(opts.argv.debug, sourcemaps.write()))
             .pipe(gulp.dest(opts.PROJECT_PATH.css));
     };
