@@ -13,10 +13,13 @@ ADD_PLUGINS_FROM_PLACEHOLDER = 'add_plugins_from_placeholder'
 CLEAR_PLACEHOLDER = 'clear_placeholder'
 
 # Page operations
+CHANGE_PAGE = 'change_page'
 MOVE_PAGE = 'move_page'
 DELETE_PAGE = 'delete_page'
 
 # Page translation operations
+ADD_PAGE_TRANSLATION = 'add_page_translation'
+CHANGE_PAGE_TRANSLATION = 'change_page_translation'
 DELETE_PAGE_TRANSLATION = 'delete_page_translation'
 PUBLISH_PAGE_TRANSLATION = 'publish_page_translation'
 REVERT_PAGE_TRANSLATION_TO_LIVE = 'revert_page_translation_to_live'

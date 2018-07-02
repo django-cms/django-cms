@@ -3,15 +3,13 @@ from collections import namedtuple
 import copy
 import json
 import sys
-import uuid
-
 
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin, messages
-from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
@@ -60,8 +58,8 @@ from cms.models import (
     Title, CMSPlugin, PagePermission,
     GlobalPagePermission, StaticPlaceholder,
 )
+from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_obj_operation, post_obj_operation
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
@@ -119,6 +117,18 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     duplicate_form = DuplicatePageForm
 
     inlines = PERMISSION_ADMIN_INLINES
+
+    def log_addition(self, request, object, object_repr):
+        # Block the admin log for addition. A signal takes care of this!
+        return
+
+    def log_deletion(self, request, object, object_repr):
+        # Block the admin log for deletion. A signal takes care of this!
+        return
+
+    def log_change(self, request, object, message):
+        # Block the admin log for change. A signal takes care of this!
+        return
 
     def get_admin_url(self, action, *args):
         url_name = "{}_{}_{}".format(
@@ -198,26 +208,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             pat(r'^get-tree/$', self.get_tree),
         ]
         return url_patterns + super(BasePageAdmin, self).get_urls()
-
-    def _send_pre_page_operation(self, request, operation, **kwargs):
-        token = str(uuid.uuid4())
-        pre_obj_operation.send(
-            sender=self.__class__,
-            operation=operation,
-            request=request,
-            token=token,
-            **kwargs
-        )
-        return token
-
-    def _send_post_page_operation(self, request, operation, token, **kwargs):
-        post_obj_operation.send(
-            sender=self.__class__,
-            operation=operation,
-            request=request,
-            token=token,
-            **kwargs
-        )
 
     def save_related(self, request, form, formsets, change):
         if hasattr(form, 'save_m2m'):
@@ -480,10 +470,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return self.render_delete_form(request, context)
 
     def delete_model(self, request, obj):
-        operation_token = self._send_pre_page_operation(
-            request,
+        operation_token = send_pre_page_operation(
+            request=request,
             operation=operations.DELETE_PAGE,
             obj=obj,
+            sender=self.model
         )
 
         cms_pages = [obj]
@@ -501,11 +492,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         super(BasePageAdmin, self).delete_model(request, obj)
 
-        self._send_post_page_operation(
-            request,
+        send_post_page_operation(
+            request=request,
             operation=operations.DELETE_PAGE,
             token=operation_token,
             obj=obj,
+            sender=self.model,
         )
 
         clear_permission_cache()
@@ -885,19 +877,21 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                                    "to move this page. Please reload the page"))
             return jsonify_request(HttpResponseForbidden(message))
 
-        operation_token = self._send_pre_page_operation(
-            request,
+        operation_token = send_pre_page_operation(
+            request=request,
             operation=operations.MOVE_PAGE,
             obj=page,
+            sender=self.model,
         )
 
         form.move_page()
 
-        self._send_post_page_operation(
-            request,
+        send_post_page_operation(
+            request=request,
             operation=operations.MOVE_PAGE,
             token=operation_token,
             obj=page,
+            sender=self.model,
         )
         return jsonify_request(HttpResponse(status=200))
 
@@ -1045,11 +1039,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             raise Http404('No translation matches requested language.')
 
         page.title_cache[language] = translation
-        operation_token = self._send_pre_page_operation(
-            request,
+        operation_token = send_pre_page_operation(
+            request=request,
             operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
             obj=page,
             translation=translation,
+            sender=self.model,
         )
 
         page.revert_to_live(language)
@@ -1057,12 +1052,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # Fetch updated translation
         translation.refresh_from_db()
 
-        self._send_post_page_operation(
+        send_post_page_operation(
             request,
             operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
             token=operation_token,
             obj=page,
             translation=translation,
+            sender=self.model,
         )
 
         messages.info(request, _('"%s" was reverted to the live version.') % page)
@@ -1100,21 +1096,23 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             reload_urls = bool(page and page.application_urls and translation)
 
         if page:
-            operation_token = self._send_pre_page_operation(
-                request,
+            operation_token = send_pre_page_operation(
+                request=request,
                 operation=operations.PUBLISH_PAGE_TRANSLATION,
                 obj=page,
                 translation=translation,
+                sender=self.model,
             )
             all_published = page.publish(language)
             page = page.reload()
-            self._send_post_page_operation(
-                request,
+            send_post_page_operation(
+                request=request,
                 operation=operations.PUBLISH_PAGE_TRANSLATION,
                 token=operation_token,
                 obj=page,
                 translation=translation,
                 successful=all_published,
+                sender=self.model,
             )
 
         if statics:
@@ -1124,21 +1122,23 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             for static_placeholder in static_placeholders.iterator():
                 # TODO: Maybe only send one signal...
                 # this would break the obj signal format though
-                operation_token = self._send_pre_page_operation(
-                    request,
+                operation_token = send_pre_page_operation(
+                    request=request,
                     operation=operations.PUBLISH_STATIC_PLACEHOLDER,
                     obj=static_placeholder,
                     target_language=language,
+                    sender=self.model,
                 )
 
                 published = static_placeholder.publish(request, language)
 
-                self._send_post_page_operation(
-                    request,
+                send_post_page_operation(
+                    request=request,
                     operation=operations.PUBLISH_STATIC_PLACEHOLDER,
                     token=operation_token,
                     obj=static_placeholder,
                     target_language=language,
+                    sender=self.model,
                 )
                 if not published:
                     all_published = False
@@ -1152,13 +1152,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                     messages.warning(request, _("Page not published! A parent page is not published yet."))
                 else:
                     messages.info(request, _('The content was successfully published.'))
-                LogEntry.objects.log_action(
-                    user_id=request.user.id,
-                    content_type_id=ContentType.objects.get_for_model(Page).pk,
-                    object_id=page_id,
-                    object_repr=page.get_title(language),
-                    action_flag=CHANGE,
-                )
             else:
                 if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
                     messages.warning(request, _("Page not published! A parent page is not published yet."))
@@ -1221,14 +1214,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             message = _('The %(language)s page "%(page)s" was successfully unpublished') % {
                 'language': language_name, 'page': page}
             messages.info(request, message)
-            LogEntry.objects.log_action(
-                user_id=request.user.id,
-                content_type_id=ContentType.objects.get_for_model(Page).pk,
-                object_id=page_id,
-                object_repr=page.get_title(),
-                action_flag=CHANGE,
-                change_message=message,
-            )
         except RuntimeError:
             exc = sys.exc_info()[1]
             messages.error(request, exc.message)
@@ -1295,11 +1280,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             if perms_needed:
                 raise PermissionDenied
 
-            operation_token = self._send_pre_page_operation(
-                request,
+            operation_token = send_pre_page_operation(
+                request=request,
                 operation=operations.DELETE_PAGE_TRANSLATION,
                 obj=page,
                 translation=translation,
+                sender=self.model
             )
 
             message = _('Title and plugins with language %(language)s was deleted') % {
@@ -1317,12 +1303,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             if page.node.is_branch:
                 page.mark_descendants_pending(language)
 
-            self._send_post_page_operation(
-                request,
+            send_post_page_operation(
+                request=request,
                 operation=operations.DELETE_PAGE_TRANSLATION,
                 token=operation_token,
                 obj=page,
                 translation=translation,
+                sender=self.model,
             )
 
             if not self.has_change_permission(request, None):
@@ -1613,7 +1600,22 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not cancel_clicked and request.method == 'POST':
             form = PageTitleForm(instance=translation, data=request.POST)
             if form.is_valid():
+                operation_token = send_pre_page_operation(
+                    request=request,
+                    operation=operations.CHANGE_PAGE_TRANSLATION,
+                    obj=page,
+                    translation=translation,
+                    sender=self.model,
+                )
                 form.save()
+                send_post_page_operation(
+                    request=request,
+                    operation=operations.CHANGE_PAGE_TRANSLATION,
+                    token=operation_token,
+                    obj=page,
+                    translation=translation,
+                    sender=self.model,
+                )
                 saved_successfully = True
         else:
             form = PageTitleForm(instance=translation)
