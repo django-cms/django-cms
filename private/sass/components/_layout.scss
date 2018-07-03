@@ -282,14 +282,22 @@ body.cke_editable {
 
 
     @include media-breakpoint-up(lg) {
-        top: 5px;
+        top: 50%;
+        transform: translateY(-50%);
         height: calc(100% - 10px);
+
+        &.page-header-image-small {
+            height: calc(100% - 40px);
+        }
     }
 
 
     @include media-breakpoint-up(xl) {
-        top: -50px;
         height: calc(100% + 100px);
+
+        &.page-header-image-small {
+            height: calc(100% - 60px);
+        }
     }
 }
 
