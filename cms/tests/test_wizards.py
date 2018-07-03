@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from mock import patch
+from mock import patch, Mock
 
 from django import forms
 from django.core.urlresolvers import reverse
@@ -521,21 +521,34 @@ class TestWizardHelpers(CMSTestCase):
         self.assertListEqual(entries, expected)
 
 
-#~ class TestEntryChoices(CMSTestCase):
+class TestEntryChoices(CMSTestCase):
 
-    #~ def test_generates_choices(self):
-        #~ user = self.get_staff_user_with_no_permissions()
-        #~ user = self.get_superuser()
-        #~ page = create_page('home', 'nav_playground.html', 'en', published=True)
-        #~ self.add_page_permission(user, page, can_add=True)
+    def test_generates_choices_in_weighted_order(self):
+        user = self.get_superuser()
+        page = create_page('home', 'nav_playground.html', 'en', published=True)
 
-        #~ wizard_choices = [option for option in entry_choices(user, page)]
+        wizard_choices = [option for option in entry_choices(user, page)]
 
-        #~ from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
-        #~ from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
-        #~ expected = [
-            #~ (cms_page_wizard.id, cms_page_wizard.title),
-            #~ (cms_subpage_wizard.id, cms_subpage_wizard.title),
-            #~ (sample_wizard.id, sample_wizard.title),
-        #~ ]
-        #~ self.assertListEqual(wizard_choices, expected)
+        expected = [
+            (cms_page_wizard.id, cms_page_wizard.title),
+            (sample_wizard.id, sample_wizard.title),
+            (cms_subpage_wizard.id, cms_subpage_wizard.title),
+        ]
+        self.assertListEqual(wizard_choices, expected)
+
+    @patch.object(
+        cms_page_wizard, 'user_has_add_permission',
+        Mock(return_value=False)
+    )
+    def test_doesnt_generate_choice_if_user_doesnt_have_permission(self):
+        user = self.get_superuser()
+        page = create_page('home', 'nav_playground.html', 'en', published=True)
+
+        wizard_choices = [option for option in entry_choices(user, page)]
+
+        expected = [
+            # Missing cms_page_wizard entry
+            (sample_wizard.id, sample_wizard.title),
+            (cms_subpage_wizard.id, cms_subpage_wizard.title),
+        ]
+        self.assertListEqual(wizard_choices, expected)

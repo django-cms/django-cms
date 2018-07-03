@@ -15,7 +15,7 @@ def entry_choices(user, page):
     Yields a list of wizard entries that the current user can use based on their
     permission to add instances of the underlying model objects.
     """
-    for entry in wizard_pool.get_entries():
+    for entry in get_entries():
         if entry.user_has_add_permission(user, page=page):
             yield (entry.id, entry.title)
 
