@@ -249,8 +249,25 @@ body.cke_editable {
     position: relative;
     padding-top: 210px;
 
+    @include media-breakpoint-down(md) {
+        display: flex;
+        flex-direction: column;
+        padding-top: 0px;
+
+        .page-header-image {
+            position: relative;
+            order: -1;
+        }
+
+        .btn {
+            margin-bottom: 5px;
+            margin-right: 0px !important;
+        }
+    }
+
+
     @include media-breakpoint-up(sm) {
-        padding-top: 320px;
+        // padding-top: 320px;
         margin-top: -70px;
     }
 
@@ -273,10 +290,10 @@ body.cke_editable {
 
     @include media-breakpoint-up(md) {
         left: auto;
-        width: auto;
+        width: 100%;
+        height: auto;
         z-index: -1;
         top: 0;
-        height: 55%;
         right: 0;
     }
 
@@ -284,20 +301,13 @@ body.cke_editable {
     @include media-breakpoint-up(lg) {
         top: 50%;
         transform: translateY(-50%);
+        width: auto;
         height: calc(100% - 10px);
-
-        &.page-header-image-small {
-            height: calc(100% - 40px);
-        }
     }
 
 
     @include media-breakpoint-up(xl) {
         height: calc(100% + 100px);
-
-        &.page-header-image-small {
-            height: calc(100% - 60px);
-        }
     }
 }
 
