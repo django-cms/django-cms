@@ -183,7 +183,11 @@ body.cke_editable {
             box-shadow: 0 0 1rem rgba(black, 0.175);
 
             .dropdown-item {
-                padding: 15px;
+                padding: 20px 20px 0;
+
+                &:last-child {
+                    padding-bottom: 20px;
+                }
 
                 .dropdown-desc {
                     line-height: 1.2rem;
