@@ -338,11 +338,13 @@ class PagesTestCase(TransactionCMSTestCase):
         page = page_a.publisher_public
         self.assertRaises(PublicIsUnmodifiable, page.copy_with_descendants, page_b, 'last-child')
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
-        self.assertRaises(PublicIsUnmodifiable, page.revert_to_live, 'en')
+        # FIXME: AA Removed revert_to_live
+        #self.assertRaises(PublicIsUnmodifiable, page.revert_to_live, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
 
         self.assertTrue(page.get_draft_object().publisher_is_draft)
-        self.assertRaises(PublicVersionNeeded, page_b.revert_to_live, 'en')
+        # FIXME: AA Removed revert_to_live
+        # self.assertRaises(PublicVersionNeeded, page_b.revert_to_live, 'en')
 
     def test_move_page_regression_left_to_right_5752(self):
         # ref: https://github.com/divio/django-cms/issues/5752
@@ -616,8 +618,11 @@ class PagesTestCase(TransactionCMSTestCase):
         Text = self.get_plugin_model('TextPlugin')
         home = create_page("home", "nav_playground.html", "en")
         page = create_page("page", "nav_playground.html", "en")
-        page.rescan_placeholders() # create placeholders
-        placeholder = page.placeholders.all()[0]
+        home_title = self.get_page_title(page=home, language='en')
+        page_title = self.get_page_title(page=page, language='en')
+        page_title.rescan_placeholders()
+        # create placeholders
+        placeholder = page_title.placeholders.all()[0]
         plugin_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
@@ -634,8 +639,8 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertTrue(Placeholder.objects.count() > 2)
 
         superuser = self.get_superuser()
-        home_pl_count = home.get_placeholders().count()
-        page_pl_count = page.get_placeholders().count()
+        home_pl_count = home_title.get_placeholders().count()
+        page_pl_count = page_title.get_placeholders().count()
         expected_pl_count = Placeholder.objects.count() - (home_pl_count + page_pl_count)
 
         with self.login_user_context(superuser):
@@ -889,7 +894,8 @@ class PagesTestCase(TransactionCMSTestCase):
                 CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
         ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
-            placeholders = list(page.placeholders.all())
+            title = self.get_page_title(page=page, language='en')
+            placeholders = list(title.placeholders.all())
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):
                     add_plugin(placeholder, 'TextPlugin', 'en', body='text-%d-%d' % (i, j))
@@ -1066,8 +1072,9 @@ class PagesTestCase(TransactionCMSTestCase):
             slug='home',
             xframe_options=Page.X_FRAME_OPTIONS_DENY
         )
-        placeholder = cms_page.placeholders.all()[0]
-        add_plugin(cms_page.placeholders.all()[0], 'TextPlugin', 'en', body=public_text)
+        title = self.get_page_title(page=cms_page, language='en')
+        placeholder = title.placeholders.all()[0]
+        add_plugin(title.placeholders.all()[0], 'TextPlugin', 'en', body=public_text)
         cms_page.publish('en')
         add_plugin(placeholder, 'TextPlugin', 'en', body=draft_text)
         endpoint = cms_page.get_absolute_url('en')
@@ -1130,8 +1137,9 @@ class PagesTestCase(TransactionCMSTestCase):
             slug='home',
             xframe_options=Page.X_FRAME_OPTIONS_DENY
         )
-        placeholder = cms_page.placeholders.all()[0]
-        add_plugin(cms_page.placeholders.all()[0], 'TextPlugin', 'en', body=public_text)
+        title = self.get_page_title(page=cms_page, language='en')
+        placeholder = title.placeholders.all()[0]
+        add_plugin(title.placeholders.all()[0], 'TextPlugin', 'en', body=public_text)
         cms_page.publish('en')
         add_plugin(placeholder, 'TextPlugin', 'en', body=draft_text)
         endpoint = cms_page.get_absolute_url('en')

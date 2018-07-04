@@ -136,8 +136,9 @@ class PluginsTestBaseCase(CMSTestCase):
 class PluginsTestCase(PluginsTestBaseCase):
 
     def _create_link_plugin_on_page(self, page, slot='col_left'):
+        title = self.get_page_title(page=page, language=settings.LANGUAGES[0][0])
         add_url = self.get_add_plugin_uri(
-            placeholder=page.placeholders.get(slot=slot),
+            placeholder=title.placeholders.get(slot=slot),
             plugin_type='LinkPlugin',
             language=settings.LANGUAGES[0][0],
         )
@@ -415,8 +416,9 @@ class PluginsTestCase(PluginsTestBaseCase):
             template='nav_playground.html',
             language=settings.LANGUAGES[0][0],
         )
+        title = self.get_page_title(page=page, language=settings.LANGUAGES[0][0])
         plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot='body'),
+            placeholder=title.placeholders.get(slot='body'),
             plugin_type='TextPlugin',
             language=settings.LANGUAGES[0][0],
             body='<div class="someclass"></div><p>foo</p>'
@@ -433,8 +435,9 @@ class PluginsTestCase(PluginsTestBaseCase):
             template='nav_playground.html',
             language=settings.LANGUAGES[0][0],
         )
+        title = self.get_page_title(page=page, language=settings.LANGUAGES[0][0])
         plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot='body'),
+            placeholder=title.placeholders.get(slot='body'),
             plugin_type='TextPlugin',
             language=settings.LANGUAGES[0][0],
             body='<script>var bar="hacked"</script>'
@@ -451,8 +454,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         # create some objects
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
         page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
-        ph_en = page_en.placeholders.get(slot="body")
-        ph_de = page_de.placeholders.get(slot="body")
+        title_en = self.get_page_title(page=page_en, language='en')
+        title_de = self.get_page_title(page=page_de, language='de')
+        ph_en = title_en.placeholders.get(slot="body")
+        ph_de = title_de.placeholders.get(slot="body")
 
         # add the text plugin
         text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
@@ -545,8 +550,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         # create some objects
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
         page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
-        ph_en = page_en.placeholders.get(slot="body")
-        ph_de = page_de.placeholders.get(slot="body")
+        title_en = self.get_page_title(page=page_en, language='en')
+        title_de = self.get_page_title(page=page_de, language='de')
+        ph_en = title_en.placeholders.get(slot="body")
+        ph_de = title_de.placeholders.get(slot="body")
 
         # add the text plugin
         text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
@@ -598,7 +605,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-        ph_en = page_en.placeholders.get(slot="body")
+        title_en = self.get_page_title(page=page_en, language='en')
+        ph_en = title_en.placeholders.get(slot="body")
 
         # Grid wrapper 1
         mcol1_en = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
@@ -622,7 +630,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         old_plugins = [mcol1_en, col1_en, col2_en, link_plugin_en]
 
         page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
-        ph_de = page_de.placeholders.get(slot="body")
+        title_de = self.get_page_title(page=page_de, language='de')
+        ph_de = title_de.placeholders.get(slot="body")
 
         # Grid wrapper 1
         mcol1_de = api.add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")

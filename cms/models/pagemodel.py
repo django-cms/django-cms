@@ -611,19 +611,9 @@ class Page(models.Model):
         Copy all the plugins to a new page.
         :param target: The page where the new content should be stored
         """
-        cleared_placeholders = target._clear_placeholders(language)
-        cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
 
-        for placeholder in self.get_placeholders():
-            try:
-                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
-            except KeyError:
-                target_placeholder = target.placeholders.create(
-                    slot=placeholder.slot,
-                    default_width=placeholder.default_width,
-                )
-
-            placeholder.copy_plugins(target_placeholder, language=language)
+        for title in target.title_set.all():
+            title.copy_placeholders(title, language)
 
     def _copy_attributes(self, target, clean=False):
         """
@@ -701,16 +691,16 @@ class Page(models.Model):
             title.path = '%s/%s' % (base, title.slug) if base else title.slug
             title.save()
 
+            # copy the placeholders (and plugins on those placeholders!)
+            for placeholder in title.placeholders.iterator():
+                new_placeholder = copy.copy(placeholder)
+                new_placeholder.pk = None
+                new_placeholder.save()
+                title.placeholders.add(new_placeholder)
+                placeholder.copy_plugins(new_placeholder, language=language)
+
             new_page.title_cache[title.language] = title
         new_page.update_languages([trans.language for trans in translations])
-
-        # copy the placeholders (and plugins on those placeholders!)
-        for placeholder in self.placeholders.iterator():
-            new_placeholder = copy.copy(placeholder)
-            new_placeholder.pk = None
-            new_placeholder.save()
-            new_page.placeholders.add(new_placeholder)
-            placeholder.copy_plugins(new_placeholder, language=language)
 
         if extensions:
             from cms.extensions import extension_pool
@@ -1003,6 +993,9 @@ class Page(models.Model):
             # Clears all the page caches
             invalidate_cms_page_cache()
 
+        """
+        FIXME: AA REMOVED
+
         if placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
             assert language, 'language is required when clearing placeholder cache'
 
@@ -1010,6 +1003,7 @@ class Page(models.Model):
 
             for placeholder in placeholders:
                 placeholder.clear_cache(language, site_id=self.node.site_id)
+        """
 
         if menu:
             # Clears all menu caches for this page's site
@@ -1201,9 +1195,11 @@ class Page(models.Model):
         for child in published_children.iterator():
             child.mark_descendants_as_published(language)
 
+    """
+    FIXME: AA Removed revert_to_live
     def revert_to_live(self, language):
-        """Revert the draft version to the same state as the public version
-        """
+        ""Revert the draft version to the same state as the public version
+        ""y
         if not self.publisher_is_draft:
             # Revert can only be called on draft pages
             raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
@@ -1224,6 +1220,7 @@ class Page(models.Model):
         )
         self._publisher_keep_state = True
         self.save()
+    """
 
     def get_draft_object(self):
         if not self.publisher_is_draft:
@@ -1326,11 +1323,6 @@ class Page(models.Model):
         if not menu_title:
             return self.get_title(language, True, force_reload)
         return menu_title
-
-    def get_placeholders(self):
-        if not hasattr(self, '_placeholder_cache'):
-            self._placeholder_cache = self.placeholders.all()
-        return self._placeholder_cache
 
     def _validate_title(self, title):
         from cms.models.titlemodels import EmptyTitle
@@ -1574,34 +1566,6 @@ class Page(models.Model):
         if self.parent_page.publisher_public_id:
             return self.parent_page.get_public_object().is_published(language)
         return False
-
-    def rescan_placeholders(self):
-        """
-        Rescan and if necessary create placeholders in the current template.
-        """
-        existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
-
-        for placeholder in self.placeholders.all():
-            if placeholder.slot in placeholders:
-                existing[placeholder.slot] = placeholder
-
-        for placeholder in placeholders:
-            if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
-        return existing
-
-    def get_declared_placeholders(self):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_placeholders
-
-        return get_placeholders(self.get_template())
-
-    def get_declared_static_placeholders(self, context):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_static_placeholders
-
-        return get_static_placeholders(self.get_template(), context)
 
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """

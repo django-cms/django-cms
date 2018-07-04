@@ -5,6 +5,19 @@ import warnings, os, sys
 
 from django.db import migrations, models
 
+"""
+Title id 1
+Title id 2
+Page id 1
+    Placeholder 1
+        - Plugin 1 lang 1
+        - Plugin 5 lang 2
+    Placeholder 2
+        - Plugin 3 lang 1
+        - Plugin 4 lang 1
+
+Title id 1
+"""
 
 def forwards(apps, schema_editor):
 
@@ -19,6 +32,7 @@ def forwards(apps, schema_editor):
         # Add each placeholder on the page template to the title
         for title in title_set:
             placeholders = page.placeholders.all()
+            # FIXME: USE SET?????
             title.placeholders.add(*list(placeholders))
 
     #except Exception:

@@ -533,9 +533,10 @@ class ToolbarTests(ToolbarTestBase):
     def test_markup_plugin_template(self):
         page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
-        plugin_1 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
+        title = self.get_page_title(page=page, language='en')
+        plugin_1 = add_plugin(title.placeholders.get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
-        plugin_2 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
+        plugin_2 = add_plugin(title.placeholders.get(slot='col_left'), language='en',
                               plugin_type='TextPlugin', body='text')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -1033,10 +1034,10 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_copy_plugins(self):
         page = create_page("tbp", "nav_playground.html", "en", published=True)
-        create_title('de', 'de page', page)
-        add_plugin(page.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
-        create_title('fr', 'fr page', page)
-        add_plugin(page.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
+        title_de = create_title('de', 'de page', page)
+        add_plugin(title_de.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
+        title_fr = create_title('fr', 'fr page', page)
+        add_plugin(title_fr.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
         page.publish('de')
         page.publish('fr')
 
