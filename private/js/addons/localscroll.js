@@ -31,7 +31,7 @@ export function initLocalScroll() {
             target = $(href);
         } catch (e) {} // eslint-disable-line
 
-        if (!target) {
+        if (!target || !target.length) {
             return;
         }
 
