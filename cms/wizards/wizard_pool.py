@@ -2,7 +2,7 @@
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import ugettext as _
 
-from cms.wizards.helpers import get_entries
+from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
 
 
@@ -102,12 +102,11 @@ class WizardPool(object):
         Wizard instance or its "id" (which is the PK of its underlying
         content-type).
 
-        NOTE: This method triggers pool discovery.
+        NOTE: This method is here for backwards compatibility only.
+        Use cms.wizards.helpers.get_enty when possible.
         """
-        self._discover()
-        if isinstance(entry, Wizard):
-            entry = entry.id
-        return self._entries[entry]
+        # TODO: Deprecated warning
+        return get_entry(entry)
 
     def get_entries(self):
         """

@@ -21,7 +21,7 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
-from cms.wizards.helpers import get_entries
+from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import (
     AlreadyRegisteredException,
@@ -185,11 +185,14 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # Now, try to unregister something that is not registered
         self.assertFalse(wizard_pool.unregister(self.user_settings_wizard))
 
-    def test_get_entry(self):
-        wizard_pool._clear()
-        wizard_pool.register(self.page_wizard)
-        entry = wizard_pool.get_entry(self.page_wizard)
-        self.assertEqual(entry, self.page_wizard)
+    @patch('cms.wizards.wizard_pool.get_entry')
+    def test_get_entry(self, mocked_get_entry):
+        """
+        Test for backwards compatibility of wizard_pool.get_entry.
+        Checking we use the new get_entry under the hood.
+        """
+        wizard_pool.get_entry(cms_page_wizard)
+        mocked_get_entry.assert_called_once()
 
     @patch('cms.wizards.wizard_pool.get_entries')
     def test_get_entries(self, mocked_get_entries):
@@ -519,6 +522,14 @@ class TestWizardHelpers(CMSTestCase):
         expected = [cms_page_wizard, sample_wizard, cms_subpage_wizard]
         entries = get_entries()
         self.assertListEqual(entries, expected)
+
+    def test_get_entry_returns_wizard_by_id(self):
+        entry = get_entry(sample_wizard.id)
+        self.assertEqual(entry, sample_wizard)
+
+    def test_get_entry_returns_wizard_by_object(self):
+        entry = get_entry(sample_wizard)
+        self.assertEqual(entry, sample_wizard)
 
 
 class TestEntryChoices(CMSTestCase):
