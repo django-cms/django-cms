@@ -1,6 +1,7 @@
 from mock import Mock
 
 from django.apps import apps
+from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_registration import get_cms_extension_apps, get_cms_config_apps
 from cms.cms_config import CMSCoreExtensions
@@ -8,14 +9,15 @@ from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.setup import setup_cms_apps
+from cms.wizards.wizard_base import Wizard
 
 
 class ConfigureWizardsUnitTestCase(CMSTestCase):
 
     def test_adds_wizards_to_dict(self):
         extensions = CMSCoreExtensions()
-        wizard1 = Mock(id=111)
-        wizard2 = Mock(id=222)
+        wizard1 = Mock(id=111, spec=Wizard)
+        wizard2 = Mock(id=222, spec=Wizard)
         cms_config = Mock(
             cms_enabled=True, cms_wizards=[wizard1, wizard2])
 
@@ -32,6 +34,24 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
             extensions.configure_wizards(cms_config)
         except AttributeError:
             self.fail("Raises exception when cms_wizards undefined")
+
+    def test_raises_exception_if_doesnt_inherit_from_wizard_class(self):
+        extensions = CMSCoreExtensions()
+        wizard = Mock(id=3, spec=object)
+        cms_config = Mock(
+            cms_enabled=True, cms_wizards=[wizard])
+
+        with self.assertRaises(ImproperlyConfigured):
+            extensions.configure_wizards(cms_config)
+
+    def test_raises_exception_if_not_list(self):
+        extensions = CMSCoreExtensions()
+        wizard = Mock(id=6, spec=Wizard)
+        cms_config = Mock(
+            cms_enabled=True, cms_wizards=wizard)
+
+        with self.assertRaises(ImproperlyConfigured):
+            extensions.configure_wizards(cms_config)
 
 
 class ConfigureWizardsIntegrationTestCase(CMSTestCase):
