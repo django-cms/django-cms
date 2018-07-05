@@ -19,3 +19,8 @@ def hmac_str(userid, key):
         data,
         digestmod=hashlib.sha256
     ).hexdigest()
+
+@register.filter()
+def size_to_padding(picture):
+    print((picture.width, picture.height))
+    return "{}%".format(picture.height * 100 / picture.width)

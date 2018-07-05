@@ -1,4 +1,4 @@
-{% load thumbnail sekizai_tags %}
+{% load thumbnail project_tags sekizai_tags %}
 
 {% if picture_link %}
     <a href="{{ picture_link }}"
@@ -12,9 +12,9 @@
 {% endif %}
 {# end render figure/figcaption #}
 
-<div class="embed-responsive" style="{{ instance.attributes.style }}">
+<div class="embed-responsive {{ instance.attributes.class }}" style="{{ instance.attributes.style }}; padding-top: {{ instance.picture|size_to_padding }};">
     <div class="embed-responsive-item">
-    <img class="js-lazyload img-lazyload embed-responsive-item {{ instance.attributes.class }}" data-src="{% spaceless %}
+    <img class="js-lazyload img-lazyload embed-responsive-item" data-src="{% spaceless %}
         {% if instance.external_picture %}
             {{ instance.external_picture }}
         {% elif instance.use_no_cropping %}
