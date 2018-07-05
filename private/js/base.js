@@ -16,6 +16,7 @@ import { initAnalytics } from 'addons/analytics';
 import { initPandadocForms } from 'addons/pandadoc';
 import { initMessages } from 'addons/messages';
 import 'addons/flying-focus';
+import { initLazyLoad } from 'addons/lazyload';
 
 svg4everybody({
     polyfill: true,
@@ -40,6 +41,7 @@ initAnalyticsIntegrations(); // required for the segment snippet
 
 $(() => {
     noscript();
+    initLazyLoad();
     initFileInputs();
     initLocalScroll();
     initHeader();

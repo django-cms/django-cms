@@ -3,6 +3,7 @@ import $ from 'jquery';
 import { initWaypoints } from 'addons/waypoints';
 import { initBlogCarousel } from 'addons/carousel';
 import Breakpoint from 'addons/breakpoint';
+import { lazyloadInstance } from 'addons/lazyload';
 
 const showBreakpoint = () => {
     const breakpoint = $('<div />', {
@@ -46,4 +47,5 @@ CMS.$(window).on('cms-content-refresh', () => {
     initWaypoints();
     initBlogCarousel();
     showBreakpoint();
+    lazyloadInstance.update();
 });

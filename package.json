@@ -39,6 +39,7 @@
     "postcss-critical-split": "^2.5.1",
     "slick-carousel": "^1.8.1",
     "svg4everybody": "^2.1.8",
+    "vanilla-lazyload": "^10.8.0",
     "velocity-animate": "^1.5.1",
     "velocity-ui-pack": "^1.2.2",
     "waypoints": "^4.0.1",

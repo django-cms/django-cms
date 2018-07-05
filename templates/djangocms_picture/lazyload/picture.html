@@ -38,19 +38,6 @@
     </div>
 </div>
 
-{% addtoblock "js" %}
-<script>
-    (function(w, d){
-    var b = d.getElementsByTagName('body')[0];
-    var s = d.createElement("script"); s.async = true;
-    var v = !("IntersectionObserver" in w) ? "8.9.0" : "10.8.0";
-    s.src = "https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/" + v + "/lazyload.min.js";
-    w.lazyLoadOptions = {elements_selector:'.js-lazyload',class_loading:'img-lazyload-loading'};
-    b.appendChild(s);
-    }(window, document));
-</script>
-{% endaddtoblock %}
-
 {# start render figure/figcaption #}
 {% if instance.caption_text %}
         <figcaption>{{ instance.caption_text }}</figcaption>
