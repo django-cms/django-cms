@@ -52,6 +52,3 @@ cms_subpage_wizard = CMSSubPageWizard(
     model=Page,
     description=_(u"Create a page below the current page.")
 )
-
-wizard_pool.register(cms_page_wizard)
-wizard_pool.register(cms_subpage_wizard)

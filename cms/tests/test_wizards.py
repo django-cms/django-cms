@@ -2,6 +2,7 @@
 from mock import patch, Mock
 
 from django import forms
+from django.apps import apps
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
@@ -162,28 +163,56 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
 
 class TestWizardPool(WizardTestMixin, CMSTestCase):
 
-    def test_discover(self):
-        wizard_pool._reset()
-        self.assertFalse(wizard_pool._discovered)
-        self.assertEqual(len(wizard_pool._entries), 0)
-        wizard_pool._discover()
-        self.assertTrue(wizard_pool._discovered)
+    def tearDown(self):
+        # Clean up in case anything has been removed or added to the
+        # registered wizards, so other tests don't have problems
+        extension = apps.get_app_config('cms').cms_extension
+        expected_wizards = {
+            cms_page_wizard.id: cms_page_wizard.title,
+            sample_wizard.id: sample_wizard.title,
+            cms_subpage_wizard.id: cms_subpage_wizard.title,
+        }
+        if extension.wizards != expected_wizards:
+            extension.wizards = expected_wizards
 
-    def test_register_unregister_isregistered(self):
-        wizard_pool._clear()
-        self.assertEqual(len(wizard_pool._entries), 0)
-        wizard_pool.register(self.page_wizard)
-        # Now, try to register the same thing
+    def test_discovered_returns_true(self):
+        # Backwards compatibility
+        self.assertTrue(wizard_pool.discovered)
+
+    def test_is_registered_for_registered_wizard(self):
+        # Backwards compatibility
+        is_registered = wizard_pool.is_registered(cms_page_wizard)
+        self.assertTrue(is_registered)
+
+    def test_is_registered_for_unregistered_wizard(self):
+        # Backwards compatibility
+        is_registered = wizard_pool.is_registered(self.page_wizard)
+        self.assertFalse(is_registered)
+
+    def test_unregister_registered_wizard(self):
+        # Test for backwards compatibility only.
+        was_unregistered = wizard_pool.unregister(cms_page_wizard)
+
+        registered_wizards = apps.get_app_config('cms').cms_extension.wizards
+        self.assertNotIn(cms_page_wizard.id, registered_wizards)
+        self.assertTrue(was_unregistered)
+
+    def test_unregister_unregistered_wizard(self):
+        # Test for backwards compatibility only.
+        was_unregistered = wizard_pool.unregister(self.page_wizard)
+        self.assertFalse(was_unregistered)
+
+    def test_register_already_registered_wizard(self):
+        # Test for backwards compatibility only.
         with self.assertRaises(AlreadyRegisteredException):
-            wizard_pool.register(self.page_wizard)
+            wizard_pool.register(cms_page_wizard)
 
-        self.assertEqual(len(wizard_pool._entries), 1)
-        self.assertTrue(wizard_pool.is_registered(self.page_wizard))
-        self.assertTrue(wizard_pool.unregister(self.page_wizard))
-        self.assertEqual(len(wizard_pool._entries), 0)
+    def test_register_unregistered_wizard(self):
+        # Test for backwards compatibility only.
+        wizard_pool.register(self.page_wizard)
 
-        # Now, try to unregister something that is not registered
-        self.assertFalse(wizard_pool.unregister(self.user_settings_wizard))
+        registered_wizards = apps.get_app_config('cms').cms_extension.wizards
+        self.assertIn(self.page_wizard.id, registered_wizards)
 
     @patch('cms.wizards.wizard_pool.get_entry')
     def test_get_entry(self, mocked_get_entry):

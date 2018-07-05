@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.apps import apps
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import ugettext as _
 
@@ -21,49 +22,28 @@ def entry_choices(user, page):
 
 
 class WizardPool(object):
-    _entries = {}
-    _discovered = False
-
-    def __init__(self):
-        self._reset()
-
-    # PRIVATE METHODS -----------------
-
-    def _discover(self):
-        if not self._discovered:
-            autodiscover_modules('cms_wizards')
-            self._discovered = True
-
-    def _clear(self):
-        """Simply empties the pool but does not clear the discovered flag."""
-        self._entries = {}
-
-    def _reset(self):
-        """Clears the wizard pool and clears the discovered flag."""
-        self._clear()
-        self._discovered = False
-
-    # PUBLIC METHODS ------------------
 
     @property
     def discovered(self):
         """
-        A public getter for the private property _discovered. Note, there is no
-        public setter.
+        Returns whether all the wizards have been autodiscovered.
+
+        NOTE: This property is for backwards compatibility only
         """
-        return self._discovered
+        # TODO: Add deprecation warning
+        # Always return True because autodiscovering now happens through
+        # the app registration system, so we no longer do any
+        # discovering of registered wizards here
+        return True
 
     def is_registered(self, entry, **kwargs):
         """
         Returns True if the provided entry is registered.
 
-        NOTE: This method triggers pool discovery unless a «passive» kwarg
-        is set to True
+        NOTE: This method is for backwards compatibility only
         """
-        passive = kwargs.get('passive', False)
-        if not passive:
-            self._discover()
-        return entry.id in self._entries
+        # TODO: Add deprecation warning
+        return entry.id in apps.get_app_config('cms').cms_extension.wizards
 
     def register(self, entry):
         """
@@ -80,7 +60,7 @@ class WizardPool(object):
                 _(u"A wizard has already been registered for model: %s") %
                 model.__name__)
         else:
-            self._entries[entry.id] = entry
+            apps.get_app_config('cms').cms_extension.wizards[entry.id] = entry
 
     def unregister(self, entry):
         """
@@ -88,11 +68,12 @@ class WizardPool(object):
 
         Returns True if the entry was successfully registered, else False.
 
-        NOTE: This method triggers pool discovery.
+        NOTE: This method is here for backwards compatibility only.
         """
+        # TODO: Add deprecation warning
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
-        if self.is_registered(entry, passive=True):
-            del self._entries[entry.id]
+        if self.is_registered(entry):
+            del apps.get_app_config('cms').cms_extension.wizards[entry.id]
             return True
         return False
 
