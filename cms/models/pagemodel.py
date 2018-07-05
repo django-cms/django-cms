@@ -595,36 +595,14 @@ class Page(models.Model):
         source_title.save()
         return source_title
 
-    def _clear_placeholders(self, language=None):
-        from cms.models import CMSPlugin
-
-        placeholders = list(self.get_placeholders())
-        placeholder_ids = (placeholder.pk for placeholder in placeholders)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
-
-        if language:
-            plugins = plugins.filter(language=language)
-        models.query.QuerySet.delete(plugins)
-        return placeholders
-
     def _copy_contents(self, target, language):
         """
         Copy all the plugins to a new page.
         :param target: The page where the new content should be stored
         """
-        cleared_placeholders = target._clear_placeholders(language)
-        cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
 
-        for placeholder in self.get_placeholders():
-            try:
-                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
-            except KeyError:
-                target_placeholder = target.placeholders.create(
-                    slot=placeholder.slot,
-                    default_width=placeholder.default_width,
-                )
-
-            placeholder.copy_plugins(target_placeholder, language=language)
+        for title in target.title_set.all():
+            title.copy_placeholders(title, language)
 
     def _copy_attributes(self, target, clean=False):
         """
@@ -1004,14 +982,6 @@ class Page(models.Model):
             # Clears all the page caches
             invalidate_cms_page_cache()
 
-        if placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
-            assert language, 'language is required when clearing placeholder cache'
-
-            placeholders = self.get_placeholders()
-
-            for placeholder in placeholders:
-                placeholder.clear_cache(language, site_id=self.node.site_id)
-
         if menu:
             # Clears all menu caches for this page's site
             menu_pool.clear(site_id=self.node.site_id)
@@ -1328,11 +1298,6 @@ class Page(models.Model):
             return self.get_title(language, True, force_reload)
         return menu_title
 
-    def get_placeholders(self):
-        if not hasattr(self, '_placeholder_cache'):
-            self._placeholder_cache = self.placeholders.all()
-        return self._placeholder_cache
-
     def _validate_title(self, title):
         from cms.models.titlemodels import EmptyTitle
         if isinstance(title, EmptyTitle):
@@ -1575,34 +1540,6 @@ class Page(models.Model):
         if self.parent_page.publisher_public_id:
             return self.parent_page.get_public_object().is_published(language)
         return False
-
-    def rescan_placeholders(self):
-        """
-        Rescan and if necessary create placeholders in the current template.
-        """
-        existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
-
-        for placeholder in self.placeholders.all():
-            if placeholder.slot in placeholders:
-                existing[placeholder.slot] = placeholder
-
-        for placeholder in placeholders:
-            if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
-        return existing
-
-    def get_declared_placeholders(self):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_placeholders
-
-        return get_placeholders(self.get_template())
-
-    def get_declared_static_placeholders(self, context):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_static_placeholders
-
-        return get_static_placeholders(self.get_template(), context)
 
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """

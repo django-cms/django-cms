@@ -188,7 +188,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     )
     page.set_tree_node(site=site, target=target_node, position=position)
     page.save()
-    page.rescan_placeholders()
 
     create_title(
         language=language,
@@ -250,6 +249,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         page=page,
         has_url_overwrite=bool(overwrite_url),
     )
+    title.rescan_placeholders()
 
     page_languages = page.get_languages()
 

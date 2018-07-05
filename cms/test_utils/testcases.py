@@ -385,6 +385,10 @@ class BaseCMSTestCase(object):
     def get_pages_root(self):
         return unquote(reverse("pages-root"))
 
+    def get_page_title(self, page, language):
+        "Returns a page title using the page and the language"
+        return page.title_set.get(language=language)
+
     def get_context(self, path=None, page=None):
         if not path:
             path = self.get_pages_root()
