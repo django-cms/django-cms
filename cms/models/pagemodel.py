@@ -203,9 +203,6 @@ class Page(models.Model):
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
 
-    # Placeholders (plugins)
-    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
-
     # Publisher fields
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
     # This is misnamed - the one-to-one relation is populated on both ends
