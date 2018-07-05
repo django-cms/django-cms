@@ -29,7 +29,12 @@
     <meta name="msapplication-TileImage" content="{% static 'ms-icon-144x144.png' %}">
     <meta name="theme-color" content="#ffffff">
 
-    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="dns-prefetch" href="{{ MEDIA_URL }}">
+    <link rel="preload" href="{% static "js/dist/gdpr.bundle.js" %}" as="script" crossorigin>
+    <link rel="preload" href="{% static "js/dist/base.bundle.js" %}" as="script" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
     {% render_block "css" %}
