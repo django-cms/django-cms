@@ -337,6 +337,22 @@ class Placeholder(models.Model):
         return [obj for field in self._get_attached_fields()
                 for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
 
+    #FIXME: AA added
+    def title_getter(self):
+        if not hasattr(self, '_title'):
+            from cms.models.titlemodels import Title
+            try:
+                self._title = Title.objects.get(placeholders=self)
+            except (Title.DoesNotExist, Title.MultipleObjectsReturned,):
+                self._title = None
+        return self._title
+
+    def title_setter(self, value):
+        self._title = value
+
+    title = property(title_getter, title_setter)
+
+    """
     def page_getter(self):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
@@ -350,6 +366,7 @@ class Placeholder(models.Model):
         self._page = value
 
     page = property(page_getter, page_setter)
+    """
 
     def get_plugins_list(self, language=None):
         return list(self.get_plugins(language))

@@ -11,6 +11,15 @@ from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 
 
+from django.core.urlresolvers import reverse
+from django.utils.translation import (
+    get_language,
+    override as force_language,
+    ugettext_lazy as _,
+)
+from cms.utils.i18n import get_current_language
+
+
 @python_2_unicode_compatible
 class Title(models.Model):
     # These are the fields whose values are compared when saving
@@ -215,7 +224,15 @@ class Title(models.Model):
             placeholder.copy_plugins(target_placeholder, language=language)
 
 
+    def get_absolute_url(self, language=None, fallback=True):
+        if not language:
+            language = get_current_language()
 
+        with force_language(language):
+            if self.is_home:
+                return reverse('pages-root')
+            path = self.get_path(language, fallback) or self.get_slug(language, fallback)
+            return reverse('pages-details-by-slug', kwargs={"slug": path})
 
 class EmptyTitle(object):
     """

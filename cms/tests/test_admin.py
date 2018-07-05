@@ -135,7 +135,8 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         create_page('child-page', "nav_playground.html", "en",
                     created_by=admin_user, published=True, parent=page)
-        body = page.placeholders.get(slot='body')
+        title = self.get_page_title(page=page, language='en')
+        body = title.placeholders.get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
         with self.login_user_context(admin_user):
@@ -151,7 +152,8 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         create_page('child-page', "nav_playground.html", "de",
                     created_by=admin_user, published=True, parent=page)
-        body = page.placeholders.get(slot='body')
+        title = self.get_page_title(page=page, language='en')
+        body = title.placeholders.get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
         with self.login_user_context(admin_user):
@@ -975,7 +977,8 @@ class AdminFormsTests(AdminTestsBase):
 
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
-        for placeholder in page.placeholders.all():
+        title = self.get_page_title(page=page, language='en')
+        for placeholder in title.placeholders.all():
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         page.publish('en')
         self.assertEqual(Page.objects.count(), 2)

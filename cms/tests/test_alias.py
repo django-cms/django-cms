@@ -56,7 +56,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        ph_1_en = page_en.placeholders.get(slot="col_left")
+        title_en = self.get_page_title(page=page_en, language='en')
+        ph_1_en = title_en.placeholders.get(slot="col_left")
         ph_2_en = page_en.placeholders.get(slot="col_sidebar")
 
         api.add_plugin(ph_1_en, 'StylePlugin', 'en', tag_type='div', class_name='info')
@@ -71,7 +72,8 @@ class AliasTestCase(TransactionCMSTestCase):
     def test_alias_recursion_across_pages(self):
         superuser = self.get_superuser()
         page_1 = api.create_page("page-1", "col_two.html", "en", published=True)
-        page_1_pl = page_1.placeholders.get(slot="col_left")
+        title_1 = self.get_page_title(page=page_1, language='en')
+        page_1_pl = title_1.placeholders.get(slot="col_left")
         source_plugin = api.add_plugin(page_1_pl, 'StylePlugin', 'en', tag_type='div', class_name='info')
         # this creates a recursive alias on the same page
         alias_plugin = api.add_plugin(page_1_pl, 'AliasPlugin', 'en', plugin=source_plugin, target=source_plugin)
@@ -84,7 +86,8 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<div class="info">', html=False)
 
         page_2 = api.create_page("page-2", "col_two.html", "en")
-        page_2_pl = page_2.placeholders.get(slot="col_left")
+        title_2 = self.get_page_title(page=page_2, language='en')
+        page_2_pl = title_2.placeholders.get(slot="col_left")
         # This points to a plugin with a recursive alias
         api.add_plugin(page_2_pl, 'AliasPlugin', 'en', plugin=source_plugin)
 
@@ -218,7 +221,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        source_placeholder = source_page.placeholders.get(slot="col_left")
+        source_title = self.get_page_title(page=source_page, language='en')
+        source_placeholder = source_title.placeholders.get(slot="col_left")
 
         style = api.add_plugin(
             source_placeholder,
@@ -235,7 +239,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        target_placeholder = target_page.placeholders.get(slot="col_left")
+        target_title = self.get_page_title(page=target_page, language='en')
+        target_placeholder = target_title.placeholders.get(slot="col_left")
         alias = api.add_plugin(
             target_placeholder,
             'AliasPlugin',
@@ -290,7 +295,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        source_placeholder = source_page.placeholders.get(slot="col_left")
+        source_title = self.get_page_title(page=source_page, language='en')
+        source_placeholder = source_title.placeholders.get(slot="col_left")
 
         api.add_plugin(
             source_placeholder,
@@ -307,7 +313,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        target_placeholder = target_page.placeholders.get(slot="col_left")
+        target_title = self.get_page_title(page=target_page, language='en')
+        target_placeholder = target_title.placeholders.get(slot="col_left")
         alias = api.add_plugin(
             target_placeholder,
             'AliasPlugin',
@@ -352,7 +359,8 @@ class AliasTestCase(TransactionCMSTestCase):
         '''
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                                   slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
+        title_en = self.get_page_title(page=page_en, language='en')
+        ph_en = title_en.placeholders.get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         with self.login_user_context(self.get_superuser()):
             #
