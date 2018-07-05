@@ -284,6 +284,9 @@ class BaseCMSTestCase(object):
         self.counter = self.counter + 1
         return page_data
 
+    def get_page_title(self, page, language):
+        return page.title_set.get(language=language)
+
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
         created from get_new_page_data so you can switch between test cases

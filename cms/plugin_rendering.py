@@ -326,7 +326,9 @@ class ContentRenderer(BaseRenderer):
         if current_page.pk not in placeholder_cache:
             # Instead of loading plugins for this one placeholder
             # try and load them for all placeholders on the page.
-            self._preload_placeholders_for_page(current_page)
+            #FIXME: AA REMOVED
+            pass
+            # self._preload_placeholders_for_page(current_page)
 
         try:
             placeholder = placeholder_cache[current_page.pk][slot]

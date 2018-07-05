@@ -31,8 +31,9 @@ class TestStructureRenderer(CMSTestCase):
 
     def test_get_placeholder_plugin_menu(self):
         cms_page = create_page("page", 'nav_playground.html', "en")
+        title = self.get_page_title(page=cms_page, language='en')
         superuser = self.get_superuser()
-        placeholder_1 = cms_page.placeholders.get(slot='body')
+        placeholder_1 = title.placeholders.get(slot='body')
 
         with self.login_user_context(superuser):
             renderer = self.get_renderer()
@@ -43,7 +44,8 @@ class TestStructureRenderer(CMSTestCase):
     def test_render_placeholder_toolbar_js(self):
         cms_page = create_page("page", 'nav_playground.html', "en")
         renderer = self.get_renderer()
-        placeholder = cms_page.placeholders.get(slot='body')
+        title = self.get_page_title(page=cms_page, language='en')
+        placeholder = title.placeholders.get(slot='body')
         content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
 
         expected_bits = [

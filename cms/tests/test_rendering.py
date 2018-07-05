@@ -124,7 +124,8 @@ class RenderingTestCase(CMSTestCase):
                         reverse_id=self.test_data['reverse_id'], published=True)
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders = {}
-        for placeholder in p.placeholders.all():
+        title = self.get_page_title(page=p, language='en')
+        for placeholder in title.placeholders.all():
             self.test_placeholders[placeholder.slot] = placeholder
             # Insert some test Text plugins
         add_plugin(self.test_placeholders['main'], 'TextPlugin', 'en',
@@ -143,9 +144,10 @@ class RenderingTestCase(CMSTestCase):
         p3 = create_page(self.test_data3['title'], INHERIT_TEMPLATE_NAME, 'en',
                          slug=self.test_data3['slug'], parent=p2,
                          reverse_id=self.test_data3['reverse_id'], published=True)
+        title3 = self.get_page_title(page=p3, language='en')
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders3 = {}
-        for placeholder in p3.placeholders.all():
+        for placeholder in title3.placeholders.all():
             self.test_placeholders3[placeholder.slot] = placeholder
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
@@ -154,9 +156,10 @@ class RenderingTestCase(CMSTestCase):
 
         # Insert another page that is not the home
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
+        title4 = self.get_page_title(page=p4, language='en')
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders4 = {}
-        for placeholder in p4.placeholders.all():
+        for placeholder in title4.placeholders.all():
             self.test_placeholders4[placeholder.slot] = placeholder
             # Insert some test plugins
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
@@ -166,9 +169,10 @@ class RenderingTestCase(CMSTestCase):
         p5 = create_page(self.test_data5['title'], INHERIT_TEMPLATE_NAME, 'en',
                          parent=p, slug=self.test_data5['slug'], published=True,
                          reverse_id=self.test_data5['reverse_id'])
+        title5 = self.get_page_title(page=p5, language='en')
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders5 = {}
-        for placeholder in p5.placeholders.all():
+        for placeholder in title5.placeholders.all():
             self.test_placeholders5[placeholder.slot] = placeholder
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders5['sub'], 'TextPlugin', 'en',
@@ -181,9 +185,10 @@ class RenderingTestCase(CMSTestCase):
         p6 = create_page(self.test_data6['title'], INHERIT_TEMPLATE_NAME, 'en',
                          slug=self.test_data6['slug'], parent=p5,
                          reverse_id=self.test_data6['reverse_id'], published=True)
+        title6 = self.get_page_title(page=p6, language='en')
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders6 = {}
-        for placeholder in p6.placeholders.all():
+        for placeholder in title6.placeholders.all():
             self.test_placeholders6[placeholder.slot] = placeholder
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en',

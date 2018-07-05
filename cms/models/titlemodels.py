@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
@@ -7,6 +9,15 @@ from django.utils.translation import ugettext_lazy as _
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
+
+
+from django.core.urlresolvers import reverse
+from django.utils.translation import (
+    get_language,
+    override as force_language,
+    ugettext_lazy as _,
+)
+from cms.utils.i18n import get_current_language
 
 
 @python_2_unicode_compatible
@@ -37,6 +48,9 @@ class Title(models.Model):
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
+
+    # Placeholders (plugins)
+    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
 
     # Publisher fields
     published = models.BooleanField(_("is published"), blank=True, default=False)
@@ -145,6 +159,80 @@ class Title(models.Model):
         )
         return old_values != new_values
 
+    def get_placeholders(self):
+        if not hasattr(self, '_placeholder_cache'):
+            self._placeholder_cache = self.placeholders.all()
+        return self._placeholder_cache
+
+    def get_declared_placeholders(self):
+        # inline import to prevent circular imports
+        from cms.utils.placeholder import get_placeholders
+        #FIXME: Andrew changed from, reason being the page is the template: self.get_template()
+        return get_placeholders(self.page.get_template())
+
+    def get_declared_static_placeholders(self, context):
+        # inline import to prevent circular imports
+        from cms.utils.placeholder import get_static_placeholders
+        # FIXME: Andrew changed from, reason being the page is the template: self.get_template()
+        return get_static_placeholders(self.page.get_template(), context)
+
+    def rescan_placeholders(self):
+        """
+        Rescan and if necessary create placeholders in the current template.
+        """
+        existing = OrderedDict()
+        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
+
+        for placeholder in self.placeholders.all():
+            if placeholder.slot in placeholders:
+                existing[placeholder.slot] = placeholder
+
+        for placeholder in placeholders:
+            if placeholder not in existing:
+                existing[placeholder] = self.placeholders.create(slot=placeholder)
+        return existing
+
+    def _clear_placeholders(self, language=None):
+        from cms.models import CMSPlugin
+
+        placeholders = list(self.get_placeholders())
+        placeholder_ids = (placeholder.pk for placeholder in placeholders)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
+
+        if language:
+            plugins = plugins.filter(language=language)
+        models.query.QuerySet.delete(plugins)
+        return placeholders
+
+    def copy_placeholders(self, target, language):
+        """
+        Copy all the plugins to a new page.
+        :param target: The page where the new content should be stored
+        """
+        cleared_placeholders = target._clear_placeholders(language)
+        cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
+
+        for placeholder in self.get_placeholders():
+            try:
+                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
+            except KeyError:
+                target_placeholder = target.placeholders.create(
+                    slot=placeholder.slot,
+                    default_width=placeholder.default_width,
+                )
+
+            placeholder.copy_plugins(target_placeholder, language=language)
+
+
+    def get_absolute_url(self, language=None, fallback=True):
+        if not language:
+            language = get_current_language()
+
+        with force_language(language):
+            if self.is_home:
+                return reverse('pages-root')
+            path = self.get_path(language, fallback) or self.get_slug(language, fallback)
+            return reverse('pages-details-by-slug', kwargs={"slug": path})
 
 class EmptyTitle(object):
     """

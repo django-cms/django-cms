@@ -224,7 +224,8 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             today = date.today()
             return os.path.join(get_cms_setting('PAGE_MEDIA_PATH'),
                                 str(today.year), str(today.month), str(today.day), filename)
-
+    """
+    # FIXME: AA REMOVED
     @property
     def page(self):
         warnings.warn(
@@ -234,6 +235,17 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             stacklevel=2,
         )
         return self.placeholder.page if self.placeholder_id else None
+    """
+
+    @property
+    def title(self):
+        warnings.warn(
+            "Don't use the page attribute on CMSPlugins! CMSPlugins are not "
+            "guaranteed to have a page associated with them!",
+            DontUsePageAttributeWarning,
+            stacklevel=2,
+        )
+        return self.placeholder.title if self.placeholder_id else None
 
     def get_instance_icon_src(self):
         """

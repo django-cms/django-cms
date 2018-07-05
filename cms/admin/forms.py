@@ -288,7 +288,8 @@ class AddPageForm(BasePageForm):
             .exclude(pk=new_page.node_id)
             .exists()
         )
-        new_page.rescan_placeholders()
+        #FIXME: AA Removed
+        #new_page.rescan_placeholders()
 
         if is_first and not new_page.is_page_type:
             # its the first page. publish it right away
