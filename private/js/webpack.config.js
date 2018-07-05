@@ -13,10 +13,6 @@ plugins.push(new WebpackPolyfillPlugin());
 // Bundle splitting. Don't forget to {% addtoblock "js" %} afterwards
 plugins.push(
     new webpack.optimize.CommonsChunkPlugin({
-        name: 'gdpr',
-        chunks: ['gdpr', 'base'],
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
         name: 'base',
         chunks: ['base', 'cms', 'press'],
     }),
@@ -68,7 +64,6 @@ if (argv.debug) {
 module.exports = {
     devtool: argv.debug ? 'cheap-module-eval-source-map' : false,
     entry: {
-        gdpr: path.join(__dirname, 'gdpr.js'),
         base: path.join(__dirname, 'base.js'),
         cms: path.join(__dirname, 'cms.js'),
         press: path.join(__dirname, 'press.js'),

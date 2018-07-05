@@ -9,7 +9,7 @@ import { initHeader } from 'addons/header';
 import { initBlogCarousel } from 'addons/carousel';
 import { initWaypoints } from 'addons/waypoints';
 import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
-import { initPrivacySettings } from 'addons/privacy';
+import { initPrivacySettings, initAnalyticsIntegrations } from 'addons/privacy';
 // import { initPartnerMap } from 'addons/map';
 import { initIntercom } from 'addons/intercom';
 import { initAnalytics } from 'addons/analytics';
@@ -34,7 +34,9 @@ $.fn.modal.Constructor.prototype._checkScrollbar = function () {
     }
     this._isBodyOverflowing = document.body.clientWidth < fullWindowWidth;
     this._scrollbarWidth = this._getScrollbarWidth()
-}
+};
+
+initAnalyticsIntegrations(); // required for the segment snippet
 
 $(() => {
     noscript();

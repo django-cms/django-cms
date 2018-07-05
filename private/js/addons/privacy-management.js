@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 
+export const baseHost = window.location.hostname.replace('www\.', '');
 let preferences;
 
 const django_privacy_management = {
@@ -43,7 +44,7 @@ const django_privacy_management = {
             // in FF this is required so that the cookie is not deleted after ending the browser session
             // we set it to a very high number of dates so that this cookie 'never' expires.
             expires: 2000,
-            domain: window.baseHost,
+            domain: baseHost,
         });
     },
 

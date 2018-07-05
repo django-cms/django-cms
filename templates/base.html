@@ -30,8 +30,8 @@
     <meta name="theme-color" content="#ffffff">
 
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="preconnect" href="https://cdn.segment.com/" crossorigin>
     <link rel="dns-prefetch" href="{{ MEDIA_URL }}">
-    <link rel="preload" href="{% static "js/dist/gdpr.bundle.js" %}" as="script">
     <link rel="preload" href="{% static "js/dist/base.bundle.js" %}" as="script">
 
     <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
@@ -53,10 +53,8 @@
             }
         </style>
     {% endif %}
-    {% include 'django_privacy_mgmt/api.html' %}
 </head>
 <body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
-{% include "includes/analytics.html" %}
 {% cms_toolbar %}
 
 {% include "includes/banner.html" %}
@@ -73,5 +71,6 @@
 {% include "includes/browser.html" %}
 {% include 'django_privacy_mgmt/banner.html' %}
 {% render_privacy_settings_modal %}
+{% include "includes/analytics.html" %}
 </body>
 </html>

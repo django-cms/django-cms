@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import Cookies from 'js-cookie';
-import django_privacy_mgmt from 'addons/privacy-management';
+import django_privacy_mgmt, { baseHost } from 'addons/privacy-management';
 
 function initCookieBar() {
     var COOKIE_NAME = 'django-privacy-mgmt-banner-state';
@@ -31,7 +31,7 @@ function initCookieBar() {
                 // in FF this is required so that the cookie is not deleted after ending the browser session
                 // we set it to a very high number of dates so that this cookie 'never' expires.
                 expires: 2000,
-                domain: window.baseHost,
+                domain: baseHost,
             }
         );
         $('.js-cookie-bar').hide();
@@ -68,6 +68,20 @@ function initPrivacyPopup() {
         el.prop('checked', preference);
     });
 }
+
+export function initAnalyticsIntegrations() {
+    window.analyticsIntegrations = null;
+
+    if (!django_privacy_mgmt.getPreference('STATISTICS')) {
+        window.analyticsIntegrations = {
+            integrations: {
+                'Segment.io': false,
+                'Google Analytics': false,
+            },
+        };
+    }
+}
+
 export function initPrivacySettings() {
     initCookieBar();
     initPrivacyPopup();
