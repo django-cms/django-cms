@@ -24,7 +24,7 @@
             {{ thumbnail.url }}
         {% endif %}{% endspaceless %}"
 
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        src=""
         {% if instance.picture.default_alt_text and not instance.attributes.alt %} alt="{{ instance.picture.default_alt_text }}"{% endif %}
         {% if instance.width %} width="{{ instance.width }}"{% endif %}
         {% if instance.height %} height="{{ instance.height }}"{% endif %}
