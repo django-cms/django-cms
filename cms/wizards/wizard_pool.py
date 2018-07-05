@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.apps import apps
-from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import ugettext as _
 
 from cms.wizards.helpers import get_entries, get_entry
@@ -51,7 +50,6 @@ class WizardPool(object):
 
         Raises AlreadyRegisteredException if the entry is already registered.
         """
-        # TODO: Use the new app registration instead of this
         # TODO: Add deprecation warning
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
         if self.is_registered(entry, passive=True):

@@ -176,21 +176,35 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
             extension.wizards = expected_wizards
 
     def test_discovered_returns_true(self):
-        # Backwards compatibility
+        """
+        Test for backwards compatibility of the discovered property.
+        This should always return True because discovering of wizards
+        now happens in the app registration system so as far as the
+        wizard_pool is concerned they are always discovered.
+        """
         self.assertTrue(wizard_pool.discovered)
 
     def test_is_registered_for_registered_wizard(self):
-        # Backwards compatibility
+        """
+        Test for backwards compatibility of is_registered when checking
+        a registered wizard.
+        """
         is_registered = wizard_pool.is_registered(cms_page_wizard)
         self.assertTrue(is_registered)
 
     def test_is_registered_for_unregistered_wizard(self):
-        # Backwards compatibility
+        """
+        Test for backwards compatibility of is_registered when checking
+        an unregistered wizard.
+        """
         is_registered = wizard_pool.is_registered(self.page_wizard)
         self.assertFalse(is_registered)
 
     def test_unregister_registered_wizard(self):
-        # Test for backwards compatibility only.
+        """
+        Test for backwards compatibility of the unregister method.
+        Removes a wizard from the wizards dict.
+        """
         was_unregistered = wizard_pool.unregister(cms_page_wizard)
 
         registered_wizards = apps.get_app_config('cms').cms_extension.wizards
@@ -198,17 +212,27 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         self.assertTrue(was_unregistered)
 
     def test_unregister_unregistered_wizard(self):
-        # Test for backwards compatibility only.
+        """
+        Test for backwards compatibility of the unregister method.
+        Returns False if wizard not fount.
+        """
         was_unregistered = wizard_pool.unregister(self.page_wizard)
         self.assertFalse(was_unregistered)
 
     def test_register_already_registered_wizard(self):
-        # Test for backwards compatibility only.
+        """
+        Test for backwards compatibility of the register method.
+        Raises AlreadyRegisteredException if the wizard is already
+        registered.
+        """
         with self.assertRaises(AlreadyRegisteredException):
             wizard_pool.register(cms_page_wizard)
 
     def test_register_unregistered_wizard(self):
-        # Test for backwards compatibility only.
+        """
+        Test for backwards compatibility of the register method.
+        Adds the wizard to the wizards dict.
+        """
         wizard_pool.register(self.page_wizard)
 
         registered_wizards = apps.get_app_config('cms').cms_extension.wizards
@@ -540,6 +564,10 @@ class TestWizardHelpers(CMSTestCase):
         get_cms_config_apps.cache_clear()
 
     def test_get_entries_orders_by_weight(self):
+        """
+        The get_entries function returns the registered wizards
+        ordered by weight.
+        """
         # The test setup registers two wizards from cms itself
         # (cms_page_wizard and cms_subpage_wizard) and one from
         # test_utils.project.sampleapp (sample_wizard)
@@ -553,10 +581,22 @@ class TestWizardHelpers(CMSTestCase):
         self.assertListEqual(entries, expected)
 
     def test_get_entry_returns_wizard_by_id(self):
+        """
+        The get_entry function returns the wizard when a wizard id is
+        supplied.
+        """
         entry = get_entry(sample_wizard.id)
         self.assertEqual(entry, sample_wizard)
 
     def test_get_entry_returns_wizard_by_object(self):
+        """
+        The get_entry function returns the wizard when a wizard is
+        supplied.
+
+        NOTE: This is a little weird as we're simply returning the
+        object we're passing to get_entry, but keeping it this way for
+        backwards compatibility.
+        """
         entry = get_entry(sample_wizard)
         self.assertEqual(entry, sample_wizard)
 
@@ -564,6 +604,9 @@ class TestWizardHelpers(CMSTestCase):
 class TestEntryChoices(CMSTestCase):
 
     def test_generates_choices_in_weighted_order(self):
+        """
+        The entry_choices function returns the wizards ordered by weight
+        """
         user = self.get_superuser()
         page = create_page('home', 'nav_playground.html', 'en', published=True)
 
@@ -581,6 +624,10 @@ class TestEntryChoices(CMSTestCase):
         Mock(return_value=False)
     )
     def test_doesnt_generate_choice_if_user_doesnt_have_permission(self):
+        """
+        The entry_choices function only returns the wizards that the
+        user has permissions for
+        """
         user = self.get_superuser()
         page = create_page('home', 'nav_playground.html', 'en', published=True)
 

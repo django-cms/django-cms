@@ -15,6 +15,10 @@ from cms.wizards.wizard_base import Wizard
 class ConfigureWizardsUnitTestCase(CMSTestCase):
 
     def test_adds_wizards_to_dict(self):
+        """
+        If the wizard setting is correctly defined, add the wizards to the
+        dictionary of wizards
+        """
         extensions = CMSCoreExtensions()
         wizard1 = Mock(id=111, spec=Wizard)
         wizard2 = Mock(id=222, spec=Wizard)
@@ -27,6 +31,10 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
             extensions.wizards, {111: wizard1, 222: wizard2})
 
     def test_doesnt_raise_exception_when_wizards_dict_undefined(self):
+        """
+        If the wizard setting is not present in the config, simply
+        ignore this. The wizard setting is optional.
+        """
         extensions = CMSCoreExtensions()
         cms_config = Mock(cms_enabled=True, spec=[])
 
@@ -36,6 +44,10 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
             self.fail("Raises exception when cms_wizards undefined")
 
     def test_raises_exception_if_doesnt_inherit_from_wizard_class(self):
+        """
+        If one or more of the wizards defined in the wizard setting
+        do not inherit from the Wizard class, raise an exception
+        """
         extensions = CMSCoreExtensions()
         wizard = Mock(id=3, spec=object)
         cms_config = Mock(
@@ -45,6 +57,9 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
             extensions.configure_wizards(cms_config)
 
     def test_raises_exception_if_not_list(self):
+        """
+        If the wizard setting isn't a list, raise an exception.
+        """
         extensions = CMSCoreExtensions()
         wizard = Mock(id=6, spec=Wizard)
         cms_config = Mock(
@@ -65,6 +80,10 @@ class ConfigureWizardsIntegrationTestCase(CMSTestCase):
         get_cms_config_apps.cache_clear()
 
     def test_adds_all_wizards_to_dict(self):
+        """
+        Check that all wizards are picked up from both cms.cms_config
+        and sampleapp.cms_config
+        """
         setup_cms_apps()
 
         app = apps.get_app_config('cms')

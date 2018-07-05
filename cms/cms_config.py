@@ -13,9 +13,13 @@ class CMSCoreConfig(CMSAppConfig):
 class CMSCoreExtensions(CMSAppExtension):
 
     def __init__(self):
-        self.wizards = {}  # this is instead of wizard_pool._entries
+        self.wizards = {}
 
     def configure_wizards(self, cms_config):
+        """
+        Adds all registered wizards from apps that define them to the
+        wizards dictionary on this class
+        """
         if not hasattr(cms_config, 'cms_wizards'):
             # The cms_wizards settings is optional. If it's not here
             # just move on.
@@ -27,8 +31,8 @@ class CMSCoreExtensions(CMSAppExtension):
                 raise ImproperlyConfigured(
                     "all wizards defined in cms_wizards must inherit "
                     "from cms.wizards.wizard_base.Wizard")
-        for wizard in cms_config.cms_wizards:
-            self.wizards[wizard.id] = wizard
+            else:
+                self.wizards[wizard.id] = wizard
 
     def configure_app(self, cms_config):
         self.configure_wizards(cms_config)
