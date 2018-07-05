@@ -345,31 +345,31 @@
                 background: white;
             }
 
-
             &:active {
                 color: black;
             }
 
             .icon {
-                margin-top: 1px;
+                margin-top: -2px;
                 flex-shrink: 0;
 
                 svg,
                 use {
                     fill: theme-color(primary);
+                    width: 220%;
+                    height: 220%;
                 }
             }
 
             .dropdown-desc {
                 white-space: normal;
-                margin-left: 1rem;
+                margin-left: 2.4rem;
                 font-size: rem(14px);
                 color: theme-color(secondary);
 
                 @include media-breakpoint-down(md) {
                     margin-bottom: 1rem;
                 }
-
 
                 .dropdown-desc-title {
                     display: block;
