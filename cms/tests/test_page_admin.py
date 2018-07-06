@@ -2437,7 +2437,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         live_page = page.publisher_public
         page_title = page.get_title_obj()
         live_page_title = live_page.get_title_obj()
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
+        draft_plugins = page_title.placeholders.get(slot='body').get_plugins(translation.language)
         live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
