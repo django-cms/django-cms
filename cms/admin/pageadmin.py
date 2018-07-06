@@ -486,9 +486,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             nodes = obj.node.get_descendants()
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
+        # Delete all of the pages titles contents
         for page in cms_pages:
-            page._clear_placeholders()
-            page.get_placeholders().delete()
+            for title in page.title_set.all():
+                title._clear_placeholders()
+                title.get_placeholders().delete()
 
         super(BasePageAdmin, self).delete_model(request, obj)
 
