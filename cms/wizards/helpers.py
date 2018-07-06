@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.apps import apps
 
-from cms.wizards.wizard_base import Wizard
-
 
 def get_entries():
     """
@@ -18,6 +16,4 @@ def get_entry(entry_key):
     """
     Returns a wizard object based on its id.
     """
-    if isinstance(entry_key, Wizard):
-        entry_key = entry_key.id
     return apps.get_app_config('cms').cms_extension.wizards[entry_key]

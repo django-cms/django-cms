@@ -22,19 +22,6 @@ def entry_choices(user, page):
 
 class WizardPool(object):
 
-    @property
-    def discovered(self):
-        """
-        Returns whether all the wizards have been autodiscovered.
-
-        NOTE: This property is for backwards compatibility only
-        """
-        # TODO: Add deprecation warning
-        # Always return True because autodiscovering now happens through
-        # the app registration system, so we no longer do any
-        # discovering of registered wizards here
-        return True
-
     def is_registered(self, entry, **kwargs):
         """
         Returns True if the provided entry is registered.
@@ -86,15 +73,5 @@ class WizardPool(object):
         """
         # TODO: Deprecated warning
         return get_entry(entry)
-
-    def get_entries(self):
-        """
-        Returns all entries in weight-order.
-
-        NOTE: This method is here for backwards compatibility only.
-        Use cms.wizards.helpers.get_entries when possible.
-        """
-        # TODO: Deprecated warning
-        return get_entries()
 
 wizard_pool = WizardPool()

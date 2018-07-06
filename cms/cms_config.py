@@ -1,3 +1,5 @@
+from collections import Iterable
+
 from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_base import CMSAppExtension, CMSAppConfig
@@ -20,19 +22,27 @@ class CMSCoreExtensions(CMSAppExtension):
         Adds all registered wizards from apps that define them to the
         wizards dictionary on this class
         """
-        if not hasattr(cms_config, 'cms_wizards'):
-            # The cms_wizards settings is optional. If it's not here
-            # just move on.
-            return
-        if type(cms_config.cms_wizards) != list:
-            raise ImproperlyConfigured("cms_wizards must be a list")
+        if not isinstance(cms_config.cms_wizards, Iterable):
+            raise ImproperlyConfigured("cms_wizards must be iterable")
         for wizard in cms_config.cms_wizards:
             if not isinstance(wizard, Wizard):
                 raise ImproperlyConfigured(
-                    "all wizards defined in cms_wizards must inherit "
-                    "from cms.wizards.wizard_base.Wizard")
+                    "All wizards defined in cms_wizards must inherit "
+                    "from cms.wizards.wizard_base.Wizard"
+                )
+            elif wizard.id in self.wizards:
+                pass
+                # TODO: This is currently breaking various tests
+                # raise ImproperlyConfigured(
+                #    "Wizard for model {} has already been registered".format(
+                #        wizard.get_model()
+                #    )
+                #)
             else:
                 self.wizards[wizard.id] = wizard
 
     def configure_app(self, cms_config):
-        self.configure_wizards(cms_config)
+        # The cms_wizards settings is optional. If it's not here
+        # just move on.
+        if hasattr(cms_config, 'cms_wizards'):
+            self.configure_wizards(cms_config)

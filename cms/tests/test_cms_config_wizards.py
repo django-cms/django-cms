@@ -24,9 +24,7 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         wizard2 = Mock(id=222, spec=Wizard)
         cms_config = Mock(
             cms_enabled=True, cms_wizards=[wizard1, wizard2])
-
         extensions.configure_wizards(cms_config)
-
         self.assertDictEqual(
             extensions.wizards, {111: wizard1, 222: wizard2})
 
@@ -37,9 +35,8 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         """
         extensions = CMSCoreExtensions()
         cms_config = Mock(cms_enabled=True, spec=[])
-
         try:
-            extensions.configure_wizards(cms_config)
+            extensions.configure_app(cms_config)
         except AttributeError:
             self.fail("Raises exception when cms_wizards undefined")
 
@@ -52,21 +49,31 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         wizard = Mock(id=3, spec=object)
         cms_config = Mock(
             cms_enabled=True, cms_wizards=[wizard])
-
         with self.assertRaises(ImproperlyConfigured):
             extensions.configure_wizards(cms_config)
 
-    def test_raises_exception_if_not_list(self):
+    def test_raises_exception_if_not_iterable(self):
         """
-        If the wizard setting isn't a list, raise an exception.
+        If the wizard setting isn't iterable, raise an exception.
         """
         extensions = CMSCoreExtensions()
         wizard = Mock(id=6, spec=Wizard)
         cms_config = Mock(
             cms_enabled=True, cms_wizards=wizard)
-
         with self.assertRaises(ImproperlyConfigured):
             extensions.configure_wizards(cms_config)
+
+    # TODO: Currently adding this check breaks various tests elsewhere
+    #~ def test_cant_register_the_same_wizard_twice(self):
+        #~ """
+        #~ If a wizard is already added to the dict, raise an exception.
+        #~ """
+        #~ extensions = CMSCoreExtensions()
+        #~ wizard = Mock(id=81, spec=Wizard)
+        #~ cms_config = Mock(
+            #~ cms_enabled=True, cms_wizards=[wizard, wizard])
+        #~ with self.assertRaises(ImproperlyConfigured):
+            #~ extensions.configure_wizards(cms_config)
 
 
 class ConfigureWizardsIntegrationTestCase(CMSTestCase):
@@ -85,7 +92,6 @@ class ConfigureWizardsIntegrationTestCase(CMSTestCase):
         and sampleapp.cms_config
         """
         setup_cms_apps()
-
         app = apps.get_app_config('cms')
         # cms core defines wizards in its config, as does sampleapp
         # all of these wizards should have been picked up and added

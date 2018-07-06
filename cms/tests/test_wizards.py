@@ -167,22 +167,13 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # Clean up in case anything has been removed or added to the
         # registered wizards, so other tests don't have problems
         extension = apps.get_app_config('cms').cms_extension
-        expected_wizards = {
-            cms_page_wizard.id: cms_page_wizard.title,
-            sample_wizard.id: sample_wizard.title,
-            cms_subpage_wizard.id: cms_subpage_wizard.title,
-        }
-        if extension.wizards != expected_wizards:
-            extension.wizards = expected_wizards
-
-    def test_discovered_returns_true(self):
-        """
-        Test for backwards compatibility of the discovered property.
-        This should always return True because discovering of wizards
-        now happens in the app registration system so as far as the
-        wizard_pool is concerned they are always discovered.
-        """
-        self.assertTrue(wizard_pool.discovered)
+        extension.wizards = {}
+        configs_with_wizards = [
+            app.cms_config for app in get_cms_config_apps()
+            if hasattr(app.cms_config, 'cms_wizards')
+        ]
+        for config in configs_with_wizards:
+            extension.configure_wizards(config)
 
     def test_is_registered_for_registered_wizard(self):
         """
@@ -206,7 +197,6 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         Removes a wizard from the wizards dict.
         """
         was_unregistered = wizard_pool.unregister(cms_page_wizard)
-
         registered_wizards = apps.get_app_config('cms').cms_extension.wizards
         self.assertNotIn(cms_page_wizard.id, registered_wizards)
         self.assertTrue(was_unregistered)
@@ -234,7 +224,6 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         Adds the wizard to the wizards dict.
         """
         wizard_pool.register(self.page_wizard)
-
         registered_wizards = apps.get_app_config('cms').cms_extension.wizards
         self.assertIn(self.page_wizard.id, registered_wizards)
 
@@ -246,15 +235,6 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         """
         wizard_pool.get_entry(cms_page_wizard)
         mocked_get_entry.assert_called_once()
-
-    @patch('cms.wizards.wizard_pool.get_entries')
-    def test_get_entries(self, mocked_get_entries):
-        """
-        Test for backwards compatibility of wizard_pool.get_entries.
-        Checking we use the new get_entries under the hood.
-        """
-        wizard_pool.get_entries()
-        mocked_get_entries.assert_called_once()
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
@@ -588,18 +568,6 @@ class TestWizardHelpers(CMSTestCase):
         entry = get_entry(sample_wizard.id)
         self.assertEqual(entry, sample_wizard)
 
-    def test_get_entry_returns_wizard_by_object(self):
-        """
-        The get_entry function returns the wizard when a wizard is
-        supplied.
-
-        NOTE: This is a little weird as we're simply returning the
-        object we're passing to get_entry, but keeping it this way for
-        backwards compatibility.
-        """
-        entry = get_entry(sample_wizard)
-        self.assertEqual(entry, sample_wizard)
-
 
 class TestEntryChoices(CMSTestCase):
 
@@ -609,9 +577,7 @@ class TestEntryChoices(CMSTestCase):
         """
         user = self.get_superuser()
         page = create_page('home', 'nav_playground.html', 'en', published=True)
-
         wizard_choices = [option for option in entry_choices(user, page)]
-
         expected = [
             (cms_page_wizard.id, cms_page_wizard.title),
             (sample_wizard.id, sample_wizard.title),
@@ -630,9 +596,7 @@ class TestEntryChoices(CMSTestCase):
         """
         user = self.get_superuser()
         page = create_page('home', 'nav_playground.html', 'en', published=True)
-
         wizard_choices = [option for option in entry_choices(user, page)]
-
         expected = [
             # Missing cms_page_wizard entry
             (sample_wizard.id, sample_wizard.title),
