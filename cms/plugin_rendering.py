@@ -323,10 +323,12 @@ class ContentRenderer(BaseRenderer):
         current_page = page or self.current_page
         placeholder_cache = self._placeholders_by_page_cache
 
-        if current_page.pk not in placeholder_cache:
+        title = current_page.get_title_obj(language=self.request_language)
+
+        if title.pk not in placeholder_cache:
             # Instead of loading plugins for this one placeholder
             # try and load them for all placeholders on the page.
-            self._preload_placeholders_for_page(current_page)
+            self._preload_placeholders_for_page(title)
 
         try:
             placeholder = placeholder_cache[current_page.pk][slot]
@@ -482,7 +484,7 @@ class ContentRenderer(BaseRenderer):
                 language_cache[placeholder.pk] = cached_value
         return language_cache.get(placeholder.pk)
 
-    def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
+    def _preload_placeholders_for_page(self, title, slots=None, inherit=False):
         """
         Populates the internal plugin cache of each placeholder
         in the given page if the placeholder has not been
@@ -491,10 +493,10 @@ class ContentRenderer(BaseRenderer):
         from cms.utils.plugins import assign_plugins
 
         if slots:
-            placeholders = page.get_placeholders().filter(slot__in=slots)
+            placeholders = title.get_placeholders().filter(slot__in=slots)
         else:
             # Creates any placeholders missing on the page
-            placeholders = page.rescan_placeholders().values()
+            placeholders = title.rescan_placeholders().values()
 
         if inherit:
             # When the inherit flag is True,
@@ -503,7 +505,7 @@ class ContentRenderer(BaseRenderer):
         elif not self.toolbar.edit_mode_active:
             # Scan through the page template to find all placeholders
             # that have inheritance turned on.
-            slots_w_inheritance = [pl.slot for pl in page.get_declared_placeholders() if pl.inherit]
+            slots_w_inheritance = [pl.slot for pl in title.get_declared_placeholders() if pl.inherit]
         else:
             # Inheritance is turned off on edit-mode
             slots_w_inheritance = []
@@ -524,12 +526,12 @@ class ContentRenderer(BaseRenderer):
             assign_plugins(
                 request=self.request,
                 placeholders=placeholders_to_fetch,
-                template=page.get_template(),
+                template=title.page.get_template(),
                 lang=self.request_language,
                 is_fallback=inherit,
             )
 
-        parent_page = page.parent_page
+        parent_page = title.page.parent_page
         # Inherit only placeholders that have no plugins
         # or are not cached.
         placeholders_to_inherit = [
@@ -550,10 +552,10 @@ class ContentRenderer(BaseRenderer):
 
         for placeholder in placeholders:
             # Save a query when the placeholder toolbar is rendered.
-            placeholder.page = page
+            placeholder.page = title.page
             page_placeholder_cache[placeholder.slot] = placeholder
 
-        self._placeholders_by_page_cache[page.pk] = page_placeholder_cache
+        self._placeholders_by_page_cache[title.pk] = page_placeholder_cache
 
 
 class StructureRenderer(BaseRenderer):

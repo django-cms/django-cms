@@ -600,7 +600,6 @@ class Page(models.Model):
         Copy all the plugins to a new page.
         :param target: The page where the new content should be stored
         """
-
         for title in target.title_set.all():
             title.copy_placeholders(title, language)
 
