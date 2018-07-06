@@ -1030,7 +1030,6 @@ class PlaceholderAdminMixin(object):
 
         opts = plugin._meta
         using = router.db_for_write(opts.model)
-        get_deleted_objects_additional_kwargs = {}
         if DJANGO_2_0:
             get_deleted_objects_additional_kwargs = {
                 'opts': opts,
@@ -1130,7 +1129,6 @@ class PlaceholderAdminMixin(object):
         using = router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
 
-        get_deleted_objects_additional_kwargs = {}
         if DJANGO_2_0:
             get_deleted_objects_additional_kwargs = {
                 'opts': opts,

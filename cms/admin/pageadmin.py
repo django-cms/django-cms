@@ -444,7 +444,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
 
-        get_deleted_objects_additional_kwargs = {}
         if DJANGO_2_0:
             get_deleted_objects_additional_kwargs = {
                 'opts': opts,

@@ -7,13 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import get_resolver
 
 from cms.exceptions import LanguageError
+from cms.utils.compat.dj import LocalePrefixPattern
 from cms.utils.conf import get_cms_setting, get_site_id
-
-try:
-    from django.urls import LocalePrefixPattern
-except ImportError:
-    # Only for django 1.11
-    from django.core.urlresolvers import LocaleRegexURLResolver as LocalePrefixPattern
 
 
 @contextmanager
