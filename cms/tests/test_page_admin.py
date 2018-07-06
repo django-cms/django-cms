@@ -80,7 +80,8 @@ class PageTestBase(CMSTestCase):
             'TextPlugin': {'body': '<p>text</p>'},
             'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
         }
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj(language=language)
+        placeholder = title.placeholders.get(slot='body')
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
 
         if publish:
@@ -98,7 +99,8 @@ class PageTestBase(CMSTestCase):
         return lookup.exists()
 
     def _get_add_plugin_uri(self, page, language='en'):
-        placeholder = page.placeholders.get(slot='body')
+        page_title = page.get_title_obj(language=language)
+        placeholder = page_title.placeholders.get(slot='body')
         uri = self.get_add_plugin_uri(
             placeholder=placeholder,
             plugin_type='LinkPlugin',
@@ -179,9 +181,10 @@ class PageTest(PageTestBase):
             page = title.page
             page.save()
             page.publish('en')
+
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
-            self.assertEqual(page.placeholders.all().count(), 2)
+            self.assertEqual(page.get_placeholders().count(), 2)
 
             # were public instances created?
             self.assertEqual(Title.objects.all().count(), 4)
@@ -671,7 +674,8 @@ class PageTest(PageTestBase):
         create_title('de', 'page_a_de', cms_page)
         create_title('fr', 'page_a_fr', cms_page)
         create_title('pt-br', 'page_a_pt-br', cms_page)
-        placeholder = cms_page.placeholders.get(slot='body')
+        cms_page_title = cms_page.get_title_obj(language="en")
+        placeholder = cms_page_title.placeholders.get(slot='body')
 
         for language in languages:
             add_plugin(
@@ -684,7 +688,8 @@ class PageTest(PageTestBase):
 
         with self.login_user_context(self.get_superuser()):
             new_page = self.copy_page(cms_page, cms_page, position=1)
-            new_placeholder = new_page.placeholders.get(slot='body')
+            new_page_title = new_page.get_title_obj()
+            new_placeholder = new_page_title.placeholders.get(slot='body')
 
         for language in languages:
             self.assertTrue(new_placeholder.get_plugins(language).exists())
@@ -1748,8 +1753,9 @@ class PageTest(PageTestBase):
     def test_global_limit_on_plugin_move(self):
         superuser = self.get_superuser()
         cms_page = self.get_page()
-        source_placeholder = cms_page.placeholders.get(slot='right-column')
-        target_placeholder = cms_page.placeholders.get(slot='body')
+        cms_page_title = cms_page.get_title_obj()
+        source_placeholder = cms_page_title.placeholders.get(slot='right-column')
+        target_placeholder = cms_page_title.placeholders.get(slot='body')
         data = {
             'placeholder': source_placeholder,
             'plugin_type': 'LinkPlugin',
@@ -1777,8 +1783,9 @@ class PageTest(PageTestBase):
     def test_type_limit_on_plugin_move(self):
         superuser = self.get_superuser()
         cms_page = self.get_page()
-        source_placeholder = cms_page.placeholders.get(slot='right-column')
-        target_placeholder = cms_page.placeholders.get(slot='body')
+        cms_page_title = cms_page.get_title_obj()
+        source_placeholder = cms_page_title.placeholders.get(slot='right-column')
+        target_placeholder = cms_page_title.placeholders.get(slot='body')
         data = {
             'placeholder': source_placeholder,
             'plugin_type': 'TextPlugin',
@@ -2386,8 +2393,10 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             translation.language,
         )
         live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
+        page_title = page.get_title_obj()
+        live_page_title = live_page.get_title_obj()
+        draft_plugins = page_title.placeholders.get(slot='body').get_plugins(translation.language)
+        live_plugins = live_page_title.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -2426,6 +2435,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             translation.language,
         )
         live_page = page.publisher_public
+        page_title = page.get_title_obj()
+        live_page_title = live_page.get_title_obj()
         draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
         live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
@@ -3038,7 +3049,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj()
+        placeholder = title.placeholders.get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -3061,7 +3073,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj()
+        placeholder = title.placeholders.get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -3382,7 +3395,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
 
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj()
+        placeholder = title.placeholders.get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
@@ -3401,7 +3415,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
 
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj()
+        placeholder = title.placeholders.get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
@@ -3927,8 +3942,10 @@ class PermissionsOnPageTest(PermissionsTestCase):
             translation.language,
         )
         live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
+        page_title = page.get_title_obj()
+        live_page_title = live_page.get_title_obj()
+        draft_plugins = page_title.placeholders.get(slot='body').get_plugins(translation.language)
+        live_plugins = live_page_title.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -3971,7 +3988,9 @@ class PermissionsOnPageTest(PermissionsTestCase):
             translation.language,
         )
         live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
+        draft_title = page.get_title_obj()
+        live_title = live_page.get_title_obj()
+        draft_plugins = draft_title.placeholders.get(slot='body').get_plugins(translation.language)
         live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
@@ -4519,7 +4538,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj()
+        placeholder = title.placeholders.get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -4546,7 +4566,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        page_title = page.get_title_obj()
+        placeholder = page_title.placeholders.get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -4910,7 +4931,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        title = page.get_title_obj()
+        placeholder = title.placeholders.get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
@@ -4928,7 +4950,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        page_title = page.get_title_obj()
+        placeholder = page_title.placeholders.get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')

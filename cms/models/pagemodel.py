@@ -679,16 +679,16 @@ class Page(models.Model):
             title.path = '%s/%s' % (base, title.slug) if base else title.slug
             title.save()
 
+            # copy the placeholders (and plugins on those placeholders!)
+            for placeholder in title.placeholders.iterator():
+                new_placeholder = copy.copy(placeholder)
+                new_placeholder.pk = None
+                new_placeholder.save()
+                new_page.placeholders.add(new_placeholder)
+                placeholder.copy_plugins(new_placeholder, language=language)
+
             new_page.title_cache[title.language] = title
         new_page.update_languages([trans.language for trans in translations])
-
-        # copy the placeholders (and plugins on those placeholders!)
-        for placeholder in self.placeholders.iterator():
-            new_placeholder = copy.copy(placeholder)
-            new_placeholder.pk = None
-            new_placeholder.save()
-            new_page.placeholders.add(new_placeholder)
-            placeholder.copy_plugins(new_placeholder, language=language)
 
         if extensions:
             from cms.extensions import extension_pool
@@ -1559,6 +1559,15 @@ class Page(models.Model):
         except IndexError:
             return None
 
+    def get_placeholders(self, language=None):
+        """
+        Allow placeholders to be fetched from the page object using a language param.
+        By default a cached title is returned.
+        """
+        return self.get_title_obj(language=language).get_placeholders()
+
+    def rescan_placeholders(self, language=None):
+        return self.get_title_obj(language=language).rescan_placeholders()
 
 class PageType(Page):
 

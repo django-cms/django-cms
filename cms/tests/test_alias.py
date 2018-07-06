@@ -218,7 +218,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        source_placeholder = source_page.placeholders.get(slot="col_left")
+        source_title = source_page.get_title_obj(language="en")
+        source_placeholder = source_title.placeholders.get(slot="col_left")
 
         style = api.add_plugin(
             source_placeholder,

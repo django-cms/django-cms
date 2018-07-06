@@ -194,22 +194,6 @@ class Title(models.Model):
         models.query.QuerySet.delete(plugins)
         return placeholders
 
-    def copy_placeholders(self, title, language):
-
-        cleared_placeholders = target._clear_placeholders(language)
-        cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
-
-        for placeholder in self.get_placeholders():
-            try:
-                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
-            except KeyError:
-                target_placeholder = target.placeholders.create(
-                    slot=placeholder.slot,
-                    default_width=placeholder.default_width,
-                )
-
-            placeholder.copy_plugins(target_placeholder, language=language)
-
     def copy_placeholders(self, target, language):
         """
         Copy all the plugins to a new page.

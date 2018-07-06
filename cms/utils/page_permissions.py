@@ -40,7 +40,7 @@ _django_permissions_by_action = {
 
 def _get_draft_placeholders(page):
     if page.publisher_is_draft:
-        return page.placeholders.all()
+        return page.get_placeholders()
     return Placeholder.objects.filter(page__pk=page.publisher_public_id)
 
 

@@ -1015,7 +1015,8 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 class PlaceholderConfTests(TestCase):
     def test_get_all_plugins_single_page(self):
         page = create_page('page', 'col_two.html', 'en')
-        placeholder = page.placeholders.get(slot='col_left')
+        title = page.get_title_obj(language='en')
+        placeholder = title.placeholders.get(slot='col_left')
         conf = {
             'col_two': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
@@ -1033,7 +1034,8 @@ class PlaceholderConfTests(TestCase):
     def test_get_all_plugins_inherit(self):
         parent = create_page('parent', 'col_two.html', 'en')
         page = create_page('page', constants.TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
-        placeholder = page.placeholders.get(slot='col_left')
+        title = page.get_title_obj(language='en')
+        placeholder = title.placeholders.get(slot='col_left')
         conf = {
             'col_two': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
