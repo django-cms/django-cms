@@ -2438,7 +2438,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page_title = page.get_title_obj()
         live_page_title = live_page.get_title_obj()
         draft_plugins = page_title.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
+        live_plugins = live_page_title.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -3224,7 +3224,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         plugin = self._add_plugin_to_page(page)
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        title = page.get_title_obj(language='en')
+        target_placeholder = title.placeholders.get(slot='right-column')
 
         data = {
             'plugin_id': plugin.pk,
@@ -3942,8 +3943,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
             translation.language,
         )
         live_page = page.publisher_public
-        page_title = page.get_title_obj()
-        live_page_title = live_page.get_title_obj()
+        page_title = page.get_title_obj(language=translation.language)
+        live_page_title = live_page.get_title_obj(language=translation.language)
         draft_plugins = page_title.placeholders.get(slot='body').get_plugins(translation.language)
         live_plugins = live_page_title.placeholders.get(slot='body').get_plugins(translation.language)
 
@@ -3991,7 +3992,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         draft_title = page.get_title_obj()
         live_title = live_page.get_title_obj()
         draft_plugins = draft_title.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
+        live_plugins = live_title.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -4741,7 +4742,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         plugin = self._add_plugin_to_page(page)
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        title = page.get_title_obj()
+        target_placeholder = title.placeholders.get(slot='right-column')
 
         data = {
             'plugin_id': plugin.pk,
@@ -4776,7 +4778,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        title = page.get_title_obj(translation.language)
+        target_placeholder = title.placeholders.get(slot='right-column')
 
         data = {
             'source_plugin_id': plugin.pk,
@@ -4818,7 +4821,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        title = page.get_title_obj(translation.language)
+        target_placeholder = title.placeholders.get(slot='right-column')
 
         data = {
             'source_plugin_id': plugin.pk,

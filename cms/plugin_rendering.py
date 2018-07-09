@@ -331,7 +331,7 @@ class ContentRenderer(BaseRenderer):
             self._preload_placeholders_for_page(title)
 
         try:
-            placeholder = placeholder_cache[current_page.pk][slot]
+            placeholder = placeholder_cache[title.pk][slot]
         except KeyError:
             content = ''
             placeholder = None

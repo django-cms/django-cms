@@ -340,8 +340,10 @@ class Placeholder(models.Model):
     def page_getter(self):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
+            from cms.models.titlemodels import Title
             try:
-                self._page = Page.objects.get(placeholders=self)
+                title = Title.objects.get(placeholders=self)
+                self._page = title.page
             except (Page.DoesNotExist, Page.MultipleObjectsReturned,):
                 self._page = None
         return self._page
