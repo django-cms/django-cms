@@ -20,7 +20,6 @@ from cms.utils.i18n import get_language_tuple, get_language_dict
 from cms.utils.page_permissions import (
     user_can_change_page,
     user_can_delete_page,
-    user_can_publish_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
@@ -281,20 +280,6 @@ class PageToolbar(CMSToolbar):
         except Title.DoesNotExist:
             return None
 
-    def has_publish_permission(self):
-        if self.page:
-            publish_permission = page_permissions.user_can_publish_page(
-                self.request.user,
-                page=self.page,
-                site=self.current_site
-            )
-        else:
-            publish_permission = False
-
-        if publish_permission and self.statics:
-            publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
-        return publish_permission
-
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
             self.page_change_permission = can_change_page(self.request)
@@ -370,16 +355,6 @@ class PageToolbar(CMSToolbar):
         return dirty
 
     # Buttons
-
-    def user_can_publish(self):
-        if self.page and self.page.is_page_type:
-            # By design, page-types are not publishable.
-            return False
-
-        if not self.toolbar.edit_mode_active:
-            return False
-        return self.has_publish_permission() and self.has_dirty_objects()
-
     def add_draft_live(self):
         if self.page:
             if self.toolbar.edit_mode_active and not self.title:
@@ -649,23 +624,6 @@ class PageToolbar(CMSToolbar):
                     nav_title,
                     action=nav_action,
                     disabled=(not edit_mode or not can_change),
-                    on_success=refresh,
-                )
-
-            # publisher
-            if self.title and not self.page.is_page_type:
-                if self.title.published:
-                    publish_title = _('Unpublish page')
-                    publish_url = admin_reverse('cms_page_unpublish', args=(self.page.pk, self.current_lang))
-                else:
-                    publish_title = _('Publish page')
-                    publish_url = admin_reverse('cms_page_publish_page', args=(self.page.pk, self.current_lang))
-
-                user_can_publish = user_can_publish_page(self.request.user, page=self.page)
-                current_page_menu.add_ajax_item(
-                    publish_title,
-                    action=publish_url,
-                    disabled=not edit_mode or not user_can_publish,
                     on_success=refresh,
                 )
 
