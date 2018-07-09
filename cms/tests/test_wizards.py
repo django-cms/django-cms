@@ -3,6 +3,7 @@ from mock import patch, Mock
 
 from django import forms
 from django.apps import apps
+from django.apps.registry import Apps
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
@@ -11,16 +12,18 @@ from django.test.utils import override_settings
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 
+from cms import app_registration
 from cms.api import create_page, publish_page
-from cms.app_registration import get_cms_extension_apps, get_cms_config_apps
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 from cms.models import Page, PageType, UserSettings
+from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from cms.utils.setup import setup_cms_apps
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
 from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
@@ -169,11 +172,14 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         extension = apps.get_app_config('cms').cms_extension
         extension.wizards = {}
         configs_with_wizards = [
-            app.cms_config for app in get_cms_config_apps()
+            app.cms_config for app in app_registration.get_cms_config_apps()
             if hasattr(app.cms_config, 'cms_wizards')
         ]
         for config in configs_with_wizards:
             extension.configure_wizards(config)
+        # Clean up in case cached apps are different than the defaults
+        app_registration.get_cms_extension_apps.cache_clear()
+        app_registration.get_cms_config_apps.cache_clear()
 
     def test_is_registered_for_registered_wizard(self):
         """
@@ -236,26 +242,37 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.get_entry(cms_page_wizard)
         mocked_get_entry.assert_called_once()
 
-    @override_settings(INSTALLED_APPS=[
-        'cms',
-        'treebeard',
-        'cms.test_utils.project.backwards_wizards',
-        'cms.test_utils.project.sampleapp',  # adds itself anyway before this is overridden
-    ])
     def test_old_registration_still_works(self):
-        extension = apps.get_app_config('cms').cms_extension
-        extension.wizards = {}
-        from cms.utils.setup import setup_cms_apps
-        setup_cms_apps()
-        app = apps.get_app_config('cms')
-        from cms.test_utils.project.backwards_wizards.wizards import wizard
+        # NOTE: Because of how the override_settings decorator works,
+        # we can't use it for this test as the app registry first
+        # gets loaded with the default apps and then again with
+        # the overriden ones.
+        INSTALLED_APPS = [
+            'cms',
+            'treebeard',
+            'cms.test_utils.project.backwards_wizards',
+        ]
+        mocked_apps = Apps(installed_apps=INSTALLED_APPS)
+        # clear out app registration cache now that installed apps have
+        # changed
+        app_registration.get_cms_extension_apps.cache_clear()
+        app_registration.get_cms_config_apps.cache_clear()
+        # Run the setup with the mocked installed apps
+        with patch.object(app_registration, 'apps', mocked_apps):
+            setup_cms_apps()
+        # Check the wizards built into the cms app and the wizard from
+        # the backwards_wizards app have been picked up.
+        # The backwards_wizards app does not have a cms_config.py but
+        # registers its wizard by adding wizard_pool.register(wizard)
+        # to cms_wizards.py which is the old way we want backwards
+        # compatibility with.
+        cms_app = mocked_apps.get_app_config('cms')
         expected_wizards = {
             cms_page_wizard.id: cms_page_wizard,
             cms_subpage_wizard.id: cms_subpage_wizard,
             wizard.id: wizard,
-            sample_wizard.id: sample_wizard,
         }
-        self.assertDictEqual(app.cms_extension.wizards, expected_wizards)
+        self.assertDictEqual(cms_app.cms_extension.wizards, expected_wizards)
 
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
@@ -561,8 +578,8 @@ class TestWizardHelpers(CMSTestCase):
         # are cached. Clear this cache because installed apps change
         # between tests and therefore unlike in a live environment,
         # results of this function can change between tests
-        get_cms_extension_apps.cache_clear()
-        get_cms_config_apps.cache_clear()
+        app_registration.get_cms_extension_apps.cache_clear()
+        app_registration.get_cms_config_apps.cache_clear()
 
     def test_get_entries_orders_by_weight(self):
         """
