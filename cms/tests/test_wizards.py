@@ -236,6 +236,27 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.get_entry(cms_page_wizard)
         mocked_get_entry.assert_called_once()
 
+    @override_settings(INSTALLED_APPS=[
+        'cms',
+        'treebeard',
+        'cms.test_utils.project.backwards_wizards',
+        'cms.test_utils.project.sampleapp',  # adds itself anyway before this is overridden
+    ])
+    def test_old_registration_still_works(self):
+        extension = apps.get_app_config('cms').cms_extension
+        extension.wizards = {}
+        from cms.utils.setup import setup_cms_apps
+        setup_cms_apps()
+        app = apps.get_app_config('cms')
+        from cms.test_utils.project.backwards_wizards.wizards import wizard
+        expected_wizards = {
+            cms_page_wizard.id: cms_page_wizard,
+            cms_subpage_wizard.id: cms_subpage_wizard,
+            wizard.id: wizard,
+            sample_wizard.id: sample_wizard,
+        }
+        self.assertDictEqual(app.cms_extension.wizards, expected_wizards)
+
 
 class TestPageWizard(WizardTestMixin, CMSTestCase):
 
