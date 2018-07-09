@@ -1,3 +1,4 @@
+from logging import getLogger
 from collections import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
@@ -5,6 +6,9 @@ from django.core.exceptions import ImproperlyConfigured
 from cms.app_base import CMSAppExtension, CMSAppConfig
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.wizards.wizard_base import Wizard
+
+
+logger = getLogger(__name__)
 
 
 class CMSCoreConfig(CMSAppConfig):
@@ -31,13 +35,10 @@ class CMSCoreExtensions(CMSAppExtension):
                     "from cms.wizards.wizard_base.Wizard"
                 )
             elif wizard.id in self.wizards:
-                pass
-                # TODO: This is currently breaking various tests
-                # raise ImproperlyConfigured(
-                #    "Wizard for model {} has already been registered".format(
-                #        wizard.get_model()
-                #    )
-                #)
+                msg = "Wizard for model {} has already been registered".format(
+                    wizard.get_model()
+                )
+                logger.warning(msg)
             else:
                 self.wizards[wizard.id] = wizard
 

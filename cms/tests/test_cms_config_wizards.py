@@ -1,4 +1,4 @@
-from mock import Mock
+from mock import Mock, patch
 
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
@@ -63,17 +63,22 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         with self.assertRaises(ImproperlyConfigured):
             extensions.configure_wizards(cms_config)
 
-    # TODO: Currently adding this check breaks various tests elsewhere
-    #~ def test_cant_register_the_same_wizard_twice(self):
-        #~ """
-        #~ If a wizard is already added to the dict, raise an exception.
-        #~ """
-        #~ extensions = CMSCoreExtensions()
-        #~ wizard = Mock(id=81, spec=Wizard)
-        #~ cms_config = Mock(
-            #~ cms_enabled=True, cms_wizards=[wizard, wizard])
-        #~ with self.assertRaises(ImproperlyConfigured):
-            #~ extensions.configure_wizards(cms_config)
+    @patch('cms.cms_config.logger.warning')
+    def test_warning_if_registering_the_same_wizard_twice(self, mocked_logger):
+        """
+        If a wizard is already added to the dict log a warning.
+        """
+        extensions = CMSCoreExtensions()
+        wizard = Mock(id=81, spec=Wizard)
+        cms_config = Mock(
+            cms_enabled=True, cms_wizards=[wizard, wizard])
+        extensions.configure_wizards(cms_config)
+        warning_msg = "Wizard for model {} has already been registered".format(
+            wizard.get_model())
+        # Warning message displayed
+        mocked_logger.assert_called_once_with(warning_msg)
+        # wizards dict is still what we expect it to be
+        self.assertDictEqual(extensions.wizards, {81: wizard})
 
 
 class ConfigureWizardsIntegrationTestCase(CMSTestCase):
