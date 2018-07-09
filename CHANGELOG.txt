@@ -6,6 +6,7 @@
 * Fixed a bug where cached page permissions overrides global permissions
 * Fixed a bug where editing pages with primary keys greater than 9999 would throw an
   exception.
+* Fixed a regression which caused the `render_plugin_block` template tag to not work.
 
 
 === 3.4.6 (2018-03-26) ===
