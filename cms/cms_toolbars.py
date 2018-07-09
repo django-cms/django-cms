@@ -295,9 +295,6 @@ class PageToolbar(CMSToolbar):
             publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
         return publish_permission
 
-    def has_unpublish_permission(self):
-        return self.has_publish_permission()
-
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
             self.page_change_permission = can_change_page(self.request)
