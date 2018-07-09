@@ -295,6 +295,7 @@ class AddPageForm(BasePageForm):
             new_page.save()
 
         translation = self.create_translation(new_page)
+        translation.rescan_placeholders()
 
         if source:
             extension_pool.copy_extensions(
@@ -310,7 +311,6 @@ class AddPageForm(BasePageForm):
             .exclude(pk=new_page.node_id)
             .exists()
         )
-        #AA REMOVED: new_page.rescan_placeholders()
 
         if is_first and not new_page.is_page_type:
             # its the first page. publish it right away

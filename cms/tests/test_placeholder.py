@@ -967,10 +967,9 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         result = ph._get_attached_model()
         self.assertEqual(result, None) # Simple PH - no model
 
-    def test_excercise_get_attached_field_name(self):
+    def test_excercise_get_attached_field(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = ph._get_attached_field_name()
-        self.assertEqual(result, None) # Simple PH - no field name
+        self.assertEqual(ph._get_attached_field(), None) # Simple PH - no field name
 
     def test_excercise_get_attached_models_notplugins(self):
         ex = Example1(

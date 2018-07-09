@@ -581,27 +581,45 @@ class Page(models.Model):
         source_title_id = source_title.pk
 
         # If an old title exists, overwrite. Otherwise create new
-        source_title.pk = target_title_id
-        source_title.page = target
-        source_title.publisher_is_draft = target.publisher_is_draft
-        source_title.publisher_public_id = source_title_id
-        source_title.published = published
-        source_title._publisher_keep_state = True
+        target_title = copy.copy(source_title)
+        target_title.pk = target_title_id
+        target_title.page = target
+        target_title.publisher_is_draft = target.publisher_is_draft
+        target_title.publisher_public_id = source_title_id
+        target_title.published = published
+        target_title._publisher_keep_state = True
 
         if published:
-            source_title.publisher_state = PUBLISHER_STATE_DEFAULT
+            target_title.publisher_state = PUBLISHER_STATE_DEFAULT
         else:
-            source_title.publisher_state = PUBLISHER_STATE_PENDING
-        source_title.save()
-        return source_title
+            target_title.publisher_state = PUBLISHER_STATE_PENDING
+        target_title.save()
 
-    def _copy_contents(self, target, language):
-        """
-        Copy all the plugins to a new page.
-        :param target: The page where the new content should be stored
-        """
-        for title in target.title_set.all():
-            title.copy_placeholders(title, language)
+        if target_title_id:
+            cleared_placeholders = target._clear_placeholders(language)
+            cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
+        else:
+            cleared_placeholders_by_slot = {}
+
+        for placeholder in source_title.get_placeholders():
+            try:
+                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
+            except KeyError:
+                target_placeholder = target_title.placeholders.create(
+                    slot=placeholder.slot,
+                    default_width=placeholder.default_width,
+                )
+            placeholder.copy_plugins(target_placeholder, language=language)
+        return target_title
+
+    def _clear_placeholders(self, language):
+        from cms.models import CMSPlugin
+
+        placeholders = self.get_placeholders(language)
+        placeholder_ids = (placeholder.pk for placeholder in placeholders)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids, language=language)
+        models.query.QuerySet.delete(plugins)
+        return placeholders
 
     def _copy_attributes(self, target, clean=False):
         """
@@ -659,14 +677,15 @@ class Page(models.Model):
             translations = self.title_set.all()
         else:
             translations = self.title_set.none()
+        translations = translations.prefetch_related('placeholders')
 
         # copy titles of this page
         for title in translations:
-            title = copy.copy(title)
-            title.pk = None
-            title.page = new_page
-            title.published = False
-            title.publisher_public = None
+            new_title = copy.copy(title)
+            new_title.pk = None
+            new_title.page = new_page
+            new_title.published = False
+            new_title.publisher_public = None
 
             if parent_page:
                 base = parent_page.get_path(title.language)
@@ -675,19 +694,18 @@ class Page(models.Model):
                 base = ''
                 path = title.slug
 
-            title.slug = get_available_slug(site, path, title.language)
-            title.path = '%s/%s' % (base, title.slug) if base else title.slug
-            title.save()
+            new_title.slug = get_available_slug(site, path, title.language)
+            new_title.path = '%s/%s' % (base, title.slug) if base else title.slug
+            new_title.save()
 
-            # copy the placeholders (and plugins on those placeholders!)
-            for placeholder in title.placeholders.iterator():
-                new_placeholder = copy.copy(placeholder)
-                new_placeholder.pk = None
-                new_placeholder.save()
-                new_page.placeholders.add(new_placeholder)
-                placeholder.copy_plugins(new_placeholder, language=language)
-
-            new_page.title_cache[title.language] = title
+            for placeholder in title.placeholders.all():
+                # copy the placeholders (and plugins on those placeholders!)
+                new_placeholder = new_title.placeholders.create(
+                    slot=placeholder.slot,
+                    default_width=placeholder.default_width,
+                )
+                placeholder.copy_plugins(new_placeholder, language=new_title.language)
+            new_page.title_cache[new_title.language] = new_title
         new_page.update_languages([trans.language for trans in translations])
 
         if extensions:
@@ -954,7 +972,6 @@ class Page(models.Model):
             publisher_public=public_title,
             publisher_state=PUBLISHER_STATE_DEFAULT,
         )
-        self._copy_contents(public_page, language)
 
         if self.node.is_branch:
             self.mark_descendants_as_published(language)
@@ -980,6 +997,14 @@ class Page(models.Model):
         if get_cms_setting('PAGE_CACHE'):
             # Clears all the page caches
             invalidate_cms_page_cache()
+
+        if placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
+            assert language, 'language is required when clearing placeholder cache'
+
+            placeholders = self.get_placeholders(language)
+
+            for placeholder in placeholders:
+                placeholder.clear_cache(language, site_id=self.node.site_id)
 
         if menu:
             # Clears all menu caches for this page's site
@@ -1184,7 +1209,6 @@ class Page(models.Model):
             raise PublicVersionNeeded('A public version of this page is needed')
 
         public._copy_attributes(self)
-        public._copy_contents(self, language)
         public._copy_titles(self, language, public.is_published(language))
 
         self.update_translations(
@@ -1296,6 +1320,11 @@ class Page(models.Model):
         if not menu_title:
             return self.get_title(language, True, force_reload)
         return menu_title
+
+    def get_placeholders(self, language):
+        from cms.models import Placeholder
+
+        return Placeholder.objects.filter(title__language=language, title__page=self)
 
     def _validate_title(self, title):
         from cms.models.titlemodels import EmptyTitle
@@ -1500,11 +1529,6 @@ class Page(models.Model):
         from cms.utils.page_permissions import user_can_move_page
         return user_can_move_page(user, page=self)
 
-    def has_placeholder_change_permission(self, user):
-        if not self.publisher_is_draft:
-            return False
-        return self.has_change_permission(user)
-
     def get_media_path(self, filename):
         """
         Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing
@@ -1540,6 +1564,34 @@ class Page(models.Model):
             return self.parent_page.get_public_object().is_published(language)
         return False
 
+    def rescan_placeholders(self):
+        """
+        Rescan and if necessary create placeholders in the current template.
+        """
+        existing = OrderedDict()
+        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
+
+        for placeholder in self.placeholders.all():
+            if placeholder.slot in placeholders:
+                existing[placeholder.slot] = placeholder
+
+        for placeholder in placeholders:
+            if placeholder not in existing:
+                existing[placeholder] = self.placeholders.create(slot=placeholder)
+        return existing
+
+    def get_declared_placeholders(self):
+        # inline import to prevent circular imports
+        from cms.utils.placeholder import get_placeholders
+
+        return get_placeholders(self.get_template())
+
+    def get_declared_static_placeholders(self, context):
+        # inline import to prevent circular imports
+        from cms.utils.placeholder import get_static_placeholders
+
+        return get_static_placeholders(self.get_template(), context)
+
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = self.xframe_options or self.X_FRAME_OPTIONS_INHERIT
@@ -1559,15 +1611,6 @@ class Page(models.Model):
         except IndexError:
             return None
 
-    def get_placeholders(self, language=None):
-        """
-        Allow placeholders to be fetched from the page object using a language param.
-        By default a cached title is returned.
-        """
-        return self.get_title_obj(language=language).get_placeholders()
-
-    def rescan_placeholders(self, language=None):
-        return self.get_title_obj(language=language).rescan_placeholders()
 
 class PageType(Page):
 

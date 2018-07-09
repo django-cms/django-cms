@@ -149,12 +149,17 @@ class Title(models.Model):
         )
         return old_values != new_values
 
+    def has_placeholder_change_permission(self, user):
+        if not self.page.publisher_is_draft:
+            return False
+        return self.page.has_change_permission(user)
+
     def rescan_placeholders(self):
         """
         Rescan and if necessary create placeholders in the current template.
         """
         existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
+        placeholders = [pl.slot for pl in self.page.get_declared_placeholders()]
 
         for placeholder in self.placeholders.all():
             if placeholder.slot in placeholders:
@@ -165,64 +170,10 @@ class Title(models.Model):
                 existing[placeholder] = self.placeholders.create(slot=placeholder)
         return existing
 
-    def get_declared_placeholders(self):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_placeholders
-
-        return get_placeholders(self.page.get_template())
-
-    def get_declared_static_placeholders(self, context):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_static_placeholders
-
-        return get_static_placeholders(self.page.get_template(), context)
-
     def get_placeholders(self):
         if not hasattr(self, '_placeholder_cache'):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
-
-    def _clear_placeholders(self, language=None):
-        from cms.models import CMSPlugin
-
-        placeholders = list(self.get_placeholders())
-        placeholder_ids = (placeholder.pk for placeholder in placeholders)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
-
-        if language:
-            plugins = plugins.filter(language=language)
-        models.query.QuerySet.delete(plugins)
-        return placeholders
-
-    def copy_placeholders(self, target, language):
-        """
-        Copy all the plugins to a new page.
-        :param target: The page where the new content should be stored
-        """
-        cleared_placeholders = target._clear_placeholders(language)
-        cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
-
-        for placeholder in self.get_placeholders():
-            try:
-                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
-            except KeyError:
-                target_placeholder = target.placeholders.create(
-                    slot=placeholder.slot,
-                    default_width=placeholder.default_width,
-                )
-
-            placeholder.copy_plugins(target_placeholder, language=language)
-
-    def clear_cache(self, language=None, menu=False, placeholder=False):
-
-        # FIXME: Taken from page, should the call be to here and this clears page or should the page clear all titles???
-        if placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
-            assert language, 'language is required when clearing placeholder cache'
-
-            placeholders = self.get_placeholders()
-
-            for placeholder in placeholders:
-                placeholder.clear_cache(language, site_id=self.node.site_id)
 
 
 class EmptyTitle(object):

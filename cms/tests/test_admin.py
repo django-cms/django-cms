@@ -527,7 +527,7 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 403)
 
     def test_remove_plugin_requires_post(self):
-        ph = self.page.get_placeholders()[0]
+        ph = self.page.get_placeholders('en')[0]
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
@@ -537,7 +537,7 @@ class AdminTests(AdminTestsBase):
 
     def test_move_language(self):
         page = self.get_page()
-        source, target = list(page.get_placeholders())[:2]
+        source, target = list(page.get_placeholders('en'))[:2]
         col = add_plugin(source, 'MultiColumnPlugin', 'en')
         sub_col = add_plugin(source, 'ColumnPlugin', 'en', target=col)
         col2 = add_plugin(source, 'MultiColumnPlugin', 'de')
@@ -694,7 +694,7 @@ class NoDBAdminTests(CMSTestCase):
 class PluginPermissionTests(AdminTestsBase):
     def setUp(self):
         self._page = create_page('test page', 'nav_playground.html', 'en')
-        self._placeholder = self._page.get_placeholders()[0]
+        self._placeholder = self._page.get_placeholders('en')[0]
 
     def _get_admin(self):
         User = get_user_model()
@@ -967,7 +967,7 @@ class AdminFormsTests(AdminTestsBase):
 
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
-        for placeholder in page.get_placeholders():
+        for placeholder in page.get_placeholders('en'):
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         page.publish('en')
         self.assertEqual(Page.objects.count(), 2)

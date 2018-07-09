@@ -500,7 +500,7 @@ def copy_plugins_to_language(page, source_language, target_language,
     :return int: number of copied plugins
     """
     copied = 0
-    placeholders = page.get_placeholders()
+    placeholders = page.get_placeholders(source_language)
     for placeholder in placeholders:
         # only_empty is True we check if the placeholder already has plugins and
         # we skip it if has some
