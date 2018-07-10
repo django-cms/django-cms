@@ -764,7 +764,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         en_us_content = en_us_renderer.render_placeholder(self.placeholder_en, en_us_context, 'en', width=350)
         en_uk_content = en_uk_renderer.render_placeholder(self.placeholder_en, en_uk_context, 'en', width=350)
 
-        del self.placeholder._plugins_cache
+        del self.placeholder_en._plugins_cache
 
         de_renderer = self.get_content_renderer(self.de_request)
         de_context = Context({
@@ -774,19 +774,19 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
         self.assertNotEqual(en_content, de_content)
 
-        set_placeholder_cache(self.placeholder, 'en', 1, en_content, self.en_request)
+        set_placeholder_cache(self.placeholder_en, 'en', 1, en_content, self.en_request)
         cached_en_content = get_placeholder_cache(self.placeholder_en, 'en', 1, self.en_request)
         self.assertEqual(cached_en_content, en_content)
 
-        set_placeholder_cache(self.placeholder, 'de', 1, de_content, self.de_request)
+        set_placeholder_cache(self.placeholder_de, 'de', 1, de_content, self.de_request)
         cached_de_content = get_placeholder_cache(self.placeholder_de, 'de', 1, self.de_request)
         self.assertNotEqual(cached_en_content, cached_de_content)
 
-        set_placeholder_cache(self.placeholder, 'en', 1, en_us_content, self.en_us_request)
+        set_placeholder_cache(self.placeholder_en, 'en', 1, en_us_content, self.en_us_request)
         cached_en_us_content = get_placeholder_cache(self.placeholder_en, 'en', 1, self.en_us_request)
         self.assertNotEqual(cached_en_content, cached_en_us_content)
 
-        set_placeholder_cache(self.placeholder, 'en', 1, en_uk_content, self.en_uk_request)
+        set_placeholder_cache(self.placeholder_en, 'en', 1, en_uk_content, self.en_uk_request)
         cached_en_uk_content = get_placeholder_cache(self.placeholder_en, 'en', 1, self.en_uk_request)
         self.assertNotEqual(cached_en_us_content, cached_en_uk_content)
 
