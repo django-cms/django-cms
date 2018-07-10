@@ -243,6 +243,12 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         mocked_get_entry.assert_called_once()
 
     def test_old_registration_still_works(self):
+        """
+        Integration-like test checking that if you register your wizard
+        by adding wizard_pool.register(wizard) to cms_wizards.py it will
+        correctly register the wizard. This ensures backwards
+        compatibility.
+        """
         # NOTE: Because of how the override_settings decorator works,
         # we can't use it for this test as the app registry first
         # gets loaded with the default apps and then again with
@@ -257,9 +263,13 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # changed
         app_registration.get_cms_extension_apps.cache_clear()
         app_registration.get_cms_config_apps.cache_clear()
-        # Run the setup with the mocked installed apps
-        with patch.object(app_registration, 'apps', mocked_apps):
-            setup_cms_apps()
+        # Run the setup with the mocked installed apps. Due to the order
+        # of imports and other fun things, apps have to be patched
+        # in multiple places. If functions are moved around the code
+        # this could get worse.
+        with patch('cms.app_registration.apps', mocked_apps):
+            with patch('cms.wizards.wizard_pool.apps', mocked_apps):
+                setup_cms_apps()
         # Check the wizards built into the cms app and the wizard from
         # the backwards_wizards app have been picked up.
         # The backwards_wizards app does not have a cms_config.py but

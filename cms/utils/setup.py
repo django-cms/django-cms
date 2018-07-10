@@ -3,6 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_registration import (
     autodiscover_cms_configs,
+    backwards_compatibility_config,
     configure_cms_apps,
     get_cms_extension_apps,
 )
@@ -54,3 +55,4 @@ def setup_cms_apps():
     autodiscover_cms_configs()
     cms_apps = get_cms_extension_apps()
     configure_cms_apps(cms_apps)
+    backwards_compatibility_config()

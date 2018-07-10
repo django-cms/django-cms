@@ -1,4 +1,4 @@
-from cms.test_utils.project.backwards_wizard.wizards import wizard
+from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.wizards.wizard_pool import wizard_pool
 
 
