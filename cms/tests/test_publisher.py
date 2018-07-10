@@ -795,7 +795,7 @@ class PublishingTests(TestCase):
         self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
 
         self.assertEqual(CMSPlugin.objects.count(), 4)
-        plugins = CMSPlugin.objects.filter(placeholder__page=page)
+        plugins = CMSPlugin.objects.filter(placeholder__title=page.get_title_obj("en"))
         self.assertEqual(plugins.count(), 2)
 
         plugins = [plugin.get_plugin_instance()[0] for plugin in plugins]

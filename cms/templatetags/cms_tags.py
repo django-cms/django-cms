@@ -130,7 +130,7 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id,
         return ''
 
     try:
-        placeholder = page.placeholders.get(slot=placeholder_name)
+        placeholder = page.get_placeholders(lang).get(slot=placeholder_name)
     except PlaceholderModel.DoesNotExist:
         if settings.DEBUG:
             raise

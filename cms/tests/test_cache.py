@@ -54,9 +54,10 @@ class CacheTestCase(CMSTestCase):
         page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder = page1.placeholders.filter(slot="body")[0]
-        add_plugin(placeholder, "TextPlugin", 'en', body="English")
-        add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+        placeholder_en = page1.get_placeholders('en').filter(slot="body")[0]
+        placeholder_de = page1.get_placeholders('en').filter(slot="body")[0]
+        add_plugin(placeholder_en, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder_de, "TextPlugin", 'de', body="Deutsch")
         request = self.get_request(page1_url)
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
@@ -104,8 +105,8 @@ class CacheTestCase(CMSTestCase):
                             published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder1 = page1.placeholders.filter(slot='body')[0]
-        placeholder2 = page1.placeholders.filter(slot='right-column')[0]
+        placeholder1 = page1.get_placeholders('en').filter(slot='body')[0]
+        placeholder2 = page1.get_placeholders('en').filter(slot='right-column')[0]
         try:
             plugin_pool.register_plugin(NoCachePlugin)
         except PluginAlreadyRegistered:
@@ -576,7 +577,7 @@ class CacheTestCase(CMSTestCase):
                             published=True)
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
-        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
         plugin_pool.register_plugin(SekizaiPlugin)
         add_plugin(placeholder1, "SekizaiPlugin", 'en')
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
@@ -604,7 +605,7 @@ class CacheTestCase(CMSTestCase):
                                 published=True)
             page1_url = page1.get_absolute_url()
 
-            placeholder = page1.get_placeholders("en").get(slot="body")
+            placeholder = page1.placeholders.get(slot="body")
             add_plugin(placeholder, "TextPlugin", 'en', body="First content")
             page1.publish('en')
             response = self.client.get(page1_url)
@@ -671,9 +672,9 @@ class PlaceholderCacheTestCase(CMSTestCase):
         self.placeholder_de = self.page.get_placeholders("de").filter(slot="body")[0]
         plugin_pool.register_plugin(VaryCacheOnPlugin)
         add_plugin(self.placeholder_en, 'TextPlugin', 'en', body='English')
-        add_plugin(self.placeholder, 'TextPlugin', 'de', body='Deutsch')
+        add_plugin(self.placeholder_de, 'TextPlugin', 'de', body='Deutsch')
         add_plugin(self.placeholder_en, 'VaryCacheOnPlugin', 'en')
-        add_plugin(self.placeholder, 'VaryCacheOnPlugin', 'de')
+        add_plugin(self.placeholder_de, 'VaryCacheOnPlugin', 'de')
 
         self.en_request = self.get_request('/en/')
         self.en_request.current_page = Page.objects.get(pk=self.page.pk)

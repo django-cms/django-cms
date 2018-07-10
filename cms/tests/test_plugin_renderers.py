@@ -116,7 +116,7 @@ class TestContentRenderer(TestStructureRenderer):
             name='Link #2',
             external_link='https://www.django-cms.org',
         )
-        placeholder_2 = cms_page.placeholders.get(slot='right-column')
+        placeholder_2 = cms_page.get_placeholders("en").get(slot='right-column')
         placeholder_2_plugin_1 = add_plugin(
             placeholder_2,
             plugin_type='LinkPlugin',

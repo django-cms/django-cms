@@ -84,7 +84,7 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<div class="info">', html=False)
 
         page_2 = api.create_page("page-2", "col_two.html", "en")
-        page_2_pl = page_2.placeholders.get(slot="col_left")
+        page_2_pl = page_2.get_placeholders('en').get(slot="col_left")
         # This points to a plugin with a recursive alias
         api.add_plugin(page_2_pl, 'AliasPlugin', 'en', plugin=source_plugin)
 
@@ -176,7 +176,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=False,
         )
         api.add_plugin(
-            target_page.placeholders.get(slot="col_left"),
+            target_page.get_placeholders('en').get(slot="col_left"),
             'AliasPlugin',
             language='en',
             alias_placeholder=source_placeholder,
@@ -307,7 +307,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        target_placeholder = target_page.placeholders.get(slot="col_left")
+        target_placeholder = target_page.get_placeholders('en').get(slot="col_left")
         alias = api.add_plugin(
             target_placeholder,
             'AliasPlugin',

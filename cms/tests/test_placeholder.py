@@ -474,7 +474,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def test_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
         page_en = create_page('page_en', 'col_two.html', 'en')
-        title_de = create_title("de", "page_de", page_en)
+        create_title("de", "page_de", page_en)
         placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
         placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
         add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
@@ -528,7 +528,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def test_nested_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration for nested plugins"""
         page_en = create_page('page_en', 'col_two.html', 'en')
-        title_de = create_title("de", "page_de", page_en)
+        create_title("de", "page_de", page_en)
         placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
         placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
         link_en = add_plugin(placeholder_en, 'LinkPlugin', 'en', name='en name', external_link='http://example.com/en')
@@ -589,9 +589,9 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
         # First test the default (fallback) behavior)
         ## Deutsch page should have the text plugin
-        content_de = _render_placeholder(placeholder_en, context_de)
+        content_de = _render_placeholder(placeholder_de, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
-        del(placeholder_en._plugins_cache)
+        del(placeholder_de._plugins_cache)
         cache.clear()
         ## English page should have no text
         content_en = _render_placeholder(placeholder_en, context_en)
@@ -669,7 +669,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
-            placeholder = page.placeholders.get(slot='col_left')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
             context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             # Our page should have "en default body 1" AND "en default body 2"
@@ -726,10 +726,11 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
         for placeholder in page.get_placeholders("en"):
-            page.placeholders.remove(placeholder)
+            title = placeholder.title
+            title.placeholders.remove(placeholder)
             placeholder.pk += 1000
             placeholder.save()
-            page.placeholders.add(placeholder)
+            title.placeholders.add(placeholder)
         page.reload()
         for placeholder in page.placeholders.all():
             add_plugin(placeholder, "TextPlugin", "en", body="body")

@@ -285,7 +285,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             inherit=False,
             page=page,
         )
-        self.assertObjectExist(page.placeholders.all(), slot='col_right')
+        self.assertObjectExist(page.get_placeholders('en'), slot='col_right')
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
@@ -317,29 +317,30 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
         create_title('fr', 'Fr Test', page)
-        placeholder = page.placeholders.all()[0]
-        add_plugin(placeholder, TextPlugin, 'en', body='<b>En Test</b>')
-        add_plugin(placeholder, TextPlugin, 'fr', body='<b>Fr Test</b>')
+        placeholder_en = page.get_placeholders('en')[0]
+        placeholder_fr = page.get_placeholders('fr')[0]
+        add_plugin(placeholder_en, TextPlugin, 'en', body='<b>En Test</b>')
+        add_plugin(placeholder_fr, TextPlugin, 'fr', body='<b>Fr Test</b>')
 
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
         request.current_page = page
 
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
-        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder_en.slot}, request)
         self.assertIn('<b>En Test</b>', output)
 
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'fr' 1 %}{% render_block 'js' %}"
-        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder_fr.slot}, request)
         self.assertIn('<b>Fr Test</b>', output)
 
         # Cache is now primed for both languages
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
-        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder_en.slot}, request)
         self.assertIn('<b>En Test</b>', output)
 
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'fr' 1 %}{% render_block 'js' %}"
-        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder_fr.slot}, request)
         self.assertIn('<b>Fr Test</b>', output)
 
     def test_show_placeholder_for_page_marks_output_safe(self):

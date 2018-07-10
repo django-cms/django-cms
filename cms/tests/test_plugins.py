@@ -338,8 +338,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         draft_page.publish('en')
         draft_page = draft_page.reload()
         live_page = draft_page.get_public_object()
-        placeholder = draft_page.placeholders.get(slot="col_left")
-        live_placeholder = live_page.placeholders.get(slot="col_left")
+        placeholder = draft_page.get_placeholders('en').get(slot="col_left")
+        live_placeholder = live_page.get_placeholders('en').get(slot="col_left")
 
         with self.settings(CMS_PERMISSION=False):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_1.pk).position, 0)

@@ -4772,7 +4772,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        title = page.get_title_obj(translation.language)
+        page.get_title_obj(translation.language)
         target_placeholder = page.get_placeholders(translation.language).get(slot='right-column')
 
         data = {

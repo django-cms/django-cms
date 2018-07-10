@@ -657,7 +657,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                    position=u"last-child", published=True, in_navigation=True)
             page_one_ph_one = page_one.get_placeholders("en").get(slot=u"col_sidebar")
             page_one_ph_two = page_one.get_placeholders("en").get(slot=u"col_left")
-            page_one.placeholders.get(slot=u"col_right")
+            page_one.get_placeholders("en").get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body="Hello World")
             self.assertEqual(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
@@ -866,7 +866,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                    position=u"last-child", published=True, in_navigation=True)
             page_one_ph_one = page_one.get_placeholders("en").get(slot=u"col_sidebar")
             page_one_ph_two = page_one.get_placeholders("en").get(slot=u"col_left")
-            page_one.placeholders.get(slot=u"col_right")
+            page_one.get_placeholders("en").get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
             self.assertEqual(text_plugin_en.id, CMSPlugin.objects.all()[0].id)
@@ -901,9 +901,9 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             page_one.save()
             # get the plugins from the original page
             page_one = self.reload(page_one)
-            page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
-            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
-            page_one_ph_three = page_one.placeholders.get(slot=u"col_right")
+            page_one_ph_one = page_one.get_placeholders("en").get(slot=u"col_sidebar")
+            page_one_ph_two = page_one.get_placeholders("en").get(slot=u"col_left")
+            page_one_ph_three = page_one.get_placeholders("en").get(slot=u"col_right")
             # verify the plugins got created
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEqual(len(org_placeholder_one_plugins), 1)
