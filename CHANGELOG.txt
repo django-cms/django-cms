@@ -6,6 +6,7 @@
 * Fixed a bug where cached page permissions overrides global permissions
 * Fixed a bug where editing pages with primary keys greater than 9999 would throw an
   exception.
+* Fixed broken wizard page creation when no language is set within the template context (see #5828).
 
 
 === 3.4.6 (2018-03-26) ===
