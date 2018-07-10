@@ -911,7 +911,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertEqual(len(org_placeholder_two_plugins), 2)
             org_placeholder_three_plugins = page_one_ph_three.get_plugins()
             self.assertEqual(len(org_placeholder_three_plugins), 0)
-            self.assertEqual(page_one.placeholders.count(), 3)
+            self.assertEqual(page_one.get_placeholders("en").count(), 3)
 
             placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEqual(placeholder_count, 3)

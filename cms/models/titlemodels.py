@@ -9,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
-from cms.utils.conf import get_cms_setting
 
 
 @python_2_unicode_compatible
@@ -175,6 +174,24 @@ class Title(models.Model):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
 
+    def copy_placeholders(self, target, language):
+        """
+        Copy all the plugins to a new page.
+        :param target: The page where the new content should be stored
+        """
+        cleared_placeholders = target._clear_placeholders(language)
+        cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
+
+        for placeholder in self.get_placeholders():
+            try:
+                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
+            except KeyError:
+                target_placeholder = target.placeholders.create(
+                    slot=placeholder.slot,
+                    default_width=placeholder.default_width,
+                )
+
+            placeholder.copy_plugins(target_placeholder, language=language)
 
 class EmptyTitle(object):
     """

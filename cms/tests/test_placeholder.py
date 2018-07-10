@@ -725,14 +725,14 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
+        title = page.get_title_obj("en")
         for placeholder in page.get_placeholders("en"):
-            title = placeholder.title
             title.placeholders.remove(placeholder)
             placeholder.pk += 1000
             placeholder.save()
             title.placeholders.add(placeholder)
         page.reload()
-        for placeholder in page.placeholders.all():
+        for placeholder in page.get_placeholders("en"):
             add_plugin(placeholder, "TextPlugin", "en", body="body")
         with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
@@ -741,7 +741,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
                               password=getattr(user, get_user_model().USERNAME_FIELD))
             endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             response = self.client.get(endpoint)
-            for placeholder in page.placeholders.all():
+            for placeholder in page.get_placeholders("en"):
                 self.assertContains(
                     response, '"placeholder_id": "%s"' % placeholder.pk)
                 self.assertNotContains(
@@ -798,7 +798,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         for lang in avail_langs:
             add_plugin(placeholder, u"EmptyPlugin", lang)
         # reload placeholder from database
-        placeholder = page.placeholders.get(slot='col_sidebar')
+        placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         # get languages
         langs = [lang['code'] for lang in placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))

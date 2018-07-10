@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import copy
-from collections import OrderedDict
 from logging import getLogger
 from os.path import join
 
@@ -1597,6 +1596,14 @@ class Page(models.Model):
             return xframe_options[0]
         except IndexError:
             return None
+
+    def _copy_contents(self, target, language):
+        """
+        Copy all the plugins to a new page.
+        :param target: The page where the new content should be stored
+        """
+        for title in target.title_set.all():
+            title.copy_placeholders(title, language)
 
 
 class PageType(Page):

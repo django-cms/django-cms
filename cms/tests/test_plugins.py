@@ -700,7 +700,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
         # there should be only 1 plugin
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        self.assertEqual(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=True).count(), 1)
+        self.assertEqual(CMSPlugin.objects.filter(placeholder__title__page__publisher_is_draft=True).count(), 1)
 
         # publish page
         response = self.client.post(URL_CMS_PAGE + "%d/en/publish/" % page.pk, {1: 1})
@@ -723,7 +723,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # there should be no plugins
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        self.assertEqual(CMSPlugin.objects.filter(placeholder__page__publisher_is_draft=False).count(), 1)
+        self.assertEqual(CMSPlugin.objects.filter(placeholder__title__page__publisher_is_draft=False).count(), 1)
 
     def test_remove_plugin_not_associated_to_page(self):
         """
@@ -1310,7 +1310,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         )
         FKModel.objects.create(fk_field=plugin)
         old_public_count = FKModel.objects.filter(
-            fk_field__placeholder__page__publisher_is_draft=False
+            fk_field__placeholder__title__page__publisher_is_draft=False
         ).count()
         api.publish_page(
             self.page1,
@@ -1318,7 +1318,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
             self.FIRST_LANG
         )
         new_public_count = FKModel.objects.filter(
-            fk_field__placeholder__page__publisher_is_draft=False
+            fk_field__placeholder__title__page__publisher_is_draft=False
         ).count()
         self.assertEqual(
             new_public_count,
@@ -1334,7 +1334,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         m2m_target = M2MTargetModel.objects.create()
         plugin.m2m_field.add(m2m_target)
         old_public_count = M2MTargetModel.objects.filter(
-            pluginmodelwithm2mtomodel__placeholder__page__publisher_is_draft=False
+            pluginmodelwithm2mtomodel__placeholder__title__page__publisher_is_draft=False
         ).count()
         api.publish_page(
             self.page1,
@@ -1342,7 +1342,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
             self.FIRST_LANG
         )
         new_public_count = M2MTargetModel.objects.filter(
-            pluginmodelwithm2mtomodel__placeholder__page__publisher_is_draft=False
+            pluginmodelwithm2mtomodel__placeholder__title__page__publisher_is_draft=False
         ).count()
         self.assertEqual(
             new_public_count,

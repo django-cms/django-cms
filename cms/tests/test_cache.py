@@ -577,7 +577,7 @@ class CacheTestCase(CMSTestCase):
                             published=True)
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         plugin_pool.register_plugin(SekizaiPlugin)
         add_plugin(placeholder1, "SekizaiPlugin", 'en')
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
@@ -605,7 +605,7 @@ class CacheTestCase(CMSTestCase):
                                 published=True)
             page1_url = page1.get_absolute_url()
 
-            placeholder = page1.placeholders.get(slot="body")
+            placeholder = page1.get_placeholders("en").get(slot="body")
             add_plugin(placeholder, "TextPlugin", 'en', body="First content")
             page1.publish('en')
             response = self.client.get(page1_url)
