@@ -134,14 +134,18 @@ class SitemapTestCase(CMSTestCase):
             locations.append(item['location'])
         for page in Page.objects.drafts():
             if page.get_public_object():
-                set1 = set(page.get_public_object().title_set.values_list('path', flat=True))
-                set2 = set(page.title_set.values_list('path', flat=True))
+                set1 = set(t.path for t in page.get_public_object().title_set.all())
+                set2 = set(t.path for t in page.title_set.all())
                 unpublished_titles.update(set2.difference(set1))
             else:
-                unpublished_titles.update(page.title_set.values_list('path', flat=True))
+                unpublished_titles.update([t.path for t in page.title_set.all()])
+
+        path_map = {
+            t.path: t for t in Title.objects.all()
+        }
 
         for path in unpublished_titles:
-            title = Title.objects.get(path=path)
+            title = path_map[path]
             if title.path:
                 url = 'http://example.com/%s/%s/' % (title.language, title.path)
             else:

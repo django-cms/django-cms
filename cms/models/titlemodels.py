@@ -32,7 +32,7 @@ class Title(models.Model):
     meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
-    path = models.CharField(_("Path"), max_length=255, db_index=True)
+    path_override = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
@@ -83,8 +83,31 @@ class Title(models.Model):
         """Return overwritten url, or None
         """
         if self.has_url_overwrite:
-            return self.path
+            return self.path_override
         return None
+
+    def _path_elements(self):
+        if self.page.is_home:
+            yield ''
+            return
+        ancestors = self.page.node.get_ancestors()
+        for title in self.__class__.objects.filter(
+            page__node__in=ancestors,
+            publisher_is_draft=self.publisher_is_draft,
+            language=self.language,
+        ).exclude(page__is_home=True).order_by('page__node__path'):
+            yield title.slug
+        yield self.slug
+
+    @property
+    def _path(self):
+        return '/'.join(self._path_elements())
+
+    @property
+    def path(self):
+        if self.has_url_overwrite:
+            return self.path_override
+        return self._path
 
     def is_dirty(self):
         return self.publisher_state == PUBLISHER_STATE_DIRTY

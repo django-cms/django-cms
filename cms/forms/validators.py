@@ -6,7 +6,7 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 
-from cms.utils.page import get_all_pages_from_path
+from cms.utils.page import is_path_available
 from cms.utils.urlutils import admin_reverse, relative_url_regex
 
 
@@ -30,18 +30,10 @@ def validate_url_uniqueness(site, path, language, exclude_page=None):
         validate_url(path)
 
     path = path.strip('/')
-    pages = get_all_pages_from_path(site, path, language)
-    pages = pages.select_related('publisher_public')
 
-    if exclude_page:
-        pages = pages.exclude(pk=exclude_page.pk)
+    conflict_page = is_path_available(site, path, language, exclude_page)
 
-        if exclude_page.publisher_public_id:
-            pages = pages.exclude(pk=exclude_page.publisher_public_id)
-
-    try:
-        conflict_page = pages[0]
-    except IndexError:
+    if not conflict_page:
         return True
 
     if conflict_page.publisher_is_draft:

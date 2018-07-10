@@ -7,7 +7,6 @@ from os.path import join
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models.functions import Concat
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -322,7 +321,9 @@ class Page(models.Model):
                 changed_by=changed_by,
                 changed_date=changed_date,
             )
-            old_home_tree = old_home._set_title_root_path()
+            old_home_tree = self.__class__.objects.filter(
+                node__in=TreeNode.get_tree(self.node),
+            )
 
         self.update(
             draft_only=False,
@@ -330,90 +331,7 @@ class Page(models.Model):
             changed_by=changed_by,
             changed_date=changed_date,
         )
-        new_home_tree = self._remove_title_root_path()
-        return (new_home_tree, old_home_tree)
-
-    def _update_title_path(self, language):
-        parent_page = self.get_parent_page()
-
-        if parent_page:
-            base = parent_page.get_path(language, fallback=True)
-        else:
-            base = ''
-
-        title_obj = self.get_title_obj(language, fallback=False)
-        title_obj.path = title_obj.get_path_for_base(base)
-        title_obj.save()
-
-    def _update_title_path_recursive(self, language):
-        assert self.publisher_is_draft
-        from cms.models import Title
-
-        if self.node.is_leaf() or language not in self.get_languages():
-            return
-
-        pages = self.get_child_pages()
-        base = self.get_path(language, fallback=True)
-
-        if base:
-            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
-        else:
-            # User is moving the homepage
-            new_path = models.F('slug')
-
-        (Title
-         .objects
-         .filter(language=language, page__in=pages)
-         .exclude(has_url_overwrite=True)
-         .update(path=new_path))
-
-        for child in pages.filter(title_set__language=language).iterator():
-            child._update_title_path_recursive(language)
-
-    def _set_title_root_path(self):
-        from cms.models import Title
-
-        node_tree = TreeNode.get_tree(self.node)
-        page_tree = self.__class__.objects.filter(node__in=node_tree)
-        translations = Title.objects.filter(page__in=page_tree, has_url_overwrite=False)
-
-        for language, slug in self.title_set.values_list('language', 'slug'):
-            # Update the translations for all descendants of this page
-            # to include this page's slug as its path prefix
-            (translations
-             .filter(language=language)
-             .update(path=Concat(models.Value(slug), models.Value('/'), 'path')))
-
-            # Explicitly update this page's path to match its slug
-            # Doing this is cheaper than a TRIM call to remove the "/" characters
-            if self.publisher_public_id:
-                # include the public translation
-                current_translations = Title.objects.filter(page__in=[self.pk, self.publisher_public_id])
-            else:
-                current_translations = self.title_set.all()
-            current_translations.filter(language=language).update(path=slug)
-        return page_tree
-
-    def _remove_title_root_path(self):
-        from cms.models import Title
-
-        node_tree = TreeNode.get_tree(self.node)
-        page_tree = self.__class__.objects.filter(node__in=node_tree)
-        translations = Title.objects.filter(page__in=page_tree, has_url_overwrite=False)
-
-        for language, slug in self.title_set.values_list('language', 'slug'):
-            # Use 2 because of 1 indexing plus the fact we need to trim
-            # the "/" character.
-            trim_count = len(slug) + 2
-            sql_func = models.Func(
-                models.F('path'),
-                models.Value(trim_count),
-                function='substr',
-            )
-            (translations
-             .filter(language=language, path__startswith=slug)
-             .update(path=sql_func))
-        return page_tree
+        return (old_home_tree, old_home_tree)
 
     def is_dirty(self, language):
         state = self.get_publisher_state(language)
@@ -540,15 +458,10 @@ class Page(models.Model):
         for language, published in titles:
             parent_is_published = parent_titles_by_language.get(language)
 
-            # Update draft title path
-            self._update_title_path(language)
-            self._update_title_path_recursive(language)
-
             if published and parent_is_published:
                 # this looks redundant but it's necessary
                 # for all the descendants of the page being
                 # moved to be set to the correct state.
-                self.publisher_public._update_title_path(language)
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
             elif published and parent_page:
@@ -558,7 +471,6 @@ class Page(models.Model):
                 # mark all descendants of source as "pending"
                 self.mark_descendants_pending(language)
             elif published:
-                self.publisher_public._update_title_path(language)
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
         self.clear_cache()
@@ -702,7 +614,6 @@ class Page(models.Model):
                 path = title.slug
 
             title.slug = get_available_slug(site, path, title.language)
-            title.path = '%s/%s' % (base, title.slug) if base else title.slug
             title.save()
 
             new_page.title_cache[title.language] = title
@@ -1163,7 +1074,6 @@ class Page(models.Model):
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
 
-        base = self.get_path(language, fallback=True)
         node_children = self.node.get_children()
         page_children = self.__class__.objects.filter(node__in=node_children)
         page_children_draft = page_children.filter(publisher_is_draft=True)
@@ -1175,15 +1085,6 @@ class Page(models.Model):
             page__in=page_children_public,
             publisher_public__published=True,
         )
-
-        if base:
-            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
-        else:
-            # User is moving the homepage
-            new_path = models.F('slug')
-
-        # Update public title paths
-        unpublished_public.exclude(has_url_overwrite=True).update(path=new_path)
 
         # Set unpublished pending titles to published
         unpublished_public.filter(published=False).update(published=True)

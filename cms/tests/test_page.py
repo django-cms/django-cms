@@ -160,8 +160,8 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertTrue(page.is_home)
         self.assertTrue(page.publisher_public.is_home)
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
-        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
+        self.assertEqual([t.path for t in Title.objects.drafts()], [u''])
+        self.assertEqual([t.path for t in Title.objects.public()], [u''])
 
     @skipIf(has_no_custom_user(), 'No custom user')
     def test_create_page_api_with_long_username(self):
@@ -185,7 +185,7 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
         self.assertRegexpMatches(page.changed_by, r'V+\.{3} \(id=\d+\)')
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
+        self.assertEqual([t.path for t in Title.objects.drafts()], [u'root'])
 
     def test_delete_page_no_template(self):
         page_data = {
@@ -840,7 +840,7 @@ class PagesTestCase(TransactionCMSTestCase):
             # Set url_overwrite for page foo
             title = foo.get_title_obj(language='en')
             title.has_url_overwrite = True
-            title.path = 'bar'
+            title.path_override = 'bar'
             title.save()
             foo.publish('en')
 

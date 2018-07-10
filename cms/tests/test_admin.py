@@ -777,7 +777,7 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.post(endpoint, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertSequenceEqual(
-                cms_page.title_set.values_list('path', 'has_url_overwrite'),
+                cms_page.title_set.values_list('path_override', 'has_url_overwrite'),
                 [('overwrite/url', True)],
             )
 
