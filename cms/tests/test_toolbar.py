@@ -532,10 +532,9 @@ class ToolbarTests(ToolbarTestBase):
     def test_markup_plugin_template(self):
         page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
-        page_title = page.get_title_obj(language="en")
-        plugin_1 = add_plugin(page_title.placeholders.get(slot='col_left'), language='en',
+        plugin_1 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
-        plugin_2 = add_plugin(page_title.placeholders.get(slot='col_left'), language='en',
+        plugin_2 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
                               plugin_type='TextPlugin', body='text')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):

@@ -134,8 +134,7 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         create_page('child-page', "nav_playground.html", "en",
                     created_by=admin_user, published=True, parent=page)
-        page_title = page.get_title_obj("en")
-        body = page_title.placeholders.get(slot='body')
+        body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
         with self.login_user_context(admin_user):
@@ -151,8 +150,7 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         create_page('child-page', "nav_playground.html", "de",
                     created_by=admin_user, published=True, parent=page)
-        page_title = page.get_title_obj("en")
-        body = page_title.placeholders.get(slot='body')
+        body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
         with self.login_user_context(admin_user):
@@ -363,8 +361,7 @@ class AdminTestCase(AdminTestsBase):
         # This allows us to catch a strange bug that happened
         # under these conditions with the new related name handling.
         page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
-        page_en_title = page_en.get_title_obj("en")
-        ph = page_en_title.placeholders.get(slot="body")
+        ph = page_en.get_placeholders("en").get(slot="body")
 
         column_wrapper = add_plugin(ph, "MultiColumnPlugin", "en")
 
@@ -391,8 +388,7 @@ class AdminTestCase(AdminTestsBase):
         """
         # create some objects
         page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
-        page_en_title = page_en.get_title_obj("en")
-        ph = page_en_title.placeholders.get(slot="body")
+        ph = page_en.get_placeholders("en").get(slot="body")
 
         # add the text plugin to the en version of the page
         add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
@@ -601,8 +597,7 @@ class AdminTests(AdminTestsBase):
         url = admin_reverse('cms_page_add_plugin')
         with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
-            page_title = page.get_title_obj(language='en')
-            body = page_title.placeholders.get(slot='body')
+            body = page.get_placeholders("en").get(slot='body')
             add_plugin(body, 'TextPlugin', 'en', body='text')
             with self.login_user_context(admin_user):
                 data = {
@@ -625,8 +620,7 @@ class AdminTests(AdminTestsBase):
         url = admin_reverse('cms_page_add_plugin')
         with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
-            page_title = page.get_title_obj(language='en')
-            body = page_title.placeholders.get(slot='body')
+            body = page.get_placeholders("en").get(slot='body')
             add_plugin(body, 'TextPlugin', 'en', body='text')
             with self.login_user_context(admin_user):
                 data = {

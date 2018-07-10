@@ -218,8 +218,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        source_title = source_page.get_title_obj(language="en")
-        source_placeholder = source_title.placeholders.get(slot="col_left")
+        source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
 
         style = api.add_plugin(
             source_placeholder,
@@ -236,7 +235,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        target_placeholder = target_page.placeholders.get(slot="col_left")
+        target_placeholder = target_page.get_placeholders("en").get(slot="col_left")
         alias = api.add_plugin(
             target_placeholder,
             'AliasPlugin',
@@ -273,7 +272,7 @@ class AliasTestCase(TransactionCMSTestCase):
                 self.assertNotIn(start_tag, output)
 
             editable_placeholders = renderer.get_rendered_editable_placeholders()
-            self.assertNotIn(source_placeholder,editable_placeholders)
+            self.assertNotIn(source_placeholder, editable_placeholders)
 
     def test_alias_from_page_change_form_text(self):
         superuser = self.get_superuser()

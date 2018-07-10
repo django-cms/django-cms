@@ -136,9 +136,8 @@ class PluginsTestBaseCase(CMSTestCase):
 class PluginsTestCase(PluginsTestBaseCase):
 
     def _create_link_plugin_on_page(self, page, slot='col_left'):
-        title = page.get_title_obj(language="en")
         add_url = self.get_add_plugin_uri(
-            placeholder=title.placeholders.get(slot=slot),
+            placeholder=page.get_placeholders('en').get(slot=slot),
             plugin_type='LinkPlugin',
             language=settings.LANGUAGES[0][0],
         )
@@ -390,8 +389,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         draft_page = api.create_page("home", "col_two.html", "en",
                                      slug="page1", published=False, in_navigation=True)
-        draft_title = draft_page.get_title_obj(language="en")
-        placeholder = draft_title.placeholders.get(slot="col_left")
+        placeholder = draft_page.get_placeholders("en").get(slot="col_left")
 
         columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
         column = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns)
@@ -417,9 +415,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             template='nav_playground.html',
             language=settings.LANGUAGES[0][0],
         )
-        title = page.get_title_obj(language=settings.LANGUAGES[0][0])
         plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot='body'),
+            placeholder=page.get_placeholders(settings.LANGUAGES[0][0]).get(slot='body'),
             plugin_type='TextPlugin',
             language=settings.LANGUAGES[0][0],
             body='<div class="someclass"></div><p>foo</p>'
@@ -436,9 +433,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             template='nav_playground.html',
             language=settings.LANGUAGES[0][0],
         )
-        title = page.get_title_obj(language=settings.LANGUAGES[0][0])
         plugin = api.add_plugin(
-            placeholder=title.placeholders.get(slot='body'),
+            placeholder=page.get_placeholders(settings.LANGUAGES[0][0].get(slot='body'),
             plugin_type='TextPlugin',
             language=settings.LANGUAGES[0][0],
             body='<script>var bar="hacked"</script>'
@@ -455,10 +451,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         # create some objects
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
         page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
-        title_en = page_en.get_title_obj(language="en")
-        title_de = page_de.get_title_obj(language="de")
-        ph_en = title_en.placeholders.get(slot="body")
-        ph_de = title_de.placeholders.get(slot="body")
+        ph_en = page_en.get_placeholders("en").get(slot="body")
+        ph_de = page_de.get_placeholders("de").get(slot="body")
 
         # add the text plugin
         text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
@@ -551,10 +545,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         # create some objects
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
         page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
-        title_en = page_en.get_title_obj(language="en")
-        title_de = page_de.get_title_obj(language="de")
-        ph_en = title_en.placeholders.get(slot="body")
-        ph_de = title_de.placeholders.get(slot="body")
+        ph_en = page_en.get_placeholders("en").get(slot="body")
+        ph_de = page_de.get_placeholders("de").get(slot="body")
 
         # add the text plugin
         text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
@@ -606,8 +598,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-        title_en = page_en.get_title_obj(language="en")
-        ph_en = title_en.placeholders.get(slot="body")
+        ph_en = page_en.get_placeholders("en").get(slot="body")
 
         # Grid wrapper 1
         mcol1_en = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
@@ -819,8 +810,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_empty_plugin_is_not_ignored(self):
         page = api.create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj(language="en")
-        placeholder = title.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
 
         plugin = CMSPlugin(
             plugin_type='TextPlugin',
@@ -847,8 +837,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_pickle(self):
         page = api.create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj(language="en")
-        placeholder = title.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         text_plugin = api.add_plugin(
             placeholder,
             "TextPlugin",
@@ -865,8 +854,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_defer_pickle(self):
         page = api.create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj(language="en")
-        placeholder = title.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
         plugins = Text.objects.all().defer('path')
         import io
@@ -875,8 +863,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_empty_plugin_description(self):
         page = api.create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj(language="en")
-        placeholder = title.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         a = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
@@ -888,8 +875,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_page_attribute_warns(self):
         page = api.create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj(language="en")
-        placeholder = title.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         a = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
@@ -934,21 +920,20 @@ class PluginsTestCase(PluginsTestBaseCase):
                 "nav_playground.html",
                 "en"
             )
-            title = page.get_title_obj(language="en")
             plugin = api.add_plugin(
-                placeholder=page.placeholders.get(slot='body'),
+                placeholder=page.get_placeholders("en").get(slot='body'),
                 plugin_type='DumbFixturePlugin',
                 language=settings.LANGUAGES[0][0]
             )
             child_plugin = api.add_plugin(
-                placeholder=page.placeholders.get(slot='body'),
+                placeholder=page.get_placeholders("en").get(slot='body'),
                 plugin_type='DumbFixturePlugin',
                 language=settings.LANGUAGES[0][0],
                 parent=plugin
             )
             post = {
                 'plugin_id': child_plugin.pk,
-                'placeholder_id': title.placeholders.get(slot='right-column').pk,
+                'placeholder_id': page.get_placeholders("en").get(slot='right-column').pk,
                 'target_language': 'en',
                 'plugin_parent': '',
             }
@@ -1040,8 +1025,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
-        title = page.get_title_obj(language="en")
-        placeholder = title.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
                                     dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
 
