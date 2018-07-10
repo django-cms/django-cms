@@ -276,7 +276,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         context = SekizaiContext()
         context['request'] = request
 
-        self.assertObjectDoesNotExist(page.placeholders.all(), slot='col_right')
+        self.assertObjectDoesNotExist(page.get_placeholders('en'), slot='col_right')
         context = self.get_context(page=page)
         renderer = self.get_content_renderer(request)
         renderer.render_page_placeholder(
@@ -299,7 +299,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         template_dir = os.path.join(os.path.dirname(project.__file__), 'templates', 'alt_plugin_templates',
                                     'show_placeholder')
         page = create_page('Test', 'col_two.html', 'en')
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         add_plugin(placeholder, TextPlugin, 'en', body='HIDDEN')
         request = RequestFactory().get('/')
         request.user = self.get_staff_user_with_no_permissions()
@@ -347,7 +347,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
 
         request = RequestFactory().get('/')
@@ -367,7 +367,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         request = RequestFactory().get('/')
         user = self._create_user("admin", True, True)
@@ -389,7 +389,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         template = "{% load cms_tags %}{% render_plugin plugin %}"
         request = RequestFactory().get('/')
@@ -406,7 +406,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         template = "{% load cms_tags %}{% render_plugin plugin %}"
         request = RequestFactory().get('/')
@@ -428,7 +428,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en', published=True)
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         template = "{% load cms_tags %}{% render_plugin plugin %}"
         request = RequestFactory().get('/')

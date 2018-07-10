@@ -334,7 +334,7 @@ class ManagementTestCase(CMSTestCase):
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
     def _fill_page_body(self, page, lang):
-        ph_en = page.placeholders.get(slot="body")
+        ph_en = page.get_placeholders(lang).get(slot="body")
         # add misc plugins
         mcol1 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child")
         add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)

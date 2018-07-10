@@ -73,7 +73,7 @@ class MultilingualTestCase(CMSTestCase):
         # Has correct title and slug after calling save()?
         self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(), page_data['slug'])
-        self.assertEqual(page.placeholders.all().count(), 2)
+        self.assertEqual(page.get_placeholders(TESTLANG).count(), 2)
 
         # Were public instances created?
         title = Title.objects.drafts().get(slug=page_data['slug'])
@@ -129,7 +129,7 @@ class MultilingualTestCase(CMSTestCase):
         TESTLANG2 = get_secondary_language()
         page = create_page("mlpage", "nav_playground.html", TESTLANG)
         create_title(TESTLANG2, page.get_title(), page, slug=page.get_slug())
-        page.rescan_placeholders()
+        page.rescan_placeholders(TESTLANG)
         page = self.reload(page)
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, "TextPlugin", TESTLANG2, body="test")
@@ -385,7 +385,7 @@ class MultilingualTestCase(CMSTestCase):
 
     def test_wrong_plugin_language(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
-        ph_en = page.placeholders.get(slot="body")
+        ph_en = page.get_placeholders("en").get(slot="body")
         add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         title = Title(title="page", slug="page", language="ru", page=page)
         title.save()

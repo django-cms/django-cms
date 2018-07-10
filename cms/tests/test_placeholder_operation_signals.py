@@ -51,8 +51,8 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             created_by=self._admin_user,
             published=True,
         )
-        self._placeholder_1 = self._cms_page.placeholders.get(slot='body')
-        self._placeholder_2 = self._cms_page.placeholders.get(slot='right-column')
+        self._placeholder_1 = self._cms_page.get_placeholders("en").get(slot='body')
+        self._placeholder_2 = self._cms_page.get_placeholders("en").get(slot='right-column')
 
     def test_pre_add_plugin(self):
         with signal_tester(pre_placeholder_operation) as env:
@@ -655,5 +655,5 @@ class AppPlaceholderTestCase(PagePlaceholderTestCase):
             created_by=self._admin_user,
             published=True,
         )
-        self._placeholder_1 = self._cms_page.placeholders.get(slot='body')
-        self._placeholder_2 = self._cms_page.placeholders.get(slot='right-column')
+        self._placeholder_1 = self._cms_page.get_placeholders("en").get(slot='body')
+        self._placeholder_2 = self._cms_page.get_placeholders("en").get(slot='right-column')

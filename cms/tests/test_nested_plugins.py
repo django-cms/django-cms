@@ -596,7 +596,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
-            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            page_one_ph_two = page_one.get_placeholders("en").get(slot=u"col_left")
 
             # add a plugin
             pre_nesting_body = u"<p>the nested text plugin with a link inside</p>"
@@ -655,8 +655,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
-            page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
-            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            page_one_ph_one = page_one.get_placeholders("en").get(slot=u"col_sidebar")
+            page_one_ph_two = page_one.get_placeholders("en").get(slot=u"col_left")
             page_one.placeholders.get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body="Hello World")
@@ -864,8 +864,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
-            page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
-            page_one_ph_two = page_one.placeholders.get(slot=u"col_left")
+            page_one_ph_one = page_one.get_placeholders("en").get(slot=u"col_sidebar")
+            page_one_ph_two = page_one.get_placeholders("en").get(slot=u"col_left")
             page_one.placeholders.get(slot=u"col_right")
             # add the text plugin to placeholder one
             text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
@@ -1076,7 +1076,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
     def test_add_child_plugin(self):
         page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
-        page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
+        page_one_ph_one = page_one.get_placeholders("en").get(slot=u"col_sidebar")
         # add the text plugin to placeholder one
         text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
         superuser = self.get_superuser()

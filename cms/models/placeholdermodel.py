@@ -277,6 +277,7 @@ class Placeholder(models.Model):
     def _get_attached_model(self):
         if hasattr(self, '_attached_model_cache'):
             return self._attached_model_cache
+
         if self.page or self.page_set.exists():
             from cms.models import Page
             self._attached_model_cache = Page

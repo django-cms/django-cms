@@ -124,7 +124,7 @@ class RenderingTestCase(CMSTestCase):
                         reverse_id=self.test_data['reverse_id'], published=True)
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders = {}
-        for placeholder in p.placeholders.all():
+        for placeholder in p.get_placeholders('en'):
             self.test_placeholders[placeholder.slot] = placeholder
             # Insert some test Text plugins
         add_plugin(self.test_placeholders['main'], 'TextPlugin', 'en',

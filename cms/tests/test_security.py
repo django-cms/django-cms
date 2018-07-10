@@ -15,7 +15,7 @@ class SecurityTests(CMSTestCase):
 
     def get_data(self):
         page = create_page("page", "nav_playground.html", "en")
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders('en').get(slot='body')
         superuser = self.get_superuser()
         staff = self.get_staff_user_with_no_permissions()
         return page, placeholder, superuser, staff

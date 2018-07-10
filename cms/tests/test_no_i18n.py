@@ -156,7 +156,7 @@ class TestNoI18N(CMSTestCase):
         page = Page.objects.drafts().first()
         self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
         page = Page.objects.drafts().first()
-        placeholder = page.placeholders.latest('id')
+        placeholder = page.get_placeholders("en-us").latest('id')
         data = {'name': 'Hello', 'external_link': 'http://www.example.org/'}
         add_url = self.get_add_plugin_uri(placeholder, 'LinkPlugin', 'en-us')
 

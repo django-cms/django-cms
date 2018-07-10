@@ -1564,21 +1564,8 @@ class Page(models.Model):
             return self.parent_page.get_public_object().is_published(language)
         return False
 
-    def rescan_placeholders(self):
-        """
-        Rescan and if necessary create placeholders in the current template.
-        """
-        existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.get_declared_placeholders()]
-
-        for placeholder in self.placeholders.all():
-            if placeholder.slot in placeholders:
-                existing[placeholder.slot] = placeholder
-
-        for placeholder in placeholders:
-            if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
-        return existing
+    def rescan_placeholders(self, language):
+        return self.get_title_obj(language=language).rescan_placeholders()
 
     def get_declared_placeholders(self):
         # inline import to prevent circular imports
