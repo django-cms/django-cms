@@ -434,7 +434,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGES[0][0],
         )
         plugin = api.add_plugin(
-            placeholder=page.get_placeholders(settings.LANGUAGES[0][0].get(slot='body'),
+            placeholder=page.get_placeholders(settings.LANGUAGES[0][0]).get(slot='body'),
             plugin_type='TextPlugin',
             language=settings.LANGUAGES[0][0],
             body='<script>var bar="hacked"</script>'
