@@ -1,10 +1,10 @@
 language: python
 
-python:
-  - 3.6
-  - 3.5
-  - 3.4
-  - 2.7
+# python:
+#   - 3.6
+#   - 3.5
+#   - 3.4
+#   - 2.7
 
 sudo: false
 
@@ -91,8 +91,6 @@ env:
       - python: 3.6
         env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
-      - python: 2.7
-        env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
       - python: 3.4
         env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
       - python: 3.5
