@@ -694,7 +694,7 @@ class Page(models.Model):
                 path = title.slug
 
             new_title.slug = get_available_slug(site, path, title.language)
-            new_title.path = '%s/%s' % (base, title.slug) if base else title.slug
+            new_title.path = '%s/%s' % (base, new_title.slug) if base else new_title.slug
             new_title.save()
 
             for placeholder in title.placeholders.all():
@@ -1596,14 +1596,6 @@ class Page(models.Model):
             return xframe_options[0]
         except IndexError:
             return None
-
-    def _copy_contents(self, target, language):
-        """
-        Copy all the plugins to a new page.
-        :param target: The page where the new content should be stored
-        """
-        for title in target.title_set.all():
-            title.copy_placeholders(title, language)
 
 
 class PageType(Page):

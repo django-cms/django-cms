@@ -1001,11 +1001,11 @@ class AdminFormsTests(AdminTestsBase):
         homepage = create_page('Test', 'static.html', 'en', published=True)
         homepage.set_as_homepage()
 
-        for placeholder in Placeholder.objects.all():
+        for placeholder in homepage.get_placeholders('en'):
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
 
         user = self.get_superuser()
-        self.assertEqual(Placeholder.objects.all().count(), 4)
+        self.assertEqual(homepage.get_placeholders('en').count(), 2)
         with self.login_user_context(user):
             output = force_text(
                 self.client.get(
@@ -1013,9 +1013,8 @@ class AdminFormsTests(AdminTestsBase):
                 ).content
             )
             self.assertIn('<b>Test</b>', output)
-            self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
-            for placeholder in Placeholder.objects.all():
+            for placeholder in homepage.get_placeholders('en'):
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             output = force_text(
                 self.client.get(

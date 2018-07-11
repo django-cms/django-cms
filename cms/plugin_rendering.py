@@ -494,6 +494,8 @@ class ContentRenderer(BaseRenderer):
             placeholders = page.get_placeholders(self.request_language).filter(slot__in=slots)
         else:
             title = page.get_title_obj(self.request_language, fallback=False)
+            # TODO: Not django 2.0 compatible
+            title._page_cache = page
             # Creates any placeholders missing on the page
             placeholders = title.rescan_placeholders().values()
 

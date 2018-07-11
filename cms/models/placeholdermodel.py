@@ -283,13 +283,6 @@ class Placeholder(models.Model):
             self._attached_model_cache = Page
             return Page
 
-        """
-        # AA FIXME: REMOVED:
-        if self.page or self.page_set.exists():
-            from cms.models import Page
-            self._attached_model_cache = Page
-            return Page
-        """
         field = self._get_attached_field()
         if field:
             self._attached_model_cache = field.model

@@ -180,7 +180,6 @@ class CreateCMSPageForm(AddPageForm):
         if plugin_type in plugin_pool.plugins and plugin_body:
             if content and permissions.has_plugin_permission(
                     self._user, plugin_type, "add"):
-                new_page.rescan_placeholders(self.language_code)
                 placeholder = self.get_placeholder(new_page, slot=slot)
                 if placeholder:
                     opts = {

@@ -129,6 +129,9 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id,
     if not page:
         return ''
 
+    if lang is None:
+        lang = renderer.request_language
+
     try:
         placeholder = page.get_placeholders(lang).get(slot=placeholder_name)
     except PlaceholderModel.DoesNotExist:

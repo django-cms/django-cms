@@ -285,9 +285,6 @@ class AddPageForm(BasePageForm):
 
         if source:
             new_page = self.from_source(source, parent=parent)
-
-            for lang in source.get_languages():
-                source._copy_contents(new_page, lang)
         else:
             new_page = super(AddPageForm, self).save(commit=False)
             new_page.template = self.get_template()
@@ -303,6 +300,14 @@ class AddPageForm(BasePageForm):
                 target_page=new_page,
                 languages=[translation.language],
             )
+            placeholders = source.get_placeholders(translation.language)
+
+            for source_placeholder in placeholders:
+                target_placeholder = translation.placeholders.create(
+                    slot=source_placeholder.slot,
+                    default_width=source_placeholder.default_width,
+                )
+                source_placeholder.copy_plugins(target_placeholder, language=translation.language)
 
         is_first = not (
             TreeNode

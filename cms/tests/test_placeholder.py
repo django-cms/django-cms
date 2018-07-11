@@ -563,13 +563,13 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             cache.clear()
             # Then we add a plugin to check for proper rendering
             link_de = add_plugin(
-                placeholder_en,
+                placeholder_de,
                 'LinkPlugin',
                 language='de',
                 name='de name',
                 external_link='http://example.com/de',
             )
-            add_plugin(placeholder_en, 'TextPlugin', 'de',  target=link_de, body='de body')
+            add_plugin(placeholder_de, 'TextPlugin', 'de',  target=link_de, body='de body')
             content_de = _render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\"")
             self.assertRegexpMatches(content_de, "de body")
