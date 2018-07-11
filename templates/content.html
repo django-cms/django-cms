@@ -63,7 +63,7 @@
         <div class="row">
             <div class="col-12 col-sm-12 col-lg-2 pt-4 order-5 d-flex flex-column order-lg-1">
                 <a href="/">{% include "includes/icon.html" with icon="divio" class="footer-logo" title=request.site.name %}</a>
-                <p class="text-secondary mt-2 footer-slogan">Your Django projects on Autopilot</p>
+                <p class="text-secondary mt-2 footer-slogan">Autopilot for your Django projects</p>
                 <p class="text-secondary footer-links">{% include "django_privacy_mgmt/link.html" %}</p>
                 <div class="footer-social">
                     <p class="footer-social-title">Keep up to date</p>
@@ -144,15 +144,18 @@
                     </div>
                     <div class="row">
                         <div class="col-12 mt-4">
-                            <a href="tel:+41444801270" class="btn btn-primary btn-sm btn-block">I have an emergency</a>
+                            <a href="tel:+41444801270" class="btn btn-primary btn-sm btn-block">
+                                I have an emergency &nbsp; &nbsp; &nbsp;
+                                {% include "includes/icon.html" with icon="phone" %}
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="py-4">
-            <p class="footer-built-with">This site is built with Django &amp; Powered by Divio Cloud</p>
-            <p class="footer-copyright">COPYRIGHT © 2001-{% now "Y" %} DIVIO AG. ALL RIGHTS RESERVED.</p>
+            <p class="footer-built-with">This site is built with Django &amp; powered by Divio Cloud</p>
+            <p class="footer-copyright">COPYRIGHT &copy; 2001-{% now "Y" %} DIVIO AG. ALL RIGHTS RESERVED.</p>
         </div>
     </div>
 </footer>
