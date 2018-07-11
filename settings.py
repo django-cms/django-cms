@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from django.utils.translation import ugettext_lazy as _
 
 
 env = os.getenv
@@ -76,6 +77,19 @@ DJANGOCMS_BOOTSTRAP4_SPACER_SIZES = (
     ('5', '* 3'),
     ('6', '* 5'),
     ('7', '* 7'),
+)
+
+DJANGOCMS_BOOTSTRAP4_COLOR_STYLE_CHOICES = (
+    ('primary', _('Primary')),
+    ('secondary', _('Secondary')),
+    ('success', _('Success')),
+    ('danger', _('Danger')),
+    ('warning', _('Warning')),
+    ('info', _('Info')),
+    ('light', _('Light')),
+    ('dark', _('Dark')),
+    ('pink', _('Pink')),
+    ('purple', _('Purple')),
 )
 
 TEXT_HTML_SANITIZE = False

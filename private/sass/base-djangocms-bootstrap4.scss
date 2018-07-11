@@ -1,0 +1,27 @@
+// #############################################################################
+// IMPORTS
+@import "settings/all";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/utilities";
+@import "components/buttons";
+
+.bootstrap4-button-group .btn {
+    font-size: 11px !important;
+    font-family: $font-family-sans-serif !important;
+}
+
+.djangocms-bootstrap4-preview .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-family-sans-serif !important;
+}
+.djangocms-bootstrap4-preview .btn > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1 !important;
+}

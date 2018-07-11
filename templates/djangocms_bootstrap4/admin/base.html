@@ -1,0 +1,17 @@
+{% extends "admin/cms/page/plugin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'djangocms_bootstrap4/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base-djangocms-bootstrap4.css' %}">
+    <script src="{% static 'djangocms_bootstrap4/js/bundle.base.js' %}"></script>
+{% endblock %}
+
+{% block field_sets %}
+    <div class="djangocms-bootstrap4
+        {% block custom_class %}{% endblock %}" data-static="{% get_static_prefix %}">
+        {% block custom_message %}{% endblock %}
+        {{ block.super }}
+    </div>
+{% endblock %}
