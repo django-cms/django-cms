@@ -1,10 +1,10 @@
 language: python
 
-# python:
-#   - 3.6
-#   - 3.5
-#   - 3.4
-#   - 2.7
+python:
+  - 3.6
+  - 3.5
+  - 3.4
+  - 2.7
 
 sudo: false
 
@@ -29,85 +29,86 @@ env:
     - secure: CbPfysSncBB2Ue+VOtLDa8xJvwKl73nJO647zt/9UvZ/3PilnZN9aZv2jHxGvCiFXcez+2AddKptMCcx/5EW5UfRkrWUDHrfLCULU2TfOjmufEGM1eOIXhiAun8WQ85LBzTAYy1r9D514cbU3Yzn3xGZwJljPE8JE4cx3MNN/qQ=
     # temporary solution until https://github.com/ariya/phantomjs/issues/13953 is resolved
     - PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
-  matrix:
-    include:
-      - python: 3.6
-        env: FRONTEND=1 UNIT=1
-      - python: 3.6
-        env: FRONTEND=1 LINT=1
 
-      # DJANGO 1.11
-      - python: 3.6
-        env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
-      - python: 3.6
-        env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
-      - python: 3.6
-        env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+matrix:
+  include:
+    - python: 3.6
+      env: FRONTEND=1 UNIT=1
+    - python: 3.6
+      env: FRONTEND=1 LINT=1
 
-      - python: 2.7
-        env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.4
-        env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.5
-        env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.6
-        env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
+    # DJANGO 1.11
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
-      - python: 3.6
-        env: DJANGO=1.11 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-      - python: 3.6
-        env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-      - python: 3.6
-        env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
-      - python: 3.6
-        env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-      - python: 3.6
-        env: TEST_DOCS=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 2.7
+      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.4
+      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.5
+      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.6
+      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
 
-      # DJANGO 2.0
-      - python: 3.4
-        env: DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.5
-        env: DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.6
-        env: DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.6
+      env: DJANGO=1.11 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.6
+      env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+    - python: 3.6
+      env: TEST_DOCS=1 DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
 
-      - python: 3.6
-        env: DJANGO=2.0 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-      - python: 3.6
-        env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-      - python: 3.6
-        env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
-      - python: 3.6
-        env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-      - python: 3.6
-        env: TEST_DOCS=1 DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
+    # DJANGO 2.0
+    - python: 3.4
+      env: DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.5
+      env: DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.6
+      env: DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
 
-      # DJANGO 2.1
-      - python: 3.6
-        env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
-      - python: 3.6
-        env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
-      - python: 3.6
-        env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: DJANGO=2.0 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.6
+      env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+    - python: 3.6
+      env: TEST_DOCS=1 DJANGO=2.0 DATABASE_URL='sqlite://localhost/:memory:'
 
-      - python: 3.4
-        env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.5
-        env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
-      - python: 3.6
-        env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+    # DJANGO 2.1
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=2.1 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
-      - python: 3.6
-        env: DJANGO=2.1 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
-      - python: 3.6
-        env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
-      - python: 3.6
-        env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
-      - python: 3.6
-        env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-      - python: 3.6
-        env: TEST_DOCS=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.4
+      env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.5
+      env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+    - python: 3.6
+      env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+
+    - python: 3.6
+      env: DJANGO=2.1 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.6
+      env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+    - python: 3.6
+      env: TEST_DOCS=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
   fast_finish: true
 
 before_script:
