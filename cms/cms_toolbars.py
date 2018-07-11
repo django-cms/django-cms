@@ -235,7 +235,6 @@ class PageToolbar(CMSToolbar):
             self.statics = StaticPlaceholder.objects.filter(
                 Q(draft__in=placeholder_ids) | Q(public__in=placeholder_ids)
             )
-            self.dirty_statics = [sp for sp in self.statics if sp.dirty]
         else:
             if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
                 # User has explicitly requested structure mode
@@ -246,7 +245,6 @@ class PageToolbar(CMSToolbar):
 
             self.placeholders = renderer.get_rendered_placeholders()
             self.statics = renderer.get_rendered_static_placeholders()
-            self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 
     def add_structure_mode(self):
         if self.page and not self.page.application_urls:
