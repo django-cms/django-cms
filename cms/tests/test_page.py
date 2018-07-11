@@ -888,6 +888,7 @@ class PagesTestCase(TransactionCMSTestCase):
                 CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
         ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
+            page.title_cache['en'] = page.title_set.get(language='en')
             placeholders = list(page.get_placeholders('en'))
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):

@@ -464,6 +464,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_placeholder_with_no_page(self):
         page = create_page('Test', 'col_two.html', 'en', published=True)
+        page.title_cache['en'] = page.title_set.get(language='en')
         template = "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}"
         request = RequestFactory().get('/asdadsaasd/')
         user = self.get_superuser()
@@ -478,6 +479,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_placeholder_as_var(self):
         page = create_page('Test', 'col_two.html', 'en', published=True)
+        page.title_cache['en'] = page.title_set.get(language='en')
         template = "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}"
         request = RequestFactory().get('/asdadsaasd/')
         user = self.get_superuser()
