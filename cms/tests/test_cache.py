@@ -97,7 +97,7 @@ class CacheTestCase(CMSTestCase):
 
         overrides['CMS_PLACEHOLDER_CACHE'] = False
         with self.settings(**overrides):
-            with self.assertNumQueries(FuzzyInt(7, 16)):
+            with self.assertNumQueries(FuzzyInt(7, 17)):
                 self.client.get(page1_url)
 
     def test_no_cache_plugin(self):
@@ -426,7 +426,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
@@ -449,7 +449,7 @@ class CacheTestCase(CMSTestCase):
             # Test that this means the page is actually not cached.
             #
             page1.publish('en')
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
@@ -553,7 +553,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
