@@ -140,34 +140,31 @@ def configure_cms_apps(apps_with_features):
                 configure_app(app_config.cms_config)
 
 
-def _autodiscover_module(module_to_search):
-    # NOTE: This is basically a simplified version of
-    # django.utils.module_loading.autodiscover_modules
-    # The reason for not using django's function is a bit unfortunate.
-    # The testing of backwards compatibility of app registration with
-    # the old ways of registering things (pools etc.) is non-trivial and
-    # the only way that seems to work is by patching django's app registry.
-    # Unfortunately django's autodiscover_modules function imports
-    # django.apps.apps from inside the function, which makes mocking it
-    # impossible. Hence this function has been created solely to make
-    # testing easier.
-    # This function should be removed once backwards compatibility is
-    # deprecated.
-    for app_config in apps.get_app_configs():
-        try:
-            import_module('%s.%s' % (app_config.name, module_to_search))
-        except Exception:
-            # Decide whether to bubble up this error. If the app just
-            # doesn't have the module in question, we can ignore the error
-            # attempting to import it, otherwise we want it to bubble up.
-            if module_has_submodule(app_config.module, module_to_search):
-                raise
-
-
+# TODO: Remove this function once backwards compatibility is deprecated
 def backwards_compatibility_config():
     """
     Ensure that old ways of configuring and setting up things (plugin
     pools etc.) still work.
+
+    NOTE: The autodiscover code has been copied over from
+    django.utils.module_loading.autodiscover_modules
+    This is because django's autodiscover function imports
+    django.apps.apps from within the body of the function, which
+    interferes with backwards compatibility testing. The testing is
+    non-trivial and requires the patching of django.apps.apps (which
+    is impossible when imports are done inside of functions).
     """
-    # Backwards compatibility with the wizard pool
-    _autodiscover_module('cms_wizards')
+    # The old pools defined various discover methods that looked for
+    # specific files and ran the register code in them. Listing the
+    # names of the files here.
+    modules_to_autodiscover = ['cms_wizards']
+    for module in modules_to_autodiscover:
+        for app_config in apps.get_app_configs():
+            try:
+                import_module('%s.%s' % (app_config.name, module))
+            except Exception:
+                # Decide whether to bubble up this error. If the app just
+                # doesn't have the module in question, we can ignore the error
+                # attempting to import it, otherwise we want it to bubble up.
+                if module_has_submodule(app_config.module, module):
+                    raise
