@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.utils.translation import override as force_language, ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
@@ -285,10 +285,6 @@ class PageToolbar(CMSToolbar):
             self.page_change_permission = can_change_page(self.request)
         return self.page_change_permission
 
-    def page_is_pending(self, page, language):
-        return (page.publisher_public_id and
-                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
-
     def in_apphook(self):
         with force_language(self.toolbar.request_language):
             try:
@@ -338,21 +334,6 @@ class PageToolbar(CMSToolbar):
         self.init_placeholders()
         self.add_draft_live()
         self.add_structure_mode()
-
-    def has_dirty_objects(self):
-        language = self.current_lang
-
-        if self.page:
-            if self.dirty_statics:
-                # There's dirty static placeholders on this page.
-                # Only show the page as dirty (publish button) if the page
-                # translation has been configured.
-                dirty = self.page.has_translation(language)
-            else:
-                dirty = (self.page.is_dirty(language) or self.page_is_pending(self.page, language))
-        else:
-            dirty = bool(self.dirty_statics)
-        return dirty
 
     # Buttons
     def add_draft_live(self):
