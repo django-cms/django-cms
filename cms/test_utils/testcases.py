@@ -265,6 +265,7 @@ class BaseCMSTestCase(object):
             'title': 'test page %d' % self.counter,
             'slug': 'test-page-%d' % self.counter,
             'parent_node': parent_id,
+            'publish': True,  # Temp added as most tests require the first page to be published
         }
         # required only if user haves can_change_permission
         self.counter += 1

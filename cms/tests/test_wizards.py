@@ -295,34 +295,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertIn("id={}".format(cms_page_wizard.id), repr(cms_page_wizard))
         self.assertIn(hex(id(cms_page_wizard)), repr(cms_page_wizard))
 
-    def test_wizard_first_page_published(self):
-        site = get_current_site()
-        superuser = self.get_superuser()
-
-        with self.login_user_context(superuser):
-            request = self.get_request()
-        data = {
-            'title': 'page 1',
-            'slug': 'page_1',
-            'page_type': None,
-        }
-        form = CreateCMSPageForm(
-            data=data,
-            wizard_page=None,
-            wizard_site=site,
-            wizard_language='en',
-            wizard_request=request,
-        )
-        self.assertTrue(form.is_valid())
-        page = form.save()
-
-        self.assertTrue(page.is_published('en'))
-
-        with self.login_user_context(superuser):
-            url = page.get_absolute_url('en')
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-
     def test_wizard_create_child_page(self):
         site = get_current_site()
         superuser = self.get_superuser()

@@ -163,31 +163,19 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             self.assertEqual(Title.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
-            # crate home and auto publish
+            # create home
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
-
-            #self.assertEqual(Page.objects.all().count(), 2)
-            #self.assertEqual(Title.objects.all().count(), 2)
 
             title = Title.objects.drafts().get(slug=page_data['slug'])
             self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
 
             page = title.page
             page.save()
-            page.publish('en')
 
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.get_placeholders('en').count(), 2)
-
-            # were public instances created?
-            self.assertEqual(Title.objects.all().count(), 4)
-            title = Title.objects.drafts().get(slug=page_data['slug'])
-            title = Title.objects.public().get(slug=page_data['slug'])
 
     def test_create_page_with_unconfigured_language(self):
         """
@@ -207,14 +195,14 @@ class PageTest(PageTestBase):
         )
         self.assertEqual(Title.objects.all().count(), 0)
         self.assertEqual(Page.objects.all().count(), 0)
-        # create home and auto publish
+        # create home
         with self.settings(SITE_ID=2):
             # url uses "en" as the request language
             # but the site is configured to use "de" and "fr"
             response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
-            self.assertEqual(Title.objects.filter(language='de').count(), 2)
+            self.assertEqual(Page.objects.filter(node__site=2).count(), 1)
+            self.assertEqual(Title.objects.filter(language='de').count(), 1)
 
         # The user is on site #1 but switches sites using the site switcher
         # on the page changelist.
@@ -224,8 +212,8 @@ class PageTest(PageTestBase):
         # but the site is configured to use "de" and "fr"
         response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
         self.assertRedirects(response, URL_CMS_PAGE)
-        self.assertEqual(Page.objects.filter(node__site=2).count(), 3)
-        self.assertEqual(Title.objects.filter(language='de').count(), 3)
+        self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
+        self.assertEqual(Title.objects.filter(language='de').count(), 2)
 
         Site.objects.clear_cache()
         client.logout()
