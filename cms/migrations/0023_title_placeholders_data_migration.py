@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-import warnings, os, sys
+from collections import defaultdict
+import warnings
 
 from django.db import migrations, models
 
@@ -32,43 +32,82 @@ Page 1
 
 
 def forwards(apps, schema_editor):
-
     Page = apps.get_model('cms', 'Page')
     Plugin = apps.get_model('cms', 'CMSPlugin')
+    Placeholder = apps.get_model('cms', 'Placeholder')
+    db_alias = schema_editor.connection.alias
+    cms_pages = (
+        Page
+        .objects
+        .using(db_alias)
+        .filter(placeholders__isnull=False)
+        .distinct()
+        .prefetch_related('placeholders', 'title_set')
+    )
+    new_placeholders = []
+    old_placeholder_ids = []
 
-    # 1. Create a placeholder for each language the page is tied to (title_set)
-    # 2. Move all plugins for each language into their respective placeholder
-    # 3. Clean away the existing placeholders
+    for page in cms_pages:
+        for title in page.title_set.all():
+            for placeholder in page.placeholders.all():
+                new_placeholder = Placeholder(
+                    slot=placeholder.slot,
+                    default_width=placeholder.default_width,
+                    title_id=title.pk,
+                )
+                new_placeholders.append(new_placeholder)
+                old_placeholder_ids.append(placeholder.pk)
 
-    page_list = Page.objects.all().prefetch_related('title_set')
+    # Create all new placeholders
+    Placeholder.objects.using(db_alias).bulk_create(new_placeholders)
 
-    for page in page_list:
-        # Get all titles registered to the page
-        title_set = page.title_set.all()
-        # Get the pages placeholders
-        placeholders = page.placeholders.all()
-        # Add each placeholder on the page template to the title
-        for title in title_set:
-            # Get a list of the plugins attached to this placeholder for this language
-            for placeholder in placeholders:
-                # Get all of the plugins for this placeholder
-                placeholder_plugins = Plugin.objects.filter(placeholder_id=placeholder.pk, language=title.language)
-                # Clone the placeholder
-                placeholder.pk = None
-                placeholder.save()
-                # Create a link to the new placeholder
-                title.placeholders.add(placeholder)
+    # Map out all new placeholders by title id
+    placeholders_by_title = defaultdict(list)
+    new_placeholder_lookup = (
+        Placeholder
+        .objects
+        .using(db_alias)
+        .filter(title_id__isnull=False)
+    )
 
-                # Move the plugins to the relevant / new title -> placeholder
-                for plugin in placeholder_plugins:
-                    plugin.placeholder_id = placeholder.pk
-                    plugin.save()
+    for new_pl in new_placeholder_lookup.iterator():
+        placeholders_by_title[new_pl.title_id].append(new_pl)
 
-    # TODO: Delete previous placeholders!! None should have any plugins
-    # TODO: Handle exceptions!!
-    #except Exception:
-    #    warnings.warn(u'Placeholder migration failure.')
-    #raise os.sys.exit(u'Placeholder migration failure.')
+    for page in cms_pages:
+        for translation in page.title_set.all():
+            new_placeholders = placeholders_by_title[translation.pk]
+
+            for new_placeholder in new_placeholders:
+                # Move all plugins whose language matches
+                # the current translation and are hosted on the
+                # current placeholder slot to point to the new title placeholder.
+                Plugin.objects.filter(
+                    language=translation.language,
+                    placeholder__page=page,
+                    placeholder__slot=new_placeholder.slot,
+                ).update(placeholder_id=new_placeholder.pk)
+            # Attach the new placeholders to the title
+            translation.placeholders.set(new_placeholders)
+
+    # Gather the old placeholders
+    old_placeholders = (
+        Placeholder
+        .objects
+        .using(db_alias)
+        .filter(pk__in=old_placeholder_ids)
+        .annotate(plugin_count=models.Count('cmsplugin'))
+    )
+
+    if old_placeholders.filter(plugin_count__gt=0).exists():
+        warnings.warn(
+            "There's placeholders in your database "
+            "with plugins in a language that's not configured "
+            "These placeholders and its plugins are not in use and can be removed.",
+            UserWarning,
+        )
+
+    # Delete all old placeholders that have no plugins
+    old_placeholders.filter(plugin_count=0).delete()
 
 
 class Migration(migrations.Migration):

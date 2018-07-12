@@ -17,4 +17,9 @@ class Migration(migrations.Migration):
             name='placeholders',
             field=models.ManyToManyField(editable=False, to='cms.Placeholder'),
         ),
+        migrations.AddField(
+            model_name='placeholder',
+            name='title_id',
+            field=models.PositiveSmallIntegerField(null=True),
+        ),
     ]

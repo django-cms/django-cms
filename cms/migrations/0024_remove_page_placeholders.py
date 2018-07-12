@@ -16,4 +16,8 @@ class Migration(migrations.Migration):
             model_name='page',
             name='placeholders',
         ),
+        migrations.RemoveField(
+            model_name='placeholder',
+            name='title_id',
+        ),
     ]
