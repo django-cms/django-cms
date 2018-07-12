@@ -54,9 +54,10 @@ class CacheTestCase(CMSTestCase):
         page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder = page1.placeholders.filter(slot="body")[0]
-        add_plugin(placeholder, "TextPlugin", 'en', body="English")
-        add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
+        placeholder_en = page1.get_placeholders('en').filter(slot="body")[0]
+        placeholder_de = page1.get_placeholders('en').filter(slot="body")[0]
+        add_plugin(placeholder_en, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder_de, "TextPlugin", 'de', body="Deutsch")
         request = self.get_request(page1_url)
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
@@ -67,7 +68,7 @@ class CacheTestCase(CMSTestCase):
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             self.render_template_obj(template, {}, request)
         # toolbar
         with self.login_user_context(self.get_superuser()):
@@ -77,7 +78,7 @@ class CacheTestCase(CMSTestCase):
             request.toolbar = CMSToolbar(request)
             request.toolbar.show_toolbar = True
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             self.render_template_obj(template, {}, request)
         page1.publish('en')
         exclude = [
@@ -96,7 +97,7 @@ class CacheTestCase(CMSTestCase):
 
         overrides['CMS_PLACEHOLDER_CACHE'] = False
         with self.settings(**overrides):
-            with self.assertNumQueries(FuzzyInt(7, 15)):
+            with self.assertNumQueries(FuzzyInt(7, 17)):
                 self.client.get(page1_url)
 
     def test_no_cache_plugin(self):
@@ -104,8 +105,8 @@ class CacheTestCase(CMSTestCase):
                             published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder1 = page1.placeholders.filter(slot='body')[0]
-        placeholder2 = page1.placeholders.filter(slot='right-column')[0]
+        placeholder1 = page1.get_placeholders('en').filter(slot='body')[0]
+        placeholder2 = page1.get_placeholders('en').filter(slot='right-column')[0]
         try:
             plugin_pool.register_plugin(NoCachePlugin)
         except PluginAlreadyRegistered:
@@ -169,7 +170,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(6):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
                 with self.assertNumQueries(FuzzyInt(8, 14)):
@@ -184,8 +185,8 @@ class CacheTestCase(CMSTestCase):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
 
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         plugin_pool.register_plugin(TimeDeltaCacheExpirationPlugin)
         add_plugin(placeholder1, "TextPlugin", 'en', body="English")
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
@@ -220,8 +221,8 @@ class CacheTestCase(CMSTestCase):
                             published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         try:
             plugin_pool.register_plugin(DateTimeCacheExpirationPlugin)
         except PluginAlreadyRegistered:
@@ -258,8 +259,8 @@ class CacheTestCase(CMSTestCase):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
 
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         plugin_pool.register_plugin(TTLCacheExpirationPlugin)
         add_plugin(placeholder1, "TextPlugin", 'en', body="English")
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
@@ -298,8 +299,8 @@ class CacheTestCase(CMSTestCase):
                             published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         plugin_pool.register_plugin(TTLCacheExpirationPlugin)
         try:
             plugin_pool.register_plugin(DateTimeCacheExpirationPlugin)
@@ -364,8 +365,8 @@ class CacheTestCase(CMSTestCase):
                             published=True)
         page1_url = page1.get_absolute_url()
 
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         plugin_pool.register_plugin(LegacyCachePlugin)
         add_plugin(placeholder1, "TextPlugin", 'en', body="English")
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
@@ -414,7 +415,7 @@ class CacheTestCase(CMSTestCase):
             page1_url = page1.get_absolute_url()
 
             # Add some content
-            placeholder = page1.placeholders.filter(slot="body")[0]
+            placeholder = page1.get_placeholders("en").filter(slot="body")[0]
             add_plugin(placeholder, "TextPlugin", 'en', body="English")
             add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
 
@@ -425,7 +426,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
@@ -448,7 +449,7 @@ class CacheTestCase(CMSTestCase):
             # Test that this means the page is actually not cached.
             #
             page1.publish('en')
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
@@ -478,7 +479,7 @@ class CacheTestCase(CMSTestCase):
             page1_url = page1.get_absolute_url()
 
             # Add some content
-            placeholder = page1.placeholders.filter(slot="body")[0]
+            placeholder = page1.get_placeholders("en").filter(slot="body")[0]
             add_plugin(placeholder, "TextPlugin", 'en', body="English")
             add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
 
@@ -541,7 +542,7 @@ class CacheTestCase(CMSTestCase):
             page1_url = page1.get_absolute_url()
 
             # Add some content
-            placeholder = page1.placeholders.filter(slot="body")[0]
+            placeholder = page1.get_placeholders("en").filter(slot="body")[0]
             add_plugin(placeholder, "TextPlugin", 'en', body="English")
             add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
 
@@ -552,7 +553,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 24)):
+            with self.assertNumQueries(FuzzyInt(1, 25)):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
@@ -575,8 +576,8 @@ class CacheTestCase(CMSTestCase):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
 
-        placeholder1 = page1.placeholders.filter(slot="body")[0]
-        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
+        placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
         plugin_pool.register_plugin(SekizaiPlugin)
         add_plugin(placeholder1, "SekizaiPlugin", 'en')
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
@@ -604,7 +605,7 @@ class CacheTestCase(CMSTestCase):
                                 published=True)
             page1_url = page1.get_absolute_url()
 
-            placeholder = page1.placeholders.get(slot="body")
+            placeholder = page1.get_placeholders("en").get(slot="body")
             add_plugin(placeholder, "TextPlugin", 'en', body="First content")
             page1.publish('en')
             response = self.client.get(page1_url)
@@ -667,12 +668,13 @@ class PlaceholderCacheTestCase(CMSTestCase):
         create_title('de', "de test page", self.page)
         self.page.publish('de')
 
-        self.placeholder = self.page.placeholders.filter(slot="body")[0]
+        self.placeholder_en = self.page.get_placeholders("en").filter(slot="body")[0]
+        self.placeholder_de = self.page.get_placeholders("de").filter(slot="body")[0]
         plugin_pool.register_plugin(VaryCacheOnPlugin)
-        add_plugin(self.placeholder, 'TextPlugin', 'en', body='English')
-        add_plugin(self.placeholder, 'TextPlugin', 'de', body='Deutsch')
-        add_plugin(self.placeholder, 'VaryCacheOnPlugin', 'en')
-        add_plugin(self.placeholder, 'VaryCacheOnPlugin', 'de')
+        add_plugin(self.placeholder_en, 'TextPlugin', 'en', body='English')
+        add_plugin(self.placeholder_de, 'TextPlugin', 'de', body='Deutsch')
+        add_plugin(self.placeholder_en, 'VaryCacheOnPlugin', 'en')
+        add_plugin(self.placeholder_de, 'VaryCacheOnPlugin', 'de')
 
         self.en_request = self.get_request('/en/')
         self.en_request.current_page = Page.objects.get(pk=self.page.pk)
@@ -695,46 +697,46 @@ class PlaceholderCacheTestCase(CMSTestCase):
     def test_get_placeholder_cache_version_key(self):
         cache_version_key = '{prefix}|placeholder_cache_version|id:{id}|lang:{lang}|site:{site}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
-            id=self.placeholder.pk,
+            id=self.placeholder_en.pk,
             lang='en',
             site=1,
         )
         self.assertEqual(
-            _get_placeholder_cache_version_key(self.placeholder, 'en', 1),
+            _get_placeholder_cache_version_key(self.placeholder_en, 'en', 1),
             cache_version_key
         )
 
     def test_set_clear_get_placeholder_cache_version(self):
-        initial, _ = _get_placeholder_cache_version(self.placeholder, 'en', 1)
-        clear_placeholder_cache(self.placeholder, 'en', 1)
-        version, _ = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        initial, _ = _get_placeholder_cache_version(self.placeholder_en, 'en', 1)
+        clear_placeholder_cache(self.placeholder_en, 'en', 1)
+        version, _ = _get_placeholder_cache_version(self.placeholder_en, 'en', 1)
         self.assertGreater(version, initial)
 
     def test_get_placeholder_cache_key(self):
-        version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en', 1)
+        version, vary_on_list = _get_placeholder_cache_version(self.placeholder_en, 'en', 1)
         desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
             prefix=get_cms_setting('CACHE_PREFIX'),
-            id=self.placeholder.pk,
+            id=self.placeholder_en.pk,
             lang='en',
             site=1,
             tz=get_timezone_name(),
             version=version,
             cc='_',
         )
-        _set_placeholder_cache_version(self.placeholder, 'en', 1, version, vary_on_list=vary_on_list, duration=1)
-        actual_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_request)
+        _set_placeholder_cache_version(self.placeholder_en, 'en', 1, version, vary_on_list=vary_on_list, duration=1)
+        actual_key = _get_placeholder_cache_key(self.placeholder_en, 'en', 1, self.en_request)
         self.assertEqual(actual_key, desired_key)
 
-        en_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_request)
-        de_key = _get_placeholder_cache_key(self.placeholder, 'de', 1, self.de_request)
+        en_key = _get_placeholder_cache_key(self.placeholder_en, 'en', 1, self.en_request)
+        de_key = _get_placeholder_cache_key(self.placeholder_de, 'de', 1, self.de_request)
         self.assertNotEqual(en_key, de_key)
 
-        en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_us_request)
+        en_us_key = _get_placeholder_cache_key(self.placeholder_en, 'en', 1, self.en_us_request)
         self.assertNotEqual(en_key, en_us_key)
 
         desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
             prefix=get_cms_setting('CACHE_PREFIX'),
-            id=self.placeholder.pk,
+            id=self.placeholder_en.pk,
             lang='en',
             site=1,
             tz=get_timezone_name(),
@@ -758,34 +760,34 @@ class PlaceholderCacheTestCase(CMSTestCase):
             'request': self.en_uk_request,
         })
 
-        en_content = en_renderer.render_placeholder(self.placeholder, en_context, 'en', width=350)
-        en_us_content = en_us_renderer.render_placeholder(self.placeholder, en_us_context, 'en', width=350)
-        en_uk_content = en_uk_renderer.render_placeholder(self.placeholder, en_uk_context, 'en', width=350)
+        en_content = en_renderer.render_placeholder(self.placeholder_en, en_context, 'en', width=350)
+        en_us_content = en_us_renderer.render_placeholder(self.placeholder_en, en_us_context, 'en', width=350)
+        en_uk_content = en_uk_renderer.render_placeholder(self.placeholder_en, en_uk_context, 'en', width=350)
 
-        del self.placeholder._plugins_cache
+        del self.placeholder_en._plugins_cache
 
         de_renderer = self.get_content_renderer(self.de_request)
         de_context = Context({
             'request': self.de_request,
         })
-        de_content = de_renderer.render_placeholder(self.placeholder, de_context, 'de', width=350)
+        de_content = de_renderer.render_placeholder(self.placeholder_de, de_context, 'de', width=350)
 
         self.assertNotEqual(en_content, de_content)
 
-        set_placeholder_cache(self.placeholder, 'en', 1, en_content, self.en_request)
-        cached_en_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_request)
+        set_placeholder_cache(self.placeholder_en, 'en', 1, en_content, self.en_request)
+        cached_en_content = get_placeholder_cache(self.placeholder_en, 'en', 1, self.en_request)
         self.assertEqual(cached_en_content, en_content)
 
-        set_placeholder_cache(self.placeholder, 'de', 1, de_content, self.de_request)
-        cached_de_content = get_placeholder_cache(self.placeholder, 'de', 1, self.de_request)
+        set_placeholder_cache(self.placeholder_de, 'de', 1, de_content, self.de_request)
+        cached_de_content = get_placeholder_cache(self.placeholder_de, 'de', 1, self.de_request)
         self.assertNotEqual(cached_en_content, cached_de_content)
 
-        set_placeholder_cache(self.placeholder, 'en', 1, en_us_content, self.en_us_request)
-        cached_en_us_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_us_request)
+        set_placeholder_cache(self.placeholder_en, 'en', 1, en_us_content, self.en_us_request)
+        cached_en_us_content = get_placeholder_cache(self.placeholder_en, 'en', 1, self.en_us_request)
         self.assertNotEqual(cached_en_content, cached_en_us_content)
 
-        set_placeholder_cache(self.placeholder, 'en', 1, en_uk_content, self.en_uk_request)
-        cached_en_uk_content = get_placeholder_cache(self.placeholder, 'en', 1, self.en_uk_request)
+        set_placeholder_cache(self.placeholder_en, 'en', 1, en_uk_content, self.en_uk_request)
+        cached_en_uk_content = get_placeholder_cache(self.placeholder_en, 'en', 1, self.en_uk_request)
         self.assertNotEqual(cached_en_us_content, cached_en_uk_content)
 
     def test_set_get_placeholder_cache_with_long_prefix(self):
@@ -801,19 +803,19 @@ class PlaceholderCacheTestCase(CMSTestCase):
             en_crazy_request.META['HTTP_COUNTRY_CODE'] = 'US' * 40  # 80 chars
             en_crazy_context = Context({'request': en_crazy_request})
             en_crazy_content = en_crazy_renderer.render_placeholder(
-                self.placeholder,
+                self.placeholder_en,
                 en_crazy_context,
                 language='en',
                 width=350,
             )
-            set_placeholder_cache(self.placeholder, 'en', 1, en_crazy_content, en_crazy_request)
+            set_placeholder_cache(self.placeholder_en, 'en', 1, en_crazy_content, en_crazy_request)
 
             # Prove that it is hashed...
-            crazy_cache_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, en_crazy_request)
+            crazy_cache_key = _get_placeholder_cache_key(self.placeholder_en, 'en', 1, en_crazy_request)
             key_length = len(crazy_cache_key)
             # 221 = 180 (prefix length) + 1 (separator) + 40 (sha1 hash)
             self.assertTrue('render_placeholder' not in crazy_cache_key and key_length == 221)
 
             # Prove it still works as expected
-            cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', 1, en_crazy_request)
+            cached_en_crazy_content = get_placeholder_cache(self.placeholder_en, 'en', 1, en_crazy_request)
             self.assertEqual(en_crazy_content, cached_en_crazy_content)

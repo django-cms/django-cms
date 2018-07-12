@@ -131,7 +131,7 @@ class PermissionModeratorTests(CMSTestCase):
         Add a plugin using the test client to check for permissions.
         """
         with self.login_user_context(user):
-            placeholder = page.placeholders.all()[0]
+            placeholder = page.get_placeholders('en')[0]
             post_data = {
                 'body': 'Test'
             }
@@ -294,7 +294,7 @@ class PermissionModeratorTests(CMSTestCase):
     def test_plugins_get_published(self):
         # create page under root
         page = create_page("page", "nav_playground.html", "en")
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         add_plugin(placeholder, "TextPlugin", "en", body="test")
         # public must not exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
@@ -306,7 +306,7 @@ class PermissionModeratorTests(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", parent=self.slave_page)
 
         # add plugin
-        placeholder = page.placeholders.all()[0]
+        placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, "TextPlugin", "en", body="test")
 
         # publish page

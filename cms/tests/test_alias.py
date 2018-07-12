@@ -27,7 +27,7 @@ class AliasTestCase(TransactionCMSTestCase):
 
     def test_add_plugin_alias(self):
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en")
-        ph_en = page_en.placeholders.get(slot="col_left")
+        ph_en = page_en.get_placeholders("en").get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         with self.login_user_context(self.get_superuser()):
             response = self.client.post(admin_reverse('cms_create_alias'), data={'plugin_id': text_plugin_1.pk})
@@ -56,8 +56,8 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        ph_1_en = page_en.placeholders.get(slot="col_left")
-        ph_2_en = page_en.placeholders.get(slot="col_sidebar")
+        ph_1_en = page_en.get_placeholders("en").get(slot="col_left")
+        ph_2_en = page_en.get_placeholders("en").get(slot="col_sidebar")
 
         api.add_plugin(ph_1_en, 'StylePlugin', 'en', tag_type='div', class_name='info')
         api.add_plugin(ph_1_en, 'AliasPlugin', 'en', alias_placeholder=ph_2_en)
@@ -71,7 +71,7 @@ class AliasTestCase(TransactionCMSTestCase):
     def test_alias_recursion_across_pages(self):
         superuser = self.get_superuser()
         page_1 = api.create_page("page-1", "col_two.html", "en", published=True)
-        page_1_pl = page_1.placeholders.get(slot="col_left")
+        page_1_pl = page_1.get_placeholders("en").get(slot="col_left")
         source_plugin = api.add_plugin(page_1_pl, 'StylePlugin', 'en', tag_type='div', class_name='info')
         # this creates a recursive alias on the same page
         alias_plugin = api.add_plugin(page_1_pl, 'AliasPlugin', 'en', plugin=source_plugin, target=source_plugin)
@@ -84,7 +84,7 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<div class="info">', html=False)
 
         page_2 = api.create_page("page-2", "col_two.html", "en")
-        page_2_pl = page_2.placeholders.get(slot="col_left")
+        page_2_pl = page_2.get_placeholders('en').get(slot="col_left")
         # This points to a plugin with a recursive alias
         api.add_plugin(page_2_pl, 'AliasPlugin', 'en', plugin=source_plugin)
 
@@ -106,7 +106,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=False,
         )
         source_plugin = api.add_plugin(
-            source_page.placeholders.get(slot="col_left"),
+            source_page.get_placeholders("en").get(slot="col_left"),
             'LinkPlugin',
             language='en',
             name='A Link',
@@ -119,7 +119,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=False,
         )
         api.add_plugin(
-            target_page.placeholders.get(slot="col_left"),
+            target_page.get_placeholders("en").get(slot="col_left"),
             'AliasPlugin',
             language='en',
             plugin=source_plugin,
@@ -161,7 +161,7 @@ class AliasTestCase(TransactionCMSTestCase):
             "en",
             published=False,
         )
-        source_placeholder = source_page.placeholders.get(slot="col_left")
+        source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
         api.add_plugin(
             source_placeholder,
             'LinkPlugin',
@@ -176,7 +176,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=False,
         )
         api.add_plugin(
-            target_page.placeholders.get(slot="col_left"),
+            target_page.get_placeholders('en').get(slot="col_left"),
             'AliasPlugin',
             language='en',
             alias_placeholder=source_placeholder,
@@ -218,7 +218,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        source_placeholder = source_page.placeholders.get(slot="col_left")
+        source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
 
         style = api.add_plugin(
             source_placeholder,
@@ -235,7 +235,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        target_placeholder = target_page.placeholders.get(slot="col_left")
+        target_placeholder = target_page.get_placeholders("en").get(slot="col_left")
         alias = api.add_plugin(
             target_placeholder,
             'AliasPlugin',
@@ -272,7 +272,7 @@ class AliasTestCase(TransactionCMSTestCase):
                 self.assertNotIn(start_tag, output)
 
             editable_placeholders = renderer.get_rendered_editable_placeholders()
-            self.assertNotIn(source_placeholder,editable_placeholders)
+            self.assertNotIn(source_placeholder, editable_placeholders)
 
     def test_alias_from_page_change_form_text(self):
         superuser = self.get_superuser()
@@ -290,7 +290,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        source_placeholder = source_page.placeholders.get(slot="col_left")
+        source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
 
         api.add_plugin(
             source_placeholder,
@@ -307,7 +307,7 @@ class AliasTestCase(TransactionCMSTestCase):
             published=True,
             in_navigation=True,
         )
-        target_placeholder = target_page.placeholders.get(slot="col_left")
+        target_placeholder = target_page.get_placeholders('en').get(slot="col_left")
         alias = api.add_plugin(
             target_placeholder,
             'AliasPlugin',
@@ -352,7 +352,7 @@ class AliasTestCase(TransactionCMSTestCase):
         '''
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                                   slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
+        ph_en = page_en.get_placeholders("en").get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         with self.login_user_context(self.get_superuser()):
             #
@@ -398,7 +398,7 @@ class AliasTestCase(TransactionCMSTestCase):
     def test_context_menus(self):
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                                   slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
+        ph_en = page_en.get_placeholders("en").get(slot="col_left")
         context = self.get_context(page=page_en)
         context['placeholder'] = ph_en
         template = Template('{% load cms_tags %}{% render_extra_menu_items placeholder %}')

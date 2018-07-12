@@ -166,7 +166,8 @@ def details(request, slug):
     structure_requested = get_cms_setting('CMS_TOOLBAR_URL__BUILD') in request.GET
 
     if user_can_change_page(request.user, page) and structure_requested:
-        return render_object_structure(request, page)
+        title = page.get_title_obj(request_language, fallback=False)
+        return render_object_structure(request, title)
     return render_page(request, page, current_language=request_language, slug=slug)
 
 

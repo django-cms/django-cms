@@ -38,10 +38,18 @@ _django_permissions_by_action = {
 }
 
 
-def _get_draft_placeholders(page):
-    if page.publisher_is_draft:
-        return page.placeholders.all()
-    return Placeholder.objects.filter(page__pk=page.publisher_public_id)
+def _get_draft_placeholders(page, language):
+    if not page.publisher_is_draft:
+        placeholders = (
+            Placeholder
+            .objects
+            .filter(
+                title__language=language,
+                title_page__pk=page.publisher_public_id,
+            )
+        )
+        return placeholders
+    return page.get_placeholders(language)
 
 
 def _check_delete_translation(user, page, language, site=None):
@@ -168,16 +176,15 @@ def user_can_delete_page(user, page, site=None):
     if not has_perm:
         return False
 
-    languages = page.get_languages()
-    placeholders = (
-        _get_draft_placeholders(page)
-        .filter(cmsplugin__language__in=languages)
-        .distinct()
-    )
-
-    for placeholder in placeholders.iterator():
-        if not placeholder.has_delete_plugins_permission(user, languages):
-            return False
+    for language in page.get_languages():
+        placeholders = (
+            _get_draft_placeholders(page, language)
+            .filter(cmsplugin__language=language)
+            .distinct()
+        )
+        for placeholder in placeholders:
+            if not placeholder.has_delete_plugins_permission(user, [language]):
+                return False
     return True
 
 
@@ -195,7 +202,7 @@ def user_can_delete_page_translation(user, page, language, site=None):
         return False
 
     placeholders = (
-        _get_draft_placeholders(page)
+        _get_draft_placeholders(page, language)
         .filter(cmsplugin__language=language)
         .distinct()
     )
@@ -213,7 +220,7 @@ def user_can_revert_page_to_live(user, page, language, site=None):
         return False
 
     placeholders = (
-        _get_draft_placeholders(page)
+        _get_draft_placeholders(page, language)
         .filter(cmsplugin__language=language)
         .distinct()
     )

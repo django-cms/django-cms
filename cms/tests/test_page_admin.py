@@ -80,7 +80,7 @@ class PageTestBase(CMSTestCase):
             'TextPlugin': {'body': '<p>text</p>'},
             'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
         }
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders(language).get(slot='body')
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
 
         if publish:
@@ -98,7 +98,7 @@ class PageTestBase(CMSTestCase):
         return lookup.exists()
 
     def _get_add_plugin_uri(self, page, language='en'):
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders(language).get(slot='body')
         uri = self.get_add_plugin_uri(
             placeholder=placeholder,
             plugin_type='LinkPlugin',
@@ -179,9 +179,10 @@ class PageTest(PageTestBase):
             page = title.page
             page.save()
             page.publish('en')
+
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
-            self.assertEqual(page.placeholders.all().count(), 2)
+            self.assertEqual(page.get_placeholders('en').count(), 2)
 
             # were public instances created?
             self.assertEqual(Title.objects.all().count(), 4)
@@ -663,33 +664,25 @@ class PageTest(PageTestBase):
 
     def test_copy_page_with_plugins(self):
         """
-        Copying a page with plugins should copy all plugins for each translation
-        on the page into the respective translation in the new page.
+        Copying a page with plugins should copy all plugins for the translation
+        being copied into the respective translation in the new page.
         """
-        languages = ('en', 'de', 'fr', 'pt-br')
         cms_page = create_page("page_a_en", "nav_playground.html", "en")
-        create_title('de', 'page_a_de', cms_page)
-        create_title('fr', 'page_a_fr', cms_page)
-        create_title('pt-br', 'page_a_pt-br', cms_page)
-        placeholder = cms_page.placeholders.get(slot='body')
-
-        for language in languages:
-            add_plugin(
-                placeholder,
-                plugin_type='LinkPlugin',
-                language=language,
-                name='Link {}'.format(language),
-                external_link='https://www.django-cms.org',
-            )
+        placeholder = cms_page.get_placeholders('en').get(slot='body')
+        add_plugin(
+            placeholder,
+            plugin_type='LinkPlugin',
+            language='en',
+            name='Link {}'.format('en'),
+            external_link='https://www.django-cms.org',
+        )
 
         with self.login_user_context(self.get_superuser()):
             new_page = self.copy_page(cms_page, cms_page, position=1)
-            new_placeholder = new_page.placeholders.get(slot='body')
-
-        for language in languages:
-            self.assertTrue(new_placeholder.get_plugins(language).exists())
-            plugin = new_placeholder.get_plugins(language)[0].get_bound_plugin()
-            self.assertEqual(plugin.name, 'Link {}'.format(language))
+            new_placeholder = new_page.get_placeholders('en').get(slot='body')
+        self.assertTrue(new_placeholder.get_plugins('en').exists())
+        plugin = new_placeholder.get_plugins('en')[0].get_bound_plugin()
+        self.assertEqual(plugin.name, 'Link en')
 
     def test_copy_page_to_root(self):
         """
@@ -1748,8 +1741,8 @@ class PageTest(PageTestBase):
     def test_global_limit_on_plugin_move(self):
         superuser = self.get_superuser()
         cms_page = self.get_page()
-        source_placeholder = cms_page.placeholders.get(slot='right-column')
-        target_placeholder = cms_page.placeholders.get(slot='body')
+        source_placeholder = cms_page.get_placeholders("en").get(slot='right-column')
+        target_placeholder = cms_page.get_placeholders("en").get(slot='body')
         data = {
             'placeholder': source_placeholder,
             'plugin_type': 'LinkPlugin',
@@ -1777,8 +1770,8 @@ class PageTest(PageTestBase):
     def test_type_limit_on_plugin_move(self):
         superuser = self.get_superuser()
         cms_page = self.get_page()
-        source_placeholder = cms_page.placeholders.get(slot='right-column')
-        target_placeholder = cms_page.placeholders.get(slot='body')
+        source_placeholder = cms_page.get_placeholders("en").get(slot='right-column')
+        target_placeholder = cms_page.get_placeholders("en").get(slot='body')
         data = {
             'placeholder': source_placeholder,
             'plugin_type': 'TextPlugin',
@@ -2385,9 +2378,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             page.pk,
             translation.language,
         )
-        live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -2398,6 +2388,15 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_link')
         self.add_global_permission(staff_user, can_change=True)
+
+        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
+        live_plugins = (
+            page
+            .publisher_public
+            .get_placeholders(translation.language)
+            .get(slot='body')
+            .get_plugins()
+        )
 
         with self.login_user_context(staff_user):
             self.assertEqual(draft_plugins.count(), 2)
@@ -2425,9 +2424,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             page.pk,
             translation.language,
         )
-        live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -2437,6 +2433,15 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=True)
+
+        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
+        live_plugins = (
+            page
+            .publisher_public
+            .get_placeholders(translation.language)
+            .get(slot='body')
+            .get_plugins()
+        )
 
         with self.login_user_context(staff_user):
             self.assertEqual(draft_plugins.count(), 2)
@@ -3038,7 +3043,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -3061,7 +3066,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -3180,7 +3185,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         plugin = self._add_plugin_to_page(page)
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders('en').get(slot='right-column')
 
         data = {
             'plugin_id': plugin.pk,
@@ -3211,7 +3216,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         plugin = self._add_plugin_to_page(page)
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders("en").get(slot='right-column')
 
         data = {
             'plugin_id': plugin.pk,
@@ -3242,7 +3247,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders('en').get(slot='right-column')
 
         data = {
             'source_plugin_id': plugin.pk,
@@ -3280,7 +3285,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders('en').get(slot='right-column')
 
         data = {
             'source_plugin_id': plugin.pk,
@@ -3382,7 +3387,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
 
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
@@ -3401,7 +3406,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
 
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
@@ -3926,9 +3931,6 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page.pk,
             translation.language,
         )
-        live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -3942,6 +3944,15 @@ class PermissionsOnPageTest(PermissionsTestCase):
             staff_user,
             page,
             can_change=True,
+        )
+
+        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
+        live_plugins = (
+            page
+            .publisher_public
+            .get_placeholders(translation.language)
+            .get(slot='body')
+            .get_plugins()
         )
 
         with self.login_user_context(staff_user):
@@ -3970,9 +3981,6 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page.pk,
             translation.language,
         )
-        live_page = page.publisher_public
-        draft_plugins = page.placeholders.get(slot='body').get_plugins(translation.language)
-        live_plugins = live_page.placeholders.get(slot='body').get_plugins(translation.language)
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -3985,6 +3993,15 @@ class PermissionsOnPageTest(PermissionsTestCase):
             staff_user,
             page,
             can_change=True,
+        )
+
+        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
+        live_plugins = (
+            page
+            .publisher_public
+            .get_placeholders(translation.language)
+            .get(slot='body')
+            .get_plugins()
         )
 
         with self.login_user_context(staff_user):
@@ -4519,7 +4536,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -4546,7 +4563,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self._get_add_plugin_uri(page)
 
@@ -4685,7 +4702,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         plugin = self._add_plugin_to_page(page)
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders('en').get(slot='right-column')
 
         data = {
             'plugin_id': plugin.pk,
@@ -4720,7 +4737,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         plugin = self._add_plugin_to_page(page)
         endpoint = self.get_move_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders("en").get(slot='right-column')
 
         data = {
             'plugin_id': plugin.pk,
@@ -4755,7 +4772,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        page.get_title_obj(translation.language)
+        target_placeholder = page.get_placeholders(translation.language).get(slot='right-column')
 
         data = {
             'source_plugin_id': plugin.pk,
@@ -4797,7 +4815,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        target_placeholder = page.placeholders.get(slot='right-column')
+        target_placeholder = page.get_placeholders(translation.language).get(slot='right-column')
 
         data = {
             'source_plugin_id': plugin.pk,
@@ -4910,7 +4928,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')
@@ -4928,7 +4946,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        placeholder = page.placeholders.get(slot='body')
+        placeholder = page.get_placeholders("en").get(slot='body')
         endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_page')

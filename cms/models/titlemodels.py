@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
@@ -37,7 +39,8 @@ class Title(models.Model):
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
-
+    # Placeholders (plugins)
+    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
     # Publisher fields
     published = models.BooleanField(_("is published"), blank=True, default=False)
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
@@ -144,6 +147,32 @@ class Title(models.Model):
             self.publisher_public.published,
         )
         return old_values != new_values
+
+    def has_placeholder_change_permission(self, user):
+        if not self.page.publisher_is_draft:
+            return False
+        return self.page.has_change_permission(user)
+
+    def rescan_placeholders(self):
+        """
+        Rescan and if necessary create placeholders in the current template.
+        """
+        existing = OrderedDict()
+        placeholders = [pl.slot for pl in self.page.get_declared_placeholders()]
+
+        for placeholder in self.placeholders.all():
+            if placeholder.slot in placeholders:
+                existing[placeholder.slot] = placeholder
+
+        for placeholder in placeholders:
+            if placeholder not in existing:
+                existing[placeholder] = self.placeholders.create(slot=placeholder)
+        return existing
+
+    def get_placeholders(self):
+        if not hasattr(self, '_placeholder_cache'):
+            self._placeholder_cache = self.placeholders.all()
+        return self._placeholder_cache
 
 
 class EmptyTitle(object):

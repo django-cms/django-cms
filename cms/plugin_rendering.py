@@ -491,10 +491,13 @@ class ContentRenderer(BaseRenderer):
         from cms.utils.plugins import assign_plugins
 
         if slots:
-            placeholders = page.get_placeholders().filter(slot__in=slots)
+            placeholders = page.get_placeholders(self.request_language).filter(slot__in=slots)
         else:
+            title = page.get_title_obj(self.request_language, fallback=False)
+            # TODO: Not django 2.0 compatible
+            title._page_cache = page
             # Creates any placeholders missing on the page
-            placeholders = page.rescan_placeholders().values()
+            placeholders = title.rescan_placeholders().values()
 
         if inherit:
             # When the inherit flag is True,

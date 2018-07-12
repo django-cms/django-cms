@@ -18,6 +18,7 @@ from django.core.exceptions import (ObjectDoesNotExist,
                                     PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q, Prefetch
+from django.db.models.query import QuerySet
 from django.http import (
     HttpResponseRedirect,
     HttpResponse,
@@ -55,7 +56,7 @@ from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
     EmptyTitle, Page, PageType,
-    Title, CMSPlugin, PagePermission,
+    Title, CMSPlugin, Placeholder, PagePermission,
     GlobalPagePermission, StaticPlaceholder,
 )
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
@@ -486,9 +487,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             nodes = obj.node.get_descendants()
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
-        for page in cms_pages:
-            page._clear_placeholders()
-            page.get_placeholders().delete()
+        # Delete all of the pages titles contents
+        placeholders = Placeholder.objects.filter(title__page__in=cms_pages)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
+        QuerySet.delete(plugins)
+        placeholders.delete()
 
         super(BasePageAdmin, self).delete_model(request, obj)
 
@@ -963,9 +966,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
-        for placeholder in page.get_placeholders():
-            plugins = list(
-                placeholder.get_plugins(language=source_language).order_by('path'))
+        for placeholder in page.get_placeholders(source_language):
+            plugins = list(placeholder.get_plugins().order_by('path'))
             if not placeholder.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
             copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
@@ -1252,9 +1254,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         titleopts = Title._meta
         app_label = titleopts.app_label
         pluginopts = CMSPlugin._meta
-
-        saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
-
+        saved_plugins = CMSPlugin.objects.filter(placeholder__title=translation, language=language)
         using = router.db_for_read(self.model)
         kwargs = {
             'admin_site': self.admin_site,

@@ -178,10 +178,10 @@ class PublisherCommandTests(TestCase):
         draft = Page.objects.drafts()[0]
         draft.reverse_id = 'a_test' # we have to change *something*
         draft.save()
-        add_plugin(draft.placeholders.get(slot=u"body"),
+        add_plugin(draft.get_placeholders('en').get(slot=u"body"),
                    u"TextPlugin", u"en", body="Test content")
         draft.publish('en')
-        add_plugin(draft.placeholders.get(slot=u"body"),
+        add_plugin(draft.get_placeholders('en').get(slot=u"body"),
                    u"TextPlugin", u"en", body="Test content")
 
         # Manually undoing table name patching
@@ -779,7 +779,7 @@ class PublishingTests(TestCase):
         user = self.get_superuser()
         page = create_page("Page", "nav_playground.html", "en", published=True,
                            created_by=user)
-        placeholder = page.placeholders.get(slot=u"body")
+        placeholder = page.get_placeholders('en').get(slot=u"body")
         deleted_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Deleted content")
         text_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Public content")
         page.publish('en')
@@ -795,7 +795,7 @@ class PublishingTests(TestCase):
         self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
 
         self.assertEqual(CMSPlugin.objects.count(), 4)
-        plugins = CMSPlugin.objects.filter(placeholder__page=page)
+        plugins = CMSPlugin.objects.filter(placeholder=placeholder)
         self.assertEqual(plugins.count(), 2)
 
         plugins = [plugin.get_plugin_instance()[0] for plugin in plugins]
