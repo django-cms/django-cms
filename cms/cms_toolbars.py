@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.utils.translation import override as force_language, ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
@@ -20,7 +20,6 @@ from cms.utils.i18n import get_language_tuple, get_language_dict
 from cms.utils.page_permissions import (
     user_can_change_page,
     user_can_delete_page,
-    user_can_publish_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
@@ -236,7 +235,6 @@ class PageToolbar(CMSToolbar):
             self.statics = StaticPlaceholder.objects.filter(
                 Q(draft__in=placeholder_ids) | Q(public__in=placeholder_ids)
             )
-            self.dirty_statics = [sp for sp in self.statics if sp.dirty]
         else:
             if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
                 # User has explicitly requested structure mode
@@ -247,7 +245,6 @@ class PageToolbar(CMSToolbar):
 
             self.placeholders = renderer.get_rendered_placeholders()
             self.statics = renderer.get_rendered_static_placeholders()
-            self.dirty_statics = [sp for sp in self.statics if sp.dirty]
 
     def add_structure_mode(self):
         if self.page and not self.page.application_urls:
@@ -281,31 +278,10 @@ class PageToolbar(CMSToolbar):
         except Title.DoesNotExist:
             return None
 
-    def has_publish_permission(self):
-        if self.page:
-            publish_permission = page_permissions.user_can_publish_page(
-                self.request.user,
-                page=self.page,
-                site=self.current_site
-            )
-        else:
-            publish_permission = False
-
-        if publish_permission and self.statics:
-            publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
-        return publish_permission
-
-    def has_unpublish_permission(self):
-        return self.has_publish_permission()
-
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
             self.page_change_permission = can_change_page(self.request)
         return self.page_change_permission
-
-    def page_is_pending(self, page, language):
-        return (page.publisher_public_id and
-                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
 
     def in_apphook(self):
         with force_language(self.toolbar.request_language):
@@ -357,32 +333,7 @@ class PageToolbar(CMSToolbar):
         self.add_draft_live()
         self.add_structure_mode()
 
-    def has_dirty_objects(self):
-        language = self.current_lang
-
-        if self.page:
-            if self.dirty_statics:
-                # There's dirty static placeholders on this page.
-                # Only show the page as dirty (publish button) if the page
-                # translation has been configured.
-                dirty = self.page.has_translation(language)
-            else:
-                dirty = (self.page.is_dirty(language) or self.page_is_pending(self.page, language))
-        else:
-            dirty = bool(self.dirty_statics)
-        return dirty
-
     # Buttons
-
-    def user_can_publish(self):
-        if self.page and self.page.is_page_type:
-            # By design, page-types are not publishable.
-            return False
-
-        if not self.toolbar.edit_mode_active:
-            return False
-        return self.has_publish_permission() and self.has_dirty_objects()
-
     def add_draft_live(self):
         if self.page:
             if self.toolbar.edit_mode_active and not self.title:
@@ -652,23 +603,6 @@ class PageToolbar(CMSToolbar):
                     nav_title,
                     action=nav_action,
                     disabled=(not edit_mode or not can_change),
-                    on_success=refresh,
-                )
-
-            # publisher
-            if self.title and not self.page.is_page_type:
-                if self.title.published:
-                    publish_title = _('Unpublish page')
-                    publish_url = admin_reverse('cms_page_unpublish', args=(self.page.pk, self.current_lang))
-                else:
-                    publish_title = _('Publish page')
-                    publish_url = admin_reverse('cms_page_publish_page', args=(self.page.pk, self.current_lang))
-
-                user_can_publish = user_can_publish_page(self.request.user, page=self.page)
-                current_page_menu.add_ajax_item(
-                    publish_title,
-                    action=publish_url,
-                    disabled=not edit_mode or not user_can_publish,
                     on_success=refresh,
                 )
 
