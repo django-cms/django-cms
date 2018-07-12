@@ -104,3 +104,24 @@ $testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
 .testimonial-logo {
     max-height: 32px;
 }
+
+.testimonial-vertical {
+    opacity: 1;
+    margin-left: 0px;
+
+    .testimonial-img {
+        margin-right: 16px;
+        margin-left: 50px;
+    }
+
+    .icon {
+        transform: rotate(90deg) scaleX(-1);
+        top: 100%;
+        left: 20px;
+        margin-top: -3px;
+    }
+
+    .testimonial-footer {
+        justify-content: flex-start;
+    }
+}

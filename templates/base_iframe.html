@@ -11,29 +11,11 @@
             {% page_attribute page_title %} - {{ request.site.name }}
         {% endblock title %}
     </title>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link type="text/css" rel="stylesheet" href="//fast.fonts.net/cssapi/5f442160-ae59-4b9c-9bf3-5eacbfc463eb.css">
     {% render_block "css" %}
     <script src="{% static 'js/addons/iframeresizer.contentwindow.min.js' %}"></script>
-    <style>
-        /* required styles, do not change */
-        html, body {
-            background: #002D39;
-        }
-        .wrapper {
-            width: 100%;
-            padding: 175px 40px 0;
-            height: 100%;
-            color: white;
-            /* for testing */
-            /* max-width: 460px; */
-        }
-        html {
-            -moz-osx-font-smoothing: grayscale;
-            -webkit-font-smoothing: antialiased;
-            font-smoothing: antialiased;
-        }
-    </style>
 </head>
 <body>
     {% cms_toolbar %}
