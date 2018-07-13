@@ -71,7 +71,7 @@ matrix:
       env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
     # DJANGO 2.1
-    - python: 3.4
+    - python: 3.5
       env: DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.5
       env: DJANGO=2.1 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
