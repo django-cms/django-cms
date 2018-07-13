@@ -318,8 +318,7 @@ class AddPageForm(BasePageForm):
         )
 
         if is_first and not new_page.is_page_type:
-            # its the first page. publish it right away
-            new_page.publish(translation.language)
+            # its the first page. Make it the homepage
             new_page.set_as_homepage(self._user)
 
         send_post_page_operation(
