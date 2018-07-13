@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
 from cms.models import PagePermission, GlobalPagePermission
-from cms.utils import permissions, page_permissions, get_current_site
+from cms.utils import permissions, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 
@@ -39,25 +39,16 @@ class PagePermissionInlineAdmin(TabularInline):
     show_with_view_permissions = False
 
     def has_change_permission(self, request, obj=None):
-        site = self.get_site(request)
         if not obj:
-            return permissions.has_global_permission(request.user, site, 'can_change_pagepermission')
-        return page_permissions.user_can_change_page_permissions(request.user, page=obj, site=site)
+            return False
+        return page_permissions.user_can_change_page_permissions(
+            request.user,
+            page=obj,
+            site=obj.node.site,
+        )
 
     def has_add_permission(self, request, obj=None):
         return self.has_change_permission(request, obj)
-
-    def get_site(self, request):
-        site_id = request.session.get('cms_admin_site')
-
-        if not site_id:
-            return get_current_site()
-
-        try:
-            site = Site.objects._get_site_by_id(site_id)
-        except Site.DoesNotExist:
-            site = get_current_site()
-        return site
 
     @classproperty
     def raw_id_fields(cls):

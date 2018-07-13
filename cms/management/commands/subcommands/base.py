@@ -62,7 +62,7 @@ class SubcommandsCommand(BaseCommand):
         self.instances = {}
 
         if self.subcommands:
-            stealth_options = list(self.stealth_options)
+            stealth_options = set(self.stealth_options)
             subparsers = parser.add_subparsers(dest=self.subcommand_dest)
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
@@ -75,9 +75,9 @@ class SubcommandsCommand(BaseCommand):
 
                 add_builtin_arguments(parser=parser_sub)
                 instance.add_arguments(parser_sub)
-                stealth_options.extend({action.dest for action in parser_sub._actions})
+                stealth_options.update({action.dest for action in parser_sub._actions})
                 self.instances[command] = instance
-            self.stealth_options = tuple(set(stealth_options))
+            self.stealth_options = tuple(stealth_options)
 
     def handle(self, *args, **options):
         if options[self.subcommand_dest] in self.instances:
