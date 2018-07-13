@@ -15,7 +15,7 @@ def post_save_user(instance, raw, created, **kwargs):
     from cms.utils.permissions import get_current_user
     # read current user from thread locals
     creator = get_current_user()
-    if not creator or not created or creator.is_anonymous():
+    if not creator or not created or creator.is_anonymous:
         return
 
     page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
@@ -34,7 +34,7 @@ def post_save_user_group(instance, raw, created, **kwargs):
     from cms.utils.permissions import get_current_user
     # read current user from thread locals
     creator = get_current_user()
-    if not creator or not created or creator.is_anonymous():
+    if not creator or not created or creator.is_anonymous:
         return
     page_user = PageUserGroup(group_ptr_id=instance.pk, created_by=creator)
     page_user.__dict__.update(instance.__dict__)

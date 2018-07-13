@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import django
 from django.apps import apps
 from django.db import models
 from django.conf import settings
@@ -12,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
+from cms.utils.compat import DJANGO_1_11
 
 
 # Cannot use contrib.auth.get_user_model() at compile time.
@@ -281,5 +281,5 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
-        if (1, 10) <= django.VERSION < (2, 0):
+        if DJANGO_1_11:
             manager_inheritance_from_future = True

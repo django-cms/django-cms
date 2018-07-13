@@ -7,6 +7,8 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import no_style
 
+from cms.utils.compat import DJANGO_2_0
+
 
 def add_builtin_arguments(parser):
     parser.add_argument(
@@ -42,14 +44,16 @@ class SubcommandsCommand(BaseCommand):
     instances = {}
     help_string = ''
     command_name = ''
+    stealth_options = ('interactive',)
 
     subcommand_dest = 'subcmd'
 
     def create_parser(self, prog_name, subcommand):
+        kwargs = {'cmd': self} if DJANGO_2_0 else {}
         parser = CommandParser(
-            self,
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
-            description=self.help or None
+            description=self.help or None,
+            **kwargs
         )
         self.add_arguments(parser)
         return parser
@@ -58,18 +62,22 @@ class SubcommandsCommand(BaseCommand):
         self.instances = {}
 
         if self.subcommands:
+            stealth_options = set(self.stealth_options)
             subparsers = parser.add_subparsers(dest=self.subcommand_dest)
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
+                kwargs = {'cmd': self} if DJANGO_2_0 else {}
                 parser_sub = subparsers.add_parser(
-                    cmd=self, name=instance.command_name, help=instance.help_string,
-                    description=instance.help_string
+                    name=instance.command_name, help=instance.help_string,
+                    description=instance.help_string, **kwargs
                 )
 
                 add_builtin_arguments(parser=parser_sub)
                 instance.add_arguments(parser_sub)
+                stealth_options.update({action.dest for action in parser_sub._actions})
                 self.instances[command] = instance
+            self.stealth_options = tuple(stealth_options)
 
     def handle(self, *args, **options):
         if options[self.subcommand_dest] in self.instances:
