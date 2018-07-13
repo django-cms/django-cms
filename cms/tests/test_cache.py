@@ -423,7 +423,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url, 'en')
 
             # Ensure that user is NOT authenticated
-            self.assertFalse(request.user.is_authenticated())
+            self.assertFalse(request.user.is_authenticated)
 
             # Test that the page is initially uncached
             with self.assertNumQueries(FuzzyInt(1, 25)):
@@ -550,7 +550,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1.get_path(), 'en')
 
             # Ensure that user is NOT authenticated
-            self.assertFalse(request.user.is_authenticated())
+            self.assertFalse(request.user.is_authenticated)
 
             # Test that the page is initially uncached
             with self.assertNumQueries(FuzzyInt(1, 25)):

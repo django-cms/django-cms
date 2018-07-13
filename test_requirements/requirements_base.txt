@@ -2,11 +2,11 @@ coverage==4.2
 python-coveralls==2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==3.3
-django-treebeard>=4.1
+django-treebeard>=4.3
 argparse
 dj-database-url
-djangocms-admin-style>=1.0
-django-sekizai>=0.9
+djangocms-admin-style>=1.2
+django-sekizai>=0.7
 django-classy-tags>=0.7.2
 https://github.com/divio/djangocms-text-ckeditor/archive/master.zip
 https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
@@ -19,3 +19,4 @@ pyenchant
 # required to run the server for integration tests
 djangocms-helper
 mock>=2.0.0
+django-formtools

@@ -351,7 +351,7 @@ low-level API to edit the toolbar according to your needs::
     from cms.toolbar_base import CMSToolbar
     from cms.utils import get_cms_setting
     from cms.utils.page_permissions import user_can_change_page
-    from django.core.urlresolvers import reverse, NoReverseMatch
+    from django.urls import reverse, NoReverseMatch
     from django.utils.translation import ugettext_lazy as _
     from .models import IconExtension
 

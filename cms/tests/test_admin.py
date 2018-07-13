@@ -9,7 +9,7 @@ from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import (Http404, HttpResponseBadRequest,
                          HttpResponseNotFound)
 from django.utils.encoding import force_text, smart_str
@@ -58,10 +58,11 @@ class AdminTestsBase(CMSTestCase):
 
         normal_guy.is_staff = True
         normal_guy.is_active = True
-        normal_guy.save()
-        normal_guy.user_permissions = Permission.objects.filter(
+        perms = Permission.objects.filter(
             codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
         )
+        normal_guy.save()
+        normal_guy.user_permissions.set(perms)
         if use_global_permissions:
             gpp = GlobalPagePermission.objects.create(
                 user=normal_guy,
@@ -72,7 +73,7 @@ class AdminTestsBase(CMSTestCase):
                 can_change_permissions=False,
                 can_move_page=True,
             )
-            gpp.sites = Site.objects.all()
+            gpp.sites.set(Site.objects.all())
         return normal_guy
 
 

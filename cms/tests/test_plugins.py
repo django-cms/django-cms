@@ -11,10 +11,10 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
-from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.translation import override as force_language
@@ -924,7 +924,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             build_plugin_tree(page.get_placeholders("en").get(slot='right-column').get_plugins_list())
 
     def test_custom_plugin_urls(self):
-        plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')
+        plugin_url = reverse('admin:dumbfixtureplugin')
 
         response = self.client.get(plugin_url)
         self.assertEqual(response.status_code, 200)
@@ -1484,28 +1484,28 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
             LessMixedPlugin, NonPluginModel
         )
         # the first concrete class of the following four plugins is TestPluginAlphaModel
-        self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        self.assertEqual(TestPluginBetaModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(TestPluginBetaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        self.assertEqual(ProxiedAlphaPluginModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(ProxiedAlphaPluginModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
         # Abstract plugins will have the dynamic format for related name
         self.assertEqual(
-            AbstractPluginParent.cmsplugin_ptr.field.rel.related_name,
+            AbstractPluginParent.cmsplugin_ptr.field.remote_field.related_name,
             '%(app_label)s_%(class)s'
         )
         # Concrete plugin of an abstract plugin gets its relatedname
-        self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testplugingammamodel')
         # Child plugin gets it's own related name
-        self.assertEqual(MixedPlugin.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(MixedPlugin.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_mixedplugin')
         # If the child plugin inherit straight from CMSPlugin, even if composed with
         # other models, gets its own related_name
-        self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_lessmixedplugin')
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, 'cmsplugin_ptr'))

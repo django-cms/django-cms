@@ -4,8 +4,8 @@ from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.db.models import Q
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import override as force_language, ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
