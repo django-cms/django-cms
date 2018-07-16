@@ -3,14 +3,14 @@ import datetime
 import json
 import sys
 
-from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
+from django.urls import clear_url_caches
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
@@ -587,7 +587,7 @@ class PageTest(PageTestBase):
     def test_publish_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en", published=True)
         homepage.set_as_homepage()
-        pending_child_1 =  create_page(
+        pending_child_1 = create_page(
             "child-1",
             "nav_playground.html",
             language="en",
@@ -1025,13 +1025,13 @@ class PageTest(PageTestBase):
                     'name': 'English',
                     'fallbacks': ['fr', 'de'],
                     'public': True,
-                    'fallbacks':['fr']
+                    'fallbacks': ['fr']
                 },
                 {
                     'code': 'fr',
                     'name': 'French',
                     'public': True,
-                    'fallbacks':['en']
+                    'fallbacks': ['en']
                 },
         ]}
         with self.settings(CMS_LANGUAGES=languages):

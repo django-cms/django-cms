@@ -549,7 +549,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
                                   help_text=_('Redirects to this URL.'),
                                   placeholder_text=_('Start typing...'),
-                                  ajax_view='admin:cms_page_get_published_pagelist'
+                                  ajax_view='admin:cms_page_get_published_pagelist',
     )
 
     # This is really a 'fake' field which does not correspond to any Page attribute

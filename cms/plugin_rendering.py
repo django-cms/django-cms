@@ -13,12 +13,14 @@ from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
+from cms.models.titlemodels import Title
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
+from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
@@ -494,8 +496,11 @@ class ContentRenderer(BaseRenderer):
             placeholders = page.get_placeholders(self.request_language).filter(slot__in=slots)
         else:
             title = page.get_title_obj(self.request_language, fallback=False)
-            # TODO: Not django 2.0 compatible
-            title._page_cache = page
+
+            if DJANGO_1_11:
+                title._page_cache = page
+            else:
+                Title.page.field.set_cached_value(title, page)
             # Creates any placeholders missing on the page
             placeholders = title.rescan_placeholders().values()
 

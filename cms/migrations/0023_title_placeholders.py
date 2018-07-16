@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0021_auto_20180507_1432'),
+        ('cms', '0022_auto_20180620_1551'),
     ]
 
     operations = [
@@ -17,6 +17,7 @@ class Migration(migrations.Migration):
             name='placeholders',
             field=models.ManyToManyField(editable=False, to='cms.Placeholder'),
         ),
+        # Temporary field used by migration 0024
         migrations.AddField(
             model_name='placeholder',
             name='title_id',

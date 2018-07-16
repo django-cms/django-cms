@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
+from django.urls import Resolver404, resolve, reverse
 
 from cms import __version__
 from cms.cache.page import set_page_cache
