@@ -4,73 +4,66 @@
 {% block title %}{{ profile.name }} - Divio Partner{% endblock %}
 
 {% block extend_base %}
-    <div class="page-header">
-        <div class="container">
-            <div class="page-header-with-image">
-                <p class="spitzmarke">Divio Partner</p>
-                <h1 class="display-1">{{ profile.name }}</h1>
-                <div class="lead">{{ profile.description|safe|truncatewords:"25" }}</div>
-                <a href="../../../" class="btn btn-outline-primary mr-2">
-                    {% include "includes/icon.html" with icon="arrow-right" class="icon-rotate-180" %} &nbsp;
-                    {% trans "Back" %}
-                </a>
-                {% if profile.contact %}
-                    {% if profile.kind|lower == "individual" %}
-                        <a class="btn btn-primary js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
-                            data-page="Partners"
-                            data-process="{{ profile.name }}"
-                            data-event="Clicked on Hire me"
-                        >{% trans "Hire us" %}</a>
-                    {% else %}
-                        <a class="btn btn-primary js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
-                            data-page="Partners"
-                            data-process="{{ profile.name }}"
-                            data-event="Clicked on Hire us"
-                        >{% trans "Hire us" %}</a>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </div>
-    </div>
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <div class="divio-partner-col-left pt-3 pt-md-6 pt-lg-7">
+                    <div class="divio-partner-logo-section mb-7">
+                        {% if profile.logo %}
+                            <img src="{{ profile.logo }}" alt="{{ profile.name }}" class="img-thumbnail p-3 mb-3">
+                        {% endif %}
 
-    <div class="section section-fullwidth stripe stripe-up">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    {% if profile.logo %}
-                        <img src="{{ profile.logo }}" alt="{{ profile.name }}" class="img-thumbnail p-3 mb-3">
-                    {% endif %}
+                        <a href="../../../" class="btn btn-block btn-sm btn-outline-primary mr-2">
+                            {% trans "Back to overview" %}
+                        </a>
 
-                    <div class="list-group mb-3">
-                        <div class="list-group-item active"><strong>{% trans "About" %}</strong></div>
+                        {% if profile.contact %}
+                            {% if profile.kind|lower == "individual" %}
+                                <a class="btn btn-primary btn-block btn-sm js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
+                                    data-page="Partners"
+                                    data-process="{{ profile.name }}"
+                                    data-event="Clicked on Hire me"
+                                >{% trans "Hire us" %}</a>
+                            {% else %}
+                                <a class="btn btn-primary btn-block btn-sm js-analytics-link" href="mailto:{{ profile.contact }}?subject=Hiring%20Request%20from%20Divio%20Partners"
+                                    data-page="Partners"
+                                    data-process="{{ profile.name }}"
+                                    data-event="Clicked on Hire us"
+                                >{% trans "Hire us" %}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-5">
+                        <p class="h6">{% trans "About" %}<p>
                         {% if profile.active_for %}
-                            <div class="list-group-item">
+                            <div class="spitzmarke">
                                 {{ profile.active_for }} Yr{{ profile.active_for|pluralize }}. experience
                             </div>
                         {% elif profile.active_since %}
-                            <div class="list-group-item">
+                            <div class="spitzmarke">
                                 {% trans "Since" %} {{ profile.active_since }}
                             </div>
                         {% endif %}
 
                         {% if profile.url %}
-                            <a href="{{ profile.url }}" class="list-group-item list-group-item-action" target="_blank">
+                            <a href="{{ profile.url }}" class="spitzmarke" target="_blank">
                                 {% trans "View website" %}
                             </a>
                         {% endif %}
                     </div>
 
                     {% if profile.locations %}
-                        <div class="list-group mb-3">
-                            <div class="list-group-item active"><strong>{% trans "Locations" %}</strong></div>
+                        <div class="mb-5">
+                            <p class="h6">{% trans "Locations" %}</p>
                             {% for location in profile.locations %}
                                 {% if location and location.lat and location.lon %}
-                                    <a href="https://www.google.com/maps/place/{{ location.full_address|slugify }}/@{{ location.lat }},{{ location.lon }},14z"
-                                        class="list-group-item" target="_blank">
+                                    <a class="spitzmarke" href="https://www.google.com/maps/place/{{ location.full_address|slugify }}/@{{ location.lat }},{{ location.lon }},14z"
+                                        class="" target="_blank">
                                         {{ location.full_address }}
                                     </a>
                                 {% else %}
-                                    <div class="list-group-item">
+                                    <div class="spitzmarke">
                                         {{ location.full_address }}
                                     </div>
                                 {% endif %}
@@ -79,24 +72,31 @@
                     {% endif %}
 
                     {% if profile.expertise %}
-                        <ul class="list-group mb-3">
-                            <li class="list-group-item active"><strong>{% trans "Expertise" %}</strong></li>
+                        <div class="mb-5">
+                            <p class="h6">{% trans "Expertise" %}</p>
                             {% for expertise in profile.expertise %}
-                                <li class="list-group-item">{{ expertise }}</li>
+                                <div class="spitzmarke">{{ expertise }}</div>
                             {% endfor %}
-                        </ul>
+                        </div>
                     {% endif %}
                 </div>
-                <div class="col-md-8">
-                    <h2>{% trans "Description" %}</h2>
+            </div>
+            <div class="col-md-8">
+                <div class="pt-3 pt-md-6 pt-lg-7 divio-partner-col-right">
+                    <p class="spitzmarke">Divio Partner</p>
+                    <h1 class="display-1">{{ profile.name }}</h1>
+
                     {% if profile.backdrop %}
-                        <p><img src="{{ profile.backdrop }}" alt="" class="img-fluid rounded"></p>
+                        <p><img src="{{ profile.backdrop }}" alt="" class="img-fluid rounded my-5"></p>
                     {% endif %}
-                    {{ profile.description|safe }}
+
+                    <div class="lead mb-7">
+                        {{ profile.description|safe }}
+                    </div>
 
                     {% if profile.references %}
                         <div class="network-references">
-                            <h2>
+                            <h2 class="h6 spitzmarke-lg">
                                 {% if profile.kind|lower == "individual" %}
                                     {% trans "My portfolio" %}
                                 {% else %}
