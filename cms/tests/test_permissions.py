@@ -5,11 +5,19 @@ from django.test.utils import override_settings
 from cms.api import create_page, assign_user_to_page
 from cms.cache.permissions import (get_permission_cache, set_permission_cache,
                                    clear_user_permission_cache)
+from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.page_permissions import get_change_id_list
+from cms.utils.page_permissions import get_change_id_list, user_can_publish_page
 
 
-@override_settings(CMS_PERMISSION=True)
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_CACHE_DURATIONS={
+        'menus': 60,
+        'content': 60,
+        'permissions': 60,
+    },
+)
 class PermissionCacheTests(CMSTestCase):
 
     def setUp(self):
@@ -51,3 +59,28 @@ class PermissionCacheTests(CMSTestCase):
                                                               "change_page")
         self.assertEqual(live_permissions, [page_b.id])
         self.assertEqual(cached_permissions_permissions, live_permissions)
+
+    def test_cached_permission_precedence(self):
+        # refs - https://github.com/divio/django-cms/issues/6335
+        # cached page permissions should not override global permissions
+        page = create_page(
+            "test page",
+            "nav_playground.html",
+            "en",
+            created_by=self.user_super,
+        )
+        page_permission = GlobalPagePermission.objects.create(
+            can_change=True,
+            can_publish=True,
+            user=self.user_normal,
+        )
+        page_permission.sites.add(Site.objects.get_current())
+        set_permission_cache(self.user_normal, "publish_page", [])
+
+        can_publish = user_can_publish_page(
+            self.user_normal,
+            page,
+            Site.objects.get_current(),
+        )
+        self.assertTrue(can_publish)
+

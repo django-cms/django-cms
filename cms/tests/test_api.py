@@ -238,3 +238,7 @@ class PythonAPITests(CMSTestCase):
         parent_page = create_page(**page_attrs)
         parent_page_public = parent_page.get_public_object()
         self.assertRaises(AssertionError, create_page, parent=parent_page_public, **page_attrs)
+
+    def test_create_page_page_title(self):
+        page = create_page(**dict(self._get_default_create_page_arguments(), page_title='page title'))
+        self.assertEqual(page.get_title_obj_attribute('page_title'), 'page title')
