@@ -154,7 +154,7 @@ export function initFixedHeaderTables(selector = '.js-table') {
     });
 }
 
-export function initTableCrossHover(selector = '.js-table') {
+export function initTableCrossHover(selector = '.js-table.table-hover') {
     $(selector).closest('.sticky-wrap').each((i, el) => {
         const wrapper = $(el);
 

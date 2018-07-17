@@ -91,4 +91,9 @@
     tr td:last-child {
         text-align: left;
     }
+
+    tr th:first-child {
+        font-size: rem(18px);
+        font-weight: normal;
+    }
 }
