@@ -284,7 +284,7 @@ Classes and methods
 
     ..  method:: add_item(item, position=None)
 
-        Adds a item (which must be a sub-class of :class:`~cms.toolbar.items.BaseItem`), and
+        Adds an item (which must be a sub-class of :class:`~cms.toolbar.items.BaseItem`), and
         returns it. This is a low-level API, and you should always use one of the built-in
         object-specific methods to add items in preference if possible, using this method **only**
         for custom item classes.

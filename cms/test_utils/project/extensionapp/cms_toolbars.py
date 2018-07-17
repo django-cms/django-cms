@@ -3,7 +3,7 @@ from cms.api import get_page_draft
 from cms.test_utils.project.extensionapp.models import MyTitleExtension, MyPageExtension
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
-from django.core.urlresolvers import NoReverseMatch
+from django.urls import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 
 from cms.toolbar_pool import toolbar_pool

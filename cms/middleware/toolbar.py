@@ -5,7 +5,7 @@ Edit Toolbar middleware
 from django import forms
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
@@ -70,7 +70,7 @@ class ToolbarMiddleware(MiddlewareMixin):
             request.session['cms_toolbar_disabled'] = False
 
         toolbar_enabled = not request.session.get('cms_toolbar_disabled', False)
-        can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous())
+        can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous)
         show_toolbar = (toolbar_enabled and can_see_toolbar)
 
         if edit_enabled and show_toolbar and not request.session.get('cms_edit'):

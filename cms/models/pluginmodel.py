@@ -5,15 +5,15 @@ import os
 import warnings
 
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import Model, ManyToManyField
+from django.db.models import ManyToManyField, Model
 from django.db.models.base import ModelBase
+from django.urls import NoReverseMatch
 from django.utils import six, timezone
-from django.utils.six import text_type
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
@@ -73,6 +73,7 @@ class PluginModelBase(ModelBase):
                     related_name='%(app_label)s_%(class)s',
                     auto_created=True,
                     parent_link=True,
+                    on_delete=models.CASCADE,
                 )
 
         # create a new class (using the super-metaclass)

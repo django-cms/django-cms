@@ -14,6 +14,20 @@ try:
 except ImportError:
     class MiddlewareMixin(object): pass
 
+try:
+    from django.urls import URLResolver  # nopyflakes
+    from django.urls.resolvers import RegexPattern, URLPattern  # nopyflakes
+except ImportError:
+    # django 1.11 support
+    from django.core.urlresolvers import RegexURLResolver as URLResolver, RegexURLPattern as URLPattern  # nopyflakes
+    class RegexPattern: pass
+
+try:
+    from django.urls import LocalePrefixPattern  # nopyflakes
+except ImportError:
+    # Only for django 1.11
+    from django.core.urlresolvers import LocaleRegexURLResolver as LocalePrefixPattern  # nopyflakes
+
 
 # TODO: move these helpers out of compat?
 def is_installed(app_name):

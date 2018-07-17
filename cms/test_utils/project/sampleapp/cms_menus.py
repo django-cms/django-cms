@@ -1,6 +1,6 @@
 from cms.menu_bases import CMSAttachMenu
 from cms.test_utils.project.sampleapp.models import Category
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool

@@ -64,6 +64,7 @@ Define and register a ``CMSToolbar`` sub-class
 The ``cms.toolbar_pool.ToolbarPool.register`` method can also be used as a decorator:
 
 ..  code-block:: python
+    :emphasize-lines: 1
 
     @toolbar_pool.register
     class MyToolbarClass(CMSToolbar):
@@ -80,8 +81,8 @@ Two methods are available to control what will appear in the django CMS toolbar:
 * ``post_template_populate()``, which is called *after* the page's template is rendered
 
 The latter method allows you to manage the toolbar based on the contents of the page, such as the
-state of plugins or placeholders, but unless you need to you would opt for the more simple
-``populate()`` method.
+state of plugins or placeholders, but unless you need to do this, you should opt for the more
+simple ``populate()`` method.
 
 ..  code-block:: python
     :emphasize-lines: 3-5
@@ -99,45 +100,44 @@ Now you have to decide exactly what items will appear in your toolbar. These can
 * various other toolbar items
 
 
-Add items to the toolbar
-========================
+Add links and buttons to the toolbar
+====================================
 
-A number of items are available for you to add as entries to a menu instance, using the various
-``add`` methods. These are higher-level APIs that in turn use
-:meth:`~cms.toolbar.items.ToolbarAPIMixin.add_item`. Almost all items are links that either open
-another resource or perform some action.
+You can add links and buttons as entries to a menu instance, using the various
+``add_`` methods.
 
-The basic form is:
+====================== ============================================================= ===========================================================
+Action                 Text link variant                                             Button variant
+====================== ============================================================= ===========================================================
+Open link              :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_link_item`      :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button`
+Open link in sideframe :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_sideframe_item` :meth:`~cms.toolbar.toolbar.CMSToolbar.add_sideframe_button`
+Open link in modal     :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_modal_item`     :meth:`~cms.toolbar.toolbar.CMSToolbar.add_modal_button`
+POST action            :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_ajax_item`
+====================== ============================================================= ===========================================================
+
+The basic form for using any of these is:
 
 ..  code-block:: python
 
     def populate(self):
 
-        self.toolbar.add_link_item(name='A link', url=url)
+        self.toolbar.add_link_item( # or add_button(), add_modal_item(), etc
+            name='A link',
+            url=url
+            )
 
-..  admonition:: Positional arguments in toolbar methods
-
-    Although toolbars may take various positional arguments in their methods, **we strongly
-    recommend using named arguments**, as above. This will help ensure that your own toolbar
-    classes and methods survive upgrades.
-
-* :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_link_item` creates a
-  :class:`~cms.toolbar.items.LinkItem`, which sends a ``GET`` request.
-* :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_ajax_item` creates a
-  :class:`~cms.toolbar.items.AjaxItem`, which sends a ``POST`` request.
+Note that although these toolbar items may take various positional arguments in their methods, **we
+strongly recommend using named arguments**, as above. This will help ensure that your own toolbar
+classes and methods survive upgrades. See the reference documentation linked to in the table above
+for details of the signature of each method.
 
 
-To open a URL in an iframe
+Opening a URL in an iframe
 --------------------------
 
 A common case is to provide a URL that opens in a sideframe or modal dialog on the same page
 (*Administration...* in the site menu, that opens the Django admin in a sideframe, is a good
-example of this). Both the sideframe and modal are HTML iframes. The two available methods are:
-
-* :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_sideframe_item` to add a
-  :class:`~cms.toolbar.items.SideframeItem`
-* :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_modal_item` to add a
-  :class:`~cms.toolbar.items.ModalItem`
+example of this). Both the sideframe and modal are HTML iframes.
 
 A typical use for a sideframe is to display an admin list (similar to that used in the
 :ref:`tutorial example <add-nodes-to-polls-menu>`):
@@ -167,7 +167,25 @@ However, you are not restricted to these examples, and you may open any suitable
 the modal or sideframe. Note that protocols may need to match and the requested resource must allow
 it.
 
-You can :ref:`do the same things with buttons <create-toolbar-button>`, below.
+
+..  _create-toolbar-button:
+
+Adding buttons to the toolbar
+-----------------------------
+
+A button is a sub-class of :class:`cms.toolbar.items.Button`
+
+Buttons can also be added in a list - a :class:`~cms.toolbar.items.ButtonList` is a group of
+visually-linked buttons.
+
+..  code-block:: python
+    :emphasize-lines: 3-5
+
+    def populate(self):
+
+        button_list = self.toolbar.add_button_list()
+        button_list.add_button(name='Button 1', url=url_1)
+        button_list.add_button(name='Button 2', url=url_2)
 
 
 ..  _create-toolbar-menu:
@@ -175,7 +193,7 @@ You can :ref:`do the same things with buttons <create-toolbar-button>`, below.
 Create a toolbar menu
 =====================
 
-The toolbar items described above can also be added as nodes to menus that are in the toolbar.
+The text link items described above can also be added as nodes to menus in the toolbar.
 
 A menu is an instance of :class:`cms.toolbar.items.Menu`. In your ``CMSToolbar`` sub-class, you can
 either create a menu, or identify one that already exists (in order to add new items to it, for
@@ -245,51 +263,6 @@ A sub-menu is a menu that belongs to another ``Menu``:
 You can then add items to the sub-menu in the same way as in the examples above. Note that a
 sub-menu is an instance of :class:`~cms.toolbar.items.SubMenu`, and may not itself have further
 sub-menus.
-
-
-..  _create-toolbar-button:
-
-Add buttons to the toolbar
-==========================
-
-A button is a sub-class of :class:`cms.toolbar.items.Button`
-
-* :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button` adds a :class:`~cms.toolbar.items.Button`
-* :meth:`~cms.toolbar.toolbar.CMSToolbar.add_sideframe_button` adds a
-  :class:`~cms.toolbar.items.SideframeButton`
-* :meth:`~cms.toolbar.toolbar.CMSToolbar.add_modal_button` adds a
-  :class:`~cms.toolbar.items.ModalButton`
-* :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button_list` adds a
-  :class:`~cms.toolbar.items.ButtonList`
-
-You can instantiate a ``Button`` with :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button`. Like menu
-items, buttons open URLs. For example:
-
-..  code-block:: python
-    :emphasize-lines: 3-6
-
-    def populate(self):
-
-        button = self.toolbar.add_button(
-            name='My button',
-            url=url
-            )
-
-The :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button` and
-:meth:`~cms.toolbar.toolbar.CMSToolbar.add_sideframe_button` methods are similar, but open the
-``url`` in an iframe.
-
-Buttons can also be added in a list - a :class:`~cms.toolbar.items.ButtonList` is a group of
-visually-linked buttons.
-
-..  code-block:: python
-    :emphasize-lines: 3-5
-
-    def populate(self):
-
-        button_list = self.toolbar.add_button_list()
-        button_list.add_button(name='Button 1', url=url_1)
-        button_list.add_button(name='Button 2', url=url_2)
 
 
 .. _finding_toolbar_items:
@@ -497,4 +470,3 @@ The toolbar also fires a JavaScript event called ``cms-ready`` on the document.
 You can listen to this event using jQuery::
 
     CMS.$(document).on('cms-ready', function () { ... });
-
