@@ -627,8 +627,8 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['redirect'].widget.language = self._language
             self.fields['redirect'].initial = self.title_obj.redirect
 
-        if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
-            self.fields['overwrite_url'].initial = self.title_obj.path
+        if 'path_override' in self.fields and self.title_obj.path_override:
+            self.fields['path_override'].initial = self.title_obj.path
 
     @cached_property
     def _language(self):
@@ -802,7 +802,6 @@ class AdvancedSettingsForm(forms.ModelForm):
             path_override=data['path'],
             redirect=(data.get('redirect') or None),
             publisher_state=PUBLISHER_STATE_DIRTY,
-            has_url_overwrite=bool(data.get('overwrite_url')),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
 

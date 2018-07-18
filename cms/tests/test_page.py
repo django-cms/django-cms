@@ -839,7 +839,6 @@ class PagesTestCase(TransactionCMSTestCase):
 
             # Set url_overwrite for page foo
             title = foo.get_title_obj(language='en')
-            title.has_url_overwrite = True
             title.path_override = 'bar'
             title.save()
             foo.publish('en')

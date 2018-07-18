@@ -33,8 +33,7 @@ class Title(models.Model):
     meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
-    path_override = models.CharField(_("Path"), max_length=255, db_index=True)
-    has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
+    path_override = models.CharField(_("Path"), max_length=255, db_index=True, blank=True, null=True)
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
@@ -77,7 +76,7 @@ class Title(models.Model):
 
     @property
     def has_path_override(self):
-        return self.has_url_overwrite or bool(self.redirect)
+        return self.path_override or bool(self.redirect)
 
     @property
     def overwrite_url(self):
@@ -110,7 +109,7 @@ class Title(models.Model):
 
     @property
     def path(self):
-        if self.has_url_overwrite:
+        if self.path_override:
             return self.path_override
         return self._path
 

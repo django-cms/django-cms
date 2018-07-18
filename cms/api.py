@@ -232,7 +232,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
     if path:
         warnings.warn(
             "`path` argument to `create_title` has been deprecated. "
-            "Use `overwrite_url` instead.")
+            "Use `overwrite_url` instead.",
+            UserWarning,
+        )
 
     # set default slug:
     if not slug:
@@ -253,7 +255,6 @@ def create_title(language, title, page, menu_title=None, slug=None,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
-        has_url_overwrite=bool(overwrite_url),
     )
 
     page_languages = page.get_languages()
