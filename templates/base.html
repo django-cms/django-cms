@@ -35,13 +35,11 @@
     <link rel="dns-prefetch" href="{{ MEDIA_URL }}">
     <link rel="preload" href="{% static "js/dist/base.bundle.js" %}" as="script">
 
-    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
     {% render_block "css" %}
-    {% block extrahead %}{% endblock %}
-    {{ ALDRYN_SNAKE.render_head }}
     {% if request.toolbar and request.toolbar.edit_mode_active %}
+        <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
         <style type="text/css">
             /* TMP */
             @media (min-width: 1602px) {
@@ -53,7 +51,11 @@
                 }
             }
         </style>
+    {% else %}
+        {% include 'includes/css.html' %}
     {% endif %}
+    {% block extrahead %}{% endblock %}
+    {{ ALDRYN_SNAKE.render_head }}
 </head>
 <body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
 {% cms_toolbar %}
@@ -62,6 +64,25 @@
 
 {% block extend_root %}{% endblock %}
 
+{% if not request.toolbar or not request.toolbar.edit_mode_active %}
+    <noscript id="deferred-styles">
+        <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    </noscript>
+    <script>
+        var loadDeferredStyles = function() {
+        var addStylesNode = document.getElementById("deferred-styles");
+        var replacement = document.createElement("div");
+        replacement.innerHTML = addStylesNode.textContent;
+        document.body.appendChild(replacement)
+        addStylesNode.parentElement.removeChild(addStylesNode);
+        };
+        var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+            window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+        if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
+        else window.addEventListener('load', loadDeferredStyles);
+    </script>
+{% endif %}
 <script src="{% static 'js/dist/base.bundle.js' %}"></script>
 {% render_block "js" %}
 {% if request.toolbar and request.toolbar.edit_mode_active %}
