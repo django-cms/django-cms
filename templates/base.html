@@ -83,10 +83,10 @@
         else window.addEventListener('load', loadDeferredStyles);
     </script>
 {% endif %}
-<script src="{% static 'js/dist/base.bundle.js' %}"></script>
+<script defer src="{% static 'js/dist/base.bundle.js' %}"></script>
 {% render_block "js" %}
 {% if request.toolbar and request.toolbar.edit_mode_active %}
-    <script src="{% static 'js/dist/cms.bundle.js' %}"></script>
+    <script defer src="{% static 'js/dist/cms.bundle.js' %}"></script>
 {% endif %}
 {% block extrafoot %}{% endblock %}
 {{ ALDRYN_SNAKE.render_tail }}

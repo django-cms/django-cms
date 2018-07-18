@@ -18,9 +18,7 @@ import { initMessages } from 'addons/messages';
 import 'addons/flying-focus';
 import { initLazyLoad } from 'addons/lazyload';
 
-svg4everybody({
-    polyfill: true,
-});
+svg4everybody();
 
 window.$ = window.jQuery = $;
 

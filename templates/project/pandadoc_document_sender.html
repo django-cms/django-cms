@@ -33,28 +33,28 @@
             <div id="recaptcha"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary js-pandadoc-submit" data-processing-text="" disabled>{% trans "Send" %}</button>
+        <button id="pandadoc-submit-{{ instance.pk }}" type="submit" class="btn btn-primary js-pandadoc-submit" data-processing-text="{% trans 'Sending...' %}" disabled>{% trans "Send" %}</button>
     </div>
 </form>
 
 {% addtoblock "js" %}
     <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback{{ instance.id }}&render=explicit" async defer></script>
     <script>
-        $(function () {
-            var submitButton = $('.js-pandadoc-submit');
-            var recaptchaCheck = function (response) {
-                if (response.length) {
-                    submitButton.prop('disabled', false);
-                }
-            };
-            window.onRecaptchaLoadCallback{{ instance.id }} = function () {
-                grecaptcha.render('recaptcha', {
-                    sitekey: '{{ recaptcha_sitekey }}',
-                    callback: recaptchaCheck,
-                    theme: 'light'
-                });
-            };
+        var recaptchaCheck = function (response) {
+            if (response.length) {
+                document.getElementById('pandadoc-submit-{{ instance.pk }}').removeAttribute('disabled');
+            }
+        };
+        window.onRecaptchaLoadCallback{{ instance.id }} = function () {
+            grecaptcha.render('recaptcha', {
+                sitekey: '{{ recaptcha_sitekey }}',
+                callback: recaptchaCheck,
+                theme: 'light'
+            });
+        };
 
+        window.addEventListener('load', function () {
+            var submitButton = $('.js-pandadoc-submit');
             $('form.js-pandadoc-form').submit(function () {
                 submitButton.prop('disabled', true);
                 submitButton.html('{% trans 'Sending...' %}');

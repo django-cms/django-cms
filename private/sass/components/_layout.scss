@@ -345,3 +345,7 @@ body.cke_editable {
         }
     }
 }
+
+.page-header ~ .container {
+    visibility: visible;
+}
