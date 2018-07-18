@@ -11,6 +11,12 @@
 .bootstrap4-button-group .btn {
     font-size: 11px !important;
     font-family: $font-family-sans-serif !important;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    .icon {
+        margin: 0;
+    }
 }
 
 .djangocms-bootstrap4-preview .btn {
