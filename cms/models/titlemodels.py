@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import PUBLISHER_STATE_DIRTY
@@ -87,19 +88,23 @@ class Title(models.Model):
         return None
 
     def _path_elements(self):
+
         if self.page.is_home:
             yield ''
             return
+
+        # TODO: Convert to use a CTE!
         ancestors = self.page.node.get_ancestors()
         for title in self.__class__.objects.filter(
             page__node__in=ancestors,
             publisher_is_draft=self.publisher_is_draft,
             language=self.language,
         ).exclude(page__is_home=True).order_by('page__node__path'):
+
             yield title.slug
         yield self.slug
 
-    @property
+    @cached_property
     def _path(self):
         return '/'.join(self._path_elements())
 
