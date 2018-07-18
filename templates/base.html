@@ -34,7 +34,7 @@
     <link rel="preconnect" href="https://cdn.segment.com/" crossorigin>
     <link rel="dns-prefetch" href="{{ MEDIA_URL }}">
     <link rel="preload" href="{% static "js/dist/base.bundle.js" %}" as="script">
-
+    <link rel="preload" href="{% static 'css/base.css' %}" as="style">
 
     {% render_block "css" %}
     {% if request.toolbar and request.toolbar.edit_mode_active %}
