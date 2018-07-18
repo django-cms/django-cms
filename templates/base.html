@@ -12,11 +12,12 @@
     </title>
     {% block meta_tags %}
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <meta name="description" content="{% spaceless %}
-            {% block meta_description %}
-                {% page_attribute meta_description %}
-            {% endblock %}
-        {% endspaceless %}">
+        {% block meta_description %}
+            {% page_attribute meta_description as meta_description %}
+            {% if meta_description and meta_description != 'None' %}
+            <meta name="description" content="{{ meta_description }}">
+            {% endif %}
+        {% endblock %}
     {% endblock meta_tags %}
     <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
     <!--[if IE]><link rel="shortcut icon" href="{% static 'favicon.ico' %}"><![endif]-->
