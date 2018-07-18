@@ -23,3 +23,4 @@ https://control.divio.com/api/v1/apps/serve/djangocms-video/2.0.4/d62adbd2-40e9-
 https://control.divio.com/api/v1/apps/serve/django-filer/1.3.2/a68cceeb-0373-47af-9cf6-01dbc9bead40/django-filer-1.3.2.tar.gz#egg=django-filer==1.3.2
 https://control.divio.com/api/v1/apps/serve/django-privacy-mgmt/0.0.13/f9b92058-cbbd-4985-a241-f54655b7ee18/django-privacy-mgmt-0.0.13.tar.gz#egg=django-privacy-mgmt==0.0.13
 # </INSTALLED_ADDONS>
+https://github.com/divio/djangocms-text-ckeditor/archive/07752326f4b6ca6d6eda1a128ada43d714d76c8b.zip#egg=djangocms_text_ckeditor==3.6.0
