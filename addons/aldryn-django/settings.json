@@ -3,5 +3,5 @@
     "enable_gis": false, 
     "languages": "[\"en\"]", 
     "session_timeout": "", 
-    "use_manifeststaticfilesstorage": false
+    "use_manifeststaticfilesstorage": true
 }
