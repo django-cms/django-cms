@@ -1199,29 +1199,6 @@ class Page(models.Model):
         for child in published_children.iterator():
             child.mark_descendants_as_published(language)
 
-    def revert_to_live(self, language):
-        """Revert the draft version to the same state as the public version
-        """
-        if not self.publisher_is_draft:
-            # Revert can only be called on draft pages
-            raise PublicIsUnmodifiable('The public instance cannot be reverted. Use draft.')
-
-        public = self.get_public_object()
-
-        if not public:
-            raise PublicVersionNeeded('A public version of this page is needed')
-
-        public._copy_attributes(self)
-        public._copy_titles(self, language, public.is_published(language))
-
-        self.update_translations(
-            language,
-            published=True,
-            publisher_state=PUBLISHER_STATE_DEFAULT,
-        )
-        self._publisher_keep_state = True
-        self.save()
-
     def get_draft_object(self):
         if not self.publisher_is_draft:
             return self.publisher_draft
