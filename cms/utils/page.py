@@ -107,24 +107,17 @@ def get_page_from_path(site, path, preview=False, draft=False, language=None, ex
         titles = titles_with_overwrites
     elif path:
         slugs = path.split('/')
-        target_slug = slugs[-1:]
+        target_slug = slugs[-1:][0]
         titles = titles.filter(slug=target_slug, page__is_home=False)
-        parent_node_id = None
         for title in titles:
             node = title.page.node
+            # Prevent pages from a different site
             if node.site_id != site.pk:
                 continue
-            if node.parent_id == parent_node_id or (
-                parent_node_id is None and
-                title.page.get_parent_page().is_home
-            ):
-                # advance to next depth level
-                parent_node_id = title.page.node_id
+
+            if title.path == path:
+                titles = titles.filter(pk=title.pk)
                 break
-        else:
-            # no title matched for given level
-            return
-        titles = titles.filter(pk=title.pk)
     else:
         # home page
         titles = titles.filter(page__is_home=True)

@@ -21,7 +21,6 @@ class Title(models.Model):
         'page_title',
         'menu_title',
         'meta_description',
-        'has_url_overwrite',
     ]
 
     language = models.CharField(_("language"), max_length=15, db_index=True)
@@ -82,7 +81,7 @@ class Title(models.Model):
     def overwrite_url(self):
         """Return overwritten url, or None
         """
-        if self.has_url_overwrite:
+        if self.has_path_override:
             return self.path_override
         return None
 
@@ -148,7 +147,7 @@ class Title(models.Model):
             if not old_val == new_val:
                 return True
 
-        if old_title.path != self.path and self.has_url_overwrite:
+        if old_title.path != self.path and self.has_path_override:
             # path is handled individually because its a special field.
             # The path field is both an internal and user facing field,
             # as such we can't mark the title as dirty on any change,
@@ -183,7 +182,6 @@ class EmptyTitle(object):
     path = ""
     meta_description = ""
     redirect = ""
-    has_url_overwrite = False
     application_urls = ""
     menu_title = ""
     page_title = ""

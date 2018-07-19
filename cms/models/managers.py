@@ -152,10 +152,7 @@ class TitleManager(PublisherManager):
             if page.has_advanced_settings_permission(user):
                 overwrite_url = cleaned_data.get('overwrite_url', None)
                 if overwrite_url:
-                    data['has_url_overwrite'] = True
                     data['path'] = overwrite_url
-                else:
-                    data['has_url_overwrite'] = False
                 for field in advanced_fields:
                     value = cleaned_data.get(field) or None
                     data[field] = value
