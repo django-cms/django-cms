@@ -177,6 +177,7 @@ p:last-child {
 }
 
 .breadcrumb-item {
+    visibility: visible;
     text-transform: uppercase;
     font-weight: bold;
     font-size: rem(12px);

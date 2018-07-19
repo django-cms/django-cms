@@ -4,6 +4,7 @@ $testimonial-container-max-widths: (md: 720px, lg: 960px, xl: 1140px);
     display: flex;
     opacity: 0;
     flex-direction: column;
+    visibility: visible;
 
     // max-width: 450px;
 
