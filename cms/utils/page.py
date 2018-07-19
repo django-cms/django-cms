@@ -102,6 +102,69 @@ def get_page_from_path(site, path, preview=False, draft=False, language=None, ex
     if language:
         titles = titles.filter(language=language)
 
+    titles_with_overwrites = titles.filter(path_override=path)
+    if titles_with_overwrites.exists():
+        titles = titles_with_overwrites
+    elif path:
+        slugs = path.split('/')
+        target_slug = slugs[-1:]
+        titles = titles.filter(slug=target_slug, page__is_home=False)
+        parent_node_id = None
+        for title in titles:
+            node = title.page.node
+            if node.site_id != site.pk:
+                continue
+            if node.parent_id == parent_node_id or (
+                parent_node_id is None and
+                title.page.get_parent_page().is_home
+            ):
+                # advance to next depth level
+                parent_node_id = title.page.node_id
+                break
+        else:
+            # no title matched for given level
+            return
+        titles = titles.filter(pk=title.pk)
+    else:
+        # home page
+        titles = titles.filter(page__is_home=True)
+
+    for title in titles.iterator():
+        if title.page.node.site_id != site.pk:
+            continue
+
+        if published_only and not _page_is_published(title.page):
+            continue
+
+        title.page.title_cache = {title.language: title}
+        return title.page
+    return
+
+"""
+
+def get_page_from_path(site, path, preview=False, draft=False, language=None, exclude_page_ids=None):
+    ""
+    Resolves a url path to a single page object.
+    Returns None if page does not exist
+    ""
+    from cms.models import Title
+
+    titles = Title.objects.select_related('page__node')
+    published_only = (not draft and not preview)
+
+    if draft:
+        titles = titles.filter(publisher_is_draft=True)
+    elif preview:
+        titles = titles.filter(publisher_is_draft=False)
+    else:
+        titles = titles.filter(published=True, publisher_is_draft=False)
+
+    if exclude_page_ids:
+        titles = titles.exclude(page_id__in=exclude_page_ids)
+
+    if language:
+        titles = titles.filter(language=language)
+
     titles_with_overwrites = titles.filter(has_url_overwrite=True, path_override=path)
     if titles_with_overwrites.exists():
         titles = titles_with_overwrites
@@ -145,7 +208,7 @@ def get_page_from_path(site, path, preview=False, draft=False, language=None, ex
         title.page.title_cache = {title.language: title}
         return title.page
     return
-
+"""
 
 def get_page_from_request(request, use_path=None, clean_path=None):
     """
