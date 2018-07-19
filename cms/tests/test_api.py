@@ -174,7 +174,7 @@ class PythonAPITests(CMSTestCase):
 
     def test_create_page_can_overwrite_url(self):
         page_attrs = self._get_default_create_page_arguments()
-        page_attrs["path_override"] = 'test/home'
+        page_attrs["overwrite_url"] = 'test/home'
         page = create_page(**page_attrs)
         self.assertEqual(page.get_title_obj_attribute('path_override'), 'test/home')
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')

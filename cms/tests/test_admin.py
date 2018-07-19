@@ -778,7 +778,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertSequenceEqual(
                 cms_page.title_set.values_list('path_override'),
-                [('overwrite/url')],
+                [('overwrite/url',)],
             )
 
     def test_missmatching_site_parent_dotsite(self):
