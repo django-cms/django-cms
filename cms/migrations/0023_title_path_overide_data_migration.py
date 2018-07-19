@@ -5,9 +5,10 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 
-# TODO: Then move all title paths from titles with has_url_overwrite set to True and then remove path field.
-
 def forwards(apps, schema_editor):
+    """
+    Move all title paths from titles with has_url_overwrite set to True and then remove path field.
+    """
     Title = apps.get_model('cms', 'Title')
     db_alias = schema_editor.connection.alias
 
