@@ -15,7 +15,7 @@ def forwards(apps, schema_editor):
         Title
         .objects
         .using(db_alias)
-        .filter(has_url_overwrite=True)
+        .filter(has_path_override__isnull=True)
         .distinct()
     )
 
