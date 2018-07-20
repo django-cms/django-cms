@@ -81,7 +81,7 @@ class Title(models.Model):
     def overwrite_url(self):
         """Return overwritten url, or None
         """
-        if self.has_path_override:
+        if self.path_override:
             return self.path_override
         return None
 
@@ -181,6 +181,7 @@ class EmptyTitle(object):
     slug = ""
     path = ""
     meta_description = ""
+    path_override = ""
     redirect = ""
     application_urls = ""
     menu_title = ""
