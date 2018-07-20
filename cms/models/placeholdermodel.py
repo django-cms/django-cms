@@ -40,7 +40,7 @@ class Placeholder(models.Model):
     cache_placeholder = True
     is_static = False
     is_editable = True
-    content_type = models.ForeignKey(ContentType,  blank=True, null=True, on_delete=models.SET_NULL)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     source = GenericForeignKey('content_type', 'object_id')
 
