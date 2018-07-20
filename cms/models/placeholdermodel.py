@@ -10,6 +10,8 @@ from django.template.defaultfilters import title
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, force_text
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
@@ -38,6 +40,10 @@ class Placeholder(models.Model):
     cache_placeholder = True
     is_static = False
     is_editable = True
+    content_type = models.ForeignKey(ContentType,  blank=True, null=True, on_delete=models.SET_NULL)
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
 
     class Meta:
         app_label = 'cms'
