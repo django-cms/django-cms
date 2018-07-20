@@ -44,7 +44,6 @@ class Placeholder(models.Model):
     object_id = models.PositiveIntegerField(blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
-
     class Meta:
         app_label = 'cms'
         permissions = (
