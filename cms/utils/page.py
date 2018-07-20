@@ -106,17 +106,20 @@ def get_page_from_path(site, path, preview=False, draft=False, language=None, ex
         titles = titles_with_overwrites
     elif path:
         slugs = path.split('/')
-        target_slug = slugs[-1:][0]
-        titles = titles.filter(slug=target_slug, page__is_home=False)
+        # Get the last slug in the slug list
+        titles = titles.filter(slug=slugs[-1:][0], page__is_home=False)
         for title in titles:
             node = title.page.node
             # Prevent pages from a different site
             if node.site_id != site.pk:
                 continue
-
+            # If the paths match add the title to the filter list
             if title.path == path:
                 titles = titles.filter(pk=title.pk)
                 break
+        # no title matched for given level
+        else:
+            return
     else:
         # home page
         titles = titles.filter(page__is_home=True)
