@@ -42,7 +42,7 @@ class Placeholder(models.Model):
     is_editable = True
     content_type = models.ForeignKey(ContentType,  blank=True, null=True, on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(blank=True, null=True)
-    content_object = GenericForeignKey('content_type', 'object_id')
+    source = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
         app_label = 'cms'
