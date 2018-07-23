@@ -28,7 +28,7 @@ def forwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0022_auto_20180718_1606'),
+        ('cms', '0026_auto_20180718_1606'),
     ]
 
     operations = [

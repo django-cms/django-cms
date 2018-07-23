@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0021_auto_20180507_1432'),
+        ('cms', '0025_remove_page_placeholders'),
     ]
 
     operations = [
