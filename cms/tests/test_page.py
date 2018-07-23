@@ -339,7 +339,6 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertRaises(PublicIsUnmodifiable, page.copy_with_descendants, page_b, 'last-child')
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
-
         self.assertTrue(page.get_draft_object().publisher_is_draft)
 
     def test_move_page_regression_left_to_right_5752(self):
