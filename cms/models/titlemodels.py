@@ -92,7 +92,7 @@ class Title(models.Model):
 
         if self.page.is_home:
             yield ''
-            return
+            raise StopIteration
 
         # TODO: Convert to use a CTE!
         ancestors = self.page.node.get_ancestors()
