@@ -138,3 +138,33 @@ def configure_cms_apps(apps_with_features):
             if getattr(app_config.cms_config, enabled_property, False):
                 # Feature enabled for this app so configure
                 configure_app(app_config.cms_config)
+
+
+# TODO: Remove this function once backwards compatibility is deprecated
+def backwards_compatibility_config():
+    """
+    Ensure that old ways of configuring and setting up things (plugin
+    pools etc.) still work.
+
+    NOTE: The autodiscover code has been copied over from
+    django.utils.module_loading.autodiscover_modules
+    This is because django's autodiscover function imports
+    django.apps.apps from within the body of the function, which
+    interferes with backwards compatibility testing. The testing is
+    non-trivial and requires the patching of django.apps.apps (which
+    is impossible when imports are done inside of functions).
+    """
+    # The old pools defined various discover methods that looked for
+    # specific files and ran the register code in them. Listing the
+    # names of the files here.
+    modules_to_autodiscover = ['cms_wizards']
+    for module in modules_to_autodiscover:
+        for app_config in apps.get_app_configs():
+            try:
+                import_module('%s.%s' % (app_config.name, module))
+            except Exception:
+                # Decide whether to bubble up this error. If the app just
+                # doesn't have the module in question, we can ignore the error
+                # attempting to import it, otherwise we want it to bubble up.
+                if module_has_submodule(app_config.module, module):
+                    raise

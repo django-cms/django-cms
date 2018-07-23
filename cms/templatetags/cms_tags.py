@@ -7,16 +7,20 @@ from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
-from django.core.urlresolvers import reverse
 from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import six
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.six import string_types
-from django.utils.translation import get_language, override as force_language, ugettext_lazy as _
+from django.utils.translation import (
+    get_language,
+    override as force_language,
+    ugettext_lazy as _,
+)
 
 from classytags.arguments import (Argument, MultiValueArgument,
                                   MultiKeywordArgument)
@@ -129,8 +133,11 @@ def _show_placeholder_by_id(context, placeholder_name, reverse_id,
     if not page:
         return ''
 
+    if lang is None:
+        lang = renderer.request_language
+
     try:
-        placeholder = page.placeholders.get(slot=placeholder_name)
+        placeholder = page.get_placeholders(lang).get(slot=placeholder_name)
     except PlaceholderModel.DoesNotExist:
         if settings.DEBUG:
             raise

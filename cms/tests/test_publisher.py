@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, add_plugin, create_title
@@ -468,7 +468,7 @@ class PublishingTests(TestCase):
         user = self.get_superuser()
         page = create_page("Page", "nav_playground.html", "en", published=True,
                            created_by=user)
-        placeholder = page.placeholders.get(slot=u"body")
+        placeholder = page.get_placeholders('en').get(slot=u"body")
         deleted_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Deleted content")
         text_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Public content")
         page.publish('en')
@@ -484,7 +484,7 @@ class PublishingTests(TestCase):
         self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
 
         self.assertEqual(CMSPlugin.objects.count(), 4)
-        plugins = CMSPlugin.objects.filter(placeholder__page=page)
+        plugins = CMSPlugin.objects.filter(placeholder=placeholder)
         self.assertEqual(plugins.count(), 2)
 
         plugins = [plugin.get_plugin_instance()[0] for plugin in plugins]

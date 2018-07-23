@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
+from cms.signals.log_entries import log_page_operations, log_placeholder_operations
 from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
 from cms.utils.conf import get_cms_setting
 
@@ -77,6 +78,13 @@ urls_need_reloading.connect(
     trigger_server_restart,
     dispatch_uid='aldryn-apphook-reload-handle-urls-need-reloading'
 )
+
+
+###################### log entries #######################
+
+
+post_obj_operation.connect(log_page_operations)
+post_placeholder_operation.connect(log_placeholder_operations)
 
 ###################### permissions #######################
 

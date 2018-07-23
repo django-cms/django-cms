@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
 import sys
+
 from django.core.management import color_style
-from django.core.urlresolvers import clear_url_caches
 from django.core.signals import request_finished
+from django.urls import clear_url_caches
+
 from cms.utils.apphook_reload import mark_urlconf_as_changed
 
 

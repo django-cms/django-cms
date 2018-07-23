@@ -108,26 +108,7 @@
                                     </a>
                                 </li>
                                 {# hide if page is empty #}
-                                {% if lang in page_languages %}
-                                    {% if ancestors|items_are_published:lang %}
-                                        {% if page|is_dirty:lang or not page|is_published:lang %}
-                                            <li>
-                                                <a href="{% url opts|admin_urlname:'publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
-                                                    <span class="cms-icon cms-icon-check-o"></span>
-                                                    <span>{% autoescape on %}{% trans "Publish" %}{% endautoescape %}</span>
-                                                </a>
-                                            </li>
-                                        {% endif %}
-                                        {% if page|is_published:lang %}
-                                            <li>
-                                                <a href="{% url opts|admin_urlname:'unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
-                                                    <span class="cms-icon cms-icon-forbidden"></span>
-                                                    <span>{% autoescape on %}{% trans "Unpublish" %}{% endautoescape %}</span>
-                                                </a>
-                                            </li>
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
+                                {% if not lang in page_languages %}
                                     <li>
                                         <a href="{% url opts|admin_urlname:'change' page.id %}?language={{ lang }}">
                                             <span class="cms-icon cms-icon-cogs"></span>

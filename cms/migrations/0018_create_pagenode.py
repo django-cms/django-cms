@@ -7,7 +7,7 @@ import django.contrib.auth.models
 from django.db import migrations, models
 import django.db.models.deletion
 
-from ._base import IrreversibleMigration
+from . import IrreversibleMigration
 
 
 def get_descendants(root):
@@ -100,15 +100,10 @@ class Migration(IrreversibleMigration):
             name='page',
             unique_together=set([('node', 'publisher_is_draft')]),
         ),
-    ]
-
-
-if django.VERSION >= (1, 10):
-    Migration.operations.append(
         migrations.AlterModelManagers(
             name='pageusergroup',
             managers=[
                 ('objects', django.contrib.auth.models.GroupManager()),
             ],
         ),
-    )
+    ]

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
-from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
@@ -45,7 +45,7 @@ def details(request, slug):
         not hasattr(request, 'toolbar') or (
             not request.toolbar.edit_mode_active and
             not request.toolbar.show_toolbar and
-            not request.user.is_authenticated()
+            not request.user.is_authenticated
         )
     ):
         cache_content = get_page_cache(request)
@@ -157,7 +157,7 @@ def details(request, slug):
             return HttpResponseRedirect(redirect_url)
 
     # permission checks
-    if page.login_required and not request.user.is_authenticated():
+    if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
     if hasattr(request, 'toolbar'):
@@ -166,7 +166,8 @@ def details(request, slug):
     structure_requested = get_cms_setting('CMS_TOOLBAR_URL__BUILD') in request.GET
 
     if user_can_change_page(request.user, page) and structure_requested:
-        return render_object_structure(request, page)
+        title = page.get_title_obj(request_language, fallback=False)
+        return render_object_structure(request, title)
     return render_page(request, page, current_language=request_language, slug=slug)
 
 
@@ -174,10 +175,10 @@ def details(request, slug):
 def login(request):
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
 
-    if not is_safe_url(url=redirect_to, host=request.get_host()):
+    if not is_safe_url(url=redirect_to, allowed_hosts=request.get_host()):
         redirect_to = reverse("pages-root")
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return HttpResponseRedirect(redirect_to)
 
     form = CMSToolbarLoginForm(request=request, data=request.POST)

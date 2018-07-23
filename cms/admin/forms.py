@@ -10,6 +10,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms import api
@@ -23,11 +24,20 @@ from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationC
 from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, GlobalPagePermission, TreeNode)
 from cms.models.permissionmodels import User
+from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE
+from cms.operations.helpers import (
+    send_pre_page_operation,
+    send_post_page_operation,
+)
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.conf import get_cms_setting
 from cms.utils.compat.forms import UserChangeForm
-from cms.utils.i18n import get_language_list, get_language_object
+from cms.utils.i18n import (
+    get_language_list,
+    get_language_object,
+    get_site_language_from_request,
+)
 from cms.utils.permissions import (
     get_current_user,
     get_subordinate_users,
@@ -113,9 +123,8 @@ class CopyPermissionForm(forms.Form):
 
 
 class BasePageForm(forms.ModelForm):
-    _user = None
     _site = None
-    _language = None
+    _request = None
 
     title = forms.CharField(label=_("Title"), max_length=255, widget=forms.TextInput(),
                             help_text=_('The default title'))
@@ -141,6 +150,14 @@ class BasePageForm(forms.ModelForm):
         if not slug:
             raise ValidationError(_("Slug must not be empty."))
         return slug
+
+    @cached_property
+    def _language(self):
+        return get_site_language_from_request(self._request, site_id=self._site.pk)
+
+    @property
+    def _user(self):
+        return self._request.user
 
 
 class AddPageForm(BasePageForm):
@@ -261,11 +278,13 @@ class AddPageForm(BasePageForm):
         source = self.cleaned_data.get('source')
         parent = self.cleaned_data.get('parent_node')
 
+        operation_token = send_pre_page_operation(
+            request=self._request,
+            operation=ADD_PAGE_TRANSLATION,
+        )
+
         if source:
             new_page = self.from_source(source, parent=parent)
-
-            for lang in source.get_languages():
-                source._copy_contents(new_page, lang)
         else:
             new_page = super(AddPageForm, self).save(commit=False)
             new_page.template = self.get_template()
@@ -273,6 +292,7 @@ class AddPageForm(BasePageForm):
             new_page.save()
 
         translation = self.create_translation(new_page)
+        translation.rescan_placeholders()
 
         if source:
             extension_pool.copy_extensions(
@@ -280,6 +300,14 @@ class AddPageForm(BasePageForm):
                 target_page=new_page,
                 languages=[translation.language],
             )
+            placeholders = source.get_placeholders(translation.language)
+
+            for source_placeholder in placeholders:
+                target_placeholder = translation.placeholders.create(
+                    slot=source_placeholder.slot,
+                    default_width=source_placeholder.default_width,
+                )
+                source_placeholder.copy_plugins(target_placeholder, language=translation.language)
 
         is_first = not (
             TreeNode
@@ -288,12 +316,17 @@ class AddPageForm(BasePageForm):
             .exclude(pk=new_page.node_id)
             .exists()
         )
-        new_page.rescan_placeholders()
 
         if is_first and not new_page.is_page_type:
-            # its the first page. publish it right away
-            new_page.publish(translation.language)
+            # its the first page. Make it the homepage
             new_page.set_as_homepage(self._user)
+
+        send_post_page_operation(
+            request=self._request,
+            operation=ADD_PAGE_TRANSLATION,
+            token=operation_token,
+            obj=new_page,
+        )
         return new_page
 
 
@@ -443,6 +476,11 @@ class ChangePageForm(BasePageForm):
         return data
 
     def save(self, commit=True):
+        operation_token = send_pre_page_operation(
+            request=self._request,
+            operation=CHANGE_PAGE,
+        )
+
         data = self.cleaned_data
         cms_page = super(ChangePageForm, self).save(commit=False)
 
@@ -467,6 +505,12 @@ class ChangePageForm(BasePageForm):
         else:
             cms_page._update_title_path_recursive(self._language)
         cms_page.clear_cache(menu=True)
+        send_post_page_operation(
+            request=self._request,
+            operation=CHANGE_PAGE,
+            token=operation_token,
+            obj=cms_page,
+        )
         return cms_page
 
 
@@ -485,9 +529,8 @@ class PublicationDatesForm(forms.ModelForm):
 class AdvancedSettingsForm(forms.ModelForm):
     from cms.forms.fields import PageSmartLinkField
 
-    _user = None
     _site = None
-    _language = None
+    _request = None
 
     application_urls = forms.ChoiceField(label=_('Application'),
                                          choices=(), required=False,
@@ -506,7 +549,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
                                   help_text=_('Redirects to this URL.'),
                                   placeholder_text=_('Start typing...'),
-                                  ajax_view='admin:cms_page_get_published_pagelist'
+                                  ajax_view='admin:cms_page_get_published_pagelist',
     )
 
     # This is really a 'fake' field which does not correspond to any Page attribute
@@ -590,6 +633,10 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
             self.fields['overwrite_url'].initial = self.title_obj.path
+
+    @cached_property
+    def _language(self):
+        return get_site_language_from_request(self._request, site_id=self._site.pk)
 
     def get_apphooks(self):
         for hook in apphook_pool.get_apphooks():
