@@ -717,19 +717,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         site = self.get_site(request)
         return page_permissions.user_can_publish_page(request.user, page=obj, site=site)
 
-    def has_revert_to_live_permission(self, request, language, obj=None):
-        if not obj:
-            return False
-
-        site = self.get_site(request)
-        has_perm = page_permissions.user_can_revert_page_to_live(
-            request.user,
-            page=obj,
-            language=language,
-            site=site,
-        )
-        return has_perm
-
     def get_placeholder_template(self, request, placeholder):
         page = placeholder.page
         return page.get_template() if page else None
