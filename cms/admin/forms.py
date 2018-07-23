@@ -282,9 +282,6 @@ class AddPageForm(BasePageForm):
 
         if source:
             new_page = self.from_source(source, parent=parent)
-
-            for lang in source.get_languages():
-                source._copy_contents(new_page, lang)
         else:
             new_page = super(AddPageForm, self).save(commit=False)
             new_page.template = self.get_template()
@@ -292,6 +289,7 @@ class AddPageForm(BasePageForm):
             new_page.save()
 
         translation = self.create_translation(new_page)
+        translation.rescan_placeholders()
 
         if source:
             extension_pool.copy_extensions(
@@ -299,6 +297,14 @@ class AddPageForm(BasePageForm):
                 target_page=new_page,
                 languages=[translation.language],
             )
+            placeholders = source.get_placeholders(translation.language)
+
+            for source_placeholder in placeholders:
+                target_placeholder = translation.placeholders.create(
+                    slot=source_placeholder.slot,
+                    default_width=source_placeholder.default_width,
+                )
+                source_placeholder.copy_plugins(target_placeholder, language=translation.language)
 
         is_first = not (
             TreeNode
@@ -307,11 +313,9 @@ class AddPageForm(BasePageForm):
             .exclude(pk=new_page.node_id)
             .exists()
         )
-        new_page.rescan_placeholders()
 
         if is_first and not new_page.is_page_type:
-            # its the first page. publish it right away
-            new_page.publish(translation.language)
+            # its the first page. Make it the homepage
             new_page.set_as_homepage(self._user)
 
         send_post_page_operation(
@@ -545,7 +549,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
                                   help_text=_('Redirects to this URL.'),
                                   placeholder_text=_('Start typing...'),
-                                  ajax_view='admin:cms_page_get_published_pagelist'
+                                  ajax_view='admin:cms_page_get_published_pagelist',
     )
 
     # This is really a 'fake' field which does not correspond to any Page attribute

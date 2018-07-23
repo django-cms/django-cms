@@ -1,13 +1,13 @@
 import re
 import sys
 
-from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import clear_url_caches
+from django.core.cache import cache
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
+from django.urls import clear_url_caches
 
 from cms.api import create_page, create_title, publish_page
 from cms.models import PagePermission, UserSettings, Placeholder
@@ -306,7 +306,7 @@ class ContextTests(CMSTestCase):
 
         # Number of queries when context processors is enabled
         with self.settings(**original_context):
-            with self.assertNumQueries(FuzzyInt(13, 26)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 30)) as context:
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)

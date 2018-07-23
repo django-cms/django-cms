@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
-from cms.constants import PUBLISHER_STATE_PENDING
 
 from django import template
 from django.conf import settings
@@ -47,60 +46,19 @@ class TreePublishRow(Tag):
     )
 
     def render_tag(self, context, page, language):
-        page_pending_publication = page.get_publisher_state(language) == PUBLISHER_STATE_PENDING
+        cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
+        text = _("no content")
 
-        if page.is_published(language) and not page_pending_publication:
-            if page.is_dirty(language):
-                cls = "cms-pagetree-node-state cms-pagetree-node-state-dirty dirty"
-                text = _("unpublished changes")
-            else:
-                cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
-                text = _("published")
-        else:
-            page_languages = page.get_languages()
+        if page.is_dirty(language):
+            cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
+            text = _("has contents")
 
-            if language in page_languages:
-                if page_pending_publication:
-                    cls = "cms-pagetree-node-state cms-pagetree-node-state-unpublished-parent unpublishedparent"
-                    text = _("unpublished parent")
-                else:
-                    cls = "cms-pagetree-node-state cms-pagetree-node-state-unpublished unpublished"
-                    text = _("unpublished")
-            else:
-                cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
-                text = _("no content")
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
             'data-cms-tooltip="%s"></span>' % (cls, force_text(text)))
 
 
 register.tag(TreePublishRow)
-
-
-@register.filter
-def is_published(page, language):
-    if page.is_published(language):
-        return True
-
-    page_languages = page.get_languages()
-
-    if language in page_languages and page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
-        return True
-    return False
-
-
-@register.filter
-def is_dirty(page, language):
-    return page.is_dirty(language)
-
-
-@register.filter
-def items_are_published(items, language):
-    """
-    Returns False if any of the ancestors of page (and language) are
-    unpublished, otherwise True.
-    """
-    return all(item.is_published(language) for item in items)
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')

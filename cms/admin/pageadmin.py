@@ -18,6 +18,7 @@ from django.core.exceptions import (ObjectDoesNotExist,
                                     PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q, Prefetch
+from django.db.models.query import QuerySet
 from django.http import (
     HttpResponseRedirect,
     HttpResponse,
@@ -55,7 +56,7 @@ from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
     EmptyTitle, Page, PageType,
-    Title, CMSPlugin, PagePermission,
+    Title, CMSPlugin, Placeholder, PagePermission,
     GlobalPagePermission, StaticPlaceholder,
 )
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
@@ -71,6 +72,7 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.admin import jsonify_request
+from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -431,8 +433,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
+
+        if DJANGO_2_0:
+            get_deleted_objects_additional_kwargs = {
+                'opts': opts,
+                'using': using,
+                'user': request.user,
+            }
+        else:
+            get_deleted_objects_additional_kwargs = {'request': request}
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            objs, opts, request.user, self.admin_site, using)
+            objs, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
@@ -486,9 +499,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             nodes = obj.node.get_descendants()
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
-        for page in cms_pages:
-            page._clear_placeholders()
-            page.get_placeholders().delete()
+        # Delete all of the pages titles contents
+        placeholders = Placeholder.objects.filter(title__page__in=cms_pages)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
+        QuerySet.delete(plugins)
+        placeholders.delete()
 
         super(BasePageAdmin, self).delete_model(request, obj)
 
@@ -653,6 +668,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             use_cache=False,
         )
         return can_change_page
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
 
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
@@ -963,9 +981,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
-        for placeholder in page.get_placeholders():
-            plugins = list(
-                placeholder.get_plugins(language=source_language).order_by('path'))
+        for placeholder in page.get_placeholders(source_language):
+            plugins = list(placeholder.get_plugins().order_by('path'))
             if not placeholder.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
             copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
@@ -1252,24 +1269,25 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         titleopts = Title._meta
         app_label = titleopts.app_label
         pluginopts = CMSPlugin._meta
-
-        saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
-
+        saved_plugins = CMSPlugin.objects.filter(placeholder__title=translation, language=language)
         using = router.db_for_read(self.model)
-        kwargs = {
-            'admin_site': self.admin_site,
-            'user': request.user,
-            'using': using
-        }
 
+        kwargs = {'admin_site': self.admin_site}
+        if DJANGO_2_0:
+            kwargs.update({'using': using, 'opts': titleopts, 'user': request.user})
+        else:
+            kwargs.update({'request': request})
         deleted_objects, __, perms_needed = get_deleted_objects(
             [translation],
-            titleopts,
             **kwargs
         )[:3]
+
+        if DJANGO_2_0:
+            kwargs.update({'using': using, 'opts': pluginopts, 'user': request.user})
+        else:
+            kwargs.update({'request': request})
         to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
             saved_plugins,
-            pluginopts,
             **kwargs
         )[:3]
 

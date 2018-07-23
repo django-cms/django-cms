@@ -38,10 +38,18 @@ _django_permissions_by_action = {
 }
 
 
-def _get_draft_placeholders(page):
-    if page.publisher_is_draft:
-        return page.placeholders.all()
-    return Placeholder.objects.filter(page__pk=page.publisher_public_id)
+def _get_draft_placeholders(page, language):
+    if not page.publisher_is_draft:
+        placeholders = (
+            Placeholder
+            .objects
+            .filter(
+                title__language=language,
+                title__page__pk=page.publisher_public_id,
+            )
+        )
+        return placeholders
+    return page.get_placeholders(language)
 
 
 def _check_delete_translation(user, page, language, site=None):
@@ -78,7 +86,7 @@ def auth_permission_required(action):
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
         def wrapper(user, *args, **kwargs):
-            if not user.is_authenticated():
+            if not user.is_authenticated:
                 return False
 
             permissions = _django_permissions_by_action[action]
@@ -168,16 +176,15 @@ def user_can_delete_page(user, page, site=None):
     if not has_perm:
         return False
 
-    languages = page.get_languages()
-    placeholders = (
-        _get_draft_placeholders(page)
-        .filter(cmsplugin__language__in=languages)
-        .distinct()
-    )
-
-    for placeholder in placeholders.iterator():
-        if not placeholder.has_delete_plugins_permission(user, languages):
-            return False
+    for language in page.get_languages():
+        placeholders = (
+            _get_draft_placeholders(page, language)
+            .filter(cmsplugin__language=language)
+            .distinct()
+        )
+        for placeholder in placeholders:
+            if not placeholder.has_delete_plugins_permission(user, [language]):
+                return False
     return True
 
 
@@ -195,7 +202,7 @@ def user_can_delete_page_translation(user, page, language, site=None):
         return False
 
     placeholders = (
-        _get_draft_placeholders(page)
+        _get_draft_placeholders(page, language)
         .filter(cmsplugin__language=language)
         .distinct()
     )
@@ -213,7 +220,7 @@ def user_can_revert_page_to_live(user, page, language, site=None):
         return False
 
     placeholders = (
-        _get_draft_placeholders(page)
+        _get_draft_placeholders(page, language)
         .filter(cmsplugin__language=language)
         .distinct()
     )
@@ -292,7 +299,7 @@ def user_can_view_page(user, page, site=None):
         # Page has no restrictions and project is configured
         # to allow everyone to see unrestricted pages.
         return True
-    elif not user.is_authenticated():
+    elif not user.is_authenticated:
         # Page has restrictions or project is configured
         # to require staff user status to see pages.
         return False
@@ -357,7 +364,7 @@ def user_can_view_all_pages(user, site):
         can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
         return can_see_unrestricted
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.has_perm(PAGE_VIEW_CODENAME):

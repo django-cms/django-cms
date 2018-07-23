@@ -34,10 +34,11 @@ def bool(value):
 
 @register.simple_tag(takes_context=True)
 def render_cms_structure_js(context, renderer, obj):
+    cms_page = obj.page
     markup_bits = []
     static_placeholders = []
     page_placeholders_by_slot = obj.rescan_placeholders()
-    declared_static_placeholders = obj.get_declared_static_placeholders(context)
+    declared_static_placeholders = cms_page.get_declared_static_placeholders(context)
 
     for static_placeholder in declared_static_placeholders:
         kwargs = {
@@ -53,11 +54,11 @@ def render_cms_structure_js(context, renderer, obj):
         static_placeholder = StaticPlaceholder.objects.get_or_create(**kwargs)[0]
         static_placeholders.append(static_placeholder)
 
-    for placeholder_node in obj.get_declared_placeholders():
+    for placeholder_node in cms_page.get_declared_placeholders():
         page_placeholder = page_placeholders_by_slot.get(placeholder_node.slot)
 
         if page_placeholder:
-            placeholder_js = renderer.render_page_placeholder(obj, page_placeholder)
+            placeholder_js = renderer.render_page_placeholder(cms_page, page_placeholder)
             markup_bits.append(placeholder_js)
 
     for placeholder in static_placeholders:

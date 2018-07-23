@@ -9,7 +9,7 @@ from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import (Http404, HttpResponseBadRequest,
                          HttpResponseNotFound)
 from django.utils.encoding import force_text, smart_str
@@ -58,10 +58,11 @@ class AdminTestsBase(CMSTestCase):
 
         normal_guy.is_staff = True
         normal_guy.is_active = True
-        normal_guy.save()
-        normal_guy.user_permissions = Permission.objects.filter(
+        perms = Permission.objects.filter(
             codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
         )
+        normal_guy.save()
+        normal_guy.user_permissions.set(perms)
         if use_global_permissions:
             gpp = GlobalPagePermission.objects.create(
                 user=normal_guy,
@@ -72,7 +73,7 @@ class AdminTestsBase(CMSTestCase):
                 can_change_permissions=False,
                 can_move_page=True,
             )
-            gpp.sites = Site.objects.all()
+            gpp.sites.set(Site.objects.all())
         return normal_guy
 
 
@@ -134,7 +135,7 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         create_page('child-page', "nav_playground.html", "en",
                     created_by=admin_user, published=True, parent=page)
-        body = page.placeholders.get(slot='body')
+        body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
         with self.login_user_context(admin_user):
@@ -150,7 +151,7 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user, published=True)
         create_page('child-page', "nav_playground.html", "de",
                     created_by=admin_user, published=True, parent=page)
-        body = page.placeholders.get(slot='body')
+        body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         page.publish('en')
         with self.login_user_context(admin_user):
@@ -361,7 +362,7 @@ class AdminTestCase(AdminTestsBase):
         # This allows us to catch a strange bug that happened
         # under these conditions with the new related name handling.
         page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
-        ph = page_en.placeholders.get(slot="body")
+        ph = page_en.get_placeholders("en").get(slot="body")
 
         column_wrapper = add_plugin(ph, "MultiColumnPlugin", "en")
 
@@ -388,7 +389,7 @@ class AdminTestCase(AdminTestsBase):
         """
         # create some objects
         page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
-        ph = page_en.placeholders.get(slot="body")
+        ph = page_en.get_placeholders("en").get(slot="body")
 
         # add the text plugin to the en version of the page
         add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
@@ -523,7 +524,7 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 403)
 
     def test_remove_plugin_requires_post(self):
-        ph = self.page.placeholders.all()[0]
+        ph = self.page.get_placeholders('en')[0]
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
@@ -533,7 +534,7 @@ class AdminTests(AdminTestsBase):
 
     def test_move_language(self):
         page = self.get_page()
-        source, target = list(page.placeholders.all())[:2]
+        source, target = list(page.get_placeholders('en'))[:2]
         col = add_plugin(source, 'MultiColumnPlugin', 'en')
         sub_col = add_plugin(source, 'ColumnPlugin', 'en', target=col)
         col2 = add_plugin(source, 'MultiColumnPlugin', 'de')
@@ -597,7 +598,7 @@ class AdminTests(AdminTestsBase):
         url = admin_reverse('cms_page_add_plugin')
         with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
-            body = page.placeholders.get(slot='body')
+            body = page.get_placeholders("en").get(slot='body')
             add_plugin(body, 'TextPlugin', 'en', body='text')
             with self.login_user_context(admin_user):
                 data = {
@@ -620,7 +621,7 @@ class AdminTests(AdminTestsBase):
         url = admin_reverse('cms_page_add_plugin')
         with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
-            body = page.placeholders.get(slot='body')
+            body = page.get_placeholders("en").get(slot='body')
             add_plugin(body, 'TextPlugin', 'en', body='text')
             with self.login_user_context(admin_user):
                 data = {
@@ -688,7 +689,7 @@ class NoDBAdminTests(CMSTestCase):
 class PluginPermissionTests(AdminTestsBase):
     def setUp(self):
         self._page = create_page('test page', 'nav_playground.html', 'en')
-        self._placeholder = self._page.placeholders.all()[0]
+        self._placeholder = self._page.get_placeholders('en')[0]
 
     def _get_admin(self):
         User = get_user_model()
@@ -961,7 +962,7 @@ class AdminFormsTests(AdminTestsBase):
 
     def test_create_page_type(self):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
-        for placeholder in page.placeholders.all():
+        for placeholder in page.get_placeholders('en'):
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         page.publish('en')
         self.assertEqual(Page.objects.count(), 2)
@@ -1001,11 +1002,11 @@ class AdminFormsTests(AdminTestsBase):
         homepage = create_page('Test', 'static.html', 'en', published=True)
         homepage.set_as_homepage()
 
-        for placeholder in Placeholder.objects.all():
+        for placeholder in homepage.get_placeholders('en'):
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
 
         user = self.get_superuser()
-        self.assertEqual(Placeholder.objects.all().count(), 4)
+        self.assertEqual(homepage.get_placeholders('en').count(), 2)
         with self.login_user_context(user):
             output = force_text(
                 self.client.get(
@@ -1013,9 +1014,8 @@ class AdminFormsTests(AdminTestsBase):
                 ).content
             )
             self.assertIn('<b>Test</b>', output)
-            self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
-            for placeholder in Placeholder.objects.all():
+            for placeholder in homepage.get_placeholders('en'):
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             output = force_text(
                 self.client.get(
