@@ -206,7 +206,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
-            pat(r'^([0-9]+)/([a-z\-]+)/revert-to-live/$', self.revert_to_live),
             pat(r'^get-tree/$', self.get_tree),
         ]
         return url_patterns + super(BasePageAdmin, self).get_urls()
@@ -1035,54 +1034,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         new_page = form.copy_page()
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
-
-    @require_POST
-    @transaction.atomic
-    def revert_to_live(self, request, page_id, language):
-        """
-        Resets the draft version of the page to match the live one
-        """
-        page = self.get_object(request, object_id=page_id)
-
-        if not self.has_revert_to_live_permission(request, language, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to revert this page.")))
-
-        if page is None:
-            raise self._get_404_exception(page_id)
-
-        try:
-            translation = page.title_set.get(language=language)
-        except Title.DoesNotExist:
-            raise Http404('No translation matches requested language.')
-
-        page.title_cache[language] = translation
-        operation_token = send_pre_page_operation(
-            request=request,
-            operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
-            obj=page,
-            translation=translation,
-            sender=self.model,
-        )
-
-        page.revert_to_live(language)
-
-        # Fetch updated translation
-        translation.refresh_from_db()
-
-        send_post_page_operation(
-            request,
-            operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
-            token=operation_token,
-            obj=page,
-            translation=translation,
-            sender=self.model,
-        )
-
-        messages.info(request, _('"%s" was reverted to the live version.') % page)
-
-        path = page.get_absolute_url(language=language)
-        path = '%s?%s' % (path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
-        return HttpResponseRedirect(path)
 
     @require_POST
     @transaction.atomic

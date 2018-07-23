@@ -19,7 +19,7 @@ from django.utils.translation import (
 
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
+from cms.exceptions import PublicIsUnmodifiable, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
 from cms.utils.compat import DJANGO_1_11
