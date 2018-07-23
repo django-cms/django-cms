@@ -1,0 +1,11 @@
+.. _upgrade-to-3.5.3:
+
+###################
+3.5.3 release notes
+###################
+
+
+Bug Fixes
+=========
+
+* Fixed rendering of permission icons. Use SVG variants instead of GIFs.
