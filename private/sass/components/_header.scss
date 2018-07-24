@@ -209,6 +209,7 @@
         }
     }
 
+    .navbar-logo-wrapper,
     .navbar-logo {
         @include media-breakpoint-down(md) {
             z-index: z(header, logo);
@@ -244,15 +245,15 @@
 }
 
 .navbar-toggler {
-    padding: 2px;
+    padding: 0px;
     position: relative;
 
     .navbar-toggler-icon {
-        padding: 0 4px;
+        width: 22px;
+        height: 18px;
     }
 
     .icon-bar {
-        margin-left: 3px;
         display: block;
         width: 22px;
         height: 2px;
@@ -264,18 +265,18 @@
         &:nth-child(1) {
             transform: rotate(45deg);
             transform-origin: left center;
-            top: 7px;
+            top: 0px;
         }
 
         &:nth-child(2) {
             opacity: 0;
-            top: 15px;
+            top: 8px;
         }
 
         &:nth-child(3) {
             transform: rotate(-45deg);
             transform-origin: left center;
-            top: 23px;
+            top: 16px;
         }
     }
 
@@ -345,6 +346,7 @@
                 background: white;
             }
 
+
             &:active {
                 color: black;
             }
@@ -370,6 +372,7 @@
                 @include media-breakpoint-down(md) {
                     margin-bottom: 1rem;
                 }
+
 
                 .dropdown-desc-title {
                     display: block;
@@ -400,7 +403,12 @@
 }
 
 .mobile-menu-shown {
+    overflow: hidden;
     position: fixed;
-    z-index: z(default);
-    width: 100%;
+
+    .main-nav {
+        position: fixed;
+        z-index: z(default);
+        width: 100%;
+    }
 }

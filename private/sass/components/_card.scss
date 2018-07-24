@@ -8,6 +8,19 @@
     height: 100%;
     min-height: 284px;
 
+    &,
+    &:hover,
+    &:active,
+    &:focus {
+        color: $body-color;
+        text-decoration: none;
+    }
+
+    &:hover,
+    &:focus {
+        box-shadow: 0 2px 10px rgba(black, 0.5);
+    }
+
     .card-body {
         display: flex;
         flex-direction: column;

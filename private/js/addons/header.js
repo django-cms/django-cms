@@ -59,12 +59,11 @@ function initSticky() {
 }
 
 function initMobileMenu() {
-    const mainNav = $('.main-nav');
-
     $('[data-toggle="custom-collapse"]').on('click', async function () {
         const toggle = $(this);
         const isCollapsed = toggle.hasClass('collapsed');
         const target = $(toggle.data('target'));
+        const html = $('html');
 
         if (isCollapsed) {
             await scrollTo(0, 30);
@@ -73,7 +72,7 @@ function initMobileMenu() {
             toggle.attr('aria-expanded', true);
             Velocity(target, 'transition.expandIn', {
                 duration: 200,
-                complete: () => mainNav.addClass('mobile-menu-shown'),
+                complete: () => html.addClass('mobile-menu-shown'),
             });
             Velocity(document.querySelectorAll('.navbar-collapse-container .nav-link'), 'transition.slideLeftIn', {
                 duration: 200,
@@ -87,7 +86,7 @@ function initMobileMenu() {
             Velocity(target, 'transition.expandOut', {
                 duration: 200,
             });
-            mainNav.removeClass('mobile-menu-shown');
+            html.removeClass('mobile-menu-shown');
         }
     });
 }

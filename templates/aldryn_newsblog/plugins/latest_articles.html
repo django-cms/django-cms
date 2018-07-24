@@ -18,16 +18,16 @@
             {% for article in article_list %}
                 <div class="carousel-item">
                     {% with namespace=instance.app_config.namespace %}
-                        <div class="card">
+                        <a class="card" href="{% namespace_url 'article-detail' article.slug namespace=namespace default='' %}">
                             <div class="card-body">
-                                <h4 class="card-title"><a href="{% namespace_url 'article-detail' article.slug namespace=namespace default='' %}">{% render_model article "title" %}</a></h4>
+                                <h4 class="card-title">{% render_model article "title" %}</h4>
                                 <div class="mb-3">
                                     {% render_model article "lead_in" "" "" "truncatewords_html:'20'" %}
                                 </div>
                                 <hr>
                                 {% include "aldryn_newsblog/includes/author.html" with author=article.author %}
                             </div>
-                        </div>
+                        </a>
                     {% endwith %}
                 </div>
             {% endfor %}

@@ -7,7 +7,7 @@
 {% block header %}
     <header class="navbar navbar-expand-lg main-nav">
         <div class="container">
-            <a class="d-block" href="{% url "pages-root" %}">
+            <a class="navbar-logo-wrapper d-block" href="{% url "pages-root" %}">
                 <span class="sr-only">{{ request.site.name }}</span>
                 {% include "includes/icon.html" with icon="divio" class="navbar-logo d-block" title=request.site.name %}
             </a>
