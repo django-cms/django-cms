@@ -29,7 +29,7 @@ class Title(models.Model):
                                   help_text=_("overwrite the title (html title tag)"))
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True,
                                   help_text=_("overwrite the title in the menu"))
-    meta_description = models.TextField(_("description"), max_length=155, blank=True, null=True,
+    meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
-from ._base import IrreversibleMigration
+from . import IrreversibleMigration
 
 
 def unpublish_never_published_pages(apps, schema_editor):

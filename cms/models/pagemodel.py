@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import copy
-import warnings
 from collections import OrderedDict
 from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
+from django.db.models.base import ModelState
 from django.db.models.functions import Concat
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -23,6 +23,7 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
+from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
@@ -238,6 +239,7 @@ class Page(models.Model):
     objects = PageManager()
 
     class Meta:
+        default_permissions = ('add', 'change', 'delete')
         permissions = (
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
@@ -275,12 +277,12 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if hasattr(self, '_node_cache'):
-            del self._node_cache
-
-        if hasattr(self, 'fields_cache'):
-            # Django >= 2.0
-            self.fields_cache = {}
+        if DJANGO_1_11:
+            if hasattr(self, '_node_cache'):
+                del self._node_cache
+        else:
+            if Page.node.is_cached(self):
+                Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.title_cache = {}
@@ -288,55 +290,6 @@ class Page(models.Model):
 
         if hasattr(self, '_prefetched_objects_cache'):
             del self._prefetched_objects_cache
-
-    @property
-    def parent(self):
-        warnings.warn(
-            'Pages no longer have a "parent" field. '
-            'To get the parent object of any given page, use the "parent_page" attribute. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.parent_page
-
-    @property
-    def parent_id(self):
-        warnings.warn(
-            'Pages no longer have a "parent_id" attribute. '
-            'To get the parent id of any given page, '
-            'call "pk" on the "parent_page" attribute. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        if self.parent_page:
-            return self.parent_page.pk
-        return None
-
-    @property
-    def site(self):
-        warnings.warn(
-            'Pages no longer have a "site" field. '
-            'To get the site object of any given page, '
-            'call "site" on the page "node" object. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.node.site
-
-    @property
-    def site_id(self):
-        warnings.warn(
-            'Pages no longer have a "site_id" attribute. '
-            'To get the site id of any given page, '
-            'call "site_id" on the page "node" object. '
-            'This backwards compatible shim will be removed in version 3.6',
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.node.site_id
 
     @cached_property
     def parent_page(self):
@@ -648,19 +601,16 @@ class Page(models.Model):
         source_title.save()
         return source_title
 
-    def _clear_placeholders(self, language):
+    def _clear_placeholders(self, language=None):
         from cms.models import CMSPlugin
-        from cms.signals.utils import disable_cms_plugin_signals
 
         placeholders = list(self.get_placeholders())
         placeholder_ids = (placeholder.pk for placeholder in placeholders)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids)
 
-        with disable_cms_plugin_signals():
-            plugins = CMSPlugin.objects.filter(
-                language=language,
-                placeholder__in=placeholder_ids,
-            )
-            models.query.QuerySet.delete(plugins)
+        if language:
+            plugins = plugins.filter(language=language)
+        models.query.QuerySet.delete(plugins)
         return placeholders
 
     def _copy_contents(self, target, language):
@@ -716,6 +666,7 @@ class Page(models.Model):
             parent_page = None
 
         new_page = copy.copy(self)
+        new_page._state = ModelState()
         new_page._clear_internal_cache()
         new_page.pk = None
         new_page.node = new_node
@@ -759,6 +710,7 @@ class Page(models.Model):
             title.save()
 
             new_page.title_cache[title.language] = title
+        new_page.update_languages([trans.language for trans in translations])
 
         # copy the placeholders (and plugins on those placeholders!)
         for placeholder in self.placeholders.iterator():

@@ -4,7 +4,7 @@ import codecs
 
 try:
     from cStringIO import StringIO
-except:
+except ImportError:
     from io import StringIO
 
 from django.core.management import call_command
@@ -30,6 +30,7 @@ class FixtureTestCase(NavextendersFixture, CMSTestCase):
         original_tree_nodes = TreeNode.objects.count()
         original_plugins = CMSPlugin.objects.count()
         Page.objects.all().delete()
+        Placeholder.objects.all().delete()
         TreeNode.objects.all().delete()
         output.seek(0)
         with codecs.open(dump[1], 'w', 'utf-8') as dumpfile:
@@ -40,7 +41,7 @@ class FixtureTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(0, Placeholder.objects.count())
         # Transaction disable, otherwise the connection it the test would be
         # isolated from the data loaded in the different command connection
-        call_command('loaddata', dump[1], commit=False, stdout=output)
+        call_command('loaddata', dump[1], stdout=output)
         self.assertEqual(10, Page.objects.count())
         self.assertEqual(original_pages, Page.objects.count())
         self.assertEqual(5, TreeNode.objects.count())

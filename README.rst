@@ -2,7 +2,7 @@
 django CMS
 ##########
 .. image:: https://travis-ci.org/divio/django-cms.svg?branch=develop
-    :target: http://travis-ci.org/divio/django-cms
+    :target: https://travis-ci.org/divio/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
@@ -48,17 +48,17 @@ Features
 
 Developing applications that integrate with and take advantage of django CMS features is easy and well-documented.
 
-More information on `our website <http://www.django-cms.org>`_.
+More information on `our website <https://www.django-cms.org>`_.
 
 ************
 Requirements
 ************
 
 See the `Python/Django requirements for the current release version
-<http://docs.django-cms.org/en/stable/#software-version-requirements-and-release-notes>`_ in our documentation.
+<http://docs.django-cms.org/en/latest/#software-version-requirements-and-release-notes>`_ in our documentation.
 
 See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
-<http://docs.django-cms.org/en/stable/how-to/install.html>`_
+<http://docs.django-cms.org/en/latest/how_to/install.html>`_
 
 *************
 Documentation
@@ -71,7 +71,7 @@ We maintain documentation for several versions of the project. Key versions are:
 * `develop <http://docs.django-cms.org/en/develop/>`_, representing the latest build of the **develop branch**
 
 For more information about our branch policy, see `Branches
-<http://docs.django-cms.org/en/stable/contributing/development-policies.html>`_.
+<http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
@@ -122,7 +122,7 @@ Credits
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
+* JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
 * Many thanks to the
   `over 515 contributors <https://github.com/divio/django-cms/blob/develop/AUTHORS>`_
   to the django CMS!

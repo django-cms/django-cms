@@ -10,7 +10,8 @@ We'll get started by setting up our environment.
 Requirements
 ************
 
-django CMS requires Django 1.8, 1.9 or 1.10 and Python 2.7, 3.3 or 3.4.
+django CMS requires Django 1.8 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
+you are using Python 3.
 
 ************************
 Your working environment
@@ -20,12 +21,12 @@ We're going to assume that you have a reasonably recent version of virtualenv
 installed and that you have some basic familiarity with it.
 
 
-Create and activate a virtual env
-=================================
+Create and activate a virtual environment
+=========================================
 
 ::
 
-    virtualenv env
+    python3.6 -m venv env   # Python 2 usage: virtualenv env
     source env/bin/activate
 
 Note that if you're using Windows, to activate the virtualenv you'll need::
@@ -33,8 +34,8 @@ Note that if you're using Windows, to activate the virtualenv you'll need::
     env\Scripts\activate
 
 
-Update pip
-==========
+Update pip inside the virtual environment
+=========================================
 
 ``pip`` is the Python installer. Make sure yours is up-to-date, as earlier versions can be less reliable::
 
@@ -107,8 +108,8 @@ Start up the runserver
 
     python manage.py runserver
 
-Open http://localhost:8000/ in your browser, where you should be presented with
-your brand new django CMS homepage.
+Open http://localhost:8000/ in your browser, where you should be invited to login, and then create
+a new page.
 
 .. image:: /introduction/images/welcome.png
    :alt: a django CMS home page
@@ -117,8 +118,8 @@ your brand new django CMS homepage.
 
 Congratulations, you now have installed a fully functional CMS.
 
-To log in, append ``?edit`` to the URL and hit enter. This will enable the
+If you need to log in at any time, append ``?edit`` to the URL and hit Return. This will enable the
 toolbar, from where you can log in and manage your website.
 
-If you are not already familiar with django CMS, take a few minutes to run through the basics of
-the :ref:`django CMS tutorial for users <user-tutorial>`.
+If you are not already familiar with django CMS, you can take a few minutes to run through the
+basics of the :ref:`django CMS tutorial for users <user-tutorial>`.

@@ -20,7 +20,7 @@ can be switched for another at any time.
 
 You'll find the site's templates in ``mysite/templates``.
 
-If you didn't change the automatically-created home page's template, it's ``fullwidth.html``, the first one listed in
+By default, pages in your site will use the ``fullwidth.html`` template, the first one listed in
 the project's ``settings.py`` ``CMS_TEMPLATES`` tuple:
 
 ..  code-block:: python
@@ -51,8 +51,8 @@ required template tag library.
 If you're not already familiar with Django template tags, you can find out more in the `Django documentation
 <https://docs.djangoproject.com/en/dev/topics/templates/>`_.
 
-Add a couple of new placeholders, ``{% placeholder "feature" %}`` and ``{% placeholder "splashbox" %}`` to the
-template's HTML structure. You can add them anywhere, for example:
+Add a couple of new placeholders to ``fullwidth.html``, ``{% placeholder "feature" %}`` and ``{%
+placeholder "splashbox" %}`` inside the ``{% block content %}`` section. For example:
 
 .. code-block:: html+django
    :emphasize-lines: 2,4
@@ -88,14 +88,19 @@ you added content to it, it will be saved globally. Even when you remove the
 static placeholders from a template, you can reuse them later.
 
 So let's add a footer to all our pages. Since we want our footer on every
-single page, we should add it to our base template
-(``mysite/templates/base.html``). Place it at the bottom of the HTML ``<body>``:
+single page, we should add it to our **base template**
+(``mysite/templates/base.html``). Place it near the end of the HTML ``<body>`` element:
 
 .. code-block:: html+django
+   :emphasize-lines: 1-3
 
-    <footer>
-      {% static_placeholder 'footer' %}
-    </footer>
+        <footer>
+          {% static_placeholder 'footer' %}
+        </footer>
+
+
+        {% render_block "js" %}
+    </body>
 
 Save the template and return to your browser. Refresh any page in Structure mode, and you'll
 see the new static placeholder.
@@ -120,14 +125,6 @@ Rendering Menus
 In order to render the CMS's menu in your template you can use the :doc:`show_menu
 </reference/navigation>` tag.
 
-The example we use in ``mysite/templates/base.html`` is:
-
-.. code-block:: html+django
-
-    <ul class="nav navbar-nav">
-        {% show_menu 0 1 100 100 "menu.html" %}
-    </ul>
-
 Any template that uses ``show_menu`` must load the CMS's ``menu_tags`` library
 first:
 
@@ -135,8 +132,14 @@ first:
 
     {% load menu_tags %}
 
-If you chose "bootstrap" while setting up with djangocms-installer, the menu
-will already be there and ``templates/menu.html`` will already contain a
-version that uses bootstrap compatible markup.
+The menu we use in ``mysite/templates/base.html`` is:
+
+.. code-block:: html+django
+
+    <ul class="nav navbar-nav">
+        {% show_menu 0 100 100 100 "menu.html" %}
+    </ul>
+
+The options control the levels of the site hierarchy that are displayed in the menu tree - but you don't need to worry about exactly what they do at this stage.
 
 Next we'll look at :ref:`integrating_applications`.

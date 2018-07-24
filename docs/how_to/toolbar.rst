@@ -4,8 +4,6 @@
 How to extend the Toolbar
 #########################
 
-.. versionadded:: 3.0
-
 You can add and remove toolbar items. This allows you to integrate django CMS's frontend editing
 mode into your application, and provide your users with a streamlined editing experience.
 
@@ -18,6 +16,7 @@ For the toolbar API reference, please refer to :ref:`toolbar-api-reference`.
     behaviour in the user's browser.
 
     In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
+
 
 ***********
 Registering
@@ -106,10 +105,10 @@ When adding items, all arguments other than the name or identifier should be
 given as **keyword arguments**. This will help ensure that your custom toolbar
 items survive upgrades.
 
-Following our :doc:`/introduction/toolbar`, let's add the poll app
+Following our example in the :ref:`toolbar tutorial <toolbar_introduction>`, let's add the poll app
 to the toolbar::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.utils.translation import ugettext_lazy as _
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar_base import CMSToolbar
@@ -131,7 +130,7 @@ To do this, you can use positional insertion coupled with the fact that
 menus::
 
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.utils.translation import ugettext_lazy as _
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar.items import Break
@@ -191,7 +190,7 @@ when they come from multiple applications.
 An example is shown here for an 'Offices' app, which allows handy access to
 certain admin functions for managing office locations in a project::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.utils.translation import ugettext_lazy as _
     from cms.toolbar_base import CMSToolbar
     from cms.toolbar_pool import toolbar_pool
@@ -279,7 +278,7 @@ Another way to add items to the toolbar is through our own views (``polls/views.
 This method can be useful if you need to access certain variables, in our case e.g. the
 selected poll and its sub-methods::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.shortcuts import get_object_or_404, render
     from django.utils.translation import ugettext_lazy as _
 
