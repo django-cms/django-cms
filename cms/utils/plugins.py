@@ -48,21 +48,16 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     qs = get_cmsplugin_queryset(request)
     qs = qs.filter(placeholder__in=placeholders, language=lang)
     plugins = list(qs.order_by('placeholder', 'path'))
-
     # Create default plugins if enabled)
     if not plugins:
         plugins = create_default_plugins(request, placeholders, template, lang)
-
-
     plugins = downcast_plugins(plugins, placeholders, request=request)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
     plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
-
     all_plugins_groups = plugin_groups.copy()
     for group in plugin_groups:
         plugin_groups[group] = build_plugin_tree(plugin_groups[group])
-
     for placeholder in placeholders:
         # This is all the plugins.
         setattr(placeholder, '_all_plugins_cache', all_plugins_groups.get(placeholder.pk, []))
