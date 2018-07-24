@@ -185,7 +185,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         Tests a placeholder won't render a ghost plugin.
         """
         page_en = create_page('page_en', 'col_two.html', 'en')
-        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
 
         CMSPlugin.objects.create(
             language='en',
@@ -215,7 +215,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         Tests a placeholder won't render a ghost plugin or any of it's children.
         """
         page_en = create_page('page_en', 'col_two.html', 'en')
-        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
 
         plugin = CMSPlugin.objects.create(
             language='en',
@@ -281,7 +281,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         #1366 does not apply to placeholder defined in a page
         """
         page = create_page('page', 'col_two.html', 'en')
-        ph1 = page.placeholders.get(slot='col_left')
+        ph1 = page.get_placeholders("en").get(slot='col_left')
         ###
         # add the test plugin
         ###
@@ -383,7 +383,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_name_conf(self):
         page_en = create_page('page_en', 'col_two.html', 'en')
-        placeholder_1 = page_en.placeholders.get(slot='col_left')
+        placeholder_1 = page_en.get_placeholders("en").get(slot='col_left')
         placeholder_2 = Placeholder.objects.create(slot='col_left')
         placeholder_3 = Placeholder.objects.create(slot='no_name')
 
@@ -474,9 +474,9 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def test_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
         page_en = create_page('page_en', 'col_two.html', 'en')
-        title_de = create_title("de", "page_de", page_en)
-        placeholder_en = page_en.placeholders.get(slot='col_left')
-        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        create_title("de", "page_de", page_en)
+        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
+        placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
         add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
 
         context_en = SekizaiContext()
@@ -528,9 +528,9 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def test_nested_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration for nested plugins"""
         page_en = create_page('page_en', 'col_two.html', 'en')
-        title_de = create_title("de", "page_de", page_en)
-        placeholder_en = page_en.placeholders.get(slot='col_left')
-        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        create_title("de", "page_de", page_en)
+        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
+        placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
         link_en = add_plugin(placeholder_en, 'LinkPlugin', 'en', name='en name', external_link='http://example.com/en')
         add_plugin(placeholder_en, 'TextPlugin', 'en',  target=link_en, body='en body')
 
@@ -563,13 +563,13 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             cache.clear()
             # Then we add a plugin to check for proper rendering
             link_de = add_plugin(
-                placeholder_en,
+                placeholder_de,
                 'LinkPlugin',
                 language='de',
                 name='de name',
                 external_link='http://example.com/de',
             )
-            add_plugin(placeholder_en, 'TextPlugin', 'de',  target=link_de, body='de body')
+            add_plugin(placeholder_de, 'TextPlugin', 'de',  target=link_de, body='de body')
             content_de = _render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\"")
             self.assertRegexpMatches(content_de, "de body")
@@ -578,8 +578,8 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         """ Tests language_fallback placeholder configuration """
         page_en = create_page('page_en', 'col_two.html', 'en')
         create_title("de", "page_de", page_en)
-        placeholder_en = page_en.placeholders.get(slot='col_left')
-        placeholder_de = page_en.placeholders.get(slot='col_left')
+        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
+        placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
         add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
 
         context_en = SekizaiContext()
@@ -589,9 +589,9 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
         # First test the default (fallback) behavior)
         ## Deutsch page should have the text plugin
-        content_de = _render_placeholder(placeholder_en, context_de)
+        content_de = _render_placeholder(placeholder_de, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
-        del(placeholder_en._plugins_cache)
+        del(placeholder_de._plugins_cache)
         cache.clear()
         ## English page should have no text
         content_en = _render_placeholder(placeholder_en, context_en)
@@ -625,8 +625,8 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         """
         page_en = create_page('page_en', 'col_two.html', 'en')
         create_title("de", "page_de", page_en)
-        placeholder_sidebar_en = page_en.placeholders.get(slot='col_sidebar')
-        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_sidebar_en = page_en.get_placeholders("en").get(slot='col_sidebar')
+        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
         add_plugin(placeholder_sidebar_en, 'TextPlugin', 'en', body='en body')
 
         context_en = SekizaiContext()
@@ -669,7 +669,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
-            placeholder = page.placeholders.get(slot='col_left')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
             context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             # Our page should have "en default body 1" AND "en default body 2"
@@ -712,7 +712,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
-            placeholder = page.placeholders.get(slot='col_left')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
             context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             _render_placeholder(placeholder, context)
@@ -725,13 +725,14 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
-        for placeholder in page.placeholders.all():
-            page.placeholders.remove(placeholder)
+        title = page.get_title_obj("en")
+        for placeholder in page.get_placeholders("en"):
+            title.placeholders.remove(placeholder)
             placeholder.pk += 1000
             placeholder.save()
-            page.placeholders.add(placeholder)
+            title.placeholders.add(placeholder)
         page.reload()
-        for placeholder in page.placeholders.all():
+        for placeholder in page.get_placeholders("en"):
             add_plugin(placeholder, "TextPlugin", "en", body="body")
         with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
@@ -740,7 +741,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
                               password=getattr(user, get_user_model().USERNAME_FIELD))
             endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             response = self.client.get(endpoint)
-            for placeholder in page.placeholders.all():
+            for placeholder in page.get_placeholders("en"):
                 self.assertContains(
                     response, '"placeholder_id": "%s"' % placeholder.pk)
                 self.assertNotContains(
@@ -790,14 +791,14 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         for lang in avail_langs:
             if lang != u'en':
                 create_title(lang, 'test page %s' % lang, page)
-        placeholder = page.placeholders.get(slot='col_sidebar')
+        placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         ###
         # add the test plugin
         ###
         for lang in avail_langs:
             add_plugin(placeholder, u"EmptyPlugin", lang)
         # reload placeholder from database
-        placeholder = page.placeholders.get(slot='col_sidebar')
+        placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         # get languages
         langs = [lang['code'] for lang in placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
@@ -967,10 +968,9 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         result = ph._get_attached_model()
         self.assertEqual(result, None) # Simple PH - no model
 
-    def test_excercise_get_attached_field_name(self):
+    def test_excercise_get_attached_field(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = ph._get_attached_field_name()
-        self.assertEqual(result, None) # Simple PH - no field name
+        self.assertEqual(ph._get_attached_field(), None) # Simple PH - no field name
 
     def test_excercise_get_attached_models_notplugins(self):
         ex = Example1(
@@ -1015,7 +1015,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 class PlaceholderConfTests(TestCase):
     def test_get_all_plugins_single_page(self):
         page = create_page('page', 'col_two.html', 'en')
-        placeholder = page.placeholders.get(slot='col_left')
+        placeholder = page.get_placeholders('en').get(slot='col_left')
         conf = {
             'col_two': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],
@@ -1033,7 +1033,7 @@ class PlaceholderConfTests(TestCase):
     def test_get_all_plugins_inherit(self):
         parent = create_page('parent', 'col_two.html', 'en')
         page = create_page('page', constants.TEMPLATE_INHERITANCE_MAGIC, 'en', parent=parent)
-        placeholder = page.placeholders.get(slot='col_left')
+        placeholder = page.get_placeholders("en").get(slot='col_left')
         conf = {
             'col_two': {
                 'plugins': ['TextPlugin', 'LinkPlugin'],

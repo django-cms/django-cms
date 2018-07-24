@@ -58,8 +58,30 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
                                  if all(ph.pk != p.placeholder_id for p in plugins))
         for placeholder in disjoint_placeholders:
             if get_placeholder_conf("language_fallback", placeholder.slot, template, True):
+                fallback_languages = get_fallback_languages(lang)
+
+                if placeholder.page:
+                    translations = placeholder.page.title_set.filter(language__in=fallback_languages)
+                    placeholders_by_language = {
+                        title.language: [pl for pl in title.placeholders.all() if pl.slot == placeholder.slot]
+                        for title in translations.prefetch_related('placeholders')
+                    }
+                else:
+                    placeholders_by_language = {}
+
                 for fallback_language in get_fallback_languages(lang):
-                    assign_plugins(request, (placeholder,), template, fallback_language, is_fallback=True)
+                    try:
+                        fallback_placeholder = placeholders_by_language[fallback_language][0]
+                    except (KeyError, IndexError):
+                        fallback_placeholder = None
+
+                    if fallback_placeholder:
+                        assign_plugins(request, (fallback_placeholder,), template, fallback_language, is_fallback=True)
+                        placeholder._plugins_cache = fallback_placeholder._plugins_cache
+                        placeholder._all_plugins_cache = fallback_placeholder._all_plugins_cache
+                    else:
+                        assign_plugins(request, (placeholder,), template, fallback_language, is_fallback=True)
+
                     fallback_plugins = placeholder._plugins_cache
                     if fallback_plugins:
                         fallbacks[placeholder.pk] += fallback_plugins

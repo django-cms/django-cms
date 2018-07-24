@@ -32,7 +32,7 @@ class TestStructureRenderer(CMSTestCase):
     def test_get_placeholder_plugin_menu(self):
         cms_page = create_page("page", 'nav_playground.html', "en")
         superuser = self.get_superuser()
-        placeholder_1 = cms_page.placeholders.get(slot='body')
+        placeholder_1 = cms_page.get_placeholders("en").get(slot='body')
 
         with self.login_user_context(superuser):
             renderer = self.get_renderer()
@@ -43,7 +43,7 @@ class TestStructureRenderer(CMSTestCase):
     def test_render_placeholder_toolbar_js(self):
         cms_page = create_page("page", 'nav_playground.html', "en")
         renderer = self.get_renderer()
-        placeholder = cms_page.placeholders.get(slot='body')
+        placeholder = cms_page.get_placeholders("en").get(slot='body')
         content = renderer.get_placeholder_toolbar_js(placeholder, cms_page)
 
         expected_bits = [
@@ -59,7 +59,7 @@ class TestStructureRenderer(CMSTestCase):
     def test_render_placeholder_toolbar_js_escaping(self):
         cms_page = create_page("page", 'nav_playground.html', "en")
         renderer = self.get_renderer()
-        placeholder = cms_page.placeholders.get(slot='body')
+        placeholder = cms_page.get_placeholders("en").get(slot='body')
 
         conf = {placeholder.slot: {'name': 'Content-with-dash'}}
 
@@ -101,7 +101,7 @@ class TestContentRenderer(TestStructureRenderer):
 
     def test_preload_placeholders_for_page_with_inherit_off(self):
         cms_page = create_page("page", 'nav_playground.html', "en")
-        placeholder_1 = cms_page.placeholders.get(slot='body')
+        placeholder_1 = cms_page.get_placeholders("en").get(slot='body')
         placeholder_1_plugin_1 = add_plugin(
             placeholder_1,
             plugin_type='LinkPlugin',
@@ -116,7 +116,7 @@ class TestContentRenderer(TestStructureRenderer):
             name='Link #2',
             external_link='https://www.django-cms.org',
         )
-        placeholder_2 = cms_page.placeholders.get(slot='right-column')
+        placeholder_2 = cms_page.get_placeholders("en").get(slot='right-column')
         placeholder_2_plugin_1 = add_plugin(
             placeholder_2,
             plugin_type='LinkPlugin',

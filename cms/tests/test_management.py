@@ -334,7 +334,7 @@ class ManagementTestCase(CMSTestCase):
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
     def _fill_page_body(self, page, lang):
-        ph_en = page.placeholders.get(slot="body")
+        ph_en = page.get_placeholders(lang).get(slot="body")
         # add misc plugins
         mcol1 = add_plugin(ph_en, "MultiColumnPlugin", lang, position="first-child")
         add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol1)
@@ -378,7 +378,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
 
         root_page = Page.objects.get_home(site)
-        root_plugins = CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
+        root_plugins = CMSPlugin.objects.filter(placeholder=root_page.get_placeholders('en').get(slot="body"))
 
         first_plugin_en, _ = root_plugins.get(language='en', parent=None).get_plugin_instance()
         first_plugin_de, _ = root_plugins.get(language='de', parent=None).get_plugin_instance()
@@ -424,7 +424,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         root_page = Page.objects.get_home(site)
         root_plugins = CMSPlugin.objects.filter(
-            placeholder=root_page.placeholders.get(slot="body"))
+            placeholder=root_page.get_placeholders('en').get(slot="body"))
 
         first_plugin_en, _ = root_plugins.get(language='en', parent=None).get_plugin_instance()
         first_plugin_de = None
@@ -456,7 +456,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         site_2_pk = site_2.pk
         phs = []
         for page in Page.objects.on_site(site_1_pk).drafts():
-            phs.extend(page.placeholders.values_list('pk', flat=True))
+            phs.extend(page.get_placeholders('en').values_list('pk', flat=True))
         number_start_plugins = CMSPlugin.objects.filter(placeholder__in=phs).count()
 
         out = StringIO()
@@ -478,9 +478,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         phs_1 = []
         phs_2 = []
         for page in Page.objects.on_site(site_1_pk).drafts():
-            phs_1.extend(page.placeholders.values_list('pk', flat=True))
+            phs_1.extend(page.get_placeholders('en').values_list('pk', flat=True))
         for page in Page.objects.on_site(site_2_pk).drafts():
-            phs_2.extend(page.placeholders.values_list('pk', flat=True))
+            phs_2.extend(page.get_placeholders('en').values_list('pk', flat=True))
 
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
@@ -488,8 +488,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         root_page_1 = Page.objects.get_home(site_1)
         root_page_2 = Page.objects.get_home(site_2)
-        root_plugins_1 = CMSPlugin.objects.filter(placeholder=root_page_1.placeholders.get(slot="body"))
-        root_plugins_2 = CMSPlugin.objects.filter(placeholder=root_page_2.placeholders.get(slot="body"))
+        root_plugins_1 = CMSPlugin.objects.filter(placeholder=root_page_1.get_placeholders('en').get(slot="body"))
+        root_plugins_2 = CMSPlugin.objects.filter(placeholder=root_page_2.get_placeholders('en').get(slot="body"))
 
         first_plugin_1, _ = root_plugins_1.get(language='en', parent=None).get_plugin_instance()
         first_plugin_2, _ = root_plugins_2.get(language='en', parent=None).get_plugin_instance()
@@ -541,7 +541,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         # create an empty title language
         root_page = Page.objects.get_home(site)
         create_title("de", "root page de", root_page)
-        ph = root_page.placeholders.get(slot="body")
+        ph = root_page.get_placeholders('en').get(slot="body")
         add_plugin(ph, "TextPlugin", "de", body="Hello World")
 
         out = StringIO()
@@ -565,7 +565,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         # create an empty title language
         root_page = Page.objects.get_home(site)
         create_title("de", "root page de", root_page)
-        ph = root_page.placeholders.get(slot="body")
+        ph = root_page.get_placeholders('en').get(slot="body")
         add_plugin(ph, "TextPlugin", "de", body="Hello World")
 
         root_plugins = CMSPlugin.objects.filter(placeholder=ph)
@@ -577,7 +577,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             stdout=out
         )
 
-        CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
+        CMSPlugin.objects.filter(placeholder=root_page.get_placeholders('en').get(slot="body"))
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # we have an existing plugin in one placeholder, so we have one more

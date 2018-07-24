@@ -5,13 +5,13 @@ import warnings
 from datetime import datetime, timedelta
 
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _, force_text
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
@@ -37,13 +37,16 @@ class Placeholder(models.Model):
     """
     slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
-    cache_placeholder = True
-    is_static = False
-    is_editable = True
-    content_type = models.ForeignKey(ContentType, blank=True, null=True,
+    content_type = models.ForeignKey(ContentType,
+                                     blank=True,
+                                     null=True,
                                      on_delete=models.SET_NULL)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     source = GenericForeignKey('content_type', 'object_id')
+    cache_placeholder = True
+    is_static = False
+    is_editable = True
+
 
     class Meta:
         app_label = 'cms'
@@ -237,9 +240,9 @@ class Placeholder(models.Model):
 
     def _get_attached_fields(self):
         """
-        Returns an ITERATOR of all non-cmsplugin reverse related fields.
+        Returns a list of all non-cmsplugin reverse related fields.
         """
-        from cms.models import CMSPlugin, UserSettings
+        from cms.models import CMSPlugin, Title, UserSettings
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
             relations = self._get_related_objects()
@@ -254,15 +257,18 @@ class Placeholder(models.Model):
                 except KeyError:
                     admin_class = None
 
-                # UserSettings is a special case
+                # UserSettings and Title are special cases.
                 # Attached objects are used to check permissions
                 # and we filter out any attached object that does not
                 # inherit from PlaceholderAdminMixin
                 # Because UserSettings does not (and shouldn't) inherit
                 # from PlaceholderAdminMixin, we add a manual exception.
-                is_user_settings = related_model == UserSettings
+                is_internal = (
+                    related_model == UserSettings
+                    or related_model == Title
+                )
 
-                if is_user_settings or isinstance(admin_class, PlaceholderAdminMixin):
+                if is_internal or isinstance(admin_class, PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.exists():
@@ -272,42 +278,20 @@ class Placeholder(models.Model):
         return self._attached_fields_cache
 
     def _get_attached_field(self):
-        from cms.models import CMSPlugin, StaticPlaceholder, Page
-        if not hasattr(self, '_attached_field_cache'):
-            self._attached_field_cache = None
-            relations = self._get_related_objects()
-            for rel in relations:
-                parent = rel.related_model
-                if parent == Page or parent == StaticPlaceholder:
-                    relations.insert(0, relations.pop(relations.index(rel)))
-            for rel in relations:
-                if issubclass(rel.model, CMSPlugin):
-                    continue
-                from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                parent = rel.related_model
-                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
-                    field = getattr(self, rel.get_accessor_name())
-                    try:
-                        if field.exists():
-                            self._attached_field_cache = rel.field
-                            break
-                    except:
-                        pass
-        return self._attached_field_cache
-
-    def _get_attached_field_name(self):
-        field = self._get_attached_field()
-        if field:
-            return field.name
-        return None
+        try:
+            return self._get_attached_fields()[0]
+        except IndexError:
+            return None
 
     def _get_attached_model(self):
         if hasattr(self, '_attached_model_cache'):
             return self._attached_model_cache
-        if self.page or self.page_set.exists():
+
+        if self.page or self.title_set.exists():
             from cms.models import Page
             self._attached_model_cache = Page
             return Page
+
         field = self._get_attached_field()
         if field:
             self._attached_model_cache = field.model
@@ -347,8 +331,8 @@ class Placeholder(models.Model):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
             try:
-                self._page = Page.objects.get(placeholders=self)
-            except (Page.DoesNotExist, Page.MultipleObjectsReturned,):
+                self._page = Page.objects.distinct().get(title_set__placeholders=self)
+            except (Page.DoesNotExist, Page.MultipleObjectsReturned):
                 self._page = None
         return self._page
 

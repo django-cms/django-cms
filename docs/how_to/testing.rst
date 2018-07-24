@@ -21,7 +21,7 @@ So you could create ``myapp/tests/urls.py`` with the following code::
     from django.conf.urls import url, include
 
     urlpatterns = [
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
         url(r'^myapp/', include('myapp.urls')),
         url(r'', include('cms.urls')),
     ]

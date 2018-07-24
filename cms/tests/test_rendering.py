@@ -124,7 +124,7 @@ class RenderingTestCase(CMSTestCase):
                         reverse_id=self.test_data['reverse_id'], published=True)
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders = {}
-        for placeholder in p.placeholders.all():
+        for placeholder in p.get_placeholders('en'):
             self.test_placeholders[placeholder.slot] = placeholder
             # Insert some test Text plugins
         add_plugin(self.test_placeholders['main'], 'TextPlugin', 'en',
@@ -145,7 +145,7 @@ class RenderingTestCase(CMSTestCase):
                          reverse_id=self.test_data3['reverse_id'], published=True)
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders3 = {}
-        for placeholder in p3.placeholders.all():
+        for placeholder in p3.get_placeholders('en'):
             self.test_placeholders3[placeholder.slot] = placeholder
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
@@ -156,7 +156,7 @@ class RenderingTestCase(CMSTestCase):
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders4 = {}
-        for placeholder in p4.placeholders.all():
+        for placeholder in p4.get_placeholders('en'):
             self.test_placeholders4[placeholder.slot] = placeholder
             # Insert some test plugins
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
@@ -168,7 +168,7 @@ class RenderingTestCase(CMSTestCase):
                          reverse_id=self.test_data5['reverse_id'])
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders5 = {}
-        for placeholder in p5.placeholders.all():
+        for placeholder in p5.get_placeholders('en'):
             self.test_placeholders5[placeholder.slot] = placeholder
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders5['sub'], 'TextPlugin', 'en',
@@ -183,7 +183,7 @@ class RenderingTestCase(CMSTestCase):
                          reverse_id=self.test_data6['reverse_id'], published=True)
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders6 = {}
-        for placeholder in p6.placeholders.all():
+        for placeholder in p6.get_placeholders('en'):
             self.test_placeholders6[placeholder.slot] = placeholder
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en',
@@ -334,7 +334,7 @@ class RenderingTestCase(CMSTestCase):
         renderer = self.get_content_renderer(request)
         context = SekizaiContext()
         context['cms_content_renderer'] = renderer
-        placeholder = self.test_page.placeholders.get(slot='empty')
+        placeholder = self.test_page.get_placeholders('en').get(slot='empty')
         expected = renderer.render_placeholder(
             placeholder,
             context=context,
@@ -511,7 +511,7 @@ class RenderingTestCase(CMSTestCase):
         Tests that {% show_uncached_placeholder %} does not populate cache.
         """
         template = '{% load cms_tags %}<h1>{% show_uncached_placeholder "sub" test_page %}</h1>'
-        placeholder = self.test_page.placeholders.get(slot='sub')
+        placeholder = self.test_page.get_placeholders('en').get(slot='sub')
         request = self.get_request(page=self.test_page)
         cache_value_before = get_placeholder_cache(placeholder, 'en', 1, request)
         output = self.render(self.test_page, template, {'test_page': self.test_page})
@@ -701,7 +701,7 @@ class RenderingTestCase(CMSTestCase):
         Ensures that the edit-mode markup is correct
         """
         page = self.test_page.publisher_public
-        placeholder = page.placeholders.get(slot='main')
+        placeholder = page.get_placeholders('en').get(slot='main')
         parent_plugin = add_plugin(placeholder, 'SolarSystemPlugin', 'en')
         child_plugin_1 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)
         child_plugin_2 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)

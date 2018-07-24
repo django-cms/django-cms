@@ -13,30 +13,30 @@ class UnalteredPM(CMSPlugin):
 
 
 class NoRelNmePM(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='+', parent_link=True)
+    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='+', parent_link=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     search_fields = ['title']
 
 
 class NoRelQNmePM(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_query_name='+', parent_link=True)
+    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_query_name='+', parent_link=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     search_fields = ['title']
 
 
 class CustomRelQNmePM(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_query_name='reldesc_custom_relqn', parent_link=True)
+    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_query_name='reldesc_custom_relqn', parent_link=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     search_fields = ['title']
 
 
 class CustomRelNmePM(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='reldesc_custom_reln', parent_link=True)
+    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='reldesc_custom_reln', parent_link=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     search_fields = ['title']
 
 
 class CustomRelNmeAndRelQNmePM(CMSPlugin):
-    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='reldesc_custom_reln2', related_query_name='reldesc_custom_relqn2', parent_link=True)
+    cmsplugin_ptr = models.OneToOneField(CMSPlugin, related_name='reldesc_custom_reln2', related_query_name='reldesc_custom_relqn2', parent_link=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     search_fields = ['title']
