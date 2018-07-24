@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, Template
 from django.template.loader import get_template
@@ -29,14 +28,12 @@ from cms.test_utils.project.placeholderapp.models import (
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
-from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
                                    _scan_placeholders)
-from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
 
@@ -470,185 +467,6 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         # And test the plugin counts remain the same
         self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
-
-    def test_plugins_language_fallback(self):
-        """ Tests language_fallback placeholder configuration """
-        page_en = create_page('page_en', 'col_two.html', 'en')
-        create_title("de", "page_de", page_en)
-        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
-        placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
-        add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
-
-        context_en = SekizaiContext()
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = SekizaiContext()
-        context_de['request'] = self.get_request(language="de", page=page_en)
-
-        # First test the default (fallback) behavior)
-        ## English page should have the text plugin
-        content_en = _render_placeholder(placeholder_en, context_en)
-        self.assertRegexpMatches(content_en, "^en body$")
-
-        ## Deutsch page have text due to fallback
-        content_de = _render_placeholder(placeholder_de, context_de)
-        self.assertRegexpMatches(content_de, "^en body$")
-        self.assertEqual(len(content_de), 7)
-
-        conf = {
-            'col_left': {
-                'language_fallback': False,
-            },
-        }
-        # configure non fallback
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            ## Deutsch page should have no text
-            del(placeholder_de._plugins_cache)
-            cache.clear()
-            content_de = _render_placeholder(placeholder_de, context_de)
-            ## Deutsch page should inherit english content
-            self.assertNotRegex(content_de, "^en body$")
-            context_de2 = SekizaiContext()
-            request = self.get_request(language="de", page=page_en)
-            request.session['cms_edit'] = True
-            request.user = self.get_superuser()
-            request.toolbar = CMSToolbar(request)
-            context_de2['request'] = request
-            del(placeholder_de._plugins_cache)
-            cache.clear()
-            content_de2 = _render_placeholder(placeholder_de, context_de2)
-            self.assertFalse("en body" in content_de2)
-            # remove the cached plugins instances
-            del(placeholder_de._plugins_cache)
-            cache.clear()
-            # Then we add a plugin to check for proper rendering
-            add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
-            content_de = _render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "^de body$")
-
-    def test_nested_plugins_language_fallback(self):
-        """ Tests language_fallback placeholder configuration for nested plugins"""
-        page_en = create_page('page_en', 'col_two.html', 'en')
-        create_title("de", "page_de", page_en)
-        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
-        placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
-        link_en = add_plugin(placeholder_en, 'LinkPlugin', 'en', name='en name', external_link='http://example.com/en')
-        add_plugin(placeholder_en, 'TextPlugin', 'en',  target=link_en, body='en body')
-
-        context_en = SekizaiContext()
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = SekizaiContext()
-        context_de['request'] = self.get_request(language="de", page=page_en)
-
-        conf = {
-            'col_left': {
-                'language_fallback': True,
-            },
-        }
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            content_de = _render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\"")
-            self.assertRegexpMatches(content_de, "en body")
-            context_de2 = SekizaiContext()
-            request = self.get_request(language="de", page=page_en)
-            request.session['cms_edit'] = True
-            request.user = self.get_superuser()
-            request.toolbar = CMSToolbar(request)
-            context_de2['request'] = request
-            del(placeholder_de._plugins_cache)
-            cache.clear()
-            content_de2 = _render_placeholder(placeholder_de, context_de2)
-            self.assertFalse("en body" in content_de2)
-            # remove the cached plugins instances
-            del(placeholder_de._plugins_cache)
-            cache.clear()
-            # Then we add a plugin to check for proper rendering
-            link_de = add_plugin(
-                placeholder_de,
-                'LinkPlugin',
-                language='de',
-                name='de name',
-                external_link='http://example.com/de',
-            )
-            add_plugin(placeholder_de, 'TextPlugin', 'de',  target=link_de, body='de body')
-            content_de = _render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\"")
-            self.assertRegexpMatches(content_de, "de body")
-
-    def test_plugins_non_default_language_fallback(self):
-        """ Tests language_fallback placeholder configuration """
-        page_en = create_page('page_en', 'col_two.html', 'en')
-        create_title("de", "page_de", page_en)
-        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
-        placeholder_de = page_en.get_placeholders("de").get(slot='col_left')
-        add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
-
-        context_en = SekizaiContext()
-        context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = SekizaiContext()
-        context_de['request'] = self.get_request(language="de", page=page_en)
-
-        # First test the default (fallback) behavior)
-        ## Deutsch page should have the text plugin
-        content_de = _render_placeholder(placeholder_de, context_de)
-        self.assertRegexpMatches(content_de, "^de body$")
-        del(placeholder_de._plugins_cache)
-        cache.clear()
-        ## English page should have no text
-        content_en = _render_placeholder(placeholder_en, context_en)
-        self.assertRegexpMatches(content_en, "^de body$")
-        self.assertEqual(len(content_en), 7)
-        del(placeholder_en._plugins_cache)
-        cache.clear()
-        conf = {
-            'col_left': {
-                'language_fallback': False,
-            },
-        }
-        # configure non-fallback
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            ## English page should have deutsch text
-            content_en = _render_placeholder(placeholder_en, context_en)
-            self.assertNotRegex(content_en, "^de body$")
-
-            # remove the cached plugins instances
-            del(placeholder_en._plugins_cache)
-            cache.clear()
-            # Then we add a plugin to check for proper rendering
-            add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
-            content_en = _render_placeholder(placeholder_en, context_en)
-            self.assertRegexpMatches(content_en, "^en body$")
-
-    def test_plugins_discarded_with_language_fallback(self):
-        """
-        Tests side effect of language fallback: if fallback enabled placeholder
-        existed, it discards all other existing plugins
-        """
-        page_en = create_page('page_en', 'col_two.html', 'en')
-        create_title("de", "page_de", page_en)
-        placeholder_sidebar_en = page_en.get_placeholders("en").get(slot='col_sidebar')
-        placeholder_en = page_en.get_placeholders("en").get(slot='col_left')
-        add_plugin(placeholder_sidebar_en, 'TextPlugin', 'en', body='en body')
-
-        context_en = SekizaiContext()
-        context_en['request'] = self.get_request(language="en", page=page_en)
-
-        conf = {
-            'col_left': {
-                'language_fallback': True,
-            },
-        }
-        with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            # call assign plugins first, as this is what is done in real cms life
-            # for all placeholders in a page at once
-            assign_plugins(context_en['request'],
-                           [placeholder_sidebar_en, placeholder_en], 'col_two.html')
-            # if the normal, non fallback enabled placeholder still has content
-            content_en = _render_placeholder(placeholder_sidebar_en, context_en)
-            self.assertRegexpMatches(content_en, "^en body$")
-
-            # remove the cached plugins instances
-            del(placeholder_sidebar_en._plugins_cache)
-            cache.clear()
 
     def test_plugins_prepopulate(self):
         """ Tests prepopulate placeholder configuration """

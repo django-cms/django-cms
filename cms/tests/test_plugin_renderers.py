@@ -125,7 +125,7 @@ class TestContentRenderer(TestStructureRenderer):
             external_link='https://www.django-cms.org',
         )
         renderer = self.get_renderer(page=cms_page)
-        renderer._preload_placeholders_for_page(cms_page, inherit=False)
+        renderer._preload_placeholders_for_page(cms_page)
 
         self.assertIn(cms_page.pk, renderer._placeholders_by_page_cache)
         self.assertIn(placeholder_1.slot, renderer._placeholders_by_page_cache[cms_page.pk])
