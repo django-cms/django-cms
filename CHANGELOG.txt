@@ -9,6 +9,7 @@
 * Added ``page_title`` parameter for ``cms.api.create_page()`` and ``cms.api.create_title()``.
 * Introduced Django 2.0 support.
 * Introduced Django 2.1 support.
+* Fixed rendering of permission icons. Use SVG variants instead of GIFs.
 
 
 === 3.5.2 (2018-04-11) ===
