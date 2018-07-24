@@ -41,7 +41,8 @@ class Placeholder(models.Model):
         ContentType,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL)
+        on_delete=models.SET_NULL
+    )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     source = GenericForeignKey('content_type', 'object_id')
     cache_placeholder = True
