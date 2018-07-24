@@ -16,6 +16,7 @@
 * Fixed a bug where plugins that are not rendered in content wouldn't be
   editable in structure board
 * Fixed a bug with expanding static placeholder by clicking on "Expand All" button
+* Fixed rendering of permission icons. Use SVG variants instead of GIFs.
 
 
 === 3.5.2 (2018-04-11) ===
