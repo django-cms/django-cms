@@ -253,7 +253,7 @@ def downcast_plugins(plugins,
 
     for plugin_type, pks in plugin_types_map.items():
         cls = plugin_pool.get_plugin(plugin_type)
-        # get all the plugins of type cls.modeldowncast_plugins
+        # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
 
         if select_placeholder:
