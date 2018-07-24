@@ -3,9 +3,9 @@ from django.core.cache import cache
 from django.urls import reverse
 from django.utils.translation import override as force_language
 
-from cms.api import create_page, add_plugin, create_title
+from cms.api import create_page, create_title
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-from cms.models import CMSPlugin, Page, TreeNode, Title
+from cms.models import Page, TreeNode, Title
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.urlutils import admin_reverse
@@ -463,33 +463,6 @@ class PublishingTests(TestCase):
         self.assertEqual(other.get_public_object().get_absolute_url(), root + 'another-page/')
         self.assertEqual(child2.get_absolute_url(), root + 'another-page/child/')
         self.assertEqual(child2.get_public_object().get_absolute_url(), root + 'another-page/child/')
-
-    def test_revert_contents(self):
-        user = self.get_superuser()
-        page = create_page("Page", "nav_playground.html", "en", published=True,
-                           created_by=user)
-        placeholder = page.get_placeholders('en').get(slot=u"body")
-        deleted_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Deleted content")
-        text_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Public content")
-        page.publish('en')
-
-        # Modify and delete plugins
-        text_plugin.body = "<p>Draft content</p>"
-        text_plugin.save()
-        deleted_plugin.delete()
-        self.assertEqual(CMSPlugin.objects.count(), 3)
-
-        # Now let's revert and restore
-        page.revert_to_live('en')
-        self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
-
-        self.assertEqual(CMSPlugin.objects.count(), 4)
-        plugins = CMSPlugin.objects.filter(placeholder=placeholder)
-        self.assertEqual(plugins.count(), 2)
-
-        plugins = [plugin.get_plugin_instance()[0] for plugin in plugins]
-        self.assertEqual(plugins[0].body, "Deleted content")
-        self.assertEqual(plugins[1].body, "Public content")
 
     def test_revert_move(self):
         parent = create_page("Parent", "nav_playground.html", "en", published=True)
