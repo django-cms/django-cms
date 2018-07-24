@@ -5,7 +5,6 @@ from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_title
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-
 from cms.models import Page, TreeNode, Title
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
