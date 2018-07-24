@@ -5,12 +5,12 @@ import functools
 from unittest import skipIf
 
 from django.conf import settings
-from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
+from django.urls import reverse
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
@@ -632,11 +632,22 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(Text.objects.count(), 1)
         self.assertTrue(Placeholder.objects.count() > 2)
-        page.delete()
-        home.delete()
+
+        superuser = self.get_superuser()
+        home_pl_count = home.get_placeholders().count()
+        page_pl_count = page.get_placeholders().count()
+        expected_pl_count = Placeholder.objects.count() - (home_pl_count + page_pl_count)
+
+        with self.login_user_context(superuser):
+            # Delete page
+            self.client.post(self.get_admin_url(Page, 'delete', page.pk), {'post': 'yes'})
+
+        with self.login_user_context(superuser):
+            # Delete home page
+            self.client.post(self.get_admin_url(Page, 'delete', home.pk), {'post': 'yes'})
         self.assertEqual(CMSPlugin.objects.count(), 0)
         self.assertEqual(Text.objects.count(), 0)
-        self.assertEqual(Placeholder.objects.count(), 0)
+        self.assertEqual(Placeholder.objects.exclude(slot='clipboard').count(), expected_pl_count)
         self.assertEqual(Page.objects.count(), 0)
 
     def test_get_page_from_request_nopage(self):
@@ -998,20 +1009,45 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(resp.get('X-Frame-Options'), None)
 
     def test_top_level_page_inherited_xframe_options_are_applied(self):
+        MIDDLEWARE = settings.MIDDLEWARE + ['django.middleware.clickjacking.XFrameOptionsMiddleware']
+        with self.settings(MIDDLEWARE=MIDDLEWARE):
+            page = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+            resp = self.client.get(page.get_absolute_url('en'))
+            self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
+
+    def test_xframe_options_with_cms_page_cache_and_clickjacking_middleware(self):
+        # Refs: 6346
         if getattr(settings, 'MIDDLEWARE', None):
             override = {
                 'MIDDLEWARE': settings.MIDDLEWARE + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware']
+                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                ]
             }
         else:
             override = {
                 'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware']
+                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                ]
             }
+
+        override['CMS_PAGE_CACHE'] = True
+
         with self.settings(**override):
-            page = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+            page = create_page(
+                'test page 1',
+                'nav_playground.html',
+                'en',
+                published=True,
+                xframe_options=Page.X_FRAME_OPTIONS_ALLOW,
+            )
+
+            # Normal response from render_page
             resp = self.client.get(page.get_absolute_url('en'))
-            self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
+            self.assertEqual(resp.get('X-Frame-Options'), None)
+
+            # Response from page cache
+            resp = self.client.get(page.get_absolute_url('en'))
+            self.assertEqual(resp.get('X-Frame-Options'), None)
 
     def test_xframe_options_with_cms_page_cache_and_clickjacking_middleware(self):
         # Refs: 6346

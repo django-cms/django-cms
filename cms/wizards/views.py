@@ -2,18 +2,17 @@
 
 import os
 
-from django.forms import Form
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
-from django.core.urlresolvers import NoReverseMatch
+from django.forms import Form
 from django.template.response import SimpleTemplateResponse
+from django.urls import NoReverseMatch
 
 from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
 from cms.utils import get_current_site
-from cms.utils.compat import DJANGO_1_10
 from cms.utils.i18n import get_site_language_from_request
 
 from .wizard_pool import wizard_pool
@@ -61,9 +60,6 @@ class WizardCreateView(SessionWizardView):
 
     def get_context_data(self, **kwargs):
         context = super(WizardCreateView, self).get_context_data(**kwargs)
-
-        if self.is_first_step():
-            context['DJANGO_1_10'] = DJANGO_1_10
 
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()

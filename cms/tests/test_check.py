@@ -76,7 +76,7 @@ class CheckTests(CheckAssertMixin, TestCase):
             self.assertRaises(ImproperlyConfigured, self.assertCheck, True, warnings=1, errors=0)
 
     def test_middlewares(self):
-        MIDDLEWARE_CLASSES = [
+        MIDDLEWARE = [
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
@@ -90,15 +90,7 @@ class CheckTests(CheckAssertMixin, TestCase):
             'django.middleware.cache.FetchFromCacheMiddleware',
         ]
         self.assertCheck(True, warnings=0, errors=0)
-        if getattr(settings, 'MIDDLEWARE', None):
-            override = {
-                'MIDDLEWARE': MIDDLEWARE_CLASSES
-            }
-        else:
-            override = {
-                'MIDDLEWARE_CLASSES': MIDDLEWARE_CLASSES
-            }
-        with self.settings(**override):
+        with self.settings(MIDDLEWARE=MIDDLEWARE):
             self.assertCheck(False, warnings=0, errors=2)
 
     def test_copy_relations_fk_check(self):

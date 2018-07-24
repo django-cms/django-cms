@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 import os
 import sys
 
-from cms.utils.compat import DJANGO_1_9
-
 
 def noop_gettext(s):
     return s
@@ -120,8 +118,19 @@ HELPER_SETTINGS = dict(
         'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.placeholderapp',
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'cms.middleware.utils.ApphookReloadMiddleware',
+        'django.middleware.http.ConditionalGetMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
     ],
     TEMPLATE_DIRS=(
         os.path.join(
@@ -133,12 +142,7 @@ HELPER_SETTINGS = dict(
         ('page.html', 'Standard page'),
         ('simple.html', 'Simple page'),
     ),
-)
-
-if DJANGO_1_9:
-    HELPER_SETTINGS['MIGRATION_MODULES'] = DisableMigrations()
-else:
-    HELPER_SETTINGS['MIGRATION_MODULES'] = {
+    MIGRATION_MODULES={
         'auth': None,
         'admin': None,
         'contenttypes': None,
@@ -147,7 +151,8 @@ else:
         'cms': None,
         'menus': None,
         'djangocms_text_ckeditor': None,
-    }
+    },
+)
 
 
 def _helper_patch(*args, **kwargs):

@@ -41,11 +41,11 @@ class UserObjectPermissionManager(models.Manager):
 
 
 class UserObjectPermission(models.Model):
-    permission = models.ForeignKey(Permission)
-    content_type = models.ForeignKey(ContentType)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_pk = models.CharField(_('object ID'), max_length=255)
     content_object = GenericForeignKey(fk_field='object_pk')
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'))
+    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), on_delete=models.CASCADE)
 
     objects = UserObjectPermissionManager()
 

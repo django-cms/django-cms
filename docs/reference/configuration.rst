@@ -437,7 +437,7 @@ Example::
 .. _i18n_l10n_reference:
 
 *****************************************************
-Internationalisation and localisation (I18N and L10N) 
+Internationalisation and localisation (I18N and L10N)
 *****************************************************
 
 CMS_LANGUAGES
@@ -573,7 +573,7 @@ default
 hide_untranslated
 -----------------
 
-Hides untranslated pages in menus. 
+Hides untranslated pages in menus.
 
 When applied to the ``default`` directive, if ``False``, all pages in menus will be listed in all languages, including those
 that don't yet have content in a particular language. If ``True``, untranslated pages will be hidden.
@@ -612,7 +612,7 @@ Unicode support for automated slugs
 If your site has languages which use non-ASCII character sets, :setting:`CMS_UNIHANDECODE_HOST` and
 :setting:`CMS_UNIHANDECODE_VERSION` will allow it to automate slug generation for those languages too.
 
-Support for this is provided by the unihandecode.js project. 
+Support for this is provided by the unihandecode.js project.
 
 
 ..  setting:: CMS_UNIHANDECODE_HOST
@@ -786,7 +786,7 @@ CMS_REQUEST_IP_RESOLVER
 =======================
 
 default
-    'cms.utils.request_ip_resolvers.default_request_ip_resolver'
+    '`cms.utils.request_ip_resolvers.default_request_ip_resolver`'
 
 This setting is used system-wide to provide a consistent and plug-able means
 of extracting a client IP address from the HTTP request. The default

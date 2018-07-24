@@ -79,7 +79,7 @@ cms.toolbar.toolbar
         Removes an item from the toolbar or raises a :exc:`KeyError` if it's
         not found.
 
-    .. method:: get_or_create_menu(key. verbose_name, side=LEFT, position=None)
+    .. method:: get_or_create_menu(key, verbose_name, side=LEFT, position=None)
 
         If a menu with ``key`` already exists, this method will return that
         menu. Otherwise it will create a menu for that ``key`` with the given

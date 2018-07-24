@@ -32,7 +32,7 @@ What's new in 3.3
 * Improved UI in various minor ways
 * Added a new setting CMS_INTERNAL_IPS for defining a set of IP addresses for which
   the toolbar will appear for authorized users. If left unset, retains the
-  existing behavior of allowing toolbar for authorized users at any IP address.
+  existing behaviour of allowing toolbar for authorized users at any IP address.
 * Changed behaviour of sideframe; is no longer resizable, opens to 90% of the screen or 100% on
   small screens.
 * Removed some unnecessary reloads after closing sideframe.
