@@ -47,7 +47,6 @@ class Placeholder(models.Model):
     is_static = False
     is_editable = True
 
-
     class Meta:
         app_label = 'cms'
         permissions = (
