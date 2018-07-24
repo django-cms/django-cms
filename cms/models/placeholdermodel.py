@@ -5,8 +5,8 @@ import warnings
 from datetime import datetime, timedelta
 
 from django.contrib import admin
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils import six
