@@ -1174,5 +1174,17 @@ class PlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     list_filter = []
     list_display = ['id', 'slot', 'default_width',]
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_module_permission(self, request):
+        return False
+
 
 admin.site.register(Placeholder, PlaceholderAdmin)
