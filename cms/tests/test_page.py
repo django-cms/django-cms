@@ -16,7 +16,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.api import create_page, add_plugin, create_title, publish_page
-from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
+from cms.exceptions import PublicIsUnmodifiable
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
@@ -338,11 +338,8 @@ class PagesTestCase(TransactionCMSTestCase):
         page = page_a.publisher_public
         self.assertRaises(PublicIsUnmodifiable, page.copy_with_descendants, page_b, 'last-child')
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
-        self.assertRaises(PublicIsUnmodifiable, page.revert_to_live, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
-
         self.assertTrue(page.get_draft_object().publisher_is_draft)
-        self.assertRaises(PublicVersionNeeded, page_b.revert_to_live, 'en')
 
     def test_move_page_regression_left_to_right_5752(self):
         # ref: https://github.com/divio/django-cms/issues/5752

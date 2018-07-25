@@ -214,24 +214,6 @@ def user_can_delete_page_translation(user, page, language, site=None):
 
 
 @cached_func
-@auth_permission_required('change_page')
-def user_can_revert_page_to_live(user, page, language, site=None):
-    if not user_can_change_page(user, page, site=site):
-        return False
-
-    placeholders = (
-        _get_draft_placeholders(page, language)
-        .filter(cmsplugin__language=language)
-        .distinct()
-    )
-
-    for placeholder in placeholders.iterator():
-        if not placeholder.has_delete_plugins_permission(user, [language]):
-            return False
-    return True
-
-
-@cached_func
 @auth_permission_required('publish_page')
 def user_can_publish_page(user, page, site=None):
     has_perm = has_generic_permission(
