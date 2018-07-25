@@ -5,6 +5,8 @@ import warnings
 from datetime import datetime, timedelta
 
 from django.contrib import admin
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils import six
@@ -35,6 +37,14 @@ class Placeholder(models.Model):
     """
     slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    source = GenericForeignKey('content_type', 'object_id')
     cache_placeholder = True
     is_static = False
     is_editable = True
