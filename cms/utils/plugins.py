@@ -48,7 +48,7 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     qs = get_cmsplugin_queryset(request)
     qs = qs.filter(placeholder__in=placeholders, language=lang)
     plugins = list(qs.order_by('placeholder', 'path'))
-    # Create default plugins if enabled)
+    # Create default plugins if enabled
     if not plugins:
         plugins = create_default_plugins(request, placeholders, template, lang)
     plugins = downcast_plugins(plugins, placeholders, request=request)

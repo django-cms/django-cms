@@ -482,7 +482,7 @@ class ContentRenderer(BaseRenderer):
                 language_cache[placeholder.pk] = cached_value
         return language_cache.get(placeholder.pk)
 
-    def _preload_placeholders_for_page(self, page, slots=None):
+    def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
         """
         Populates the internal plugin cache of each placeholder
         in the given page if the placeholder has not been
@@ -499,7 +499,11 @@ class ContentRenderer(BaseRenderer):
             # Creates any placeholders missing on the page
             placeholders = title.rescan_placeholders().values()
 
-        if not self.toolbar.edit_mode_active:
+        if inherit:
+            # When the inherit flag is True,
+            # assume all placeholders found are inherited and thus prefetch them.
+            slots_w_inheritance = [pl.slot for pl in placeholders]
+        elif not self.toolbar.edit_mode_active:
             # Scan through the page template to find all placeholders
             # that have inheritance turned on.
             slots_w_inheritance = [pl.slot for pl in page.get_declared_placeholders() if pl.inherit]
@@ -539,6 +543,7 @@ class ContentRenderer(BaseRenderer):
             self._preload_placeholders_for_page(
                 page=parent_page,
                 slots=placeholders_to_inherit,
+                inherit=True,
             )
 
         # Internal cache mapping placeholder slots
