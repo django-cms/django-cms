@@ -3,6 +3,7 @@ import uuid
 import warnings
 
 from django.conf.urls import url
+from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
@@ -1167,3 +1168,11 @@ class PlaceholderAdminMixin(object):
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
+
+
+class PlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
+    list_filter = []
+    list_display = ['id', 'slot', 'default_width',]
+
+
+admin.site.register(Placeholder, PlaceholderAdmin)
