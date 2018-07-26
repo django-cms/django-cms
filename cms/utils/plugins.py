@@ -12,7 +12,6 @@ from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
-from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_placeholder_conf
@@ -36,7 +35,7 @@ def get_plugins(request, placeholder, template, lang=None):
     return getattr(placeholder, '_plugins_cache')
 
 
-def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=False):
+def assign_plugins(request, placeholders, template=None, lang=None):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -49,62 +48,21 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     qs = get_cmsplugin_queryset(request)
     qs = qs.filter(placeholder__in=placeholders, language=lang)
     plugins = list(qs.order_by('placeholder', 'path'))
-    fallbacks = defaultdict(list)
-    # If no plugin is present in the current placeholder we loop in the fallback languages
-    # and get the first available set of plugins
-    if (not is_fallback and
-        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)):
-        disjoint_placeholders = (ph for ph in placeholders
-                                 if all(ph.pk != p.placeholder_id for p in plugins))
-        for placeholder in disjoint_placeholders:
-            if get_placeholder_conf("language_fallback", placeholder.slot, template, True):
-                fallback_languages = get_fallback_languages(lang)
-
-                if placeholder.page:
-                    translations = placeholder.page.title_set.filter(language__in=fallback_languages)
-                    placeholders_by_language = {
-                        title.language: [pl for pl in title.placeholders.all() if pl.slot == placeholder.slot]
-                        for title in translations.prefetch_related('placeholders')
-                    }
-                else:
-                    placeholders_by_language = {}
-
-                for fallback_language in get_fallback_languages(lang):
-                    try:
-                        fallback_placeholder = placeholders_by_language[fallback_language][0]
-                    except (KeyError, IndexError):
-                        fallback_placeholder = None
-
-                    if fallback_placeholder:
-                        assign_plugins(request, (fallback_placeholder,), template, fallback_language, is_fallback=True)
-                        placeholder._plugins_cache = fallback_placeholder._plugins_cache
-                        placeholder._all_plugins_cache = fallback_placeholder._all_plugins_cache
-                    else:
-                        assign_plugins(request, (placeholder,), template, fallback_language, is_fallback=True)
-
-                    fallback_plugins = placeholder._plugins_cache
-                    if fallback_plugins:
-                        fallbacks[placeholder.pk] += fallback_plugins
-                        break
-    # These placeholders have no fallback
-    non_fallback_phs = [ph for ph in placeholders if ph.pk not in fallbacks]
-    # If no plugin is present in non fallback placeholders, create default plugins if enabled)
+    # Create default plugins if enabled
     if not plugins:
-        plugins = create_default_plugins(request, non_fallback_phs, template, lang)
-    plugins = downcast_plugins(plugins, non_fallback_phs, request=request)
+        plugins = create_default_plugins(request, placeholders, template, lang)
+    plugins = downcast_plugins(plugins, placeholders, request=request)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
     plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
     all_plugins_groups = plugin_groups.copy()
     for group in plugin_groups:
         plugin_groups[group] = build_plugin_tree(plugin_groups[group])
-    groups = fallbacks.copy()
-    groups.update(plugin_groups)
     for placeholder in placeholders:
         # This is all the plugins.
         setattr(placeholder, '_all_plugins_cache', all_plugins_groups.get(placeholder.pk, []))
         # This one is only the root plugins.
-        setattr(placeholder, '_plugins_cache', groups.get(placeholder.pk, []))
+        setattr(placeholder, '_plugins_cache', plugin_groups.get(placeholder.pk, []))
 
 
 def create_default_plugins(request, placeholders, template, lang):
