@@ -507,11 +507,14 @@ class BaseCMSTestCase(object):
 
         return plugin_pool.get_plugin(plugin_type).model
 
-    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None):
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
             path = '/{}/'.format(language)
+
+        if position is None:
+            position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
 
         endpoint = placeholder.get_add_url()
         data = {
@@ -519,6 +522,7 @@ class BaseCMSTestCase(object):
             'placeholder_id': placeholder.pk,
             'plugin_language': language,
             'cms_path': path,
+            'plugin_position': position,
         }
 
         if parent:

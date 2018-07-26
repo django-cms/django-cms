@@ -115,6 +115,7 @@ HELPER_SETTINGS = dict(
         'cms.test_utils.project.pluginapp.plugins.link',
         'cms.test_utils.project.pluginapp.plugins.multicolumn',
         'cms.test_utils.project.pluginapp.plugins.multiwrap',
+        'cms.test_utils.project.pluginapp.plugins.no_custom_model',
         'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.placeholderapp',
     ],

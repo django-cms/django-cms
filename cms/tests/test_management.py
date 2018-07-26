@@ -75,7 +75,7 @@ class ManagementTestCase(CMSTestCase):
         page1.node.save()
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), 'fixing page tree\nfixing plugin tree\nall done\n')
+        self.assertEqual(out.getvalue(), 'fixing page tree\nall done\n')
         page1 = page1.reload()
         self.assertEqual(page1.node.path, "0002")
         self.assertEqual(page1.node.depth, 1)
@@ -141,13 +141,21 @@ class ManagementTestCase(CMSTestCase):
             1)
 
         # create a CMSPlugin with an unsaved instance
-        instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
-        instanceless_plugin.save()
+        instanceless_plugin = CMSPlugin.objects.create(
+            position=4,
+            language="en",
+            plugin_type="TextPlugin",
+            placeholder=placeholder,
+        )
 
         # create a bogus CMSPlugin to simulate one which used to exist but
         # is no longer installed
-        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
-        bogus_plugin.save()
+        bogus_plugin = CMSPlugin.objects.create(
+            position=5,
+            language="en",
+            plugin_type="BogusPlugin",
+            placeholder=placeholder,
+        )
 
         management.call_command('cms', 'list', 'plugins', interactive=False, stdout=out)
         report = plugin_report()
@@ -352,7 +360,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         link_de, _ = root_plugins.get(language='de', plugin_type='LinkPlugin').get_plugin_instance()
 
         self.assertEqual(link_en.external_link, link_de.external_link)
-        self.assertEqual(link_en.get_position_in_placeholder(), link_de.get_position_in_placeholder())
+        self.assertEqual(link_en.position, link_de.position)
 
         stack_plugins = CMSPlugin.objects.filter(placeholder=StaticPlaceholder.objects.order_by('?')[0].draft)
 
@@ -463,7 +471,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         link_2, _ = root_plugins_2.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
 
         self.assertEqual(link_1.external_link, link_2.external_link)
-        self.assertEqual(link_1.get_position_in_placeholder(), link_2.get_position_in_placeholder())
+        self.assertEqual(link_1.position, link_2.position)
 
     def test_copy_existing_title(self):
         """

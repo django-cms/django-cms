@@ -16,6 +16,7 @@ from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.models.settingmodels import UserSettings
 from cms.plugin_pool import plugin_pool
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
@@ -164,18 +165,144 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         ph2_pl2 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin3').cmsplugin_ptr
 
+        endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)
+
+        # Move ph2_pl3 to position 1 on placeholder 2
+        data = {
+            'plugin_id': str(ph2_pl3.pk),
+            'target_language': 'en',
+            'target_position': 1,
+        }
+
+        response = self.client.post(endpoint, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2], list(ph2.cmsplugin_set.order_by('position')))
+
+        # Move ph1_pl2 to last position on placeholder 2
         data = {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
             'target_language': 'en',
-            'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
+            'target_position': ph2.get_next_plugin_position('en', insert_order='last'),
         }
-        endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)
 
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
-        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
+        self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2], list(ph2.cmsplugin_set.order_by('position')))
+
+    def test_copy_plugin(self):
+        superuser = self.get_superuser()
+        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        ph_source = page_en.get_placeholders('en').get(slot="body")
+        plugin = add_plugin(ph_source, "LinkPlugin", "en", name="A Link", external_link="https://www.django-cms.org")
+        endpoint = self.get_copy_plugin_uri(plugin)
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=superuser,
+            clipboard=Placeholder.objects.create(),
+        )
+        data = {
+            'source_plugin_id': plugin.pk,
+            'source_placeholder_id': ph_source.pk,
+            'source_language': plugin.language,
+            'target_language': 'en',
+            'target_placeholder_id': user_settings.clipboard.pk,
+        }
+
+        with self.login_user_context(superuser):
+            # Copy plugins into the clipboard
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        clipboard_plugins = user_settings.clipboard.get_plugins()
+        self.assertTrue(clipboard_plugins.filter(plugin_type='LinkPlugin').exists())
+        self.assertEqual(len(clipboard_plugins), 1)
+
+    def test_copy_plugin_without_custom_model(self):
+        superuser = self.get_superuser()
+        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        ph_source = page_en.get_placeholders('en').get(slot="body")
+        plugin = add_plugin(ph_source, "NoCustomModel", "en")
+        endpoint = self.get_copy_plugin_uri(plugin)
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=superuser,
+            clipboard=Placeholder.objects.create(),
+        )
+        data = {
+            'source_plugin_id': plugin.pk,
+            'source_placeholder_id': ph_source.pk,
+            'source_language': plugin.language,
+            'target_language': 'en',
+            'target_placeholder_id': user_settings.clipboard.pk,
+        }
+
+        with self.login_user_context(superuser):
+            # Copy plugins into the clipboard
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        clipboard_plugins = user_settings.clipboard.get_plugins()
+        self.assertTrue(clipboard_plugins.filter(plugin_type='NoCustomModel').exists())
+        self.assertEqual(len(clipboard_plugins), 1)
+
+    def test_paste_plugin_from_clipboard(self):
+        superuser = self.get_superuser()
+        page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        ph_target = page_en.get_placeholders('en').get(slot="body")
+        add_plugin(ph_target, "LinkPlugin", "en", name="A Link", external_link="https://www.django-cms.org")
+        user_settings = UserSettings.objects.create(
+            language="en",
+            user=superuser,
+            clipboard=Placeholder.objects.create(),
+        )
+        plugin = add_plugin(
+            user_settings.clipboard,
+            "LinkPlugin",
+            language="en",
+            name="A Link",
+            external_link="https://www.django-cms.org",
+        )
+        endpoint = self.get_move_plugin_uri(plugin)
+
+        # Paste LinkPlugin to first position
+        data = {
+            'plugin_id': plugin.pk,
+            'move_a_copy': True,
+            'target_language': 'en',
+            'target_position': 1,
+            'placeholder_id': ph_target.pk,
+        }
+
+        with self.login_user_context(superuser):
+            # Paste plugin from the clipboard into target placeholder
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        plugins = ph_target.get_plugins('en')
+        self.assertTrue(plugins.filter(plugin_type='LinkPlugin').exists())
+        self.assertEqual(len(plugins), 2)
+
+        # Paste LinkPlugin as child of first LinkPlugin
+        target = ph_target.get_plugins('en').get(position=1)
+        data = {
+            'plugin_id': plugin.pk,
+            'move_a_copy': True,
+            'target_language': 'en',
+            'target_position': 2,
+            'plugin_parent': target.pk,
+            'placeholder_id': ph_target.pk,
+        }
+
+        with self.login_user_context(superuser):
+            # Paste plugin from the clipboard into target placeholder
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        plugins = ph_target.get_plugins('en')
+        self.assertTrue(plugins.filter(plugin_type='LinkPlugin').exists())
+        self.assertEqual(len(plugins), 3)
 
     def test_placeholder_render_ghost_plugin(self):
         """
@@ -865,3 +992,368 @@ class PlaceholderConfTests(TestCase):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
+
+
+class PlaceholderPluginTestsBase(CMSTestCase):
+
+    def _create_placeholder(self, slot='main'):
+        return Placeholder.objects.create(slot=slot)
+
+    def _create_plugin(self, placeholder, position, parent=None):
+        base = CMSPlugin.objects.create(
+            language='en',
+            plugin_type='StylePlugin',
+            parent=parent,
+            position=position,
+            placeholder=placeholder,
+        )
+        plugin_model = base.get_plugin_class().model
+        plugin = plugin_model()
+        base.set_base_attr(plugin)
+        plugin.save()
+        return plugin
+
+    def _unpack_descendants(self, parent):
+        for child in parent.cmsplugin_set.all():
+            yield child.pk
+
+            for desc in self._unpack_descendants(child):
+                yield desc
+
+    def setUp(self):
+        self.placeholder = self._create_placeholder()
+        self.create_plugins(self.placeholder)
+
+    def create_plugins(self, placeholder):
+        for i in range(1, 9):
+            self._create_plugin(placeholder, position=i)
+
+    def get_first_root_plugin(self, placeholder=None):
+        return self.get_plugins(placeholder).filter(parent__isnull=True).first()
+
+    def get_last_root_plugin(self, placeholder=None):
+        return self.get_plugins(placeholder).filter(parent__isnull=True).last()
+
+    def get_plugins(self, placeholder=None):
+        if placeholder is None:
+            placeholder = self.placeholder
+        return CMSPlugin.objects.filter(placeholder=placeholder)
+
+    def get_plugin_tree(self, placeholder=None):
+        tree = {}
+
+        for root_plugin in self.get_plugins(placeholder).filter(parent__isnull=True):
+            tree[root_plugin.pk] = self.get_plugin_descendants(root_plugin)
+        return tree
+
+    def get_plugin_descendants(self, plugin):
+        return list(self._unpack_descendants(plugin))
+
+    def assertPluginTreeEquals(self, plugins, placeholder=None):
+        """
+        plugins should be ordered by position
+        """
+        new_tree = self.get_plugins(placeholder).values_list('pk', 'position')
+        expected = [(pk, pos) for pos, pk in enumerate(plugins, 1)]
+        self.assertSequenceEqual(new_tree, expected)
+
+
+class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
+
+    def test_delete(self):
+        """
+        Deletes all root plugins from the plugin tree,
+        one by one, comparing plugin positions at every iteration.
+        """
+        tree = self.get_plugin_tree()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+
+        for plugin in self.get_plugins().filter(parent__isnull=True):
+            for plugin_id in [plugin.pk] + tree[plugin.pk]:
+                plugin_tree_all.remove(plugin_id)
+            self.placeholder.delete_plugin(plugin)
+            new_tree = self.get_plugins().values_list('pk', 'position')
+            expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+            self.assertSequenceEqual(new_tree, expected)
+
+    def test_move_left(self):
+        """
+        Moves the last plugin in the tree to the left,
+        one step at a time until it reaches the beginning of the tree.
+        """
+        plugin = self.get_last_root_plugin()
+        plugin_tree = [plugin.pk] + self.get_plugin_descendants(plugin)
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+        positions = list(
+            self
+            .get_plugins()
+            .filter(parent__isnull=True)
+            .reverse()
+            .exclude(pk=plugin.pk)
+            .values_list('pk', 'position')
+        )
+
+        for pk, position in positions:
+            self.placeholder.move_plugin(plugin, position)
+            plugin.refresh_from_db()
+
+            for edge, plugin_id in enumerate(plugin_tree):
+                target_index = plugin_tree_all.index(pk)
+                plugin_tree_all.remove(plugin_id)
+                plugin_tree_all.insert(target_index, plugin_id)
+            self.assertPluginTreeEquals(plugin_tree_all)
+
+    def test_move_left_middle(self):
+        tree = {}
+        root_tree = self.get_plugins().filter(parent__isnull=True)
+        count = root_tree.count()
+        first_plugin = root_tree.first()
+        middle_plugin = root_tree[count // 2]
+        last_plugin = root_tree.last()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+
+        for root_plugin in [first_plugin, middle_plugin, last_plugin]:
+            tree[root_plugin.pk] = list(self._unpack_descendants(root_plugin))
+
+        for target_plugin in [middle_plugin, first_plugin]:
+            self.placeholder.move_plugin(last_plugin, target_plugin.position)
+            last_plugin.refresh_from_db()
+
+            for edge, plugin_id in enumerate([last_plugin.pk] + tree[last_plugin.pk]):
+                target_index = plugin_tree_all.index(target_plugin.pk)
+                plugin_tree_all.remove(plugin_id)
+                plugin_tree_all.insert(target_index, plugin_id)
+            new_tree = self.get_plugins().values_list('pk', 'position')
+            expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+            self.assertSequenceEqual(new_tree, expected)
+
+    def test_move_right(self):
+        tree = self.get_plugin_tree()
+        plugin = self.get_plugins().first()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+        positions = list(
+            self
+            .get_plugins()
+            .filter(parent__isnull=True)
+            .exclude(pk=plugin.pk)
+            .values_list('pk', 'position')
+        )
+
+        for pk, position in positions:
+            self.placeholder.move_plugin(plugin, position)
+            plugin.refresh_from_db()
+            target_index = plugin_tree_all.index(pk) + len(tree[pk])
+
+            for edge, plugin_id in enumerate([plugin.pk] + tree[plugin.pk]):
+                plugin_tree_all.remove(plugin_id)
+                plugin_tree_all.insert(target_index, plugin_id)
+            new_tree = self.get_plugins().values_list('pk', 'position')
+            expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+            self.assertSequenceEqual(new_tree, expected)
+
+    def test_move_right_middle(self):
+        tree = {}
+        root_tree = self.get_plugins().filter(parent__isnull=True)
+        count = root_tree.count()
+        first_plugin = root_tree.first()
+        middle_plugin = root_tree[count // 2]
+        last_plugin = root_tree.last()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+
+        for root_plugin in [first_plugin, middle_plugin, last_plugin]:
+            tree[root_plugin.pk] = list(self._unpack_descendants(root_plugin))
+
+        for target_plugin in [middle_plugin, last_plugin]:
+            self.placeholder.move_plugin(first_plugin, target_plugin.position)
+            first_plugin.refresh_from_db()
+            target_index = plugin_tree_all.index(target_plugin.pk) + len(tree[target_plugin.pk])
+
+            for edge, plugin_id in enumerate([first_plugin.pk] + tree[first_plugin.pk]):
+                plugin_tree_all.remove(plugin_id)
+                plugin_tree_all.insert(target_index, plugin_id)
+            new_tree = self.get_plugins().values_list('pk', 'position')
+            expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+            self.assertSequenceEqual(new_tree, expected)
+
+    def test_move_to_top(self):
+        """
+        Moves the last plugin in the tree to the top of the tree.
+        """
+        tree = {}
+        first_plugin = self.get_plugins().filter(parent__isnull=True).first()
+        last_plugin = self.get_plugins().filter(parent__isnull=True).last()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+
+        for root_plugin in [first_plugin, last_plugin]:
+            tree[root_plugin.pk] = list(self._unpack_descendants(root_plugin))
+
+        self.placeholder.move_plugin(last_plugin, first_plugin.position)
+        last_plugin.refresh_from_db()
+
+        for edge, plugin_id in enumerate([last_plugin.pk] + tree[last_plugin.pk]):
+            target_index = plugin_tree_all.index(first_plugin.pk)
+            plugin_tree_all.remove(plugin_id)
+            plugin_tree_all.insert(target_index, plugin_id)
+        new_tree = self.get_plugins().values_list('pk', 'position')
+        expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+        self.assertSequenceEqual(new_tree, expected)
+
+    def test_move_to_placeholder_top(self):
+        source_plugins = self.get_plugins().filter(parent__isnull=True)
+        source_tree_by_root = self.get_plugin_tree()
+        source_plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+        target = self._create_placeholder('target')
+        self.create_plugins(target)
+        target_plugin_tree_all = list(
+            self
+            .get_plugins(target)
+            .values_list('pk', flat=True)
+        )
+
+        for plugin in source_plugins:
+            plugin_tree = [plugin.pk] + source_tree_by_root[plugin.pk]
+            plugin.refresh_from_db(fields=['position'])
+            self.placeholder.move_plugin(plugin, 1, target_placeholder=target)
+
+            for edge, plugin_id in enumerate(plugin_tree):
+                source_plugin_tree_all.remove(plugin_id)
+                target_plugin_tree_all.insert(edge, plugin_id)
+            self.assertPluginTreeEquals(source_plugin_tree_all)
+            self.assertPluginTreeEquals(target_plugin_tree_all, placeholder=target)
+
+    def test_move_to_bottom(self):
+        tree = {}
+        first_plugin = self.get_plugins().first()
+        last_plugin = self.get_plugins().last()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+
+        for root_plugin in [first_plugin, last_plugin]:
+            tree[root_plugin.pk] = list(self._unpack_descendants(root_plugin))
+
+        self.placeholder.move_plugin(first_plugin, last_plugin.position)
+        first_plugin.refresh_from_db()
+        target_index = plugin_tree_all.index(last_plugin.pk) + len(tree[last_plugin.pk])
+
+        for edge, plugin_id in enumerate([first_plugin.pk] + tree[first_plugin.pk]):
+            plugin_tree_all.remove(plugin_id)
+            plugin_tree_all.insert(target_index, plugin_id)
+        new_tree = self.get_plugins().values_list('pk', 'position')
+        expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+        self.assertSequenceEqual(new_tree, expected)
+
+    def test_move_to_placeholder_bottom(self):
+        source_plugins = self.get_plugins().filter(parent__isnull=True)
+        source_tree_by_root = self.get_plugin_tree()
+        source_plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+        target = self._create_placeholder('target')
+        self.create_plugins(target)
+        target_plugin_tree_all = list(
+            self
+            .get_plugins(target)
+            .values_list('pk', flat=True)
+        )
+        target_position = len(target_plugin_tree_all) + 1
+
+        for plugin in source_plugins:
+            plugin_tree = [plugin.pk] + source_tree_by_root[plugin.pk]
+            plugin.refresh_from_db(fields=['position'])
+            self.placeholder.move_plugin(plugin, target_position, target_placeholder=target)
+
+            for edge, plugin_id in enumerate(plugin_tree):
+                # target position is 1 indexed
+                index = (target_position - 1) + edge
+                source_plugin_tree_all.remove(plugin_id)
+                target_plugin_tree_all.insert(index, plugin_id)
+            target_position += len(plugin_tree)
+            self.assertPluginTreeEquals(source_plugin_tree_all)
+            self.assertPluginTreeEquals(target_plugin_tree_all, placeholder=target)
+
+
+class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
+
+    def create_plugins(self, placeholder):
+        for i in range(1, 12, 3):
+            parent = self._create_plugin(placeholder, position=i)
+            parent_2 = self._create_plugin(placeholder, parent=parent, position=i + 1)
+            self._create_plugin(placeholder, parent=parent_2, position=i+2)
+
+    def test_move_to_placeholder_under_parent(self):
+        plugin = self.get_plugins().filter(parent__isnull=True).first()
+        source_tree_by_root = self.get_plugin_tree()
+        source_plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+        target = self._create_placeholder('target')
+        self.create_plugins(target)
+        # Create a single plugin as the first plugin of the target placeholder
+        target_plugin = CMSPlugin(language='en', plugin_type='StylePlugin', position=1, placeholder=target)
+        target_plugin = target.add_plugin(target_plugin)
+        target_plugin_tree_all = list(
+            self
+            .get_plugins(target)
+            .values_list('pk', flat=True)
+        )
+        plugin_tree = [plugin.pk] + source_tree_by_root[plugin.pk]
+        plugin.refresh_from_db(fields=['position'])
+        self.placeholder.move_plugin(plugin, 2, target_placeholder=target, target_plugin=target_plugin)
+
+        for edge, plugin_id in enumerate(plugin_tree):
+            source_plugin_tree_all.remove(plugin_id)
+            target_plugin_tree_all.insert(1 + edge, plugin_id)
+        self.assertPluginTreeEquals(source_plugin_tree_all)
+        self.assertPluginTreeEquals(target_plugin_tree_all, placeholder=target)
+
+    def test_delete_single(self):
+        tree = self.get_plugin_tree()
+        plugin_tree_all = list(
+            self
+            .get_plugins()
+            .values_list('pk', flat=True)
+        )
+
+        for plugin in self.get_plugins().filter(parent__isnull=True):
+            for plugin_id in [plugin.pk] + tree[plugin.pk]:
+                plugin_tree_all.remove(plugin_id)
+            self.placeholder.delete_plugin(plugin)
+            new_tree = self.get_plugins().values_list('pk', 'position')
+            expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+            self.assertSequenceEqual(new_tree, expected)
+
