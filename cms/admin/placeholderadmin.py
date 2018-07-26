@@ -1171,8 +1171,6 @@ class PlaceholderAdminMixin(object):
 
 
 class PlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
-    list_filter = []
-    list_display = ['id', 'slot', 'default_width',]
 
     def has_add_permission(self, request):
         return False
