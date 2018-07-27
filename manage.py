@@ -48,6 +48,7 @@ if __name__ == '__main__':
         'cms.test_utils.project.pluginapp.plugins.link',
         'cms.test_utils.project.pluginapp.plugins.multicolumn',
         'cms.test_utils.project.pluginapp.plugins.multiwrap',
+        'cms.test_utils.project.pluginapp.plugins.no_custom_model',
         'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
         'cms.test_utils.project.pluginapp.plugins.extra_context',
@@ -75,7 +76,6 @@ if __name__ == '__main__':
         'cms',
         'menus',
         'sekizai',
-        'hvad',
     ] + PLUGIN_APPS
 
     MIGRATION_MODULES = {
@@ -111,7 +111,6 @@ if __name__ == '__main__':
                 'loaders': (
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
                 )
             }
         }

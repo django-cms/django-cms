@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import NoReverseMatch, reverse_lazy
-from django.forms.widgets import Select, MultiWidget, TextInput
+from django.forms.widgets import MultiWidget, Select, TextInput
+from django.urls import NoReverseMatch, reverse_lazy
 from django.utils.encoding import force_text
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
@@ -156,8 +156,8 @@ class UserSelectAdminWidget(Select):
     Current user should be assigned to widget in form constructor as an user
     attribute.
     """
-    def render(self, name, value, attrs=None, choices=()):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs)]
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, renderer=renderer)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon

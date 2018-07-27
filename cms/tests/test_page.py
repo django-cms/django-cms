@@ -5,18 +5,18 @@ import functools
 from unittest import skipIf
 
 from django.conf import settings
-from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
+from django.urls import reverse
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.api import create_page, add_plugin, create_title, publish_page
-from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
+from cms.exceptions import PublicIsUnmodifiable
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
@@ -338,11 +338,8 @@ class PagesTestCase(TransactionCMSTestCase):
         page = page_a.publisher_public
         self.assertRaises(PublicIsUnmodifiable, page.copy_with_descendants, page_b, 'last-child')
         self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
-        self.assertRaises(PublicIsUnmodifiable, page.revert_to_live, 'en')
         self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
-
         self.assertTrue(page.get_draft_object().publisher_is_draft)
-        self.assertRaises(PublicVersionNeeded, page_b.revert_to_live, 'en')
 
     def test_move_page_regression_left_to_right_5752(self):
         # ref: https://github.com/divio/django-cms/issues/5752
@@ -617,13 +614,12 @@ class PagesTestCase(TransactionCMSTestCase):
         home = create_page("home", "nav_playground.html", "en")
         page = create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders('en')[0]
-        plugin_base = CMSPlugin(
+        plugin_base = CMSPlugin.objects.create(
             plugin_type='TextPlugin',
             placeholder=placeholder,
             position=1,
             language=settings.LANGUAGES[0][0]
         )
-        plugin_base = plugin_base.add_root(instance=plugin_base)
 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)

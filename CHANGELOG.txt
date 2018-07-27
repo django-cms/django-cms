@@ -6,6 +6,9 @@
 * Removed signal handlers for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models.
 * Moved ``Title.meta_description`` length restriction from model to form
   and increased its max length to 320 characters.
+* Added ``page_title`` parameter for ``cms.api.create_page()`` and ``cms.api.create_title()``.
+* Introduced Django 2.0 support.
+* Introduced Django 2.1 support.
 
 
 === 3.5.2 (2018-04-11) ===

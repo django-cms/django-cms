@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import NoReverseMatch
+from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language_from_request, ugettext_lazy as _
@@ -112,7 +112,7 @@ class MenuRenderer(object):
 
         key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, self.site.pk)
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             key += '_%s_user' % self.request.user.pk
 
         if self.draft_mode_active:

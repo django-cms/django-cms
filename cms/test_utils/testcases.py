@@ -9,16 +9,16 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.six.moves.urllib.parse import unquote, urljoin
 from django.utils.timezone import now
 from django.utils.translation import activate
-from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page
@@ -149,7 +149,7 @@ class BaseCMSTestCase(object):
         options.update(**kwargs)
 
         gpp = GlobalPagePermission.objects.create(**options)
-        gpp.sites = Site.objects.all()
+        gpp.sites.set(Site.objects.all())
         return gpp
 
     def add_page_permission(self, user, page, **kwargs):
@@ -507,11 +507,14 @@ class BaseCMSTestCase(object):
 
         return plugin_pool.get_plugin(plugin_type).model
 
-    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None):
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
             path = '/{}/'.format(language)
+
+        if position is None:
+            position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
 
         endpoint = placeholder.get_add_url()
         data = {
@@ -519,6 +522,7 @@ class BaseCMSTestCase(object):
             'placeholder_id': placeholder.pk,
             'plugin_language': language,
             'cms_path': path,
+            'plugin_position': position,
         }
 
         if parent:

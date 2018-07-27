@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from collections import defaultdict, deque
 import json
 
 from django.utils.encoding import force_text
@@ -53,7 +54,6 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
 
 def get_plugin_tree_as_json(request, plugins):
     from cms.utils.plugins import (
-        build_plugin_tree,
         downcast_plugins,
         get_plugin_restrictions,
     )
@@ -61,14 +61,24 @@ def get_plugin_tree_as_json(request, plugins):
     tree_data = []
     tree_structure = []
     restrictions = {}
+    root_plugins = deque()
+    plugin_children = defaultdict(deque)
     toolbar = get_toolbar_from_request(request)
     template = toolbar.templates.drag_item_template
+    get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
     host_page = placeholder.page
     copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
-    plugins = downcast_plugins(plugins, select_placeholder=True)
-    plugin_tree = build_plugin_tree(plugins)
-    get_plugin_info = get_plugin_toolbar_info
+    plugins = list(downcast_plugins(plugins, select_placeholder=True))
+    plugin_ids = frozenset(plugin.pk for plugin in plugins)
+
+    for plugin in reversed(plugins):
+        plugin.child_plugin_instances = plugin_children[plugin.pk]
+
+        if plugin.parent_id in plugin_ids:
+            plugin_children[plugin.parent_id].appendleft(plugin)
+        else:
+            root_plugins.appendleft(plugin)
 
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(
@@ -84,11 +94,11 @@ def get_plugin_tree_as_json(request, plugins):
 
         tree_data.append(plugin_info)
 
-        for plugin in plugin.child_plugin_instances or []:
+        for plugin in plugin.child_plugin_instances:
             collect_plugin_data(plugin)
 
     with force_language(toolbar.toolbar_language):
-        for root_plugin in plugin_tree:
+        for root_plugin in root_plugins:
             collect_plugin_data(root_plugin)
             context = {
                 'plugin': root_plugin,

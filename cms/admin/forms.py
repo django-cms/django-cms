@@ -318,8 +318,7 @@ class AddPageForm(BasePageForm):
         )
 
         if is_first and not new_page.is_page_type:
-            # its the first page. publish it right away
-            new_page.publish(translation.language)
+            # its the first page. Make it the homepage
             new_page.set_as_homepage(self._user)
 
         send_post_page_operation(
@@ -550,7 +549,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
                                   help_text=_('Redirects to this URL.'),
                                   placeholder_text=_('Start typing...'),
-                                  ajax_view='admin:cms_page_get_published_pagelist'
+                                  ajax_view='admin:cms_page_get_published_pagelist',
     )
 
     # This is really a 'fake' field which does not correspond to any Page attribute
@@ -1290,6 +1289,7 @@ class PluginAddValidationForm(forms.Form):
         queryset=Placeholder.objects.all(),
         required=True,
     )
+    plugin_position = forms.IntegerField(required=True)
     plugin_language = forms.CharField(required=True)
     plugin_parent = forms.ModelChoiceField(
         CMSPlugin.objects.all(),
@@ -1316,6 +1316,7 @@ class PluginAddValidationForm(forms.Form):
             return data
 
         language = data['plugin_language']
+        position = data['plugin_position']
         placeholder = data['placeholder_id']
         parent_plugin = data.get('plugin_parent')
 
@@ -1333,6 +1334,11 @@ class PluginAddValidationForm(forms.Form):
             if parent_plugin.placeholder_id != placeholder.pk:
                 message = ugettext("Parent plugin placeholder must be same as placeholder!")
                 self.add_error('placeholder_id', message)
+                return self.cleaned_data
+
+            if position <= parent_plugin.position:
+                message = ugettext("Plugin position must be greater than %(position)d")
+                self.add_error('placeholder_id', message % {'position': parent_plugin.position})
                 return self.cleaned_data
 
         page = placeholder.page

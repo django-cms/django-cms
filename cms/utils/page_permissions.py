@@ -45,7 +45,7 @@ def _get_draft_placeholders(page, language):
             .objects
             .filter(
                 title__language=language,
-                title_page__pk=page.publisher_public_id,
+                title__page__pk=page.publisher_public_id,
             )
         )
         return placeholders
@@ -86,7 +86,7 @@ def auth_permission_required(action):
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
         def wrapper(user, *args, **kwargs):
-            if not user.is_authenticated():
+            if not user.is_authenticated:
                 return False
 
             permissions = _django_permissions_by_action[action]
@@ -214,24 +214,6 @@ def user_can_delete_page_translation(user, page, language, site=None):
 
 
 @cached_func
-@auth_permission_required('change_page')
-def user_can_revert_page_to_live(user, page, language, site=None):
-    if not user_can_change_page(user, page, site=site):
-        return False
-
-    placeholders = (
-        _get_draft_placeholders(page, language)
-        .filter(cmsplugin__language=language)
-        .distinct()
-    )
-
-    for placeholder in placeholders.iterator():
-        if not placeholder.has_delete_plugins_permission(user, [language]):
-            return False
-    return True
-
-
-@cached_func
 @auth_permission_required('publish_page')
 def user_can_publish_page(user, page, site=None):
     has_perm = has_generic_permission(
@@ -299,7 +281,7 @@ def user_can_view_page(user, page, site=None):
         # Page has no restrictions and project is configured
         # to allow everyone to see unrestricted pages.
         return True
-    elif not user.is_authenticated():
+    elif not user.is_authenticated:
         # Page has restrictions or project is configured
         # to require staff user status to see pages.
         return False
@@ -364,7 +346,7 @@ def user_can_view_all_pages(user, site):
         can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
         return can_see_unrestricted
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.has_perm(PAGE_VIEW_CODENAME):

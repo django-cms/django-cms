@@ -8,7 +8,6 @@ import cms
 from .subcommands.base import SubcommandsCommand
 from .subcommands.check import CheckInstallation
 from .subcommands.list import ListCommand
-from .subcommands.publisher_publish import PublishCommand
 from .subcommands.tree import FixTreeCommand
 from .subcommands.uninstall import UninstallCommand
 from .subcommands.copy import CopyCommand
@@ -23,7 +22,6 @@ class Command(SubcommandsCommand):
         ('delete-orphaned-plugins', DeleteOrphanedPluginsCommand),
         ('fix-tree', FixTreeCommand),
         ('list', ListCommand),
-        ('publisher-publish', PublishCommand),
         ('uninstall', UninstallCommand),
     ))
     missing_args_message = 'one of the available sub commands must be provided'

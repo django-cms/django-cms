@@ -63,7 +63,7 @@ from cms.operations.helpers import send_post_page_operation, send_pre_page_opera
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
+from cms.utils import permissions, get_current_site, get_language_from_request
 from cms.utils import page_permissions
 from cms.utils.i18n import (
     get_language_list,
@@ -71,7 +71,9 @@ from cms.utils.i18n import (
     get_language_object,
     get_site_language_from_request,
 )
+from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.admin import jsonify_request
+from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -205,7 +207,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
             pat(r'^([0-9]+)/([a-z\-]+)/preview/$', self.preview_page),
-            pat(r'^([0-9]+)/([a-z\-]+)/revert-to-live/$', self.revert_to_live),
             pat(r'^get-tree/$', self.get_tree),
         ]
         return url_patterns + super(BasePageAdmin, self).get_urls()
@@ -432,8 +433,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
+
+        if DJANGO_2_0:
+            get_deleted_objects_additional_kwargs = {
+                'opts': opts,
+                'using': using,
+                'user': request.user,
+            }
+        else:
+            get_deleted_objects_additional_kwargs = {'request': request}
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            objs, opts, request.user, self.admin_site, using)
+            objs, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
@@ -657,6 +669,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
         return can_change_page
 
+    def has_view_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
+
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
             return False
@@ -702,19 +717,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return False
         site = self.get_site(request)
         return page_permissions.user_can_publish_page(request.user, page=obj, site=site)
-
-    def has_revert_to_live_permission(self, request, language, obj=None):
-        if not obj:
-            return False
-
-        site = self.get_site(request)
-        has_perm = page_permissions.user_can_revert_page_to_live(
-            request.user,
-            page=obj,
-            language=language,
-            site=site,
-        )
-        return has_perm
 
     def get_placeholder_template(self, request, placeholder):
         page = placeholder.page
@@ -967,10 +969,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
         for placeholder in page.get_placeholders(source_language):
-            plugins = list(placeholder.get_plugins().order_by('path'))
+            plugins = placeholder.get_plugins_list(source_language)
+
             if not placeholder.has_add_plugins_permission(request.user, plugins):
                 return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
-            copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
+            copy_plugins_to_placeholder(plugins, placeholder, language=target_language)
         return HttpResponse("ok")
 
     @require_POST
@@ -1020,54 +1023,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         new_page = form.copy_page()
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
-
-    @require_POST
-    @transaction.atomic
-    def revert_to_live(self, request, page_id, language):
-        """
-        Resets the draft version of the page to match the live one
-        """
-        page = self.get_object(request, object_id=page_id)
-
-        if not self.has_revert_to_live_permission(request, language, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to revert this page.")))
-
-        if page is None:
-            raise self._get_404_exception(page_id)
-
-        try:
-            translation = page.title_set.get(language=language)
-        except Title.DoesNotExist:
-            raise Http404('No translation matches requested language.')
-
-        page.title_cache[language] = translation
-        operation_token = send_pre_page_operation(
-            request=request,
-            operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
-            obj=page,
-            translation=translation,
-            sender=self.model,
-        )
-
-        page.revert_to_live(language)
-
-        # Fetch updated translation
-        translation.refresh_from_db()
-
-        send_post_page_operation(
-            request,
-            operation=operations.REVERT_PAGE_TRANSLATION_TO_LIVE,
-            token=operation_token,
-            obj=page,
-            translation=translation,
-            sender=self.model,
-        )
-
-        messages.info(request, _('"%s" was reverted to the live version.') % page)
-
-        path = page.get_absolute_url(language=language)
-        path = '%s?%s' % (path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
-        return HttpResponseRedirect(path)
 
     @require_POST
     @transaction.atomic
@@ -1256,20 +1211,23 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         pluginopts = CMSPlugin._meta
         saved_plugins = CMSPlugin.objects.filter(placeholder__title=translation, language=language)
         using = router.db_for_read(self.model)
-        kwargs = {
-            'admin_site': self.admin_site,
-            'user': request.user,
-            'using': using
-        }
 
+        kwargs = {'admin_site': self.admin_site}
+        if DJANGO_2_0:
+            kwargs.update({'using': using, 'opts': titleopts, 'user': request.user})
+        else:
+            kwargs.update({'request': request})
         deleted_objects, __, perms_needed = get_deleted_objects(
             [translation],
-            titleopts,
             **kwargs
         )[:3]
+
+        if DJANGO_2_0:
+            kwargs.update({'using': using, 'opts': pluginopts, 'user': request.user})
+        else:
+            kwargs.update({'request': request})
         to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
             saved_plugins,
-            pluginopts,
             **kwargs
         )[:3]
 

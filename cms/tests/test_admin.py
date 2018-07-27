@@ -9,7 +9,7 @@ from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import (Http404, HttpResponseBadRequest,
                          HttpResponseNotFound)
 from django.utils.encoding import force_text, smart_str
@@ -58,10 +58,11 @@ class AdminTestsBase(CMSTestCase):
 
         normal_guy.is_staff = True
         normal_guy.is_active = True
-        normal_guy.save()
-        normal_guy.user_permissions = Permission.objects.filter(
+        perms = Permission.objects.filter(
             codename__in=['change_page', 'change_title', 'add_page', 'add_title', 'delete_page', 'delete_title']
         )
+        normal_guy.save()
+        normal_guy.user_permissions.set(perms)
         if use_global_permissions:
             gpp = GlobalPagePermission.objects.create(
                 user=normal_guy,
@@ -72,7 +73,7 @@ class AdminTestsBase(CMSTestCase):
                 can_change_permissions=False,
                 can_move_page=True,
             )
-            gpp.sites = Site.objects.all()
+            gpp.sites.set(Site.objects.all())
         return normal_guy
 
 
@@ -530,28 +531,6 @@ class AdminTests(AdminTestsBase):
             endpoint = self.get_delete_plugin_uri(plugin, container=self.page)
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
-
-    def test_move_language(self):
-        page = self.get_page()
-        source, target = list(page.get_placeholders('en'))[:2]
-        col = add_plugin(source, 'MultiColumnPlugin', 'en')
-        sub_col = add_plugin(source, 'ColumnPlugin', 'en', target=col)
-        col2 = add_plugin(source, 'MultiColumnPlugin', 'de')
-
-        admin_user = self.get_admin()
-        with self.login_user_context(admin_user):
-            data = {
-                'plugin_id': sub_col.pk,
-                'placeholder_id': source.id,
-                'plugin_parent': col2.pk,
-                'target_language': 'de'
-            }
-            endpoint = self.get_move_plugin_uri(sub_col)
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 200)
-        sub_col = CMSPlugin.objects.get(pk=sub_col.pk)
-        self.assertEqual(sub_col.language, "de")
-        self.assertEqual(sub_col.parent_id, col2.pk)
 
     def test_preview_page(self):
         permless = self.get_permless()

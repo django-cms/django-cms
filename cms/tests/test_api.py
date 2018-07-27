@@ -11,6 +11,7 @@ from djangocms_text_ckeditor.models import Text
 from menus.menu_pool import menu_pool
 
 from cms.api import (
+    add_plugin,
     create_page,
     _verify_plugin_type,
     assign_user_to_page,
@@ -18,7 +19,7 @@ from cms.api import (
 )
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models.pagemodel import Page
+from cms.models import Page, Placeholder
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.plugin_base import CMSPluginBase
 from cms.test_utils.testcases import CMSTestCase
@@ -238,3 +239,93 @@ class PythonAPITests(CMSTestCase):
         parent_page = create_page(**page_attrs)
         parent_page_public = parent_page.get_public_object()
         self.assertRaises(AssertionError, create_page, parent=parent_page_public, **page_attrs)
+
+
+class PythonAPIPluginTests(CMSTestCase):
+
+    def setUp(self):
+        self.placeholder = Placeholder.objects.create(slot='main')
+
+    def test_add_root_plugin(self):
+        root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        self.assertEqual(root_plugin_1.position, 1)
+        self.assertEqual(root_plugin_1.language, 'en')
+        self.assertEqual(root_plugin_1.plugin_type, 'SolarSystemPlugin')
+
+    def test_add_root_plugin_first(self):
+        """
+        User can add a new plugin to be in the first position
+        """
+        root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        root_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='first-child')
+        new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
+        expected = [(root_plugin_1.pk, 1), (root_plugin_2.pk, 2), (root_plugin_3.pk, 3)]
+        self.assertSequenceEqual(new_tree, expected)
+
+    def test_add_root_plugin_middle(self):
+        root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        root_plugin_4 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        root_plugin_6 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        root_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='left', target=root_plugin_4)
+        root_plugin_5 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=root_plugin_4.reload())
+        new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
+        expected = [
+            (root_plugin_1.pk, 1),
+            (root_plugin_2.pk, 2),
+            (root_plugin_3.pk, 3),
+            (root_plugin_4.pk, 4),
+            (root_plugin_5.pk, 5),
+            (root_plugin_6.pk, 6),
+        ]
+        self.assertSequenceEqual(new_tree, expected)
+
+    def test_add_child_plugin(self):
+        root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        child_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', target=root_plugin_1)
+        self.assertEqual(child_plugin_1.position, 2)
+        self.assertEqual(child_plugin_1.parent_id, root_plugin_1.pk)
+        self.assertEqual(child_plugin_1.language, 'en')
+        self.assertEqual(child_plugin_1.plugin_type, 'SolarSystemPlugin')
+
+    def test_add_child_plugin_first(self):
+        """
+        User can add a new plugin to be in the first position
+        """
+        root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        child_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
+        child_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
+        child_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='first-child', target=root_plugin_1)
+        root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
+        expected = [
+            (root_plugin_1.pk, 1),
+            (child_plugin_1.pk, 2),
+            (child_plugin_2.pk, 3),
+            (child_plugin_3.pk, 4),
+            (root_plugin_2.pk, 5),
+        ]
+        self.assertSequenceEqual(new_tree, expected)
+
+    def test_add_child_plugin_middle(self):
+        root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
+        child_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
+        child_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
+        child_plugin_4 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
+        child_plugin_6 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
+        child_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='left', target=child_plugin_4)
+        child_plugin_5 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=child_plugin_4.reload())
+        root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
+        expected = [
+            (root_plugin_1.pk, 1),
+            (child_plugin_1.pk, 2),
+            (child_plugin_2.pk, 3),
+            (child_plugin_3.pk, 4),
+            (child_plugin_4.pk, 5),
+            (child_plugin_5.pk, 6),
+            (child_plugin_6.pk, 7),
+            (root_plugin_2.pk, 8),
+        ]
+        self.assertSequenceEqual(new_tree, expected)

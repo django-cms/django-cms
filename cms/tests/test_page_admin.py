@@ -3,14 +3,14 @@ import datetime
 import json
 import sys
 
-from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
+from django.urls import clear_url_caches
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
@@ -118,6 +118,26 @@ class PageTestBase(CMSTestCase):
         data.update(**kwargs)
         return data
 
+    def _get_move_data(self, plugin, position, placeholder=None, parent=None):
+        try:
+            placeholder_id = placeholder.pk
+        except AttributeError:
+            placeholder_id = ''
+
+        try:
+            parent_id = parent.pk
+        except AttributeError:
+            parent_id = ''
+
+        data = {
+            'placeholder_id': placeholder_id,
+            'target_language': 'en',
+            'target_position': position,
+            'plugin_id': plugin.pk,
+            'plugin_parent': parent_id,
+        }
+        return data
+
     def get_page(self, parent=None, site=None,
                  language=None, template='nav_playground.html'):
         page_data = self.get_new_page_data_dbfields()
@@ -163,31 +183,19 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             self.assertEqual(Title.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
-            # crate home and auto publish
+            # create home
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
-
-            #self.assertEqual(Page.objects.all().count(), 2)
-            #self.assertEqual(Title.objects.all().count(), 2)
 
             title = Title.objects.drafts().get(slug=page_data['slug'])
             self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
 
             page = title.page
             page.save()
-            page.publish('en')
 
             self.assertEqual(page.get_title(), page_data['title'])
             self.assertEqual(page.get_slug(), page_data['slug'])
             self.assertEqual(page.get_placeholders('en').count(), 2)
-
-            # were public instances created?
-            self.assertEqual(Title.objects.all().count(), 4)
-            title = Title.objects.drafts().get(slug=page_data['slug'])
-            title = Title.objects.public().get(slug=page_data['slug'])
 
     def test_create_page_with_unconfigured_language(self):
         """
@@ -207,14 +215,14 @@ class PageTest(PageTestBase):
         )
         self.assertEqual(Title.objects.all().count(), 0)
         self.assertEqual(Page.objects.all().count(), 0)
-        # create home and auto publish
+        # create home
         with self.settings(SITE_ID=2):
             # url uses "en" as the request language
             # but the site is configured to use "de" and "fr"
             response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
             self.assertRedirects(response, URL_CMS_PAGE)
-            self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
-            self.assertEqual(Title.objects.filter(language='de').count(), 2)
+            self.assertEqual(Page.objects.filter(node__site=2).count(), 1)
+            self.assertEqual(Title.objects.filter(language='de').count(), 1)
 
         # The user is on site #1 but switches sites using the site switcher
         # on the page changelist.
@@ -224,8 +232,8 @@ class PageTest(PageTestBase):
         # but the site is configured to use "de" and "fr"
         response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
         self.assertRedirects(response, URL_CMS_PAGE)
-        self.assertEqual(Page.objects.filter(node__site=2).count(), 3)
-        self.assertEqual(Title.objects.filter(language='de').count(), 3)
+        self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
+        self.assertEqual(Title.objects.filter(language='de').count(), 2)
 
         Site.objects.clear_cache()
         client.logout()
@@ -599,7 +607,7 @@ class PageTest(PageTestBase):
     def test_publish_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en", published=True)
         homepage.set_as_homepage()
-        pending_child_1 =  create_page(
+        pending_child_1 = create_page(
             "child-1",
             "nav_playground.html",
             language="en",
@@ -1037,13 +1045,13 @@ class PageTest(PageTestBase):
                     'name': 'English',
                     'fallbacks': ['fr', 'de'],
                     'public': True,
-                    'fallbacks':['fr']
+                    'fallbacks': ['fr']
                 },
                 {
                     'code': 'fr',
                     'name': 'French',
                     'public': True,
-                    'fallbacks':['en']
+                    'fallbacks': ['en']
                 },
         ]}
         with self.settings(CMS_LANGUAGES=languages):
@@ -1753,15 +1761,15 @@ class PageTest(PageTestBase):
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
+                data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data) # first
                 self.assertEqual(response.status_code, 200)
-                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
+                data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_2)
                 response = self.client.post(endpoint, data) # second
                 self.assertEqual(response.status_code, 200)
-                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_3.pk, 'plugin_parent': ''}
+                data = self._get_move_data(plugin_3, position=3, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_3)
                 response = self.client.post(endpoint, data) # third
                 self.assertEqual(response.status_code, 400)
@@ -1781,11 +1789,11 @@ class PageTest(PageTestBase):
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_1.pk, 'plugin_parent': ''}
+                data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data) # first
                 self.assertEqual(response.status_code, 200)
-                data = {'placeholder_id': target_placeholder.pk, 'target_language': 'en', 'plugin_id': plugin_2.pk, 'plugin_parent': ''}
+                data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data) # second
                 self.assertEqual(response.status_code, 400)
@@ -2362,97 +2370,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             page.refresh_from_db(fields=['template'])
             self.assertEqual(page.get_template(), 'nav_playground.html')
-
-    def test_user_can_revert_non_empty_page_to_live(self):
-        """
-        User can revert a page to live with plugins if he has change permissions
-        on the Page model, delete permissions on the plugins in the translation
-        being reverted and page change permissions.
-        """
-        page = self.get_permissions_test_page()
-        staff_user = self.get_staff_user_with_no_permissions()
-        translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(
-            Page,
-            'revert_to_live',
-            page.pk,
-            translation.language,
-        )
-
-        self._add_plugin_to_page(page, language=translation.language)
-
-        page.publish(translation.language)
-
-        self._add_plugin_to_page(page, language=translation.language, publish=False)
-
-        self.add_permission(staff_user, 'change_page')
-        self.add_permission(staff_user, 'delete_link')
-        self.add_global_permission(staff_user, can_change=True)
-
-        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
-        live_plugins = (
-            page
-            .publisher_public
-            .get_placeholders(translation.language)
-            .get(slot='body')
-            .get_plugins()
-        )
-
-        with self.login_user_context(staff_user):
-            self.assertEqual(draft_plugins.count(), 2)
-            self.assertEqual(live_plugins.count(), 1)
-
-            data = {'language': translation.language}
-
-            self.client.post(endpoint, data)
-            self.assertEqual(draft_plugins.count(), 1)
-            self.assertEqual(live_plugins.count(), 1)
-
-    def test_user_cant_revert_non_empty_page_to_live(self):
-        """
-        User can't revert a page with plugins to live if he
-        does not have has change permissions on the Page model,
-        delete permissions on the plugins in the translation
-        being reverted and/or does not have page change permissions.
-        """
-        page = self.get_permissions_test_page()
-        staff_user = self.get_staff_user_with_no_permissions()
-        translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(
-            Page,
-            'revert_to_live',
-            page.pk,
-            translation.language,
-        )
-
-        self._add_plugin_to_page(page, language=translation.language)
-
-        page.publish(translation.language)
-
-        self._add_plugin_to_page(page, language=translation.language, publish=False)
-
-        self.add_permission(staff_user, 'change_page')
-        self.add_global_permission(staff_user, can_change=True)
-
-        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
-        live_plugins = (
-            page
-            .publisher_public
-            .get_placeholders(translation.language)
-            .get(slot='body')
-            .get_plugins()
-        )
-
-        with self.login_user_context(staff_user):
-            self.assertEqual(draft_plugins.count(), 2)
-            self.assertEqual(live_plugins.count(), 1)
-
-            data = {'language': translation.language}
-            response = self.client.post(endpoint, data)
-
-            self.assertEqual(response.status_code, 403)
-            self.assertEqual(draft_plugins.count(), 2)
-            self.assertEqual(live_plugins.count(), 1)
 
     def test_user_can_view_page_permissions_summary(self):
         """
@@ -3187,12 +3104,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         source_placeholder = plugin.placeholder
         target_placeholder = page.get_placeholders('en').get(slot='right-column')
 
-        data = {
-            'plugin_id': plugin.pk,
-            'target_language': 'en',
-            'placeholder_id': target_placeholder.pk,
-            'plugin_parent': '',
-        }
+        data = self._get_move_data(plugin, position=1, placeholder=target_placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -3218,12 +3130,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         source_placeholder = plugin.placeholder
         target_placeholder = page.get_placeholders("en").get(slot='right-column')
 
-        data = {
-            'plugin_id': plugin.pk,
-            'target_language': 'en',
-            'placeholder_id': target_placeholder.pk,
-            'plugin_parent': '',
-        }
+        data = self._get_move_data(plugin, position=1, placeholder=target_placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -3916,105 +3823,6 @@ class PermissionsOnPageTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertTrue(self._translation_exists())
 
-    def test_user_can_revert_non_empty_page_to_live(self):
-        """
-        User can revert a page to live with plugins if he has change permissions
-        on the Page model, delete permissions on the plugins in the translation
-        being reverted and page change permissions.
-        """
-        page = self._permissions_page
-        staff_user = self.get_staff_user_with_no_permissions()
-        translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(
-            Page,
-            'revert_to_live',
-            page.pk,
-            translation.language,
-        )
-
-        self._add_plugin_to_page(page, language=translation.language)
-
-        page.publish(translation.language)
-
-        self._add_plugin_to_page(page, language=translation.language, publish=False)
-
-        self.add_permission(staff_user, 'change_page')
-        self.add_permission(staff_user, 'delete_link')
-        self.add_page_permission(
-            staff_user,
-            page,
-            can_change=True,
-        )
-
-        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
-        live_plugins = (
-            page
-            .publisher_public
-            .get_placeholders(translation.language)
-            .get(slot='body')
-            .get_plugins()
-        )
-
-        with self.login_user_context(staff_user):
-            self.assertEqual(draft_plugins.count(), 2)
-            self.assertEqual(live_plugins.count(), 1)
-
-            data = {'language': translation.language}
-
-            self.client.post(endpoint, data)
-            self.assertEqual(draft_plugins.count(), 1)
-            self.assertEqual(live_plugins.count(), 1)
-
-    def test_user_cant_revert_non_empty_page_to_live(self):
-        """
-        User can't revert a page with plugins to live if he
-        does not have has change permissions on the Page model,
-        delete permissions on the plugins in the translation
-        being reverted and/or does not have page change permissions.
-        """
-        page = self._permissions_page
-        staff_user = self.get_staff_user_with_no_permissions()
-        translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(
-            Page,
-            'revert_to_live',
-            page.pk,
-            translation.language,
-        )
-
-        self._add_plugin_to_page(page, language=translation.language)
-
-        page.publish(translation.language)
-
-        self._add_plugin_to_page(page, language=translation.language, publish=False)
-
-        self.add_permission(staff_user, 'change_page')
-        self.add_page_permission(
-            staff_user,
-            page,
-            can_change=True,
-        )
-
-        draft_plugins = page.get_placeholders(translation.language).get(slot='body').get_plugins()
-        live_plugins = (
-            page
-            .publisher_public
-            .get_placeholders(translation.language)
-            .get(slot='body')
-            .get_plugins()
-        )
-
-        with self.login_user_context(staff_user):
-            self.assertEqual(draft_plugins.count(), 2)
-            self.assertEqual(live_plugins.count(), 1)
-
-            data = {'language': translation.language}
-            response = self.client.post(endpoint, data)
-
-            self.assertEqual(response.status_code, 403)
-            self.assertEqual(draft_plugins.count(), 2)
-            self.assertEqual(live_plugins.count(), 1)
-
     def test_user_can_add_page_permissions(self):
         """
         User can add page permissions if he has
@@ -4704,12 +4512,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         source_placeholder = plugin.placeholder
         target_placeholder = page.get_placeholders('en').get(slot='right-column')
 
-        data = {
-            'plugin_id': plugin.pk,
-            'target_language': 'en',
-            'placeholder_id': target_placeholder.pk,
-            'plugin_parent': '',
-        }
+        data = self._get_move_data(plugin, position=1, placeholder=target_placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')
@@ -4739,12 +4542,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         source_placeholder = plugin.placeholder
         target_placeholder = page.get_placeholders("en").get(slot='right-column')
 
-        data = {
-            'plugin_id': plugin.pk,
-            'target_language': 'en',
-            'placeholder_id': target_placeholder.pk,
-            'plugin_parent': '',
-        }
+        data = self._get_move_data(plugin, position=1, placeholder=target_placeholder)
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'change_link')

@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from cms.app_base import CMSApp
@@ -89,7 +89,7 @@ class NamespacedApp(CMSApp):
         return [SampleAppMenu, StaticMenu3]
 
     def get_urls(self, page=None, language=None, **kwargs):
-        return  [
+        return [
             "cms.test_utils.project.sampleapp.ns_urls",
             "cms.test_utils.project.sampleapp.urls"
         ]
