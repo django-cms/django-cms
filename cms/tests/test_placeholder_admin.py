@@ -9,6 +9,7 @@ from cms.test_utils.testcases import CMSTestCase
 # TODO: Test permissions?
 # TODO: Decide whether should have used get_change_plugin_uri to get the urls!!
 
+
 class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_add_plugin_endpoint(self):
