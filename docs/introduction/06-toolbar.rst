@@ -21,8 +21,8 @@ We'll add various controls to the toolbar, using a ``cms.toolbar_base.CMSToolbar
 Add a menu to the toolbar
 =========================
 
-Atart by adding a new ``cms_toolbars.py`` file to your Polls/CMS Integration application, and
-create the ``CMSToolbar``:
+Start by adding a new file, ``cms_toolbars.py``, to your Polls/CMS Integration application, and
+create the ``CMSToolbar`` class:
 
 ..  code-block:: python
 
@@ -84,7 +84,7 @@ method to add an item that allows us to see the full list of polls in the sidefr
             menu.add_sideframe_item(
                 name='Poll list',                              # name of the new menu item
                 url=admin_reverse('polls_poll_changelist'),    # the URL it should open with
-                )
+            )
 
 After refreshing the page to load the changes, you can now see the list of polls directly from
 the menu.
@@ -104,7 +104,7 @@ end of the ``populate()`` method:
             menu.add_modal_item(
                 name='Add a new poll',                # name of the new menu item
                 url=admin_reverse('polls_poll_add'),  # the URL it should open with
-                )
+            )
 
 
 Add buttons to the toolbar
@@ -123,12 +123,12 @@ As well as menus, you can add buttons to the toolbar in a very similar way. Rewr
         buttonlist.add_sideframe_button(
             name='Poll list',
             url=admin_reverse('polls_poll_changelist'),
-            )
+        )
 
         buttonlist.add_modal_button
             name='Add a new poll',
             url=admin_reverse('polls_poll_add'),
-            )
+        )
 
 
 *******************
@@ -199,19 +199,19 @@ For completeness, here is the full example:
             menu.add_modal_item(
                 name=('Add a new poll'),
                 url=admin_reverse('polls_poll_add'),
-                )
+            )
 
             buttonlist = self.toolbar.add_button_list()
 
             buttonlist.add_sideframe_button(
                 name='Poll list',
                 url=admin_reverse('polls_poll_changelist'),
-                )
+            )
 
             buttonlist.add_modal_button
                 name='Add a new poll',
                 url=admin_reverse('polls_poll_add'),
-                )
+            )
 
     toolbar_pool.register(PollToolbar)  # register the toolbar
 

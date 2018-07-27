@@ -19,9 +19,9 @@ Create a ``cms_toolbars.py`` file
 *********************************
 
 In order to interact with the toolbar API, you need to create a
-:class:`~cms.toolbar_base.CMSToolbar` in your own code, and register it.
+:class:`~cms.toolbar_base.CMSToolbar` sub-class in your own code, and register it.
 
-These classes should be created in your application's ``cms_toolbars.py`` file, where they will be
+This class should be created in your application's ``cms_toolbars.py`` file, where it will be
 discovered automatically when the Django runserver starts.
 
 You can also use the :setting:`CMS_TOOLBARS` to control which toolbar classes are loaded.
@@ -135,9 +135,9 @@ for details of the signature of each method.
 Opening a URL in an iframe
 --------------------------
 
-A common case is to provide a URL that opens in a sideframe or modal dialog on the same page
-(*Administration...* in the site menu, that opens the Django admin in a sideframe, is a good
-example of this). Both the sideframe and modal are HTML iframes.
+A common case is to provide a URL that opens in a sideframe or modal dialog on the same page,
+*Administration...* in the site menu, that opens the Django admin in a sideframe, is a good
+example of this. Both the sideframe and modal are HTML iframes.
 
 A typical use for a sideframe is to display an admin list (similar to that used in the
 :ref:`tutorial example <add-nodes-to-polls-menu>`):
