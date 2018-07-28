@@ -409,11 +409,15 @@ The attribute ``app_path`` will contain the name of the application handling the
 Modifying an existing toolbar
 *****************************
 
-If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) you can
-do this by extending the original one, and modifying the appropriate attribute.
+If you need to modify an existing toolbar (say to change an attribute or the behaviour of a method)
+you can do this by creating a sub-class of it that implements the required changes, and registering
+that instead of the original.
 
-If :setting:`CMS_TOOLBARS` is used to register the toolbars, add your own toolbar instead of the
-original one, otherwise unregister the original and register your own::
+The original can be unregistered using ``toolbar_pool.unregister()``, as in the example below.
+Alternatively if you orginally invoked the toolbar class using :setting:`CMS_TOOLBARS`, you will
+need to modify that to refer to the new one instead.
+
+An example, in which we unregister the original and register our own::
 
 
     from cms.toolbar_pool import toolbar_pool
@@ -421,9 +425,9 @@ original one, otherwise unregister the original and register your own::
 
     @toolbar_pool.register
     class MyBarToolbar(ThirdPartyToolbar):
-        supported_apps = ('third_party_app', 'my_app')
+        [...]
 
-    toolbar_pool.unregister(FooToolbar)
+    toolbar_pool.unregister(ThirdPartyToolbar)
 
 
 .. _url_changes:
