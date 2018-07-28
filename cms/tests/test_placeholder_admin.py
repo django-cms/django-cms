@@ -12,24 +12,89 @@ from cms.test_utils.testcases import CMSTestCase
 
 class PlaceholderAdminTestCase(CMSTestCase):
 
-    def test_add_plugin_endpoint(self):
+    def setUp(self):
+        self._populated_placeholder = Placeholder.objects.create(slot='example_placeholder')
+        add_plugin(
+            self._populated_placeholder,
+            plugin_type="TextPlugin",
+            language="en",
+            body="Contents of the text plugin",
+        )
+        add_plugin(
+            self._populated_placeholder,
+            plugin_type="LinkPlugin",
+            language="en",
+        )
+
+        self._staff_user = self.get_staff_user_with_no_permissions()
+
+    def test_user_can_add_plugin(self):
         """
-        Test that the Placeholder admin add_plugin endpoint works
+        User can add a new plugin if he has change permissions
+        on the model attached to the placeholder and he has
+        add permissions on the plugin model.
         """
-        superuser = self.get_superuser()
-        placeholder = Placeholder.objects.create(slot='test')
+        staff_user = self._staff_user
+        plugins = self._populated_placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
         endpoint = self.get_admin_url(Placeholder, 'add_plugin')
 
-        with self.login_user_context(superuser):
-            endpoint = endpoint + '?' + urlencode({
-                'plugin_type': "TextPlugin",
-                'plugin_language': "en",
-                'placeholder_id': placeholder.pk,
-                'plugin_position': 1
-            })
+        self.add_permission(staff_user, 'change_example1')
+        self.add_permission(staff_user, 'add_link')
 
-            response = self.client.get(endpoint)
-            self.assertEqual(response.status_code, 302)
+        with self.login_user_context(staff_user):
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(plugins.count(), 1)
+
+    def test_user_cant_add_plugin(self):
+        """
+        User can't add a new plugin if he does not have
+        change permissions on the model attached to the placeholder
+        and/or does not have add permissions on the plugin model.
+        """
+        staff_user = self._staff_user
+        plugins = self._populated_placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
+        endpoint = self.get_admin_url(Placeholder, 'add_plugin')
+
+        self.add_permission(staff_user, 'add_example1')
+        self.add_permission(staff_user, 'delete_example1')
+        self.add_permission(staff_user, 'add_link')
+
+        with self.login_user_context(staff_user):
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(plugins.count(), 0)
+
+        self.add_permission(staff_user, 'change_example1')
+        self.remove_permission(staff_user, 'add_link')
+
+        with self.login_user_context(staff_user):
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(plugins.count(), 0)
+
+
+    # def test_add_plugin_endpoint(self):
+    #     """
+    #     Test that the Placeholder admin add_plugin endpoint works
+    #     """
+    #     superuser = self.get_superuser()
+    #     placeholder = Placeholder.objects.create(slot='test')
+    #     endpoint = self.get_admin_url(Placeholder, 'add_plugin')
+    #
+    #     with self.login_user_context(superuser):
+    #         endpoint = endpoint + '?' + urlencode({
+    #             'plugin_type': "TextPlugin",
+    #             'plugin_language': "en",
+    #             'placeholder_id': placeholder.pk,
+    #             'plugin_position': 1
+    #         })
+    #
+    #         response = self.client.get(endpoint)
+    #         self.assertEqual(response.status_code, 302)
 
     def test_copy_plugins_add_plugins_from_placeholder(self):
         """
