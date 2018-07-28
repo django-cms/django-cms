@@ -25,7 +25,9 @@ class PlaceholderAdminTestCase(CMSTestCase):
                 'plugin_type': "TextPlugin",
                 'plugin_language': "en",
                 'placeholder_id': placeholder.pk,
+                'plugin_position': 1
             })
+
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 302)
 
@@ -164,6 +166,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
                 'plugin_id': plugin.pk,
                 'target_language': 'en',
                 'placeholder_id': target_placeholder.pk,
+                'target_position': 1,
             }
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
