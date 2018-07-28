@@ -135,7 +135,7 @@ for details of the signature of each method.
 Opening a URL in an iframe
 --------------------------
 
-A common case is to provide a URL that opens in a sideframe or modal dialog on the same page,
+A common case is to provide a URL that opens in a sideframe or modal dialog on the same page.
 *Administration...* in the site menu, that opens the Django admin in a sideframe, is a good
 example of this. Both the sideframe and modal are HTML iframes.
 
@@ -217,8 +217,8 @@ you know a menu already exists, you can obtain it with
     It's recommended to namespace your ``key`` with the application name. Otherwise, another
     application could unexpectedly interfere with your menu.
 
-Once you have your menu, you can items to it in much the same way that you add them to the toolbar.
-For example:
+Once you have your menu, you can add items to it in much the same way that you add them to the
+toolbar. For example:
 
 ..  code-block:: python
     :emphasize-lines: 4-7
@@ -229,7 +229,7 @@ For example:
         menu.add_sideframe_item(
             name='Poll list',
             url=admin_reverse('polls_poll_changelist')
-            )
+        )
 
 
 To add a menu divider
@@ -308,7 +308,7 @@ Search for items by their type:
         self.toolbar.find_items(item_type=LinkItem)
 
 will find all ``LinkItem``\s in the toolbar (but not for example in the menus in the toolbar - it
-doesn't search other items in the toolbar for items of their own).
+doesn't search *other* items in the toolbar for items of their own).
 
 :meth:`~cms.toolbar.items.ToolbarAPIMixin.find_items` returns a list of
 :class:`~cms.toolbar.items.ItemSearchResult` objects;
@@ -338,14 +338,14 @@ the last menu in the toolbar, and so on).
 
 A position of ``0`` will insert the item before all the others.
 
-If you already have a object, you can use that as a reference too. For example:
+If you already have an object, you can use that as a reference too. For example:
 
 ..  code-block:: python
 
     def populate(self):
 
         link = self.toolbar.add_link_item('Link', url=link_url)
-        self.toolbar.add_button('Button', url=button_url, position)
+        self.toolbar.add_button('Button', url=button_url, position=link)
 
 will add the new button before the link item.
 
@@ -375,9 +375,9 @@ By default, your :class:`~cms.toolbar_base.CMSToolbar` sub-class will be active 
 Sometimes however a ``CMSToolbar`` sub-class should only populate the toolbar when visiting pages
 associated with a particular application.
 
-A ``CMSToolbar`` has a useful attribute that can help determine whether a toolbar should be
-activates. ``is_current_app`` is ``True`` when the application containing the toolbar class matches
-the application handling the request
+A ``CMSToolbar`` sub-class has a useful attribute that can help determine whether a toolbar should
+be activated. ``is_current_app`` is ``True`` when the application containing the toolbar class
+matches the application handling the request.
 
 This allows you to activate it selectively, for example:
 
@@ -391,7 +391,7 @@ This allows you to activate it selectively, for example:
 
         [...]
 
-If your toolbar class is in another application than one you want it to be active for,
+If your toolbar class is in another application than the one you want it to be active for,
 you can list any applications it should support when you create the class:
 
 ..  code-block:: python
