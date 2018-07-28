@@ -987,7 +987,7 @@ default
     ``None``
 
 If defined, specifies the list of toolbar modifiers to be used to populate the
-toolbar as import paths. Otherwise, all available toolbars from both the CMS and
+toolbar, as import paths. Otherwise, all available toolbars from both the CMS and
 the third-party apps will be loaded.
 
 Example::
