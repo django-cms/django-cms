@@ -319,6 +319,27 @@ class ExtensionsTestCase(CMSTestCase):
         title_extension.delete()
         self.assertFalse(MultiTableTitleExtension.objects.filter(pk=title_extension.pk).exists())
 
+    def test_fallback_title_extension(self):
+        page = create_page('Test Fallback Title Extension', "nav_playground.html", "en")
+        title_en = page.get_title_obj('en')
+        title_extension_en = MyTitleExtension(extended_object=title_en,
+                                              extra_title='title extension EN')
+        title_extension_en.save()
+        page.publish('en')
+
+        self.assertEqual(page.get_title_obj('en', True).mytitleextension.extra_title,
+                         'title extension EN')
+
+        title_de = create_title(title="de page", language="de", page=page)
+        title_extension_de = MyTitleExtension(extended_object=title_de,
+                                              extra_title='title extension DE')
+        title_extension_de.save()
+        page.publish('de')
+
+        self.assertEqual(page.get_title_obj('de', True).mytitleextension.extra_title,
+                         'title extension DE')
+
+
 class ExtensionAdminTestCase(CMSTestCase):
 
     def setUp(self):
