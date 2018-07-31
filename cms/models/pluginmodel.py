@@ -50,7 +50,6 @@ def _get_database_cursor(action):
     return _get_database_connection(action).cursor()
 
 
-@lru_cache(maxsize=None)
 def plugin_supports_cte():
     # This has to be as function because when it's a var it evaluates before
     # db is connected and we get OperationalError. MySQL version is retrived
