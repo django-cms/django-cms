@@ -10,6 +10,7 @@ from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
 from django.utils import six, timezone
 from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.lru_cache import lru_cache
 from django.utils.safestring import mark_safe
 from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
@@ -20,6 +21,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
+@lru_cache(maxsize=None)
 def _get_descendants_cte():
     sql = (
         "WITH RECURSIVE descendants as ("
@@ -31,6 +33,34 @@ def _get_descendants_cte():
         ")"
     )
     return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+
+
+def _get_database_connection(action):
+    return {
+        'read': connections[router.db_for_read(CMSPlugin)],
+        'write': connections[router.db_for_write(CMSPlugin)]
+    }[action]
+
+
+def _get_database_vendor(action):
+    return _get_database_connection(action).vendor
+
+
+def _get_database_cursor(action):
+    return _get_database_connection(action).cursor()
+
+
+@lru_cache(maxsize=None)
+def plugin_supports_cte():
+    # This has to be as function because when it's a var it evaluates before
+    # db is connected and we get OperationalError. MySQL version is retrived
+    # from db, and it's cached_property.
+    connection = _get_database_vendor('read')
+    db_vendor = _get_database_cursor('read')
+    return not (
+        db_vendor == 'sqlite' and
+        connection.Database.sqlite_version_info < (3, 8, 3)
+    ) or db_vendor == 'mysql' and connection.mysql_version < (8, 0)
 
 
 class BoundRenderMeta(object):
@@ -147,33 +177,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
             location=hex(id(self)),
         )
         return display
-
-    @classmethod
-    def _get_database_connection(cls, action):
-        return {
-            'read': connections[router.db_for_read(cls)],
-            'write': connections[router.db_for_write(cls)]
-        }[action]
-
-    @classmethod
-    def get_database_vendor(cls, action):
-        return cls._get_database_connection(action).vendor
-
-    @classmethod
-    def _get_database_cursor(cls, action):
-        return cls._get_database_connection(action).cursor()
-
-    @classmethod
-    def NO_CTE_SUPPORT(cls):
-        # This has to be as function because when it's a var it evaluates before
-        # db is connected and we get OperationalError. MySQL version is retrived
-        # from db, and it's cached_property.
-        connection = cls._get_database_connection('read')
-        db_vendor = cls.get_database_vendor('read')
-        return (
-            db_vendor == 'sqlite' and
-            connection.Database.sqlite_version_info < (3, 8, 3)
-        ) or db_vendor == 'mysql' and connection.mysql_version < (8, 0)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -302,40 +305,57 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
         return CMSPlugin.objects.get(pk=self.pk)
 
     def _get_descendants_count(self):
-        if self.NO_CTE_SUPPORT():
-            return len(self._get_descendants_ids())
-        else:
-            cursor = CMSPlugin._get_database_cursor('write')
+        if plugin_supports_cte():
+            cursor = _get_database_cursor('write')
             sql = _get_descendants_cte() + '\n'
             sql += 'SELECT COUNT(*) FROM descendants;'
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
             cursor.execute(sql, [self.pk])
             return cursor.fetchall()[0][0]
+        return self.get_descendants().count()
 
     def _get_descendants_ids(self):
-        if self.NO_CTE_SUPPORT():
-            descendants = []
-            childrens = self.get_children().values_list('pk', flat=True)
-            descendants.extend(childrens)
-            while childrens:
-                childrens = CMSPlugin.objects.filter(
-                    parent__in=childrens,
-                ).values_list('pk', flat=True)
-                descendants.extend(childrens)
-            return descendants
-        else:
-            cursor = CMSPlugin._get_database_cursor('write')
+        if plugin_supports_cte():
+            cursor = _get_database_cursor('write')
             sql = _get_descendants_cte() + '\n'
             sql += 'SELECT id FROM descendants;'
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
             cursor.execute(sql, [self.pk])
             return [item[0] for item in cursor.fetchall()]
+        raise NotImplementedError('This method is not supported for the current database')
 
     def get_children(self):
         return self.cmsplugin_set.all()
 
     def get_descendants(self):
-        return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
+        if plugin_supports_cte():
+            return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
+
+        right_sibling = (
+            self
+            .placeholder
+            .get_last_plugin_position(
+                self.language,
+                parent=self.parent,
+            )
+        )
+
+        if self == right_sibling:
+            descendants = (
+                self
+                .placeholder
+                .get_plugins(self.language)
+                .filter(position__gt=self.position)
+            )
+        else:
+            desc_range = (self.position + 1, right_sibling.position + 1)
+            descendants = (
+                self
+                .placeholder
+                .get_plugins(self.language)
+                .filter(position__range=desc_range)
+            )
+        return descendants
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:

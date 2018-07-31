@@ -746,9 +746,10 @@ class Placeholder(models.Model):
         ).update(position=models.F('position') + offset)
 
     def _recalculate_plugin_positions(self, language):
-        from cms.models import CMSPlugin
-        cursor = CMSPlugin._get_database_cursor('write')
-        db_vendor = CMSPlugin.get_database_vendor('write')
+        from cms.models.pluginmodel import CMSPlugin, _get_database_cursor, _get_database_vendor
+
+        cursor = _get_database_cursor('write')
+        db_vendor = _get_database_vendor('write')
 
         if db_vendor == 'sqlite':
             sql = (
