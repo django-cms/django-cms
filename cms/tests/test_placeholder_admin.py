@@ -2,7 +2,7 @@
 from django.forms.models import model_to_dict
 from django.utils.http import urlencode
 
-from cms.api import add_plugin, create_title
+from cms.api import add_plugin
 from cms.models import Placeholder, UserSettings, CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
 
