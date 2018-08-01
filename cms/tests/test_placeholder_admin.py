@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.forms.models import model_to_dict
-from django.utils.http import urlencode
 
 from cms.api import add_plugin
 from cms.models import Placeholder, UserSettings, CMSPlugin
@@ -9,24 +8,32 @@ from cms.test_utils.testcases import CMSTestCase
 
 class PlaceholderAdminTestCase(CMSTestCase):
 
+    # FIXME: Should be a reusable method in testcase!
+    def _add_plugin_to_placeholder(self, placeholder, plugin_type='LinkPlugin', language='en'):
+        plugin_data = {
+            'TextPlugin': {'body': '<p>text</p>'},
+            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
+        }
+        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
+        return plugin
+
     def test_add_plugin_endpoint(self):
         """
         The Placeholder admin add_plugin endpoint works
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='test')
-        plugins = placeholder.get_plugins('en').filter(plugin_type='TextPlugin')
-        endpoint = self.get_admin_url(Placeholder, 'add_plugin')
+        plugins = placeholder.get_plugins('en').filter(plugin_type='LinkPlugin')
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type='LinkPlugin',
+            language='en',
+        )
         with self.login_user_context(superuser):
-            endpoint = endpoint + '?' + urlencode({
-                'plugin_type': "TextPlugin",
-                'plugin_language': "en",
-                'placeholder_id': placeholder.pk,
-                'plugin_position': placeholder.get_next_plugin_position('en', insert_order='last')
-            })
-            response = self.client.get(endpoint)
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+            response = self.client.post(uri, data)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(plugins.count(), 1)
 
     def test_copy_plugins_add_plugins_from_placeholder(self):
@@ -36,12 +43,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         source_placeholder = Placeholder.objects.create(slot='source')
         target_placeholder = Placeholder.objects.create(slot='target')
-        source_plugin = add_plugin(
-            source_placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
         endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
         with self.login_user_context(superuser):
             data = {
@@ -73,12 +75,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
             clipboard=Placeholder.objects.create(),
         )
         source_placeholder = Placeholder.objects.create(slot='source')
-        source_plugin = add_plugin(
-            source_placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
         endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
         with self.login_user_context(superuser):
             data = {
@@ -111,12 +108,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
             clipboard=Placeholder.objects.create(),
         )
         source_placeholder = Placeholder.objects.create(slot='source')
-        source_plugin = add_plugin(
-            source_placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        source_plugin = self._add_plugin_to_placeholder(source_placeholder)
         endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
         with self.login_user_context(superuser):
             data = {
@@ -128,6 +120,13 @@ class PlaceholderAdminTestCase(CMSTestCase):
             response = self.client.post(endpoint, data)
 
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
+        self.assertTrue(
+            user_settings.clipboard
+                .get_plugins('en')
+                .filter(plugin_type='PlaceholderPlugin')
+                .exists()
+        )
 
     def test_edit_plugin_endpoint(self):
         """
@@ -135,21 +134,16 @@ class PlaceholderAdminTestCase(CMSTestCase):
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='edit_plugin_placeholder')
-        plugin = add_plugin(
-            placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        plugin = self._add_plugin_to_placeholder(placeholder)
         endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
         with self.login_user_context(superuser):
-            data = model_to_dict(plugin, fields=['plugin_type', 'language', 'body'])
-            data['body'] = 'Contents modified'
+            data = model_to_dict(plugin, fields=['name', 'external_link'])
+            data['name'] = 'Contents modified'
             response = self.client.post(endpoint, data)
             plugin.refresh_from_db()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(plugin.body, data['body'])
+        self.assertEqual(plugin.name, data['name'])
 
     def test_move_plugin_endpoint(self):
         """
@@ -164,19 +158,14 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         source_placeholder = Placeholder.objects.create(slot='source')
         target_placeholder = Placeholder.objects.create(slot='target')
-        plugin = add_plugin(
-            source_placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        plugin = self._add_plugin_to_placeholder(source_placeholder)
         endpoint = self.get_admin_url(Placeholder, 'move_plugin')
         with self.login_user_context(superuser):
             data = {
                 'plugin_id': plugin.pk,
                 'target_language': 'en',
                 'placeholder_id': target_placeholder.pk,
-                'target_position': 1,
+                'target_position': target_placeholder.get_next_plugin_position('en', insert_order='last'),
             }
             response = self.client.post(endpoint, data)
 
@@ -190,12 +179,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
-        plugin = add_plugin(
-            placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        plugin = self._add_plugin_to_placeholder(placeholder)
         endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
         with self.login_user_context(superuser):
             data = {'post': True}
@@ -210,12 +194,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
-        add_plugin(
-            placeholder,
-            plugin_type="TextPlugin",
-            language="en",
-            body="Contents of the text plugin",
-        )
+        self._add_plugin_to_placeholder(placeholder)
         endpoint = self.get_admin_url(Placeholder, 'clear_placeholder', placeholder.pk)
         with self.login_user_context(superuser):
             response = self.client.post(endpoint, {'test': 0})
