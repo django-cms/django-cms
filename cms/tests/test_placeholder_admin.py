@@ -11,7 +11,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_add_plugin_endpoint(self):
         """
-        Test that the Placeholder admin add_plugin endpoint works
+        The Placeholder admin add_plugin endpoint works
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='test')
@@ -90,7 +90,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
             }
             response = self.client.post(endpoint, data)
 
-        # Test that the target placeholder has the plugin copied from the source placeholder
+        # Test that the target placeholder has the plugin copied from the source placeholder (clipboard)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
@@ -131,7 +131,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_edit_plugin_endpoint(self):
         """
-        Test that the Placeholder admin edit_plugins endpoint works
+        The Placeholder admin edit_plugins endpoint works
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='edit_plugin_placeholder')
@@ -153,7 +153,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_move_plugin_endpoint(self):
         """
-        Test that the Placeholder admin move_plugin endpoint works
+        The Placeholder admin move_plugin endpoint works
 
         TODO: Test??
             - _paste_placeholder
@@ -186,7 +186,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_delete_plugin_endpoint(self):
         """
-        Test that the Placeholder admin delete_plugin endpoint works
+        The Placeholder admin delete_plugin endpoint works
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
@@ -206,7 +206,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_clear_placeholder_endpoint(self):
         """
-        Test that the Placeholder admin delete_plugin endpoint works
+        The Placeholder admin delete_plugin endpoint works
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
@@ -220,5 +220,5 @@ class PlaceholderAdminTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.post(endpoint, {'test': 0})
 
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(placeholder.get_plugins('en').count(), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(placeholder.get_plugins('en').count(), 0)
