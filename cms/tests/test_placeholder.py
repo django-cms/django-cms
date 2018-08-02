@@ -457,14 +457,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             'main': {
                 'name': 'main content',
                 'plugins': ['TextPlugin', 'LinkPlugin'],
-                'default_plugins': [
-                    {
-                        'plugin_type': 'TextPlugin',
-                        'values': {
-                            'body': '<p>Some default text</p>'
-                        },
-                    },
-                ],
+                'language_fallback': False,
             },
             'layout/home.html main': {
                 'name': u'main content with FilerImagePlugin and limit',
@@ -499,8 +492,8 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             returned = get_placeholder_conf('excluded_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['layout/other.html main']['excluded_plugins'])
             # test grandparent inherited value
-            returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
-            self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
+            returned = get_placeholder_conf('language_fallback', 'main', 'layout/other.html')
+            self.assertEqual(returned, TEST_CONF['main']['language_fallback'])
             # test generic configuration
             returned = get_placeholder_conf('plugins', 'something')
             self.assertEqual(returned, TEST_CONF[None]['plugins'])
