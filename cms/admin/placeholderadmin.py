@@ -1051,9 +1051,9 @@ class PlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
-            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
-            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
+            pat(r'edit-plugin/\d/$', self.edit_plugin),
+            pat(r'delete-plugin/\d/$', self.delete_plugin),
+            pat(r'clear-placeholder/\d/$', self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         ]
         return url_patterns + super(PlaceholderAdmin, self).get_urls()

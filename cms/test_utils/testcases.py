@@ -21,7 +21,7 @@ from django.utils.timezone import now
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 
-from cms.api import create_page
+from cms.api import create_page, add_plugin
 from cms.constants import (
     PUBLISHER_STATE_DEFAULT,
     PUBLISHER_STATE_DIRTY,
@@ -626,6 +626,13 @@ class BaseCMSTestCase(object):
     def get_toolbar_disable_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))
 
+    def _add_plugin_to_placeholder(self, placeholder, plugin_type='LinkPlugin', language='en'):
+        plugin_data = {
+            'TextPlugin': {'body': '<p>text</p>'},
+            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
+        }
+        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
+        return plugin
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
