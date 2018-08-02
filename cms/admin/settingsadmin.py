@@ -14,14 +14,13 @@ from django.utils.translation import override
 from django.utils.six.moves.urllib.parse import urlparse
 
 from cms.admin.forms import RequestToolbarForm
-from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.models import UserSettings
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
 
-class SettingsAdmin(PlaceholderAdminMixin, ModelAdmin):
+class SettingsAdmin(ModelAdmin):
 
     def get_urls(self):
         def wrap(view):
@@ -31,7 +30,6 @@ class SettingsAdmin(PlaceholderAdminMixin, ModelAdmin):
             return update_wrapper(wrapper, view)
 
         info = self.model._meta.app_label, self.model._meta.model_name
-        plugin_urls = PlaceholderAdminMixin.get_urls(self)
 
         return [
             url(r'^session_store/$',
@@ -46,7 +44,7 @@ class SettingsAdmin(PlaceholderAdminMixin, ModelAdmin):
             url(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-        ] + plugin_urls
+        ]
 
     @csrf_protect_m
     @transaction.atomic

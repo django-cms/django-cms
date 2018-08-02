@@ -158,9 +158,39 @@ class FrontendEditableAdminMixin(object):
 
 
 class PlaceholderAdminMixin(object):
+    class Meta:
+        warnings.warn("PlaceholderAdminMixin has been removed", DeprecationWarning)
 
-    def _get_attached_admin(self, placeholder):
-        return placeholder._get_attached_admin(admin_site=self.admin_site)
+
+class PlaceholderAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_module_permission(self, request):
+        return False
+
+    def get_urls(self):
+        """
+        Register the plugin specific urls (add/edit/copy/remove/move)
+        """
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        url_patterns = [
+            pat(r'copy-plugins/$', self.copy_plugins),
+            pat(r'add-plugin/$', self.add_plugin),
+            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
+            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
+            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
+            pat(r'move-plugin/$', self.move_plugin),
+        ]
+        return url_patterns
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query
@@ -224,22 +254,6 @@ class PlaceholderAdminMixin(object):
         plugin_class = plugin_pool.get_plugin(plugin_type)
         real_queryset = plugin_class.get_render_queryset().select_related('parent', 'placeholder')
         return get_object_or_404(real_queryset, pk=plugin_id)
-
-    def get_urls(self):
-        """
-        Register the plugin specific urls (add/edit/copy/remove/move)
-        """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
-        url_patterns = [
-            pat(r'copy-plugins/$', self.copy_plugins),
-            pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
-            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
-            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
-            pat(r'move-plugin/$', self.move_plugin),
-        ]
-        return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
 
     def has_add_plugin_permission(self, request, placeholder, plugin_type):
         return placeholder.has_add_plugin_permission(request.user, plugin_type)
@@ -1026,37 +1040,6 @@ class PlaceholderAdminMixin(object):
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
-
-
-class PlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_module_permission(self, request):
-        return False
-
-    def get_urls(self):
-        """
-        Register the plugin specific urls (add/edit/copy/remove/move)
-        """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
-        url_patterns = [
-            pat(r'copy-plugins/$', self.copy_plugins),
-            pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
-            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
-            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
-            pat(r'move-plugin/$', self.move_plugin),
-        ]
-        return url_patterns + super(PlaceholderAdmin, self).get_urls()
 
 
 admin.site.register(Placeholder, PlaceholderAdmin)

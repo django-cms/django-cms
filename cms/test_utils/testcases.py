@@ -28,7 +28,7 @@ from cms.constants import (
     PUBLISHER_STATE_PENDING,
 )
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
-from cms.models import Page
+from cms.models import Page, Placeholder
 from cms.models.permissionmodels import (
     GlobalPagePermission,
     PagePermission,
@@ -530,7 +530,7 @@ class BaseCMSTestCase(object):
         return endpoint + '?' + urlencode(data)
 
     def get_change_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+        container = container or Placeholder
         language = language or 'en'
 
         if plugin.page:
@@ -543,7 +543,7 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_move_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+        container = container or Placeholder
         language = language or 'en'
 
         if plugin.page:
@@ -556,7 +556,7 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_copy_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+        container = container or Placeholder
         language = language or 'en'
 
         if plugin.page:
@@ -569,7 +569,7 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_copy_placeholder_uri(self, placeholder, container=None, language=None):
-        container = container or Page
+        container = container or Placeholder
         language = language or 'en'
 
         if placeholder.page:
@@ -582,7 +582,7 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_delete_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+        container = container or Placeholder
         language = language or 'en'
 
         if plugin.page:
@@ -595,7 +595,7 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_clear_placeholder_url(self, placeholder, container=None, language=None):
-        container = container or Page
+        container = container or Placeholder
         language = language or 'en'
 
         if placeholder.page:

@@ -6,15 +6,15 @@ from cms.test_utils.project.placeholderapp.models import (
 from django.contrib import admin
 
 
-class ExampleAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.ModelAdmin):
+class ExampleAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1", "char_2")
 
 
-class CharPksAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.ModelAdmin):
+class CharPksAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1",)
 
 
-class TwoPlaceholderExampleAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
+class TwoPlaceholderExampleAdmin(admin.ModelAdmin):
     pass
 
 

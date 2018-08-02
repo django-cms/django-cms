@@ -102,7 +102,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_pre_edit_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
 
         with signal_tester(pre_placeholder_operation) as env:
@@ -128,7 +128,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_edit_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
@@ -157,7 +157,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_pre_delete_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
 
         with signal_tester(pre_placeholder_operation) as env:
@@ -181,7 +181,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_delete_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
@@ -528,7 +528,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_pre_add_plugins_from_placeholder(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
+        endpoint = self.get_admin_url(Placeholder, 'copy_plugins') + '?cms_path=/en/'
         source_placeholder = plugin.placeholder
 
         data = {
@@ -561,7 +561,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_add_plugins_from_placeholder(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
+        endpoint = self.get_admin_url(Placeholder, 'copy_plugins') + '?cms_path=/en/'
         source_placeholder = plugin.placeholder
 
         data = {

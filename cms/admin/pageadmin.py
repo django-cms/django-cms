@@ -51,7 +51,6 @@ from cms.admin.forms import (
     PublicationDatesForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
-from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
@@ -101,7 +100,7 @@ class TreeNodeAdmin(admin.ModelAdmin):
     parent_display.short_description = 'parent'
 
 
-class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
+class BasePageAdmin(admin.ModelAdmin):
     form = AddPageForm
     ordering = ('node__path',)
     search_fields = ('=id', 'title_set__slug', 'title_set__title', 'reverse_id')

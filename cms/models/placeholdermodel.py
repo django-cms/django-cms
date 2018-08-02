@@ -108,17 +108,20 @@ class Placeholder(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_extra_placeholder_menu_items(self)
 
+    # FIXME: Flawed because it tries to use the attached model
     def _get_url(self, key, pk=None):
-        model = self._get_attached_model()
+        #model = self._get_attached_model()
         args = []
         if pk:
             args.append(pk)
-        if not model:
-            return admin_reverse('cms_page_%s' % key, args=args)
-        else:
-            app_label = model._meta.app_label
-            model_name = model.__name__.lower()
-            return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
+
+        return admin_reverse('cms_placeholder_%s' % key, args=args)
+        # if not model:
+        #     return admin_reverse('cms_placeholder_%s' % key, args=args)
+        # else:
+        #     app_label = self._meta.app_label
+        #     model_name = self.__name__.lower()
+        #     return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def has_change_permission(self, user):
         """
@@ -237,7 +240,7 @@ class Placeholder(models.Model):
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
-                from cms.admin.placeholderadmin import PlaceholderAdminMixin
+                from cms.admin.placeholderadmin import PlaceholderAdmin
                 related_model = rel.related_model
 
                 try:
@@ -248,15 +251,15 @@ class Placeholder(models.Model):
                 # UserSettings and Title are special cases.
                 # Attached objects are used to check permissions
                 # and we filter out any attached object that does not
-                # inherit from PlaceholderAdminMixin
+                # inherit from PlaceholderAdmin
                 # Because UserSettings does not (and shouldn't) inherit
-                # from PlaceholderAdminMixin, we add a manual exception.
+                # from PlaceholderAdmin, we add a manual exception.
                 is_internal = (
                     related_model == UserSettings
                     or related_model == Title
                 )
 
-                if is_internal or isinstance(admin_class, PlaceholderAdminMixin):
+                if is_internal or isinstance(admin_class, PlaceholderAdmin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.exists():
@@ -289,15 +292,12 @@ class Placeholder(models.Model):
 
     def _get_attached_admin(self, admin_site=None):
         from django.contrib.admin import site
+        from cms.models import Placeholder
 
         if not admin_site:
             admin_site = site
 
-        model = self._get_attached_model()
-
-        if not model:
-            return
-        return admin_site._registry.get(model)
+        return admin_site._registry.get(Placeholder)
 
     def _get_attached_models(self):
         """

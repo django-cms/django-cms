@@ -333,6 +333,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
                 operation_kwargs['tree_order'] = tree_order
             # Remember the operation token
             self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
+
+
         # Saves the plugin
         # remember the saved object
         self.saved_object = pl.add_plugin(obj)
