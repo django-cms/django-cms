@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 from collections import defaultdict, deque, OrderedDict
-from itertools import starmap
-from operator import itemgetter
 
 from django.utils.encoding import force_text
 from django.utils.lru_cache import lru_cache
@@ -12,7 +10,6 @@ from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
-from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_placeholder_conf
 
 
@@ -49,9 +46,6 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         .objects
         .filter(placeholder__in=placeholders, language=lang)
     )
-    if not plugins:
-        # Create default plugins if enabled
-        plugins = create_default_plugins(request, placeholders, template, lang)
     plugins = downcast_plugins(plugins, placeholders, request=request)
 
     # split the plugins up by placeholder
@@ -71,47 +65,6 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         setattr(placeholder, '_all_plugins_cache', all_plugins)
         # This is only the root plugins.
         setattr(placeholder, '_plugins_cache', layered_plugins)
-
-
-def create_default_plugins(request, placeholders, template, lang):
-    """
-    Create all default plugins for the given ``placeholders`` if they have
-    a "default_plugins" configuration value in settings.
-    return all plugins, children, grandchildren (etc.) created
-    """
-    from cms.api import add_plugin
-
-    def _create_default_plugins(placeholder, confs, parent=None):
-        """
-        Auxillary function that builds all of a placeholder's default plugins
-        at the current level and drives the recursion down the tree.
-        Returns the plugins at the current level along with all descendants.
-        """
-        plugins, descendants = [], []
-        addable_confs = (conf for conf in confs
-                         if has_plugin_permission(request.user,
-                                                  conf['plugin_type'], 'add'))
-        for conf in addable_confs:
-            plugin = add_plugin(placeholder, conf['plugin_type'], lang,
-                                target=parent, **conf['values'])
-            if 'children' in conf:
-                args = placeholder, conf['children'], plugin
-                descendants += _create_default_plugins(*args)
-            plugin.notify_on_autoadd(request, conf)
-            plugins.append(plugin)
-        if parent:
-            parent.notify_on_autoadd_children(request, conf, plugins)
-        return plugins + descendants
-
-    unfiltered_confs = ((ph, get_placeholder_conf('default_plugins',
-                                                  ph.slot, template))
-                        for ph in placeholders)
-    # Empty confs must be filtered before filtering on add permission
-    mutable_confs = ((ph, default_plugin_confs)
-                     for ph, default_plugin_confs
-                     in filter(itemgetter(1), unfiltered_confs)
-                     if ph.has_change_permission(request.user))
-    return sum(starmap(_create_default_plugins, mutable_confs), [])
 
 
 def get_plugins_as_layered_tree(plugins):

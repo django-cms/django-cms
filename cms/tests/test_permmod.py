@@ -186,27 +186,6 @@ class PermissionModeratorTests(CMSTestCase):
             # approve / publish as user_slave
             # user master should be able to approve as well
 
-    @override_settings(
-        CMS_PLACEHOLDER_CONF={
-            'col_left': {
-                'default_plugins': [
-                    {
-                        'plugin_type': 'TextPlugin',
-                        'values': {
-                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
-                        },
-                    },
-                ]
-            },
-        },
-    )
-    def test_default_plugins(self):
-        with self.login_user_context(self.user_slave):
-            self.assertEqual(CMSPlugin.objects.count(), 0)
-            response = self.client.get(self.slave_page.get_absolute_url(), {'edit': 1})
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(CMSPlugin.objects.count(), 1)
-
     def test_page_added_by_slave_can_be_published_by_user_master(self):
         # add page
         page = create_page("page", "nav_playground.html", "en",
