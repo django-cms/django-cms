@@ -144,7 +144,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             char_4='four'
         )
         ex.save()
-        response = self.client.get(admin_reverse('placeholderapp_example1_change', args=(ex.pk,)))
+        response = self.client.get(admin_reverse('cms_page_change', args=(ex.pk,)))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
 

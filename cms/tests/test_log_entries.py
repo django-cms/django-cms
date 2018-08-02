@@ -340,7 +340,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         When a plugin is changed a log entry is created.
         """
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
         page = plugin.placeholder.page
 
@@ -370,7 +370,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         When a plugin is deleted a log entry is created.
         """
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
         page = plugin.placeholder.page
 
@@ -475,7 +475,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         When a plugin is added to a placeholder a log entry is created.
         """
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
+        endpoint = self.get_admin_url(Placeholder, 'copy_plugins') + '?cms_path=/en/'
         page = plugin.placeholder.page
 
         data = {

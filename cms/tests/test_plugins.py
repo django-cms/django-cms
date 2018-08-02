@@ -146,7 +146,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         return CMSPlugin.objects.latest('pk').pk
 
     def __edit_link_plugin(self, plugin_id, text):
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin_id)
+        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin_id)
         endpoint += '?cms_path=/en/'
 
         response = self.client.get(endpoint)
@@ -571,7 +571,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_id': plugin.pk
         }
 
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
 
         response = self.client.post(endpoint, plugin_data)
@@ -607,7 +607,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_id': plugin.pk
         }
 
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
         endpoint += '?cms_path=/en/'
 
         response = self.client.post(endpoint, plugin_data)
@@ -1102,7 +1102,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             language=self.FIRST_LANG,
         )
 
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
+        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
         endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
 
         data = {
@@ -1138,7 +1138,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'source_language': self.FIRST_LANG,
         }
 
-        endpoint = self.get_admin_url(Page, 'copy_plugins')
+        endpoint = self.get_admin_url(Placeholder, 'copy_plugins')
         endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
 
         response = self.client.post(endpoint, copy_data)
