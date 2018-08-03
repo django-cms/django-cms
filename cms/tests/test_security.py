@@ -161,7 +161,7 @@ class SecurityTests(CMSTestCase):
         """
         page, placeholder, superuser, staff = self.get_data()
         plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
-        endpoint = self.get_change_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_change_plugin_uri(plugin)
         plugin_data = {
             'body': 'newbody',
             'language': 'en',
@@ -200,7 +200,7 @@ class SecurityTests(CMSTestCase):
         }
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
-        endpoint = self.get_delete_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_delete_plugin_uri(plugin)
         # log the user out and try to remove a plugin using PlaceholderAdmin
         self.client.logout()
         response = self.client.post(endpoint, plugin_data)

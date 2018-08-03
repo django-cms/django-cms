@@ -113,15 +113,15 @@ class AppAdminTest(AppAdminTestCase):
         with self.login_user_context(superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
-                endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
-                endpoint = self.get_move_plugin_uri(plugin_2, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_2)
                 response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_3, position=3, placeholder=target_placeholder)
-                endpoint = self.get_move_plugin_uri(plugin_3, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_3)
                 response = self.client.post(endpoint, data)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(
@@ -143,11 +143,11 @@ class AppAdminTest(AppAdminTestCase):
         with self.login_user_context(superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1)
-                endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=2)
-                endpoint = self.get_move_plugin_uri(plugin_2, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_2)
                 response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 200)
 
@@ -187,11 +187,11 @@ class AppAdminTest(AppAdminTestCase):
         with self.login_user_context(superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
-                endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=1, placeholder=target_placeholder)
-                endpoint = self.get_move_plugin_uri(plugin_2, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_2)
                 response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
@@ -210,7 +210,7 @@ class AppAdminTest(AppAdminTestCase):
         with self.login_user_context(superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1)
-                endpoint = self.get_move_plugin_uri(plugin_1, container=Example1)
+                endpoint = self.get_move_plugin_uri(plugin_1)
                 response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
 
@@ -280,7 +280,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_change_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_change_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_example1')
         self.add_permission(staff_user, 'change_link')
@@ -303,7 +303,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_change_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_change_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'add_example1')
         self.add_permission(staff_user, 'delete_example1')
@@ -339,7 +339,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_delete_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'change_example1')
         self.add_permission(staff_user, 'delete_link')
@@ -360,7 +360,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_delete_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         self.add_permission(staff_user, 'add_example1')
         self.add_permission(staff_user, 'delete_example1')
@@ -400,7 +400,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'change_link')
 
         with self.login_user_context(staff_user):
-            endpoint = self.get_move_plugin_uri(plugin, container=Example1)
+            endpoint = self.get_move_plugin_uri(plugin)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertTrue(target_placeholder.get_plugins('en').filter(pk=plugin.pk))
@@ -424,7 +424,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         self.add_permission(staff_user, 'change_link')
 
         with self.login_user_context(staff_user):
-            endpoint = self.get_move_plugin_uri(plugin, container=Example1)
+            endpoint = self.get_move_plugin_uri(plugin)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertFalse(target_placeholder.get_plugins('en').filter(pk=plugin.pk))
@@ -448,7 +448,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_copy_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = self._get_example_obj().placeholder
 
@@ -483,7 +483,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_copy_plugin_uri(plugin, container=Example1)
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
         target_placeholder = self._get_example_obj().placeholder
 
@@ -531,7 +531,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         """
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
-        endpoint = self.get_clear_placeholder_url(placeholder, container=Example1)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'change_example1')
 
@@ -546,7 +546,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         """
         staff_user = self._staff_user
         placeholder = self._obj.placeholder
-        endpoint = self.get_clear_placeholder_url(placeholder, container=Example1)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
@@ -565,7 +565,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             self._add_plugin_to_placeholder(placeholder, 'LinkPlugin'),
         ]
         placeholder = plugins[0].placeholder
-        endpoint = self.get_clear_placeholder_url(placeholder, container=Example1)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'delete_style')
         self.add_permission(staff_user, 'delete_link')
@@ -589,7 +589,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             self._add_plugin_to_placeholder(placeholder, 'LinkPlugin'),
         ]
         placeholder = plugins[0].placeholder
-        endpoint = self.get_clear_placeholder_url(placeholder, container=Example1)
+        endpoint = self.get_clear_placeholder_url(placeholder)
 
         self.add_permission(staff_user, 'delete_text')
         self.add_permission(staff_user, 'delete_link')
@@ -607,7 +607,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         """
         staff_user = self._staff_user
         source_placeholder = self._obj.placeholder
-        endpoint = self.get_copy_placeholder_uri(source_placeholder, container=Example1)
+        endpoint = self.get_copy_placeholder_uri(source_placeholder)
 
         self._add_plugin_to_placeholder(source_placeholder, 'StylePlugin')
         self._add_plugin_to_placeholder(source_placeholder, 'LinkPlugin')
@@ -654,7 +654,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         """
         staff_user = self._staff_user
         source_placeholder = self._obj.placeholder
-        endpoint = self.get_copy_placeholder_uri(source_placeholder, container=Example1)
+        endpoint = self.get_copy_placeholder_uri(source_placeholder)
 
         self._add_plugin_to_placeholder(source_placeholder, 'StylePlugin')
         self._add_plugin_to_placeholder(source_placeholder, 'LinkPlugin')
@@ -727,7 +727,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
                 'move_a_copy': True,
                 'target_position': target_placeholder.get_next_plugin_position('fr', insert_order='last'),
             }
-            endpoint = self.get_move_plugin_uri(placeholder_plugin, container=Example1)
+            endpoint = self.get_move_plugin_uri(placeholder_plugin)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(target_placeholder.get_plugins('fr').count(), 2)
@@ -772,7 +772,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
                 'move_a_copy': True,
                 'target_position': target_placeholder.get_next_plugin_position('fr', insert_order='last'),
             }
-            endpoint = self.get_move_plugin_uri(placeholder_plugin, container=Example1)
+            endpoint = self.get_move_plugin_uri(placeholder_plugin)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertEqual(target_placeholder.get_plugins('fr').count(), 0)

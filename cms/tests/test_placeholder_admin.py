@@ -44,7 +44,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         source_placeholder = Placeholder.objects.create(slot='source')
         target_placeholder = Placeholder.objects.create(slot='target')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
+        endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -76,7 +76,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
+        endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -109,7 +109,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
+        endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",

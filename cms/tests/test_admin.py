@@ -528,7 +528,7 @@ class AdminTests(AdminTestsBase):
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
-            endpoint = self.get_delete_plugin_uri(plugin, container=ph)
+            endpoint = self.get_delete_plugin_uri(plugin)
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 

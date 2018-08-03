@@ -165,7 +165,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         ph2_pl2 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 plugin3').cmsplugin_ptr
 
-        endpoint = self.get_move_plugin_uri(ph1_pl2, container=TwoPlaceholderExample)
+        endpoint = self.get_move_plugin_uri(ph1_pl2)
 
         # Move ph2_pl3 to position 1 on placeholder 2
         data = {
@@ -394,7 +394,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         ###
         test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
         test_plugin.save()
-        endpoint = self.get_change_plugin_uri(test_plugin, container=Example1)
+        endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
         self.assertContains(response, "CMS.API.Helpers.onPluginSave")
 

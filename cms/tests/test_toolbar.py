@@ -544,7 +544,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(re.search('add_plugin.+/admin/custom/view/', response_text))
         self.assertTrue(re.search('copy_plugin.+/admin/custom/copy/', response_text))
 
-        self.assertTrue(re.search('edit_plugin.+/en/admin/placeholder/page/edit-plugin/%s' % plugin_2.pk, response_text))
+        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_2.pk, response_text))
         self.assertTrue(re.search('delete_plugin.+/en/admin/cms/placeholder/delete-plugin/%s/' % plugin_2.pk, response_text))
 
     def test_show_toolbar_to_staff(self):

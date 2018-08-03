@@ -338,7 +338,7 @@ class AliasTestCase(TransactionCMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
-        endpoint = self.get_change_plugin_uri(alias, container=Example1)
+        endpoint = self.get_change_plugin_uri(alias)
 
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)

@@ -176,6 +176,18 @@ class PlaceholderAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False
 
+    def log_addition(self, request, object, object_repr):
+        # Block the admin log for addition. A signal takes care of this!
+        return
+
+    def log_deletion(self, request, object, object_repr):
+        # Block the admin log for deletion. A signal takes care of this!
+        return
+
+    def log_change(self, request, object, message):
+        # Block the admin log for change. A signal takes care of this!
+        return
+
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)

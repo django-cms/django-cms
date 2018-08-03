@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import add_plugin
-from cms.models import Page, Placeholder, UserSettings
+from cms.models import Placeholder, UserSettings
 from cms.operations import (
     ADD_PLUGIN,
     ADD_PLUGINS_FROM_PLACEHOLDER,
