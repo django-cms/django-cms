@@ -240,7 +240,6 @@ class Placeholder(models.Model):
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
-                from cms.admin.placeholderadmin import PlaceholderAdmin
                 related_model = rel.related_model
 
                 try:
@@ -259,7 +258,7 @@ class Placeholder(models.Model):
                     or related_model == Title
                 )
 
-                if is_internal or isinstance(admin_class, PlaceholderAdmin):
+                if is_internal or isinstance(admin_class, admin.ModelAdmin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.exists():

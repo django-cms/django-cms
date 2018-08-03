@@ -699,6 +699,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
         target_placeholder = self._obj.placeholder
 
         self.add_permission(staff_user, 'change_example1')
+        self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'add_link')
 
         user_settings = UserSettings.objects.create(

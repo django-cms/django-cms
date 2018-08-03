@@ -5,7 +5,6 @@ from django.http import QueryDict
 from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.project.placeholderapp.models import Example1
 
 
 class SecurityTests(CMSTestCase):
