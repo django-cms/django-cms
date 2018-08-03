@@ -197,12 +197,12 @@ class PlaceholderAdmin(admin.ModelAdmin):
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
-            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
-            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
+            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
+            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         ]
-        return url_patterns
+        return url_patterns + super(PlaceholderAdmin, self).get_urls()
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query
@@ -1052,6 +1052,3 @@ class PlaceholderAdmin(admin.ModelAdmin):
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
-
-
-admin.site.register(Placeholder, PlaceholderAdmin)
