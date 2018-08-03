@@ -731,7 +731,7 @@ class Placeholder(models.Model):
         return tree.values_list('position', flat=True).first()
 
     def get_last_plugin_position(self, language, parent=None):
-        tree =self.get_plugins(language)
+        tree = self.get_plugins(language)
 
         if parent:
             tree = tree.filter(parent=parent)

@@ -50,16 +50,21 @@ def _get_database_cursor(action):
     return _get_database_connection(action).cursor()
 
 
+@lru_cache(maxsize=None)
 def plugin_supports_cte():
     # This has to be as function because when it's a var it evaluates before
     # db is connected and we get OperationalError. MySQL version is retrived
     # from db, and it's cached_property.
-    connection = _get_database_vendor('read')
-    db_vendor = _get_database_cursor('read')
-    return not (
-        db_vendor == 'sqlite' and
-        connection.Database.sqlite_version_info < (3, 8, 3)
-    ) or db_vendor == 'mysql' and connection.mysql_version < (8, 0)
+    connection = _get_database_connection('write')
+    db_vendor = _get_database_vendor('write')
+    sqlite_no_cte = (
+        db_vendor == 'sqlite'
+        and connection.Database.sqlite_version_info < (3, 8, 3)
+    )
+
+    if sqlite_no_cte:
+        return False
+    return not (db_vendor == 'mysql' and connection.mysql_version < (8, 0))
 
 
 class BoundRenderMeta(object):
@@ -320,41 +325,22 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
             sql += 'SELECT id FROM descendants;'
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
             cursor.execute(sql, [self.pk])
-            return [item[0] for item in cursor.fetchall()]
-        raise NotImplementedError('This method is not supported for the current database')
+            descendants = [item[0] for item in cursor.fetchall()]
+        else:
+            children = self.get_children().values_list('pk', flat=True)
+            descendants = list(children)
+            while children:
+                children = CMSPlugin.objects.filter(
+                    parent__in=children,
+                ).values_list('pk', flat=True)
+                descendants.extend(children)
+        return descendants
 
     def get_children(self):
         return self.cmsplugin_set.all()
 
     def get_descendants(self):
-        if plugin_supports_cte():
-            return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
-
-        right_sibling = (
-            self
-            .placeholder
-            .get_last_plugin_position(
-                self.language,
-                parent=self.parent,
-            )
-        )
-
-        if self == right_sibling:
-            descendants = (
-                self
-                .placeholder
-                .get_plugins(self.language)
-                .filter(position__gt=self.position)
-            )
-        else:
-            desc_range = (self.position + 1, right_sibling.position + 1)
-            descendants = (
-                self
-                .placeholder
-                .get_plugins(self.language)
-                .filter(position__range=desc_range)
-            )
-        return descendants
+        return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
