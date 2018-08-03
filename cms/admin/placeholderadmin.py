@@ -23,6 +23,7 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils import translation
 from django.utils.translation import ugettext as _
+
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
@@ -1040,6 +1041,22 @@ class PlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     def has_module_permission(self, request):
         return False
+
+    def get_urls(self):
+        """
+        Register the plugin specific urls (add/edit/copy/remove/move)
+        """
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        url_patterns = [
+            pat(r'copy-plugins/$', self.copy_plugins),
+            pat(r'add-plugin/$', self.add_plugin),
+            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
+            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'move-plugin/$', self.move_plugin),
+        ]
+        return url_patterns + super(PlaceholderAdmin, self).get_urls()
 
 
 admin.site.register(Placeholder, PlaceholderAdmin)
