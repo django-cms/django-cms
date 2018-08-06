@@ -22,7 +22,7 @@ class Pandadoc {
             url: form.attr('action'),
             data: form.serialize(),
         })
-            .success(function(data) {
+            .done(function(data) {
                 if (data.success) {
                     $('.js-success-message', form).show();
                     $('.js-form-wrapper', form).hide();
