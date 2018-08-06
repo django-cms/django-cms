@@ -26,7 +26,12 @@
                     {% endwith %}
                     <div class="nav-btnlinks">
                         <a href="https://control.divio.com/" class="nav-link">Login</a>
-                        <a href="/get-started/" class="nav-link nav-link-get-started">Get started {% include "includes/icon.html" with icon="arrow-right" %}</a>
+                        <a href="/get-started/" class="nav-link nav-link-get-started js-analytics-link"
+                            data-event="Clicked get started (header)"
+                            data-page="{% page_attribute page_title %}"
+                        >
+                            Get started {% include "includes/icon.html" with icon="arrow-right" %}
+                        </a>
                     </div>
                 </div>
             </div>
