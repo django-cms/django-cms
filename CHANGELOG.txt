@@ -16,6 +16,8 @@
 * Fixed a bug where plugins that are not rendered in content wouldn't be
   editable in structure board
 * Fixed a bug with expanding static placeholder by clicking on "Expand All" button
+* Fixed a bug where descendant pages with a custom url would lose the overwritten
+  url on save.
 
 
 === 3.5.2 (2018-04-11) ===
