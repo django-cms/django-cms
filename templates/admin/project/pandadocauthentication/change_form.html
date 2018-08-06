@@ -1,0 +1,41 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools %}
+    <h3>WARNING</h3>
+    <p>PandaDoc does not seem to handle multiple authentication tokens on one account very well.
+        Sometimes after a refresh of one token others would automatically get invalidated as well.
+        <strong>It is advised to use a singular token per account to handle all the communication to PandaDoc.</strong>
+    </p>
+    <hr>
+
+    <h3>Step 1</h3>
+    <p>Fill out <code>authentication name</code>, <code>client id</code>, <code>client secret</code> and <code>redirect uri</code>. Then click "Save and edit".</p>
+
+    <h3>Step 2</h3>
+
+
+    {% if original %}
+        <p>Click on the following link to
+            <a target="_blank" href="https://app.pandadoc.com/oauth2/authorize?client_id={{ original.client_id }}&amp;redirect_uri={{ original.redirect_uri }}&amp;scope={{ original.scope }}&amp;response_type=code">get an authorization token</a>.
+            Copy the code from the browser bar into the following field
+        </p>
+
+        <h3>Step 3</h3>
+        <p>Generating the access and refresh token: Insert the code from the previous step into the form below and hit Submit</p>
+        <form action="{% url 'admin:pandadoc-token' original.pk %}" method="post">
+            {% csrf_token %}
+            <div class="form-row field-name">
+                <div>
+                    <label class="required">Code:</label>
+                    <input class="vTextField" maxlength="255" name="authorization" type="text">
+                </div>
+            </div>
+            <div class="form-row field-name">
+                <input type="submit">
+            </div>
+        </form>
+    {% else %}
+        <p>Please save the form first before continuing.</p>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
