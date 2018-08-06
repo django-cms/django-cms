@@ -196,7 +196,6 @@ Example::
             'text_only_plugins': ['LinkPlugin'],
             'extra_context': {"width":640},
             'name': gettext("Content"),
-            'language_fallback': True,
             'child_classes': {
                 'TextPlugin': ['PicturePlugin', 'LinkPlugin'],
             },
@@ -279,11 +278,6 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     limits. Special case: ``global`` - Limit the absolute number of plugins in
     this placeholder regardless of type (takes precedence over the
     type-specific limits).
-
-``language_fallback``
-    When ``True``, if the placeholder has no plugin for the current language
-    it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
-    Defaults to ``True`` since version 3.1.
 
 ``plugin_modules``
     A dictionary of plugins and custom module names to group plugin in the
@@ -522,10 +516,7 @@ will redirect to the URL of the same page in the fallback language. If
 ``False``, the content will be displayed in the fallback language, but there
 will be no redirect.
 
-Note that this applies to the fallback behaviour of *pages*. Starting for 3.1 *placeholders*
-**will** default to the same behaviour. If you do not want a placeholder to follow a page's
-fallback behaviour, you must set its ``language_fallback`` to ``False``
-in :setting:`CMS_PLACEHOLDER_CONF`, above.
+Note that this applies to the fallback behaviour of *pages*.
 
 type
     Boolean
