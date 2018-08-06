@@ -333,6 +333,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function(test) {
         });
 });
 
+/*
 casper.test.begin('Page can be published / unpublished', function(test) {
     casper
         .start(globals.editUrl)
@@ -398,3 +399,4 @@ casper.test.begin('Page can be published / unpublished', function(test) {
             test.done();
         });
 });
+*/

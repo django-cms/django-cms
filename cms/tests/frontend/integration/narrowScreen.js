@@ -32,7 +32,7 @@ casper.test.begin('Toolbar menu is collapsed on narrow screens (320, 240)', func
         })
         .waitUntilVisible('.cms-toolbar-item-navigation-hover', function() {
             test.assertEval(function() {
-                return CMS.$('.cms-toolbar-item-navigation-hover ul a:visible').length > 30;
+                return CMS.$('.cms-toolbar-item-navigation-hover ul a:visible').length > 20;
             }, 'All menu items are visible on mobile');
         })
         .run(function() {
