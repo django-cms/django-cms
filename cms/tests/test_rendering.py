@@ -7,7 +7,7 @@ from sekizai.context import SekizaiContext
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
 from cms.cache.placeholder import get_placeholder_cache
-from cms.models import Page, Placeholder, CMSPlugin
+from cms.models import Page, Placeholder
 from cms.plugin_rendering import PluginContext
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
@@ -258,7 +258,7 @@ class RenderingTestCase(CMSTestCase):
         from djangocms_text_ckeditor.cms_plugins import TextPlugin
         from cms.plugin_pool import plugin_pool
 
-        instance = CMSPlugin.objects.all()[0].get_plugin_instance()[0]
+        instance = self.test_placeholders['main'].get_plugins('en').first().get_bound_plugin()
 
         load_from_string = self.load_template_from_string
 

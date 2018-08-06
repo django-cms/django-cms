@@ -731,7 +731,7 @@ class Placeholder(models.Model):
         return tree.values_list('position', flat=True).first()
 
     def get_last_plugin_position(self, language, parent=None):
-        tree =self.get_plugins(language)
+        tree = self.get_plugins(language)
 
         if parent:
             tree = tree.filter(parent=parent)
@@ -746,16 +746,59 @@ class Placeholder(models.Model):
         ).update(position=models.F('position') + offset)
 
     def _recalculate_plugin_positions(self, language):
-        from cms.models import CMSPlugin
-        cursor = CMSPlugin._get_database_cursor('write')
-        sql = (
-            'UPDATE {0} '
-            'SET position = RowNbrs.RowNbr '
-            'FROM ('
-            'SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS RowNbr '
-            'FROM {0} WHERE placeholder_id=%s AND language=%s '
-            ') RowNbrs '
-            'WHERE {0}.id=RowNbrs.id'
-        )
-        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-        cursor.execute(sql, [self.pk, language])
+        from cms.models.pluginmodel import CMSPlugin, _get_database_cursor, _get_database_vendor
+
+        cursor = _get_database_cursor('write')
+        db_vendor = _get_database_vendor('write')
+
+        if db_vendor == 'sqlite':
+            sql = (
+                'CREATE TEMPORARY TABLE temp AS '
+                'SELECT ID, ('
+                'SELECT COUNT(*)+1 FROM {0} t WHERE '
+                'placeholder_id={0}.placeholder_id AND language={0}.language '
+                'AND {0}.position > t.position'
+                ') AS new_position '
+                'FROM {0} WHERE placeholder_id=%s AND language=%s'
+            )
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql, [self.pk, language])
+
+            sql = (
+                'UPDATE {0} '
+                'SET position = (SELECT new_position FROM temp WHERE id={0}.id) '
+                'WHERE placeholder_id=%s AND language=%s'
+            )
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql, [self.pk, language])
+
+            sql = 'DROP TABLE temp'
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql)
+        elif db_vendor == 'postgresql':
+            sql = (
+                'UPDATE {0} '
+                'SET position = RowNbrs.RowNbr '
+                'FROM ('
+                'SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS RowNbr '
+                'FROM {0} WHERE placeholder_id=%s AND language=%s '
+                ') RowNbrs '
+                'WHERE {0}.id=RowNbrs.id'
+            )
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql, [self.pk, language])
+        elif db_vendor == 'mysql':
+            sql = (
+                'UPDATE {0} '
+                'SET position = ('
+                'SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t '
+                'WHERE placeholder_id={0}.placeholder_id AND language={0}.language '
+                'AND {0}.position > t.position'
+                ') WHERE placeholder_id=%s AND language=%s'
+            )
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql, [self.pk, language])
+        else:
+            raise RuntimeError(
+                '{} is not supported by django-cms'.format(connection.vendor)
+            )
