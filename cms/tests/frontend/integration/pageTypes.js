@@ -30,47 +30,47 @@ casper.test.tearDown(function(done) {
         .run(done);
 });
 
-casper.test.begin('Different page template can be applied', function(test) {
-    casper
-        .start(globals.editUrl)
-        .waitForSelector('.cms-toolbar-expanded')
-        // wait more for the logo to finish loading?
-        .wait(300, function() {
-            test.assertDoesntExist('h1', 'Page is "fullwidth.html"');
-            // click on "Page" menu item
-            this.click('.cms-toolbar-item-navigation > li + li > a');
-        })
-        // expand "Templates" menu item
-        .wait(10, function() {
-            var position = this.getElementBounds(xPath('//a[.//span[text()[contains(.,"Templates")]]]'));
-
-            // simulating mouseenter event
-            this.mouse.move(position.left + 1, position.top - 1);
-            this.mouse.move(position.left + 1, position.top + 1);
-            this.wait(10);
-        })
-        // wait till it expands
-        .waitForSelector('.cms-toolbar-item-navigation-hover .cms-toolbar-item-navigation-hover', function() {
-            // move right
-            this.mouse.move(xPath('//a[.//span[text()[contains(.,"Fullwidth")]]]'));
-            // move down
-            this.mouse.move(xPath('//a[.//span[text()[contains(.,"Standard page")]]]'));
-            this.click(xPath('//a[.//span[text()[contains(.,"Standard page")]]]'));
-        })
-        .waitForResource(/change-template/)
-        .waitForSelector('.cms-ready', function() {
-            test.assertSelectorHasText(
-                '.cms-toolbar-item-navigation-active',
-                'Standard page',
-                'Correct template is highlighted in the menu'
-            );
-            test.assertExists('h1', 'Page is "page.html"');
-            test.assertSelectorHasText('h1', 'This is a custom page template', 'Page is "page.html"');
-        })
-        .run(function() {
-            test.done();
-        });
-});
+// casper.test.begin('Different page template can be applied', function(test) {
+//     casper
+//         .start(globals.editUrl)
+//         .waitForSelector('.cms-toolbar-expanded')
+//         // wait more for the logo to finish loading?
+//         .wait(300, function() {
+//             test.assertDoesntExist('h1', 'Page is "fullwidth.html"');
+//             // click on "Page" menu item
+//             this.click('.cms-toolbar-item-navigation > li + li > a');
+//         })
+//         // expand "Templates" menu item
+//         .wait(10, function() {
+//             var position = this.getElementBounds(xPath('//a[.//span[text()[contains(.,"Templates")]]]'));
+//
+//             // simulating mouseenter event
+//             this.mouse.move(position.left + 1, position.top - 1);
+//             this.mouse.move(position.left + 1, position.top + 1);
+//             this.wait(10);
+//         })
+//         // wait till it expands
+//         .waitForSelector('.cms-toolbar-item-navigation-hover .cms-toolbar-item-navigation-hover', function() {
+//             // move right
+//             this.mouse.move(xPath('//a[.//span[text()[contains(.,"Fullwidth")]]]'));
+//             // move down
+//             this.mouse.move(xPath('//a[.//span[text()[contains(.,"Standard page")]]]'));
+//             this.click(xPath('//a[.//span[text()[contains(.,"Standard page")]]]'));
+//         })
+//         .waitForResource(/change-template/)
+//         .waitForSelector('.cms-ready', function() {
+//             test.assertSelectorHasText(
+//                 '.cms-toolbar-item-navigation-active',
+//                 'Standard page',
+//                 'Correct template is highlighted in the menu'
+//             );
+//             test.assertExists('h1', 'Page is "page.html"');
+//             test.assertSelectorHasText('h1', 'This is a custom page template', 'Page is "page.html"');
+//         })
+//         .run(function() {
+//             test.done();
+//         });
+// });
 
 casper.test.begin('PageType can be created and used', function(test) {
     casper
