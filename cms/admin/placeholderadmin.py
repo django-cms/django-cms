@@ -1052,3 +1052,6 @@ class PlaceholderAdmin(admin.ModelAdmin):
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
+
+
+admin.site.register(Placeholder, PlaceholderAdmin)

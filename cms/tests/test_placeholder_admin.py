@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.forms.models import model_to_dict
 
-<<<<<<< HEAD
 from cms.api import add_plugin
-=======
->>>>>>> upstream/release/4.0.x
 from cms.models import Placeholder, UserSettings, CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
 
 
 class PlaceholderAdminTestCase(CMSTestCase):
 
-<<<<<<< HEAD
     # FIXME: Should be a reusable method in testcase!
     def _add_plugin_to_placeholder(self, placeholder, plugin_type='LinkPlugin', language='en'):
         plugin_data = {
@@ -21,8 +17,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
         return plugin
 
-=======
->>>>>>> upstream/release/4.0.x
     def test_add_plugin_endpoint(self):
         """
         The Placeholder admin add_plugin endpoint works
@@ -42,11 +36,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugins.count(), 1)
 
-<<<<<<< HEAD
     def test_copy_plugins_add_plugins_from_placeholder(self):
-=======
-    def test_add_plugins_from_placeholder(self):
->>>>>>> upstream/release/4.0.x
         """
         User can copy plugins from one placeholder to another
         """
@@ -54,11 +44,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         source_placeholder = Placeholder.objects.create(slot='source')
         target_placeholder = Placeholder.objects.create(slot='target')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-<<<<<<< HEAD
         endpoint = self.get_copy_plugin_uri(source_plugin)
-=======
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
->>>>>>> upstream/release/4.0.x
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -73,21 +59,12 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             target_placeholder
-<<<<<<< HEAD
                 .get_plugins('en')
                 .filter(plugin_type=source_plugin.plugin_type)
                 .exists()
         )
 
     def test_copy_plugins_copy_plugin_to_clipboard(self):
-=======
-            .get_plugins('en')
-            .filter(plugin_type=source_plugin.plugin_type)
-            .exists()
-        )
-
-    def test_copy_plugins_to_clipboard(self):
->>>>>>> upstream/release/4.0.x
         """
         User can copy plugins from a placeholder to the clipboard
         """
@@ -99,11 +76,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-<<<<<<< HEAD
         endpoint = self.get_copy_plugin_uri(source_plugin)
-=======
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
->>>>>>> upstream/release/4.0.x
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -116,7 +89,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
         # Test that the target placeholder has the plugin copied from the source placeholder (clipboard)
         self.assertEqual(response.status_code, 200)
-<<<<<<< HEAD
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             user_settings.clipboard
@@ -126,16 +98,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
 
     def test_copy_plugins_copy_placeholder_to_clipboard(self):
-=======
-        self.assertTrue(
-            user_settings.clipboard
-            .get_plugins('en')
-            .filter(plugin_type=source_plugin.plugin_type)
-            .exists()
-        )
-
-    def test_copy_placeholder_to_clipboard(self):
->>>>>>> upstream/release/4.0.x
         """
         User can copy a placeholder to the clipboard
         """
@@ -147,11 +109,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-<<<<<<< HEAD
         endpoint = self.get_copy_plugin_uri(source_plugin)
-=======
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
->>>>>>> upstream/release/4.0.x
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -165,15 +123,9 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             user_settings.clipboard
-<<<<<<< HEAD
                 .get_plugins('en')
                 .filter(plugin_type='PlaceholderPlugin')
                 .exists()
-=======
-            .get_plugins('en')
-            .filter(plugin_type='PlaceholderPlugin')
-            .exists()
->>>>>>> upstream/release/4.0.x
         )
 
     def test_edit_plugin_endpoint(self):
@@ -193,7 +145,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugin.name, data['name'])
 
-<<<<<<< HEAD
     def test_move_plugin_endpoint(self):
         """
         The Placeholder admin move_plugin endpoint works
@@ -222,8 +173,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertTrue(target_placeholder.get_plugins('en').filter(pk=plugin.pk))
         self.assertFalse(source_placeholder.get_plugins('en').filter(pk=plugin.pk))
 
-=======
->>>>>>> upstream/release/4.0.x
     def test_delete_plugin_endpoint(self):
         """
         The Placeholder admin delete_plugin endpoint works
@@ -241,11 +190,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_clear_placeholder_endpoint(self):
         """
-<<<<<<< HEAD
         The Placeholder admin delete_plugin endpoint works
-=======
-        The Placeholder admin clear_placeholder endpoint works
->>>>>>> upstream/release/4.0.x
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
