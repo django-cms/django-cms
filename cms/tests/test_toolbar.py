@@ -26,7 +26,7 @@ from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_u
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
-from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_char, ClassDetail
+from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
                                       URL_CMS_USERSETTINGS)
@@ -2071,23 +2071,6 @@ class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
                                        data={'edit_fields': 'char_1'})
             # if we get a response pattern matches
             self.assertEqual(response.status_code, 200)
-
-    def test_view_char_pk(self):
-        """
-        Tests whether the admin urls triggered when the toolbar is active works
-        (i.e.: no NoReverseMatch is raised) with alphanumeric pks
-        """
-        page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex = CharPksExample(
-            char_1='one',
-            slug='some-Special_slug_123',
-        )
-        ex.save()
-        superuser = self.get_superuser()
-        request = self.get_page_request(page, superuser, edit=True)
-        response = detail_view_char(request, ex.pk)
-        # if we get a response pattern matches
-        self.assertEqual(response.status_code, 200)
 
     def test_view_numeric_pk(self):
         """

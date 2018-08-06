@@ -96,11 +96,6 @@ class PageTestBase(CMSTestCase):
             lookup = lookup.filter(title=title)
         return lookup.exists()
 
-    def _get_add_plugin_uri(self, page, language='en'):
-        placeholder = page.get_placeholders(language).get(slot='body')
-        uri = self.get_admin_url(placeholder, 'add_plugin')
-        return uri
-
     def _get_page_data(self, **kwargs):
         site = Site.objects.get_current()
         data = {

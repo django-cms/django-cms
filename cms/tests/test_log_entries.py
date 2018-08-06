@@ -340,10 +340,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         When a plugin is changed a log entry is created.
         """
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_change_plugin_uri(plugin)
         page = plugin.placeholder.page
-
         data = {'name': 'A Link 2', 'external_link': 'https://www.django-cms.org'}
 
         with self.login_user_context(self._admin_user):
@@ -370,8 +368,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         When a plugin is deleted a log entry is created.
         """
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_delete_plugin_uri(plugin)
         page = plugin.placeholder.page
 
         with self.login_user_context(self._admin_user):

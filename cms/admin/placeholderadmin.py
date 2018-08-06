@@ -202,7 +202,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         ]
-        return url_patterns + super(PlaceholderAdmin, self).get_urls()
+        return url_patterns
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query

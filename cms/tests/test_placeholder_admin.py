@@ -135,7 +135,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='edit_plugin_placeholder')
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
+        endpoint = self.get_change_plugin_uri(plugin)
         with self.login_user_context(superuser):
             data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'Contents modified'
@@ -159,7 +159,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         source_placeholder = Placeholder.objects.create(slot='source')
         target_placeholder = Placeholder.objects.create(slot='target')
         plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'move_plugin')
+        endpoint = self.get_move_plugin_uri(plugin)
         with self.login_user_context(superuser):
             data = {
                 'plugin_id': plugin.pk,
@@ -180,7 +180,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
+        endpoint = self.get_delete_plugin_uri(plugin)
         with self.login_user_context(superuser):
             data = {'post': True}
             response = self.client.post(endpoint, data)

@@ -108,20 +108,11 @@ class Placeholder(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_extra_placeholder_menu_items(self)
 
-    # FIXME: Flawed because it tries to use the attached model
     def _get_url(self, key, pk=None):
-        #model = self._get_attached_model()
         args = []
         if pk:
             args.append(pk)
-
         return admin_reverse('cms_placeholder_%s' % key, args=args)
-        # if not model:
-        #     return admin_reverse('cms_placeholder_%s' % key, args=args)
-        # else:
-        #     app_label = self._meta.app_label
-        #     model_name = self.__name__.lower()
-        #     return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def has_change_permission(self, user):
         """
