@@ -668,7 +668,6 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(self.test_page5)
         self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
 
-    @override_settings(CMS_PLACEHOLDER_CONF={None: {'language_fallback': False}})
     def test_inherit_placeholder_queries(self):
         with self.assertNumQueries(FuzzyInt(6,8)):
             r = self.render(self.test_page2)

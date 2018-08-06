@@ -196,15 +196,6 @@ Example::
             'text_only_plugins': ['LinkPlugin'],
             'extra_context': {"width":640},
             'name': gettext("Content"),
-            'language_fallback': True,
-            'default_plugins': [
-                {
-                    'plugin_type': 'TextPlugin',
-                    'values': {
-                        'body':'<p>Lorem ipsum dolor sit amet...</p>',
-                    },
-                },
-            ],
             'child_classes': {
                 'TextPlugin': ['PicturePlugin', 'LinkPlugin'],
             },
@@ -287,76 +278,6 @@ matches; if the same configuration is retrieved for the ``content`` placeholder 
     limits. Special case: ``global`` - Limit the absolute number of plugins in
     this placeholder regardless of type (takes precedence over the
     type-specific limits).
-
-``language_fallback``
-    When ``True``, if the placeholder has no plugin for the current language
-    it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
-    Defaults to ``True`` since version 3.1.
-
-.. _placeholder_default_plugins:
-
-``default_plugins``
-    You can specify the list of default plugins which will be automatically
-    added when the placeholder will be created (or rendered).
-    Each element of the list is a dictionary with following keys :
-
-    ``plugin_type``
-        The plugin type to add to the placeholder
-        Example : ``TextPlugin``
-
-    ``values``
-        Dictionary to use for the plugin creation.
-        It depends on the ``plugin_type``. See the documentation of each
-        plugin type to see which parameters are required and available.
-        Example for a text plugin:
-        ``{'body':'<p>Lorem ipsum</p>'}``
-        Example for a link plugin:
-        ``{'name':'Django-CMS','url':'https://www.django-cms.org'}``
-
-    ``children``
-        It is a list of dictionaries to configure default plugins
-        to add as children for the current plugin (it must accepts children).
-        Each dictionary accepts same args than dictionaries of
-        ``default_plugins`` : ``plugin_type``, ``values``, ``children``
-        (yes, it is recursive).
-
-    Complete example of default_plugins usage::
-
-        CMS_PLACEHOLDER_CONF = {
-            'content': {
-                'name' : _('Content'),
-                'plugins': ['TextPlugin', 'LinkPlugin'],
-                'default_plugins':[
-                    {
-                        'plugin_type':'TextPlugin',
-                        'values':{
-                            'body':'<p>Great websites : %(_tag_child_1)s and %(_tag_child_2)s</p>'
-                        },
-                        'children':[
-                            {
-                                'plugin_type':'LinkPlugin',
-                                'values':{
-                                    'name':'django',
-                                    'url':'https://www.djangoproject.com/'
-                                },
-                            },
-                            {
-                                'plugin_type':'LinkPlugin',
-                                'values':{
-                                    'name':'django-cms',
-                                    'url':'https://www.django-cms.org'
-                                },
-                                # If using LinkPlugin from djangocms-link which
-                                # accepts children, you could add some grandchildren :
-                                # 'children' : [
-                                #     ...
-                                # ]
-                            },
-                        ]
-                    },
-                ]
-            }
-        }
 
 ``plugin_modules``
     A dictionary of plugins and custom module names to group plugin in the
@@ -595,10 +516,7 @@ will redirect to the URL of the same page in the fallback language. If
 ``False``, the content will be displayed in the fallback language, but there
 will be no redirect.
 
-Note that this applies to the fallback behaviour of *pages*. Starting for 3.1 *placeholders*
-**will** default to the same behaviour. If you do not want a placeholder to follow a page's
-fallback behaviour, you must set its ``language_fallback`` to ``False``
-in :setting:`CMS_PLACEHOLDER_CONF`, above.
+Note that this applies to the fallback behaviour of *pages*.
 
 type
     Boolean
