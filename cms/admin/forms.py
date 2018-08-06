@@ -391,7 +391,7 @@ class ChangePageForm(BasePageForm):
 
     def __init__(self, *args, **kwargs):
         super(ChangePageForm, self).__init__(*args, **kwargs)
-        title_obj = self.instance.get_title_obj(
+        self.title_obj = self.instance.get_title_obj(
             language=self._language,
             fallback=False,
             force_reload=True,
@@ -399,7 +399,7 @@ class ChangePageForm(BasePageForm):
 
         for field in self.translation_fields:
             if field in self.fields:
-                self.fields[field].initial = getattr(title_obj, field)
+                self.fields[field].initial = getattr(self.title_obj, field)
 
     def clean(self):
         data = super(ChangePageForm, self).clean()
@@ -413,6 +413,10 @@ class ChangePageForm(BasePageForm):
 
         if page.is_home:
             data['path'] = ''
+            return data
+
+        if self.title_obj.has_url_overwrite:
+            data['path'] = self.title_obj.path
             return data
 
         if 'slug' not in self.fields:
@@ -450,7 +454,10 @@ class ChangePageForm(BasePageForm):
                             for field in self.translation_fields if field in data}
 
         if 'path' in data:
-            # this field is managed manually
+            # The path key is set if
+            # the slug field is present in the form,
+            # or if the page being edited is the home page,
+            # or if the translation has a url override.
             translation_data['path'] = data['path']
 
         update_count = cms_page.update_translations(
