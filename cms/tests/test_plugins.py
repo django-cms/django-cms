@@ -36,8 +36,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate)
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
-    URL_CMS_PLUGIN_ADD, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PAGE_PUBLISH,
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH,
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
@@ -45,7 +44,6 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.plugins import get_plugins
-from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 
@@ -171,16 +169,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         admin.autodiscover()
         admin_instance = admin.site._registry[ArticlePluginModel]
         placeholder = self.get_placeholder()
-        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
-            'plugin_type': "ArticlePlugin",
-            'target_language': settings.LANGUAGES[0][0],
-            'placeholder_id': placeholder.pk,
-        })
+        add_url = self.get_add_plugin_uri(placeholder, plugin_type="ArticlePlugin", language=settings.LANGUAGES[0][0])
         superuser = self.get_superuser()
         plugin = plugin_pool.get_plugin('ArticlePlugin')
 
         with self.login_user_context(superuser):
-            request = self.get_request(url)
+            request = self.get_request(add_url)
             PluginFormClass = plugin(
                 model=plugin.model,
                 admin_site=admin.site,
@@ -633,14 +627,13 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         ph = Placeholder(slot="subplugin")
         ph.save()
-        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
-            'plugin_type': "TextPlugin",
-            'target_language': settings.LANGUAGES[0][0],
-            'placeholder': ph.pk,
-            'plugin_parent': plugin.pk
-
-        })
-        response = self.client.post(url, {'body': ''})
+        add_url = self.get_add_plugin_uri(
+            placeholder=ph,
+            plugin_type="ArticlePlugin",
+            language=settings.LANGUAGES[0][0],
+            parent=plugin
+        )
+        response = self.client.post(add_url, {'body': ''})
         # no longer allowed for security reasons
         self.assertEqual(response.status_code, 400)
 

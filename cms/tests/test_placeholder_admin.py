@@ -1,21 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.forms.models import model_to_dict
 
-from cms.api import add_plugin
 from cms.models import Placeholder, UserSettings, CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
 
 
 class PlaceholderAdminTestCase(CMSTestCase):
-
-    # FIXME: Should be a reusable method in testcase!
-    def _add_plugin_to_placeholder(self, placeholder, plugin_type='LinkPlugin', language='en'):
-        plugin_data = {
-            'TextPlugin': {'body': '<p>text</p>'},
-            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
-        }
-        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
-        return plugin
 
     def test_add_plugin_endpoint(self):
         """
@@ -195,7 +185,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
         self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
         with self.login_user_context(superuser):
             response = self.client.post(endpoint, {'test': 0})
 
