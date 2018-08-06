@@ -130,7 +130,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(FuzzyInt(18, 25)):
+            with self.assertNumQueries(FuzzyInt(16, 23)):
                 response1 = self.client.get(page1_url)
                 content1 = response1.content
 

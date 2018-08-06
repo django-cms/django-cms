@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0025_title_placeholders_data_migration'),
+        ('cms', '0027_title_placeholders_data_migration'),
     ]
 
     operations = [

@@ -313,6 +313,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             'plugin_id': plugin.pk,
             'target_language': 'en',
             'placeholder_id': self._placeholder_2.pk,
+            'target_position': 1,
         }
 
         with self.login_user_context(self._admin_user):
@@ -447,7 +448,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             'placeholder_id': self._placeholder_1.pk,
             'target_language': 'en',
             'move_a_copy': 'true',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': 1,
         }
 
         with self.login_user_context(self._admin_user):
@@ -528,7 +529,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             'placeholder_id': self._placeholder_1.pk,
             'target_language': 'en',
             'move_a_copy': 'true',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': 1,
         }
 
         with self.login_user_context(self._admin_user):

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from django.contrib import admin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import connection, models
 from django.template.defaultfilters import title
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -69,20 +69,7 @@ class Placeholder(models.Model):
         return display
 
     def clear(self, language=None):
-        if language:
-            qs = self.cmsplugin_set.filter(language=language)
-        else:
-            qs = self.cmsplugin_set.all()
-        qs = qs.order_by('-depth').select_related()
-        for plugin in qs:
-            inst, cls = plugin.get_plugin_instance()
-            if inst and getattr(inst, 'cmsplugin_ptr', False):
-                inst.cmsplugin_ptr._no_reorder = True
-                inst._no_reorder = True
-                inst.delete(no_mp=True)
-            else:
-                plugin._no_reorder = True
-                plugin.delete(no_mp=True)
+        self.get_plugins(language).delete()
 
     def get_label(self):
         from cms.utils.placeholder import get_placeholder_conf
@@ -347,9 +334,11 @@ class Placeholder(models.Model):
 
     def get_plugins(self, language=None):
         if language:
-            return self.cmsplugin_set.filter(language=language).order_by('path')
-        else:
-            return self.cmsplugin_set.all().order_by('path')
+            return self.cmsplugin_set.filter(language=language)
+        return self.cmsplugin_set.all()
+
+    def has_plugins(self, language=None):
+        return self.get_plugins(language).exists()
 
     def get_filled_languages(self):
         """
@@ -571,3 +560,202 @@ class Placeholder(models.Model):
             root_plugin=root_plugin,
         )
         return new_plugins
+
+    def add_plugin(self, instance):
+        last_position = self.get_last_plugin_position(instance.language) or 0
+        # A shift is only needed if the distance between the new plugin
+        # and the last plugin is greater than 1 position.
+        needs_shift = (instance.position - last_position) < 1
+
+        if needs_shift:
+            # shift to the right
+            self._shift_plugin_positions(
+                instance.language,
+                start=instance.position,
+                offset=last_position,
+            )
+
+        instance.save()
+
+        if needs_shift:
+            # The plugin tree was shifted to the right to make space,
+            # now squash all plugins in the tree to close any holes.
+            self._recalculate_plugin_positions(instance.language)
+        return instance
+
+    def move_plugin(self, plugin, target_position, target_placeholder=None, target_plugin=None):
+        if target_placeholder:
+            return self._move_plugin_to_placeholder(
+                plugin=plugin,
+                target_position=target_position,
+                target_placeholder=target_placeholder,
+                target_plugin=target_plugin,
+            )
+
+        target_tree = self.get_plugins(plugin.language)
+        last_plugin = self.get_last_plugin(plugin.language)
+        source_plugin_desc_count = plugin._get_descendants_count()
+        source_plugin_range = (plugin.position, plugin.position + source_plugin_desc_count)
+
+        if target_position < plugin.position:
+            # Moving left
+            # Make a big hole on the right side of the current plugin's position
+            # by shifting all right nodes further to the right, excluding the current plugin
+            # but including the target plugin and its descendants.
+            (target_tree
+             .filter(position__gte=target_position)
+             .exclude(position__range=source_plugin_range)
+             ).update(position=(models.F('position') + last_plugin.position))
+
+            # Make a big hole on the left side of the current plugin's position
+            # by shifting all right nodes further the right, including the current plugin
+            # and its descendants.
+            target_tree.filter(
+                position__lte=source_plugin_range[1]
+            ).update(position=models.F('position') - last_plugin.position)
+        else:
+            # Moving right
+            # Make a big hole on the left side of the target position,
+            # by shifting all left nodes further to the left, excluding the current plugin
+            # but including the target plugin and its descendants.
+            # Left node in the common case is target_position but if the current plugin
+            # has descendants then left node is the closest node to the right side of the
+            # last descendant.
+            (target_tree
+             .filter(position__lte=target_position + source_plugin_desc_count)
+             .exclude(position__range=source_plugin_range)
+             ).update(position=(models.F('position') - last_plugin.position))
+
+            # Make a big hole on the right side of the current plugin's position
+            # by shifting all right nodes further the right, including the current plugin
+            # and its descendants.
+            target_tree.filter(
+                position__gte=plugin.position
+            ).update(position=models.F('position') + last_plugin.position)
+
+        if plugin.parent != target_plugin:
+            # Plugin is being moved to another tree (under another parent)
+            # OR plugin is being moved to the root (no parent)
+            plugin.update(parent=target_plugin)
+        # The plugin tree was shifted to the right to make space,
+        # Squash all plugin positions in the tree to close any holes.
+        self._recalculate_plugin_positions(plugin.language)
+
+    def _move_plugin_to_placeholder(self, plugin, target_position, target_placeholder, target_plugin=None):
+        source_last_plugin = self.get_last_plugin(plugin.language)
+        target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
+
+        if target_last_plugin:
+            source_offset = source_last_plugin.position
+            target_offset = target_last_plugin.position
+            source_plugin_desc_count = plugin._get_descendants_count()
+            # Projected position of the plugin being moved
+            # If the plugin has descendants then this is the projected position
+            # of the last descendant for the plugin being moved.
+            source_projected_last_position = plugin.position + source_plugin_desc_count + source_offset
+            # Projected position of the first plugin to the right
+            # of the plugin being moved, in the target placeholder.
+            target_projected_first_position = target_position + target_offset
+            # Real position of the last plugin in the target placeholder,
+            # after the move takes place.
+            target_last_position = target_last_plugin.position + 1 + source_plugin_desc_count
+
+            if source_projected_last_position <= target_last_position:
+                source_diff = (target_last_position - source_projected_last_position)
+                source_offset += source_diff + 1
+                source_projected_last_position += source_diff + 1
+
+            if source_projected_last_position >= target_projected_first_position:
+                target_diff = source_projected_last_position - target_projected_first_position
+                target_offset += target_diff + 1
+
+            target_placeholder._shift_plugin_positions(
+                plugin.language,
+                start=target_position,
+                offset=target_offset,
+            )
+        else:
+            # moving to empty placeholder
+            source_offset = source_last_plugin.position
+
+        # Shift all plugins whose position is greater than or equal to
+        # the plugin being moved. This includes the plugin itself.
+        # This is to create enough space in-between for the squashing
+        # to work without conflicts.
+        self._shift_plugin_positions(
+            plugin.language,
+            start=plugin.position,
+            offset=source_offset,
+        )
+
+        plugin.update(parent=target_plugin, placeholder=target_placeholder)
+        # TODO: More efficient is to do raw sql update
+        plugin.get_descendants().update(placeholder=target_placeholder)
+        self._recalculate_plugin_positions(plugin.language)
+        target_placeholder._recalculate_plugin_positions(plugin.language)
+
+    def delete_plugin(self, instance):
+        instance.get_descendants().delete()
+        instance.delete()
+        last_plugin = self.get_last_plugin(instance.language)
+
+        if last_plugin:
+            self._shift_plugin_positions(
+                instance.language,
+                start=instance.position,
+                offset=last_plugin.position,
+            )
+            self._recalculate_plugin_positions(instance.language)
+
+    def get_last_plugin(self, language):
+        return self.get_plugins(language).last()
+
+    def get_next_plugin_position(self, language, parent=None, insert_order='first'):
+        if insert_order == 'first':
+            position = self.get_first_plugin_position(language, parent=parent)
+        else:
+            position = self.get_last_plugin_position(language, parent=parent)
+
+        if parent and position is None:
+            return parent.position + 1
+
+        if insert_order == 'last':
+            return (position or 0) + 1
+        return position or 1
+
+    def get_first_plugin_position(self, language, parent=None):
+        tree = self.get_plugins(language)
+
+        if parent:
+            tree = tree.filter(parent=parent)
+        return tree.values_list('position', flat=True).first()
+
+    def get_last_plugin_position(self, language, parent=None):
+        tree =self.get_plugins(language)
+
+        if parent:
+            tree = tree.filter(parent=parent)
+        return tree.values_list('position', flat=True).last()
+
+    def _shift_plugin_positions(self, language, start, offset=None):
+        if offset is None:
+            offset = self.get_last_plugin_position(language) or 0
+
+        self.get_plugins(language).filter(
+            position__gte=start
+        ).update(position=models.F('position') + offset)
+
+    def _recalculate_plugin_positions(self, language):
+        from cms.models import CMSPlugin
+        cursor = CMSPlugin._get_database_cursor('write')
+        sql = (
+            'UPDATE {0} '
+            'SET position = RowNbrs.RowNbr '
+            'FROM ('
+            'SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS RowNbr '
+            'FROM {0} WHERE placeholder_id=%s AND language=%s '
+            ') RowNbrs '
+            'WHERE {0}.id=RowNbrs.id'
+        )
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk, language])

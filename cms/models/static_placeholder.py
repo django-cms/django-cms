@@ -9,7 +9,7 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models.fields import PlaceholderField
-from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.plugins import copy_plugins_to_placeholder
 
 
 def static_slotname(instance):
@@ -71,7 +71,11 @@ class StaticPlaceholder(models.Model):
         if force or self.has_publish_permission(request):
             self.public.clear(language=language)
             plugins = self.draft.get_plugins_list(language=language)
-            copy_plugins_to(plugins, self.public, no_signals=True)
+            copy_plugins_to_placeholder(
+                plugins,
+                placeholder=self.public,
+                start_positions={language: 1},
+            )
             self.dirty = False
             self.save()
             return True

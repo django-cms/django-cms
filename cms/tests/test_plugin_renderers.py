@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from collections import deque
 
 from django.test.utils import override_settings
 
@@ -125,7 +126,7 @@ class TestContentRenderer(TestStructureRenderer):
             external_link='https://www.django-cms.org',
         )
         renderer = self.get_renderer(page=cms_page)
-        renderer._preload_placeholders_for_page(cms_page, inherit=False)
+        renderer._preload_placeholders_for_page(cms_page)
 
         self.assertIn(cms_page.pk, renderer._placeholders_by_page_cache)
         self.assertIn(placeholder_1.slot, renderer._placeholders_by_page_cache[cms_page.pk])
@@ -134,9 +135,9 @@ class TestContentRenderer(TestStructureRenderer):
         cache = renderer._placeholders_by_page_cache[cms_page.pk]
 
         self.assertEqual(cache[placeholder_1.slot], placeholder_1)
-        self.assertEqual(cache[placeholder_1.slot]._plugins_cache, [placeholder_1_plugin_1, placeholder_1_plugin_2])
+        self.assertEqual(cache[placeholder_1.slot]._plugins_cache, deque([placeholder_1_plugin_1, placeholder_1_plugin_2]))
         self.assertEqual(cache[placeholder_2.slot], placeholder_2)
-        self.assertEqual(cache[placeholder_2.slot]._plugins_cache, [placeholder_2_plugin_1])
+        self.assertEqual(cache[placeholder_2.slot]._plugins_cache, deque([placeholder_2_plugin_1]))
 
 
 class TestLegacyRenderer(TestContentRenderer):

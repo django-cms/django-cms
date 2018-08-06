@@ -129,6 +129,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
                 'placeholder_id': static_placeholder_target.draft.id,
                 'plugin_parent': '',
                 'target_language': 'en',
+                'target_position': static_placeholder_target.draft.get_next_plugin_position('en', insert_order='last'),
             }
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
@@ -156,7 +157,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             'placeholder_id': static_placeholder_target.draft.pk,
             'move_a_copy': 'true',
             'target_language': 'en',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': static_placeholder_target.draft.get_next_plugin_position('en', insert_order='last'),
         }
 
         with self.login_user_context(admin):

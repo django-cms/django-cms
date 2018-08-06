@@ -21,7 +21,7 @@ from django.utils.timezone import now
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 
-from cms.api import create_page
+from cms.api import create_page, add_plugin
 from cms.constants import (
     PUBLISHER_STATE_DEFAULT,
     PUBLISHER_STATE_DIRTY,
@@ -507,11 +507,14 @@ class BaseCMSTestCase(object):
 
         return plugin_pool.get_plugin(plugin_type).model
 
-    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None):
+    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
             path = '/{}/'.format(language)
+
+        if position is None:
+            position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
 
         endpoint = placeholder.get_add_url()
         data = {
@@ -519,6 +522,7 @@ class BaseCMSTestCase(object):
             'placeholder_id': placeholder.pk,
             'plugin_language': language,
             'cms_path': path,
+            'plugin_position': position,
         }
 
         if parent:
@@ -622,6 +626,13 @@ class BaseCMSTestCase(object):
     def get_toolbar_disable_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))
 
+    def _add_plugin_to_placeholder(self, placeholder, plugin_type='LinkPlugin', language='en'):
+        plugin_data = {
+            'TextPlugin': {'body': '<p>text</p>'},
+            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
+        }
+        plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
+        return plugin
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 

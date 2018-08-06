@@ -532,28 +532,6 @@ class AdminTests(AdminTestsBase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
-    def test_move_language(self):
-        page = self.get_page()
-        source, target = list(page.get_placeholders('en'))[:2]
-        col = add_plugin(source, 'MultiColumnPlugin', 'en')
-        sub_col = add_plugin(source, 'ColumnPlugin', 'en', target=col)
-        col2 = add_plugin(source, 'MultiColumnPlugin', 'de')
-
-        admin_user = self.get_admin()
-        with self.login_user_context(admin_user):
-            data = {
-                'plugin_id': sub_col.pk,
-                'placeholder_id': source.id,
-                'plugin_parent': col2.pk,
-                'target_language': 'de'
-            }
-            endpoint = self.get_move_plugin_uri(sub_col)
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 200)
-        sub_col = CMSPlugin.objects.get(pk=sub_col.pk)
-        self.assertEqual(sub_col.language, "de")
-        self.assertEqual(sub_col.parent_id, col2.pk)
-
     def test_preview_page(self):
         permless = self.get_permless()
         with self.login_user_context(permless):

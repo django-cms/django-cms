@@ -215,6 +215,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'plugin_id': plugin.pk,
             'target_language': 'en',
             'placeholder_id': self._placeholder_2.pk,
+            'target_position': 1,
         }
 
         with signal_tester(pre_placeholder_operation) as env:
@@ -249,6 +250,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'plugin_id': plugin.pk,
             'target_language': 'en',
             'placeholder_id': self._placeholder_2.pk,
+            'target_position': 1,
         }
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
@@ -368,7 +370,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'placeholder_id': self._placeholder_1.pk,
             'move_a_copy': 'true',
             'target_language': 'en',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': 1,
         }
 
         with signal_tester(pre_placeholder_operation) as env:
@@ -405,7 +407,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'placeholder_id': self._placeholder_1.pk,
             'target_language': 'en',
             'move_a_copy': 'true',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': 1,
         }
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
@@ -452,7 +454,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'placeholder_id': self._placeholder_1.pk,
             'move_a_copy': 'true',
             'target_language': 'en',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': 1,
         }
 
         with signal_tester(pre_placeholder_operation) as env:
@@ -497,7 +499,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'placeholder_id': self._placeholder_1.pk,
             'target_language': 'en',
             'move_a_copy': 'true',
-            'plugin_order[]': ['__COPY__'],
+            'target_position': 1,
         }
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:

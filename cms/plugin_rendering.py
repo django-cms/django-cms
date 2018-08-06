@@ -534,7 +534,6 @@ class ContentRenderer(BaseRenderer):
                 placeholders=placeholders_to_fetch,
                 template=page.get_template(),
                 lang=self.request_language,
-                is_fallback=inherit,
             )
 
         parent_page = page.parent_page
