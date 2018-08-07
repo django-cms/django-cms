@@ -473,19 +473,19 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
         return data
 
     def get_add_url(self):
-        return self.placeholder.get_add_url()
+        return admin_reverse('cms_placeholder_add_plugin')
 
     def get_edit_url(self):
-        return self.placeholder.get_edit_url(self.pk)
+        return admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,))
 
     def get_delete_url(self):
-        return self.placeholder.get_delete_url(self.pk)
+        return admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,))
 
     def get_move_url(self):
-        return self.placeholder.get_move_url()
+        return admin_reverse('cms_placeholder_move_plugin')
 
     def get_copy_url(self):
-        return self.placeholder.get_copy_url()
+        return admin_reverse('cms_placeholder_copy_plugins')
 
 
 def get_plugin_media_path(instance, filename):

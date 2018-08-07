@@ -513,7 +513,7 @@ class BaseCMSTestCase(object):
         if position is None:
             position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
 
-        endpoint = placeholder.get_add_url()
+        endpoint = admin_reverse('cms_placeholder_add_plugin')
         data = {
             'plugin_type': plugin_type,
             'placeholder_id': placeholder.pk,
@@ -534,7 +534,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = plugin.placeholder.get_edit_url(plugin.pk)
+        endpoint = admin_reverse('cms_placeholder_edit_plugin', args=(plugin.pk,))
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
@@ -546,7 +546,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = plugin.placeholder.get_move_url()
+        endpoint = admin_reverse('cms_placeholder_move_plugin')
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
@@ -558,7 +558,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = plugin.placeholder.get_copy_url()
+        endpoint = admin_reverse('cms_placeholder_copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
@@ -570,7 +570,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = placeholder.get_copy_url()
+        endpoint = admin_reverse('cms_placeholder_copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
@@ -582,7 +582,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = plugin.placeholder.get_delete_url(plugin.pk)
+        endpoint = admin_reverse('cms_placeholder_delete_plugin', args=(plugin.pk,))
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
@@ -594,7 +594,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = placeholder.get_clear_url()
+        endpoint = admin_reverse('cms_placeholder_clear_placeholder', args=(placeholder.pk,))
         endpoint += '?' + urlencode({
             'language': language,
             'cms_path': path,
@@ -620,6 +620,7 @@ class BaseCMSTestCase(object):
         }
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
         return plugin
+
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 

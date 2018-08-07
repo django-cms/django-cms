@@ -17,7 +17,6 @@ from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
 from cms.utils.i18n import get_language_object
-from cms.utils.urlutils import admin_reverse
 from cms.constants import (
     EXPIRE_NOW,
     MAX_EXPIRATION_TTL,
@@ -83,36 +82,9 @@ class Placeholder(models.Model):
         from cms.utils.placeholder import get_placeholder_conf
         return get_placeholder_conf("extra_context", self.slot, template, {})
 
-    def get_add_url(self):
-        return self._get_url('add_plugin')
-
-    def get_edit_url(self, plugin_pk):
-        return self._get_url('edit_plugin', plugin_pk)
-
-    def get_move_url(self):
-        return self._get_url('move_plugin')
-
-    def get_delete_url(self, plugin_pk):
-        return self._get_url('delete_plugin', plugin_pk)
-
-    def get_changelist_url(self):
-        return self._get_url('changelist')
-
-    def get_clear_url(self):
-        return self._get_url('clear_placeholder', self.pk)
-
-    def get_copy_url(self):
-        return self._get_url('copy_plugins')
-
     def get_extra_menu_items(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_extra_placeholder_menu_items(self)
-
-    def _get_url(self, key, pk=None):
-        args = []
-        if pk:
-            args.append(pk)
-        return admin_reverse('cms_placeholder_%s' % key, args=args)
 
     def has_change_permission(self, user):
         """
