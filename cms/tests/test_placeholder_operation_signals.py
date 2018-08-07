@@ -178,8 +178,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_delete_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
             with self.login_user_context(self._admin_user):
