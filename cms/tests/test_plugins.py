@@ -596,12 +596,10 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_id': plugin.pk
         }
 
-        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
-
+        endpoint = self.get_delete_plugin_uri(plugin)
         response = self.client.post(endpoint, plugin_data)
-        self.assertEqual(response.status_code, 302)
 
+        self.assertEqual(response.status_code, 302)
         # there should be no plugins
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__title__page__publisher_is_draft=False).count(), 1)
