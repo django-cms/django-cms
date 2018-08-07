@@ -11,9 +11,6 @@
 * Introduced Django 2.1 support.
 
 
-=== 3.5.3 (unreleased) ===
-* Fixed a regression which caused the `render_plugin_block` template tag to not work.
-
 === 3.5.2 (2018-04-11) ===
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
