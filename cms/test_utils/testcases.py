@@ -39,7 +39,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 
-# TODO: AA Should these be removed and replaced with the methods in the placeholder and page models i.e. get_ACTION_url?
+# TODO: These should all be replaced using the models get url methods, see placeholder actions i.e. get_ACTION_url
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
@@ -57,17 +57,7 @@ URL_CMS_PAGE_PUBLISH = urljoin(URL_CMS_PAGE_CHANGE_BASE, "%s/publish/")
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translation/")
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
-# Placeholder urls
-URL_CMS_PLACEHOLDER = "/en/admin/cms/placeholder/"
-URL_CMS_PLACEHOLDER_CHANGE_BASE = urljoin(URL_CMS_PLACEHOLDER, "%d/")
-URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PLACEHOLDER, "add-plugin/")
-URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PLACEHOLDER, "edit-plugin/")
-URL_CMS_PLUGIN_MOVE = urljoin(URL_CMS_PLACEHOLDER, "move-plugin/")
-URL_CMS_PLUGIN_PAGE_MOVE = urljoin(URL_CMS_PLACEHOLDER_CHANGE_BASE, "move-plugin/")
-URL_CMS_PLUGIN_PAGE_ADD = urljoin(URL_CMS_PLACEHOLDER_CHANGE_BASE, "add-plugin/")
-URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PLACEHOLDER, "delete-plugin/")
-URL_CMS_PLUGIN_DELETE = urljoin(URL_CMS_PLACEHOLDER, "delete-plugin/%s/")
-URL_CMS_PLUGINS_COPY = urljoin(URL_CMS_PLACEHOLDER, "copy-plugins/")
+
 
 class _Warning(object):
     def __init__(self, message, category, filename, lineno):

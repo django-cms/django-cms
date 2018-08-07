@@ -11,7 +11,7 @@ from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
 from cms.admin.forms import save_permissions
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE
+from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE, Placeholder
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          ACCESS_PAGE_AND_DESCENDANTS,
                                          PagePermission,
@@ -133,12 +133,14 @@ class PermissionModeratorTests(CMSTestCase):
         """
         with self.login_user_context(user):
             placeholder = page.get_placeholders('en')[0]
-            post_data = {
-                'body': 'Test'
-            }
-            endpoint = self.get_add_plugin_uri(placeholder, 'TextPlugin')
-            response = self.client.post(endpoint, post_data)
-            self.assertEqual(response.status_code, 302)
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+            endpoint = self.get_add_plugin_uri(
+                placeholder=placeholder,
+                plugin_type='LinkPlugin',
+                language='en',
+            )
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
             return response.content.decode('utf8')
 
     def test_super_can_add_page_to_root(self):
