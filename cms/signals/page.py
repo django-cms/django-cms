@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 from cms.cache.permissions import clear_permission_cache
+from cms.models.pagemodel import TreeNode
 from cms.signals.apphook import set_restart_trigger
 
 
 def pre_save_page(instance, **kwargs):
     if instance.publisher_is_draft:
-        instance.clear_cache(menu=True)
+        try:
+            instance.clear_cache(menu=True)
+        except TreeNode.DoesNotExist:
+            # can happen while loading fixtures
+            pass
         clear_permission_cache()
 
 
