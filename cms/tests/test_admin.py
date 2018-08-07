@@ -733,8 +733,9 @@ class PluginPermissionTests(AdminTestsBase):
             self.client.login(username='test', password='test')
 
         self._give_permission(normal_guy, Text, 'change')
-        url = '%s/edit-plugin/%s/' % (admin_reverse('cms_placeholder_edit_plugin', args=[plugin.id]), plugin.id)
-        response = self.client.post(url, dict())
+        endpoint = '%sedit-plugin/%s/' % (admin_reverse('cms_placeholder_edit_plugin', args=[plugin.id]), plugin.id)
+        endpoint += '?cms_path=/en/'
+        response = self.client.post(endpoint, dict())
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTrue("Plugin not found" in force_text(response.content))
 

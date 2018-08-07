@@ -11,7 +11,7 @@ from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
 from cms.admin.forms import save_permissions
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE, Placeholder
+from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          ACCESS_PAGE_AND_DESCENDANTS,
                                          PagePermission,
