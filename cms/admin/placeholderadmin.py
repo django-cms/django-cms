@@ -195,14 +195,14 @@ class PlaceholderAdmin(admin.ModelAdmin):
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
-            pat(r'copy-plugins/$', self.copy_plugins),
-            pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
-            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
-            pat(r'move-plugin/$', self.move_plugin),
+            pat(r'^copy-plugins/$', self.copy_plugins),
+            pat(r'^add-plugin/$', self.add_plugin),
+            pat(r'^edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'^delete-plugin/([0-9]+)/$', self.delete_plugin),
+            pat(r'^clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'^move-plugin/$', self.move_plugin),
         ]
-        return url_patterns + super(PlaceholderAdmin, self).get_urls()
+        return url_patterns
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query

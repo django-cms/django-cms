@@ -736,8 +736,9 @@ class PluginPermissionTests(AdminTestsBase):
         endpoint = '%sedit-plugin/%s/' % (admin_reverse('cms_placeholder_edit_plugin', args=[plugin.id]), plugin.id)
         endpoint += '?cms_path=/en/'
         response = self.client.post(endpoint, dict())
+
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTrue("Plugin not found" in force_text(response.content))
+        self.assertTrue("Page not found" in force_text(response.content))
 
 
 class AdminFormsTests(AdminTestsBase):
