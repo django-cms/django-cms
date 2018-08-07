@@ -472,9 +472,8 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         When a plugin is added to a placeholder a log entry is created.
         """
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Placeholder, 'copy_plugins') + '?cms_path=/en/'
+        endpoint = self.get_copy_plugin_uri(plugin)
         page = plugin.placeholder.page
-
         data = {
             'source_language': 'en',
             'source_placeholder_id': self._placeholder_1.pk,
