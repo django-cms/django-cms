@@ -39,7 +39,6 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 
-# TODO: These should all be replaced using the models get url methods, see placeholder actions i.e. get_ACTION_url
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
