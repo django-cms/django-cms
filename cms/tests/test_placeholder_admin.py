@@ -26,7 +26,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugins.count(), 1)
 
-    def test_copy_plugins_add_plugins_from_placeholder(self):
+    def test_add_plugins_from_placeholder(self):
         """
         User can copy plugins from one placeholder to another
         """
@@ -49,12 +49,12 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             target_placeholder
-                .get_plugins('en')
-                .filter(plugin_type=source_plugin.plugin_type)
-                .exists()
+            .get_plugins('en')
+            .filter(plugin_type=source_plugin.plugin_type)
+            .exists()
         )
 
-    def test_copy_plugins_copy_plugin_to_clipboard(self):
+    def test_copy_plugins_to_clipboard(self):
         """
         User can copy plugins from a placeholder to the clipboard
         """
@@ -82,12 +82,12 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             user_settings.clipboard
-                .get_plugins('en')
-                .filter(plugin_type=source_plugin.plugin_type)
-                .exists()
+            .get_plugins('en')
+            .filter(plugin_type=source_plugin.plugin_type)
+            .exists()
         )
 
-    def test_copy_plugins_copy_placeholder_to_clipboard(self):
+    def test_copy_placeholder_to_clipboard(self):
         """
         User can copy a placeholder to the clipboard
         """
@@ -113,9 +113,9 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             user_settings.clipboard
-                .get_plugins('en')
-                .filter(plugin_type='PlaceholderPlugin')
-                .exists()
+            .get_plugins('en')
+            .filter(plugin_type='PlaceholderPlugin')
+            .exists()
         )
 
     def test_edit_plugin_endpoint(self):
@@ -134,34 +134,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugin.name, data['name'])
-
-    def test_move_plugin_endpoint(self):
-        """
-        The Placeholder admin move_plugin endpoint works
-
-        TODO: Test??
-            - _paste_placeholder
-            - _paste_plugin
-            - _cut_plugin
-            - _move_plugin
-        """
-        superuser = self.get_superuser()
-        source_placeholder = Placeholder.objects.create(slot='source')
-        target_placeholder = Placeholder.objects.create(slot='target')
-        plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_move_plugin_uri(plugin)
-        with self.login_user_context(superuser):
-            data = {
-                'plugin_id': plugin.pk,
-                'target_language': 'en',
-                'placeholder_id': target_placeholder.pk,
-                'target_position': target_placeholder.get_next_plugin_position('en', insert_order='last'),
-            }
-            response = self.client.post(endpoint, data)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(target_placeholder.get_plugins('en').filter(pk=plugin.pk))
-        self.assertFalse(source_placeholder.get_plugins('en').filter(pk=plugin.pk))
 
     def test_delete_plugin_endpoint(self):
         """

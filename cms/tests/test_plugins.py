@@ -150,7 +150,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         data = {'name': text, 'external_link': 'https://www.django-cms.org'}
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
-        return CMSPlugin.objects.get(pk=plugin.id).get_bound_plugin()
+        return CMSPlugin.objects.get(pk=plugin.pk).get_bound_plugin()
 
     def test_add_edit_plugin(self):
         """
