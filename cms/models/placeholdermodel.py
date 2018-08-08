@@ -252,15 +252,6 @@ class Placeholder(models.Model):
         self._attached_model_cache = None
         return None
 
-    def _get_attached_admin(self, admin_site=None):
-        from django.contrib.admin import site
-        from cms.models import Placeholder
-
-        if not admin_site:
-            admin_site = site
-
-        return admin_site._registry.get(Placeholder)
-
     def _get_attached_models(self):
         """
         Returns a list of models of attached to this placeholder.

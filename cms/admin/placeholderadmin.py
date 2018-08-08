@@ -176,18 +176,6 @@ class PlaceholderAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False
 
-    def log_addition(self, request, object, object_repr):
-        # Block the admin log for addition. A signal takes care of this!
-        return
-
-    def log_deletion(self, request, object, object_repr):
-        # Block the admin log for deletion. A signal takes care of this!
-        return
-
-    def log_change(self, request, object, message):
-        # Block the admin log for change. A signal takes care of this!
-        return
-
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
@@ -937,7 +925,6 @@ class PlaceholderAdmin(admin.ModelAdmin):
             placeholder.delete_plugin(plugin)
             placeholder.mark_as_dirty(plugin.language, clear_cache=False)
 
-            self.log_deletion(request, plugin, obj_display)
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_text(opts.verbose_name), 'obj': force_text(obj_display)})
 
@@ -1022,7 +1009,6 @@ class PlaceholderAdmin(admin.ModelAdmin):
             placeholder.clear(language)
             placeholder.mark_as_dirty(language, clear_cache=False)
 
-            self.log_deletion(request, placeholder, obj_display)
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
                 'obj': obj_display})
 
