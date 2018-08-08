@@ -1009,6 +1009,8 @@ class StructureBoard {
             }
         }
 
+        Plugin._recalculatePluginPositions(action, data);
+
         if (!action) {
             CMS.API.Helpers.reloadBrowser();
             return;
