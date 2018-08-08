@@ -9,7 +9,6 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models.fields import PlaceholderField
-from cms.utils.plugins import copy_plugins_to_placeholder
 
 
 def static_slotname(instance):
@@ -66,20 +65,6 @@ class StaticPlaceholder(models.Model):
                 placeholders = placeholders.exclude(pk=self.pk)
             if placeholders.exists():
                 raise ValidationError(_("A static placeholder with the same site and code already exists"))
-
-    def publish(self, request, language, force=False):
-        if force or self.has_publish_permission(request):
-            self.public.clear(language=language)
-            plugins = self.draft.get_plugins_list(language=language)
-            copy_plugins_to_placeholder(
-                plugins,
-                placeholder=self.public,
-                start_positions={language: 1},
-            )
-            self.dirty = False
-            self.save()
-            return True
-        return False
 
     def has_change_permission(self, request):
         if request.user.is_superuser:

@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import override as force_language, ugettext_lazy as _
 
-from cms.api import get_page_draft, can_change_page
+from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
@@ -57,7 +57,7 @@ class PlaceholderToolbar(CMSToolbar):
     """
 
     def populate(self):
-        self.page = get_page_draft(self.request.current_page)
+        self.page = self.request.current_page
 
     def post_template_populate(self):
         super(PlaceholderToolbar, self).post_template_populate()
@@ -96,7 +96,7 @@ class BasicToolbar(CMSToolbar):
     _admin_menu = None
 
     def init_from_request(self):
-        self.page = get_page_draft(self.request.current_page)
+        self.page = self.request.current_page
 
     def populate(self):
         if not self.page:
@@ -164,14 +164,7 @@ class BasicToolbar(CMSToolbar):
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
-        # If current page is not published or has view restrictions user is redirected to the home page:
-        # * published page: no redirect
-        # * unpublished page: redirect to the home page
-        # * published page with login_required: redirect to the home page
-        # * published page with view permissions: redirect to the home page
-        page_is_published = self.page and self.page.is_published(self.current_lang)
-
-        if page_is_published and not self.page.login_required:
+        if self.page and not self.page.login_required:
             anon_can_access = page_permissions.user_can_view_page(
                 user=AnonymousUser(),
                 page=self.page,
@@ -274,7 +267,7 @@ class PageToolbar(CMSToolbar):
 
     def get_title(self):
         try:
-            return Title.objects.get(page=self.page, language=self.current_lang, publisher_is_draft=True)
+            return Title.objects.get(page=self.page, language=self.current_lang)
         except Title.DoesNotExist:
             return None
 
@@ -321,8 +314,8 @@ class PageToolbar(CMSToolbar):
     # Populate
 
     def populate(self):
-        self.page = get_page_draft(self.request.current_page)
-        self.title = self.get_title()
+        self.page = self.request.current_page
+        self.title = self.get_title() if self.page else None
         self.permissions_activated = get_cms_setting('PERMISSION')
         self.change_admin_menu()
         self.add_page_menu()
@@ -339,7 +332,7 @@ class PageToolbar(CMSToolbar):
             if self.toolbar.edit_mode_active and not self.title:
                 self.add_page_settings_button()
 
-            if user_can_change_page(self.request.user, page=self.page) and self.page.is_published(self.current_lang):
+            if user_can_change_page(self.request.user, page=self.page):
                 return self.add_draft_live_item()
 
         elif self.placeholders:
@@ -583,19 +576,10 @@ class PageToolbar(CMSToolbar):
                         page=self.page,
                     )
                 current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, disabled=permission_disabled)
-
-            if not self.page.is_page_type:
-                # dates settings
-                dates_url = admin_reverse('cms_page_dates', args=(self.page.pk,))
-                current_page_menu.add_modal_item(
-                    _('Publishing dates'),
-                    url=dates_url,
-                    disabled=(not edit_mode or not can_change),
-                )
-
                 # third break
                 current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
 
+            if not self.page.is_page_type:
                 # navigation toggle
                 in_navigation = self.page.get_in_navigation(language=self.toolbar.request_language)
                 nav_title = _('Hide in navigation') if in_navigation else _('Display in navigation')

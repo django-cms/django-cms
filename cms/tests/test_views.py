@@ -9,7 +9,7 @@ from django.template import Variable
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
 
-from cms.api import create_page, create_title, publish_page
+from cms.api import create_page, create_title
 from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
@@ -66,7 +66,7 @@ class ViewTests(CMSTestCase):
         apphooks = (
             '%s.%s' % (APP_MODULE, APP_NAME),
         )
-        page = create_page("page2", "nav_playground.html", "en", published=True)
+        page = create_page("page2", "nav_playground.html", "en")
         with self.settings(CMS_APPHOOKS=apphooks):
             self.apphook_clear()
             response = self.client.get(page.get_absolute_url())
@@ -76,7 +76,7 @@ class ViewTests(CMSTestCase):
     def test_external_redirect(self):
         # test external redirect
         redirect_one = 'https://www.django-cms.org/'
-        one = create_page("one", "nav_playground.html", "en", published=True,
+        one = create_page("one", "nav_playground.html", "en",
                           redirect=redirect_one)
         url = one.get_absolute_url()
         request = self.get_request(url)
@@ -88,13 +88,13 @@ class ViewTests(CMSTestCase):
         # test internal language neutral redirect
         redirect_one = 'https://www.django-cms.org/'
         redirect_two = '/'
-        one = create_page("one", "nav_playground.html", "en", published=True,
+        one = create_page("one", "nav_playground.html", "en",
                           redirect=redirect_one)
         two = create_page("two", "nav_playground.html", "en", parent=one,
-                          published=True, redirect=redirect_two)
+                          redirect=redirect_two)
         url = two.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, two.get_path())
+        response = details(request, two.get_path('en'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/en/')
 
@@ -102,34 +102,34 @@ class ViewTests(CMSTestCase):
         # test internal forced language redirect
         redirect_one = 'https://www.django-cms.org/'
         redirect_three = '/en/'
-        one = create_page("one", "nav_playground.html", "en", published=True,
+        one = create_page("one", "nav_playground.html", "en",
                           redirect=redirect_one)
         three = create_page("three", "nav_playground.html", "en", parent=one,
-                            published=True, redirect=redirect_three)
+                            redirect=redirect_three)
         url = three.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, three.get_path())
+        response = details(request, three.get_path('en'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_three)
 
     def test_redirect_to_self(self):
-        one = create_page("one", "nav_playground.html", "en", published=True,
+        one = create_page("one", "nav_playground.html", "en",
                           redirect='/one/')
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, one.get_path())
+        response = details(request, one.get_path('en'))
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_to_self_with_host(self):
-        one = create_page("one", "nav_playground.html", "en", published=True,
+        one = create_page("one", "nav_playground.html", "en",
                           redirect='http://testserver/en/one/')
         url = one.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, one.get_path())
+        response = details(request, one.get_path('en'))
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_with_toolbar(self):
-        page = create_page("one", "nav_playground.html", "en", published=True,
+        page = create_page("one", "nav_playground.html", "en",
                     redirect='/en/page2')
         page_url = page.get_absolute_url()
         page_edit_on_url = self.get_edit_on_url(page_url)
@@ -154,7 +154,7 @@ class ViewTests(CMSTestCase):
             self.assertEqual(response.status_code, 302)
 
     def test_login_required(self):
-        self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
+        self.create_homepage("page", "nav_playground.html", "en", login_required=True)
         plain_url = '/accounts/'
         login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
         with self.settings(LOGIN_URL=plain_url + '?signin'):
@@ -170,7 +170,7 @@ class ViewTests(CMSTestCase):
             self.assertTrue(login_rx.search(response['Location']))
 
     def test_edit_permission(self):
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = create_page("page", "nav_playground.html", "en")
         page_url = page.get_absolute_url()
         # Anon user
         response = self.client.get(self.get_edit_on_url(page_url))
@@ -203,9 +203,8 @@ class ViewTests(CMSTestCase):
         user_settings.clipboard = placeholder
         user_settings.save()
 
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = create_page("page", "nav_playground.html", "en")
         create_title("fr", "french home", page)
-        publish_page(page, user, "fr")
 
         page.set_as_homepage()
 
@@ -229,7 +228,7 @@ class ViewTests(CMSTestCase):
             self.assertContains(
                 response,
                 '<a class="cms-btn cms-btn-switch-save" href="/fr/?preview&{}">'
-                '<span>View published</span></a>'.format(edit_off),
+                '<span>Preview</span></a>'.format(edit_off),
                 count=1,
                 html=True,
             )
@@ -252,10 +251,9 @@ class ViewTests(CMSTestCase):
         Test details view when page slug and current language don't match.
         In this case we refer to the user's current language and the page slug we have for that language.
         """
-        create_page("home", "nav_playground.html", "en", published=True)
-        cms_page = create_page("stevejobs", "nav_playground.html", "en", published=True)
+        create_page("home", "nav_playground.html", "en")
+        cms_page = create_page("stevejobs", "nav_playground.html", "en")
         create_title("de", "jobs", cms_page)
-        cms_page.publish('de')
         response = self.client.get('/de/stevejobs/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
@@ -273,8 +271,8 @@ class ContextTests(CMSTestCase):
 
         page_template = "nav_playground.html"
         original_context = {'TEMPLATES': settings.TEMPLATES}
-        page = self.create_homepage("page", page_template, "en", published=True)
-        page_2 = create_page("page-2", page_template, "en", published=True,
+        page = self.create_homepage("page", page_template, "en")
+        page_2 = create_page("page-2", page_template, "en",
                              parent=page)
 
         # Tests for standard django applications
@@ -314,7 +312,7 @@ class ContextTests(CMSTestCase):
         cache.clear()
         menu_pool.clear()
         page_2.update_translations(template='INHERIT')
-        page_2.publish('en')
+
         with self.settings(**original_context):
             # One query more triggered as page inherits template from ancestor
             with self.assertNumQueries(num_queries_page + 1):

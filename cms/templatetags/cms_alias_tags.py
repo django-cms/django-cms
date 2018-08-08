@@ -14,17 +14,8 @@ def render_alias_plugin(context, instance):
     request = context['request']
     toolbar = get_toolbar_from_request(request)
     renderer = toolbar.content_renderer
-    source = (instance.plugin or instance.alias_placeholder)
 
-    # In edit mode, content is shown regardless of the source page publish status.
-    # In published mode, content is shown only if the source page is published.
-    if not(toolbar.edit_mode_active) and source and source.page:
-        # this is bad but showing unpublished content is worse
-        can_see_content = source.page.is_published(instance.language)
-    else:
-        can_see_content = True
-
-    if can_see_content and instance.plugin:
+    if instance.plugin:
         plugins = instance.plugin.get_descendants()
         plugins = [instance.plugin] + list(plugins)
         plugins = downcast_plugins(plugins, request=request)
@@ -37,7 +28,7 @@ def render_alias_plugin(context, instance):
         )
         return mark_safe(content)
 
-    if can_see_content and instance.alias_placeholder:
+    if instance.alias_placeholder:
         content = renderer.render_placeholder(
             placeholder=instance.alias_placeholder,
             context=context,

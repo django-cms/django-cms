@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.api import get_page_draft
 from cms.test_utils.project.extensionapp.models import MyTitleExtension, MyPageExtension
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
@@ -14,7 +13,7 @@ from cms.toolbar_base import CMSToolbar
 class MyTitleExtensionToolbar(CMSToolbar):
     def populate(self):
         # always use draft if we have a page
-        self.page = get_page_draft(self.request.current_page)
+        self.page = self.request.current_page
 
         if not self.page:
             # Nothing to do
@@ -45,7 +44,7 @@ class MyPageExtensionToolbar(CMSToolbar):
 
     def populate(self):
         # always use draft if we have a page
-        self.page = get_page_draft(self.request.current_page)
+        self.page = self.request.current_page
 
         if not self.page:
             # Nothing to do

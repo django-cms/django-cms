@@ -54,7 +54,7 @@ class LogPageOperationsTests(CMSTestCase):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
-            page_one = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+            page_one = Page.objects.get(urls__slug=page_data['slug'])
             self._assert_log_created_on_page_add(page_one)
 
     def test_log_for_create_api_page(self):
@@ -63,7 +63,7 @@ class LogPageOperationsTests(CMSTestCase):
         It may help determine why other tests might fail if the api started creating a log for page creation!!
         """
         # Create a page
-        create_page('home', 'nav_playground.html', 'en', published=True)
+        create_page('home', 'nav_playground.html', 'en')
         # Check to see if any logs exist, none should exist
         self.assertEqual(0, LogEntry.objects.count())
 
@@ -97,7 +97,8 @@ class LogPageOperationsTests(CMSTestCase):
         When a page is edited a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            page = create_page('home', 'nav_playground.html', 'en', published=True)
+            page = create_page('home', 'nav_playground.html', 'en')
+            page._clear_internal_cache()
             page_data = self.get_new_page_data()
 
             # Get and edit the page
@@ -125,9 +126,9 @@ class LogPageOperationsTests(CMSTestCase):
         When a page is moved a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            create_page("page_home", "nav_playground.html", "en", published=False)
-            page_1 = create_page("page_a", "nav_playground.html", "en", published=False)
-            page_2 = create_page("page_b", "nav_playground.html", "en", published=False)
+            create_page("page_home", "nav_playground.html", "en")
+            page_1 = create_page("page_a", "nav_playground.html", "en")
+            page_2 = create_page("page_b", "nav_playground.html", "en")
 
             # move pages
             response = self.client.post(URL_CMS_PAGE_MOVE % page_2.pk, {"target": page_1.pk, "position": "0"})
@@ -153,7 +154,7 @@ class LogPageOperationsTests(CMSTestCase):
         When a page is deleted a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            page = create_page("page_a", "nav_playground.html", "en", published=False)
+            page = create_page("page_a", "nav_playground.html", "en")
             pre_deleted_page_id = str(page.pk)
             pre_deleted_page = str(page)
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
@@ -182,7 +183,7 @@ class LogPageOperationsTests(CMSTestCase):
         When a pages translation is changed a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            page = create_page("page_a", "nav_playground.html", "en", published=False)
+            page = create_page("page_a", "nav_playground.html", "en")
             title = create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
             endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
             data = model_to_dict(title, fields=['title'])
@@ -211,7 +212,7 @@ class LogPageOperationsTests(CMSTestCase):
         When a pages translation is deleted a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            page = create_page("page_a", "nav_playground.html", "en", published=False)
+            page = create_page("page_a", "nav_playground.html", "en")
             create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
             endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
             post_data = {'post': 'yes', 'language': 'de'}
@@ -248,7 +249,6 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             "nav_playground.html",
             "en",
             created_by=self._admin_user,
-            published=True,
         )
         self._placeholder_1 = self._cms_page.get_placeholders("en").get(slot='body')
         self._placeholder_2 = self._cms_page.get_placeholders("en").get(slot='right-column')

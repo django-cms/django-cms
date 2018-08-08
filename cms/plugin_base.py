@@ -335,7 +335,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # Saves the plugin
         # remember the saved object
         self.saved_object = pl.add_plugin(obj)
-        pl.mark_as_dirty(obj.language, clear_cache=False)
+        pl.clear_cache(obj.language)
 
     def save_form(self, request, form, change):
         obj = super(CMSPluginBase, self).save_form(request, form, change)

@@ -165,10 +165,7 @@ class CreateCMSPageForm(AddPageForm):
         if parent_node and new_page.parent_page.is_page_type:
             # the new page was created under a page-type page
             # set the new page as a page-type too
-            new_page.update(
-                draft_only=True,
-                is_page_type=True,
-            )
+            new_page.update(is_page_type=True)
             new_page.update_translations(
                 self._language,
                 in_navigation=False,

@@ -11,7 +11,6 @@ from cms.models import Page, CMSPlugin
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
-from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 
 overrides = dict(
@@ -82,7 +81,7 @@ class TestNoI18N(CMSTestCase):
 
     def test_language_chooser(self):
         # test simple language chooser with default args
-        create_page("home", template="col_two.html", language="en-us", published=True)
+        create_page("home", template="col_two.html", language="en-us")
         context = self.get_context(path="/")
         del context['request'].LANGUAGE_CODE
         tpl = Template("{% load menu_tags %}{% language_chooser %}")
@@ -100,7 +99,7 @@ class TestNoI18N(CMSTestCase):
 
     def test_page_language_url(self):
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_no18n'):
-            create_page("home", template="col_two.html", language="en-us", published=True)
+            create_page("home", template="col_two.html", language="en-us")
             path = "/"
             context = self.get_context(path=path)
             del context['request'].LANGUAGE_CODE
@@ -153,9 +152,9 @@ class TestNoI18N(CMSTestCase):
                           password=getattr(self.super_user, get_user_model().USERNAME_FIELD))
 
         self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
-        page = Page.objects.drafts().first()
+        page = Page.objects.first()
         self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
-        page = Page.objects.drafts().first()
+        page = Page.objects.first()
         placeholder = page.get_placeholders("en-us").latest('id')
         data = {'name': 'Hello', 'external_link': 'http://www.example.org/'}
         add_url = self.get_add_plugin_uri(placeholder, 'LinkPlugin', 'en-us')
@@ -173,14 +172,3 @@ class TestNoI18N(CMSTestCase):
         Link = self.get_plugin_model('LinkPlugin')
         link = Link.objects.get(pk=created_plugin.pk)
         self.assertEqual("Hello World", link.name)
-
-    def test_toolbar_no_locale(self):
-        page = create_page('test', 'nav_playground.html', 'en-us', published=True)
-        sub = create_page('sub', 'nav_playground.html', 'en-us', published=True, parent=page)
-        # loads the urlconf before reverse below
-        sub.get_absolute_url('en-us')
-        request = self.get_page_request(sub, self.get_superuser(), edit=True)
-        del request.LANGUAGE_CODE
-        toolbar = CMSToolbar(request)
-        toolbar.set_object(sub)
-        self.assertEqual(toolbar.get_object_public_url(), '/test/sub/')
