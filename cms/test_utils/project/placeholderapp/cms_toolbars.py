@@ -24,4 +24,4 @@ class Example1Toolbar(CMSToolbar):
         else:
             position = 0
         category_menu = admin_menu.get_or_create_menu('example', _('Example1'), position=position)
-        category_menu.add_sideframe_item(_('Examples'), url=admin_reverse('cms_page_changelist'))
+        category_menu.add_sideframe_item(_('Examples'), url=admin_reverse('placeholderapp_example1_changelist'))

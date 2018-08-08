@@ -2,6 +2,7 @@
 import uuid
 import warnings
 
+from django import forms
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
@@ -21,8 +22,7 @@ from django.utils import six
 from django.utils.six.moves.urllib.parse import parse_qsl, urlparse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
-from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language_from_path, ugettext as _
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
@@ -157,9 +157,24 @@ class FrontendEditableAdminMixin(object):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
+class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
+
+    def __new__(cls, name, bases, attrs):
+        super_new = super(PlaceholderAdminMixinBase, cls).__new__
+        parents = [b for b in bases if isinstance(b, PlaceholderAdminMixinBase)]
+
+        if not parents:
+            return super_new(cls, name, bases, attrs)
+        warnings.warn(
+            "PlaceholderAdminMixin is no longer needed and thus will be removed in django CMS 5.0",
+            DeprecationWarning,
+        )
+        return super_new(cls, name, bases, attrs)
+
+
+@six.add_metaclass(PlaceholderAdminMixinBase)
 class PlaceholderAdminMixin(object):
-    def __init__(self):
-        warnings.warn("PlaceholderAdminMixin has been removed", DeprecationWarning)
+    pass
 
 
 class PlaceholderAdmin(admin.ModelAdmin):
@@ -203,7 +218,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         language = queries.get('language')
 
         if not language:
-            language = translation.get_language_from_path(parsed_url.path)
+            language = get_language_from_path(parsed_url.path)
         return get_language_code(language, site_id=site.pk)
 
     def _get_operation_origin(self, request):

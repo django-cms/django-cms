@@ -4,7 +4,6 @@ import warnings
 
 from datetime import datetime, timedelta
 
-from django.contrib import admin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
@@ -196,38 +195,22 @@ class Placeholder(models.Model):
         """
         Returns a list of all non-cmsplugin reverse related fields.
         """
-        from cms.models import CMSPlugin, Title, UserSettings
+        from cms.models import CMSPlugin
+
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
             relations = self._get_related_objects()
             for rel in relations:
-                if issubclass(rel.model, CMSPlugin):
+                if issubclass(rel.field.model, CMSPlugin):
                     continue
-                related_model = rel.related_model
+
+                field = getattr(self, rel.get_accessor_name())
 
                 try:
-                    admin_class = admin.site._registry[related_model]
-                except KeyError:
-                    admin_class = None
-
-                # UserSettings and Title are special cases.
-                # Attached objects are used to check permissions
-                # and we filter out any attached object that does not
-                # inherit from PlaceholderAdmin
-                # Because UserSettings does not (and shouldn't) inherit
-                # from PlaceholderAdmin, we add a manual exception.
-                is_internal = (
-                    related_model == UserSettings
-                    or related_model == Title
-                )
-
-                if is_internal or isinstance(admin_class, admin.ModelAdmin):
-                    field = getattr(self, rel.get_accessor_name())
-                    try:
-                        if field.exists():
-                            self._attached_fields_cache.append(rel.field)
-                    except:
-                        pass
+                    if field.exists():
+                        self._attached_fields_cache.append(rel.field)
+                except:
+                    pass
         return self._attached_fields_cache
 
     def _get_attached_field(self):

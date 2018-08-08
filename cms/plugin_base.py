@@ -312,8 +312,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         This has to be made, because if the object is newly created, it must know
         where it lives.
         """
-        pl = obj.placeholder
         from django.contrib.admin import site
+
+        pl = obj.placeholder
         pl_admin = site._registry[obj.placeholder.__class__]
         operation_kwargs = {
             'request': request,
