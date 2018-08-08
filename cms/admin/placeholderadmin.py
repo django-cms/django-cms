@@ -158,7 +158,7 @@ class FrontendEditableAdminMixin(object):
 
 
 class PlaceholderAdminMixin(object):
-    class Meta:
+    def __init__(self):
         warnings.warn("PlaceholderAdminMixin has been removed", DeprecationWarning)
 
 
