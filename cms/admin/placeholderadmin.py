@@ -204,6 +204,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             pat(r'^delete-plugin/([0-9]+)/$', self.delete_plugin),
             pat(r'^clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'^move-plugin/$', self.move_plugin),
+            # register object edit/structure/preview endpoints
         ]
         return url_patterns
 
