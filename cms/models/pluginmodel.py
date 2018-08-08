@@ -487,36 +487,21 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
             # once the javascript files have been refactored
             # to use the new naming schema (ending in _url).
             data = {
-                'edit_plugin': self.get_edit_url(),
-                'add_plugin': self.get_add_url(),
-                'delete_plugin': self.get_delete_url(),
-                'move_plugin': self.get_move_url(),
-                'copy_plugin': self.get_copy_url(),
+                'edit_plugin': admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,)),
+                'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
+                'delete_plugin': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
+                'move_plugin': admin_reverse('cms_placeholder_move_plugin'),
+                'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
             }
         else:
             data = {
-                'edit_url': self.get_edit_url(),
-                'add_url': self.get_add_url(),
-                'delete_url': self.get_delete_url(),
-                'move_url': self.get_move_url(),
-                'copy_url': self.get_copy_url(),
+                'edit_url': admin_reverse('cms_placeholder_edit_plugin', args=(self.pk,)),
+                'add_url': admin_reverse('cms_placeholder_add_plugin'),
+                'delete_url': admin_reverse('cms_placeholder_delete_plugin', args=(self.pk,)),
+                'move_url': admin_reverse('cms_placeholder_move_plugin'),
+                'copy_url': admin_reverse('cms_placeholder_copy_plugins'),
             }
         return data
-
-    def get_add_url(self):
-        return self.placeholder.get_add_url()
-
-    def get_edit_url(self):
-        return self.placeholder.get_edit_url(self.pk)
-
-    def get_delete_url(self):
-        return self.placeholder.get_delete_url(self.pk)
-
-    def get_move_url(self):
-        return self.placeholder.get_move_url()
-
-    def get_copy_url(self):
-        return self.placeholder.get_copy_url()
 
 
 def get_plugin_media_path(instance, filename):

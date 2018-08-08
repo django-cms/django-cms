@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.api import add_plugin
-from cms.models import Page, Placeholder, UserSettings
+from cms.models import Placeholder, UserSettings
 from cms.operations import (
     ADD_PLUGIN,
     ADD_PLUGINS_FROM_PLACEHOLDER,
@@ -102,8 +102,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_pre_edit_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_change_plugin_uri(plugin)
 
         with signal_tester(pre_placeholder_operation) as env:
             data = {'name': 'A Link 2', 'external_link': 'https://www.django-cms.org'}
@@ -128,8 +127,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_edit_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_change_plugin_uri(plugin)
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
             data = {'name': 'A Link 2', 'external_link': 'https://www.django-cms.org'}
@@ -157,8 +155,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_pre_delete_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         with signal_tester(pre_placeholder_operation) as env:
             with self.login_user_context(self._admin_user):
@@ -181,8 +178,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_delete_plugin(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
+        endpoint = self.get_delete_plugin_uri(plugin)
 
         with signal_tester(pre_placeholder_operation, post_placeholder_operation) as env:
             with self.login_user_context(self._admin_user):
@@ -528,7 +524,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_pre_add_plugins_from_placeholder(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
 
         data = {
@@ -561,7 +557,7 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_post_add_plugins_from_placeholder(self):
         plugin = self._add_plugin()
-        endpoint = self.get_admin_url(Page, 'copy_plugins') + '?cms_path=/en/'
+        endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
 
         data = {

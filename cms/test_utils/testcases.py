@@ -39,7 +39,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 
-
+# Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
 URL_CMS_PAGE_CHANGE_BASE = urljoin(URL_CMS_PAGE, "%d/")
@@ -54,14 +54,6 @@ URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
 URL_CMS_PAGE_CHANGE_TEMPLATE = urljoin(URL_CMS_PAGE_CHANGE, "change-template/")
 URL_CMS_PAGE_PUBLISH = urljoin(URL_CMS_PAGE_CHANGE_BASE, "%s/publish/")
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete/")
-URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE, "add-plugin/")
-URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE, "edit-plugin/")
-URL_CMS_PLUGIN_MOVE = urljoin(URL_CMS_PAGE, "move-plugin/")
-URL_CMS_PLUGIN_PAGE_MOVE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "move-plugin/")
-URL_CMS_PLUGIN_PAGE_ADD = urljoin(URL_CMS_PAGE_CHANGE_BASE, "add-plugin/")
-URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE, "delete-plugin/")
-URL_CMS_PLUGIN_DELETE = urljoin(URL_CMS_PAGE, "delete-plugin/%s/")
-URL_CMS_PLUGINS_COPY = urljoin(URL_CMS_PAGE, "copy-plugins/")
 URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translation/")
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
@@ -196,11 +188,16 @@ class BaseCMSTestCase(object):
         user.set_password(getattr(user, get_user_model().USERNAME_FIELD))
         user.save()
         if is_staff and not is_superuser and add_default_permissions:
+            # Text plugin permissions
             user.user_permissions.add(Permission.objects.get(codename='add_text'))
             user.user_permissions.add(Permission.objects.get(codename='delete_text'))
             user.user_permissions.add(Permission.objects.get(codename='change_text'))
+            # Link plugin permissions
+            user.user_permissions.add(Permission.objects.get(codename='add_link'))
+            user.user_permissions.add(Permission.objects.get(codename='delete_link'))
+            user.user_permissions.add(Permission.objects.get(codename='change_link'))
+            # Page permissions
             user.user_permissions.add(Permission.objects.get(codename='publish_page'))
-
             user.user_permissions.add(Permission.objects.get(codename='add_page'))
             user.user_permissions.add(Permission.objects.get(codename='change_page'))
             user.user_permissions.add(Permission.objects.get(codename='delete_page'))
@@ -516,7 +513,7 @@ class BaseCMSTestCase(object):
         if position is None:
             position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
 
-        endpoint = placeholder.get_add_url()
+        endpoint = admin_reverse('cms_placeholder_add_plugin')
         data = {
             'plugin_type': plugin_type,
             'placeholder_id': placeholder.pk,
@@ -529,8 +526,7 @@ class BaseCMSTestCase(object):
             data['plugin_parent'] = parent.pk
         return endpoint + '?' + urlencode(data)
 
-    def get_change_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+    def get_change_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
         if plugin.page:
@@ -538,12 +534,11 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = self.get_admin_url(container, 'edit_plugin', plugin.pk)
+        endpoint = admin_reverse('cms_placeholder_edit_plugin', args=(plugin.pk,))
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
-    def get_move_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+    def get_move_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
         if plugin.page:
@@ -551,12 +546,11 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = self.get_admin_url(container, 'move_plugin')
+        endpoint = admin_reverse('cms_placeholder_move_plugin')
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
-    def get_copy_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+    def get_copy_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
         if plugin.page:
@@ -564,12 +558,11 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = self.get_admin_url(container, 'copy_plugins')
+        endpoint = admin_reverse('cms_placeholder_copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
-    def get_copy_placeholder_uri(self, placeholder, container=None, language=None):
-        container = container or Page
+    def get_copy_placeholder_uri(self, placeholder, language=None):
         language = language or 'en'
 
         if placeholder.page:
@@ -577,12 +570,11 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = self.get_admin_url(container, 'copy_plugins')
+        endpoint = admin_reverse('cms_placeholder_copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
-    def get_delete_plugin_uri(self, plugin, container=None, language=None):
-        container = container or Page
+    def get_delete_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
         if plugin.page:
@@ -590,12 +582,11 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = self.get_admin_url(container, 'delete_plugin', plugin.pk)
+        endpoint = admin_reverse('cms_placeholder_delete_plugin', args=(plugin.pk,))
         endpoint += '?' + urlencode({'cms_path': path})
         return endpoint
 
-    def get_clear_placeholder_url(self, placeholder, container=None, language=None):
-        container = container or Page
+    def get_clear_placeholder_url(self, placeholder, language=None):
         language = language or 'en'
 
         if placeholder.page:
@@ -603,11 +594,7 @@ class BaseCMSTestCase(object):
         else:
             path = '/{}/'.format(language)
 
-        endpoint = self.get_admin_url(
-            container,
-            'clear_placeholder',
-            placeholder.pk,
-        )
+        endpoint = admin_reverse('cms_placeholder_clear_placeholder', args=(placeholder.pk,))
         endpoint += '?' + urlencode({
             'language': language,
             'cms_path': path,
@@ -633,6 +620,7 @@ class BaseCMSTestCase(object):
         }
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
         return plugin
+
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 

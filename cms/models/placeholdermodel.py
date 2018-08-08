@@ -4,7 +4,6 @@ import warnings
 
 from datetime import datetime, timedelta
 
-from django.contrib import admin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
@@ -17,7 +16,6 @@ from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
 from cms.utils.i18n import get_language_object
-from cms.utils.urlutils import admin_reverse
 from cms.constants import (
     EXPIRE_NOW,
     MAX_EXPIRATION_TTL,
@@ -83,42 +81,9 @@ class Placeholder(models.Model):
         from cms.utils.placeholder import get_placeholder_conf
         return get_placeholder_conf("extra_context", self.slot, template, {})
 
-    def get_add_url(self):
-        return self._get_url('add_plugin')
-
-    def get_edit_url(self, plugin_pk):
-        return self._get_url('edit_plugin', plugin_pk)
-
-    def get_move_url(self):
-        return self._get_url('move_plugin')
-
-    def get_delete_url(self, plugin_pk):
-        return self._get_url('delete_plugin', plugin_pk)
-
-    def get_changelist_url(self):
-        return self._get_url('changelist')
-
-    def get_clear_url(self):
-        return self._get_url('clear_placeholder', self.pk)
-
-    def get_copy_url(self):
-        return self._get_url('copy_plugins')
-
     def get_extra_menu_items(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_extra_placeholder_menu_items(self)
-
-    def _get_url(self, key, pk=None):
-        model = self._get_attached_model()
-        args = []
-        if pk:
-            args.append(pk)
-        if not model:
-            return admin_reverse('cms_page_%s' % key, args=args)
-        else:
-            app_label = model._meta.app_label
-            model_name = model.__name__.lower()
-            return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def has_change_permission(self, user):
         """
@@ -230,39 +195,22 @@ class Placeholder(models.Model):
         """
         Returns a list of all non-cmsplugin reverse related fields.
         """
-        from cms.models import CMSPlugin, Title, UserSettings
+        from cms.models import CMSPlugin
+
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
             relations = self._get_related_objects()
             for rel in relations:
-                if issubclass(rel.model, CMSPlugin):
+                if issubclass(rel.field.model, CMSPlugin):
                     continue
-                from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                related_model = rel.related_model
+
+                field = getattr(self, rel.get_accessor_name())
 
                 try:
-                    admin_class = admin.site._registry[related_model]
-                except KeyError:
-                    admin_class = None
-
-                # UserSettings and Title are special cases.
-                # Attached objects are used to check permissions
-                # and we filter out any attached object that does not
-                # inherit from PlaceholderAdminMixin
-                # Because UserSettings does not (and shouldn't) inherit
-                # from PlaceholderAdminMixin, we add a manual exception.
-                is_internal = (
-                    related_model == UserSettings
-                    or related_model == Title
-                )
-
-                if is_internal or isinstance(admin_class, PlaceholderAdminMixin):
-                    field = getattr(self, rel.get_accessor_name())
-                    try:
-                        if field.exists():
-                            self._attached_fields_cache.append(rel.field)
-                    except:
-                        pass
+                    if field.exists():
+                        self._attached_fields_cache.append(rel.field)
+                except:
+                    pass
         return self._attached_fields_cache
 
     def _get_attached_field(self):
@@ -286,18 +234,6 @@ class Placeholder(models.Model):
             return field.model
         self._attached_model_cache = None
         return None
-
-    def _get_attached_admin(self, admin_site=None):
-        from django.contrib.admin import site
-
-        if not admin_site:
-            admin_site = site
-
-        model = self._get_attached_model()
-
-        if not model:
-            return
-        return admin_site._registry.get(model)
 
     def _get_attached_models(self):
         """

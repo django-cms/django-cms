@@ -122,7 +122,7 @@ CMS.config = {
     },
     'clipboard': {
         'id': '{{ cms_toolbar.clipboard.pk|unlocalize }}',
-        'url': '{% if cms_toolbar.clipboard.pk %}{% cms_admin_url "cms_page_clear_placeholder" cms_toolbar.clipboard.pk %}{% endif %}'
+        'url': '{% if cms_toolbar.clipboard.pk %}{% cms_admin_url "cms_placeholder_clear_placeholder" cms_toolbar.clipboard.pk %}{% endif %}'
     },
     'messages': '{% filter escapejs %}{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}{% endfilter %}',
     'error': '{% filter escapejs %}{% if cms_toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}{% endfilter %}',

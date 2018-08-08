@@ -26,7 +26,7 @@ from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_u
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
-from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_char, ClassDetail
+from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
                                       URL_CMS_USERSETTINGS)
@@ -531,21 +531,16 @@ class ToolbarTests(ToolbarTestBase):
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         plugin_1 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
-        plugin_2 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
-                              plugin_type='TextPlugin', body='text')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         response_text = response.render().rendered_content
-        self.assertTrue(re.search('edit_plugin.+/admin/custom/view/%s' % plugin_1.pk, response_text))
-        self.assertTrue(re.search('move_plugin.+/admin/custom/move/', response_text))
-        self.assertTrue(re.search('delete_plugin.+/admin/custom/delete/%s/' % plugin_1.pk, response_text))
-        self.assertTrue(re.search('add_plugin.+/admin/custom/view/', response_text))
-        self.assertTrue(re.search('copy_plugin.+/admin/custom/copy/', response_text))
-
-        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/page/edit-plugin/%s' % plugin_2.pk, response_text))
-        self.assertTrue(re.search('delete_plugin.+/en/admin/cms/page/delete-plugin/%s/' % plugin_2.pk, response_text))
+        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text))
+        self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
+        self.assertTrue(re.search('delete_plugin.+/en/admin/cms/placeholder/delete-plugin/%s/' % plugin_1.pk, response_text))
+        self.assertTrue(re.search('add_plugin.+/en/admin/cms/placeholder/add-plugin/', response_text))
+        self.assertTrue(re.search('copy_plugin.+/en/admin/cms/placeholder/copy-plugins/', response_text))
 
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
@@ -2071,23 +2066,6 @@ class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
                                        data={'edit_fields': 'char_1'})
             # if we get a response pattern matches
             self.assertEqual(response.status_code, 200)
-
-    def test_view_char_pk(self):
-        """
-        Tests whether the admin urls triggered when the toolbar is active works
-        (i.e.: no NoReverseMatch is raised) with alphanumeric pks
-        """
-        page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex = CharPksExample(
-            char_1='one',
-            slug='some-Special_slug_123',
-        )
-        ex.save()
-        superuser = self.get_superuser()
-        request = self.get_page_request(page, superuser, edit=True)
-        response = detail_view_char(request, ex.pk)
-        # if we get a response pattern matches
-        self.assertEqual(response.status_code, 200)
 
     def test_view_numeric_pk(self):
         """
