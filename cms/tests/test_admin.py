@@ -528,7 +528,7 @@ class AdminTests(AdminTestsBase):
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
-            endpoint = self.get_delete_plugin_uri(plugin, container=self.page)
+            endpoint = self.get_delete_plugin_uri(plugin)
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
@@ -573,7 +573,7 @@ class AdminTests(AdminTestsBase):
             },
         }
         admin_user = self.get_admin()
-        url = admin_reverse('cms_page_add_plugin')
+        url = admin_reverse('cms_placeholder_add_plugin')
         with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.get_placeholders("en").get(slot='body')
@@ -596,7 +596,7 @@ class AdminTests(AdminTestsBase):
             },
         }
         admin_user = self.get_admin()
-        url = admin_reverse('cms_page_add_plugin')
+        url = admin_reverse('cms_placeholder_add_plugin')
         with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.get_placeholders("en").get(slot='body')
@@ -733,10 +733,12 @@ class PluginPermissionTests(AdminTestsBase):
             self.client.login(username='test', password='test')
 
         self._give_permission(normal_guy, Text, 'change')
-        url = '%s/edit-plugin/%s/' % (admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
-        response = self.client.post(url, dict())
+        endpoint = '%sedit-plugin/%s/' % (admin_reverse('cms_placeholder_edit_plugin', args=[plugin.id]), plugin.id)
+        endpoint += '?cms_path=/en/'
+        response = self.client.post(endpoint, dict())
+
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTrue("Plugin not found" in force_text(response.content))
+        self.assertTrue("Page not found" in force_text(response.content))
 
 
 class AdminFormsTests(AdminTestsBase):

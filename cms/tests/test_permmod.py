@@ -133,12 +133,14 @@ class PermissionModeratorTests(CMSTestCase):
         """
         with self.login_user_context(user):
             placeholder = page.get_placeholders('en')[0]
-            post_data = {
-                'body': 'Test'
-            }
-            endpoint = self.get_add_plugin_uri(placeholder, 'TextPlugin')
-            response = self.client.post(endpoint, post_data)
-            self.assertEqual(response.status_code, 302)
+            data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+            endpoint = self.get_add_plugin_uri(
+                placeholder=placeholder,
+                plugin_type='LinkPlugin',
+                language='en',
+            )
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
             return response.content.decode('utf8')
 
     def test_super_can_add_page_to_root(self):

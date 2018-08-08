@@ -123,7 +123,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         admin = self.get_admin()
 
         with self.login_user_context(admin):
-            endpoint = self.get_move_plugin_uri(sourceplugin, container=StaticPlaceholder)
+            endpoint = self.get_move_plugin_uri(sourceplugin)
             data = {
                 'plugin_id': sourceplugin.pk,
                 'placeholder_id': static_placeholder_target.draft.id,

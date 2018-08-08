@@ -34,7 +34,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         source_placeholder = Placeholder.objects.create(slot='source')
         target_placeholder = Placeholder.objects.create(slot='target')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
+        endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -66,7 +66,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
+        endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -79,6 +79,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
         # Test that the target placeholder has the plugin copied from the source placeholder (clipboard)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(source_placeholder.get_plugins('en').filter(pk=source_plugin.pk).exists())
         self.assertTrue(
             user_settings.clipboard
             .get_plugins('en')
@@ -98,7 +99,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         )
         source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
-        endpoint = self.get_copy_plugin_uri(source_plugin, container=Placeholder, language="en")
+        endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
             data = {
                 'source_language': "en",
@@ -124,7 +125,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='edit_plugin_placeholder')
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'edit_plugin', plugin.pk)
+        endpoint = self.get_change_plugin_uri(plugin)
         with self.login_user_context(superuser):
             data = model_to_dict(plugin, fields=['name', 'external_link'])
             data['name'] = 'Contents modified'
@@ -141,7 +142,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
         plugin = self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'delete_plugin', plugin.pk)
+        endpoint = self.get_delete_plugin_uri(plugin)
         with self.login_user_context(superuser):
             data = {'post': True}
             response = self.client.post(endpoint, data)
@@ -151,12 +152,12 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
     def test_clear_placeholder_endpoint(self):
         """
-        The Placeholder admin clear_placeholder endpoint works
+        The Placeholder admin delete_plugin endpoint works
         """
         superuser = self.get_superuser()
         placeholder = Placeholder.objects.create(slot='source')
         self._add_plugin_to_placeholder(placeholder)
-        endpoint = self.get_admin_url(Placeholder, 'clear_placeholder', placeholder.pk)
+        endpoint = self.get_clear_placeholder_url(placeholder)
         with self.login_user_context(superuser):
             response = self.client.post(endpoint, {'test': 0})
 

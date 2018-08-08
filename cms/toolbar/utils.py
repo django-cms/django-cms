@@ -7,6 +7,7 @@ from django.utils.six import text_type
 from django.utils.translation import override as force_language, ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.utils.urlutils import admin_reverse
 
 
 def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
@@ -22,8 +23,8 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
         'plugin_restriction': allowed_plugins or [],
         'addPluginHelpTitle': force_text(help_text),
         'urls': {
-            'add_plugin': placeholder.get_add_url(),
-            'copy_plugin': placeholder.get_copy_url(),
+            'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
+            'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
         }
     }
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}

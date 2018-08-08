@@ -309,30 +309,29 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def save_model(self, request, obj, form, change):
         """
         Override original method, and add some attributes to obj
-        This have to be made, because if object is newly created, he must know
-        where he lives.
+        This has to be made, because if the object is newly created, it must know
+        where it lives.
         """
+        from django.contrib.admin import site
+
         pl = obj.placeholder
-        pl_admin = pl._get_attached_admin()
-
-        if pl_admin:
-            operation_kwargs = {
-                'request': request,
-                'placeholder': pl,
-            }
-
-            if change:
-                operation_kwargs['old_plugin'] = self.model.objects.get(pk=obj.pk)
-                operation_kwargs['new_plugin'] = obj
-                operation_kwargs['operation'] = operations.CHANGE_PLUGIN
-            else:
-                parent_id = obj.parent.pk if obj.parent else None
-                tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
-                operation_kwargs['plugin'] = obj
-                operation_kwargs['operation'] = operations.ADD_PLUGIN
-                operation_kwargs['tree_order'] = tree_order
-            # Remember the operation token
-            self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
+        pl_admin = site._registry[obj.placeholder.__class__]
+        operation_kwargs = {
+            'request': request,
+            'placeholder': pl,
+        }
+        if change:
+            operation_kwargs['old_plugin'] = self.model.objects.get(pk=obj.pk)
+            operation_kwargs['new_plugin'] = obj
+            operation_kwargs['operation'] = operations.CHANGE_PLUGIN
+        else:
+            parent_id = obj.parent.pk if obj.parent else None
+            tree_order = obj.placeholder.get_plugin_tree_order(parent_id)
+            operation_kwargs['plugin'] = obj
+            operation_kwargs['operation'] = operations.ADD_PLUGIN
+            operation_kwargs['tree_order'] = tree_order
+        # Remember the operation token
+        self._operation_token = pl_admin._send_pre_placeholder_operation(**operation_kwargs)
         # Saves the plugin
         # remember the saved object
         self.saved_object = pl.add_plugin(obj)

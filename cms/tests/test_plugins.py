@@ -36,8 +36,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate)
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
-    URL_CMS_PLUGIN_ADD, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PAGE_PUBLISH,
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH,
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
@@ -45,7 +44,6 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.plugins import get_plugins
-from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 
@@ -143,18 +141,16 @@ class PluginsTestCase(PluginsTestBaseCase):
         data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
         response = self.client.post(add_url, data)
         self.assertEqual(response.status_code, 200)
-        return CMSPlugin.objects.latest('pk').pk
+        return CMSPlugin.objects.latest('pk')
 
-    def __edit_link_plugin(self, plugin_id, text):
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin_id)
-        endpoint += '?cms_path=/en/'
-
+    def __edit_link_plugin(self, plugin, text):
+        endpoint = self.get_change_plugin_uri(plugin)
         response = self.client.get(endpoint)
         self.assertEqual(response.status_code, 200)
         data = {'name': text, 'external_link': 'https://www.django-cms.org'}
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
-        return CMSPlugin.objects.get(pk=plugin_id).get_bound_plugin()
+        return CMSPlugin.objects.get(pk=plugin.pk).get_bound_plugin()
 
     def test_add_edit_plugin(self):
         """
@@ -164,25 +160,21 @@ class PluginsTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.drafts().first()
-        created_plugin_id = self._create_link_plugin_on_page(page)
+        created_plugin = self._create_link_plugin_on_page(page)
         # now edit the plugin
-        plugin = self.__edit_link_plugin(created_plugin_id, "Hello World")
+        plugin = self.__edit_link_plugin(created_plugin, "Hello World")
         self.assertEqual("Hello World", plugin.name)
 
     def test_plugin_add_form_integrity(self):
         admin.autodiscover()
         admin_instance = admin.site._registry[ArticlePluginModel]
         placeholder = self.get_placeholder()
-        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
-            'plugin_type': "ArticlePlugin",
-            'target_language': settings.LANGUAGES[0][0],
-            'placeholder_id': placeholder.pk,
-        })
+        add_url = self.get_add_plugin_uri(placeholder, plugin_type="ArticlePlugin", language=settings.LANGUAGES[0][0])
         superuser = self.get_superuser()
         plugin = plugin_pool.get_plugin('ArticlePlugin')
 
         with self.login_user_context(superuser):
-            request = self.get_request(url)
+            request = self.get_request(add_url)
             PluginFormClass = plugin(
                 model=plugin.model,
                 admin_site=admin.site,
@@ -266,14 +258,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = Page.objects.drafts().first()
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
-        created_plugin_id = self._create_link_plugin_on_page(page)
+        created_plugin = self._create_link_plugin_on_page(page)
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), False)
-        self.__edit_link_plugin(created_plugin_id, "Hello World")
+        self.__edit_link_plugin(created_plugin, "Hello World")
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
 
@@ -570,10 +562,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         plugin_data = {
             'plugin_id': plugin.pk
         }
-
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
-
+        endpoint = self.get_delete_plugin_uri(plugin)
         response = self.client.post(endpoint, plugin_data)
         self.assertEqual(response.status_code, 302)
         # there should be no plugins
@@ -607,12 +596,10 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_id': plugin.pk
         }
 
-        endpoint = self.get_admin_url(Page, 'delete_plugin', plugin.pk)
-        endpoint += '?cms_path=/en/'
-
+        endpoint = self.get_delete_plugin_uri(plugin)
         response = self.client.post(endpoint, plugin_data)
-        self.assertEqual(response.status_code, 302)
 
+        self.assertEqual(response.status_code, 302)
         # there should be no plugins
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__title__page__publisher_is_draft=False).count(), 1)
@@ -638,14 +625,13 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         ph = Placeholder(slot="subplugin")
         ph.save()
-        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
-            'plugin_type': "TextPlugin",
-            'target_language': settings.LANGUAGES[0][0],
-            'placeholder': ph.pk,
-            'plugin_parent': plugin.pk
-
-        })
-        response = self.client.post(url, {'body': ''})
+        add_url = self.get_add_plugin_uri(
+            placeholder=ph,
+            plugin_type="ArticlePlugin",
+            language=settings.LANGUAGES[0][0],
+            parent=plugin
+        )
+        response = self.client.post(add_url, {'body': ''})
         # no longer allowed for security reasons
         self.assertEqual(response.status_code, 400)
 
@@ -776,8 +762,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
-        plugin_id = self._create_link_plugin_on_page(page, slot='body')
-        plugin = self.__edit_link_plugin(plugin_id, "fnord")
+        plugin = self._create_link_plugin_on_page(page, slot='body')
+        plugin = self.__edit_link_plugin(plugin, "fnord")
 
         actual_last_modification_time = CMSSitemap().lastmod(title)
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
@@ -1094,38 +1080,32 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
     def test_copy_plugin_with_m2m(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
-
         plugin = ArticlePluginModel.objects.create(
             plugin_type='ArticlePlugin',
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG,
         )
-
-        endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
-        endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
-
+        endpoint = self.get_change_plugin_uri(plugin, language=self.FIRST_LANG)
         data = {
             'title': "Articles Plugin 1",
             "sections": self.section_pks
         }
         response = self.client.post(endpoint, data)
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
-
         self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
 
         page_data = self.get_new_page_data()
-
         #create 2nd language page
         page_data.update({
             'language': self.SECOND_LANG,
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
         })
-
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
 
+        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
         self.assertEqual(CMSPlugin.objects.count(), 1)
@@ -1137,19 +1117,19 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'target_language': self.SECOND_LANG,
             'source_language': self.FIRST_LANG,
         }
-
-        endpoint = self.get_admin_url(Page, 'copy_plugins')
-        endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
-
+        endpoint = self.get_copy_plugin_uri(plugin, language=self.FIRST_LANG)
         response = self.client.post(endpoint, copy_data)
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf8').count('"plugin_type": "ArticlePlugin"'), 1)
         # assert copy success
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.count(), 2)
+
         db_counts = [plgn.sections.count() for plgn in ArticlePluginModel.objects.all()]
         expected = [self.section_count for _ in range(len(db_counts))]
+
         self.assertEqual(expected, db_counts)
 
 
