@@ -531,21 +531,16 @@ class ToolbarTests(ToolbarTestBase):
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         plugin_1 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
-        plugin_2 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
-                              plugin_type='TextPlugin', body='text')
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         response_text = response.render().rendered_content
-        self.assertTrue(re.search('edit_plugin.+/admin/custom/view/%s' % plugin_1.pk, response_text))
-        self.assertTrue(re.search('move_plugin.+/admin/custom/move/', response_text))
-        self.assertTrue(re.search('delete_plugin.+/admin/custom/delete/%s/' % plugin_1.pk, response_text))
-        self.assertTrue(re.search('add_plugin.+/admin/custom/view/', response_text))
-        self.assertTrue(re.search('copy_plugin.+/admin/custom/copy/', response_text))
-
-        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_2.pk, response_text))
-        self.assertTrue(re.search('delete_plugin.+/en/admin/cms/placeholder/delete-plugin/%s/' % plugin_2.pk, response_text))
+        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text))
+        self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
+        self.assertTrue(re.search('delete_plugin.+/en/admin/cms/placeholder/delete-plugin/%s/' % plugin_1.pk, response_text))
+        self.assertTrue(re.search('add_plugin.+/en/admin/cms/placeholder/add-plugin/', response_text))
+        self.assertTrue(re.search('copy_plugin.+/en/admin/cms/placeholder/copy-plugins/', response_text))
 
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
