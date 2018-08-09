@@ -46,7 +46,7 @@ from cms.utils.plugins import (
     has_reached_plugin_limit,
 )
 from cms.utils.urlutils import admin_reverse
-from cms.views import render_object_structure
+from cms.views import render_object_edit, render_object_structure
 
 _no_default = object()
 
@@ -205,9 +205,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
             pat(r'^delete-plugin/([0-9]+)/$', self.delete_plugin),
             pat(r'^clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'^move-plugin/$', self.move_plugin),
-            # register object edit/structure/preview endpoints
+            # Register object edit/structure/preview endpoints.
+            # pat(r'^object/(?P<content_type_id>\d+)/structure/(?P<object_id>.+)$', render_object_structure),
+            pat(r'^object/([0-9]+)/edit/([0-9]+)/$', render_object_edit),
             pat(r'^object/([0-9]+)/structure/([0-9]+)/$', render_object_structure),
-            #pat(r'^object/(?P<content_type_id>\d+)/structure/(?P<object_id>.+)$', render_object_structure),
         ]
         return url_patterns
 
