@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
@@ -173,6 +174,11 @@ class Title(models.Model):
         if not hasattr(self, '_placeholder_cache'):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
+
+    def get_absolute_url(self):
+        if self.page.is_home:
+            return reverse('pages-root')
+        return reverse('pages-details-by-slug', kwargs={'slug': self.path})
 
 
 class EmptyTitle(object):

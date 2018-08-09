@@ -19,6 +19,7 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
+from cms.models.placeholdermodel import Placeholder
 from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -199,7 +200,15 @@ def render_object_structure(request, content_type_id, object_id):
 
 
 def render_object_edit(request, content_type_id, object_id):
-    ct_object = _get_content_type_object(content_type_id, object_id)
+    content_type = ContentType.objects.get_for_id(content_type_id)
+
+    if not is_model_editable(content_type.model_class()):
+        raise Http404
+
+    try:
+        ct_object = content_type.get_object_for_this_type(pk=object_id)
+    except ObjectDoesNotExist:
+        raise Http404
 
     if not hasattr(ct_object, 'get_absolute_url'):
         raise NotImplementedError('get_absolute_url not implemented for object')
@@ -209,6 +218,7 @@ def render_object_edit(request, content_type_id, object_id):
     return match.func(request, **match.kwargs)
 
 
+# WE MIGHT NOT NEED THIS AFTER ALL ;)
 def _get_content_type_object(content_type_id, object_id):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
@@ -216,3 +226,31 @@ def _get_content_type_object(content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404(_('Content type object not found.'))
     return obj
+
+
+# THIS SHOULD BE MOVED TO A PROPER UTILS FILE
+def is_model_editable(model_class):
+    """
+    Return True if the model_class is editable.
+    Checks whether the model_class has any relationships with Placeholder.
+    If not, checks whether the model_class has an admin class
+    and is inherited by FrontendEditableAdminMixin.
+    :param model_class: The model class
+    :return: Boolean
+    """
+    # First check whether model_class has
+    # any fields which has a relation to Placeholder
+    for field in model_class._meta.get_fields():
+        if field.related_model == Placeholder:
+            return True
+
+    # Check whether model_class has an admin class
+    # and whether its inherited from FrontendEditableAdminMixin
+    from django.contrib import admin
+    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
+
+    admin_class = admin.site._registry[model_class]
+
+    if admin_class and issubclass(admin_class, FrontendEditableAdminMixin):
+        return True
+    return False
