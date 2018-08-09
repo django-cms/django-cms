@@ -807,17 +807,11 @@ class Page(models.Model):
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
 
-        created = not bool(self.pk)
         if self.reverse_id == "":
             self.reverse_id = None
         if self.application_namespace == "":
             self.application_namespace = None
-        from cms.utils.permissions import get_current_user_name
 
-        self.changed_by = get_current_user_name()
-
-        if created:
-            self.created_by = self.changed_by
         super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
@@ -935,7 +929,7 @@ class Page(models.Model):
             public_page = Page.objects.get(pk=self.publisher_public_id)
             public_languages = public_page.get_languages()
         else:
-            public_page = Page(created_by=self.created_by)
+            public_page = Page()
             public_languages = [language]
 
         self._copy_attributes(public_page, clean=False)

@@ -6,13 +6,30 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from cms import constants
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
+from cms.utils.conf import get_cms_setting
 
 
 @python_2_unicode_compatible
 class Title(models.Model):
+    LIMIT_VISIBILITY_IN_MENU_CHOICES = (
+        (constants.VISIBILITY_USERS, _('for logged in users only')),
+        (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
+    )
+    TEMPLATE_DEFAULT = constants.TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
+
+    X_FRAME_OPTIONS_CHOICES = (
+        (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+        (constants.X_FRAME_OPTIONS_DENY, _('Deny')),
+        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+        (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
+    )
+
+    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+
     # These are the fields whose values are compared when saving
     # a Title object to know if it has changed.
     editable_fields = [
@@ -54,6 +71,29 @@ class Title(models.Model):
     )
     publisher_state = models.SmallIntegerField(default=0, editable=False, db_index=True)
 
+    created_by = models.CharField(
+        _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
+        editable=False)
+    changed_by = models.CharField(
+        _("changed by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
+        editable=False)
+    changed_date = models.DateTimeField(auto_now=True)
+
+    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
+
+    template = models.CharField(_("template"), max_length=100, choices=template_choices,
+                                help_text=_('The template used to render the content.'),
+                                default=TEMPLATE_DEFAULT)
+    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
+                                                        choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
+                                                        help_text=_("limit when this page is visible in the menu"))
+
+    # X Frame Options for clickjacking protection
+    xframe_options = models.IntegerField(
+        choices=X_FRAME_OPTIONS_CHOICES,
+        default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
+    )
+
     objects = TitleManager()
 
     class Meta:
@@ -91,6 +131,14 @@ class Title(models.Model):
 
     def is_dirty(self):
         return self.publisher_state == PUBLISHER_STATE_DIRTY
+
+    def save(self, **kwargs):
+        created = not bool(self.pk)
+        from cms.utils.permissions import get_current_user_name
+        self.changed_by = get_current_user_name()
+        if created:
+            self.created_by = self.changed_by
+        super(Title, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
