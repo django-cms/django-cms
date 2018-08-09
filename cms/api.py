@@ -195,6 +195,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         title=title,
         menu_title=menu_title,
         slug=slug,
+        created_by=created_by,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
@@ -214,7 +215,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
 @transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None, parent=None,
-                 overwrite_url=None, page_title=None, path=None):
+                 overwrite_url=None, page_title=None, path=None,
+                 created_by='python-api'):
     """
     Create a title.
 
@@ -238,6 +240,14 @@ def create_title(language, title, page, menu_title=None, slug=None,
     elif path is None:
         path = page.get_path_for_slug(slug, language)
 
+    # ugly permissions hack
+    should_delete_tls_user = not hasattr(_thread_locals, 'user')
+    if created_by and isinstance(created_by, get_user_model()):
+        _thread_locals.user = created_by
+        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+    else:
+        _thread_locals.user = None
+
     title = Title.objects.create(
         language=language,
         title=title,
@@ -249,6 +259,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
         meta_description=meta_description,
         page=page,
         has_url_overwrite=bool(overwrite_url),
+        created_by=created_by,
+        changed_by=created_by,
     )
     title.rescan_placeholders()
 
@@ -256,6 +268,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     if language not in page_languages:
         page.update_languages(page_languages + [language])
+    if should_delete_tls_user:
+        del _thread_locals.user
     return title
 
 
