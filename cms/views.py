@@ -251,6 +251,6 @@ def is_model_editable(model_class):
 
     admin_class = admin.site._registry[model_class]
 
-    if admin_class and issubclass(admin_class, FrontendEditableAdminMixin):
+    if admin_class and issubclass(admin_class.__class__, FrontendEditableAdminMixin):
         return True
     return False
