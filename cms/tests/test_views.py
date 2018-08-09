@@ -14,6 +14,7 @@ from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
+from cms.toolbar.utils import get_object_structure_url
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 from menus.menu_pool import menu_pool
@@ -131,6 +132,7 @@ class ViewTests(CMSTestCase):
     def test_redirect_with_toolbar(self):
         page = create_page("one", "nav_playground.html", "en", published=True,
                     redirect='/en/page2')
+        page_content = page.get_title_obj("en")
         page_url = page.get_absolute_url()
         page_edit_on_url = self.get_edit_on_url(page_url)
 
@@ -145,7 +147,7 @@ class ViewTests(CMSTestCase):
             self.assertEqual(response.status_code, 302)
 
             self.client.get(page_edit_on_url)
-            response = self.client.get(self.get_obj_structure_url(page_url))
+            response = self.client.get(get_object_structure_url(page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'This page has no preview')
 

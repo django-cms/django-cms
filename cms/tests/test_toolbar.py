@@ -35,6 +35,7 @@ from cms.toolbar_pool import toolbar_pool
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_structure_url
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -423,7 +424,7 @@ class ToolbarTests(ToolbarTestBase):
     def test_markup_generic_module(self):
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
         page_content = page.get_title_obj("en")
-        page_structure_url = self.get_obj_structure_url(page_content)
+        page_structure_url = get_object_structure_url(page_content)
         superuser = self.get_superuser()
 
         with self.login_user_context(superuser):
@@ -436,7 +437,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
         page_content = page.get_title_obj("en")
-        page_structure_url = self.get_obj_structure_url(page_content)
+        page_structure_url = get_object_structure_url(page_content)
 
         with self.login_user_context(superuser):
             response = self.client.get(page_structure_url)
@@ -450,7 +451,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
         page_content = page.get_title_obj("en")
-        page_structure_url = self.get_obj_structure_url(page_content)
+        page_structure_url = get_object_structure_url(page_content)
 
         with self.login_user_context(superuser):
             response = self.client.get(page_structure_url)
