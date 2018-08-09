@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
-from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
-from django.utils.translation import get_language_from_request
+from django.utils.translation import ugettext_lazy as _, get_language_from_request
 from django.views.decorators.http import require_POST
 
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
+from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
@@ -24,7 +27,6 @@ from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_default_language_for_site,
                             is_language_prefix_patterns_used)
 from cms.utils.page import get_page_from_request
-from cms.utils.page_permissions import user_can_change_page
 
 
 def _clean_redirect_url(redirect_url, language):
@@ -163,11 +165,6 @@ def details(request, slug):
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(page)
 
-    structure_requested = get_cms_setting('CMS_TOOLBAR_URL__BUILD') in request.GET
-
-    if user_can_change_page(request.user, page) and structure_requested:
-        title = page.get_title_obj(request_language, fallback=False)
-        return render_object_structure(request, title)
     return render_page(request, page, current_language=request_language, slug=slug)
 
 
@@ -188,3 +185,18 @@ def login(request):
     else:
         redirect_to += u'?cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)
+
+
+def render_object_structure(request, content_type_id, object_id):
+
+    try:
+        content_model = ContentType.objects.get_for_id(content_type_id)
+        object = content_model.get_object_for_this_type(pk=object_id)
+    except ObjectDoesNotExist:
+        raise Http404(_('Content type not found.'))
+
+    context = {
+        'object': object,
+        'cms_toolbar': request.toolbar,
+    }
+    return render(request, 'cms/toolbar/structure.html', context)

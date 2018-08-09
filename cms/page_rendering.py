@@ -50,15 +50,6 @@ def render_page(request, page, current_language, slug):
         response['X-Frame-Options'] = 'DENY'
     return response
 
-
-def render_object_structure(request, obj):
-    context = {
-        'object': obj,
-        'cms_toolbar': request.toolbar,
-    }
-    return render(request, 'cms/toolbar/structure.html', context)
-
-
 def _handle_no_page(request):
     try:
         #add a $ to the end of the url (does not match on the cms anymore)
