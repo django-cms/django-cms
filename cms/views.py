@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import resolve
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
@@ -188,15 +189,30 @@ def login(request):
 
 
 def render_object_structure(request, content_type_id, object_id):
-
-    try:
-        content_model = ContentType.objects.get_for_id(content_type_id)
-        object = content_model.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404(_('Content type not found.'))
+    ct_object = _get_content_type_object(content_type_id, object_id)
 
     context = {
-        'object': object,
+        'object': ct_object,
         'cms_toolbar': request.toolbar,
     }
     return render(request, 'cms/toolbar/structure.html', context)
+
+
+def render_object_edit(request, content_type_id, object_id):
+    ct_object = _get_content_type_object(content_type_id, object_id)
+
+    if not hasattr(ct_object, 'get_absolute_url'):
+        raise NotImplementedError('get_absolute_url not implemented for object')
+
+    abs_url = ct_object.get_absolute_url()
+    match = resolve(abs_url)
+    return match.func(request, **match.kwargs)
+
+
+def _get_content_type_object(content_type_id, object_id):
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+        obj = content_type.get_object_for_this_type(pk=object_id)
+    except ObjectDoesNotExist:
+        raise Http404(_('Content type object not found.'))
+    return obj
