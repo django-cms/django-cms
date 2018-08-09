@@ -44,15 +44,12 @@ from cms.views import details
 class ToolbarTestBase(CMSTestCase):
 
     def get_page_request(self, page, user, path=None, edit=False,
-                         preview=False, structure=False, lang_code='en', disable=False):
+                         preview=False, lang_code='en', disable=False):
         if not path:
             path = page.get_absolute_url()
 
         if edit:
             path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-
-        if structure:
-            path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
 
         if preview:
             path += '?preview'
@@ -425,7 +422,8 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_markup_generic_module(self):
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
-        page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
+        page_content = page.get_title_obj("en")
+        page_structure_url = self.get_obj_structure_url(page_content)
         superuser = self.get_superuser()
 
         with self.login_user_context(superuser):
@@ -437,7 +435,8 @@ class ToolbarTests(ToolbarTestBase):
     def test_markup_link_custom_module(self):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
-        page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
+        page_content = page.get_title_obj("en")
+        page_structure_url = self.get_obj_structure_url(page_content)
 
         with self.login_user_context(superuser):
             response = self.client.get(page_structure_url)
@@ -450,7 +449,8 @@ class ToolbarTests(ToolbarTestBase):
     def test_extra_placeholder_menu_items(self):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
-        page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
+        page_content = page.get_title_obj("en")
+        page_structure_url = self.get_obj_structure_url(page_content)
 
         with self.login_user_context(superuser):
             response = self.client.get(page_structure_url)

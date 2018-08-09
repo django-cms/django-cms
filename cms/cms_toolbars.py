@@ -258,6 +258,7 @@ class PageToolbar(CMSToolbar):
             if sp.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
+    #FIXME: AA This is not possible without an object sent through to "build" the structure url!!!
     def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)

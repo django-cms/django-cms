@@ -35,6 +35,7 @@ from cms.models.permissionmodels import (
     PageUser,
 )
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.toolbar.utils import get_object_structure_url
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -607,8 +608,11 @@ class BaseCMSTestCase(object):
     def get_edit_off_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
 
-    def get_obj_structure_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__BUILD'))
+    #TODO AA: Clean up and remove method in all tests
+    def get_obj_structure_url(self, object):
+        #AA Removed
+        # return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__BUILD'))
+        return get_object_structure_url(object)
 
     def get_toolbar_disable_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))
