@@ -4,6 +4,7 @@ from collections import OrderedDict
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import PUBLISHER_STATE_DIRTY
@@ -22,7 +23,6 @@ class Title(models.Model):
         'page_title',
         'menu_title',
         'meta_description',
-        'has_url_overwrite',
     ]
 
     language = models.CharField(_("language"), max_length=15, db_index=True)
@@ -34,8 +34,7 @@ class Title(models.Model):
     meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
-    path = models.CharField(_("Path"), max_length=255, db_index=True)
-    has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
+    path_override = models.CharField(_("Path"), max_length=255, db_index=True, blank=True, null=True)
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
@@ -79,15 +78,42 @@ class Title(models.Model):
 
     @property
     def has_path_override(self):
-        return self.has_url_overwrite or bool(self.redirect)
+        return self.path_override or bool(self.redirect)
 
     @property
     def overwrite_url(self):
         """Return overwritten url, or None
         """
-        if self.has_url_overwrite:
-            return self.path
+        if self.path_override:
+            return self.path_override
         return None
+
+    def _path_elements(self):
+
+        if self.page.is_home:
+            yield ''
+            raise StopIteration
+
+        # TODO: Convert to use a CTE!
+        ancestors = self.page.node.get_ancestors()
+        for title in self.__class__.objects.filter(
+            page__node__in=ancestors,
+            publisher_is_draft=self.publisher_is_draft,
+            language=self.language,
+        ).exclude(page__is_home=True).order_by('page__node__path'):
+
+            yield title.slug
+        yield self.slug
+
+    @cached_property
+    def _path(self):
+        return '/'.join(self._path_elements())
+
+    @property
+    def path(self):
+        if self.path_override:
+            return self.path_override
+        return self._path
 
     def is_dirty(self):
         return self.publisher_state == PUBLISHER_STATE_DIRTY
@@ -124,7 +150,7 @@ class Title(models.Model):
             if not old_val == new_val:
                 return True
 
-        if old_title.path != self.path and self.has_url_overwrite:
+        if old_title.path != self.path and self.has_path_override:
             # path is handled individually because its a special field.
             # The path field is both an internal and user facing field,
             # as such we can't mark the title as dirty on any change,
@@ -184,8 +210,8 @@ class EmptyTitle(object):
     slug = ""
     path = ""
     meta_description = ""
+    path_override = ""
     redirect = ""
-    has_url_overwrite = False
     application_urls = ""
     menu_title = ""
     page_title = ""

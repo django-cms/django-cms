@@ -78,7 +78,7 @@ def get_page_queryset(site, draft=True, published=False):
     return Page.objects.public().on_site(site)
 
 
-def get_page_from_path(site, path, preview=False, draft=False):
+def get_page_from_path(site, path, preview=False, draft=False, language=None, exclude_page_ids=None):
     """
     Resolves a url path to a single page object.
     Returns None if page does not exist
@@ -94,7 +94,35 @@ def get_page_from_path(site, path, preview=False, draft=False):
         titles = titles.filter(publisher_is_draft=False)
     else:
         titles = titles.filter(published=True, publisher_is_draft=False)
-    titles = titles.filter(path=(path or ''))
+
+    if exclude_page_ids:
+        titles = titles.exclude(page_id__in=exclude_page_ids)
+
+    if language:
+        titles = titles.filter(language=language)
+
+    titles_with_overwrites = titles.filter(path_override=path)
+    if titles_with_overwrites.exists():
+        titles = titles_with_overwrites
+    elif path:
+        slugs = path.split('/')
+        # Get the last slug in the slug list
+        titles = titles.filter(slug=slugs[-1:][0], page__is_home=False)
+        for title in titles:
+            node = title.page.node
+            # Prevent pages from a different site
+            if node.site_id != site.pk:
+                continue
+            # If the paths match add the title to the filter list
+            if title.path == path:
+                titles = titles.filter(pk=title.pk)
+                break
+        # no title matched for given level
+        else:
+            return
+    else:
+        # home page
+        titles = titles.filter(page__is_home=True)
 
     for title in titles.iterator():
         if title.page.node.site_id != site.pk:
@@ -106,24 +134,6 @@ def get_page_from_path(site, path, preview=False, draft=False):
         title.page.title_cache = {title.language: title}
         return title.page
     return
-
-
-def get_pages_from_path(site, path, preview=False, draft=False):
-    """ Returns a queryset of pages corresponding to the path given
-    """
-    pages = get_page_queryset(
-        site,
-        draft=draft,
-        published=not (draft or preview),
-    )
-
-    if path:
-        # title_set__path=path should be clear, get the pages where the path of the
-        # title object is equal to our path.
-        return pages.filter(title_set__path=path).distinct()
-    # if there is no path (slashes stripped) and we found a home, this is the
-    # home page.
-    return pages.filter(is_home=True).distinct()
 
 
 def get_page_from_request(request, use_path=None, clean_path=None):
@@ -187,10 +197,22 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     return page
 
 
-def get_all_pages_from_path(site, path, language):
-    pages = get_pages_from_path(site, path, draft=True)
-    pages |= get_pages_from_path(site, path, preview=True, draft=False)
-    return pages.filter(title_set__language=language)
+def is_path_available(site, path, language, exclude_page=None):
+
+    def ids_from_pages(pages):
+        for page in pages:
+            yield page.pk
+            if page.publisher_public_id:
+                yield page.publisher_public_id
+
+    exclude_page_ids = None
+    if exclude_page:
+        exclude_page_ids = list(ids_from_pages([exclude_page]))
+
+    return (
+        get_page_from_path(site, path, language=language, exclude_page_ids=exclude_page_ids) or
+        get_page_from_path(site, path, language=language, exclude_page_ids=exclude_page_ids, draft=True)
+    )
 
 
 def get_available_slug(site, path, language, suffix='copy', modified=False):
@@ -199,9 +221,8 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
     If path is used, appends the value of suffix to the end.
     """
     base, _, slug = path.rpartition('/')
-    pages = get_all_pages_from_path(site, path, language)
 
-    if pages.exists():
+    if is_path_available(site, path, language):
         match = SUFFIX_REGEX.match(slug)
 
         if match and modified:

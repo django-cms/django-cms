@@ -1688,9 +1688,11 @@ class PageAdmin(BasePageAdmin):
             query_term = request.GET.get('q','').strip('/')
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
+            # TODO add path support back
             matching_published_pages = self.model.objects.published().public().filter(
                 Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__path__icontains=query_term, title_set__language=language_code)
+                | Q(title_set__slug__icontains=query_term, title_set__language=language_code)
+                | Q(title_set__path_override__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
             ).distinct()

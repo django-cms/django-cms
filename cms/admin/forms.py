@@ -228,8 +228,6 @@ class AddPageForm(BasePageForm):
             )
         except ValidationError as error:
             self.add_error('slug', error)
-        else:
-            data['path'] = path
         return data
 
     def clean_parent_node(self):
@@ -245,7 +243,6 @@ class AddPageForm(BasePageForm):
             'page': page,
             'language': self._language,
             'slug': data['slug'],
-            'path': data['path'],
             'title': data['title'],
         }
 
@@ -362,7 +359,6 @@ class AddPageTypeForm(AddPageForm):
                 title=ugettext('Page Types'),
                 page=root_page,
                 slug=PAGE_TYPES_ID,
-                path=PAGE_TYPES_ID,
             )
         return root_page.node
 
@@ -489,7 +485,7 @@ class ChangePageForm(BasePageForm):
 
         if 'path' in data:
             # this field is managed manually
-            translation_data['path'] = data['path']
+            translation_data['path_override'] = data['path']
 
         update_count = cms_page.update_translations(
             self._language,
@@ -501,9 +497,13 @@ class ChangePageForm(BasePageForm):
             del cms_page.title_cache[self._language]
 
         if update_count == 0:
+            try:
+                path_override = translation_data.pop('path_override')
+            except KeyError:
+                pass
+            else:
+                translation_data['overwrite_url'] = path_override
             api.create_title(language=self._language, page=cms_page, **translation_data)
-        else:
-            cms_page._update_title_path_recursive(self._language)
         cms_page.clear_cache(menu=True)
         send_post_page_operation(
             request=self._request,
@@ -631,8 +631,8 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['redirect'].widget.language = self._language
             self.fields['redirect'].initial = self.title_obj.redirect
 
-        if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
-            self.fields['overwrite_url'].initial = self.title_obj.path
+        if 'overwrite_url' in self.fields and self.title_obj.path_override:
+            self.fields['overwrite_url'].initial = self.title_obj.path_override
 
     @cached_property
     def _language(self):
@@ -801,12 +801,17 @@ class AdvancedSettingsForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         data = self.cleaned_data
         page = super(AdvancedSettingsForm, self).save(*args, **kwargs)
+
+        # Get the cleaned path if an override is supplied
+        override = ''
+        if data['overwrite_url']:
+            override = data['path']
+
         page.update_translations(
             self._language,
-            path=data['path'],
+            path_override=override,
             redirect=(data.get('redirect') or None),
             publisher_state=PUBLISHER_STATE_DIRTY,
-            has_url_overwrite=bool(data.get('overwrite_url')),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
 

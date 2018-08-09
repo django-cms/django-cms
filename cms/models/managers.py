@@ -152,10 +152,7 @@ class TitleManager(PublisherManager):
             if page.has_advanced_settings_permission(user):
                 overwrite_url = cleaned_data.get('overwrite_url', None)
                 if overwrite_url:
-                    data['has_url_overwrite'] = True
                     data['path'] = overwrite_url
-                else:
-                    data['has_url_overwrite'] = False
                 for field in advanced_fields:
                     value = cleaned_data.get(field) or None
                     data[field] = value
@@ -167,8 +164,7 @@ class TitleManager(PublisherManager):
         if page.has_advanced_settings_permission(user):
             if 'overwrite_url' in cleaned_data:
                 overwrite_url = cleaned_data.get('overwrite_url', None)
-                obj.has_url_overwrite = bool(overwrite_url)
-                obj.path = overwrite_url
+                obj.path_override = overwrite_url
             for field in advanced_fields:
                 if field in form.base_fields:
                     value = cleaned_data.get(field) or None

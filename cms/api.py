@@ -7,6 +7,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -228,15 +229,21 @@ def create_title(language, title, page, menu_title=None, slug=None,
     # validate language:
     assert language in get_language_list(page.node.site_id)
 
+    if path:
+        warnings.warn(
+            "`path` argument to `create_title` has been deprecated. "
+            "Use `overwrite_url` instead.",
+            UserWarning,
+        )
+
     # set default slug:
     if not slug:
         base = page.get_path_for_slug(slugify(title), language)
         slug = get_available_slug(page.node.site, base, language)
 
+    path = ''
     if overwrite_url:
         path = overwrite_url.strip('/')
-    elif path is None:
-        path = page.get_path_for_slug(slug, language)
 
     title = Title.objects.create(
         language=language,
@@ -244,11 +251,10 @@ def create_title(language, title, page, menu_title=None, slug=None,
         menu_title=menu_title,
         page_title=page_title,
         slug=slug,
-        path=path,
+        path_override=path,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
-        has_url_overwrite=bool(overwrite_url),
     )
     title.rescan_placeholders()
 

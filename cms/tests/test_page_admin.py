@@ -491,7 +491,6 @@ class PageTest(PageTestBase):
             self.assertEqual(response.status_code, 200)
             page_data['template'] = page.template
             page_data['overwrite_url'] = '/hello/'
-            page_data['has_url_overwrite'] = True
             response = self.client.post(URL_CMS_PAGE_ADVANCED_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
@@ -715,8 +714,12 @@ class PageTest(PageTestBase):
         new_path = cms_page.get_slug('en') + '-copy-2'
 
         self.assertEqual(
-            Title.objects.filter(slug=new_slug, path=new_path).count(),
+            Title.objects.filter(slug=new_slug).count(),
             1,
+        )
+        self.assertEqual(
+            Title.objects.filter(slug=new_slug)[0].path,
+            new_path,
         )
 
     def test_copy_page_to_root_with_pagetypes(self):
@@ -779,8 +782,8 @@ class PageTest(PageTestBase):
         page_5_title = self.assertObjectExist(
             Title.objects.all(),
             slug=new_slug,
-            path=new_path,
         )
+        self.assertEqual(page_5_title.path, new_path)
         page_5 = page_5_title.page
 
         tree = (
@@ -1408,7 +1411,7 @@ class PageTest(PageTestBase):
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
 
         # control test
-        self.assertTrue(cms_page.title_set.filter(path='new-url').exists())
+        self.assertTrue(cms_page.title_set.filter(path_override='new-url').exists())
 
         with self.login_user_context(superuser):
             page_data = {

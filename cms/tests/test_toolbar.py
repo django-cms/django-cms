@@ -496,7 +496,6 @@ class ToolbarTests(ToolbarTestBase):
 
         # page with publish != draft
         page_2.get_title_obj().slug = 'mod-page'
-        page_2.get_title_obj().path = 'top-page/mod-page'
         page_2.get_title_obj().save()
         # check when in draft mode
         with self.login_user_context(superuser):
