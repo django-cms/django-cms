@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _, get_language_from_request
+from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
 
 from cms.cache.page import get_page_cache
@@ -190,11 +190,11 @@ def login(request):
 
 
 def render_object_structure(request, content_type_id, object_id):
+    content_type = ContentType.objects.get_for_id(content_type_id)
     try:
-        content_type = ContentType.objects.get_for_id(content_type_id)
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
-        raise Http404(_('Content type object not found.'))
+        raise Http404
 
     context = {
         'object': content_type_obj,
@@ -222,15 +222,16 @@ def render_object_edit(request, content_type_id, object_id):
     return match.func(request, **match.kwargs)
 
 
-# WE MIGHT NOT NEED THIS AFTER ALL ;)
-def _get_content_type_object(content_type_id, object_id):
+def render_object_preview(request, content_type_id, object_id):
+    content_type = ContentType.objects.get_for_id(content_type_id)
     try:
-        content_type = ContentType.objects.get_for_id(content_type_id)
-        obj = content_type.get_object_for_this_type(pk=object_id)
+        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
-        raise Http404(_('Content type object not found.'))
-    return obj
+        raise Http404
 
+    abs_url = content_type_obj.get_absolute_url()
+    match = resolve(abs_url)
+    return match.func(request, **match.kwargs)
 
 # THIS SHOULD BE MOVED TO A PROPER UTILS FILE
 def is_model_editable(model_class):

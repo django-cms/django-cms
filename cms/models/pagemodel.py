@@ -1553,12 +1553,6 @@ class Page(models.Model):
 
         return get_placeholders(self.get_template())
 
-    def get_declared_static_placeholders(self, context):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_static_placeholders
-
-        return get_static_placeholders(self.get_template(), context)
-
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = self.xframe_options or self.X_FRAME_OPTIONS_INHERIT
