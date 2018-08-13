@@ -124,9 +124,9 @@ def get_object_edit_url(obj):
     return admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
 
 
-def get_object_preview_url():
-    #TODO
-    pass
+def get_object_preview_url(obj):
+    content_type = ContentType.objects.get_for_model(obj)
+    return admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
 
 
 def get_object_structure_url(obj):
