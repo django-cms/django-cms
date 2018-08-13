@@ -190,10 +190,14 @@ def login(request):
 
 
 def render_object_structure(request, content_type_id, object_id):
-    ct_object = _get_content_type_object(content_type_id, object_id)
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+    except ObjectDoesNotExist:
+        raise Http404(_('Content type object not found.'))
 
     context = {
-        'object': ct_object,
+        'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
     return render(request, 'cms/toolbar/structure.html', context)
