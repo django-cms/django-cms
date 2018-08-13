@@ -186,20 +186,21 @@ class Page(models.Model):
     # Please use toggle_in_navigation() instead of affecting this property
     # directly so that the cms page cache can be invalidated as appropriate.
     #
+    # @TODO
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
                                     help_text=_("All ancestors will not be displayed in the navigation"))
+    # @TODO
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "A unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
-    template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_DEFAULT)
 
     login_required = models.BooleanField(_("login required"), default=False)
+    # @TODO
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
+    # @TODO
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
@@ -215,12 +216,6 @@ class Page(models.Model):
         editable=False,
     )
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
-
-    # X Frame Options for clickjacking protection
-    xframe_options = models.IntegerField(
-        choices=X_FRAME_OPTIONS_CHOICES,
-        default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
-    )
 
     # Flag that marks a page as page-type
     is_page_type = models.BooleanField(default=False)
@@ -491,9 +486,12 @@ class Page(models.Model):
 
         if inherited_template and target_node.is_root() and position in ('left', 'right'):
             # The page is being moved to a root position.
-            # Explicitly set the inherited template on the page
+            # Explicitly set the inherited template on the titles
             # to keep all plugins / placeholders.
-            self.update(refresh=False, template=self.get_template())
+            template = self.get_template()
+            self.title_set.update(template=template)
+            for title in self.title_cache.values():
+                title.template = template
 
         # Don't use a cached node. Always get a fresh one.
         self._clear_node_cache()
@@ -641,8 +639,6 @@ class Page(models.Model):
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
         target.application_namespace = self.application_namespace
-        target.template = self.template
-        target.xframe_options = self.xframe_options
         target.is_page_type = self.is_page_type
 
     def copy(self, site, parent_node=None, language=None,
@@ -689,6 +685,8 @@ class Page(models.Model):
             new_title.page = new_page
             new_title.published = False
             new_title.publisher_public = None
+            new_title.template = title.template
+            new_title.xframe_options = title.xframe_options
 
             if parent_page:
                 base = parent_page.get_path(title.language)
@@ -803,14 +801,16 @@ class Page(models.Model):
             self.mark_descendants_pending(language)
 
     def save(self, **kwargs):
-        # delete template cache
-        if hasattr(self, '_template_cache'):
-            delattr(self, '_template_cache')
-
         if self.reverse_id == "":
             self.reverse_id = None
         if self.application_namespace == "":
             self.application_namespace = None
+
+        created = not bool(self.pk)
+        from cms.utils.permissions import get_current_user_name
+        self.changed_by = get_current_user_name()
+        if created:
+            self.created_by = self.changed_by
 
         super(Page, self).save(**kwargs)
 
@@ -861,7 +861,7 @@ class Page(models.Model):
         if self.pk:
             fields = [
                 'publication_date', 'publication_end_date', 'in_navigation', 'soft_root', 'reverse_id',
-                'navigation_extenders', 'template', 'login_required', 'limit_visibility_in_menu'
+                'navigation_extenders', 'login_required', 'limit_visibility_in_menu'
             ]
             try:
                 old_page = Page.objects.get(pk=self.pk)
@@ -965,6 +965,7 @@ class Page(models.Model):
         # is pending.
         self.update_translations(
             language,
+            changed_by=public_page.changed_by,
             published=True,
             publisher_public=public_title,
             publisher_state=PUBLISHER_STATE_DEFAULT,
@@ -1342,13 +1343,13 @@ class Page(models.Model):
         """
         get when this page was last updated
         """
-        return self.changed_date
+        return self.get_title_obj_attribute("changed_date", language, fallback, force_reload)
 
     def get_changed_by(self, language=None, fallback=True, force_reload=False):
         """
         get user who last changed this page
         """
-        return self.changed_by
+        return self.get_title_obj_attribute("changed_by", language, fallback, force_reload)
 
     def get_page_title(self, language=None, fallback=True, force_reload=False):
         """
@@ -1407,31 +1408,15 @@ class Page(models.Model):
                             return lang
         return language
 
-    def get_template(self):
-        """
-        get the template of this page if defined or if closer parent if
-        defined or DEFAULT_PAGE_TEMPLATE otherwise
-        """
-        if hasattr(self, '_template_cache'):
-            return self._template_cache
+    @property
+    def template(self):
+        return self.get_title_obj_attribute("template")
 
-        if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
-            self._template_cache = self.template or get_cms_setting('TEMPLATES')[0][0]
-            return self._template_cache
-
-        templates = (
-            self
-            .get_ancestor_pages()
-            .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-            .order_by('-node__path')
-            .values_list('template', flat=True)
-        )
-
-        try:
-            self._template_cache = templates[0]
-        except IndexError:
-            self._template_cache = get_cms_setting('TEMPLATES')[0][0]
-        return self._template_cache
+    def get_template(self, language=None, fallback=True, force_reload=False):
+        get_template = self.get_title_obj_attribute("get_template", language, fallback, force_reload)
+        if get_template:
+            return get_template()
+        return get_cms_setting('TEMPLATES')[0][0]
 
     def get_template_name(self):
         """
@@ -1553,24 +1538,10 @@ class Page(models.Model):
 
         return get_static_placeholders(self.get_template(), context)
 
-    def get_xframe_options(self):
-        """ Finds X_FRAME_OPTION from tree if inherited """
-        xframe_options = self.xframe_options or self.X_FRAME_OPTIONS_INHERIT
-
-        if xframe_options != self.X_FRAME_OPTIONS_INHERIT:
-            return xframe_options
-
-        # Ignore those pages which just inherit their value
-        ancestors = self.get_ancestor_pages().order_by('-node__path')
-        ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
-
-        # Now just give me the clickjacking setting (not anything else)
-        xframe_options = ancestors.values_list('xframe_options', flat=True)
-
-        try:
-            return xframe_options[0]
-        except IndexError:
-            return None
+    def get_xframe_options(self, language=None, fallback=True, force_reload=False):
+        get_xframe_options = self.get_title_obj_attribute("get_xframe_options", language, fallback, force_reload)
+        if get_xframe_options:
+            return get_xframe_options()
 
 
 class PageType(Page):

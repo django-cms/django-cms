@@ -80,7 +80,8 @@ class Title(models.Model):
     changed_date = models.DateTimeField(auto_now=True)
 
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
-
+    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
+                                    help_text=_("All ancestors will not be displayed in the navigation"))
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
                                 default=TEMPLATE_DEFAULT)
@@ -133,6 +134,10 @@ class Title(models.Model):
         return self.publisher_state == PUBLISHER_STATE_DIRTY
 
     def save(self, **kwargs):
+        # delete template cache
+        if hasattr(self, '_template_cache'):
+            delattr(self, '_template_cache')
+
         created = not bool(self.pk)
         from cms.utils.permissions import get_current_user_name
         self.changed_by = get_current_user_name()
@@ -222,6 +227,82 @@ class Title(models.Model):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
 
+    def get_ancestor_titles(self):
+        return Title.objects.filter(
+            page__in=self.page.get_ancestor_pages(),
+            publisher_is_draft=self.publisher_is_draft,
+            language=self.language,
+        )
+
+    def get_changed_date(self):
+        """
+        get when this title was last updated
+        """
+        return self.changed_date
+
+    def get_changed_by(self):
+        """
+        get user who last changed this title
+        """
+        return self.changed_by
+
+    def get_template(self):
+        """
+        get the template of this page if defined or if closer parent if
+        defined or DEFAULT_PAGE_TEMPLATE otherwise
+        """
+        if hasattr(self, '_template_cache'):
+            return self._template_cache
+
+        if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
+            self._template_cache = self.template or get_cms_setting('TEMPLATES')[0][0]
+            return self._template_cache
+
+        templates = (
+            self
+            .get_ancestor_titles()
+            .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
+            .order_by('-page__node__path')
+            .values_list('template', flat=True)
+        )
+
+        try:
+            self._template_cache = templates[0]
+        except IndexError:
+            self._template_cache = get_cms_setting('TEMPLATES')[0][0]
+        return self._template_cache
+
+    def get_template_name(self):
+        """
+        get the textual name (2nd parameter in get_cms_setting('TEMPLATES'))
+        of the template of this title. failing to find that, return the
+        name of the default template.
+        """
+        template = self.get_template()
+        for t in get_cms_setting('TEMPLATES'):
+            if t[0] == template:
+                return t[1]
+        return _("default")
+
+    def get_xframe_options(self):
+        """ Finds X_FRAME_OPTION from tree if inherited """
+        xframe_options = self.xframe_options or constants.X_FRAME_OPTIONS_INHERIT
+
+        if xframe_options != constants.X_FRAME_OPTIONS_INHERIT:
+            return xframe_options
+
+        # Ignore those pages which just inherit their value
+        ancestors = self.get_ancestor_titles().order_by('-page__node__path')
+        ancestors = ancestors.exclude(xframe_options=constants.X_FRAME_OPTIONS_INHERIT)
+
+        # Now just give me the clickjacking setting (not anything else)
+        xframe_options = ancestors.values_list('xframe_options', flat=True)
+
+        try:
+            return xframe_options[0]
+        except IndexError:
+            return None
+
 
 class EmptyTitle(object):
     """
@@ -237,6 +318,8 @@ class EmptyTitle(object):
     application_urls = ""
     menu_title = ""
     page_title = ""
+    xframe_options = None
+    template = get_cms_setting('TEMPLATES')[0][0]
     published = False
 
     def __init__(self, language):

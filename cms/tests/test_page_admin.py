@@ -2345,9 +2345,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data = {'template': 'simple.html'}
             response = self.client.post(endpoint, data)
             self.assertContains(response, 'The template was successfully changed')
-            page.refresh_from_db(fields=['template'])
-            # clear the template cache
-            page.__dict__.pop('_template_cache', None)
             self.assertEqual(page.get_template(), 'simple.html')
 
     def test_user_cant_change_template(self):
@@ -2368,7 +2365,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data = {'template': 'simple.html'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
-            page.refresh_from_db(fields=['template'])
+            page.title_cache = {}
             self.assertEqual(page.get_template(), 'nav_playground.html')
 
     def test_user_can_view_page_permissions_summary(self):

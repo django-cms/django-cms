@@ -270,7 +270,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         """
         page = create_page('Test', 'col_two.html', 'en')
         # I need to make it seem like the user added another placeholder to the SAME template.
-        page._template_cache = 'col_three.html'
+        page.title_cache['en']._template_cache = 'col_three.html'
 
         request = self.get_request(page=page)
         context = SekizaiContext()
@@ -375,7 +375,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page.publisher_public
         request.user = user
         template = "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}"
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')

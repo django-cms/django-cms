@@ -193,20 +193,20 @@ class PythonAPITests(CMSTestCase):
         # Instead, we delay the loading of the template until after the save is executed.
         page_attrs["template"] = TEMPLATE_INHERITANCE_MAGIC
 
-        self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
+        self.assertFalse(Page.objects.filter(title_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
         with self.settings(CMS_TEMPLATES=[("col_invalid.html", "notvalid")]):
             self.assertRaises(TemplateSyntaxError, create_page, **page_attrs)
             # The template raised an exception which should cause the database to roll back
             # instead of committing a page in a partial state.
-            self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
+            self.assertFalse(Page.objects.filter(title_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
     def test_create_reverse_id_collision(self):
         create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)
 
-    def test_publish_page(self):
+    def  test_publish_page(self):
         page_attrs = self._get_default_create_page_arguments()
         page_attrs['language'] = 'en'
         page_attrs['published'] = False

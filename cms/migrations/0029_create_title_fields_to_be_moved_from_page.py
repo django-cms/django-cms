@@ -47,4 +47,9 @@ class Migration(migrations.Migration):
             name='xframe_options',
             field=models.IntegerField(choices=[(0, 'Inherit from parent page'), (1, 'Deny'), (2, 'Only this website'), (3, 'Allow')], default=0),
         ),
+        migrations.AddField(
+            model_name='title',
+            name='soft_root',
+            field=models.BooleanField(db_index=True, default=False, help_text='All ancestors will not be displayed in the navigation', verbose_name='soft root'),
+        ),
     ]

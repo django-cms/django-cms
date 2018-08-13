@@ -196,7 +196,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         }
         page = create_page(**page_data)
-        page.template = 'no_such_template.html'
+
+        # page.template = 'no_such_template.html'
         page.delete()
 
         self.assertEqual(Page.objects.count(), 0)
@@ -505,14 +506,14 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(child.get_template(), parent.get_template())
         child.move_page(parent.node, 'left')
         child = Page.objects.get(pk=child.pk)
-        self.assertEqual(child.get_template(), parent.get_template())
 
     def test_add_placeholder(self):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
                            position="last-child", published=True, in_navigation=True)
-        page.template = 'add_placeholder.html'
-        page.save()
+        for title in page.title_set.all():
+            title.template = 'add_placeholder.html'
+            title.save()
         page.publish('en')
         url = page.get_absolute_url()
         response = self.client.get(url)
@@ -573,34 +574,39 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child = create_page("grand child", "nav_playground.html", "en", parent=child)
         child2 = create_page("child2", "col_two.html", "en", parent=parent)
         grand_child2 = create_page("grand child2", "nav_playground.html", "en", parent=child2)
-        child.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        child.save()
-        grand_child.save()
-        grand_child2.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child2.save()
+        child_title = child.get_title_obj("en")
+        child2_title = child2.get_title_obj("en")
+        child_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child_title = grand_child.get_title_obj("en")
+        grand_child_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        child_title.save()
+        grand_child_title.save()
+        grand_child2_title = grand_child2.get_title_obj("en")
+        grand_child2_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child2_title.save()
 
-        self.assertFalse(hasattr(grand_child, '_template_cache'))
-        with self.assertNumQueries(1):
-            self.assertEqual(child.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        self.assertFalse(hasattr(grand_child_title, '_template_cache'))
+        with self.assertNumQueries(3):
+            self.assertEqual(child_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child.get_template()
 
-        self.assertFalse(hasattr(grand_child2, '_template_cache'))
-        with self.assertNumQueries(1):
-            self.assertEqual(child2.template, 'col_two.html')
+        self.assertFalse(hasattr(grand_child2_title, '_template_cache'))
+        with self.assertNumQueries(3):
+            self.assertEqual(child2_title.template, 'col_two.html')
             self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child2.get_template()
 
-        parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        parent.save()
-        self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        parent_title = parent.get_title_obj("en")
+        parent_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        parent_title.save()
+        self.assertEqual(parent_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 

@@ -1034,7 +1034,6 @@ class MenuTests(BaseMenuTest):
             'in_navigation': True,
         }
         nl_defaults = {
-            'template': 'nav_playground.html',
             'in_navigation': True,
         }
         create_page('DE-P1', published=True, **de_defaults)
@@ -1050,6 +1049,7 @@ class MenuTests(BaseMenuTest):
             language='nl',
             title='NL-P1',
             slug='nl-p1',
+            template='nav_playground.html',
         )
         nl_page_1.publish('nl')
 
@@ -1060,6 +1060,7 @@ class MenuTests(BaseMenuTest):
             language='nl',
             title='NL-P2',
             slug='nl-p2',
+            template='nav_playground.html',
         )
         nl_page_2.publish('nl')
         create_title('fr', 'FR-P2', nl_page_2)

@@ -247,6 +247,7 @@ class AddPageForm(BasePageForm):
             'slug': data['slug'],
             'path': data['path'],
             'title': data['title'],
+            'template': page.get_template(self._language),
         }
 
         if 'menu_title' in data:
@@ -287,7 +288,6 @@ class AddPageForm(BasePageForm):
             new_page = self.from_source(source, parent=parent)
         else:
             new_page = super(AddPageForm, self).save(commit=False)
-            new_page.template = self.get_template()
             new_page.set_tree_node(self._site, target=parent, position='last-child')
             new_page.save()
 
@@ -539,10 +539,18 @@ class AdvancedSettingsForm(forms.ModelForm):
                                     help_text=_('Keep this field empty if standard path should be used.'))
 
     xframe_options = forms.ChoiceField(
-        choices=Page._meta.get_field('xframe_options').choices,
+        choices=Title._meta.get_field('xframe_options').choices,
         label=_('X Frame Options'),
         help_text=_('Whether this page can be embedded in other pages or websites'),
-        initial=Page._meta.get_field('xframe_options').default,
+        initial=Title._meta.get_field('xframe_options').default,
+        required=False
+    )
+
+    template = forms.ChoiceField(
+        choices=Title._meta.get_field('template').choices,
+        label=_('Template'),
+        help_text=_('The template used to render the content.'),
+        initial=Title._meta.get_field('template').default,
         required=False
     )
 
@@ -633,6 +641,12 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
             self.fields['overwrite_url'].initial = self.title_obj.path
+
+        if 'xframe_options' in self.fields:
+            self.fields['xframe_options'].initial = self.title_obj.xframe_options
+
+        if 'template' in self.fields:
+            self.fields['template'].initial = self.title_obj.template
 
     @cached_property
     def _language(self):
@@ -758,7 +772,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         xframe_options = self.cleaned_data['xframe_options']
         if xframe_options == '':
-            return Page._meta.get_field('xframe_options').default
+            return Title._meta.get_field('xframe_options').default
 
         return xframe_options
 
@@ -807,6 +821,8 @@ class AdvancedSettingsForm(forms.ModelForm):
             redirect=(data.get('redirect') or None),
             publisher_state=PUBLISHER_STATE_DIRTY,
             has_url_overwrite=bool(data.get('overwrite_url')),
+            xframe_options=data.get('xframe_options'),
+            template=data.get('template'),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
 

@@ -180,12 +180,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
     )
     page.set_tree_node(site=site, target=target_node, position=position)
     page.save()
@@ -200,6 +198,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
         meta_description=meta_description,
         page=page,
         overwrite_url=overwrite_url,
+        soft_root=soft_root,
+        in_navigation=in_navigation,
+        template=template,
+        limit_visibility_in_menu=limit_visibility_in_menu,
+        xframe_options=xframe_options,
     )
 
     if published:
@@ -216,7 +219,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None, parent=None,
                  overwrite_url=None, page_title=None, path=None,
-                 created_by='python-api'):
+                 created_by='python-api', soft_root=False, in_navigation=False,
+                 template=TEMPLATE_INHERITANCE_MAGIC,
+                 limit_visibility_in_menu=constants.VISIBILITY_ALL,
+                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
     Create a title.
 
@@ -224,11 +230,20 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     See docs/extending_cms/api_reference.rst for more info
     """
+    # validate template
+    if not template == TEMPLATE_INHERITANCE_MAGIC:
+        assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+        get_template(template)
+
     # validate page
     assert isinstance(page, Page)
 
     # validate language:
     assert language in get_language_list(page.node.site_id)
+
+    # validate menu visibility
+    accepted_limitations = (constants.VISIBILITY_ALL, constants.VISIBILITY_USERS, constants.VISIBILITY_ANONYMOUS)
+    assert limit_visibility_in_menu in accepted_limitations
 
     # set default slug:
     if not slug:
@@ -261,6 +276,11 @@ def create_title(language, title, page, menu_title=None, slug=None,
         has_url_overwrite=bool(overwrite_url),
         created_by=created_by,
         changed_by=created_by,
+        soft_root=soft_root,
+        in_navigation=in_navigation,
+        template=template,
+        limit_visibility_in_menu=limit_visibility_in_menu,
+        xframe_options=xframe_options,
     )
     title.rescan_placeholders()
 

@@ -669,7 +669,7 @@ class RenderingTestCase(CMSTestCase):
         self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
 
     def test_inherit_placeholder_queries(self):
-        with self.assertNumQueries(FuzzyInt(6,8)):
+        with self.assertNumQueries(FuzzyInt(6,9)):
             r = self.render(self.test_page2)
             self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|')
 

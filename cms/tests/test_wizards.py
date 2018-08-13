@@ -399,13 +399,13 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         )
 
         self.assertTrue(form.is_valid())
-        self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
+        self.assertFalse(Page.objects.filter(title_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
         with self.settings(CMS_TEMPLATES=[("col_invalid.html", "notvalid")]):
             self.assertRaises(TemplateSyntaxError, form.save)
             # The template raised an exception which should cause the database to roll back
             # instead of committing a page in a partial state.
-            self.assertFalse(Page.objects.filter(template=TEMPLATE_INHERITANCE_MAGIC).exists())
+            self.assertFalse(Page.objects.filter(title_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
     def test_wizard_content_placeholder_setting(self):
         """
