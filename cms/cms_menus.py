@@ -90,7 +90,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     # Other attributes will be added conditionally later.
     attr = {
         'is_page': True,
-        'soft_root': page.soft_root,
+        'soft_root': page.get_soft_root(language),
         'auth_required': page.login_required,
         'reverse_id': page.reverse_id,
     }
@@ -146,7 +146,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
                 url='',
                 id=page.pk,
                 attr=attr,
-                visible=page.in_navigation,
+                visible=page.get_in_navigation(translation.language),
                 path=translation.path or translation.slug,
                 language=(translation.language if translation.language != language else None),
             )
@@ -285,7 +285,7 @@ class CMSMenu(Menu):
                 continue
 
             menu_node = _page_to_node(page)
-            cut_homepage = homepage and not homepage.in_navigation
+            cut_homepage = homepage and not homepage.get_in_navigation(lang)
 
             if cut_homepage and parent_id == homepage.pk:
                 # When the homepage is hidden from navigation,

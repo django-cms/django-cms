@@ -168,8 +168,8 @@ class CreateCMSPageForm(AddPageForm):
             new_page.update(
                 draft_only=True,
                 is_page_type=True,
-                in_navigation=False,
             )
+            new_page.title_set.update(in_navigation=False)
 
         # If the user provided content, then use that instead.
         content = self.cleaned_data.get('content')

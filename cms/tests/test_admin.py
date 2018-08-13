@@ -509,11 +509,11 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 403)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'no': 'data'})
-            old = page.in_navigation
+            old = page.get_in_navigation()
             response = self.admin_class.change_innavigation(request, page.pk)
             self.assertEqual(response.status_code, 204)
             page = self.reload(page)
-            self.assertEqual(old, not page.in_navigation)
+            self.assertEqual(old, not page.get_in_navigation())
 
     def test_publish_page_requires_perms(self):
         permless = self.get_permless()

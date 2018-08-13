@@ -186,21 +186,14 @@ class Page(models.Model):
     # Please use toggle_in_navigation() instead of affecting this property
     # directly so that the cms page cache can be invalidated as appropriate.
     #
-    # @TODO
-    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
-    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
-                                    help_text=_("All ancestors will not be displayed in the navigation"))
-    # @TODO
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "A unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
 
     login_required = models.BooleanField(_("login required"), default=False)
-    # @TODO
     limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
                                                         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
                                                         help_text=_("limit when this page is visible in the menu"))
-    # @TODO
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
@@ -633,8 +626,6 @@ class Page(models.Model):
             target.reverse_id = self.reverse_id
         target.changed_by = self.changed_by
         target.login_required = self.login_required
-        target.in_navigation = self.in_navigation
-        target.soft_root = self.soft_root
         target.limit_visibility_in_menu = self.limit_visibility_in_menu
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
@@ -860,7 +851,7 @@ class Page(models.Model):
     def is_new_dirty(self):
         if self.pk:
             fields = [
-                'publication_date', 'publication_end_date', 'in_navigation', 'soft_root', 'reverse_id',
+                'publication_date', 'publication_end_date', 'reverse_id',
                 'navigation_extenders', 'login_required', 'limit_visibility_in_menu'
             ]
             try:
@@ -883,17 +874,20 @@ class Page(models.Model):
         '''
         Toggles (or sets) in_navigation and invalidates the cms page cache
         '''
-        old = self.in_navigation
+        old = self.get_in_navigation()
         if set_to in [True, False]:
-            self.in_navigation = set_to
+            new = set_to
         else:
-            self.in_navigation = not self.in_navigation
-        self.save()
+            new = not old
+
+        for title in self.title_set.all():
+            title.in_navigation = new
+            title.save()
 
         # If there was a change, invalidate the cms page cache
-        if self.in_navigation != old:
+        if new != old:
             self.clear_cache()
-        return self.in_navigation
+        return new
 
     def get_publisher_state(self, language, force_reload=False):
         try:
@@ -1412,6 +1406,10 @@ class Page(models.Model):
     def template(self):
         return self.get_title_obj_attribute("template")
 
+    @property
+    def soft_root(self):
+        return self.get_title_obj_attribute("soft_root")
+
     def get_template(self, language=None, fallback=True, force_reload=False):
         get_template = self.get_title_obj_attribute("get_template", language, fallback, force_reload)
         if get_template:
@@ -1542,6 +1540,12 @@ class Page(models.Model):
         get_xframe_options = self.get_title_obj_attribute("get_xframe_options", language, fallback, force_reload)
         if get_xframe_options:
             return get_xframe_options()
+
+    def get_soft_root(self, language=None, fallback=True, force_reload=False):
+        return self.get_title_obj_attribute("soft_root", language, fallback, force_reload)
+
+    def get_in_navigation(self, language=None, fallback=True, force_reload=False):
+        return self.get_title_obj_attribute("in_navigation", language, fallback, force_reload)
 
 
 class PageType(Page):

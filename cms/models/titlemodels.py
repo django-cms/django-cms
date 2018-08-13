@@ -321,6 +321,8 @@ class EmptyTitle(object):
     xframe_options = None
     template = get_cms_setting('TEMPLATES')[0][0]
     published = False
+    soft_root = False
+    in_navigation = False
 
     def __init__(self, language):
         self.language = language

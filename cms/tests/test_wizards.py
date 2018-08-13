@@ -368,7 +368,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         child_page = form.save()
 
         self.assertTrue(child_page.is_page_type)
-        self.assertFalse(child_page.in_navigation)
+        self.assertFalse(child_page.get_in_navigation('en'))
         self.assertEqual(child_page.node.depth, 3)
         self.assertEqual(child_page.parent_page, parent_page)
         self.assertEqual(child_page.get_title('en'), 'page-type-child')

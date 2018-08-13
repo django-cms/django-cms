@@ -269,7 +269,7 @@ class AddPageForm(BasePageForm):
             permissions=False,
             extensions=False,
         )
-        new_page.update(is_page_type=False, in_navigation=True)
+        new_page.update(is_page_type=False)
         return new_page
 
     def get_template(self):
@@ -350,7 +350,6 @@ class AddPageTypeForm(AddPageForm):
         if not root_page:
             root_page = Page(
                 publisher_is_draft=True,
-                in_navigation=False,
                 is_page_type=True,
             )
             root_page.set_tree_node(self._site)
@@ -363,6 +362,7 @@ class AddPageTypeForm(AddPageForm):
                 page=root_page,
                 slug=PAGE_TYPES_ID,
                 path=PAGE_TYPES_ID,
+                in_navigation=False,
             )
         return root_page.node
 
@@ -387,7 +387,7 @@ class AddPageTypeForm(AddPageForm):
             permissions=False,
             extensions=False,
         )
-        new_page.update(is_page_type=True, in_navigation=False)
+        new_page.update(is_page_type=True)
         return new_page
 
     def save(self, *args, **kwargs):
@@ -399,7 +399,6 @@ class AddPageTypeForm(AddPageForm):
             new_page.update(
                 draft_only=True,
                 is_page_type=True,
-                in_navigation=False,
             )
         return new_page
 
@@ -538,6 +537,10 @@ class AdvancedSettingsForm(forms.ModelForm):
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
                                     help_text=_('Keep this field empty if standard path should be used.'))
 
+    soft_root = forms.BooleanField(label=_('Soft root'),
+                                   required=False,
+                                   help_text=_("All ancestors will not be displayed in the navigation"))
+
     xframe_options = forms.ChoiceField(
         choices=Title._meta.get_field('xframe_options').choices,
         label=_('X Frame Options'),
@@ -581,7 +584,7 @@ class AdvancedSettingsForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = [
-            'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'template', 'reverse_id', 'overwrite_url', 'redirect', 'navigation_extenders',
             'application_urls', 'application_namespace', "xframe_options",
         ]
 
@@ -647,6 +650,9 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'template' in self.fields:
             self.fields['template'].initial = self.title_obj.template
+
+        if 'soft_root' in self.fields:
+            self.fields['soft_root'].initial = self.title_obj.soft_root
 
     @cached_property
     def _language(self):
@@ -823,6 +829,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             has_url_overwrite=bool(data.get('overwrite_url')),
             xframe_options=data.get('xframe_options'),
             template=data.get('template'),
+            soft_root=data.get('soft_root'),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
 
