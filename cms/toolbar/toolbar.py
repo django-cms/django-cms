@@ -74,13 +74,15 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def structure_mode_active(self):
-        return self.is_staff and self.request.resolver_match.url_name == "cms_placeholder_render_object_structure"
+        return (self.is_staff and self.request.resolver_match
+                and self.request.resolver_match.url_name == "cms_placeholder_render_object_structure")
 
     @cached_property
     def edit_mode_active(self):
         if not self.show_toolbar:
             return False
-        return self.structure_mode_active or self.request.resolver_match.url_name == "cms_placeholder_render_object_edit"
+        return (self.structure_mode_active or (self.request.resolver_match
+                and self.request.resolver_match.url_name == "cms_placeholder_render_object_edit"))
 
     @cached_property
     def content_mode_active(self):
@@ -314,13 +316,17 @@ class CMSToolbar(BaseToolbar):
         return ''
 
     def get_object_preview_url(self):
-        # FIXME AA: Only works for a page endpoint!!!
-        obj = self.obj.get_title_obj(language=self.request_language)
+        # Gets the PageContents of a page!
+        obj = self.obj
+        if obj.__class__.__name__ == "Page":
+            obj = self.obj.get_title_obj(language=self.request_language)
         return get_object_preview_url(obj)
 
     def get_object_edit_url(self):
-        # FIXME AA: Only works for a page endpoint!!!
-        obj = self.obj.get_title_obj(language=self.request_language)
+        # Gets the PageContents of a page!
+        obj = self.obj
+        if obj.__class__.__name__ == "Page":
+            obj = self.obj.get_title_obj(language=self.request_language)
         return get_object_edit_url(obj)
 
     # Internal API
