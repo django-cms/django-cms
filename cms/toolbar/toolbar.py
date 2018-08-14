@@ -11,6 +11,7 @@ from cms.models import UserSettings, Placeholder
 from cms.templates import TemplatesCache
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
@@ -312,26 +313,15 @@ class CMSToolbar(BaseToolbar):
             return self.obj.pk
         return ''
 
-    def get_object_public_url(self):
-        if self.obj:
-            with force_language(self.request_language):
-                try:
-                    return self.obj.get_public_url()
-                except:
-                    pass
-        return ''
+    def get_object_preview_url(self):
+        # FIXME AA: Only works for a page endpoint!!!
+        obj = self.obj.get_title_obj(language=self.request_language)
+        return get_object_preview_url(obj)
 
-    def get_object_draft_url(self):
-        if self.obj:
-            with force_language(self.request_language):
-                try:
-                    return self.obj.get_draft_url()
-                except:
-                    try:
-                        return self.obj.get_absolute_url()
-                    except:
-                        pass
-        return ''
+    def get_object_edit_url(self):
+        # FIXME AA: Only works for a page endpoint!!!
+        obj = self.obj.get_title_obj(language=self.request_language)
+        return get_object_edit_url(obj)
 
     # Internal API
 

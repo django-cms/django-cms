@@ -56,6 +56,7 @@ class ToolbarMiddleware(MiddlewareMixin):
         if not self.is_cms_request(request):
             return
 
+        # TODO: AA Remove me
         """
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
@@ -72,6 +73,7 @@ class ToolbarMiddleware(MiddlewareMixin):
         elif enable_toolbar in request.GET:
             request.session['cms_toolbar_disabled'] = False
 
+        # TODO: AA Remove me
         """
         toolbar_enabled = not request.session.get('cms_toolbar_disabled', False)
         can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous)
