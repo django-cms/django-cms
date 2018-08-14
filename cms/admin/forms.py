@@ -270,6 +270,7 @@ class AddPageForm(BasePageForm):
             extensions=False,
         )
         new_page.update(is_page_type=False)
+        new_page.title_set.update(in_navigation=True)
         return new_page
 
     def get_template(self):
@@ -388,6 +389,7 @@ class AddPageTypeForm(AddPageForm):
             extensions=False,
         )
         new_page.update(is_page_type=True)
+        new_page.title_set.update(in_navigation=False)
         return new_page
 
     def save(self, *args, **kwargs):
@@ -546,15 +548,14 @@ class AdvancedSettingsForm(forms.ModelForm):
         label=_('X Frame Options'),
         help_text=_('Whether this page can be embedded in other pages or websites'),
         initial=Title._meta.get_field('xframe_options').default,
-        required=False
+        required=False,
     )
-
     template = forms.ChoiceField(
         choices=Title._meta.get_field('template').choices,
         label=_('Template'),
         help_text=_('The template used to render the content.'),
         initial=Title._meta.get_field('template').default,
-        required=False
+        required=False,
     )
 
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
@@ -861,8 +862,7 @@ class PagePermissionForm(forms.ModelForm):
             fallback=False,
             force_reload=True,
         )
-        if 'limit_visibility_in_menu' in self.fields:
-            self.fields['limit_visibility_in_menu'].initial = self.title_obj.limit_visibility_in_menu
+        self.fields['limit_visibility_in_menu'].initial = self.title_obj.limit_visibility_in_menu
 
     @cached_property
     def _language(self):
@@ -875,8 +875,10 @@ class PagePermissionForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         page = super(PagePermissionForm, self).save(*args, **kwargs)
         page.clear_cache(menu=True)
-        if "limit_visibility_in_menu" in self.cleaned_data:
-            page.title_set.update(limit_visibility_in_menu=self.cleaned_data.get("limit_visibility_in_menu"))
+        if "limit_visibility_in_menu" in self.changed_data:
+            page.title_set.filter(language=self._language).update(
+                limit_visibility_in_menu=self.cleaned_data["limit_visibility_in_menu"],
+            )
         clear_permission_cache()
         return page
 

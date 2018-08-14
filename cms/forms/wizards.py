@@ -169,7 +169,10 @@ class CreateCMSPageForm(AddPageForm):
                 draft_only=True,
                 is_page_type=True,
             )
-            new_page.title_set.update(in_navigation=False)
+            new_page.update_translations(
+                language=self._language,
+                in_navigation=False,
+            )
 
         # If the user provided content, then use that instead.
         content = self.cleaned_data.get('content')

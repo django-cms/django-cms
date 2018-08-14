@@ -834,9 +834,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if to_template not in dict(get_cms_setting('TEMPLATES')):
             return HttpResponseBadRequest(force_text(_("Template not valid")))
 
-        for title in page.title_set.all():
-            title.template = to_template
-            title.save()
+        page.update_translations(template=to_template)
         return HttpResponse(force_text(_("The template was successfully changed")))
 
     @require_POST

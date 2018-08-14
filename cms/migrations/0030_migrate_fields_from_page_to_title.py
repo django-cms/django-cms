@@ -8,19 +8,16 @@ from django.db import migrations
 def forwards(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     Page = apps.get_model('cms', 'Page')
-
-    page_qs = Page.objects.using(db_alias)
-    cms_pages = page_qs.prefetch_related('title_set')
-    for page in cms_pages:
-        for title in page.title_set.all():
-            title.created_by = page.created_by
-            title.changed_by = page.changed_by
-            title.changed_date = page.changed_date
-            title.in_navigation = page.in_navigation
-            title.limit_visibility_in_menu = page.limit_visibility_in_menu
-            title.template = page.template
-            title.xframe_options = page.xframe_options
-            title.save()
+    for page in Page.objects.using(db_alias):
+        page.title_set.update(
+            created_by=page.created_by,
+            changed_by=page.changed_by,
+            changed_date=page.changed_date,
+            in_navigation=page.in_navigation,
+            limit_visibility_in_menu=page.limit_visibility_in_menu,
+            template=page.template,
+            xframe_options=page.xframe_options,
+        )
 
 
 class Migration(migrations.Migration):
