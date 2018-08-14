@@ -30,10 +30,12 @@ from django.utils.translation import override as force_language
 class BaseToolbar(ToolbarAPIMixin):
 
     watch_models = []
+
     edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+
 
     @cached_property
     def site_language(self):
@@ -57,38 +59,34 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def legacy_renderer(self):
         from cms.plugin_rendering import LegacyRenderer
-
         return LegacyRenderer(request=self.request)
 
     @cached_property
     def content_renderer(self):
         from cms.plugin_rendering import ContentRenderer
-
         return ContentRenderer(request=self.request)
 
     @cached_property
     def structure_renderer(self):
         from cms.plugin_rendering import StructureRenderer
-
         return StructureRenderer(request=self.request)
 
     @cached_property
     def structure_mode_active(self):
-        structure = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
-        return self.is_staff and structure in self.request.GET
+        return self.is_staff and self.request.resolver_match.url_name == "cms_placeholder_render_object_structure"
 
     @cached_property
     def edit_mode_active(self):
         if not self.show_toolbar:
             return False
-        return self.structure_mode_active or self.content_mode_active
+        return self.structure_mode_active or self.request.resolver_match.url_name == "cms_placeholder_render_object_edit"
 
     @cached_property
     def content_mode_active(self):
         if self.structure_mode_active:
             # Structure mode always takes precedence
             return False
-        return self.is_staff and self.request.session.get('cms_edit', False)
+        return self.is_staff and not self.edit_mode_active
 
     @cached_property
     def uses_legacy_structure_mode(self):
@@ -122,7 +120,6 @@ class CMSToolbar(BaseToolbar):
         self.redirect_url = None
         self.request = None
         self.is_staff = None
-        self.show_toolbar = None
         self.clipboard = None
         self.toolbar_language = None
         self.show_toolbar = True
@@ -177,7 +174,8 @@ class CMSToolbar(BaseToolbar):
     def init_toolbar(self, request, request_path=None):
         self.request = request
         self.is_staff = self.request.user.is_staff
-        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        #FIXME: AA Changed: self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.show_toolbar = self.is_staff
 
         if self.request.session.get('cms_toolbar_disabled', False):
             self.show_toolbar = False
