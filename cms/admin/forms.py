@@ -873,12 +873,13 @@ class PagePermissionForm(forms.ModelForm):
         fields = ['login_required', 'limit_visibility_in_menu']
 
     def save(self, *args, **kwargs):
-        page = super(PagePermissionForm, self).save(*args, **kwargs)
-        page.clear_cache(menu=True)
         if "limit_visibility_in_menu" in self.changed_data:
-            page.title_set.filter(language=self._language).update(
+            self.instance.update_translations(
+                language=self._language,
                 limit_visibility_in_menu=self.cleaned_data["limit_visibility_in_menu"],
             )
+        page = super(PagePermissionForm, self).save(*args, **kwargs)
+        page.clear_cache(menu=True)
         clear_permission_cache()
         return page
 
