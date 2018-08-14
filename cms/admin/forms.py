@@ -572,12 +572,12 @@ class AdvancedSettingsForm(forms.ModelForm):
     )
     fieldsets = (
         (None, {
-            'fields': ('overwrite_url', 'redirect'),
+            'fields': ('overwrite_url', 'redirect', 'template',
+                       'soft_root', 'xframe_options',),
         }),
         (_('Language independent options'), {
-            'fields': ('template', 'reverse_id', 'soft_root', 'navigation_extenders',
-                       'application_urls', 'application_namespace', 'application_configs',
-                       'xframe_options',)
+            'fields': ('reverse_id', 'navigation_extenders', 'application_urls',
+                       'application_namespace', 'application_configs',)
         })
     )
 
@@ -586,6 +586,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         fields = [
             'template', 'reverse_id', 'overwrite_url', 'redirect', 'navigation_extenders',
             'application_urls', 'application_namespace', "xframe_options",
+            'soft_root',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -840,6 +841,32 @@ class AdvancedSettingsForm(forms.ModelForm):
 
 
 class PagePermissionForm(forms.ModelForm):
+    _site = None
+    _request = None
+
+    limit_visibility_in_menu = forms.TypedChoiceField(
+        choices=Title._meta.get_field('limit_visibility_in_menu').choices,
+        label=_("menu visibility"),
+        help_text=_("limit when this page is visible in the menu"),
+        initial=Title._meta.get_field('limit_visibility_in_menu').default,
+        required=False,
+        coerce=int,
+        empty_value=None,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(PagePermissionForm, self).__init__(*args, **kwargs)
+        self.title_obj = self.instance.get_title_obj(
+            language=self._language,
+            fallback=False,
+            force_reload=True,
+        )
+        if 'limit_visibility_in_menu' in self.fields:
+            self.fields['limit_visibility_in_menu'].initial = self.title_obj.limit_visibility_in_menu
+
+    @cached_property
+    def _language(self):
+        return get_site_language_from_request(self._request, site_id=self._site.pk)
 
     class Meta:
         model = Page
@@ -848,6 +875,8 @@ class PagePermissionForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         page = super(PagePermissionForm, self).save(*args, **kwargs)
         page.clear_cache(menu=True)
+        if "limit_visibility_in_menu" in self.cleaned_data:
+            page.title_set.update(limit_visibility_in_menu=self.cleaned_data.get("limit_visibility_in_menu"))
         clear_permission_cache()
         return page
 

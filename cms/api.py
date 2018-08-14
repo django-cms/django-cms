@@ -181,7 +181,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         login_required=login_required,
-        limit_visibility_in_menu=limit_visibility_in_menu,
     )
     page.set_tree_node(site=site, target=target_node, position=position)
     page.save()

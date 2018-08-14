@@ -95,12 +95,14 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         'reverse_id': page.reverse_id,
     }
 
-    if page.limit_visibility_in_menu is constants.VISIBILITY_ALL:
+    limit_visibility_in_menu = page.get_limit_visibility_in_menu(language)
+
+    if limit_visibility_in_menu is constants.VISIBILITY_ALL:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
-        attr['visible_for_authenticated'] = page.limit_visibility_in_menu == constants.VISIBILITY_USERS
-        attr['visible_for_anonymous'] = page.limit_visibility_in_menu == constants.VISIBILITY_ANONYMOUS
+        attr['visible_for_authenticated'] = limit_visibility_in_menu == constants.VISIBILITY_USERS
+        attr['visible_for_anonymous'] = limit_visibility_in_menu == constants.VISIBILITY_ANONYMOUS
     attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []

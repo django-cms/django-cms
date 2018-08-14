@@ -494,6 +494,7 @@ class PageTest(PageTestBase):
             page_data['has_url_overwrite'] = True
             response = self.client.post(URL_CMS_PAGE_ADVANCED_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
+            page.title_cache = {}
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
             Title.objects.all()[0]
             page = page.reload()

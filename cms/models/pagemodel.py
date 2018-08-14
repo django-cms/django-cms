@@ -191,9 +191,6 @@ class Page(models.Model):
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
 
     login_required = models.BooleanField(_("login required"), default=False)
-    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
-                                                        choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
-                                                        help_text=_("limit when this page is visible in the menu"))
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
@@ -626,7 +623,6 @@ class Page(models.Model):
             target.reverse_id = self.reverse_id
         target.changed_by = self.changed_by
         target.login_required = self.login_required
-        target.limit_visibility_in_menu = self.limit_visibility_in_menu
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
         target.application_namespace = self.application_namespace
@@ -852,7 +848,7 @@ class Page(models.Model):
         if self.pk:
             fields = [
                 'publication_date', 'publication_end_date', 'reverse_id',
-                'navigation_extenders', 'login_required', 'limit_visibility_in_menu'
+                'navigation_extenders', 'login_required'
             ]
             try:
                 old_page = Page.objects.get(pk=self.pk)
@@ -1546,6 +1542,9 @@ class Page(models.Model):
 
     def get_in_navigation(self, language=None, fallback=True, force_reload=False):
         return self.get_title_obj_attribute("in_navigation", language, fallback, force_reload)
+
+    def get_limit_visibility_in_menu(self, language=None, fallback=True, force_reload=False):
+        return self.get_title_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
 
 
 class PageType(Page):
