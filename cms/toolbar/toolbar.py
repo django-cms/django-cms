@@ -81,6 +81,7 @@ class BaseToolbar(ToolbarAPIMixin):
     def edit_mode_active(self):
         if not self.show_toolbar:
             return False
+        #FIXME: AA Why is structure mode not a not????
         return (self.structure_mode_active or (self.request.resolver_match
                 and self.request.resolver_match.url_name == "cms_placeholder_render_object_edit"))
 
@@ -318,6 +319,7 @@ class CMSToolbar(BaseToolbar):
     def get_object_preview_url(self):
         # Gets the PageContents of a page!
         obj = self.obj
+        #FIXME: If the toolbar was focused on Title this wouldn't be an issue/
         if obj.__class__.__name__ == "Page":
             obj = self.obj.get_title_obj(language=self.request_language)
         return get_object_preview_url(obj)
@@ -325,6 +327,7 @@ class CMSToolbar(BaseToolbar):
     def get_object_edit_url(self):
         # Gets the PageContents of a page!
         obj = self.obj
+        #FIXME: If the toolbar was focused on Title this wouldn't be an issue/
         if obj.__class__.__name__ == "Page":
             obj = self.obj.get_title_obj(language=self.request_language)
         return get_object_edit_url(obj)
