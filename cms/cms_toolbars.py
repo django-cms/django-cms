@@ -14,6 +14,7 @@ from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.utils import get_object_edit_url, get_object_structure_url
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_dict
@@ -258,13 +259,11 @@ class PageToolbar(CMSToolbar):
             if sp.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
-    #FIXME: AA Mode switcher is deprecated behaviour!!
     def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
-
-        build_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        edit_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        build_url = get_object_structure_url(self.title)
+        edit_url = get_object_edit_url(self.title)
 
         if self.request.user.has_perm("cms.use_structure"):
             switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
