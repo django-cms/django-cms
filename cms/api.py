@@ -252,13 +252,8 @@ def create_title(language, title, page, menu_title=None, slug=None,
     elif path is None:
         path = page.get_path_for_slug(slug, language)
 
-    # ugly permissions hack
-    should_delete_tls_user = not hasattr(_thread_locals, 'user')
     if created_by and isinstance(created_by, get_user_model()):
-        _thread_locals.user = created_by
         created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
-    else:
-        _thread_locals.user = None
 
     title = Title.objects.create(
         language=language,
@@ -285,8 +280,6 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     if language not in page_languages:
         page.update_languages(page_languages + [language])
-    if should_delete_tls_user:
-        del _thread_locals.user
     return title
 
 

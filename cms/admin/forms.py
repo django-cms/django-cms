@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -248,6 +249,7 @@ class AddPageForm(BasePageForm):
             'path': data['path'],
             'title': data['title'],
             'template': page.get_template(self._language),
+            'created_by': self._user,
         }
 
         if 'menu_title' in data:
@@ -495,6 +497,8 @@ class ChangePageForm(BasePageForm):
         update_count = cms_page.update_translations(
             self._language,
             publisher_state=PUBLISHER_STATE_DIRTY,
+            changed_by=getattr(self._request.user, get_user_model().USERNAME_FIELD),
+            changed_date=timezone.now(),
             **translation_data
         )
 
@@ -832,6 +836,8 @@ class AdvancedSettingsForm(forms.ModelForm):
             xframe_options=data.get('xframe_options'),
             template=data.get('template'),
             soft_root=data.get('soft_root'),
+            changed_by=getattr(self._request.user, get_user_model().USERNAME_FIELD),
+            changed_date=timezone.now(),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
 
@@ -877,6 +883,8 @@ class PagePermissionForm(forms.ModelForm):
             self.instance.update_translations(
                 language=self._language,
                 limit_visibility_in_menu=self.cleaned_data["limit_visibility_in_menu"],
+                changed_by=getattr(self._request.user, get_user_model().USERNAME_FIELD),
+                changed_date=timezone.now(),
             )
         page = super(PagePermissionForm, self).save(*args, **kwargs)
         page.clear_cache(menu=True)

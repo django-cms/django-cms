@@ -137,12 +137,6 @@ class Title(models.Model):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
-
-        created = not bool(self.pk)
-        from cms.utils.permissions import get_current_user_name
-        self.changed_by = get_current_user_name()
-        if created:
-            self.created_by = self.changed_by
         super(Title, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
