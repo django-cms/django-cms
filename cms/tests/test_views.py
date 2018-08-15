@@ -140,7 +140,6 @@ class ViewTests(CMSTestCase):
 
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-
             # The edit works?
             response = self.client.get(page_edit_url)
             self.assertEqual(response.status_code, 200)
@@ -152,6 +151,7 @@ class ViewTests(CMSTestCase):
             self.assertEqual(response.status_code, 302)
 
             # The structure works?
+            # FIXME: Possibly expecting to use toolbar_with_structure.html to redirect
             self.client.get(page_edit_url)
             response = self.client.get(page_structure_url)
             self.assertEqual(response.status_code, 200)
