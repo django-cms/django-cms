@@ -35,9 +35,11 @@ from cms.models.permissionmodels import (
     PageUser,
 )
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
+
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -603,11 +605,21 @@ class BaseCMSTestCase(object):
         })
         return endpoint
 
-    def get_edit_on_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+    def get_edit_on_url(self, obj, lang="en"):
 
-    def get_edit_off_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+        # FIXME: Terrible, should use title / PageContent by default!!
+        if obj.__class__.__name__ == "Page":
+            obj = obj.get_title_obj(lang)
+
+        return get_object_edit_url(obj)
+
+    def get_edit_off_url(self, obj, lang="en"):
+
+        # FIXME: Terrible, should use title / PageContent by default!!
+        if obj.__class__.__name__ == "Page":
+            obj = obj.get_title_obj(lang)
+
+        return get_object_preview_url(obj)
 
     def get_toolbar_disable_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))

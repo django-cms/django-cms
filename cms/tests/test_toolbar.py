@@ -42,34 +42,39 @@ from cms.utils.urlutils import admin_reverse
 from cms.views import details
 
 
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
+
+
 class ToolbarTestBase(CMSTestCase):
 
-    def get_page_request(self, page, user, path=None, edit=False,
+    # Remove path from all calls to this method
+    def get_page_request(self, object, user, path=None, edit=False,
                          preview=False, lang_code='en', disable=False):
-        if not path:
-            path = page.get_absolute_url()
+
+        path = object.get_absolute_url()
 
         if edit:
-            path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            path = get_object_edit_url(object)
 
-        if preview:
-            path += '?preview'
+        elif preview:
+            path = get_object_preview_url(object)
 
         request = RequestFactory().get(path)
         request.session = {}
         request.user = user
         request.LANGUAGE_CODE = lang_code
-        if edit:
-            request.GET = {'edit': None}
-        else:
-            request.GET = {'edit_off': None}
+
+        request.GET = {}
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
-        request.current_page = page
+
+        request.current_page = object
         mid = ToolbarMiddleware()
         mid.process_request(request)
+
         if hasattr(request,'toolbar'):
             request.toolbar.populate()
+
         return request
 
     def get_anon(self):
@@ -102,12 +107,24 @@ class ToolbarTestBase(CMSTestCase):
         session['cms_log_latest'] = entry.pk
         session.save()
 
+    def _get_example_obj(self):
+
+        obj = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+
+        return obj
+
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
 class ToolbarMiddlewareTest(ToolbarTestBase):
+
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
-        request = self.get_page_request(None, self.get_anon(), '/en/example/')
+        request = self.get_page_request(self._get_example_obj(), self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
@@ -118,12 +135,12 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_hide_toolbar_in_non_cms_urls_toolbar_hide_unsetted(self):
-        request = self.get_page_request(None, self.get_anon(), '/en/example/')
+        request = self.get_page_request(self._get_example_obj(), self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_hide_toolbar_in_non_cms_urls(self):
-        request = self.get_page_request(None, self.get_anon(), '/en/example/')
+        request = self.get_page_request(self._get_example_obj(), self.get_anon())
         self.assertFalse(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
@@ -142,27 +159,27 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
 
     def test_cms_internal_ips_unset(self):
         with self.settings(CMS_INTERNAL_IPS=[]):
-            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            request = self.get_page_request(self._get_example_obj(), self.get_staff(), '/en/example/')
             self.assertTrue(hasattr(request, 'toolbar'))
 
     def test_cms_internal_ips_set_no_match(self):
         with self.settings(CMS_INTERNAL_IPS=['123.45.67.89', ]):
-            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            request = self.get_page_request(self._get_example_obj(), self.get_staff(), '/en/example/')
             self.assertFalse(hasattr(request, 'toolbar'))
 
     def test_cms_internal_ips_set_match(self):
         with self.settings(CMS_INTERNAL_IPS=['127.0.0.0', '127.0.0.1', '127.0.0.2', ]):
-            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            request = self.get_page_request(self._get_example_obj(), self.get_staff(), '/en/example/')
             self.assertTrue(hasattr(request, 'toolbar'))
 
     def test_cms_internal_ips_iptools(self):
         with self.settings(CMS_INTERNAL_IPS=iptools.IpRangeList(('127.0.0.0', '127.0.0.255'))):
-            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            request = self.get_page_request(self._get_example_obj(), self.get_staff(), '/en/example/')
             self.assertTrue(hasattr(request, 'toolbar'))
 
     def test_cms_internal_ips_iptools_bad_range(self):
         with self.settings(CMS_INTERNAL_IPS=iptools.IpRangeList(('128.0.0.0', '128.0.0.255'))):
-            request = self.get_page_request(None, self.get_staff(), '/en/example/')
+            request = self.get_page_request(self._get_example_obj(), self.get_staff(), '/en/example/')
             self.assertFalse(hasattr(request, 'toolbar'))
 
 
@@ -306,7 +323,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(form.is_valid())
 
     def test_no_page_anon(self):
-        request = self.get_page_request(None, self.get_anon(), '/')
+        request = self.get_page_request(self._get_example_obj(), self.get_anon(), '/')
         toolbar = CMSToolbar(request)
         toolbar.populate()
         toolbar.post_template_populate()
@@ -314,7 +331,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(len(items), 0)
 
     def test_no_page_staff(self):
-        request = self.get_page_request(None, self.get_staff(), '/')
+        request = self.get_page_request(self._get_example_obj(), self.get_staff(), '/')
         toolbar = CMSToolbar(request)
         toolbar.populate()
         toolbar.post_template_populate()
@@ -325,7 +342,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(len(admin_items), 12, admin_items)
 
     def test_no_page_superuser(self):
-        request = self.get_page_request(None, self.get_superuser(), '/')
+        request = self.get_page_request(self._get_example_obj(), self.get_superuser(), '/')
         toolbar = CMSToolbar(request)
         toolbar.populate()
         toolbar.post_template_populate()
@@ -387,7 +404,8 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_markup(self):
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
+
         superuser = self.get_superuser()
 
         with self.login_user_context(superuser):
@@ -476,23 +494,22 @@ class ToolbarTests(ToolbarTestBase):
         page_2 = create_page("sec-page", "col_two.html", "en", published=True, parent=page_1)
         page_3 = create_page("trd-page", "col_two.html", "en", published=False, parent=page_1)
 
+        page_2_preview_url = self.get_edit_off_url(page_2)
+        page_2_edit_url = self.get_edit_on_url(page_2)
+        page_3_edit_url = self.get_edit_on_url(page_3)
+
         # page with publish = draft
         # check when in draft mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
-                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            response = self.client.get(page_2_edit_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
-            page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        ))
+        self.assertContains(response, 'href="%s"' % page_2_preview_url)
         # check when in live mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?preview&%s' % (
-                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
+            response = self.client.get(page_2_preview_url)
+
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
-            page_2.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
+        self.assertContains(response, 'href="%s"' % page_2_edit_url)
         self.assertEqual(page_2.get_draft_url(), page_2.get_public_url())
 
         # page with publish != draft
@@ -501,27 +518,20 @@ class ToolbarTests(ToolbarTestBase):
         page_2.get_title_obj().save()
         # check when in draft mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
-                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            response = self.client.get(page_2_edit_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
-            page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        ))
+        self.assertContains(response, 'href="%s"' % page_2_preview_url)
         # check when in live mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?preview&%s' % (
-                page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
+            response = self.client.get(page_2_preview_url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
-            page_2.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
+        self.assertContains(response, 'href="%s"' % page_2_edit_url)
         self.assertNotEqual(page_2.get_draft_url(), page_2.get_public_url())
 
         # not published page
         # check when in draft mode
         with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
-                page_3.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            response = self.client.get(page_3_edit_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'cms-toolbar-item-switch')
         self.assertEqual(page_3.get_public_url(), '')
@@ -529,7 +539,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_markup_plugin_template(self):
         page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
         plugin_1 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
         superuser = self.get_superuser()
@@ -600,7 +610,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_show_toolbar_login_anonymous(self):
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
         response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'cms-form-login')
@@ -608,14 +618,14 @@ class ToolbarTests(ToolbarTestBase):
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
     def test_hide_toolbar_login_anonymous_setting(self):
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
         response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'cms-form-login')
 
     def test_hide_toolbar_login_nonstaff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
 
         with self.login_user_context(self.get_nonstaff()):
             response = self.client.get(page_edit_on_url)
@@ -683,7 +693,7 @@ class ToolbarTests(ToolbarTestBase):
         Tests that even called multiple times, admin and language buttons are not duplicated
         """
         user = self.get_staff()
-        en_request = self.get_page_request(None, user, edit=True, path='/')
+        en_request = self.get_page_request(self._get_example_obj(), user, edit=True, path='/')
         toolbar = CMSToolbar(en_request)
         toolbar.populated = False
         toolbar.populate()
@@ -700,7 +710,7 @@ class ToolbarTests(ToolbarTestBase):
     def test_placeholder_name(self):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en", published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
 
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_on_url)
@@ -715,7 +725,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_remove_lang(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
-        page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
+        page_edit_on_url = self.get_edit_on_url(page)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_on_url)
@@ -1467,7 +1477,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% render_model_icon instance %}
 {% endblock content %}
 '''
-        request = self.get_page_request(None, user, path='/', edit=True)
+        request = self.get_page_request(self._get_example_obj(), user, path='/', edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
