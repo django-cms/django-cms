@@ -281,7 +281,7 @@ class AddPageForm(BasePageForm):
         )
 
     def get_template(self):
-        source = data.get('source')
+        source = self.cleaned_data.get('source')
         if source:
             return source.get_template(self._language)
         return Title.TEMPLATE_DEFAULT
