@@ -1387,7 +1387,9 @@ class Page(models.Model):
 
     def get_template(self, language=None, fallback=True, force_reload=False):
         title = self.get_title_obj(language, fallback, force_reload)
-        return title.get_template()
+        if title:
+            return title.get_template()
+        return get_cms_setting('TEMPLATES')[0][0]
 
     def get_template_name(self):
         """
@@ -1511,7 +1513,8 @@ class Page(models.Model):
 
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
         title = self.get_title_obj(language, fallback, force_reload)
-        return title.get_xframe_options()
+        if title:
+            return title.get_xframe_options()
 
     def get_soft_root(self, language=None, fallback=True, force_reload=False):
         return self.get_title_obj_attribute("soft_root", language, fallback, force_reload)

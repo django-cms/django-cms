@@ -320,9 +320,3 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
-
-    def get_template(self):
-        return self.template
-
-    def get_xframe_options(self):
-        return self.xframe_options
