@@ -164,10 +164,10 @@ class BaseCMSTestCase(object):
         pp.sites = Site.objects.all()
         return pp
 
-    def get_page_title_obj(self, page, language):
+    def get_page_title_obj(self, page, language="en"):
         from cms.models import Title
 
-        return Title.objects.get(language=language, page=page)
+        return Title.objects.get(page=page, language=language)
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):
@@ -611,13 +611,13 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_edit_on_url(self, obj, lang="en"):
-        # FIXME: Terrible, We sohould be accessing this method when required. Requires clean up
+        # FIXME: Terrible, We should be accessing this method when required. Requires clean up
         if obj.__class__.__name__ == "Page":
             obj = self.get_page_title_obj(page=obj, language=lang)
         return get_object_edit_url(obj)
 
     def get_edit_off_url(self, obj, lang="en"):
-        # FIXME: Terrible, We sohould be accessing this method when required. Requires clean up
+        # FIXME: Terrible, We should be accessing this method when required. Requires clean up
         if obj.__class__.__name__ == "Page":
             obj = self.get_page_title_obj(page=obj, language=lang)
 
