@@ -242,17 +242,13 @@ class AddPageForm(BasePageForm):
 
     def create_translation(self, page):
         data = self.cleaned_data
-        if data.get('source'):
-            template = data.get('source').get_template(self._language)
-        else:
-            template = self.get_template()
         title_kwargs = {
             'page': page,
             'language': self._language,
             'slug': data['slug'],
             'path': data['path'],
             'title': data['title'],
-            'template': template,
+            'template': self.get_template(),
             'created_by': self._user,
         }
 
@@ -285,6 +281,9 @@ class AddPageForm(BasePageForm):
         )
 
     def get_template(self):
+        source = data.get('source')
+        if source:
+            return source.get_template(self._language)
         return Title.TEMPLATE_DEFAULT
 
     def save(self, *args, **kwargs):
