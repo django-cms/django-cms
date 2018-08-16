@@ -65,7 +65,7 @@ class ToolbarTestBase(CMSTestCase):
         request.LANGUAGE_CODE = lang_code
 
         request.GET = {}
-        if disable:
+        if disable and not edit:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
 
         request.current_page = object
@@ -864,6 +864,9 @@ class ToolbarTests(ToolbarTestBase):
                             published=False, parent=page2)
         page4 = create_page("non-pub-2", "nav_playground.html", "en",
                             published=False, parent=page3)
+        page3_edit_url = self.get_edit_on_url(page3)
+        page4_edit_url = self.get_edit_on_url(page4)
+
         superuser = self.get_superuser()
         url = admin_reverse('cms_page_resolve')
         with self.login_user_context(superuser):
@@ -876,16 +879,10 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url())
             # redirect to the first published ancestor
             response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
-                page3.get_absolute_url(),
-                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            )
+            self.assertEqual(response.content.decode('utf-8'), page3_edit_url)
             # redirect to the first published ancestor
             response = self.client.post(url, {'pk': page4.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
-                page4.get_absolute_url(),
-                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            )
+            self.assertEqual(response.content.decode('utf-8'), page4_edit_url)
 
             # checking the redirect by setting the session data
             self._fake_logentry(page1.get_draft_object().pk, superuser, 'test page')
@@ -898,17 +895,11 @@ class ToolbarTests(ToolbarTestBase):
 
             self._fake_logentry(page3.get_draft_object().pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
-                page3.get_absolute_url(),
-                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            )
+            self.assertEqual(response.content.decode('utf-8'), page3_edit_url)
 
             self._fake_logentry(page4.get_draft_object().pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
-                page4.get_absolute_url(),
-                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            )
+            self.assertEqual(response.content.decode('utf-8'), page4_edit_url)
 
     def test_page_edit_redirect_errors(self):
         page1 = create_page("home", "nav_playground.html", "en",
@@ -1045,13 +1036,14 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("home", "nav_playground.html", "en",
                            published=True)
         page.publish('en')
-        self.get_page_request(page, superuser, '/')
+        self.get_page_request(page, superuser)
         #
         # Test that the logout shows the username of the logged-in user if
         # first_name and last_name haven't been provided.
         #
+        page_edit_url = self.get_edit_on_url(page)
         with self.login_user_context(superuser):
-            response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
@@ -1064,9 +1056,10 @@ class ToolbarTests(ToolbarTestBase):
         superuser.last_name = 'User'
         superuser.save()
         # Sanity check...
-        self.get_page_request(page, superuser, '/')
+        self.get_page_request(page, superuser)
+        page_edit_url = self.get_edit_on_url(page)
         with self.login_user_context(superuser):
-            response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
@@ -1094,33 +1087,38 @@ class ToolbarTests(ToolbarTestBase):
                             published=True, parent=page0)
         PagePermission.objects.create(page=page4, can_view=True,
                                       user=superuser)
+        page1_edit_url = self.get_edit_on_url(page1)
+        page2_edit_url = self.get_edit_on_url(page2)
+        page3_edit_url = self.get_edit_on_url(page3)
+        page4_edit_url = self.get_edit_on_url(page4)
+
         page4.publish('en')
         page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
 
         with self.login_user_context(superuser):
             # Published page, no redirect
-            response = self.client.get(page1.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page1_edit_url)
             toolbar = response.context['request'].toolbar
             menu_name = _(u'Logout %s') % self.get_username(superuser)
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
             # Unpublished page, redirect
-            response = self.client.get(page2.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page2_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
 
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with login restrictions, redirect
-            response = self.client.get(page3.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page3_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with view permissions, redirect
-            response = self.client.get(page4.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page4_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
@@ -1145,16 +1143,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, superuser, edit=True)
         response = detail_view(request, ex1.pk)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
-            ex1.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        ))
+        self.assertContains(response, 'href="%s"' % self.get_preview_on_url(page))
         # check when in live mode
         request = self.get_page_request(page, superuser, preview=True)
         response = detail_view(request, ex1.pk)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
-            ex1.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
+        self.assertContains(response, 'href="%s?%s"' % self.get_edit_on_url(page))
         self.assertNotEqual(ex1.get_draft_url(), ex1.get_public_url())
 
     def test_anon(self):
