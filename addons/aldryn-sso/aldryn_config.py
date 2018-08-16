@@ -23,7 +23,7 @@ class Form(forms.BaseForm):
 
         env = partial(djsenv, settings=settings)
 
-        if 'MIDDLEWARE' in settings:
+        if settings.get('MIDDLEWARE'):
             # Django>=1.10
             MIDDLEWARE = settings['MIDDLEWARE']
         else:
