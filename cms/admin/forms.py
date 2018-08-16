@@ -279,7 +279,7 @@ class AddPageForm(BasePageForm):
         return new_page
 
     def get_template(self):
-        return Page.TEMPLATE_DEFAULT
+        return Title.TEMPLATE_DEFAULT
 
     def save(self, *args, **kwargs):
         source = self.cleaned_data.get('source')

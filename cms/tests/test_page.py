@@ -908,7 +908,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+            xframe_options=constants.X_FRAME_OPTIONS_ALLOW
         )
 
         resp = self.client.get(page.get_absolute_url('en'))
@@ -922,7 +922,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_SAMEORIGIN
+            xframe_options=constants.X_FRAME_OPTIONS_SAMEORIGIN
         )
 
         resp = self.client.get(page.get_absolute_url('en'))
@@ -936,7 +936,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
 
         resp = self.client.get(page.get_absolute_url('en'))
@@ -950,7 +950,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
 
         child1 = create_page(
@@ -960,7 +960,7 @@ class PagesTestCase(TransactionCMSTestCase):
             published=True,
             slug='subpage',
             parent=parent,
-            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+            xframe_options=constants.X_FRAME_OPTIONS_INHERIT
         )
 
         child2 = create_page(
@@ -970,7 +970,7 @@ class PagesTestCase(TransactionCMSTestCase):
             published=True,
             slug='subpage',
             parent=child1,
-            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+            xframe_options=constants.X_FRAME_OPTIONS_ALLOW
         )
         child3 = create_page(
             title='subpage',
@@ -979,7 +979,7 @@ class PagesTestCase(TransactionCMSTestCase):
             published=True,
             slug='subpage',
             parent=child2,
-            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+            xframe_options=constants.X_FRAME_OPTIONS_INHERIT
         )
 
         resp = self.client.get(parent.get_absolute_url('en'))
@@ -1024,7 +1024,7 @@ class PagesTestCase(TransactionCMSTestCase):
                 'nav_playground.html',
                 'en',
                 published=True,
-                xframe_options=Page.X_FRAME_OPTIONS_ALLOW,
+                xframe_options=constants.X_FRAME_OPTIONS_ALLOW,
             )
 
             # Normal response from render_page
@@ -1050,7 +1050,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
         placeholder = cms_page.get_placeholders('en')[0]
         add_plugin(cms_page.get_placeholders('en')[0], 'TextPlugin', 'en', body=public_text)
@@ -1114,7 +1114,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
         placeholder = cms_page.get_placeholders('en')[0]
         add_plugin(cms_page.get_placeholders('en')[0], 'TextPlugin', 'en', body=public_text)

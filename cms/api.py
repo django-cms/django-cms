@@ -108,7 +108,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
+                xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
 

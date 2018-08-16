@@ -18,7 +18,7 @@ from django.utils.translation import (
 )
 
 from cms import constants
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 from cms.exceptions import PublicIsUnmodifiable, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
@@ -149,24 +149,6 @@ class Page(models.Model):
     """
     A simple hierarchical page model
     """
-    LIMIT_VISIBILITY_IN_MENU_CHOICES = (
-        (constants.VISIBILITY_USERS, _('for logged in users only')),
-        (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
-    )
-    TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
-
-    X_FRAME_OPTIONS_INHERIT = constants.X_FRAME_OPTIONS_INHERIT
-    X_FRAME_OPTIONS_DENY = constants.X_FRAME_OPTIONS_DENY
-    X_FRAME_OPTIONS_SAMEORIGIN = constants.X_FRAME_OPTIONS_SAMEORIGIN
-    X_FRAME_OPTIONS_ALLOW = constants.X_FRAME_OPTIONS_ALLOW
-    X_FRAME_OPTIONS_CHOICES = (
-        (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-        (constants.X_FRAME_OPTIONS_DENY, _('Deny')),
-        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-        (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
-    )
-
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
