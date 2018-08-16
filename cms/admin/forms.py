@@ -242,13 +242,17 @@ class AddPageForm(BasePageForm):
 
     def create_translation(self, page):
         data = self.cleaned_data
+        if data.get('source'):
+            template = page.get_template(self._language)
+        else:
+            template = self.get_template()
         title_kwargs = {
             'page': page,
             'language': self._language,
             'slug': data['slug'],
             'path': data['path'],
             'title': data['title'],
-            'template': page.get_template(self._language),
+            'template': template,
             'created_by': self._user,
         }
 
@@ -272,11 +276,13 @@ class AddPageForm(BasePageForm):
             extensions=False,
         )
         new_page.update(is_page_type=False)
+        return new_page
+
+    def update_translations_from_source(self, new_page):
         new_page.update_translations(
             self._language,
             in_navigation=True,
         )
-        return new_page
 
     def get_template(self):
         return Title.TEMPLATE_DEFAULT
@@ -301,6 +307,8 @@ class AddPageForm(BasePageForm):
         translation.rescan_placeholders()
 
         if source:
+            self.update_translations_from_source(new_page)
+
             extension_pool.copy_extensions(
                 source_page=source,
                 target_page=new_page,
@@ -394,11 +402,13 @@ class AddPageTypeForm(AddPageForm):
             extensions=False,
         )
         new_page.update(is_page_type=True)
+        return new_page
+
+    def update_translations_from_source(self, new_page):
         new_page.update_translations(
             self._language,
             in_navigation=False,
         )
-        return new_page
 
     def save(self, *args, **kwargs):
         new_page = super(AddPageTypeForm, self).save(*args, **kwargs)
