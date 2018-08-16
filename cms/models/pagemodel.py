@@ -479,9 +479,8 @@ class Page(models.Model):
             # Explicitly set the inherited template on the titles
             # to keep all plugins / placeholders.
             template = self.get_template()
-            self.title_set.update(template=template)
-            for title in self.title_cache.values():
-                title.template = template
+            self.update_translations(template=template)
+            self.title_cache = {}
 
         # Don't use a cached node. Always get a fresh one.
         self._clear_node_cache()
@@ -876,9 +875,7 @@ class Page(models.Model):
         else:
             new = not old
 
-        for title in self.title_set.all():
-            title.in_navigation = new
-            title.save()
+        self.update_translations(in_navigation=new)
 
         # If there was a change, invalidate the cms page cache
         if new != old:
@@ -1407,10 +1404,8 @@ class Page(models.Model):
         return self.get_title_obj_attribute("soft_root")
 
     def get_template(self, language=None, fallback=True, force_reload=False):
-        get_template = self.get_title_obj_attribute("get_template", language, fallback, force_reload)
-        if get_template:
-            return get_template()
-        return get_cms_setting('TEMPLATES')[0][0]
+        title = self.get_title_obj(language, fallback, force_reload)
+        return title.get_template()
 
     def get_template_name(self):
         """
@@ -1533,9 +1528,8 @@ class Page(models.Model):
         return get_static_placeholders(self.get_template(), context)
 
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
-        get_xframe_options = self.get_title_obj_attribute("get_xframe_options", language, fallback, force_reload)
-        if get_xframe_options:
-            return get_xframe_options()
+        title = self.get_title_obj(language, fallback, force_reload)
+        return title.get_xframe_options()
 
     def get_soft_root(self, language=None, fallback=True, force_reload=False):
         return self.get_title_obj_attribute("soft_root", language, fallback, force_reload)

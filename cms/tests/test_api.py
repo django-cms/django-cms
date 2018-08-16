@@ -206,7 +206,7 @@ class PythonAPITests(CMSTestCase):
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)
 
-    def  test_publish_page(self):
+    def test_publish_page(self):
         page_attrs = self._get_default_create_page_arguments()
         page_attrs['language'] = 'en'
         page_attrs['published'] = False

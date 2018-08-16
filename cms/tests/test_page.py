@@ -187,21 +187,6 @@ class PagesTestCase(TransactionCMSTestCase):
 
         self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
 
-    def test_delete_page_no_template(self):
-        page_data = {
-            'title': 'root',
-            'slug': 'root',
-            'language': settings.LANGUAGES[0][0],
-            'template': 'nav_playground.html',
-
-        }
-        page = create_page(**page_data)
-
-        # page.template = 'no_such_template.html'
-        page.delete()
-
-        self.assertEqual(Page.objects.count(), 0)
-
     def test_get_available_slug_recursion(self):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
         """
@@ -506,14 +491,13 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(child.get_template(), parent.get_template())
         child.move_page(parent.node, 'left')
         child = Page.objects.get(pk=child.pk)
+        self.assertEqual(child.get_template(), parent.get_template())
 
     def test_add_placeholder(self):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
                            position="last-child", published=True, in_navigation=True)
-        for title in page.title_set.all():
-            title.template = 'add_placeholder.html'
-            title.save()
+        page.update_translations(template='add_placeholder.html')
         page.publish('en')
         url = page.get_absolute_url()
         response = self.client.get(url)

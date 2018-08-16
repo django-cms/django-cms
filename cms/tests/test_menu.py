@@ -769,14 +769,10 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_home_not_in_menu(self):
         page1 = self.get_page(1)
-        for title in page1.title_set.all():
-            title.in_navigation = False
-            title.save()
+        page1.update_translations(in_navigation=False)
         page1.save()
         page4 = self.get_page(4)
-        for title in page4.title_set.all():
-            title.in_navigation = False
-            title.save()
+        page4.update_translations(in_navigation=False)
         page4.save()
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1221,9 +1217,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         hard_root = context['children']
         # root IS a soft root
         root = self.get_page('root')
-        for title in root.title_set.all():
-            title.soft_root = True
-            title.save()
+        root.update_translations(soft_root=True)
         aaa = self.get_page('aaa')
         context = self.get_context(aaa.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
@@ -1284,9 +1278,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         """
         # root IS a soft root
         root = self.get_page('root')
-        for title in root.title_set.all():
-            title.soft_root = True
-            title.save()
+        root.update_translations(soft_root=True)
         aaa = self.get_page('aaa')
         context = self.get_context(aaa.get_absolute_url(), page=aaa)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")

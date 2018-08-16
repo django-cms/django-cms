@@ -272,7 +272,10 @@ class AddPageForm(BasePageForm):
             extensions=False,
         )
         new_page.update(is_page_type=False)
-        new_page.title_set.update(in_navigation=True)
+        new_page.update_translations(
+            self._language,
+            in_navigation=True,
+        )
         return new_page
 
     def get_template(self):
@@ -391,7 +394,10 @@ class AddPageTypeForm(AddPageForm):
             extensions=False,
         )
         new_page.update(is_page_type=True)
-        new_page.title_set.update(in_navigation=False)
+        new_page.update_translations(
+            self._language,
+            in_navigation=False,
+        )
         return new_page
 
     def save(self, *args, **kwargs):
@@ -497,7 +503,7 @@ class ChangePageForm(BasePageForm):
         update_count = cms_page.update_translations(
             self._language,
             publisher_state=PUBLISHER_STATE_DIRTY,
-            changed_by=getattr(self._request.user, get_user_model().USERNAME_FIELD),
+            changed_by=self._request.user.get_username(),
             changed_date=timezone.now(),
             **translation_data
         )
@@ -836,7 +842,7 @@ class AdvancedSettingsForm(forms.ModelForm):
             xframe_options=data.get('xframe_options'),
             template=data.get('template'),
             soft_root=data.get('soft_root'),
-            changed_by=getattr(self._request.user, get_user_model().USERNAME_FIELD),
+            changed_by=self._request.user.get_username(),
             changed_date=timezone.now(),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
@@ -881,9 +887,9 @@ class PagePermissionForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         if "limit_visibility_in_menu" in self.changed_data:
             self.instance.update_translations(
-                language=self._language,
+                self._language,
                 limit_visibility_in_menu=self.cleaned_data["limit_visibility_in_menu"],
-                changed_by=getattr(self._request.user, get_user_model().USERNAME_FIELD),
+                changed_by=self._request.user.get_username(),
                 changed_date=timezone.now(),
             )
         page = super(PagePermissionForm, self).save(*args, **kwargs)

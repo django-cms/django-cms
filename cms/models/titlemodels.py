@@ -228,18 +228,6 @@ class Title(models.Model):
             language=self.language,
         )
 
-    def get_changed_date(self):
-        """
-        get when this title was last updated
-        """
-        return self.changed_date
-
-    def get_changed_by(self):
-        """
-        get user who last changed this title
-        """
-        return self.changed_by
-
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
@@ -332,3 +320,9 @@ class EmptyTitle(object):
     @property
     def overwrite_url(self):
         return None
+
+    def get_template(self):
+        return self.template
+
+    def get_xframe_options(self):
+        return self.xframe_options

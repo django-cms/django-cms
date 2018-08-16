@@ -163,7 +163,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # ugly permissions hack
     if created_by and isinstance(created_by, get_user_model()):
         _thread_locals.user = created_by
-        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+        created_by = created_by.get_username()
     else:
         _thread_locals.user = None
 
@@ -253,7 +253,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         path = page.get_path_for_slug(slug, language)
 
     if created_by and isinstance(created_by, get_user_model()):
-        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+        created_by = created_by.get_username()
 
     title = Title.objects.create(
         language=language,

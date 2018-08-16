@@ -170,7 +170,7 @@ class CreateCMSPageForm(AddPageForm):
                 is_page_type=True,
             )
             new_page.update_translations(
-                language=self._language,
+                self._language,
                 in_navigation=False,
             )
 

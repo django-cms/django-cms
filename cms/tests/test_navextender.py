@@ -53,9 +53,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 4)
         self.assertEqual(len(nodes[0].children[3].children), 1)
-        for title in Title.objects.filter(title='page1'):
-            title.in_navigation = False
-            title.save()
+        Title.objects.filter(title='page1').update(in_navigation=False)
         menu_pool.clear(settings.SITE_ID)
         tpl = Template("{% load menu_tags %}{% show_menu %}")
         tpl.render(context)
@@ -76,9 +74,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         """
         TestMenu has 4 flat nodes
         """
-        for title in Title.objects.filter(title='page1'):
-            title.in_navigation = False
-            title.save()
+        Title.objects.filter(title='page1').update(in_navigation=False)
         self._update_page(2, navigation_extenders="TestMenu")
         menu_pool.clear(settings.SITE_ID)
         menu_pool.clear(settings.SITE_ID)
