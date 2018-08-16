@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='title',
             name='limit_visibility_in_menu',
-            field=models.SmallIntegerField(blank=True, choices=[(1, 'for logged in users only'), (2, 'for anonymous users only')], db_index=True, default=None, help_text='limit when this page is visible in the menu', null=True, verbose_name='menu visibility'),
+            field=models.SmallIntegerField(blank=True, choices=Title.LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True, default=None, help_text='limit when this page is visible in the menu', null=True, verbose_name='menu visibility'),
         ),
         migrations.AddField(
             model_name='title',
