@@ -65,7 +65,7 @@ class ToolbarMiddleware(MiddlewareMixin):
         edit_disabled = edit_off in request.GET or 'preview' in request.GET
         """
 
-        enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
         if disable_toolbar in request.GET:

@@ -73,6 +73,7 @@ DEFAULTS = {
     'TOOLBAR_URL__EDIT_OFF': 'edit_off',
     'TOOLBAR_URL__BUILD': 'structure',
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
+    'TOOLBAR_URL__ENABLE': 'toolbar_on',
     'ADMIN_NAMESPACE': 'admin',
     'APP_NAME': None,
     'TOOLBAR_HIDE': False,
@@ -124,6 +125,11 @@ def get_toolbar_url__structure():
 @default('CMS_TOOLBAR_URL__DISABLE')
 def get_toolbar_url__disable():
     return get_cms_setting('TOOLBAR_URL__DISABLE')
+
+
+@default('CMS_TOOLBAR_URL__ENABLE')
+def get_toolbar_url__enable():
+    return get_cms_setting('TOOLBAR_URL__ENABLE')
 
 
 def get_templates():
@@ -273,6 +279,7 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
     'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__structure,
     'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
+    'CMS_TOOLBAR_URL__ENABLE': get_toolbar_url__enable,
 }
 
 
