@@ -264,16 +264,18 @@ class PageToolbar(CMSToolbar):
     def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
-        build_url = get_object_structure_url(self.title)
-        edit_url = get_object_edit_url(self.title)
 
-        if self.request.user.has_perm("cms.use_structure"):
-            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
-                                                    extra_classes=extra_classes)
-            switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
-                    extra_classes='cms-structure-btn')
-            switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
-                    extra_classes='cms-content-btn')
+        with force_language(self.current_lang):
+            build_url = get_object_structure_url(self.title) if self.title else ''
+            edit_url = get_object_edit_url(self.title) if self.title else ''
+
+            if self.request.user.has_perm("cms.use_structure"):
+                switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                        extra_classes=extra_classes)
+                switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
+                        extra_classes='cms-structure-btn')
+                switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
+                        extra_classes='cms-content-btn')
 
     def get_title(self):
         try:

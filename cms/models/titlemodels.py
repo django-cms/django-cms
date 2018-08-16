@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import override as force_language, ugettext_lazy as _
 
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
@@ -176,9 +176,10 @@ class Title(models.Model):
         return self._placeholder_cache
 
     def get_absolute_url(self):
-        if self.page.is_home:
-            return reverse('pages-root')
-        return reverse('pages-details-by-slug', kwargs={'slug': self.path})
+        with force_language(self.language):
+            if self.page.is_home:
+                return reverse('pages-root')
+            return reverse('pages-details-by-slug', kwargs={'slug': self.path})
 
 
 class EmptyTitle(object):

@@ -25,6 +25,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
@@ -914,9 +915,10 @@ class ApphooksTestCase(CMSTestCase):
         homepage = create_page('EN-P1', **defaults)
         homepage.set_as_homepage()
         app_root = create_page('EN-P2', apphook='AppWithNoMenu', apphook_namespace='app_with_no_menu', **defaults)
+        app_root_content = self.get_page_title_obj(app_root)
 
         # Public version
-        request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
+        request = self.get_request(get_object_edit_url(app_root_content))
         request.current_page = get_page(request)
         menu_nodes = menu_pool.get_renderer(request).get_nodes()
         self.assertEqual(len(menu_nodes), 2)
@@ -927,7 +929,7 @@ class ApphooksTestCase(CMSTestCase):
 
         # Draft version
         with self.login_user_context(self.get_superuser()):
-            request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
+            request = self.get_request(get_object_edit_url(app_root_content))
             request.current_page = get_page(request)
             menu_nodes = menu_pool.get_renderer(request).get_nodes()
             self.assertEqual(len(menu_nodes), 2)

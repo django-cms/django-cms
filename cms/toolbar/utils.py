@@ -8,6 +8,7 @@ from django.utils.six import text_type
 from django.utils.translation import override as force_language, ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.utils.i18n import get_current_language
 from cms.utils.urlutils import admin_reverse
 
 
@@ -121,14 +122,20 @@ def get_toolbar_from_request(request):
 
 def get_object_edit_url(obj):
     content_type = ContentType.objects.get_for_model(obj)
-    return admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+
+    with force_language(get_current_language()):
+        return admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
 
 
 def get_object_preview_url(obj):
     content_type = ContentType.objects.get_for_model(obj)
-    return admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+
+    with force_language(get_current_language()):
+        return admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
 
 
 def get_object_structure_url(obj):
     content_type = ContentType.objects.get_for_model(obj)
-    return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+
+    with force_language(get_current_language()):
+        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
