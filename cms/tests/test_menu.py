@@ -782,9 +782,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
         self.assertEqual(nodes[0].children[0].get_absolute_url(), self.get_page(3).get_absolute_url())
         page4 = self.get_page(4)
-        for title in page4.title_set.all():
-            title.in_navigation = True
-            title.save()
+        page4.update_translations(in_navigation=True)
         page4.save()
         menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
