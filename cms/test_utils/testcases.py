@@ -164,6 +164,11 @@ class BaseCMSTestCase(object):
         pp.sites = Site.objects.all()
         return pp
 
+    def get_page_title_obj(self, page, language):
+        from cms.models import Title
+
+        return Title.objects.get(language=language, page=page)
+
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):
         """
@@ -606,18 +611,15 @@ class BaseCMSTestCase(object):
         return endpoint
 
     def get_edit_on_url(self, obj, lang="en"):
-
-        # FIXME: Terrible, should use title / PageContent by default!!
+        # FIXME: Terrible, We sohould be accessing this method when required. Requires clean up
         if obj.__class__.__name__ == "Page":
-            obj = obj.get_title_obj(lang)
-
+            obj = self.get_page_title_obj(page=obj, language=lang)
         return get_object_edit_url(obj)
 
     def get_edit_off_url(self, obj, lang="en"):
-
-        # FIXME: Terrible, should use title / PageContent by default!!
+        # FIXME: Terrible, We sohould be accessing this method when required. Requires clean up
         if obj.__class__.__name__ == "Page":
-            obj = obj.get_title_obj(lang)
+            obj = self.get_page_title_obj(page=obj, language=lang)
 
         return get_object_preview_url(obj)
 
