@@ -462,10 +462,9 @@ class Page(models.Model):
             # to keep all plugins / placeholders.
             template = self.get_template()
             self.update_translations(template=template)
-            self.title_cache = {}
 
         # Don't use a cached node. Always get a fresh one.
-        self._clear_node_cache()
+        self._clear_internal_cache()
 
         # Runs the SQL updates on the treebeard fields
         self.node.move(target_node, position)
