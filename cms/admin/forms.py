@@ -243,7 +243,7 @@ class AddPageForm(BasePageForm):
     def create_translation(self, page):
         data = self.cleaned_data
         if data.get('source'):
-            template = page.get_template(self._language)
+            template = data.get('source').get_template(self._language)
         else:
             template = self.get_template()
         title_kwargs = {
