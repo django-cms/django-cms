@@ -313,8 +313,7 @@ class ContextTests(CMSTestCase):
                 num_queries_page = len(context.captured_queries)
         cache.clear()
         menu_pool.clear()
-        page_2.template = 'INHERIT'
-        page_2.save()
+        page_2.update_translations(template='INHERIT')
         page_2.publish('en')
         with self.settings(**original_context):
             # One query more triggered as page inherits template from ancestor
