@@ -34,7 +34,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.page import get_available_slug
+from cms.utils.page import get_available_slug, get_clean_username
 from cms.utils.permissions import _thread_locals, current_user
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
@@ -163,7 +163,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # ugly permissions hack
     if created_by and isinstance(created_by, get_user_model()):
         _thread_locals.user = created_by
-        created_by = created_by.get_username()
+        created_by = get_clean_username(created_by)
     else:
         _thread_locals.user = None
 
@@ -253,7 +253,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         path = page.get_path_for_slug(slug, language)
 
     if created_by and isinstance(created_by, get_user_model()):
-        created_by = created_by.get_username()
+        created_by = get_clean_username(created_by)
 
     title = Title.objects.create(
         language=language,
