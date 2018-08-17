@@ -23,6 +23,14 @@ class ToolbarMiddleware(MiddlewareMixin):
     Middleware to set up CMS Toolbar.
     """
 
+    def is_edit_mode(self, request):
+        try:
+            match = resolve(request.path_info)
+        except:
+            return False
+
+        return match.url_name == 'cms_placeholder_render_object_edit'
+
     def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
         internal_ips = get_cms_setting('INTERNAL_IPS')
@@ -64,13 +72,13 @@ class ToolbarMiddleware(MiddlewareMixin):
         edit_enabled = edit_on in request.GET and 'preview' not in request.GET
         edit_disabled = edit_off in request.GET or 'preview' in request.GET
         """
-
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
         if disable_toolbar in request.GET:
             request.session['cms_toolbar_disabled'] = True
-        elif enable_toolbar in request.GET:
+
+        if enable_toolbar in request.GET or self.is_edit_mode(request):
             request.session['cms_toolbar_disabled'] = False
 
         # TODO: AA Remove me
