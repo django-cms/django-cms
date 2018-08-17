@@ -958,7 +958,7 @@ class ApphooksTestCase(CMSTestCase):
         app_root = create_page('EN-P2', apphook='AppWithNoMenu', apphook_namespace='app_with_no_menu', **defaults)
 
         # Public version
-        request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
+        request = self.get_request('/en/en-p2/settings/')
         request.current_page = get_page(request)
         menu_nodes = menu_pool.get_renderer(request).get_nodes()
         self.assertEqual(len(menu_nodes), 2)
@@ -969,7 +969,7 @@ class ApphooksTestCase(CMSTestCase):
 
         # Draft version
         with self.login_user_context(self.get_superuser()):
-            request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
+            request = self.get_request('/en/en-p2/settings/')
             request.current_page = get_page(request)
             menu_nodes = menu_pool.get_renderer(request).get_nodes()
             self.assertEqual(len(menu_nodes), 2)
