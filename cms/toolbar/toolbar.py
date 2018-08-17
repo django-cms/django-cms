@@ -77,16 +77,21 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def structure_mode_active(self):
-        return (self.is_staff and self.request.resolver_match
-                and self.request.resolver_match.url_name == "cms_placeholder_render_object_structure")
+        try:
+            match = resolve(self.request.path_info)
+        except:
+            return False
+        return self.is_staff and match.url_name == 'cms_placeholder_render_object_structure'
 
     @cached_property
     def edit_mode_active(self):
         if not self.show_toolbar:
             return False
-        #FIXME: AA Why is structure mode not a not????
-        return (self.structure_mode_active or (self.request.resolver_match
-                and self.request.resolver_match.url_name == "cms_placeholder_render_object_edit"))
+        try:
+            match = resolve(self.request.path_info)
+        except:
+            return False
+        return self.structure_mode_active or match.url_name == 'cms_placeholder_render_object_edit'
 
     @cached_property
     def content_mode_active(self):
@@ -97,10 +102,6 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def uses_legacy_structure_mode(self):
-        current_page = self.request.current_page
-
-        #if not current_page or current_page.application_urls:
-        #    return True
         return False
 
     @cached_property

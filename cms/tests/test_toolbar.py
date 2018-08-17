@@ -1143,7 +1143,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         page = create_page('Test', 'col_two.html', 'en', published=True)
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
-        preview_url = get_object_edit_url(page_content)
+        preview_url = get_object_preview_url(page_content)
         ex1 = self._get_example_obj()
         # object
         # check when in draft mode
@@ -1164,7 +1164,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = self._get_example_obj()
         request = self.get_page_request(page, user)
         response = detail_view(request, ex1.pk)
-        self.assertContains(response, "<h1>char_1</h1>")
+        self.assertContains(response, "<h1>one</h1>")
         self.assertNotContains(response, "CMS.API")
 
     def test_noedit(self):
@@ -1173,7 +1173,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = self._get_example_obj()
         request = self.get_page_request(page, user)
         response = detail_view(request, ex1.pk)
-        self.assertContains(response, "<h1>char_1</h1>")
+        self.assertContains(response, "<h1>one</h1>")
         self.assertContains(response, "CMS.API")
 
     def test_edit(self):
@@ -1188,7 +1188,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<h1><template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template></h1>'.format(
                 'placeholderapp', 'example1', 'char_1', ex1.pk))
 
@@ -1475,7 +1475,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% render_model_icon instance %}
 {% endblock content %}
 '''
-        request = self.get_page_request(ex1, user, edit_url)
+        request = self.get_page_request(None, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
@@ -1775,7 +1775,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<h1><template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template></h1>'.format(
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
@@ -1835,7 +1835,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<h1>'
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'.format(
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
@@ -1858,7 +1858,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         expected_output = (
             '<h1>'
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'
         ).format('placeholderapp', 'example1', 'callable_item', ex1.pk)
@@ -1883,7 +1883,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<h1>'
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'.format(
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
@@ -1909,7 +1909,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<h1>'
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'.format(
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
@@ -1936,7 +1936,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<h1>'
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'.format(
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
@@ -1961,7 +1961,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<h1>'
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
-            'char_1'
+            'one'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             '</h1>'.format(
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
@@ -1980,7 +1980,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request.GET['edit_fields'] = 'char_1'
         response = exadmin.edit_field(request, ex1.pk, "en")
         self.assertContains(response, 'id="id_char_1"')
-        self.assertContains(response, 'value="char_1"')
+        self.assertContains(response, 'value="one"')
 
     def test_edit_field_not_allowed(self):
         from django.contrib.admin import site
