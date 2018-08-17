@@ -48,14 +48,14 @@ from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 class ToolbarTestBase(CMSTestCase):
 
     # Remove path from all calls to this method
-    def get_page_request(self, object, user, path=None, edit=False,
+    def get_page_request(self, obj, user, path=None, edit=False,
                          preview=False, lang_code='en', disable=False):
         if not path:
-            path = object.get_absolute_url()
+            path = obj.get_absolute_url()
 
-        editable_object = object
-        if object and object.__class__.__name__ == "Page":
-            editable_object = self.get_page_title_obj(object)
+        editable_object = obj
+        if obj and obj.__class__.__name__ == 'Page':
+            editable_object = self.get_page_title_obj(obj)
 
         if edit:
             path = get_object_edit_url(editable_object)
@@ -425,7 +425,6 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         ex1 = self._get_example_obj()
         obj_edit_url = get_object_edit_url(ex1)
-        obj_preview_url = get_object_preview_url(ex1)
         output = (
             '<a class="cms-btn cms-btn-action cms-btn-switch-edit" '
             'href="/en/example/latest/?{}">Edit</a>'
@@ -1447,7 +1446,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% render_model_icon instance %}
 {% endblock content %}
 '''
-        request = self.get_page_request(None, user, path='/', edit=True)
+        request = self.get_page_request(ex1, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,

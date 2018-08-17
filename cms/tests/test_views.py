@@ -8,13 +8,18 @@ from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
+from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_title, publish_page
 from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.toolbar.utils import get_object_structure_url, get_object_edit_url
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url,
+)
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 from menus.menu_pool import menu_pool
@@ -132,34 +137,27 @@ class ViewTests(CMSTestCase):
     def test_redirect_with_toolbar(self):
         page = create_page("one", "nav_playground.html", "en", published=True,
                     redirect='/en/page2')
-        page_content = page.get_title_obj("en")
-
-        page_url = page.get_absolute_url()
-        page_edit_url = get_object_edit_url(page_content)
-        page_structure_url = get_object_structure_url(page_content)
+        page_content = self.get_page_title_obj(page)
+        page_edit_on_url = get_object_edit_url(page_content)
 
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            # The edit works?
-            response = self.client.get(page_edit_url)
+            response = self.client.get(page_edit_on_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'This page has no preview')
 
-            # The edit off works?
-            self.client.get(page_edit_url)
-            response = self.client.get(page_url)
+            self.client.get(page_edit_on_url)
+            response = self.client.get(get_object_preview_url(page_content))
             self.assertEqual(response.status_code, 302)
 
-            # The structure works?
-            # FIXME: Possibly expecting to use toolbar_with_structure.html to redirect
-            self.client.get(page_edit_url)
-            response = self.client.get(page_structure_url)
+            self.client.get(page_edit_on_url)
+            response = self.client.get(get_object_structure_url(page_content))
             self.assertEqual(response.status_code, 200)
+            # FIXME: This fails as structure is not rendering properly
             self.assertContains(response, 'This page has no preview')
 
-            # The toolbar disable works?
-            self.client.get(page_edit_url)
-            response = self.client.get(self.get_toolbar_disable_url(page_url))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_toolbar_disable_url(page_edit_on_url))
             self.assertEqual(response.status_code, 302)
 
     def test_login_required(self):
@@ -180,15 +178,15 @@ class ViewTests(CMSTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
-        page_url = page.get_absolute_url()
+        # FIXME: Fails because it's redirected to login page
         # Anon user
-        response = self.client.get(self.get_edit_on_url(page_url))
+        response = self.client.get(self.get_edit_on_url(page))
         self.assertNotContains(response, "cms_toolbar-item-switch-save-edit", 200)
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get(self.get_edit_on_url(page_url))
+            response = self.client.get(self.get_edit_on_url(page))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
         # Admin but with no permission
@@ -196,12 +194,12 @@ class ViewTests(CMSTestCase):
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
         with self.login_user_context(user):
-            response = self.client.get(self.get_edit_on_url(page_url))
+            response = self.client.get(self.get_edit_on_url(page))
         self.assertNotContains(response, "cms-toolbar-item-switch-save-edit", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
-            response = self.client.get(self.get_edit_on_url(page_url))
+            response = self.client.get(self.get_edit_on_url(page))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
     def test_toolbar_switch_urls(self):
@@ -213,22 +211,27 @@ class ViewTests(CMSTestCase):
         user_settings.save()
 
         page = create_page("page", "nav_playground.html", "en", published=True)
-        create_title("fr", "french home", page)
+        page_content = create_title("fr", "french home", page)
         publish_page(page, user, "fr")
 
         page.set_as_homepage()
 
-        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        with self.login_user_context(user), force_language('fr'):
+            edit_url = get_object_edit_url(page_content)
+            preview_url = get_object_preview_url(page_content)
+            structure_url = get_object_structure_url(page_content)
 
-        with self.login_user_context(user):
-            response = self.client.get("/fr/?{}".format(edit_on))
+            response = self.client.get(edit_url)
             expected = """
-                <a href="?structure" class="cms-btn cms-btn-disabled" title="Toggle structure"
-                data-cms-structure-btn='{ "url": "/fr/?structure", "name": "Structure" }'
-                data-cms-content-btn='{ "url": "/fr/?edit", "name": "Content" }'>
+                <a href="%s" class="cms-btn cms-btn-disabled" title="Toggle structure"
+                data-cms-structure-btn='{ "url": "%s", "name": "Structure" }'
+                data-cms-content-btn='{ "url": "%s", "name": "Content" }'>
                 <span class="cms-icon cms-icon-plugins"></span></a>
-            """
+            """ % (
+                structure_url,
+                structure_url,
+                edit_url,
+            )
             self.assertContains(
                 response,
                 expected,
@@ -237,12 +240,14 @@ class ViewTests(CMSTestCase):
             )
             self.assertContains(
                 response,
-                '<a class="cms-btn cms-btn-switch-save" href="/fr/?preview&{}">'
-                '<span>View published</span></a>'.format(edit_off),
+                '<a class="cms-btn cms-btn-switch-save" href="%s">'
+                '<span>View published</span></a>' % (
+                    preview_url,
+                ),
                 count=1,
                 html=True,
             )
-            response = self.client.get("/fr/?preview&{}".format(edit_off))
+            response = self.client.get(preview_url)
             self.assertContains(
                 response,
                 expected,
@@ -251,7 +256,9 @@ class ViewTests(CMSTestCase):
             )
             self.assertContains(
                 response,
-                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{}">Edit</a>'.format(edit_on),
+                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="%s">Edit</a>' % (
+                    edit_url,
+                ),
                 count=1,
                 html=True,
             )

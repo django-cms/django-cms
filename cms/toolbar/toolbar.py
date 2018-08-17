@@ -11,7 +11,11 @@ from cms.models import UserSettings, Placeholder
 from cms.templates import TemplatesCache
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_structure_url,
+    get_object_preview_url,
+)
 from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
@@ -34,7 +38,6 @@ class BaseToolbar(ToolbarAPIMixin):
 
     edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-    structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
 
@@ -317,20 +320,40 @@ class CMSToolbar(BaseToolbar):
         return ''
 
     def get_object_preview_url(self):
-        # Gets the PageContents of a page!
-        obj = self.obj
-        #FIXME: If the toolbar was focused on Title this wouldn't be an issue/
-        if obj.__class__.__name__ == "Page":
-            obj = self.obj.get_title_obj(language=self.request_language)
-        return get_object_preview_url(obj)
+        if self.obj:
+            obj = self.obj
+
+            # FIXME: Once title is passed this can be removed
+            if obj.__class__.__name__ == 'Page':
+                obj = self.obj.get_title_obj(language=self.request_language)
+
+            with force_language(self.request_language):
+                return get_object_preview_url(obj)
+        return ''
 
     def get_object_edit_url(self):
-        # Gets the PageContents of a page!
-        obj = self.obj
-        #FIXME: If the toolbar was focused on Title this wouldn't be an issue/
-        if obj.__class__.__name__ == "Page":
-            obj = self.obj.get_title_obj(language=self.request_language)
-        return get_object_edit_url(obj)
+        if self.obj:
+            obj = self.obj
+
+            # FIXME: Once title is passed this can be removed
+            if obj.__class__.__name__ == 'Page':
+                obj = self.obj.get_title_obj(language=self.request_language)
+
+            with force_language(self.request_language):
+                return get_object_edit_url(obj)
+        return ''
+
+    def get_object_structure_url(self):
+        if self.obj:
+            obj = self.obj
+
+            # FIXME: Once title is passed this can be removed
+            if obj.__class__.__name__ == 'Page':
+                obj = self.obj.get_title_obj(language=self.request_language)
+
+            with force_language(self.request_language):
+                return get_object_structure_url(obj)
+        return ''
 
     # Internal API
 
@@ -444,7 +467,7 @@ class CMSToolbar(BaseToolbar):
             'cms_renderer': renderer,
             'cms_edit_on': self.edit_mode_url_on,
             'cms_edit_off': self.edit_mode_url_off,
-            'cms_structure_on': self.structure_mode_url_on,
+            'cms_structure_on': self.get_object_structure_url(),
             'cms_version': __version__,
             'django_version': DJANGO_VERSION,
             'login_form': CMSToolbarLoginForm(),

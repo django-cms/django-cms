@@ -163,10 +163,6 @@ def details(request, slug):
     # permission checks
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
-
-    if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(page)
-
     return render_page(request, page, current_language=request_language, slug=slug)
 
 
@@ -191,6 +187,7 @@ def login(request):
 
 def render_object_structure(request, content_type_id, object_id):
     content_type = ContentType.objects.get_for_id(content_type_id)
+
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
@@ -200,6 +197,9 @@ def render_object_structure(request, content_type_id, object_id):
         'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
+
+    if hasattr(request, 'toolbar'):
+        request.toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
 
 
@@ -210,20 +210,24 @@ def render_object_edit(request, content_type_id, object_id):
         raise Http404
 
     try:
-        ct_object = content_type.get_object_for_this_type(pk=object_id)
+        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
-    if not hasattr(ct_object, 'get_absolute_url'):
+    if not hasattr(content_type_obj, 'get_absolute_url'):
         raise NotImplementedError('get_absolute_url not implemented for object')
 
-    abs_url = ct_object.get_absolute_url()
+    abs_url = content_type_obj.get_absolute_url()
     match = resolve(abs_url)
+
+    if hasattr(request, 'toolbar'):
+        request.toolbar.set_object(content_type_obj)
     return match.func(request, **match.kwargs)
 
 
 def render_object_preview(request, content_type_id, object_id):
     content_type = ContentType.objects.get_for_id(content_type_id)
+
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
@@ -231,6 +235,9 @@ def render_object_preview(request, content_type_id, object_id):
 
     abs_url = content_type_obj.get_absolute_url()
     match = resolve(abs_url)
+
+    if hasattr(request, 'toolbar'):
+        request.toolbar.set_object(content_type_obj)
     return match.func(request, **match.kwargs)
 
 # THIS SHOULD BE MOVED TO A PROPER UTILS FILE
