@@ -415,7 +415,7 @@ class ToolbarTests(ToolbarTestBase):
         obj_edit_url = get_object_edit_url(ex1)
         output = (
             '<a class="cms-btn cms-btn-action cms-btn-switch-edit" '
-            'href="/en/example/latest/?{}">Edit</a>'
+            'href="{}">Edit</a>'
         ).format(obj_edit_url)
 
         with self.login_user_context(superuser):
