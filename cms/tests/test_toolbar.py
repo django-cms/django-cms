@@ -55,12 +55,11 @@ class ToolbarTestBase(CMSTestCase):
         request.session = {}
         request.user = user
         request.LANGUAGE_CODE = lang_code
+        request.current_page = page
 
         request.GET = {}
-        if disable and not edit:
+        if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
-
-        request.current_page = page
 
         mid = ToolbarMiddleware()
         mid.process_request(request)
@@ -666,7 +665,7 @@ class ToolbarTests(ToolbarTestBase):
         user = self.get_staff()
         # en page
         cms_page = create_page('test-en', 'nav_playground.html', 'en', published=True)
-        page_content_en = self.get_page_title_obj(page)
+        page_content_en = self.get_page_title_obj(cms_page)
         edit_url_en = get_object_edit_url(page_content_en)
         # de page
         page_content_de = create_title('de', 'test-de', cms_page)
@@ -691,7 +690,10 @@ class ToolbarTests(ToolbarTestBase):
         Tests that even called multiple times, admin and language buttons are not duplicated
         """
         user = self.get_staff()
-        en_request = self.get_page_request(None, user, edit=True, path='/')
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page_content = self.get_page_title_obj(page)
+        edit_url = get_object_edit_url(page_content)
+        en_request = self.get_page_request(page, user, edit_url)
         toolbar = CMSToolbar(en_request)
         toolbar.populated = False
         toolbar.populate()
