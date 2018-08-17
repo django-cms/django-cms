@@ -99,8 +99,8 @@ class BaseToolbar(ToolbarAPIMixin):
     def uses_legacy_structure_mode(self):
         current_page = self.request.current_page
 
-        if not current_page or current_page.application_urls:
-            return True
+        #if not current_page or current_page.application_urls:
+        #    return True
         return False
 
     @cached_property
