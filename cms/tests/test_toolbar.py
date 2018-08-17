@@ -546,8 +546,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.show_toolbar)
 
     def test_show_toolbar_with_edit(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en",
-                           published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en",  published=True)
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
         request = self.get_page_request(page, AnonymousUser(), edit_url)
@@ -803,10 +802,9 @@ class ToolbarTests(ToolbarTestBase):
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
         page = self.create_homepage("home", "nav_playground.html", "en", published=True)
-        resolve_url_on = '%s?%s' % (admin_reverse('cms_page_resolve'),
-                                    get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        resolve_url_off = '%s?%s' % (admin_reverse('cms_page_resolve'),
-                                     get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+        page_content = self.get_page_title_obj(page)
+        resolve_url_on = admin_reverse('cms_page_resolve') # get_object_edit_url(page_content)
+        resolve_url_off = admin_reverse('cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url_on, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
@@ -830,10 +828,9 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_page_edit_redirect_editmode(self):
         page1 = self.create_homepage("home", "nav_playground.html", "en", published=True)
-        page2 = create_page("test", "nav_playground.html", "en",
-                            published=True)
-        page3 = create_page("non-pub", "nav_playground.html", "en",
-                            published=False)
+        page2 = create_page("test", "nav_playground.html", "en", published=True)
+        page3 = create_page("non-pub", "nav_playground.html", "en", published=False)
+        page3_content = self.get_page_title_obj(page3)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
@@ -848,7 +845,7 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.content.decode('utf-8'), '/en/')
             # non published page - staff user can access it
             response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '/en/admin/cms/placeholder/object/17/edit/5/')
+            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page3_content))
         # anonymous users should be redirected to the root page
         response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
         self.assertEqual(response.content.decode('utf-8'), '/')
