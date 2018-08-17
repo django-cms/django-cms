@@ -183,4 +183,4 @@ class TestNoI18N(CMSTestCase):
         del request.LANGUAGE_CODE
         toolbar = CMSToolbar(request)
         toolbar.set_object(sub)
-        self.assertEqual(toolbar.get_object_public_url(), '/test/sub/')
+        self.assertEqual(toolbar.get_object_preview_url(), '/test/sub/')
