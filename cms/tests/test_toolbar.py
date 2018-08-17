@@ -72,8 +72,8 @@ class ToolbarTestBase(CMSTestCase):
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
 
         current_page = None
-        if object and object.__class__.__name__ == "Page":
-            current_page = object
+        if obj and obj.__class__.__name__ == 'Page':
+            current_page = obj
         request.current_page = current_page
 
         mid = ToolbarMiddleware()
@@ -427,7 +427,7 @@ class ToolbarTests(ToolbarTestBase):
         obj_edit_url = get_object_edit_url(ex1)
         output = (
             '<a class="cms-btn cms-btn-action cms-btn-switch-edit" '
-            'href="/en/example/latest/?{}">Edit</a>'
+            'href="{}">Edit</a>'
         ).format(obj_edit_url)
 
         with self.login_user_context(superuser):
