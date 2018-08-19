@@ -13,6 +13,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_edit_url
 from cms.views import details
 
 
@@ -715,8 +716,9 @@ class RenderingTestCase(CMSTestCase):
         ]
 
         with self.login_user_context(self.get_superuser()):
-            request = self.get_request(page.get_absolute_url(), page=page)
-            request.session = {'cms_edit': True}
+            page_content = self.get_page_title_obj(page)
+            request = self.get_request(get_object_edit_url(page_content))
+            request.session = {}
             request.toolbar = CMSToolbar(request)
             context = SekizaiContext()
             context['request'] = request

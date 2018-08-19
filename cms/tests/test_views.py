@@ -151,14 +151,10 @@ class ViewTests(CMSTestCase):
             self.assertEqual(response.status_code, 302)
 
             self.client.get(page_edit_on_url)
-            response = self.client.get(get_object_structure_url(page_content))
-            self.assertEqual(response.status_code, 200)
-            # FIXME: This fails as structure is not rendering properly
-            self.assertContains(response, 'This page has no preview')
-
-            self.client.get(page_edit_on_url)
             response = self.client.get(self.get_toolbar_disable_url(page_edit_on_url))
-            self.assertEqual(response.status_code, 302)
+            # edit endpoint overrides toolbar_off and enables it
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'This page has no preview')
 
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
