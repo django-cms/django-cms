@@ -19,11 +19,11 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.models.placeholdermodel import Placeholder
 from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import is_model_editable
 from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             get_default_language_for_site,
@@ -239,30 +239,3 @@ def render_object_preview(request, content_type_id, object_id):
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(content_type_obj)
     return match.func(request, **match.kwargs)
-
-# THIS SHOULD BE MOVED TO A PROPER UTILS FILE
-def is_model_editable(model_class):
-    """
-    Return True if the model_class is editable.
-    Checks whether the model_class has any relationships with Placeholder.
-    If not, checks whether the model_class has an admin class
-    and is inherited by FrontendEditableAdminMixin.
-    :param model_class: The model class
-    :return: Boolean
-    """
-    # First check whether model_class has
-    # any fields which has a relation to Placeholder
-    for field in model_class._meta.get_fields():
-        if field.related_model == Placeholder:
-            return True
-
-    # Check whether model_class has an admin class
-    # and whether its inherited from FrontendEditableAdminMixin
-    from django.contrib import admin
-    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
-
-    admin_class = admin.site._registry[model_class]
-
-    if admin_class and issubclass(admin_class.__class__, FrontendEditableAdminMixin):
-        return True
-    return False
