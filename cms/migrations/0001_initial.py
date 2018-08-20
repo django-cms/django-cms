@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from cms.models import ACCESS_CHOICES, Page
+from cms.models import ACCESS_CHOICES, Title
 from cms.utils.conf import get_cms_setting
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from django.conf import settings
@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
                 ('navigation_extenders', models.CharField(db_index=True, max_length=80, blank=True, verbose_name=_('attached menu'), null=True)),
                 ('template', models.CharField(max_length=100, default=template_default, help_text='The template used to render the content.', verbose_name=_('template'), choices=template_choices)),
                 ('login_required', models.BooleanField(default=False, verbose_name=_('login required'))),
-                ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name=_('menu visibility'), null=True, choices=Page.LIMIT_VISIBILITY_IN_MENU_CHOICES, help_text='limit when this page is visible in the menu', blank=True)),
+                ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name=_('menu visibility'), null=True, choices=Title.LIMIT_VISIBILITY_IN_MENU_CHOICES, help_text='limit when this page is visible in the menu', blank=True)),
                 ('is_home', models.BooleanField(db_index=True, default=False, editable=False)),
                 ('application_urls', models.CharField(db_index=True, max_length=200, blank=True, verbose_name=_('application'), null=True)),
                 ('application_namespace', models.CharField(max_length=200, null=True, blank=True, verbose_name=_('application instance name'))),
@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
                 ('publisher_is_draft', models.BooleanField(db_index=True, default=True, editable=False)),
                 ('languages', models.CharField(max_length=255, null=True, blank=True, editable=False)),
                 ('revision_id', models.PositiveIntegerField(default=0, editable=False)),
-                ('xframe_options', models.IntegerField(default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'), choices=Page.X_FRAME_OPTIONS_CHOICES)),
+                ('xframe_options', models.IntegerField(default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'), choices=Title.X_FRAME_OPTIONS_CHOICES)),
                 ('parent', models.ForeignKey(on_delete=models.CASCADE, null=True, to='cms.Page', related_name='children', blank=True)),
                 ('publisher_public', models.OneToOneField(null=True, to='cms.Page', related_name='publisher_draft', editable=False, on_delete=models.CASCADE)),
                 ('site', models.ForeignKey(on_delete=models.CASCADE, to='sites.Site', verbose_name=_('site'), related_name='djangocms_pages', help_text='The site the page is accessible at.')),
