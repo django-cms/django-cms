@@ -174,15 +174,16 @@ class ViewTests(CMSTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
-        # FIXME: Fails because it's redirected to login page
+        page_content = self.get_page_title_obj(page)
+        page_edit_url = get_object_edit_url(page_content)
         # Anon user
-        response = self.client.get(self.get_edit_on_url(page))
+        response = self.client.get(page_edit_url)
         self.assertNotContains(response, "cms_toolbar-item-switch-save-edit", 200)
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get(self.get_edit_on_url(page))
+            response = self.client.get(page_edit_url)
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
         # Admin but with no permission
@@ -190,12 +191,12 @@ class ViewTests(CMSTestCase):
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
         with self.login_user_context(user):
-            response = self.client.get(self.get_edit_on_url(page))
+            response = self.client.get(page_edit_url)
         self.assertNotContains(response, "cms-toolbar-item-switch-save-edit", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
-            response = self.client.get(self.get_edit_on_url(page))
+            response = self.client.get(page_edit_url)
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
     def test_toolbar_switch_urls(self):

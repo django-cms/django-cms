@@ -35,11 +35,6 @@ from cms.models.permissionmodels import (
     PageUser,
 )
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_preview_url,
-    get_object_structure_url,
-)
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -613,24 +608,6 @@ class BaseCMSTestCase(object):
             'cms_path': path,
         })
         return endpoint
-
-    def get_edit_on_url(self, obj, lang='en'):
-        # FIXME: Terrible, We should be accessing this method when required. Requires clean up
-        if obj.__class__.__name__ == "Page":
-            obj = self.get_page_title_obj(page=obj, language=lang)
-        return get_object_edit_url(obj)
-
-    def get_edit_off_url(self, obj, lang='en'):
-        # FIXME: Terrible, We should be accessing this method when required. Requires clean up
-        if obj.__class__.__name__ == "Page":
-            obj = self.get_page_title_obj(page=obj, language=lang)
-        return get_object_preview_url(obj)
-
-    def get_structure_url(self, obj, lang='en'):
-        # FIXME: Terrible, We should be accessing this method when required. Requires clean up
-        if obj.__class__.__name__ == 'Page':
-            obj = obj.get_title_obj(language=lang)
-        return get_object_structure_url(obj)
 
     def get_toolbar_disable_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))

@@ -7,7 +7,7 @@ from cms import __version__
 from cms.api import get_page_draft
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models import UserSettings, Placeholder
+from cms.models import UserSettings, Placeholder, Page
 from cms.templates import TemplatesCache
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
@@ -182,8 +182,7 @@ class CMSToolbar(BaseToolbar):
     def init_toolbar(self, request, request_path=None):
         self.request = request
         self.is_staff = self.request.user.is_staff
-        #FIXME: AA Changed: self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
-        self.show_toolbar = self.is_staff or not self.edit_mode_active
+        self.show_toolbar = self.is_staff
 
         if self.request.session.get('cms_toolbar_disabled', False):
             self.show_toolbar = False
@@ -324,10 +323,8 @@ class CMSToolbar(BaseToolbar):
         if self.obj:
             obj = self.obj
 
-            # FIXME: Once title is passed this can be removed
-            if obj.__class__.__name__ == 'Page':
+            if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
-
             with force_language(self.request_language):
                 return get_object_preview_url(obj)
         return ''
@@ -336,10 +333,8 @@ class CMSToolbar(BaseToolbar):
         if self.obj:
             obj = self.obj
 
-            # FIXME: Once title is passed this can be removed
-            if obj.__class__.__name__ == 'Page':
+            if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
-
             with force_language(self.request_language):
                 return get_object_edit_url(obj)
         return ''
@@ -348,10 +343,8 @@ class CMSToolbar(BaseToolbar):
         if self.obj:
             obj = self.obj
 
-            # FIXME: Once title is passed this can be removed
-            if obj.__class__.__name__ == 'Page':
+            if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
-
             with force_language(self.request_language):
                 return get_object_structure_url(obj)
         return ''

@@ -1509,13 +1509,6 @@ class BasePageAdmin(admin.ModelAdmin):
                     if obj.get_public_object():
                         url = obj.get_public_object().get_absolute_url()
                     else:
-                        # FIXME AA: This cannot return an edit url like this, it needs to return a link back to the title!!
-                        """
-                        url = '%s?%s' % (
-                            obj.get_draft_object().get_absolute_url(),
-                            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-                        )
-                        """
                         url = get_object_edit_url(obj.get_title_obj())
                 else:
                     url = obj.get_absolute_url()

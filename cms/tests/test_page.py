@@ -23,6 +23,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
+from cms.toolbar.utils import get_object_preview_url
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
     get_available_slug,
@@ -1052,23 +1053,18 @@ class PagesTestCase(TransactionCMSTestCase):
             slug='home',
             xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
+        page_content = self.get_page_title_obj(cms_page)
+        preview_url = get_object_preview_url(page_content)
+        endpoint = cms_page.get_absolute_url('en')
         placeholder = cms_page.get_placeholders('en')[0]
         add_plugin(cms_page.get_placeholders('en')[0], 'TextPlugin', 'en', body=public_text)
         cms_page.publish('en')
         add_plugin(placeholder, 'TextPlugin', 'en', body=draft_text)
-        endpoint = cms_page.get_absolute_url('en')
 
         with self.login_user_context(superuser):
             # staff user with change permissions
             # draft page is always used
             resp = self.client.get(endpoint)
-            self.assertContains(resp, public_text)
-            self.assertContains(resp, draft_text)
-
-        with self.login_user_context(superuser):
-            # staff user with change permissions
-            # draft page is used regardless of edit
-            resp = self.client.get(endpoint + '?edit_off')
             self.assertContains(resp, public_text)
             self.assertContains(resp, draft_text)
 
@@ -1081,15 +1077,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         with self.login_user_context(superuser):
             # staff user with change permissions
-            # public page is used because of explicit ?preview
-            resp = self.client.get(endpoint + '?preview')
-            self.assertContains(resp, public_text)
-            self.assertNotContains(resp, draft_text)
-
-        with self.login_user_context(superuser):
-            # staff user with change permissions
-            # public page is used because of preview disables edit
-            resp = self.client.get(endpoint + '?preview&edit')
+            # public page is used because of preview
+            resp = self.client.get(preview_url)
             self.assertContains(resp, public_text)
             self.assertNotContains(resp, draft_text)
 
@@ -1116,16 +1105,18 @@ class PagesTestCase(TransactionCMSTestCase):
             slug='home',
             xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
+        page_content = self.get_page_title_obj(cms_page)
+        preview_url = get_object_preview_url(page_content)
+        endpoint = cms_page.get_absolute_url('en')
         placeholder = cms_page.get_placeholders('en')[0]
         add_plugin(cms_page.get_placeholders('en')[0], 'TextPlugin', 'en', body=public_text)
         cms_page.publish('en')
         add_plugin(placeholder, 'TextPlugin', 'en', body=draft_text)
-        endpoint = cms_page.get_absolute_url('en')
 
         with self.login_user_context(superuser):
             # staff user with change permissions
-            # public page is used because of explicit ?preview
-            resp = self.client.get(endpoint + '?preview')
+            # public page is used because of preview
+            resp = self.client.get(preview_url)
             self.assertContains(resp, public_text)
             self.assertNotContains(resp, draft_text)
             resp = self.client.get(endpoint)

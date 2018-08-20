@@ -206,7 +206,6 @@ class PlaceholderAdmin(admin.ModelAdmin):
             pat(r'^clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'^move-plugin/$', self.move_plugin),
             # Register object edit/structure/preview endpoints.
-            # FIXME: AA kept for reference back to an earlier request from Paulo
             # pat(r'^object/(?P<content_type_id>\d+)/structure/(?P<object_id>.+)$', render_object_structure),
             pat(r'^object/([0-9]+)/edit/([0-9]+)/$', render_object_edit),
             pat(r'^object/([0-9]+)/structure/([0-9]+)/$', render_object_structure),
