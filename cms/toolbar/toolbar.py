@@ -36,6 +36,7 @@ class BaseToolbar(ToolbarAPIMixin):
 
     watch_models = []
 
+    #FIXME: AA: This will need to be removed but unsure as to the impact to the FE!!
     edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
