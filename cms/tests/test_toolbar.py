@@ -692,7 +692,7 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
-        en_request = self.get_page_request(page, user, edit_url)
+        en_request = self.get_page_request(None, user, edit_url)
         toolbar = CMSToolbar(en_request)
         toolbar.populated = False
         toolbar.populate()

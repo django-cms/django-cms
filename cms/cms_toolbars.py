@@ -97,9 +97,7 @@ class BasicToolbar(CMSToolbar):
     _admin_menu = None
 
     def init_from_request(self):
-        # FIXME: AA Removed
-        # self.page = get_page_draft(self.request.current_page)
-        self.page = self.request.current_page
+        self.page = get_page_draft(self.request.current_page)
 
     def populate(self):
         if not self.page:

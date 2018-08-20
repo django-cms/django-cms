@@ -183,7 +183,7 @@ class CMSToolbar(BaseToolbar):
         self.request = request
         self.is_staff = self.request.user.is_staff
         #FIXME: AA Changed: self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
-        self.show_toolbar = self.is_staff
+        self.show_toolbar = self.is_staff or not self.edit_mode_active
 
         if self.request.session.get('cms_toolbar_disabled', False):
             self.show_toolbar = False
