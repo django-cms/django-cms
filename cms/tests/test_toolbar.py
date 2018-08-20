@@ -544,14 +544,6 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
-    def test_show_toolbar_with_edit(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en",  published=True)
-        page_content = self.get_page_title_obj(page)
-        edit_url = get_object_edit_url(page_content)
-        request = self.get_page_request(page, AnonymousUser(), edit_url)
-        toolbar = CMSToolbar(request)
-        self.assertTrue(toolbar.show_toolbar)
-
     def test_show_toolbar_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
         page_content = self.get_page_title_obj(page)
@@ -595,13 +587,6 @@ class ToolbarTests(ToolbarTestBase):
         response = self.client.post(endpoint, {'username': username, 'password': username})
         self.assertRedirects(response, page.get_absolute_url(), fetch_redirect_response=False)
 
-    def test_show_toolbar_login_anonymous(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        page_content = self.get_page_title_obj(page)
-        page_edit_url = get_object_edit_url(page_content)
-        response = self.client.get(page_edit_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'cms-form-login')
 
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
     # Test toolbar on
@@ -610,17 +595,6 @@ class ToolbarTests(ToolbarTestBase):
         response = self.client.get(page.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'cms-form-login')
-
-    def test_hide_toolbar_login_nonstaff(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
-        page_content = self.get_page_title_obj(page)
-        page_edit_url = get_object_edit_url(page_content)
-
-        with self.login_user_context(self.get_nonstaff()):
-            response = self.client.get(page_edit_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms-form-login')
-        self.assertNotContains(response, 'cms-toolbar')
 
     def test_admin_logout_staff(self):
         with override_settings(CMS_PERMISSION=True):

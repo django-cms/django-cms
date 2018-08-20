@@ -492,7 +492,7 @@ class CacheTestCase(CMSTestCase):
 
             # Make an initial edit request
             with self.login_user_context(superuser):
-                with self.assertNumQueries(FuzzyInt(1, 28)):
+                with self.assertNumQueries(FuzzyInt(1, 30)):
                     response = self.client.get(page_edit_url)
             self.assertEqual(response.status_code, 200)
 

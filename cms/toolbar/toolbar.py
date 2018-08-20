@@ -345,6 +345,7 @@ class CMSToolbar(BaseToolbar):
 
             if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
+
             with force_language(self.request_language):
                 return get_object_structure_url(obj)
         return ''
