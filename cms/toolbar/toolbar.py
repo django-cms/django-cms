@@ -35,11 +35,7 @@ from django.utils.translation import override as force_language
 class BaseToolbar(ToolbarAPIMixin):
 
     watch_models = []
-
-    edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-    edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
-
 
     @cached_property
     def site_language(self):
@@ -63,16 +59,19 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def legacy_renderer(self):
         from cms.plugin_rendering import LegacyRenderer
+
         return LegacyRenderer(request=self.request)
 
     @cached_property
     def content_renderer(self):
         from cms.plugin_rendering import ContentRenderer
+
         return ContentRenderer(request=self.request)
 
     @cached_property
     def structure_renderer(self):
         from cms.plugin_rendering import StructureRenderer
+
         return StructureRenderer(request=self.request)
 
     @cached_property
@@ -460,8 +459,8 @@ class CMSToolbar(BaseToolbar):
         context = {
             'cms_toolbar': self,
             'cms_renderer': renderer,
-            'cms_edit_on': self.edit_mode_url_on,
-            'cms_edit_off': self.edit_mode_url_off,
+            'cms_edit_on': self.get_object_edit_url(),
+            'cms_edit_off': self.get_object_preview_url(),
             'cms_structure_on': self.get_object_structure_url(),
             'cms_version': __version__,
             'django_version': DJANGO_VERSION,
