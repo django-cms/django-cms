@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -38,6 +39,7 @@ from cms.utils.i18n import (
     get_language_object,
     get_site_language_from_request,
 )
+from cms.utils.page import get_clean_username
 from cms.utils.permissions import (
     get_current_user,
     get_subordinate_users,
@@ -247,6 +249,8 @@ class AddPageForm(BasePageForm):
             'slug': data['slug'],
             'path': data['path'],
             'title': data['title'],
+            'template': self.get_template(),
+            'created_by': self._user,
         }
 
         if 'menu_title' in data:
@@ -268,11 +272,20 @@ class AddPageForm(BasePageForm):
             permissions=False,
             extensions=False,
         )
-        new_page.update(is_page_type=False, in_navigation=True)
+        new_page.update(is_page_type=False)
         return new_page
 
+    def update_translations_from_source(self, new_page):
+        new_page.update_translations(
+            self._language,
+            in_navigation=True,
+        )
+
     def get_template(self):
-        return Page.TEMPLATE_DEFAULT
+        source = self.cleaned_data.get('source')
+        if source:
+            return source.get_template(self._language)
+        return Title.TEMPLATE_DEFAULT
 
     def save(self, *args, **kwargs):
         source = self.cleaned_data.get('source')
@@ -287,7 +300,6 @@ class AddPageForm(BasePageForm):
             new_page = self.from_source(source, parent=parent)
         else:
             new_page = super(AddPageForm, self).save(commit=False)
-            new_page.template = self.get_template()
             new_page.set_tree_node(self._site, target=parent, position='last-child')
             new_page.save()
 
@@ -295,6 +307,8 @@ class AddPageForm(BasePageForm):
         translation.rescan_placeholders()
 
         if source:
+            self.update_translations_from_source(new_page)
+
             extension_pool.copy_extensions(
                 source_page=source,
                 target_page=new_page,
@@ -350,7 +364,6 @@ class AddPageTypeForm(AddPageForm):
         if not root_page:
             root_page = Page(
                 publisher_is_draft=True,
-                in_navigation=False,
                 is_page_type=True,
             )
             root_page.set_tree_node(self._site)
@@ -363,6 +376,7 @@ class AddPageTypeForm(AddPageForm):
                 page=root_page,
                 slug=PAGE_TYPES_ID,
                 path=PAGE_TYPES_ID,
+                in_navigation=False,
             )
         return root_page.node
 
@@ -387,8 +401,14 @@ class AddPageTypeForm(AddPageForm):
             permissions=False,
             extensions=False,
         )
-        new_page.update(is_page_type=True, in_navigation=False)
+        new_page.update(is_page_type=True)
         return new_page
+
+    def update_translations_from_source(self, new_page):
+        new_page.update_translations(
+            self._language,
+            in_navigation=False,
+        )
 
     def save(self, *args, **kwargs):
         new_page = super(AddPageTypeForm, self).save(*args, **kwargs)
@@ -399,7 +419,6 @@ class AddPageTypeForm(AddPageForm):
             new_page.update(
                 draft_only=True,
                 is_page_type=True,
-                in_navigation=False,
             )
         return new_page
 
@@ -494,6 +513,8 @@ class ChangePageForm(BasePageForm):
         update_count = cms_page.update_translations(
             self._language,
             publisher_state=PUBLISHER_STATE_DIRTY,
+            changed_by=get_clean_username(self._request.user),
+            changed_date=timezone.now(),
             **translation_data
         )
 
@@ -538,12 +559,23 @@ class AdvancedSettingsForm(forms.ModelForm):
     overwrite_url = forms.CharField(label=_('Overwrite URL'), max_length=255, required=False,
                                     help_text=_('Keep this field empty if standard path should be used.'))
 
+    soft_root = forms.BooleanField(label=_('Soft root'),
+                                   required=False,
+                                   help_text=_("All ancestors will not be displayed in the navigation"))
+
     xframe_options = forms.ChoiceField(
-        choices=Page._meta.get_field('xframe_options').choices,
+        choices=Title._meta.get_field('xframe_options').choices,
         label=_('X Frame Options'),
         help_text=_('Whether this page can be embedded in other pages or websites'),
-        initial=Page._meta.get_field('xframe_options').default,
-        required=False
+        initial=Title._meta.get_field('xframe_options').default,
+        required=False,
+    )
+    template = forms.ChoiceField(
+        choices=Title._meta.get_field('template').choices,
+        label=_('Template'),
+        help_text=_('The template used to render the content.'),
+        initial=Title._meta.get_field('template').default,
+        required=False,
     )
 
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
@@ -561,20 +593,21 @@ class AdvancedSettingsForm(forms.ModelForm):
     )
     fieldsets = (
         (None, {
-            'fields': ('overwrite_url', 'redirect'),
+            'fields': ('overwrite_url', 'redirect', 'template',
+                       'soft_root', 'xframe_options',),
         }),
         (_('Language independent options'), {
-            'fields': ('template', 'reverse_id', 'soft_root', 'navigation_extenders',
-                       'application_urls', 'application_namespace', 'application_configs',
-                       'xframe_options',)
+            'fields': ('reverse_id', 'navigation_extenders', 'application_urls',
+                       'application_namespace', 'application_configs',)
         })
     )
 
     class Meta:
         model = Page
         fields = [
-            'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'template', 'reverse_id', 'overwrite_url', 'redirect', 'navigation_extenders',
             'application_urls', 'application_namespace', "xframe_options",
+            'soft_root',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -633,6 +666,15 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         if 'overwrite_url' in self.fields and self.title_obj.has_url_overwrite:
             self.fields['overwrite_url'].initial = self.title_obj.path
+
+        if 'xframe_options' in self.fields:
+            self.fields['xframe_options'].initial = self.title_obj.xframe_options
+
+        if 'template' in self.fields:
+            self.fields['template'].initial = self.title_obj.template
+
+        if 'soft_root' in self.fields:
+            self.fields['soft_root'].initial = self.title_obj.soft_root
 
     @cached_property
     def _language(self):
@@ -758,7 +800,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         xframe_options = self.cleaned_data['xframe_options']
         if xframe_options == '':
-            return Page._meta.get_field('xframe_options').default
+            return Title._meta.get_field('xframe_options').default
 
         return xframe_options
 
@@ -807,6 +849,11 @@ class AdvancedSettingsForm(forms.ModelForm):
             redirect=(data.get('redirect') or None),
             publisher_state=PUBLISHER_STATE_DIRTY,
             has_url_overwrite=bool(data.get('overwrite_url')),
+            xframe_options=data.get('xframe_options'),
+            template=data.get('template'),
+            soft_root=data.get('soft_root'),
+            changed_by=get_clean_username(self._request.user),
+            changed_date=timezone.now(),
         )
         is_draft_and_has_public = page.publisher_is_draft and page.publisher_public_id
 
@@ -817,12 +864,44 @@ class AdvancedSettingsForm(forms.ModelForm):
 
 
 class PagePermissionForm(forms.ModelForm):
+    _site = None
+    _request = None
+
+    limit_visibility_in_menu = forms.TypedChoiceField(
+        choices=Title._meta.get_field('limit_visibility_in_menu').choices,
+        label=_("menu visibility"),
+        help_text=_("limit when this page is visible in the menu"),
+        initial=Title._meta.get_field('limit_visibility_in_menu').default,
+        required=False,
+        coerce=int,
+        empty_value=None,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(PagePermissionForm, self).__init__(*args, **kwargs)
+        self.title_obj = self.instance.get_title_obj(
+            language=self._language,
+            fallback=False,
+            force_reload=True,
+        )
+        self.fields['limit_visibility_in_menu'].initial = self.title_obj.limit_visibility_in_menu
+
+    @cached_property
+    def _language(self):
+        return get_site_language_from_request(self._request, site_id=self._site.pk)
 
     class Meta:
         model = Page
         fields = ['login_required', 'limit_visibility_in_menu']
 
     def save(self, *args, **kwargs):
+        if "limit_visibility_in_menu" in self.changed_data:
+            self.instance.update_translations(
+                self._language,
+                limit_visibility_in_menu=self.cleaned_data["limit_visibility_in_menu"],
+                changed_by=get_clean_username(self._request.user),
+                changed_date=timezone.now(),
+            )
         page = super(PagePermissionForm, self).save(*args, **kwargs)
         page.clear_cache(menu=True)
         clear_permission_cache()

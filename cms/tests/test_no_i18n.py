@@ -12,6 +12,7 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_preview_url
 from cms.utils.conf import get_cms_setting
 
 overrides = dict(
@@ -179,8 +180,9 @@ class TestNoI18N(CMSTestCase):
         sub = create_page('sub', 'nav_playground.html', 'en-us', published=True, parent=page)
         # loads the urlconf before reverse below
         sub.get_absolute_url('en-us')
+        sub_page_content = self.get_page_title_obj(sub, language='en-us')
         request = self.get_page_request(sub, self.get_superuser(), edit=True)
         del request.LANGUAGE_CODE
         toolbar = CMSToolbar(request)
         toolbar.set_object(sub)
-        self.assertEqual(toolbar.get_object_preview_url(), '/test/sub/')
+        self.assertEqual(toolbar.get_object_preview_url(), get_object_preview_url(sub_page_content))

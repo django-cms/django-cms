@@ -168,6 +168,9 @@ class CreateCMSPageForm(AddPageForm):
             new_page.update(
                 draft_only=True,
                 is_page_type=True,
+            )
+            new_page.update_translations(
+                self._language,
                 in_navigation=False,
             )
 

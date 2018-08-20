@@ -8,6 +8,7 @@ from cms.models import Placeholder
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import TransactionCMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.urlutils import admin_reverse
 
 from sekizai.data import UniqueSequence
@@ -125,6 +126,8 @@ class AliasTestCase(TransactionCMSTestCase):
             plugin=source_plugin,
         )
 
+        target_page_content = self.get_page_title_obj(target_page)
+
         with self.login_user_context(superuser):
             # Not published, not edit mode: hide content
             response = self.client.get(target_page.get_absolute_url())
@@ -132,7 +135,7 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
             # Not published, edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            response = self.client.get(get_object_edit_url(target_page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
@@ -145,7 +148,7 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
             # Published, edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            response = self.client.get(get_object_edit_url(target_page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
@@ -182,6 +185,8 @@ class AliasTestCase(TransactionCMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
+        target_page_content = self.get_page_title_obj(target_page)
+
         with self.login_user_context(superuser):
             # Not published, not edit mode: hide content
             response = self.client.get(target_page.get_absolute_url())
@@ -189,7 +194,7 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
             # Not published, edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            response = self.client.get(get_object_edit_url(target_page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
@@ -202,7 +207,7 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
             # Published, edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            response = self.client.get(get_object_edit_url(target_page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
@@ -243,10 +248,11 @@ class AliasTestCase(TransactionCMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
+        target_page_content = self.get_page_title_obj(target_page)
+
         with self.login_user_context(self.get_superuser()):
-            context = self.get_context(path=target_page.get_absolute_url(), page=target_page)
+            context = self.get_context(path=get_object_edit_url(target_page_content))
             request = context['request']
-            request.session['cms_edit'] = True
             request.toolbar = CMSToolbar(request)
             renderer = request.toolbar.get_content_renderer()
             context[get_varname()] = defaultdict(UniqueSequence)

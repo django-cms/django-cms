@@ -769,10 +769,10 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_home_not_in_menu(self):
         page1 = self.get_page(1)
-        page1.in_navigation = False
+        page1.update_translations(in_navigation=False)
         page1.save()
         page4 = self.get_page(4)
-        page4.in_navigation = False
+        page4.update_translations(in_navigation=False)
         page4.save()
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -782,7 +782,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(nodes[0].get_absolute_url(), self.get_page(2).get_absolute_url())
         self.assertEqual(nodes[0].children[0].get_absolute_url(), self.get_page(3).get_absolute_url())
         page4 = self.get_page(4)
-        page4.in_navigation = True
+        page4.update_translations(in_navigation=True)
         page4.save()
         menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
@@ -807,7 +807,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 1 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
-        number_of_p6_children = page6.get_child_pages().filter(in_navigation=True).count()
+        number_of_p6_children = page6.get_child_pages().filter(
+            title_set__language='en', title_set__in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p6_children)
 
         page7 = self.get_page(7)
@@ -820,7 +821,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 2 100 0 1 %}")
         tpl.render(context)
         nodes = context['children']
-        number_of_p7_children = page7.get_child_pages().filter(in_navigation=True).count()
+        number_of_p7_children = page7.get_child_pages().filter(
+            title_set__language='en', title_set__in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p7_children)
 
     def test_show_breadcrumb_invisible(self):
@@ -1033,36 +1035,36 @@ class MenuTests(BaseMenuTest):
             'language': 'de',
             'in_navigation': True,
         }
-        nl_defaults = {
-            'template': 'nav_playground.html',
-            'in_navigation': True,
-        }
         create_page('DE-P1', published=True, **de_defaults)
         create_page('DE-P2', published=True, **de_defaults)
         create_page('DE-P3', published=True, **de_defaults)
 
         # The nl language is not configured for the current site
         # as a result, we have to create the pages manually.
-        nl_page_1 = Page(**nl_defaults)
+        nl_page_1 = Page()
         nl_page_1.set_tree_node(site=site_2, target=None)
         nl_page_1.save()
         nl_page_1.title_set.create(
             language='nl',
             title='NL-P1',
             slug='nl-p1',
+            template='nav_playground.html',
+            in_navigation=True,
         )
         nl_page_1.publish('nl')
 
-        nl_page_2 = Page(**nl_defaults)
+        nl_page_2 = Page()
         nl_page_2.set_tree_node(site=site_2, target=None)
         nl_page_2.save()
         nl_page_2.title_set.create(
             language='nl',
             title='NL-P2',
             slug='nl-p2',
+            template='nav_playground.html',
+            in_navigation=True,
         )
         nl_page_2.publish('nl')
-        create_title('fr', 'FR-P2', nl_page_2)
+        create_title('fr', 'FR-P2', nl_page_2, in_navigation=True)
         nl_page_2.publish('fr')
 
         with self.settings(SITE_ID=2):
@@ -1213,8 +1215,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         hard_root = context['children']
         # root IS a soft root
         root = self.get_page('root')
-        root.soft_root = True
-        root.save()
+        root.update_translations(soft_root=True)
         aaa = self.get_page('aaa')
         context = self.get_context(aaa.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
@@ -1275,8 +1276,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
         """
         # root IS a soft root
         root = self.get_page('root')
-        root.soft_root = True
-        root.save()
+        root.update_translations(soft_root=True)
         aaa = self.get_page('aaa')
         context = self.get_context(aaa.get_absolute_url(), page=aaa)
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")

@@ -181,13 +181,13 @@ class PublishingTests(TestCase):
     def test_modify_child_while_pending(self):
         home = self.create_page("Home", published=True, in_navigation=True)
         child = self.create_page("Child", published=True, parent=home,
-                                 in_navigation=False)
+                                 login_required=False)
         home.reload().unpublish('en')
 
         self.assertPending(child.reload())
 
         child.refresh_from_db()
-        child.in_navigation = True
+        child.login_required = True
         child.save()
 
         # assert draft dirty
@@ -232,11 +232,11 @@ class PublishingTests(TestCase):
         home = self.reload(home)
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
-        dirty1.in_navigation = True
+        dirty1.login_required = True
         dirty1.save()
         home.unpublish('en')
         dirty2 = self.reload(dirty2)
-        dirty2.in_navigation = True
+        dirty2.login_required = True
         dirty2.save()
         dirty1 = self.reload(dirty1)
         dirty2 = self.reload(dirty2)
@@ -340,7 +340,7 @@ class PublishingTests(TestCase):
         page = self.create_page("Page", published=True)
         child = self.create_page("Child", parent=page, published=True)
         gchild = self.create_page("Grandchild", parent=child, published=True)
-        child.in_navigation = True
+        child.login_required = True
         child.save()
 
         self.assertTrue(child.is_dirty("en"))
