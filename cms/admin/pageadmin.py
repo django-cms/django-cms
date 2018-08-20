@@ -1321,8 +1321,7 @@ class BasePageAdmin(admin.ModelAdmin):
             self.message_user(request, message, level=messages.ERROR)
             return HttpResponseRedirect(self.get_admin_url('changelist'))
 
-        attrs = "?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        attrs += "&language=" + language
+        attrs = "?language=" + language
         url = page.get_absolute_url(language) + attrs
 
         if site != active_site and page.node.site_id != site.pk:
