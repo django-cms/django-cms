@@ -529,8 +529,9 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
 
             # page edit
-            page_edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-            current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
+            with force_language(self.current_lang):
+                page_edit_url = get_object_edit_url(self.title) if self.title else ''
+                current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
 
             # page settings
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)
