@@ -55,6 +55,7 @@ class ToolbarTestBase(CMSTestCase):
         request.current_page = page
 
         request.GET = {}
+        # Hide the toolbar
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
 
@@ -576,6 +577,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(request.session.get('cms_toolbar_disabled'))
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
+
 
     def test_toolbar_login_redirect_validation(self):
         user = self._create_user('toolbar', True, True)
