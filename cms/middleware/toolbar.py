@@ -64,14 +64,6 @@ class ToolbarMiddleware(MiddlewareMixin):
         if not self.is_cms_request(request):
             return
 
-        # TODO: AA Remove me
-        """
-        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        anonymous_on = get_cms_setting('TOOLBAR_ANONYMOUS_ON')
-        edit_enabled = edit_on in request.GET and 'preview' not in request.GET
-        edit_disabled = edit_off in request.GET or 'preview' in request.GET
-        """
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
@@ -80,30 +72,6 @@ class ToolbarMiddleware(MiddlewareMixin):
 
         if enable_toolbar in request.GET or self.is_edit_mode(request):
             request.session['cms_toolbar_disabled'] = False
-
-        # TODO: AA Remove me
-        """
-        toolbar_enabled = not request.session.get('cms_toolbar_disabled', False)
-        can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous)
-        show_toolbar = (toolbar_enabled and can_see_toolbar)
-
-        if edit_enabled and show_toolbar and not request.session.get('cms_edit'):
-            # User has explicitly enabled mode
-            # AND can see the toolbar
-            request.session['cms_edit'] = True
-            request.session['cms_preview'] = False
-
-        if edit_disabled or not show_toolbar and request.session.get('cms_edit'):
-            # User has explicitly disabled the toolbar
-            # OR user has explicitly turned off edit mode
-            # OR user can't see toolbar
-            request.session['cms_edit'] = False
-
-
-        if 'preview' in request.GET and not request.session.get('cms_preview'):
-            # User has explicitly requested a preview of the live page.
-            request.session['cms_preview'] = True
-        """
 
         if request.user.is_staff:
             try:
