@@ -31,7 +31,6 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
 from cms.utils.compat.tests import UnittestCompatMixin
-from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
                                    _scan_placeholders)
