@@ -492,6 +492,9 @@ class PageTest(PageTestBase):
             page_data['template'] = page.template
             page_data['overwrite_url'] = '/hello/'
             page_data['has_url_overwrite'] = True
+            # page.template accesses Title object and caches it,
+            # need to clear it to check our changes
+            page.title_cache = {}
             response = self.client.post(URL_CMS_PAGE_ADVANCED_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
@@ -2345,9 +2348,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data = {'template': 'simple.html'}
             response = self.client.post(endpoint, data)
             self.assertContains(response, 'The template was successfully changed')
-            page.refresh_from_db(fields=['template'])
-            # clear the template cache
-            page.__dict__.pop('_template_cache', None)
             self.assertEqual(page.get_template(), 'simple.html')
 
     def test_user_cant_change_template(self):
@@ -2368,7 +2368,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data = {'template': 'simple.html'}
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
-            page.refresh_from_db(fields=['template'])
             self.assertEqual(page.get_template(), 'nav_playground.html')
 
     def test_user_can_view_page_permissions_summary(self):

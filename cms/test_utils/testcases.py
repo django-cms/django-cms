@@ -184,27 +184,29 @@ class BaseCMSTestCase(object):
             fields[get_user_model().USERNAME_FIELD] = username
 
         user = User(**fields)
-
         user.set_password(getattr(user, get_user_model().USERNAME_FIELD))
         user.save()
         if is_staff and not is_superuser and add_default_permissions:
-            # Text plugin permissions
-            user.user_permissions.add(Permission.objects.get(codename='add_text'))
-            user.user_permissions.add(Permission.objects.get(codename='delete_text'))
-            user.user_permissions.add(Permission.objects.get(codename='change_text'))
-            # Link plugin permissions
-            user.user_permissions.add(Permission.objects.get(codename='add_link'))
-            user.user_permissions.add(Permission.objects.get(codename='delete_link'))
-            user.user_permissions.add(Permission.objects.get(codename='change_link'))
-            # Page permissions
-            user.user_permissions.add(Permission.objects.get(codename='publish_page'))
-            user.user_permissions.add(Permission.objects.get(codename='add_page'))
-            user.user_permissions.add(Permission.objects.get(codename='change_page'))
-            user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+            self._add_default_permissions(user)
         if is_staff and not is_superuser and permissions:
             for permission in permissions:
                 user.user_permissions.add(Permission.objects.get(codename=permission))
         return user
+
+    def _add_default_permissions(self, user):
+        # Text plugin permissions
+        user.user_permissions.add(Permission.objects.get(codename='add_text'))
+        user.user_permissions.add(Permission.objects.get(codename='delete_text'))
+        user.user_permissions.add(Permission.objects.get(codename='change_text'))
+        # Link plugin permissions
+        user.user_permissions.add(Permission.objects.get(codename='add_link'))
+        user.user_permissions.add(Permission.objects.get(codename='delete_link'))
+        user.user_permissions.add(Permission.objects.get(codename='change_link'))
+        # Page permissions
+        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
+        user.user_permissions.add(Permission.objects.get(codename='add_page'))
+        user.user_permissions.add(Permission.objects.get(codename='change_page'))
+        user.user_permissions.add(Permission.objects.get(codename='delete_page'))
 
     def get_superuser(self):
         try:

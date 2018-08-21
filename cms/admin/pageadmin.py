@@ -833,8 +833,8 @@ class BasePageAdmin(admin.ModelAdmin):
         if to_template not in dict(get_cms_setting('TEMPLATES')):
             return HttpResponseBadRequest(force_text(_("Template not valid")))
 
-        page.template = to_template
-        page.save()
+        # TODO: Make this language-aware
+        page.update_translations(template=to_template)
         return HttpResponse(force_text(_("The template was successfully changed")))
 
     @require_POST
