@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth import get_user_model
 from django.template import Template
-from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
 
 from cms.api import create_page
-from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, CMSPlugin
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_preview_url
-from cms.utils.conf import get_cms_setting
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
+
 
 overrides = dict(
     LANGUAGE_CODE='en-us',
@@ -56,30 +54,6 @@ class TestNoI18N(CMSTestCase):
     def tearDown(self):
         super(TestNoI18N, self).tearDown()
         clear_url_caches()
-
-    def get_page_request(self, page, user, path=None, edit=False, lang_code='en', disable=False):
-        path = path or page and page.get_absolute_url()
-        if edit:
-            path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        request = RequestFactory().get(path)
-        request.session = {}
-        request.user = user
-        request.LANGUAGE_CODE = lang_code
-        request.GET = request.GET.copy()
-
-        if edit:
-            request.GET['edit'] = None
-        else:
-            request.GET['edit_off'] = None
-
-        if disable:
-            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
-        request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
-        if hasattr(request, 'toolbar'):
-            request.toolbar.populate()
-        return request
 
     def test_language_chooser(self):
         # test simple language chooser with default args
@@ -181,8 +155,9 @@ class TestNoI18N(CMSTestCase):
         # loads the urlconf before reverse below
         sub.get_absolute_url('en-us')
         sub_page_content = self.get_page_title_obj(sub, language='en-us')
-        request = self.get_page_request(sub, self.get_superuser(), edit=True)
+        edit_url = get_object_edit_url(sub_page_content)
+        request = self.get_page_request(sub, self.get_superuser(), path=edit_url)
         del request.LANGUAGE_CODE
         toolbar = CMSToolbar(request)
-        toolbar.set_object(sub)
+        toolbar.set_object(sub_page_content)
         self.assertEqual(toolbar.get_object_preview_url(), get_object_preview_url(sub_page_content))

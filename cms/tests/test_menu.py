@@ -25,6 +25,7 @@ from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
+from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 
@@ -410,9 +411,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_menu_cache_draft_only(self):
         # Tests that the cms uses a separate cache for draft & live
         public_page = self.get_page(1)
+        public_page_content = self.get_page_title_obj(public_page)
         draft_page = public_page.publisher_public
-        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        edit_off_path = public_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        draft_page_content = self.get_page_title_obj(draft_page)
+        edit_on_path = get_object_edit_url(draft_page_content)
+        edit_off_path = get_object_preview_url(public_page_content)
         superuser = self.get_superuser()
 
         # Prime the public menu cache
@@ -436,9 +439,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_menu_cache_live_only(self):
         # Tests that the cms uses a separate cache for draft & live
         public_page = self.get_page(1)
+        public_page_content = self.get_page_title_obj(public_page)
         draft_page = public_page.publisher_public
-        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        edit_off_path = public_page.get_absolute_url() + '?preview&%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        draft_page_content = self.get_page_title_obj(draft_page)
+        edit_on_path = get_object_edit_url(draft_page_content)
+        edit_off_path = get_object_preview_url(public_page_content)
         superuser = self.get_superuser()
 
         # Prime the draft menu cache

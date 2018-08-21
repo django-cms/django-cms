@@ -7,7 +7,7 @@ from cms import __version__
 from cms.api import get_page_draft
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models import UserSettings, Placeholder, Page
+from cms.models import UserSettings, Placeholder
 from cms.templates import TemplatesCache
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
@@ -320,33 +320,20 @@ class CMSToolbar(BaseToolbar):
 
     def get_object_preview_url(self):
         if self.obj:
-            obj = self.obj
-
-            if obj.__class__.__name__ == Page.__name__:
-                obj = self.obj.get_title_obj(language=self.request_language)
             with force_language(self.request_language):
-                return get_object_preview_url(obj)
+                return get_object_preview_url(self.obj)
         return ''
 
     def get_object_edit_url(self):
         if self.obj:
-            obj = self.obj
-
-            if obj.__class__.__name__ == Page.__name__:
-                obj = self.obj.get_title_obj(language=self.request_language)
             with force_language(self.request_language):
-                return get_object_edit_url(obj)
+                return get_object_edit_url(self.obj)
         return ''
 
     def get_object_structure_url(self):
         if self.obj:
-            obj = self.obj
-
-            if obj.__class__.__name__ == Page.__name__:
-                obj = self.obj.get_title_obj(language=self.request_language)
-
             with force_language(self.request_language):
-                return get_object_structure_url(obj)
+                return get_object_structure_url(self.obj)
         return ''
 
     # Internal API

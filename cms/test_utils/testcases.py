@@ -27,6 +27,7 @@ from cms.constants import (
     PUBLISHER_STATE_DIRTY,
     PUBLISHER_STATE_PENDING,
 )
+from cms.middleware.toolbar import ToolbarMiddleware
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
@@ -446,6 +447,25 @@ class BaseCMSTestCase(object):
                 pass
 
         request._messages = MockStorage()
+        return request
+
+    def get_page_request(self, page, user, path=None, lang_code='en', disable=False):
+        path = path or page and page.get_absolute_url()
+
+        request = RequestFactory().get(path)
+        request.session = {}
+        request.user = user
+        request.LANGUAGE_CODE = lang_code
+        request.GET = request.GET.copy()
+
+        # Hide the toolbar
+        if disable:
+            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
+        request.current_page = page
+        mid = ToolbarMiddleware()
+        mid.process_request(request)
+        if hasattr(request, 'toolbar'):
+            request.toolbar.populate()
         return request
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):

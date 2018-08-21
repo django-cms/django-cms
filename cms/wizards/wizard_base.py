@@ -9,14 +9,12 @@ from django.utils.functional import cached_property
 
 from django.utils.translation import override as force_language, ugettext as _
 
-from cms.utils.conf import get_cms_setting
-
 
 class WizardBase(object):
     template_name = None
 
     def __init__(self, title, weight, form, model=None, template_name=None,
-                 description=None, edit_mode_on_success=True):
+                 description=None):
         """
         :param title: This is used on the start form.
         :param weight: Used for determining the order of the wizards on the
@@ -27,8 +25,6 @@ class WizardBase(object):
                       wizard per model.
         :param template_name: The full-path to the template to use, if any.
         :param description: This is used on the start form.
-        :param edit_mode_on_success: If true, the CMS will switch to edit mode
-                                     when going to the newly created object.
         """
         # NOTE: If class attributes or properties are changed, consider updating
         # cms.templatetags.cms_wizard_tags.WizardProperty too.
@@ -37,7 +33,6 @@ class WizardBase(object):
         self.form = form
         self.model = model
         self.description = description
-        self.edit_mode_on_success = edit_mode_on_success
         if template_name is not None:
             self.template_name = template_name
 
@@ -125,11 +120,6 @@ class Wizard(WizardBase):
         else:
             url = obj.get_absolute_url()
 
-        # Add 'edit' to GET params of URL
-        if self.edit_mode_on_success:
-            sep = "&" if "?" in url else "?"
-            url = '{0}{1}{2}'.format(
-                url, sep, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         return url
 
     def get_model(self):

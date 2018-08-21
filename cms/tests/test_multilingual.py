@@ -394,7 +394,7 @@ class MultilingualTestCase(CMSTestCase):
         # add wrong plugin language
         add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")
         page.publish('en')
-        endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        endpoint = page.get_absolute_url()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)

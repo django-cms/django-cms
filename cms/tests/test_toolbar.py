@@ -23,7 +23,6 @@ from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
                               LANGUAGE_MENU_IDENTIFIER)
-from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
 from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
@@ -36,36 +35,12 @@ from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
-from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
 from cms.views import details
 
 
 class ToolbarTestBase(CMSTestCase):
-
-    def get_page_request(self, page, user, path=None, lang_code='en', disable=False):
-        if not path:
-            path = page.get_absolute_url()
-
-        request = RequestFactory().get(path)
-        request.session = {}
-        request.user = user
-        request.LANGUAGE_CODE = lang_code
-        request.current_page = page
-
-        request.GET = {}
-        # Hide the toolbar
-        if disable:
-            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
-
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
-
-        if hasattr(request, 'toolbar'):
-            request.toolbar.populate()
-
-        return request
 
     def get_anon(self):
         return AnonymousUser()
@@ -2091,7 +2066,7 @@ class ToolbarAPITests(TestCase):
         self.assertEqual(result.index, 0)
 
     def test_not_is_staff(self):
-        request = RequestFactory().get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        request = RequestFactory().get('/en/')
         request.session = {}
         request.LANGUAGE_CODE = 'en'
         request.user = AnonymousUser()

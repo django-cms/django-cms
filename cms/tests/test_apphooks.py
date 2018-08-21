@@ -25,7 +25,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
@@ -357,13 +356,13 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             with force_language("en"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                request = self.get_request(path)
                 request.LANGUAGE_CODE = 'en'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEqual(attached_to_page.pk, page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                request = self.get_request(path)
                 request.LANGUAGE_CODE = 'de'
                 attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
                 self.assertEqual(attached_to_page.pk, page.pk)

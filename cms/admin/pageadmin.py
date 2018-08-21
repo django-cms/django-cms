@@ -1134,11 +1134,11 @@ class BasePageAdmin(admin.ModelAdmin):
                         path = page.get_absolute_url(language, fallback=True)
                     else:
                         public_page = Page.objects.get(publisher_public=page.pk)
-                        path = '%s?preview&%s' % (public_page.get_absolute_url(language, fallback=True), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+                        path = '%s?preview' % (public_page.get_absolute_url(language, fallback=True))
                 else:
-                    path = '%s?preview&%s' % (referrer, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+                    path = '%s?preview' % (referrer)
             else:
-                path = '/?preview&%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+                path = '/?preview'
 
         return HttpResponseRedirect(path)
 

@@ -988,18 +988,14 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual(homepage.get_placeholders('en').count(), 2)
         with self.login_user_context(user):
             output = force_text(
-                self.client.get(
-                    '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-                ).content
+                self.client.get('/en/').content
             )
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in homepage.get_placeholders('en'):
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             output = force_text(
-                self.client.get(
-                    '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-                ).content
+                self.client.get('/en/').content
             )
             self.assertIn('<b>Test</b>', output)
 
