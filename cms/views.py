@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
@@ -23,7 +23,7 @@ from cms.page_rendering import _handle_no_page, render_page, _render_welcome_pag
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.helpers import is_model_editable
+from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
                             get_default_language_for_site,
@@ -163,6 +163,10 @@ def details(request, slug):
     # permission checks
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+
+    if hasattr(request, 'toolbar'):
+        request.toolbar.set_object(page.get_title_obj(language=request_language))
+
     return render_page(request, page, current_language=request_language, slug=slug)
 
 
@@ -197,16 +201,15 @@ def render_object_structure(request, content_type_id, object_id):
         'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
-
-    if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(content_type_obj)
+    toolbar = get_toolbar_from_request(request)
+    toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
 
 
 def render_object_edit(request, content_type_id, object_id):
     content_type = ContentType.objects.get_for_id(content_type_id)
 
-    if not is_model_editable(content_type.model_class()):
+    if not is_editable_model(content_type.model_class()):
         raise Http404
 
     try:
@@ -215,13 +218,12 @@ def render_object_edit(request, content_type_id, object_id):
         raise Http404
 
     if not hasattr(content_type_obj, 'get_absolute_url'):
-        raise NotImplementedError('get_absolute_url not implemented for object')
+        return HttpResponseBadRequest('Requested object does not have a valid url')
 
     abs_url = content_type_obj.get_absolute_url()
     match = resolve(abs_url)
-
-    if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(content_type_obj)
+    toolbar = get_toolbar_from_request(request)
+    toolbar.set_object(content_type_obj)
     return match.func(request, **match.kwargs)
 
 
@@ -233,9 +235,11 @@ def render_object_preview(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
+    if not hasattr(content_type_obj, 'get_absolute_url'):
+        return HttpResponseBadRequest('Requested object does not have a valid url')
+
     abs_url = content_type_obj.get_absolute_url()
     match = resolve(abs_url)
-
-    if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(content_type_obj)
+    toolbar = get_toolbar_from_request(request)
+    toolbar.set_object(content_type_obj)
     return match.func(request, **match.kwargs)

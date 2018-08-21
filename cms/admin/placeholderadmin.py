@@ -48,6 +48,7 @@ from cms.utils.plugins import (
 from cms.utils.urlutils import admin_reverse
 from cms.views import render_object_edit, render_object_structure, render_object_preview
 
+
 _no_default = object()
 
 

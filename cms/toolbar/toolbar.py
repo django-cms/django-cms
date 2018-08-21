@@ -324,8 +324,7 @@ class CMSToolbar(BaseToolbar):
 
             if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
-            with force_language(self.request_language):
-                return get_object_preview_url(obj)
+            return get_object_preview_url(obj, language=self.request_language)
         return ''
 
     def get_object_edit_url(self):
@@ -334,8 +333,7 @@ class CMSToolbar(BaseToolbar):
 
             if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
-            with force_language(self.request_language):
-                return get_object_edit_url(obj)
+            return get_object_edit_url(obj, language=self.request_language)
         return ''
 
     def get_object_structure_url(self):
@@ -344,9 +342,7 @@ class CMSToolbar(BaseToolbar):
 
             if obj.__class__.__name__ == Page.__name__:
                 obj = self.obj.get_title_obj(language=self.request_language)
-
-            with force_language(self.request_language):
-                return get_object_structure_url(obj)
+            return get_object_structure_url(obj, language=self.request_language)
         return ''
 
     # Internal API
@@ -459,9 +455,9 @@ class CMSToolbar(BaseToolbar):
         context = {
             'cms_toolbar': self,
             'cms_renderer': renderer,
-            'cms_edit_on': self.get_object_edit_url(),
-            'cms_edit_off': self.get_object_preview_url(),
-            'cms_structure_on': self.get_object_structure_url(),
+            'cms_edit_url': self.get_object_edit_url(),
+            'cms_preview_url': self.get_object_preview_url(),
+            'cms_structure_url': self.get_object_structure_url(),
             'cms_version': __version__,
             'django_version': DJANGO_VERSION,
             'login_form': CMSToolbarLoginForm(),
