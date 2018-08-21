@@ -56,7 +56,7 @@ class SiteTestCase(CMSTestCase):
     def test_site_preview(self):
         page = create_page("page", "nav_playground.html", "de", site=self.site2, published=True)
         page_content_de = self.get_page_title_obj(page, language='de')
-        page_url = page_content_de.get_absolute_url()
+        page_url = page_content_de.get_absolute_url(language='de')
 
         with self.login_user_context(self.get_superuser()):
             # set the current site on changelist

@@ -160,4 +160,4 @@ class TestNoI18N(CMSTestCase):
         del request.LANGUAGE_CODE
         toolbar = CMSToolbar(request)
         toolbar.set_object(sub_page_content)
-        self.assertEqual(toolbar.get_object_preview_url(), get_object_preview_url(sub_page_content))
+        self.assertEqual(toolbar.get_object_preview_url(), get_object_preview_url(sub_page_content, language='en-us'))

@@ -84,7 +84,7 @@ def get_timezone_name():
     return tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
 
 
-def is_model_editable(model_class):
+def is_editable_model(model_class):
     """
     Return True if the model_class is editable.
     Checks whether the model_class has any relationships with Placeholder.
@@ -110,7 +110,4 @@ def is_model_editable(model_class):
         admin_class = admin.site._registry[model_class]
     except KeyError:
         return False
-
-    if admin_class and issubclass(admin_class.__class__, FrontendEditableAdminMixin):
-        return True
-    return False
+    return isinstance(admin_class, FrontendEditableAdminMixin)
