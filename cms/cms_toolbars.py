@@ -597,7 +597,8 @@ class PageToolbar(CMSToolbar):
                 current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
 
                 # navigation toggle
-                nav_title = _('Hide in navigation') if self.page.in_navigation else _('Display in navigation')
+                in_navigation = self.page.get_in_navigation(language=self.toolbar.request_language)
+                nav_title = _('Hide in navigation') if in_navigation else _('Display in navigation')
                 nav_action = admin_reverse('cms_page_change_innavigation', args=(self.page.pk,))
                 current_page_menu.add_ajax_item(
                     nav_title,

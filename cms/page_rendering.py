@@ -6,8 +6,8 @@ from django.template.response import TemplateResponse
 from django.urls import Resolver404, resolve, reverse
 
 from cms import __version__
+from cms import constants
 from cms.cache.page import set_page_cache
-from cms.models import Page
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_template_from_request
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
@@ -34,19 +34,19 @@ def render_page(request, page, current_language, slug):
     xframe_options = page.get_xframe_options()
     # xframe_options can be None if there's no xframe information on the page
     # (eg. a top-level page which has xframe options set to "inherit")
-    if xframe_options == Page.X_FRAME_OPTIONS_INHERIT or xframe_options is None:
+    if xframe_options == constants.X_FRAME_OPTIONS_INHERIT or xframe_options is None:
         # This is when we defer to django's own clickjacking handling
         return response
 
     # We want to prevent django setting this in their middlewear
     response.xframe_options_exempt = True
 
-    if xframe_options == Page.X_FRAME_OPTIONS_ALLOW:
+    if xframe_options == constants.X_FRAME_OPTIONS_ALLOW:
         # Do nothing, allowed is no header.
         return response
-    elif xframe_options == Page.X_FRAME_OPTIONS_SAMEORIGIN:
+    elif xframe_options == constants.X_FRAME_OPTIONS_SAMEORIGIN:
         response['X-Frame-Options'] = 'SAMEORIGIN'
-    elif xframe_options == Page.X_FRAME_OPTIONS_DENY:
+    elif xframe_options == constants.X_FRAME_OPTIONS_DENY:
         response['X-Frame-Options'] = 'DENY'
     return response
 

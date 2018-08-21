@@ -34,7 +34,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.page import get_available_slug
+from cms.utils.page import get_available_slug, get_clean_username
 from cms.utils.permissions import _thread_locals, current_user
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
@@ -108,7 +108,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
+                xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
 
@@ -163,7 +163,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # ugly permissions hack
     if created_by and isinstance(created_by, get_user_model()):
         _thread_locals.user = created_by
-        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+        created_by = get_clean_username(created_by)
     else:
         _thread_locals.user = None
 
@@ -176,16 +176,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
         changed_by=created_by,
         publication_date=publication_date,
         publication_end_date=publication_end_date,
-        in_navigation=in_navigation,
-        soft_root=soft_root,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
-        template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         login_required=login_required,
-        limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,
     )
     page.set_tree_node(site=site, target=target_node, position=position)
     page.save()
@@ -195,10 +190,16 @@ def create_page(title, template, language, menu_title=None, slug=None,
         title=title,
         menu_title=menu_title,
         slug=slug,
+        created_by=created_by,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
         overwrite_url=overwrite_url,
+        soft_root=soft_root,
+        in_navigation=in_navigation,
+        template=template,
+        limit_visibility_in_menu=limit_visibility_in_menu,
+        xframe_options=xframe_options,
     )
 
     if published:
@@ -214,7 +215,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
 @transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None, parent=None,
-                 overwrite_url=None, page_title=None, path=None):
+                 overwrite_url=None, page_title=None, path=None,
+                 created_by='python-api', soft_root=False, in_navigation=False,
+                 template=TEMPLATE_INHERITANCE_MAGIC,
+                 limit_visibility_in_menu=constants.VISIBILITY_ALL,
+                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
     Create a title.
 
@@ -222,11 +227,20 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     See docs/extending_cms/api_reference.rst for more info
     """
+    # validate template
+    if not template == TEMPLATE_INHERITANCE_MAGIC:
+        assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
+        get_template(template)
+
     # validate page
     assert isinstance(page, Page)
 
     # validate language:
     assert language in get_language_list(page.node.site_id)
+
+    # validate menu visibility
+    accepted_limitations = (constants.VISIBILITY_ALL, constants.VISIBILITY_USERS, constants.VISIBILITY_ANONYMOUS)
+    assert limit_visibility_in_menu in accepted_limitations
 
     # set default slug:
     if not slug:
@@ -237,6 +251,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
         path = overwrite_url.strip('/')
     elif path is None:
         path = page.get_path_for_slug(slug, language)
+
+    if created_by and isinstance(created_by, get_user_model()):
+        created_by = get_clean_username(created_by)
 
     title = Title.objects.create(
         language=language,
@@ -249,6 +266,13 @@ def create_title(language, title, page, menu_title=None, slug=None,
         meta_description=meta_description,
         page=page,
         has_url_overwrite=bool(overwrite_url),
+        created_by=created_by,
+        changed_by=created_by,
+        soft_root=soft_root,
+        in_navigation=in_navigation,
+        template=template,
+        limit_visibility_in_menu=limit_visibility_in_menu,
+        xframe_options=xframe_options,
     )
     title.rescan_placeholders()
 

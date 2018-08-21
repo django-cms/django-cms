@@ -187,20 +187,6 @@ class PagesTestCase(TransactionCMSTestCase):
 
         self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
 
-    def test_delete_page_no_template(self):
-        page_data = {
-            'title': 'root',
-            'slug': 'root',
-            'language': settings.LANGUAGES[0][0],
-            'template': 'nav_playground.html',
-
-        }
-        page = create_page(**page_data)
-        page.template = 'no_such_template.html'
-        page.delete()
-
-        self.assertEqual(Page.objects.count(), 0)
-
     def test_get_available_slug_recursion(self):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
         """
@@ -511,8 +497,7 @@ class PagesTestCase(TransactionCMSTestCase):
         # create page
         page = create_page("Add Placeholder", "nav_playground.html", "en",
                            position="last-child", published=True, in_navigation=True)
-        page.template = 'add_placeholder.html'
-        page.save()
+        page.update_translations(template='add_placeholder.html')
         page.publish('en')
         url = page.get_absolute_url()
         response = self.client.get(url)
@@ -573,34 +558,39 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child = create_page("grand child", "nav_playground.html", "en", parent=child)
         child2 = create_page("child2", "col_two.html", "en", parent=parent)
         grand_child2 = create_page("grand child2", "nav_playground.html", "en", parent=child2)
-        child.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        child.save()
-        grand_child.save()
-        grand_child2.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child2.save()
+        child_title = child.get_title_obj("en")
+        child2_title = child2.get_title_obj("en")
+        child_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child_title = grand_child.get_title_obj("en")
+        grand_child_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        child_title.save()
+        grand_child_title.save()
+        grand_child2_title = grand_child2.get_title_obj("en")
+        grand_child2_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child2_title.save()
 
-        self.assertFalse(hasattr(grand_child, '_template_cache'))
-        with self.assertNumQueries(1):
-            self.assertEqual(child.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        self.assertFalse(hasattr(grand_child_title, '_template_cache'))
+        with self.assertNumQueries(3):
+            self.assertEqual(child_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child.get_template()
 
-        self.assertFalse(hasattr(grand_child2, '_template_cache'))
-        with self.assertNumQueries(1):
-            self.assertEqual(child2.template, 'col_two.html')
+        self.assertFalse(hasattr(grand_child2_title, '_template_cache'))
+        with self.assertNumQueries(3):
+            self.assertEqual(child2_title.template, 'col_two.html')
             self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child2.get_template()
 
-        parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        parent.save()
-        self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        parent_title = parent.get_title_obj("en")
+        parent_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        parent_title.save()
+        self.assertEqual(parent_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 
@@ -918,7 +908,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+            xframe_options=constants.X_FRAME_OPTIONS_ALLOW
         )
 
         resp = self.client.get(page.get_absolute_url('en'))
@@ -932,7 +922,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_SAMEORIGIN
+            xframe_options=constants.X_FRAME_OPTIONS_SAMEORIGIN
         )
 
         resp = self.client.get(page.get_absolute_url('en'))
@@ -946,7 +936,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
 
         resp = self.client.get(page.get_absolute_url('en'))
@@ -960,7 +950,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
 
         child1 = create_page(
@@ -970,7 +960,7 @@ class PagesTestCase(TransactionCMSTestCase):
             published=True,
             slug='subpage',
             parent=parent,
-            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+            xframe_options=constants.X_FRAME_OPTIONS_INHERIT
         )
 
         child2 = create_page(
@@ -980,7 +970,7 @@ class PagesTestCase(TransactionCMSTestCase):
             published=True,
             slug='subpage',
             parent=child1,
-            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+            xframe_options=constants.X_FRAME_OPTIONS_ALLOW
         )
         child3 = create_page(
             title='subpage',
@@ -989,7 +979,7 @@ class PagesTestCase(TransactionCMSTestCase):
             published=True,
             slug='subpage',
             parent=child2,
-            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+            xframe_options=constants.X_FRAME_OPTIONS_INHERIT
         )
 
         resp = self.client.get(parent.get_absolute_url('en'))
@@ -1034,7 +1024,7 @@ class PagesTestCase(TransactionCMSTestCase):
                 'nav_playground.html',
                 'en',
                 published=True,
-                xframe_options=Page.X_FRAME_OPTIONS_ALLOW,
+                xframe_options=constants.X_FRAME_OPTIONS_ALLOW,
             )
 
             # Normal response from render_page
@@ -1060,7 +1050,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
         placeholder = cms_page.get_placeholders('en')[0]
         add_plugin(cms_page.get_placeholders('en')[0], 'TextPlugin', 'en', body=public_text)
@@ -1124,7 +1114,7 @@ class PagesTestCase(TransactionCMSTestCase):
             language='en',
             published=True,
             slug='home',
-            xframe_options=Page.X_FRAME_OPTIONS_DENY
+            xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
         placeholder = cms_page.get_placeholders('en')[0]
         add_plugin(cms_page.get_placeholders('en')[0], 'TextPlugin', 'en', body=public_text)

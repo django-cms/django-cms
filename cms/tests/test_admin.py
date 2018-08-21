@@ -509,11 +509,11 @@ class AdminTests(AdminTestsBase):
             self.assertEqual(response.status_code, 403)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'no': 'data'})
-            old = page.in_navigation
+            old = page.get_in_navigation()
             response = self.admin_class.change_innavigation(request, page.pk)
             self.assertEqual(response.status_code, 204)
             page = self.reload(page)
-            self.assertEqual(old, not page.in_navigation)
+            self.assertEqual(old, not page.get_in_navigation())
 
     def test_publish_page_requires_perms(self):
         permless = self.get_permless()
@@ -750,7 +750,7 @@ class AdminFormsTests(AdminTestsBase):
         cms_page = create_page('test page', 'nav_playground.html', 'en')
         page_data = {
             'overwrite_url': '/overwrite/url/',
-            'template': cms_page.template,
+            'template': cms_page.get_template(),
         }
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
 
@@ -867,7 +867,7 @@ class AdminFormsTests(AdminTestsBase):
             redirect_path = admin_reverse('cms_page_changelist') + '?language=en'
             response = self.client.post(en_path, page_data)
             self.assertRedirects(response, redirect_path)
-            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+            self.assertEqual(Page.objects.get(pk=page.pk).get_template(), 'col_two.html')
 
         # Now switch it up by adding german as the current language
         # Note that german has not been created as page translation.
@@ -880,7 +880,7 @@ class AdminFormsTests(AdminTestsBase):
             # Assert user is redirected to basic settings.
             self.assertRedirects(response, redirect_path)
             # Make sure no change was made
-            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+            self.assertEqual(Page.objects.get(pk=page.pk).get_template('de'), 'col_two.html')
 
         de_translation = create_title('de', title='Page 1', page=page.reload())
         de_translation.slug = ''
@@ -896,7 +896,7 @@ class AdminFormsTests(AdminTestsBase):
             # Assert user is not redirected because there was a form error
             self.assertEqual(response.status_code, 200)
             # Make sure no change was made
-            self.assertEqual(Page.objects.get(pk=page.pk).template, 'col_two.html')
+            self.assertEqual(Page.objects.get(pk=page.pk).get_template(), 'col_two.html')
 
         de_translation.slug = 'someslug'
         de_translation.save()
@@ -910,7 +910,7 @@ class AdminFormsTests(AdminTestsBase):
             redirect_path = admin_reverse('cms_page_changelist') + '?language=de'
             response = self.client.post(en_path, page_data)
             self.assertRedirects(response, redirect_path)
-            self.assertEqual(Page.objects.get(pk=page.pk).template, 'nav_playground.html')
+            self.assertEqual(Page.objects.get(pk=page.pk).get_template('de'), 'nav_playground.html')
 
     def test_advanced_settings_endpoint_fails_gracefully(self):
         admin_user = self.get_superuser()

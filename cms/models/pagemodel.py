@@ -18,7 +18,7 @@ from django.utils.translation import (
 )
 
 from cms import constants
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 from cms.exceptions import PublicIsUnmodifiable, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
@@ -149,24 +149,6 @@ class Page(models.Model):
     """
     A simple hierarchical page model
     """
-    LIMIT_VISIBILITY_IN_MENU_CHOICES = (
-        (constants.VISIBILITY_USERS, _('for logged in users only')),
-        (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
-    )
-    TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
-
-    X_FRAME_OPTIONS_INHERIT = constants.X_FRAME_OPTIONS_INHERIT
-    X_FRAME_OPTIONS_DENY = constants.X_FRAME_OPTIONS_DENY
-    X_FRAME_OPTIONS_SAMEORIGIN = constants.X_FRAME_OPTIONS_SAMEORIGIN
-    X_FRAME_OPTIONS_ALLOW = constants.X_FRAME_OPTIONS_ALLOW
-    X_FRAME_OPTIONS_CHOICES = (
-        (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-        (constants.X_FRAME_OPTIONS_DENY, _('Deny')),
-        (constants.X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-        (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
-    )
-
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -186,20 +168,11 @@ class Page(models.Model):
     # Please use toggle_in_navigation() instead of affecting this property
     # directly so that the cms page cache can be invalidated as appropriate.
     #
-    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
-    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
-                                    help_text=_("All ancestors will not be displayed in the navigation"))
     reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
         "A unique identifier that is used with the page_url templatetag for linking to this page"))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
-    template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_DEFAULT)
 
     login_required = models.BooleanField(_("login required"), default=False)
-    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
-                                                        choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
-                                                        help_text=_("limit when this page is visible in the menu"))
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
@@ -215,12 +188,6 @@ class Page(models.Model):
         editable=False,
     )
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
-
-    # X Frame Options for clickjacking protection
-    xframe_options = models.IntegerField(
-        choices=X_FRAME_OPTIONS_CHOICES,
-        default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
-    )
 
     # Flag that marks a page as page-type
     is_page_type = models.BooleanField(default=False)
@@ -491,12 +458,13 @@ class Page(models.Model):
 
         if inherited_template and target_node.is_root() and position in ('left', 'right'):
             # The page is being moved to a root position.
-            # Explicitly set the inherited template on the page
+            # Explicitly set the inherited template on the titles
             # to keep all plugins / placeholders.
-            self.update(refresh=False, template=self.get_template())
+            template = self.get_template()
+            self.update_translations(template=template)
 
         # Don't use a cached node. Always get a fresh one.
-        self._clear_node_cache()
+        self._clear_internal_cache()
 
         # Runs the SQL updates on the treebeard fields
         self.node.move(target_node, position)
@@ -635,14 +603,9 @@ class Page(models.Model):
             target.reverse_id = self.reverse_id
         target.changed_by = self.changed_by
         target.login_required = self.login_required
-        target.in_navigation = self.in_navigation
-        target.soft_root = self.soft_root
-        target.limit_visibility_in_menu = self.limit_visibility_in_menu
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls
         target.application_namespace = self.application_namespace
-        target.template = self.template
-        target.xframe_options = self.xframe_options
         target.is_page_type = self.is_page_type
 
     def copy(self, site, parent_node=None, language=None,
@@ -689,6 +652,8 @@ class Page(models.Model):
             new_title.page = new_page
             new_title.published = False
             new_title.publisher_public = None
+            new_title.template = title.template
+            new_title.xframe_options = title.xframe_options
 
             if parent_page:
                 base = parent_page.get_path(title.language)
@@ -803,21 +768,17 @@ class Page(models.Model):
             self.mark_descendants_pending(language)
 
     def save(self, **kwargs):
-        # delete template cache
-        if hasattr(self, '_template_cache'):
-            delattr(self, '_template_cache')
-
-        created = not bool(self.pk)
         if self.reverse_id == "":
             self.reverse_id = None
         if self.application_namespace == "":
             self.application_namespace = None
+
+        created = not bool(self.pk)
         from cms.utils.permissions import get_current_user_name
-
         self.changed_by = get_current_user_name()
-
         if created:
             self.created_by = self.changed_by
+
         super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
@@ -866,8 +827,8 @@ class Page(models.Model):
     def is_new_dirty(self):
         if self.pk:
             fields = [
-                'publication_date', 'publication_end_date', 'in_navigation', 'soft_root', 'reverse_id',
-                'navigation_extenders', 'template', 'login_required', 'limit_visibility_in_menu'
+                'publication_date', 'publication_end_date', 'reverse_id',
+                'navigation_extenders', 'login_required'
             ]
             try:
                 old_page = Page.objects.get(pk=self.pk)
@@ -889,17 +850,18 @@ class Page(models.Model):
         '''
         Toggles (or sets) in_navigation and invalidates the cms page cache
         '''
-        old = self.in_navigation
+        old = self.get_in_navigation()
         if set_to in [True, False]:
-            self.in_navigation = set_to
+            new = set_to
         else:
-            self.in_navigation = not self.in_navigation
-        self.save()
+            new = not old
+
+        self.update_translations(in_navigation=new)
 
         # If there was a change, invalidate the cms page cache
-        if self.in_navigation != old:
+        if new != old:
             self.clear_cache()
-        return self.in_navigation
+        return new
 
     def get_publisher_state(self, language, force_reload=False):
         try:
@@ -935,7 +897,7 @@ class Page(models.Model):
             public_page = Page.objects.get(pk=self.publisher_public_id)
             public_languages = public_page.get_languages()
         else:
-            public_page = Page(created_by=self.created_by)
+            public_page = Page()
             public_languages = [language]
 
         self._copy_attributes(public_page, clean=False)
@@ -971,6 +933,7 @@ class Page(models.Model):
         # is pending.
         self.update_translations(
             language,
+            changed_by=public_page.changed_by,
             published=True,
             publisher_public=public_title,
             publisher_state=PUBLISHER_STATE_DEFAULT,
@@ -1348,13 +1311,13 @@ class Page(models.Model):
         """
         get when this page was last updated
         """
-        return self.changed_date
+        return self.get_title_obj_attribute("changed_date", language, fallback, force_reload)
 
     def get_changed_by(self, language=None, fallback=True, force_reload=False):
         """
         get user who last changed this page
         """
-        return self.changed_by
+        return self.get_title_obj_attribute("changed_by", language, fallback, force_reload)
 
     def get_page_title(self, language=None, fallback=True, force_reload=False):
         """
@@ -1413,31 +1376,19 @@ class Page(models.Model):
                             return lang
         return language
 
-    def get_template(self):
-        """
-        get the template of this page if defined or if closer parent if
-        defined or DEFAULT_PAGE_TEMPLATE otherwise
-        """
-        if hasattr(self, '_template_cache'):
-            return self._template_cache
+    @property
+    def template(self):
+        return self.get_title_obj_attribute("template")
 
-        if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
-            self._template_cache = self.template or get_cms_setting('TEMPLATES')[0][0]
-            return self._template_cache
+    @property
+    def soft_root(self):
+        return self.get_title_obj_attribute("soft_root")
 
-        templates = (
-            self
-            .get_ancestor_pages()
-            .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-            .order_by('-node__path')
-            .values_list('template', flat=True)
-        )
-
-        try:
-            self._template_cache = templates[0]
-        except IndexError:
-            self._template_cache = get_cms_setting('TEMPLATES')[0][0]
-        return self._template_cache
+    def get_template(self, language=None, fallback=True, force_reload=False):
+        title = self.get_title_obj(language, fallback, force_reload)
+        if title:
+            return title.get_template()
+        return get_cms_setting('TEMPLATES')[0][0]
 
     def get_template_name(self):
         """
@@ -1559,24 +1510,19 @@ class Page(models.Model):
 
         return get_static_placeholders(self.get_template(), context)
 
-    def get_xframe_options(self):
-        """ Finds X_FRAME_OPTION from tree if inherited """
-        xframe_options = self.xframe_options or self.X_FRAME_OPTIONS_INHERIT
+    def get_xframe_options(self, language=None, fallback=True, force_reload=False):
+        title = self.get_title_obj(language, fallback, force_reload)
+        if title:
+            return title.get_xframe_options()
 
-        if xframe_options != self.X_FRAME_OPTIONS_INHERIT:
-            return xframe_options
+    def get_soft_root(self, language=None, fallback=True, force_reload=False):
+        return self.get_title_obj_attribute("soft_root", language, fallback, force_reload)
 
-        # Ignore those pages which just inherit their value
-        ancestors = self.get_ancestor_pages().order_by('-node__path')
-        ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+    def get_in_navigation(self, language=None, fallback=True, force_reload=False):
+        return self.get_title_obj_attribute("in_navigation", language, fallback, force_reload)
 
-        # Now just give me the clickjacking setting (not anything else)
-        xframe_options = ancestors.values_list('xframe_options', flat=True)
-
-        try:
-            return xframe_options[0]
-        except IndexError:
-            return None
+    def get_limit_visibility_in_menu(self, language=None, fallback=True, force_reload=False):
+        return self.get_title_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
 
 
 class PageType(Page):
