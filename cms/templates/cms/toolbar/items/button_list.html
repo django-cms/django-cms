@@ -1,7 +1,7 @@
 {% load i18n %}
 {% if 'cms-toolbar-item-cms-mode-switcher' in extra_classes %}
     <div class="{{ extra_classes|join:' ' }}">
-        <a href="?{{ cms_structure_on }}" class="cms-btn cms-btn-disabled" title="{% trans 'Toggle structure' %}"
+        <a href="{{ cms_structure_url }}" class="cms-btn cms-btn-disabled" title="{% trans 'Toggle structure' %}"
             {% for button in buttons %}
                 data-{{ button.extra_classes }}='{ "url": "{{ button.url }}", "name": "{{ button.name }}" }'
             {% endfor %}>

@@ -38,8 +38,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_CHANGE,
 )
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.conf import get_cms_setting
+from cms.toolbar.utils import get_toolbar_from_request, get_object_edit_url
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.plugins import get_plugins
 
@@ -793,15 +792,16 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_toolbar_struct_permissions(self):
         page = self.get_permissions_test_page()
+        page_content = self.get_page_title_obj(page)
+        page_edit_url = get_object_edit_url(page_content)
         staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.get_placeholders('en').get(slot='body')
-        page_url = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'add_text')
 
         with self.login_user_context(staff_user):
-            request = self.get_request(page_url, page=page)
+            request = self.get_request(page_edit_url, page=page)
             request.toolbar = CMSToolbar(request)
             renderer = self.get_structure_renderer(request=request)
             output = renderer.render_placeholder(placeholder, language='en', page=page)
@@ -961,7 +961,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEqual(self.section_count, plugin.sections.count())
-        response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        response = self.client.get('/en/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodel_sections')
 

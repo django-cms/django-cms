@@ -115,9 +115,9 @@ CMS.config = {
         'mode': {% if cms_toolbar.structure_mode_active %}'structure'{% else %}'edit'{% endif %},
         'sideframe': { 'url': '' },
         'states': [],
-        'edit': '{{ cms_edit_on }}',
-        'edit_off': '{{ cms_edit_off }}',
-        'structure': '{{ cms_structure_on }}',
+        'edit': '{{ cms_edit_url }}',
+        'edit_off': '{{ cms_preview_url }}',
+        'structure': '{{ cms_structure_url }}',
         'legacy_mode': {{ cms_toolbar.uses_legacy_structure_mode|yesno:'true,false' }}
     },
     'clipboard': {

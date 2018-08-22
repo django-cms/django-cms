@@ -6,7 +6,6 @@ class TwoPagesFixture(object):
     def create_fixtures(self):
         defaults = {
             'template': 'nav_playground.html',
-            'published': True,
             'in_navigation': True,
         }
         with self.settings(CMS_PERMISSION=False):

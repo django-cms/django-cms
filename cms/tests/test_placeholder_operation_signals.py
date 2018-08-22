@@ -49,7 +49,6 @@ class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             "nav_playground.html",
             "en",
             created_by=self._admin_user,
-            published=True,
         )
         self._placeholder_1 = self._cms_page.get_placeholders("en").get(slot='body')
         self._placeholder_2 = self._cms_page.get_placeholders("en").get(slot='right-column')
@@ -651,7 +650,6 @@ class AppPlaceholderTestCase(PagePlaceholderTestCase):
             "nav_playground.html",
             "en",
             created_by=self._admin_user,
-            published=True,
         )
         self._placeholder_1 = self._cms_page.get_placeholders("en").get(slot='body')
         self._placeholder_2 = self._cms_page.get_placeholders("en").get(slot='right-column')
