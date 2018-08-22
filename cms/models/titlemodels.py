@@ -213,7 +213,7 @@ class Title(models.Model):
 
         for placeholder in placeholders:
             if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
+                existing[placeholder] = self.placeholders.create(slot=placeholder, source=self)
         return existing
 
     def get_placeholders(self):
