@@ -105,7 +105,6 @@ class TestNoI18N(CMSTestCase):
                 "home",
                 template="col_two.html",
                 language="en-us",
-                published=True,
                 redirect='/foobar/',
             )
             homepage.set_as_homepage()

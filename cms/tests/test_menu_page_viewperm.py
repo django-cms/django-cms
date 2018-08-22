@@ -67,7 +67,6 @@ class ViewPermissionTests(CMSTestCase):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         homepage = create_page("page_a", **stdkwargs)
@@ -564,7 +563,6 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         homepage = create_page("page_1", **stdkwargs)

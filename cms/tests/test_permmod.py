@@ -217,8 +217,7 @@ class PermissionModeratorTests(CMSTestCase):
             user_global = create_page_user(user_global, user_global)
             user_global.is_staff = False
             user_global.save() # Prevent is_staff permission
-            global_page = create_page("global", "nav_playground.html", "en",
-                                      published=True)
+            global_page = create_page("global", "nav_playground.html", "en")
             # Removed call since global page user doesn't have publish permission
             #global_page = publish_page(global_page, user_global)
             # it's allowed for the normal user to view the page

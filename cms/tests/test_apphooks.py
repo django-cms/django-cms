@@ -428,7 +428,6 @@ class ApphooksTestCase(CMSTestCase):
                             "nav_playground.html",
                             language="en",
                             created_by=self.superuser,
-                            published=True,
                             parent=de_title.page.get_parent_page(),
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
@@ -876,7 +875,6 @@ class ApphooksTestCase(CMSTestCase):
         """
         defaults = {
             'language': 'en',
-            'published': True,
             'in_navigation': True,
             'template': 'nav_playground.html',
         }
@@ -905,7 +903,6 @@ class ApphooksTestCase(CMSTestCase):
         # Refs - https://github.com/divio/django-cms/issues/6336
         defaults = {
             'language': 'en',
-            'published': True,
             'in_navigation': True,
             'template': 'nav_playground.html',
         }

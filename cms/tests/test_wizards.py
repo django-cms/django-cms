@@ -136,7 +136,6 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             created_by=smart_text(user),
             parent=None,
             in_navigation=True,
-            published=False
         )
         url = page.get_absolute_url(language="en")
         self.assertEqual(self.page_wizard.get_success_url(
@@ -539,7 +538,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             'page',
             'nav_playground.html',
             language='en',
-            published=True,
             slug='page'
         )
 

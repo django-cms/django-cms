@@ -471,7 +471,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         self.assertEqual('<b>Test</b>', output)
 
     def test_render_plugin_no_context(self):
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         page_content = self.get_page_title_obj(page)
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')

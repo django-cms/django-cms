@@ -178,7 +178,7 @@ class ViewTests(CMSTestCase):
         page_edit_url = get_object_edit_url(page_content)
         # Anon user
         response = self.client.get(page_edit_url)
-        self.assertNotContains(response, "cms_toolbar-item-switch-save-edit", 200)
+        self.assertRedirects(response, '/en/admin/login/?next={}'.format(page_edit_url))
 
         # Superuser
         user = self.get_superuser()

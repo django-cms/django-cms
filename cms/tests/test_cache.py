@@ -101,8 +101,7 @@ class CacheTestCase(CMSTestCase):
                 self.client.get(page1_url)
 
     def test_no_cache_plugin(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_url = page1.get_absolute_url()
 
         placeholder1 = page1.get_placeholders('en').filter(slot='body')[0]
@@ -183,8 +182,7 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.unregister_plugin(NoCachePlugin)
 
     def test_timedelta_cache_plugin(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
         placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
@@ -217,8 +215,7 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.unregister_plugin(TimeDeltaCacheExpirationPlugin)
 
     def test_datetime_cache_plugin(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_url = page1.get_absolute_url()
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
@@ -255,8 +252,7 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
 
     def TTLCacheExpirationPlugin(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
         placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
@@ -293,8 +289,7 @@ class CacheTestCase(CMSTestCase):
         Tests that when used in combination, the page is cached to the
         shortest TTL.
         """
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_url = page1.get_absolute_url()
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
@@ -358,8 +353,7 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.unregister_plugin(NoCachePlugin)
 
     def test_dual_legacy_cache_plugins(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_url = page1.get_absolute_url()
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
@@ -534,8 +528,7 @@ class CacheTestCase(CMSTestCase):
                 self.assertEqual(response.status_code, 200)
 
     def test_sekizai_plugin(self):
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
 
         placeholder1 = page1.get_placeholders("en").filter(slot="body")[0]
         placeholder2 = page1.get_placeholders("en").filter(slot="right-column")[0]
@@ -561,8 +554,7 @@ class CacheTestCase(CMSTestCase):
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
             self.assertTrue(page_cache_setting)
-            page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                                published=True)
+            page1 = create_page('test page 1', 'nav_playground.html', 'en')
             page1_url = page1.get_absolute_url()
 
             placeholder = page1.get_placeholders("en").get(slot="body")

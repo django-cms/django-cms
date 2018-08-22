@@ -37,6 +37,17 @@ class BaseToolbar(ToolbarAPIMixin):
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
     @cached_property
+    def _resolver_match(self):
+        if getattr(self.request, 'resolver_match', None):
+            return self.request.resolver_match
+
+        try:
+            match = resolve(self.request.path_info)
+        except Resolver404:
+            match = None
+        return match
+
+    @cached_property
     def site_language(self):
         cms_page = self.request.current_page
         site_id = cms_page.node.site_id if cms_page else None
@@ -75,21 +86,21 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def structure_mode_active(self):
-        try:
-            match = resolve(self.request.path_info)
-        except:
-            return False
-        return self.is_staff and match.url_name == 'cms_placeholder_render_object_structure'
+        if self.is_staff and self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_structure'
+        return False
 
     @cached_property
     def edit_mode_active(self):
         if not self.show_toolbar:
             return False
-        try:
-            match = resolve(self.request.path_info)
-        except:
-            return False
-        return self.structure_mode_active or match.url_name == 'cms_placeholder_render_object_edit'
+
+        if self.structure_mode_active:
+            return True
+
+        if self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+        return False
 
     @cached_property
     def content_mode_active(self):

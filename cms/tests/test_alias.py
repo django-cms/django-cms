@@ -53,7 +53,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "col_two.html",
             "en",
             slug="page1",
-            published=True,
             in_navigation=True,
         )
         ph_1_en = page_en.get_placeholders("en").get(slot="col_left")
@@ -98,7 +97,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         source_plugin = api.add_plugin(
             source_page.get_placeholders("en").get(slot="col_left"),
@@ -111,7 +109,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         api.add_plugin(
             target_page.get_placeholders("en").get(slot="col_left"),
@@ -142,7 +139,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
         api.add_plugin(
@@ -156,7 +152,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         api.add_plugin(
             target_page.get_placeholders('en').get(slot="col_left"),
@@ -187,7 +182,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Home",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
@@ -204,7 +198,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Target",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         target_placeholder = target_page.get_placeholders("en").get(slot="col_left")
@@ -228,7 +221,7 @@ class AliasTestCase(TransactionCMSTestCase):
                 context=context,
                 language='en',
                 page=target_page,
-                editable=True
+                editable=True,
             )
 
             tag_format = '<template class="cms-plugin cms-plugin-start cms-plugin-{}">'
@@ -253,14 +246,12 @@ class AliasTestCase(TransactionCMSTestCase):
             "Home",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         source_page = api.create_page(
             "Source",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
@@ -277,7 +268,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Target",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         target_placeholder = target_page.get_placeholders('en').get(slot="col_left")

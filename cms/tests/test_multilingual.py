@@ -201,14 +201,12 @@ class MultilingualTestCase(CMSTestCase):
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
         page_2 = create_page(
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
 
@@ -227,14 +225,12 @@ class MultilingualTestCase(CMSTestCase):
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
         page_2 = create_page(
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
 

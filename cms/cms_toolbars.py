@@ -257,10 +257,9 @@ class PageToolbar(CMSToolbar):
         edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
 
         with force_language(self.current_lang):
-            build_url = get_object_structure_url(self.title) if self.title else ''
-            edit_url = get_object_edit_url(self.title) if self.title else ''
-
             if self.request.user.has_perm("cms.use_structure"):
+                build_url = get_object_structure_url(self.title) if self.title else ''
+                edit_url = get_object_edit_url(self.title) if self.title else ''
                 switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                         extra_classes=extra_classes)
                 switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
@@ -280,6 +279,9 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def in_apphook(self):
+        if self.toolbar.edit_mode_active:
+            return False
+
         with force_language(self.toolbar.request_language):
             try:
                 resolver = resolve(self.toolbar.request_path)

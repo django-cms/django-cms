@@ -26,9 +26,7 @@ from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_u
 from cms.models import Page, UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
 from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
-from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
-                                      URL_CMS_USERSETTINGS)
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_CHANGE, URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar_pool import toolbar_pool
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -462,8 +460,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(re.search('copy_plugin.+/en/admin/cms/placeholder/copy-plugins/', response_text))
 
     def test_show_toolbar_to_staff(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en",
-                           published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         staff = self.get_staff()
         assert staff.user_permissions.get().name == 'Can change page'
         request = self.get_page_request(page, staff, '/')
@@ -471,7 +468,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.show_toolbar)
 
     def test_show_toolbar_staff(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
         request = self.get_page_request(page, self.get_staff(), edit_url)
@@ -479,7 +476,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.show_toolbar)
 
     def test_hide_toolbar_non_staff(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
         request = self.get_page_request(page, self.get_nonstaff(), edit_url)
@@ -487,7 +484,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(toolbar.show_toolbar)
 
     def test_hide_toolbar_disabled(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         # Edit mode should re-enable the toolbar in any case
         request = self.get_page_request(page, self.get_staff(), disable=True)
         self.assertTrue(request.session.get('cms_toolbar_disabled'))
@@ -495,7 +492,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(toolbar.edit_mode_active)
 
     def test_show_disabled_toolbar_with_edit(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
         request = self.get_page_request(page, self.get_staff(), edit_url, disable=True)
@@ -528,7 +525,7 @@ class ToolbarTests(ToolbarTestBase):
                 self.assertTrue(response.status_code, 200)
 
     def test_show_toolbar_without_edit(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, AnonymousUser())
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.show_toolbar)
@@ -539,21 +536,19 @@ class ToolbarTests(ToolbarTestBase):
         edit_url = get_object_edit_url(page_content)
         user = self.get_staff()
         user.user_permissions.all().delete()
-        request = self.get_page_request(page, user, edit_url)
-        toolbar = CMSToolbar(request)
-        toolbar.populate()
-        toolbar.post_template_populate()
+        request = self.get_page_request(page, user, edit_url, disable=False)
+        request.toolbar.post_template_populate()
         self.assertFalse(page.has_change_permission(request.user))
         self.assertFalse(page.has_publish_permission(request.user))
 
-        items = toolbar.get_left_items() + toolbar.get_right_items()
+        items = request.toolbar.get_left_items() + request.toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 4, items)
         page_items = items[1].get_items()
         # The page menu should only have the "Create page" item enabled.
         self.assertFalse(page_items[0].disabled)
         self.assertTrue(all(item.disabled for item in page_items[1:] if hasattr(item, 'disabled')))
-        admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
+        admin_items = request.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 14, admin_items)
 
     def test_button_consistency_staff(self):
@@ -585,7 +580,7 @@ class ToolbarTests(ToolbarTestBase):
         Tests that even called multiple times, admin and language buttons are not duplicated
         """
         user = self.get_staff()
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page = create_page('test', 'nav_playground.html', 'en')
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
         en_request = self.get_page_request(None, user, edit_url)
@@ -636,7 +631,7 @@ class ToolbarTests(ToolbarTestBase):
                 self.assertNotContains(response, '/it/')
 
     def test_get_alphabetical_insert_position(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en",  published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
         toolbar.get_left_items()
@@ -662,8 +657,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(beta_position, gamma_position)
 
     def test_out_of_order(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en",
-                           published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
         menu1 = toolbar.get_or_create_menu("test")
@@ -700,7 +694,6 @@ class ToolbarTests(ToolbarTestBase):
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
         page = self.create_homepage("home", "nav_playground.html", "en")
-        page_content = self.get_page_title_obj(page)
         resolve_url = admin_reverse('cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
@@ -709,22 +702,17 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(self.get_admin_url(Page, 'add'), page_data)
             self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
 
-            # test redirection when toolbar is in edit mode
-            edit_url = get_object_edit_url(page_content)
+            new_page = Page.objects.get(urls__slug__startswith='test-page-')
+            edit_url = get_object_edit_url(self.get_page_title_obj(new_page))
             response = self.client.post(resolve_url, {'pk': page.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), edit_url)
 
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
-            # test redirection when toolbar is not in edit mode
-            response = self.client.post(resolve_url, {'pk': page.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '/en/')
-
     def test_page_edit_redirect_editmode(self):
         page1 = self.create_homepage("home", "nav_playground.html", "en")
-        page2 = create_page("test", "nav_playground.html", "en",
-                            published=True)
-        page3 = create_page("non-pub", "nav_playground.html", "en",
-                            published=False)
+        page1_content = self.get_page_title_obj(page1)
+        page2 = create_page("test", "nav_playground.html", "en")
+        page2_content = self.get_page_title_obj(page2)
+        page3 = create_page("non-pub", "nav_playground.html", "en")
         page3_content = self.get_page_title_obj(page3)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -734,10 +722,10 @@ class ToolbarTests(ToolbarTestBase):
             # first call returns the latest modified page with updated slug even if a different
             # page has been requested
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '/en/test/')
+            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page2_content))
             # following call returns the actual page requested
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '/en/')
+            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page1_content))
             # non published page - staff user can access it
             response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page3_content))
@@ -746,7 +734,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.content.decode('utf-8'), '/')
 
     def test_page_edit_redirect_no_editmode(self):
-        page1 = create_page("home", "nav_playground.html", "en", published=True)
+        page1 = create_page("home", "nav_playground.html", "en")
         page1_content = self.get_page_title_obj(page1)
         page1_edit_url = get_object_edit_url(page1_content)
         page2 = create_page("test", "nav_playground.html", "en", parent=page1)
@@ -775,12 +763,11 @@ class ToolbarTests(ToolbarTestBase):
 
 
     def test_page_edit_redirect_errors(self):
-        page1 = create_page("home", "nav_playground.html", "en",
-                            published=True)
+        page1 = create_page("home", "nav_playground.html", "en")
         page2 = create_page("test", "nav_playground.html", "en",
                             parent=page1)
-        create_page("non-pub", "nav_playground.html", "en",
-                    published=False, parent=page2)
+        page2_content = self.get_page_title_obj(page2)
+        create_page("non-pub", "nav_playground.html", "en", parent=page2)
         superuser = self.get_superuser()
         url = admin_reverse('cms_page_resolve')
 
@@ -788,7 +775,7 @@ class ToolbarTests(ToolbarTestBase):
             # logentry - non existing id - parameter is used
             self._fake_logentry(9999, superuser, 'test page')
             response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page2_content))
             # parameters - non existing id - no redirection
             response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
@@ -910,8 +897,7 @@ class ToolbarTests(ToolbarTestBase):
             superuser.last_name = ''
             superuser.save()
 
-        page = create_page("home", "nav_playground.html", "en",
-                           published=True)
+        page = create_page("home", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)
         page_edit_url = get_object_edit_url(page_content)
         self.get_page_request(page, superuser, '/')
@@ -942,6 +928,7 @@ class ToolbarTests(ToolbarTestBase):
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
 
+    @override_settings(CMS_PERMISSION=True)
     def test_toolbar_logout_redirect(self):
         """
         Tests the logount AjaxItem on_success parameter in four different conditions:
@@ -951,13 +938,12 @@ class ToolbarTests(ToolbarTestBase):
          * published page with view permissions: redirect to the home page
         """
         superuser = self.get_superuser()
-        page0 = create_page("home", "nav_playground.html", "en",
-                            published=True)
+        page0 = create_page("home", "nav_playground.html", "en")
         page1 = create_page("internal", "nav_playground.html", "en",
                             parent=page0)
         page1_content = self.get_page_title_obj(page1)
         page1_edit_url = get_object_edit_url(page1_content)
-        create_page("unpublished", "nav_playground.html", "en", published=False, parent=page0)
+        create_page("unpublished", "nav_playground.html", "en", parent=page0)
         page3 = create_page("login_restricted", "nav_playground.html", "en",
                             parent=page0, login_required=True)
         page3_content = self.get_page_title_obj(page3)
