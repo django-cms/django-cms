@@ -24,7 +24,7 @@ from menus.menu_pool import menu_pool
 from cms.api import create_page, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
-from cms.models import Page
+from cms.models import Page, Title
 from cms.models.permissionmodels import (
     GlobalPagePermission,
     PagePermission,
@@ -160,8 +160,6 @@ class BaseCMSTestCase(object):
         return pp
 
     def get_page_title_obj(self, page, language="en"):
-        from cms.models import Title
-
         return Title.objects.get(page=page, language=language)
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
