@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from classytags.arguments import Argument
-from classytags.core import Options, Tag
+from classytags.core import Tag
 from classytags.helpers import InclusionTag
 
 from django import template
@@ -10,7 +9,9 @@ from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import get_language, ugettext_lazy as _
+
+from cms.utils import i18n
 
 
 register = template.Library()
@@ -38,27 +39,50 @@ def show_admin_menu_for_pages(context, descendants, depth=1):
     return mark_safe(''.join(rows))
 
 
-class TreePublishRow(Tag):
-    name = "tree_publish_row"
-    options = Options(
-        Argument('page'),
-        Argument('language')
-    )
+@register.simple_tag(takes_context=False)
+def get_page_display_name(cms_page):
+    from cms.models.titlemodels import EmptyTitle
+    language = get_language()
 
-    def render_tag(self, context, page, language):
-        cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
-        text = _("no content")
+    if not cms_page.title_cache:
+        cms_page.set_translations_cache()
 
-        if page.is_dirty(language):
-            cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
-            text = _("has contents")
+    if not cms_page.title_cache.get(language):
+        fallback_langs = i18n.get_fallback_languages(language)
+        found = False
+        for lang in fallback_langs:
+            if cms_page.title_cache.get(lang):
+                found = True
+                language = lang
+        if not found:
+            language = None
+            for lang, item in cms_page.title_cache.items():
+                if not isinstance(item, EmptyTitle):
+                    language = lang
+    if not language:
+        return _("Empty")
+    title = cms_page.title_cache[language]
+    if title.title:
+        return title.title
+    if title.page_title:
+        return title.page_title
+    if title.menu_title:
+        return title.menu_title
+    return cms_page.get_slug(language)
 
-        return mark_safe(
-            '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
-            'data-cms-tooltip="%s"></span>' % (cls, force_text(text)))
 
+@register.simple_tag(takes_context=True)
+def tree_publish_row(context, page, language):
+    cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
+    text = _("no content")
 
-register.tag(TreePublishRow)
+    if page.title_cache.get(language):
+        cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
+        text = _("has contents")
+
+    return mark_safe(
+        '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
+        'data-cms-tooltip="%s"></span>' % (cls, force_text(text)))
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')
@@ -89,22 +113,6 @@ def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     return mark_safe(
         '<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
-
-
-@register.filter
-def preview_link(page, language):
-    if settings.USE_I18N:
-
-        # Which one of page.get_slug() and page.get_path() is the right
-        # one to use in this block? They both seem to return the same thing.
-        try:
-            # attempt to retrieve the localized path/slug and return
-            return page.get_absolute_url(language, fallback=False)
-        except:
-            # no localized path/slug. therefore nothing to preview. stay on the same page.
-            # perhaps the user should be somehow notified for this.
-            return ''
-    return page.get_absolute_url(language)
 
 
 class PageSubmitRow(InclusionTag):

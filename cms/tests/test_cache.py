@@ -8,7 +8,7 @@ from django.template import Context
 from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page, create_title
-from cms.cache import _get_cache_version, invalidate_cms_page_cache
+from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import (
     _get_placeholder_cache_version_key,
     _get_placeholder_cache_version,
@@ -52,7 +52,7 @@ class CacheTestCase(CMSTestCase):
 
     def test_cache_placeholder(self):
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_url = page1.get_absolute_url()
 
         placeholder_en = page1.get_placeholders('en').filter(slot="body")[0]
@@ -81,7 +81,6 @@ class CacheTestCase(CMSTestCase):
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
         with self.assertNumQueries(5):
             self.render_template_obj(template, {}, request)
-        page1.publish('en')
         exclude = [
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
@@ -93,7 +92,7 @@ class CacheTestCase(CMSTestCase):
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get(page1_url)
-            with self.assertNumQueries(FuzzyInt(5, 11)):
+            with self.assertNumQueries(FuzzyInt(5, 13)):
                 self.client.get(page1_url)
 
         overrides['CMS_PLACEHOLDER_CACHE'] = False
@@ -156,8 +155,9 @@ class CacheTestCase(CMSTestCase):
             self.assertEqual(content1, content3)
 
             # Add the 'no-cache' plugin
-            add_plugin(placeholder1, "NoCachePlugin", 'en')
-            page1.publish('en')
+            with self.login_user_context(self.get_superuser()):
+                endpoint = self.get_add_plugin_uri(placeholder1, 'NoCachePlugin')
+                self.client.post(endpoint, {})
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
@@ -174,7 +174,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(6):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
-                with self.assertNumQueries(FuzzyInt(8, 14)):
+                with self.assertNumQueries(FuzzyInt(8, 16)):
                     response = self.client.get(page1_url)
                     resp2 = response.content.decode('utf8').split("$$$")[1]
             self.assertNotEqual(output, output2)
@@ -206,7 +206,6 @@ class CacheTestCase(CMSTestCase):
             'MIDDLEWARE': [mw for mw in settings.MIDDLEWARE if mw not in exclude]
         }
         with self.settings(**overrides):
-            page1.publish('en')
             request = self.get_request(page1.get_absolute_url())
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
@@ -246,7 +245,6 @@ class CacheTestCase(CMSTestCase):
             'MIDDLEWARE': [mw for mw in settings.MIDDLEWARE if mw not in exclude]
         }
         with self.settings(**overrides):
-            page1.publish('en')
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
@@ -281,7 +279,6 @@ class CacheTestCase(CMSTestCase):
             'MIDDLEWARE': [mw for mw in settings.MIDDLEWARE if mw not in exclude]
         }
         with self.settings(**overrides):
-            page1.publish('en')
             request = self.get_request('/en/')
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
@@ -330,7 +327,6 @@ class CacheTestCase(CMSTestCase):
             'MIDDLEWARE': [mw for mw in settings.MIDDLEWARE if mw not in exclude]
         }
         with self.settings(**overrides):
-            page1.publish('en')
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
@@ -386,7 +382,6 @@ class CacheTestCase(CMSTestCase):
             'MIDDLEWARE': [mw for mw in settings.MIDDLEWARE if mw not in exclude]
         }
         with self.settings(**overrides):
-            page1.publish('en')
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
@@ -412,7 +407,7 @@ class CacheTestCase(CMSTestCase):
             self.assertTrue(page_cache_setting)
 
             # Create a test page
-            page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+            page1 = create_page('test page 1', 'nav_playground.html', 'en')
             page1_url = page1.get_absolute_url()
 
             # Add some content
@@ -439,25 +434,8 @@ class CacheTestCase(CMSTestCase):
                 response = self.client.get(page1_url)
             self.assertEqual(response.status_code, 200)
 
-            #
-            # Test that the cache is invalidated on unpublishing the page
-            #
-            old_version = _get_cache_version()
-            page1.unpublish('en')
-            self.assertGreater(_get_cache_version(), old_version)
-
-            #
-            # Test that this means the page is actually not cached.
-            #
-            page1.publish('en')
-            with self.assertNumQueries(FuzzyInt(1, 25)):
-                response = self.client.get(page1_url)
-            self.assertEqual(response.status_code, 200)
-
-            #
             # Test that the above behavior is different when CMS_PAGE_CACHE is
             # set to False (disabled)
-            #
             with self.settings(CMS_PAGE_CACHE=False):
 
                 # Test that the page is initially un-cached
@@ -487,12 +465,9 @@ class CacheTestCase(CMSTestCase):
             add_plugin(placeholder, "TextPlugin", 'en', body="English")
             add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
 
-            # Publish
-            page.publish('en')
-
-            # Make an initial edit request
+            # Make an initial edit endpoint request
             with self.login_user_context(superuser):
-                with self.assertNumQueries(FuzzyInt(1, 30)):
+                with self.assertNumQueries(FuzzyInt(1, 35)):
                     response = self.client.get(page_edit_url)
             self.assertEqual(response.status_code, 200)
 
@@ -524,7 +499,7 @@ class CacheTestCase(CMSTestCase):
             self.assertTrue(page_cache_setting)
 
             # Create a test page
-            page1 = create_page('test page 1', 'nav_playground.html', 'en', published=True)
+            page1 = create_page('test page 1', 'nav_playground.html', 'en')
             page1_url = page1.get_absolute_url()
 
             # Add some content
@@ -533,7 +508,7 @@ class CacheTestCase(CMSTestCase):
             add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
 
             # Create a request object
-            request = self.get_request(page1.get_path(), 'en')
+            request = self.get_request(page1.get_path('en'), 'en')
 
             # Ensure that user is NOT authenticated
             self.assertFalse(request.user.is_authenticated)
@@ -567,7 +542,6 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.register_plugin(SekizaiPlugin)
         add_plugin(placeholder1, "SekizaiPlugin", 'en')
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
-        page1.publish('en')
         response = self.client.get(page1.get_absolute_url())
         self.assertContains(response, 'alert(')
         response = self.client.get(page1.get_absolute_url())
@@ -593,15 +567,17 @@ class CacheTestCase(CMSTestCase):
 
             placeholder = page1.get_placeholders("en").get(slot="body")
             add_plugin(placeholder, "TextPlugin", 'en', body="First content")
-            page1.publish('en')
             response = self.client.get(page1_url)
             self.assertContains(response, 'First content')
             response = self.client.get(page1_url)
             self.assertContains(response, 'First content')
-            add_plugin(placeholder, "TextPlugin", 'en', body="Second content")
-            page1.publish('en')
+
+            with self.login_user_context(self.get_superuser()):
+                post_data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+                endpoint = self.get_add_plugin_uri(placeholder, 'LinkPlugin')
+                self.client.post(endpoint, post_data)
             response = self.client.get(page1_url)
-            self.assertContains(response, 'Second content')
+            self.assertContains(response, 'A Link')
 
     def test_render_placeholder_cache(self):
         """
@@ -649,10 +625,9 @@ class PlaceholderCacheTestCase(CMSTestCase):
         cache.clear()
 
         self.page = create_page(
-            'en test page', 'nav_playground.html', 'en', published=True)
+            'en test page', 'nav_playground.html', 'en')
         # Now create and publish as 'de' title
         create_title('de', "de test page", self.page)
-        self.page.publish('de')
 
         self.placeholder_en = self.page.get_placeholders("en").filter(slot="body")[0]
         self.placeholder_de = self.page.get_placeholders("de").filter(slot="body")[0]

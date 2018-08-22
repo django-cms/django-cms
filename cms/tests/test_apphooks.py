@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 import sys
 
@@ -18,7 +19,6 @@ from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
-from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Title, Page
 from cms.middleware.page import get_page
 from cms.test_utils.project.placeholderapp.models import Example1
@@ -97,25 +97,22 @@ class ApphooksTestCase(CMSTestCase):
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
         page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser, published=True)
+                           created_by=superuser)
         create_title('de', page.get_title(), page)
-        page.publish('de')
         child_page = create_page("child_page", "nav_playground.html", "en",
-                                 created_by=superuser, published=True, parent=page)
+                                 created_by=superuser, parent=page)
         create_title('de', child_page.get_title(), child_page)
-        child_page.publish('de')
         child_child_page = create_page("child_child_page", "nav_playground.html",
-                                       "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
+                                       "en", created_by=superuser, parent=child_page, apphook=apphook,
                                        apphook_namespace=namespace)
         create_title("de", child_child_page.get_title(), child_child_page)
-        child_child_page.publish('de')
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
         if isinstance(title_langs, six.string_types):
-            titles = child_child_page.publisher_public.get_title_obj(title_langs)
+            titles = child_child_page.get_title_obj(title_langs)
         else:
-            titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
+            titles = [child_child_page.get_title_obj(l) for l in title_langs]
 
         self.reload_urls()
 
@@ -153,15 +150,12 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_homepage("apphooked-page", "nav_playground.html", "en",
-                                    created_by=superuser, published=True, apphook="SampleApp")
-        blank_page = create_page("not-apphooked-page", "nav_playground.html", "en",
-                                 created_by=superuser, published=True, apphook="", slug='blankapp')
+                                    created_by=superuser, apphook="SampleApp")
+        create_page("not-apphooked-page", "nav_playground.html", "en",
+                    created_by=superuser, apphook="", slug='blankapp')
         english_title = page.title_set.all()[0]
         self.assertEqual(english_title.language, 'en')
         create_title("de", "aphooked-page-de", page)
-        self.assertTrue(page.publish('en'))
-        self.assertTrue(page.publish('de'))
-        self.assertTrue(blank_page.publish('en'))
         with force_language("en"):
             response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
@@ -176,10 +170,8 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("apphooked-page", "nav_playground.html", "en",
-                           created_by=superuser, published=True, apphook="SampleApp")
+                           created_by=superuser, apphook="SampleApp")
         create_title("de", "aphooked-page-de", page)
-        self.assertTrue(page.publish('de'))
-        self.assertTrue(page.publish('en'))
 
         self.reload_urls()
 
@@ -195,21 +187,21 @@ class ApphooksTestCase(CMSTestCase):
         request = self.get_request()
         request.user = superuser
         home_site_1 = create_page(
-            "home", "nav_playground.html", "en", created_by=superuser, published=True, site=site1
+            "home", "nav_playground.html", "en", created_by=superuser, site=site1
         )
         home_site_2 = create_page(
-            "home", "nav_playground.html", "de", created_by=superuser, published=True, site=site2
+            "home", "nav_playground.html", "de", created_by=superuser, site=site2
         )
 
         page_a_1 = create_page(
-            "apphooked-page", "nav_playground.html", "en", created_by=superuser, published=True, parent=home_site_1,
+            "apphooked-page", "nav_playground.html", "en", created_by=superuser, parent=home_site_1,
             apphook=NS_APP_NAME, apphook_namespace="instance"
         )
         page_a_2 = create_page(
-            "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_1,
+            "apphooked-page", "nav_playground.html", "de", created_by=superuser, parent=home_site_1,
         )
         page_b_1 = create_page(
-            "apphooked-page", "nav_playground.html", "de", created_by=superuser, published=True, parent=home_site_2,
+            "apphooked-page", "nav_playground.html", "de", created_by=superuser, parent=home_site_2,
             site=site2
         )
 
@@ -243,10 +235,9 @@ class ApphooksTestCase(CMSTestCase):
         en_title, de_title = self.create_base_structure(APP_NAME, ['en', 'de'])
         with force_language("en"):
             path = reverse('sample-settings')
-        request = self.get_request(path)
-        request.LANGUAGE_CODE = 'en'
-
-        attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'en'
+            attached_to_page = applications_page_check(request)
         self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
         response = self.client.get(path)
@@ -256,9 +247,9 @@ class ApphooksTestCase(CMSTestCase):
         self.assertContains(response, en_title.title)
         with force_language("de"):
             path = reverse('sample-settings')
-        request = self.get_request(path)
-        request.LANGUAGE_CODE = 'de'
-        attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash and language prefix
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'de'
+            attached_to_page = applications_page_check(request)
         self.assertEqual(attached_to_page.pk, de_title.page.pk)
 
         response = self.client.get(path)
@@ -277,10 +268,7 @@ class ApphooksTestCase(CMSTestCase):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
 
-        page = en_title.page.publisher_public
-        page.login_required = True
-        page.save()
-        page.publish('en')
+        en_title.page.update(login_required=True)
 
         response = self.client.get(path)
         self.assertEqual(response.status_code, 302)
@@ -309,10 +297,7 @@ class ApphooksTestCase(CMSTestCase):
             excluded_path = reverse('excluded:example')
             not_excluded_path = reverse('not_excluded:example')
 
-        page = en_title.page.publisher_public
-        page.login_required = True
-        page.save()
-        page.publish('en')
+        en_title.page.update(login_required=True)
 
         excluded_response = self.client.get(excluded_path)
         not_excluded_response = self.client.get(not_excluded_path)
@@ -328,43 +313,35 @@ class ApphooksTestCase(CMSTestCase):
             superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
 
         page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser, published=True, apphook=APP_NAME)
+                           created_by=superuser, apphook=APP_NAME)
         create_title('de', page.get_title(), page)
-        page.publish('en')
-        page.publish('de')
-        page.save()
-
-        # Needed because publish button only shows if the page is dirty
-        page.set_publisher_state('en', state=PUBLISHER_STATE_DIRTY)
-
-        public_page = page.get_public_object()
 
         with force_language("en"):
             path = reverse('sample-settings')
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'en'
-            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEqual(attached_to_page.pk, public_page.pk)
+            attached_to_page = applications_page_check(request)
+            self.assertEqual(attached_to_page.pk, page.pk)
 
         with force_language("de"):
             path = reverse('sample-settings')
             request = self.get_request(path)
             request.LANGUAGE_CODE = 'de'
-            attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
-            self.assertEqual(attached_to_page.pk, public_page.pk)
+            attached_to_page = applications_page_check(request)
+            self.assertEqual(attached_to_page.pk, page.pk)
 
         with self.login_user_context(superuser):
             with force_language("en"):
                 path = reverse('sample-settings')
                 request = self.get_request(path)
                 request.LANGUAGE_CODE = 'en'
-                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+                attached_to_page = applications_page_check(request)
                 self.assertEqual(attached_to_page.pk, page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
                 request = self.get_request(path)
                 request.LANGUAGE_CODE = 'de'
-                attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+                attached_to_page = applications_page_check(request)
                 self.assertEqual(attached_to_page.pk, page.pk)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
@@ -383,7 +360,7 @@ class ApphooksTestCase(CMSTestCase):
         request = self.get_request(path)
         request.LANGUAGE_CODE = 'en'
 
-        attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+        attached_to_page = applications_page_check(request)
         self.assertEqual(attached_to_page.pk, en_title.page.pk)
         self.apphook_clear()
 
@@ -399,7 +376,7 @@ class ApphooksTestCase(CMSTestCase):
 
         request = self.get_request(path)
         request.LANGUAGE_CODE = 'en'
-        attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+        attached_to_page = applications_page_check(request)
         self.assertEqual(attached_to_page.pk, en_title.page_id)
         self.apphook_clear()
 
@@ -411,7 +388,7 @@ class ApphooksTestCase(CMSTestCase):
         request = self.get_request(path)
         request.LANGUAGE_CODE = 'en'
 
-        attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+        attached_to_page = applications_page_check(request)
         self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
         response = self.client.get(path)
@@ -442,10 +419,7 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
         public_de_title = titles[1]
-        de_title = Title.objects.get(page=public_de_title.page.publisher_draft, language="de")
-        de_title.slug = "de"
-        de_title.save()
-        de_title.page.publish('de')
+        de_title = Title.objects.get(page=public_de_title.page, language="de")
 
         self.reload_urls()
         self.apphook_clear()
@@ -459,7 +433,6 @@ class ApphooksTestCase(CMSTestCase):
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
         create_title("de", "de_title", page2, slug="slug")
-        page2.publish('de')
         clear_app_resolvers()
         clear_url_caches()
 
@@ -498,7 +471,7 @@ class ApphooksTestCase(CMSTestCase):
         request = self.get_request(path)
         request.LANGUAGE_CODE = 'en'
 
-        attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
+        attached_to_page = applications_page_check(request)
         self.assertEqual(attached_to_page.pk, en_title.page.pk)
 
         response = self.client.get(path)
@@ -540,11 +513,11 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2')
     def test_apphook_breaking_under_home_with_new_path_caching(self):
-        home = self.create_homepage("home", "nav_playground.html", "en", published=True)
-        child = create_page("child", "nav_playground.html", "en", published=True, parent=home)
+        home = self.create_homepage("home", "nav_playground.html", "en")
+        child = create_page("child", "nav_playground.html", "en", parent=home)
         # not-home is what breaks stuff, because it contains the slug of the home page
-        not_home = create_page("not-home", "nav_playground.html", "en", published=True, parent=child)
-        create_page("subchild", "nav_playground.html", "en", published=True, parent=not_home, apphook='SampleApp')
+        not_home = create_page("not-home", "nav_playground.html", "en", parent=child)
+        create_page("subchild", "nav_playground.html", "en", parent=not_home, apphook='SampleApp')
         with force_language("en"):
             self.reload_urls()
             urlpatterns = get_app_patterns()
@@ -579,11 +552,11 @@ class ApphooksTestCase(CMSTestCase):
         # test for #1538
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
+        create_page("home", "nav_playground.html", "en", created_by=superuser, )
         create_page("apphook1-page", "nav_playground.html", "en",
-                    created_by=superuser, published=True, apphook="SampleApp")
+                    created_by=superuser, apphook="SampleApp")
         create_page("apphook2-page", "nav_playground.html", "en",
-                    created_by=superuser, published=True, apphook="SampleApp2")
+                    created_by=superuser, apphook="SampleApp2")
 
         reverse('sample-root')
         reverse('sample2-root')
@@ -593,9 +566,8 @@ class ApphooksTestCase(CMSTestCase):
     def test_apphooks_return_urls_directly(self):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        page = create_page("apphooked3-page", "nav_playground.html", "en",
-                           created_by=superuser, published=True, apphook="SampleApp3")
-        self.assertTrue(page.publish('en'))
+        create_page("apphooked3-page", "nav_playground.html", "en",
+                    created_by=superuser, apphook="SampleApp3")
         self.reload_urls()
 
         path = reverse('sample3-root')
@@ -794,11 +766,11 @@ class ApphooksTestCase(CMSTestCase):
             self.apphook_clear()
 
             superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-            create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
+            create_page("home", "nav_playground.html", "en", created_by=superuser, )
             parent_page = create_page("parent-apphook-page", "nav_playground.html", "en",
-                                      created_by=superuser, published=True, apphook="ParentApp")
+                                      created_by=superuser, apphook="ParentApp")
             create_page("child-apphook-page", "nav_playground.html", "en", parent=parent_page,
-                        created_by=superuser, published=True, apphook="ChildApp")
+                        created_by=superuser, apphook="ChildApp")
 
             parent_app_path = reverse('parentapp_view', kwargs={'path': 'parent/path/'})
             child_app_path = reverse('childapp_view', kwargs={'path': 'child-path/'})
@@ -838,11 +810,10 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
 
         page2 = create_page('page2', 'nav_playground.html',
-                            'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.get_parent_page().get_draft_object(),
+                            'en', created_by=self.superuser,
+                            parent=titles[0].page.get_parent_page(),
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_title('de', 'de_title', page2, slug='slug')
-        page2.publish('de')
 
         self.reload_urls()
 
@@ -880,12 +851,11 @@ class ApphooksTestCase(CMSTestCase):
         self.reload_urls()
 
         page2 = create_page('page2', 'nav_playground.html',
-                            'en', created_by=self.superuser, published=True,
-                            parent=titles[0].page.get_parent_page().get_draft_object(),
+                            'en', created_by=self.superuser,
+                            parent=titles[0].page.get_parent_page(),
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_title('de', 'de_title', page2, slug='slug')
-        page2.publish('de')
         request = self.get_request('/page2/')
         renderer = menu_pool.get_renderer(request)
         nodes = renderer.get_nodes()
@@ -919,21 +889,10 @@ class ApphooksTestCase(CMSTestCase):
         request.current_page = get_page(request)
         menu_nodes = menu_pool.get_renderer(request).get_nodes()
         self.assertEqual(len(menu_nodes), 2)
-        self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
+        self.assertEqual(menu_nodes[0].id, homepage.pk)
         self.assertEqual(menu_nodes[0].selected, False)
-        self.assertEqual(menu_nodes[1].id, app_root.publisher_public_id)
+        self.assertEqual(menu_nodes[1].id, app_root.pk)
         self.assertEqual(menu_nodes[1].selected, True)
-
-        # Draft version
-        with self.login_user_context(self.get_superuser()):
-            request = self.get_request('/en/en-p2/')
-            request.current_page = get_page(request)
-            menu_nodes = menu_pool.get_renderer(request).get_nodes()
-            self.assertEqual(len(menu_nodes), 2)
-            self.assertEqual(menu_nodes[0].id, homepage.pk)
-            self.assertEqual(menu_nodes[0].selected, False)
-            self.assertEqual(menu_nodes[1].id, app_root.pk)
-            self.assertEqual(menu_nodes[1].selected, True)
 
     @override_settings(
         CMS_APPHOOKS=['cms.test_utils.project.sampleapp.cms_apps.AppWithNoMenu'],
@@ -954,26 +913,14 @@ class ApphooksTestCase(CMSTestCase):
         homepage.set_as_homepage()
         app_root = create_page('EN-P2', apphook='AppWithNoMenu', apphook_namespace='app_with_no_menu', **defaults)
 
-        # Public version
         request = self.get_request('/en/en-p2/settings/')
         request.current_page = get_page(request)
         menu_nodes = menu_pool.get_renderer(request).get_nodes()
         self.assertEqual(len(menu_nodes), 2)
-        self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
+        self.assertEqual(menu_nodes[0].id, homepage.pk)
         self.assertEqual(menu_nodes[0].selected, False)
-        self.assertEqual(menu_nodes[1].id, app_root.publisher_public_id)
+        self.assertEqual(menu_nodes[1].id, app_root.pk)
         self.assertEqual(menu_nodes[1].selected, True)
-
-        # Draft version
-        with self.login_user_context(self.get_superuser()):
-            request = self.get_request('/en/en-p2/settings/')
-            request.current_page = get_page(request)
-            menu_nodes = menu_pool.get_renderer(request).get_nodes()
-            self.assertEqual(len(menu_nodes), 2)
-            self.assertEqual(menu_nodes[0].id, homepage.pk)
-            self.assertEqual(menu_nodes[0].selected, False)
-            self.assertEqual(menu_nodes[1].id, app_root.pk)
-            self.assertEqual(menu_nodes[1].selected, True)
 
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):
@@ -1015,20 +962,14 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
         create_title('de', page.get_title(), page)
-        page.publish('en')
-        page.publish('de')
 
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
         create_title('de', child_page.get_title(), child_page)
-        child_page.publish('en')
-        child_page.publish('de')
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
         create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
-        child_child_page.publish('en')
-        child_child_page.publish('de')
 
         # publisher_public is set to draft on publish, issue with one to one reverse
         child_child_page = self.reload(child_child_page)

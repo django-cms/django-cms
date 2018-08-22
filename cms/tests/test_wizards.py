@@ -13,7 +13,7 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 
 from cms import app_registration
-from cms.api import create_page, publish_page
+from cms.api import create_page
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
@@ -431,7 +431,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         with override_settings(**settings):
             page = create_page("wizard home", "page_wizard.html", "en")
-            publish_page(page, superuser, "en")
             content = '<p>sub-content content.</p>'
             data = {
                 'title': 'page 1',
@@ -448,7 +447,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             )
             self.assertTrue(form.is_valid())
             page = form.save()
-            page.publish('en')
 
             with self.login_user_context(superuser):
                 url = page.get_absolute_url('en')
@@ -484,7 +482,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         with override_settings(**settings):
             page = create_page("wizard home", "page_wizard.html", "en")
-            publish_page(page, superuser, "en")
             content = '<p>footer content.</p>'
             data = {
                 'title': 'page 1',
@@ -501,7 +498,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             )
             self.assertTrue(form.is_valid())
             page = form.save()
-            page.publish('en')
 
             with self.login_user_context(superuser):
                 url = page.get_absolute_url('en')
@@ -556,7 +552,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().title_set.filter(slug='page-2'))
+        self.assertTrue(form.save().get_urls().filter(slug='page-2'))
 
         # slug -> page-2
         form = CreateCMSPageForm(
@@ -567,7 +563,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().title_set.filter(slug='page-3'))
+        self.assertTrue(form.save().get_urls().filter(slug='page-3'))
 
         # Now explicitly request the page-2 slug
         data['slug'] = 'page-2'
@@ -581,7 +577,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().title_set.filter(slug='page-2-2'))
+        self.assertTrue(form.save().get_urls().filter(slug='page-2-2'))
 
         # slug -> page-2-3
         form = CreateCMSPageForm(
@@ -592,7 +588,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             wizard_request=request,
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(form.save().title_set.filter(slug='page-2-3'))
+        self.assertTrue(form.save().get_urls().filter(slug='page-2-3'))
 
 
 class TestWizardHelpers(CMSTestCase):
@@ -638,7 +634,7 @@ class TestEntryChoices(CMSTestCase):
         The entry_choices function returns the wizards ordered by weight
         """
         user = self.get_superuser()
-        page = create_page('home', 'nav_playground.html', 'en', published=True)
+        page = create_page('home', 'nav_playground.html', 'en')
         wizard_choices = [option for option in entry_choices(user, page)]
         expected = [
             (cms_page_wizard.id, cms_page_wizard.title),
@@ -657,7 +653,7 @@ class TestEntryChoices(CMSTestCase):
         user has permissions for
         """
         user = self.get_superuser()
-        page = create_page('home', 'nav_playground.html', 'en', published=True)
+        page = create_page('home', 'nav_playground.html', 'en')
         wizard_choices = [option for option in entry_choices(user, page)]
         expected = [
             # Missing cms_page_wizard entry

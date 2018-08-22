@@ -250,7 +250,7 @@
     >
 
     {% language LANGUAGE_CODE %}
-        {{ page.get_admin_tree_title }}
+        {% get_page_display_name page %}
     {% endlanguage %}
 
     {# INFO render children #}

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.utils.urlutils import admin_reverse
-from cms.api import get_page_draft
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
 from cms.utils.page_permissions import user_can_change_page
@@ -28,12 +27,8 @@ class ExtensionToolbar(CMSToolbar):
         return
 
     def _get_page(self):
-        """
-        A utility method that caches the current page and make sure to use the draft version of the page.
-        """
-        # always use draft if we have a page
         if not self.page:
-            self.page = get_page_draft(self.request.current_page)
+            self.page = self.request.current_page
         return self.page
 
     def get_page_extension_admin(self):

@@ -48,10 +48,10 @@ class FormsTestCase(CMSTestCase):
         """
         site = get_current_site()
         pages = [
-            create_page("0001", "nav_playground.html", "en", published=True),
-            create_page("0002", "nav_playground.html", "en", published=True),
-            create_page("0003", "nav_playground.html", "en", published=True),
-            create_page("0004", "nav_playground.html", "en", published=True),
+            create_page("0001", "nav_playground.html", "en"),
+            create_page("0002", "nav_playground.html", "en"),
+            create_page("0003", "nav_playground.html", "en"),
+            create_page("0004", "nav_playground.html", "en"),
         ]
 
         expected = [

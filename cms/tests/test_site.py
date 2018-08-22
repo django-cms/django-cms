@@ -47,14 +47,14 @@ class SiteTestCase(CMSTestCase):
             self.assertEqual(Page.objects.on_site(self.site2.pk).count(), 1)
             self.assertEqual(Page.objects.on_site(self.site3.pk).count(), 2)
 
-            self.assertEqual(Page.objects.drafts().on_site().count(), 2)
+            self.assertEqual(Page.objects.on_site().count(), 2)
 
         with self.settings(SITE_ID=self.site2.pk):
             # without param
-            self.assertEqual(Page.objects.drafts().on_site().count(), 1)
+            self.assertEqual(Page.objects.on_site().count(), 1)
 
     def test_site_preview(self):
-        page = create_page("page", "nav_playground.html", "de", site=self.site2, published=True)
+        page = create_page("page", "nav_playground.html", "de", site=self.site2)
         page_content_de = self.get_page_title_obj(page, language='de')
         page_url = page_content_de.get_absolute_url(language='de')
 
@@ -65,7 +65,7 @@ class SiteTestCase(CMSTestCase):
             # simulate user clicks on preview icon
             response = self.client.get(admin_reverse('cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response._headers['location'][1], 'http://sample2.com{}?language=de'.format(page_url))
+            self.assertEqual(response._headers['location'][1], 'http://sample2.com{}'.format(page_url))
 
     def test_site_publish(self):
         self._login_context.__exit__(None, None, None)
@@ -76,15 +76,15 @@ class SiteTestCase(CMSTestCase):
         with self.settings(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="de"):
             with self.settings(SITE_ID=self.site2.pk):
                 pages["2"][0] = create_page("page_2", "nav_playground.html", "de",
-                                            site=self.site2, published=True)
+                                            site=self.site2)
                 pages["2"][1] = create_page("page_2_1", "nav_playground.html", "de",
-                                            parent=pages["2"][0], site=self.site2, published=True)
+                                            parent=pages["2"][0], site=self.site2)
                 pages["2"][2] = create_page("page_2_2", "nav_playground.html", "de",
-                                            parent=pages["2"][0], site=self.site2, published=True)
+                                            parent=pages["2"][0], site=self.site2)
                 pages["2"][3] = create_page("page_2_1_1", "nav_playground.html", "de",
-                                            parent=pages["2"][1], site=self.site2, published=True)
+                                            parent=pages["2"][1], site=self.site2)
                 pages["2"][4] = create_page("page_2_1_2", "nav_playground.html", "de",
-                                            parent=pages["2"][1], site=self.site2, published=True)
+                                            parent=pages["2"][1], site=self.site2)
 
                 for page in pages["2"]:
                     page_url = page.get_absolute_url(language='de')
@@ -94,15 +94,14 @@ class SiteTestCase(CMSTestCase):
             with self.settings(SITE_ID=self.site3.pk):
                 pages["3"][0] = create_page("page_3", "nav_playground.html", "de",
                                             site=self.site3)
-                pages["3"][0].publish('de')
                 pages["3"][1] = create_page("page_3_1", "nav_playground.html", "de",
-                                            parent=pages["3"][0], site=self.site3, published=True)
+                                            parent=pages["3"][0], site=self.site3)
                 pages["3"][2] = create_page("page_3_2", "nav_playground.html", "de",
-                                            parent=pages["3"][0], site=self.site3, published=True)
+                                            parent=pages["3"][0], site=self.site3)
                 pages["3"][3] = create_page("page_3_1_1", "nav_playground.html", "de",
-                                            parent=pages["3"][1], site=self.site3, published=True)
+                                            parent=pages["3"][1], site=self.site3)
                 pages["3"][4] = create_page("page_3_1_2", "nav_playground.html", "de",
-                                            parent=pages["3"][1], site=self.site3, published=True)
+                                            parent=pages["3"][1], site=self.site3)
 
                 for page in pages["3"]:
                     if page.is_home:

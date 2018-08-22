@@ -30,40 +30,20 @@ class MenuUtilsTests(CMSTestCase):
         self.assertContains(response, '<h1>/fr/sample/login3/</h1>')
 
     def test_default_language_changer(self):
-        view = self.get_simple_view()
-        # check we maintain the view name
-        self.assertEqual(view.__name__, view.__name__)
-        request = self.get_request('/en/', 'en')
-        response = view(request)
-        self.assertEqual(response.content, b'')
-        fake_context = {'request': request}
-        tag = DumbPageLanguageUrl()
-        output = tag.get_context(fake_context, 'en')
-        url = output['content']
-        self.assertEqual(url, '/en/')
-        output = tag.get_context(fake_context, 'ja')
-        url = output['content']
-        self.assertEqual(url, '/ja/')
-
-    def test_default_language_changer_with_public_page(self):
         """
         The DefaultLanguageChanger should not try to resolve the url
-        for unpublished languages.
+        for languages not configured.
         """
-        cms_page = create_page('en-page', 'nav_playground.html', 'en', published=True)
+        cms_page = create_page('en-page', 'nav_playground.html', 'en')
 
         for language in get_language_list(site_id=1):
-            if language != 'en':
+            if language not in ('en', 'pt-br', 'es-mx'):
                 create_title(language, '%s-page' % language, cms_page)
-                cms_page.publish(language)
-        else:
-            cms_page.unpublish('pt-br')
-            cms_page.unpublish('es-mx')
 
         request = self.get_request(
             path=cms_page.get_absolute_url(),
             language='en',
-            page=cms_page.publisher_public,
+            page=cms_page,
         )
         urls_expected = [
             '/en/en-page/',

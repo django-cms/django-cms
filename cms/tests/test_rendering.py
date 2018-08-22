@@ -122,7 +122,7 @@ class RenderingTestCase(CMSTestCase):
         # Insert a page
         p = create_page(self.test_data['title'], TEMPLATE_NAME, 'en',
                         slug=self.test_data['slug'], created_by=self.test_user,
-                        reverse_id=self.test_data['reverse_id'], published=True)
+                        reverse_id=self.test_data['reverse_id'])
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders = {}
         for placeholder in p.get_placeholders('en'):
@@ -132,18 +132,16 @@ class RenderingTestCase(CMSTestCase):
                    body=self.test_data['text_main'])
         add_plugin(self.test_placeholders['sub'], 'TextPlugin', 'en',
                    body=self.test_data['text_sub'])
-        p.publish('en')
 
         # Insert another page that is not the home page
         p2 = create_page(self.test_data2['title'], INHERIT_TEMPLATE_NAME, 'en',
-                         parent=p, slug=self.test_data2['slug'], published=True,
+                         parent=p, slug=self.test_data2['slug'],
                          reverse_id=self.test_data2['reverse_id'])
-        p2.publish('en')
 
         # Insert another page that is not the home page
         p3 = create_page(self.test_data3['title'], INHERIT_TEMPLATE_NAME, 'en',
                          slug=self.test_data3['slug'], parent=p2,
-                         reverse_id=self.test_data3['reverse_id'], published=True)
+                         reverse_id=self.test_data3['reverse_id'])
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders3 = {}
         for placeholder in p3.get_placeholders('en'):
@@ -151,7 +149,6 @@ class RenderingTestCase(CMSTestCase):
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
                    body=self.test_data3['text_sub'])
-        p3.publish('en')
 
         # Insert another page that is not the home
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
@@ -161,11 +158,10 @@ class RenderingTestCase(CMSTestCase):
             self.test_placeholders4[placeholder.slot] = placeholder
             # Insert some test plugins
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
-        p4.publish('en')
 
         # Insert another page that is not the home page
         p5 = create_page(self.test_data5['title'], INHERIT_TEMPLATE_NAME, 'en',
-                         parent=p, slug=self.test_data5['slug'], published=True,
+                         parent=p, slug=self.test_data5['slug'],
                          reverse_id=self.test_data5['reverse_id'])
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders5 = {}
@@ -176,12 +172,11 @@ class RenderingTestCase(CMSTestCase):
                    body=self.test_data5['text_sub'])
         add_plugin(self.test_placeholders5['main'], 'TextPlugin', 'en',
                    body=self.test_data5['text_main'])
-        p5.publish('en')
 
         # Insert another page that is not the home page
         p6 = create_page(self.test_data6['title'], INHERIT_TEMPLATE_NAME, 'en',
                          slug=self.test_data6['slug'], parent=p5,
-                         reverse_id=self.test_data6['reverse_id'], published=True)
+                         reverse_id=self.test_data6['reverse_id'])
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders6 = {}
         for placeholder in p6.get_placeholders('en'):
@@ -189,32 +184,31 @@ class RenderingTestCase(CMSTestCase):
             # # Insert some test Text plugins
         add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en',
                    body=self.test_data6['text_sub'])
-        p6.publish('en')
         p7 = create_page(self.test_data7['title'], INHERIT_TEMPLATE_NAME, 'en',
                          slug=self.test_data7['slug'], parent=p6,
-                         reverse_id=self.test_data7['reverse_id'], published=True)
+                         reverse_id=self.test_data7['reverse_id'])
         p8 = create_page(self.test_data8['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
                          slug=self.test_data8['slug'], parent=p7,
-                         reverse_id=self.test_data8['reverse_id'], published=True)
+                         reverse_id=self.test_data8['reverse_id'])
 
         p9 = create_page(self.test_data9['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
                          slug=self.test_data9['slug'],
-                         reverse_id=self.test_data9['reverse_id'], published=True)
+                         reverse_id=self.test_data9['reverse_id'])
         p10 = create_page(self.test_data10['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
                          slug=self.test_data10['slug'], parent=p9,
-                         reverse_id=self.test_data10['reverse_id'], published=True)
+                         reverse_id=self.test_data10['reverse_id'])
 
         # Reload test pages
-        self.test_page = self.reload(p.publisher_public)
-        self.test_page2 = self.reload(p2.publisher_public)
-        self.test_page3 = self.reload(p3.publisher_public)
-        self.test_page4 = self.reload(p4.publisher_public)
-        self.test_page5 = self.reload(p5.publisher_public)
-        self.test_page6 = self.reload(p6.publisher_public)
-        self.test_page7 = self.reload(p7.publisher_public)
-        self.test_page8 = self.reload(p8.publisher_public)
-        self.test_page9 = self.reload(p9.publisher_public)
-        self.test_page10 = self.reload(p10.publisher_public)
+        self.test_page = self.reload(p)
+        self.test_page2 = self.reload(p2)
+        self.test_page3 = self.reload(p3)
+        self.test_page4 = self.reload(p4)
+        self.test_page5 = self.reload(p5)
+        self.test_page6 = self.reload(p6)
+        self.test_page7 = self.reload(p7)
+        self.test_page8 = self.reload(p8)
+        self.test_page9 = self.reload(p9)
+        self.test_page10 = self.reload(p10)
 
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
@@ -241,7 +235,7 @@ class RenderingTestCase(CMSTestCase):
         """
         Tests that the `detail` view is working.
         """
-        response = details(self.get_request(page=self.test_page), self.test_page.get_path())
+        response = details(self.get_request(page=self.test_page), self.test_page.get_path('en'))
         response.render()
         r = self.strip_rendered(response.content.decode('utf8'))
         self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
@@ -701,7 +695,7 @@ class RenderingTestCase(CMSTestCase):
         """
         Ensures that the edit-mode markup is correct
         """
-        page = self.test_page.publisher_public
+        page = self.test_page
         placeholder = page.get_placeholders('en').get(slot='main')
         parent_plugin = add_plugin(placeholder, 'SolarSystemPlugin', 'en')
         child_plugin_1 = add_plugin(placeholder, 'PlanetPlugin', 'en', target=parent_plugin)

@@ -5,9 +5,8 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import get_page_draft
 from cms.apphook_pool import apphook_pool
-from cms.models import EmptyTitle
+from cms.models import EmptyTitle, PageUrl, Title
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -30,7 +29,6 @@ def get_visible_nodes(request, pages, site):
      pages contains all published pages
     """
     user = request.user
-    _get_page_draft = get_page_draft
     public_for = get_cms_setting('PUBLIC_FOR')
     can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
 
@@ -43,9 +41,7 @@ def get_visible_nodes(request, pages, site):
     if user_can_view_all_pages(user, site):
         return list(pages)
 
-    # Permissions are only attached to draft pages
-    draft_pages = [_get_page_draft(page) for page in pages]
-    restricted_pages = get_view_restrictions(draft_pages)
+    restricted_pages = get_view_restrictions(pages)
 
     if not restricted_pages:
         # If there's no restrictions, let the user see all pages
@@ -57,8 +53,7 @@ def get_visible_nodes(request, pages, site):
     is_auth_user = user.is_authenticated
 
     def user_can_see_page(page):
-        page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
-        page_permissions = restricted_pages.get(page_id, [])
+        page_permissions = restricted_pages.get(page.pk, [])
 
         if not page_permissions:
             # Page has no view restrictions, fallback to the project's
@@ -138,6 +133,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         translation = page.title_cache[lang]
 
         if translation:
+            page_url = page.urls_cache[lang]
             # Do we have a redirectURL?
             attr['redirect_url'] = translation.redirect  # save redirect URL if any
 
@@ -149,7 +145,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
                 id=page.pk,
                 attr=attr,
                 visible=page.get_in_navigation(translation.language),
-                path=translation.path or translation.slug,
+                path=page_url.path or page_url.slug,
                 language=(translation.language if translation.language != language else None),
             )
             return ret_node
@@ -187,15 +183,9 @@ class CMSNavigationNode(NavigationNode):
 class CMSMenu(Menu):
 
     def get_nodes(self, request):
-        from cms.models import Title
-
         site = self.renderer.site
         lang = self.renderer.request_language
-        pages = get_page_queryset(
-            site,
-            draft=self.renderer.draft_mode_active,
-            published=not self.renderer.draft_mode_active,
-        )
+        pages = get_page_queryset(site)
 
         if is_valid_site_language(lang, site_id=site.pk):
             _valid_language = True
@@ -225,11 +215,6 @@ class CMSMenu(Menu):
             .order_by('node__path')
             .distinct()
         )
-
-        if not self.renderer.draft_mode_active:
-            # we're dealing with public pages.
-            # prefetch the draft versions.
-            pages = pages.select_related('publisher_public__node')
         pages = get_visible_nodes(request, pages, site)
 
         if not pages:
@@ -240,17 +225,17 @@ class CMSMenu(Menu):
         except IndexError:
             homepage = None
 
-        titles = Title.objects.filter(
-            language__in=languages,
-            publisher_is_draft=self.renderer.draft_mode_active,
+        urls_lookup = Prefetch(
+            'urls',
+            to_attr='filtered_urls',
+            queryset=PageUrl.objects.filter(language__in=languages),
         )
-
-        lookup = Prefetch(
+        translations_lookup = Prefetch(
             'title_set',
             to_attr='filtered_translations',
-            queryset=titles,
+            queryset=Title.objects.filter(language__in=languages),
         )
-        prefetch_related_objects(pages, lookup)
+        prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once
         blank_title_cache = {language: EmptyTitle(language=language) for language in languages}
 
@@ -265,8 +250,12 @@ class CMSMenu(Menu):
             # to find a translation in the database
             page.title_cache = blank_title_cache.copy()
 
+            for page_url in page.filtered_urls:
+                page.urls_cache[page_url.language] = page_url
+
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
+
             menu_node =  get_menu_node_for_page(
                 self.renderer,
                 page,

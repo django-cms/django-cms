@@ -11,14 +11,10 @@ from treebeard.mp_tree import MP_NodeManager
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet, PageNodeQuerySet
-from cms.publisher import PublisherManager
 from cms.utils.i18n import get_fallback_languages
 
 
-class PageManager(PublisherManager):
-    """Use draft() and public() methods for accessing the corresponding
-    instances.
-    """
+class PageManager(models.Manager):
 
     def get_queryset(self):
         """Change standard model queryset to our own.
@@ -35,11 +31,8 @@ class PageManager(PublisherManager):
     def on_site(self, site=None):
         return self.get_queryset().on_site(site)
 
-    def published(self, site=None):
-        return self.get_queryset().published(site)
-
     def get_home(self, site=None):
-        return self.get_queryset().drafts().get_home(site)
+        return self.get_queryset().get_home(site)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
@@ -95,7 +88,14 @@ class PageNodeManager(MP_NodeManager):
         return self.filter(site=site)
 
 
-class TitleManager(PublisherManager):
+class PageUrlManager(models.Manager):
+
+    def get_for_site(self, site, **kwargs):
+        kwargs['page__node__site'] = site
+        return self.filter(**kwargs)
+
+
+class TitleManager(models.Manager):
     def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back
@@ -120,61 +120,6 @@ class TitleManager(PublisherManager):
                 raise
         return None
 
-    def public(self):
-        return super(TitleManager, self).public().filter(published=True)
-
-    def set_or_create(self, request, page, form, language):
-        """
-        set or create a title for a particular page and language
-        """
-        base_fields = [
-            'slug',
-            'title',
-            'meta_description',
-            'page_title',
-            'menu_title'
-        ]
-        advanced_fields = [
-            'redirect',
-        ]
-        cleaned_data = form.cleaned_data
-        user = request.user
-
-        try:
-            obj = self.get(page=page, language=language)
-        except self.model.DoesNotExist:
-            data = {}
-            for name in base_fields:
-                if name in cleaned_data:
-                    data[name] = cleaned_data[name]
-            data['page'] = page
-            data['language'] = language
-            if page.has_advanced_settings_permission(user):
-                overwrite_url = cleaned_data.get('overwrite_url', None)
-                if overwrite_url:
-                    data['has_url_overwrite'] = True
-                    data['path'] = overwrite_url
-                else:
-                    data['has_url_overwrite'] = False
-                for field in advanced_fields:
-                    value = cleaned_data.get(field) or None
-                    data[field] = value
-            return self.create(**data)
-        for name in base_fields:
-            if name in form.base_fields:
-                value = cleaned_data.get(name, None)
-                setattr(obj, name, value)
-        if page.has_advanced_settings_permission(user):
-            if 'overwrite_url' in cleaned_data:
-                overwrite_url = cleaned_data.get('overwrite_url', None)
-                obj.has_url_overwrite = bool(overwrite_url)
-                obj.path = overwrite_url
-            for field in advanced_fields:
-                if field in form.base_fields:
-                    value = cleaned_data.get(field) or None
-                    setattr(obj, field, value)
-        obj.save()
-        return obj
 
 ################################################################################
 # Permissions
@@ -349,7 +294,6 @@ class PagePermissionManager(BasicPagePermissionManager):
         from cms.models import (ACCESS_DESCENDANTS, ACCESS_CHILDREN,
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE)
 
-        page = page.get_draft_object()
         paths = page.node.get_ancestor_paths()
 
         # Ancestors

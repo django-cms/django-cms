@@ -18,7 +18,7 @@ CMS.config = {
     'request': {
         'language': '{{ cms_toolbar.request_language }}',
         'model': '{{ cms_toolbar.get_object_model }}',
-        'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk|unlocalize }}{% else %}{{ request.current_page.publisher_public_id|unlocalize }}{% endif %}',
+        'page_id': '{{ request.current_page.pk|unlocalize }}',
         'pk': '{{ cms_toolbar.get_object_pk|unlocalize }}',
         'url': '{% language cms_toolbar.request_language %}{% cms_admin_url "cms_page_resolve" %}{% endlanguage %}',
         'toolbar': '{% language cms_toolbar.request_language %}{% cms_admin_url "cms_usersettings_get_toolbar" %}{% endlanguage %}'
@@ -125,8 +125,7 @@ CMS.config = {
         'url': '{% if cms_toolbar.clipboard.pk %}{% cms_admin_url "cms_placeholder_clear_placeholder" cms_toolbar.clipboard.pk %}{% endif %}'
     },
     'messages': '{% filter escapejs %}{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}{% endfilter %}',
-    'error': '{% filter escapejs %}{% if cms_toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}{% endfilter %}',
-    'publisher': '{% filter escapejs %}{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}{% endfilter %}'
+    'error': '{% filter escapejs %}{% if cms_toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}{% endfilter %}'
 };
 CMS.$(function () {
     CMS.settings = CMS.API.Helpers.getSettings();

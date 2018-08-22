@@ -527,7 +527,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         copied_plugins = copy_plugins_to_placeholder(old_plugins, target_placeholder, language=target_language)
         new_plugin_ids = (new.pk for new in copied_plugins)
 
-        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
+        target_placeholder.clear_cache(target_language)
 
         new_plugins = CMSPlugin.objects.filter(pk__in=new_plugin_ids)
         new_plugins = list(new_plugins)
@@ -565,7 +565,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         plugin = getattr(plugin_instance, 'saved_object', None)
 
         if plugin:
-            plugin.placeholder.mark_as_dirty(plugin.language, clear_cache=False)
+            plugin.placeholder.clear_cache(plugin.language)
 
         if plugin_instance._operation_token:
             self._send_post_placeholder_operation(
@@ -735,7 +735,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             start_positions={target_language: target_position},
         )
         root_plugin = new_plugins[0]
-        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
+        target_placeholder.clear_cache(target_language)
 
         # Fetch from db to update position and other tree values
         root_plugin.refresh_from_db()
@@ -784,7 +784,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             start_positions={target_language: target_position},
         )
         new_plugin_ids = (new.pk for new  in new_plugins)
-        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
+        target_placeholder.clear_cache(plugin.language)
 
         new_plugins = (
             CMSPlugin
@@ -844,8 +844,8 @@ class PlaceholderAdmin(admin.ModelAdmin):
         updated_plugin = plugin.reload()
 
         if target_placeholder:
-            target_placeholder.mark_as_dirty(language, clear_cache=False)
-        source_placeholder.mark_as_dirty(language, clear_cache=False)
+            target_placeholder.clear_cache(language)
+        source_placeholder.clear_cache(language)
 
         self._send_post_placeholder_operation(
             request,
@@ -887,7 +887,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             target_placeholder=target_placeholder,
             target_plugin=None,
         )
-        source_placeholder.mark_as_dirty(plugin.language, clear_cache=False)
+        source_placeholder.clear_cache(plugin.language)
         updated_plugin = plugin.reload()
 
         self._send_post_placeholder_operation(
@@ -945,7 +945,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
                 tree_order=plugin_tree_order,
             )
             placeholder.delete_plugin(plugin)
-            placeholder.mark_as_dirty(plugin.language, clear_cache=False)
+            placeholder.clear_cache(plugin.language)
 
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_text(opts.verbose_name), 'obj': force_text(obj_display)})
@@ -1029,7 +1029,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             )
 
             placeholder.clear(language)
-            placeholder.mark_as_dirty(language, clear_cache=False)
+            placeholder.clear_cache(language)
 
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
                 'obj': obj_display})

@@ -57,7 +57,7 @@ class ToolbarPoolTests(CMSTestCase):
         with self.settings(CMS_TOOLBARS=['cms.cms_toolbars.BasicToolbar', 'cms.cms_toolbars.PlaceholderToolbar']):
             toolbar_pool.register(TestToolbar)
             self.assertEqual(len(list(pool.get_toolbars().keys())), 2)
-            page = api.create_page("home", "simple.html", "en", published=True)
+            page = api.create_page("home", "simple.html", "en")
             page_content = self.get_page_title_obj(page)
             page_edit_url_on = get_object_edit_url(page_content)
 

@@ -87,12 +87,6 @@
     {% endblock actions %}
     <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
     <li>
-        {% if page.publication_date %}
-            <p title="{% filter escapejs %}{% trans "publication date" %}{% endfilter %}: {{ page.publication_date|date:"Y-m-d" }}"><strong>{% filter escapejs %}{% trans "publication date" %}{% endfilter %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
-        {% endif %}
-        {% if page.publication_end_date %}
-            <p title="{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}: {{ page.publication_end_date|date:"Y-m-d" }}"><strong>{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
-        {% endif %}
         <p title="{% filter escapejs %}{% trans "is restricted" %}: {% if page_is_restricted %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}{% endfilter %}">
             <strong>{% filter escapejs %}{% trans "is restricted" %}{% endfilter %}:</strong>
             {% if page_is_restricted %}
